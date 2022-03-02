@@ -17,5 +17,13 @@
   -->
 <resources>
 
-    <style name="AppTheme" parent="AppThemeBase" />
+    <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase">
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
 </resources>

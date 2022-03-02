@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
   ~ Copyright (C) 2022 Infomaniak Network SA
   ~
@@ -15,7 +15,10 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.LoginActivity">
 
-    <style name="AppTheme" parent="AppThemeBase" />
-</resources>
+</androidx.constraintlayout.widget.ConstraintLayout>
