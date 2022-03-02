@@ -15,23 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui
+package com.infomaniak.mail.ui.main.settings.select
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.ui.main.MainActivity
-
-class LaunchActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val destinationClass = when {
-            true -> LoginActivity::class.java // TODO
-            else -> MainActivity::class.java
-        }
-        startActivity(Intent(this, destinationClass))
-    }
-
-}
+class MessageDisplayModeSettingFragment : SelectSettingsFragment()

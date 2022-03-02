@@ -3,7 +3,8 @@
     package="com.infomaniak.mail">
 
     <application
-        android:allowBackup="true"
+        android:name=".ApplicationMain"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/appName"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -14,11 +15,13 @@
             android:exported="true"
             android:noHistory="true"
             android:theme="@style/AppTheme.Launcher">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <activity
@@ -26,8 +29,30 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.main.newmessage.NewMessageActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="mailto" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+        </activity>
+
     </application>
 
 </manifest>

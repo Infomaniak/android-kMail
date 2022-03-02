@@ -15,23 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui
+package com.infomaniak.mail.ui.main.thread
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.ui.main.MainActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.mail.R
 
-class LaunchActivity : AppCompatActivity() {
+class MessageActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val destinationClass = when {
-            true -> LoginActivity::class.java // TODO
-            else -> MainActivity::class.java
-        }
-        startActivity(Intent(this, destinationClass))
-    }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = inflater.inflate(R.layout.fragment_bottom_sheet_message_actions, container, false)
 
 }
