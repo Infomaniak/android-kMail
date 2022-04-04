@@ -33,5 +33,4 @@ class LaunchActivity : AppCompatActivity() {
         }
         startActivity(Intent(this, destinationClass))
     }
-
 }
