@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+    id 'realm-android'
 }
 
 android {
@@ -14,7 +16,8 @@ android {
         versionName '1.0'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
-        buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com/"'
+        buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
+        buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
     }
 
     buildTypes {
@@ -30,6 +33,8 @@ android {
     }
 
     kotlinOptions { jvmTarget = rootProject.ext.java_version }
+
+    buildFeatures { viewBinding true }
 }
 
 dependencies {

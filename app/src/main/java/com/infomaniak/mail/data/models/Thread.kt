@@ -19,32 +19,36 @@ package com.infomaniak.mail.data.models
 
 import java.util.*
 
-data class Thread(
-    val uid: String,
-    val messagesCount: Int,
-    val uniqueMessagesCount: Int,
-    val deletedMessagesCount: Int,
-    val messages: MutableSet<Message>,
-    val unseenMessages: Int,
-    val from: ArrayList<Recipient>,
-    val to: ArrayList<Recipient>,
-    val cc: ArrayList<Recipient>,
-    val bcc: ArrayList<Recipient>,
-    val subject: String,
-    val date: Date,
-    val hasAttachments: Boolean,
-    val hasStAttachments: Boolean,
-    val hasDrafts: Boolean,
-    val flagged: Boolean,
-    val answered: Boolean,
-    val forwarded: Boolean,
-    val size: Int,
+data class ThreadResult(
+    val threads: ArrayList<Thread>,
 ) {
-    enum class Filter(title: String) {
-        ALL("All"),
-        SEEN("Seen"),
-        UNSEEN("Unseen"),
-        STARRED("Starred"),
-        UNSTARRED("Unstarred"),
+    data class Thread(
+        val uid: String,
+        val messagesCount: Int,
+        val uniqueMessagesCount: Int,
+        val deletedMessagesCount: Int,
+        val messages: ArrayList<Message>,
+        val unseenMessages: Int,
+        val from: ArrayList<Recipient>,
+        val to: ArrayList<Recipient>,
+        val cc: ArrayList<Recipient>,
+        val bcc: ArrayList<Recipient>,
+        val subject: String,
+        val date: String,
+        val hasAttachments: Boolean,
+        val hasStAttachments: Boolean,
+        val hasDrafts: Boolean,
+        val flagged: Boolean,
+        val answered: Boolean,
+        val forwarded: Boolean,
+        val size: Int,
+    ) {
+        enum class Filter(title: String) {
+            ALL("All"),
+            SEEN("Seen"),
+            UNSEEN("Unseen"),
+            STARRED("Starred"),
+            UNSTARRED("Unstarred"),
+        }
     }
 }

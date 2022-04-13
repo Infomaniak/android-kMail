@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.data.models
 
+import com.google.gson.annotations.SerializedName
+
 data class Mailbox(
     val objectId: String,
     val uuid: String,
@@ -26,7 +28,7 @@ data class Mailbox(
     val realMailbox: String,
     val linkId: Int,
     val mailboxId: Int,
-    val hostingId: Int,
+    @SerializedName("hosting_id") val hostingId: Int,
     val isPrimary: Boolean,
     val passwordStatus: String,
     val isPasswordValid: Boolean,

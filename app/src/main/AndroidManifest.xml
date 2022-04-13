@@ -57,6 +57,10 @@
             android:exported="false" />
 
         <activity
+            android:name="com.infomaniak.lib.login.WebViewLoginActivity"
+            android:configChanges="orientation|screenSize" />
+
+        <activity
             android:name=".ui.main.MainActivity"
             android:exported="false" />
 
