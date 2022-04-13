@@ -23,12 +23,22 @@
     tools:context=".ui.main.MainActivity">
 
     <TextView
+        android:id="@+id/helloWorld"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MainActivity"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/startCalls"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/startCalls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Calls"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/helloWorld" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -34,7 +34,7 @@ object ApiRoutes {
 
     fun mailbox() = "$MAIL_API/api/mailbox"
 
-    fun folders(uuid: String) = "/api/mail/$uuid/folder"
+    fun folders(uuid: String) = "$MAIL_API/api/mail/$uuid/folder"
 
     fun folder(uuid: String, folderId: String) = "${folders(uuid)}/$folderId"
 
@@ -52,7 +52,7 @@ object ApiRoutes {
             if (filter != null) "$this&offset=$filter" else this
         }
 
-    fun quotas(mailbox: String, productId: Int) = "${mailbox()}/quotas?mailbox=$mailbox&product_id=$productId"
+    fun quotas(mailbox: String, hostingId: Int) = "${mailbox()}/quotas?mailbox=$mailbox&product_id=$hostingId"
 
 //    fun moveMessage(uuid: String) = "/api/mail/$uuid/message/move"
 

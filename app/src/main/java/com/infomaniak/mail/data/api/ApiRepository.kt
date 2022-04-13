@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.GET
 import com.infomaniak.lib.core.utils.ApiController.callApi
 import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.ThreadResult.Thread
 
 object ApiRepository : ApiRepositoryCore() {
 
@@ -64,10 +65,10 @@ object ApiRepository : ApiRepositoryCore() {
 //    fun deleteFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
 //        callApi(ApiRoutes.folder(mailbox.uuid, folder.id), DELETE)
 
-    fun getThreads(mailbox: Mailbox, folder: Folder, filter: Thread.Filter?): ApiResponse<ArrayList<Thread>> =
+    fun getThreads(mailbox: Mailbox, folder: Folder, filter: Thread.Filter?): ApiResponse<ThreadResult> =
         callApi(ApiRoutes.threads(mailbox.uuid, folder.id, filter?.name), GET)
 
-    fun getMessage(mailbox: Mailbox, message: Message): ApiResponse<Message> =
+    fun getMessage(message: Message): ApiResponse<Message> =
         callApi(ApiRoutes.resource("${message.resource}?name=prefered_format&value=html"), GET)
 
     fun getQuotas(mailbox: Mailbox): ApiResponse<Quotas> =

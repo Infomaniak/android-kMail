@@ -24,7 +24,7 @@ data class Message(
     val msgId: String,
     val subject: String,
     val priority: MessagePriority,
-    val date: Date,
+    val date: String,
     val size: Int,
     val from: ArrayList<Recipient>,
     val to: ArrayList<Recipient>,

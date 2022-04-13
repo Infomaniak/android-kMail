@@ -17,4 +17,6 @@
   -->
 <resources>
     <string name="appName" translatable="false">kMail</string>
+
+    <string name="buttonCancel">Cancel</string>
 </resources>
