@@ -17,18 +17,29 @@
  */
 package com.infomaniak.mail.data.models
 
+import com.google.gson.annotations.SerializedName
+
 data class Folder(
     val id: String,
     val path: String,
     val name: String,
     val role: FolderRole,
+    @SerializedName("unread_count")
     val unreadCount: Int,
+    @SerializedName("total_count")
     val totalCount: Int,
+    @SerializedName("is_fake")
     val isFake: Boolean,
+    @SerializedName("is_collapsed")
     val isCollapsed: Boolean,
+    @SerializedName("is_favorite")
     val isFavorite: Boolean,
     val separator: String,
     val children: ArrayList<Folder>,
+
+    /**
+     * Local
+     */
     val threads: ArrayList<Thread>,
     val parentLink: Folder?,
 ) {

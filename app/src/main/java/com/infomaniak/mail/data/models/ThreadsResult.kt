@@ -17,17 +17,21 @@
  */
 package com.infomaniak.mail.data.models
 
-import java.util.*
+import com.google.gson.annotations.SerializedName
 
-data class ThreadResult(
+data class ThreadsResult(
     val threads: ArrayList<Thread>,
 ) {
     data class Thread(
         val uid: String,
+        @SerializedName("messages_count")
         val messagesCount: Int,
+        @SerializedName("unique_messages_count")
         val uniqueMessagesCount: Int,
+        @SerializedName("deleted_messages_count")
         val deletedMessagesCount: Int,
         val messages: ArrayList<Message>,
+        @SerializedName("unseen_messages")
         val unseenMessages: Int,
         val from: ArrayList<Recipient>,
         val to: ArrayList<Recipient>,
@@ -35,8 +39,11 @@ data class ThreadResult(
         val bcc: ArrayList<Recipient>,
         val subject: String,
         val date: String,
+        @SerializedName("has_attachments")
         val hasAttachments: Boolean,
+        @SerializedName("has_st_attachments")
         val hasStAttachments: Boolean,
+        @SerializedName("has_drafts")
         val hasDrafts: Boolean,
         val flagged: Boolean,
         val answered: Boolean,

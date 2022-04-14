@@ -17,4 +17,4 @@
  */
 package com.infomaniak.mail.data.models
 
-//data class EmptyResponse(val id: Int)
+data class EmptyResponse(val id: Int)

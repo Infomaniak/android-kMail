@@ -17,7 +17,10 @@
  */
 package com.infomaniak.mail.data.models
 
+import com.google.gson.annotations.SerializedName
+
 data class Quotas(
     val size: Int,
+    @SerializedName("size_checked_at")
     val sizeCheckedAt: Long,
 )

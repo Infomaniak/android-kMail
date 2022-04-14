@@ -19,16 +19,30 @@ package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
 
-data class Contact(
-    val id: String,
-    val name: String,
-    @SerializedName("firstname")
-    val firstName: String,
-    @SerializedName("lastname")
-    val lastName: String,
-    val color: String,
-    val other: Boolean,
-    @SerializedName("contacted_times")
-    val contactedTimes: Pair<String, Int>,
-    val emails: ArrayList<String>,
-)
+data class AddressBooksResult(
+    @SerializedName("addressbooks")
+    val addressBooks: ArrayList<AddressBook>,
+    val default: AddressBook?,
+) {
+    data class AddressBook(
+        val id: Int,
+        @SerializedName("user_id")
+        val userId: Int,
+        @SerializedName("principal_uri")
+        val principalUri: String,
+        val name: String,
+        val color: String,
+        val uuid: String,
+        val description: String,
+        @SerializedName("is_shared")
+        val isShared: Boolean,
+        val rights: String,
+        @SerializedName("is_activated")
+        val isActivated: Boolean,
+        @SerializedName("is_hidden")
+        val isHidden: Boolean,
+        @SerializedName("is_pending")
+        val isPending: Boolean,
+        // val categories: ArrayList<Category>,
+    )
+}

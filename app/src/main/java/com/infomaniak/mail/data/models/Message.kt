@@ -17,40 +17,54 @@
  */
 package com.infomaniak.mail.data.models
 
-import java.util.*
+import com.google.gson.annotations.SerializedName
 
 data class Message(
     val uid: String,
+    @SerializedName("msg_id")
     val msgId: String,
-    val subject: String,
-    val priority: MessagePriority,
     val date: String,
-    val size: Int,
+    val subject: String,
     val from: ArrayList<Recipient>,
     val to: ArrayList<Recipient>,
     val cc: ArrayList<Recipient>,
     val bcc: ArrayList<Recipient>,
+    @SerializedName("reply_to")
     val replyTo: ArrayList<Recipient>,
-    val body: Body,
-    val attachments: ArrayList<Attachment>,
+    val references: String?,
+    val priority: MessagePriority,
+    @SerializedName("dkim_status")
     val dkimStatus: MessageDKIM,
-    val attachmentsResource: String,
-    val resource: String,
-    val downloadResource: String,
-    val draftResource: String,
-    val stUuid: String,
+    @SerializedName("folder_id")
     val folderId: String,
     val folder: String,
-    val references: String,
-    val answered: Boolean,
-    val isDuplicate: Boolean,
+    @SerializedName("st_uuid")
+    val stUuid: String?,
+    val resource: String,
+    @SerializedName("download_resource")
+    val downloadResource: String,
+    @SerializedName("is_draft")
     val isDraft: Boolean,
+    val body: Body,
+    @SerializedName("has_attachments")
     val hasAttachments: Boolean,
+    @SerializedName("attachments_resources")
+    val attachmentsResource: String?,
+    val attachments: ArrayList<Attachment>?,
     val seen: Boolean,
-    val scheduled: Boolean,
     val forwarded: Boolean,
+    val answered: Boolean,
     val flagged: Boolean,
+    val scheduled: Boolean,
+    val size: Int,
+    @SerializedName("safe_display")
     val safeDisplay: Boolean,
+    val isDuplicate: Boolean,
+
+    /**
+     * Local
+     */
+    val draftResource: String,
     val hasUnsubscribeLink: Boolean,
     val parentLink: Thread,
 ) {
@@ -69,6 +83,6 @@ data class Message(
     data class Body(
         val value: String,
         val type: String,
-        val subBody: String,
+        val subBody: String?,
     )
 }

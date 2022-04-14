@@ -19,27 +19,27 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.lib.core.utils.ApiController.ApiMethod.GET
+import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.utils.ApiController.callApi
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.ThreadResult.Thread
+import com.infomaniak.mail.data.models.ThreadsResult.Thread
 
 object ApiRepository : ApiRepositoryCore() {
 
-//    fun getAddressBooks(): ApiResponse<ArrayList<AddressBook>> =
-//        callApi(ApiRoutes.addressBooks(), GET)
+    fun getAddressBooks(): ApiResponse<AddressBooksResult> =
+        callApi(ApiRoutes.addressBooks(), GET)
 
-//    fun getContacts(): ApiResponse<ArrayList<Contact>> =
-//        callApi(ApiRoutes.contacts(), GET)
+    fun getContacts(): ApiResponse<ArrayList<Contact>> =
+        callApi(ApiRoutes.contacts(), GET)
 
-//    fun getUser(): ApiResponse<User> =
-//        callApi(ApiRoutes.user(), GET)
+    fun getUser(): ApiResponse<UserResult> =
+        callApi(ApiRoutes.user(), GET)
 
 //    fun getContactImage(path: String): ApiResponse<Data> =
 //        callApi(ApiRoutes.resource(path), GET)
 
-//    fun getSignatures(mailbox: Mailbox): ApiResponse<ArrayList<Signature>> =
-//        callApi(ApiRoutes.signatures(mailbox.hostingId, mailbox.mailbox), GET)
+    fun getSignatures(mailbox: Mailbox): ApiResponse<SignaturesResult> =
+        callApi(ApiRoutes.signatures(mailbox.hostingId, mailbox.mailbox), GET)
 
     fun getMailboxes(): ApiResponse<ArrayList<Mailbox>> =
         callApi(ApiRoutes.mailbox(), GET)
@@ -65,7 +65,7 @@ object ApiRepository : ApiRepositoryCore() {
 //    fun deleteFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
 //        callApi(ApiRoutes.folder(mailbox.uuid, folder.id), DELETE)
 
-    fun getThreads(mailbox: Mailbox, folder: Folder, filter: Thread.Filter?): ApiResponse<ThreadResult> =
+    fun getThreads(mailbox: Mailbox, folder: Folder, filter: Thread.Filter?): ApiResponse<ThreadsResult> =
         callApi(ApiRoutes.threads(mailbox.uuid, folder.id, filter?.name), GET)
 
     fun getMessage(message: Message): ApiResponse<Message> =
@@ -74,8 +74,8 @@ object ApiRepository : ApiRepositoryCore() {
     fun getQuotas(mailbox: Mailbox): ApiResponse<Quotas> =
         callApi(ApiRoutes.quotas(mailbox.mailbox, mailbox.hostingId), GET)
 
-//    fun getAttachment(mailbox: Mailbox, attachment: Attachment): ApiResponse<Data> =
-//        callApi(ApiRoutes.resource(attachment.resource), GET)
+    fun getAttachment(mailbox: Mailbox, attachment: Attachment): ApiResponse<Data> =
+        callApi(ApiRoutes.resource(attachment.resource), GET)
 
 //    fun markAsSeen(mailbox: Mailbox, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
 //        callApi(ApiRoutes.messageSeen(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }))
@@ -89,23 +89,23 @@ object ApiRepository : ApiRepositoryCore() {
 //    fun trustSender(mailbox: Mailbox, message: Message): ApiResponse<EmptyResponse> =
 //        callApi(ApiRoutes.resource("${message.resource}/trustForm"), POST)
 
-//    fun saveDraft(mailbox: Mailbox, draft: Draft): ApiResponse<Draft> {
-//        fun postDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailbox.uuid), POST, draft)
-//        fun putDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailbox.uuid, draft.uuid), PUT, draft)
-//        return if (draft.uuid.isEmpty()) postDraft() else putDraft()
-//    }
+    fun saveDraft(mailbox: Mailbox, draft: Draft): ApiResponse<Draft> {
+        fun postDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailbox.uuid), POST, draft)
+        fun putDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailbox.uuid, draft.uuid), PUT, draft)
+        return if (draft.uuid.isEmpty()) postDraft() else putDraft()
+    }
 
-//    fun send(mailbox: Mailbox, draft: Draft): ApiResponse<Boolean> {
-//        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailbox.uuid), POST, draft)
-//        fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailbox.uuid, draft.uuid), PUT, draft)
-//        return if (draft.uuid.isEmpty()) postDraft() else putDraft()
-//    }
+    fun send(mailbox: Mailbox, draft: Draft): ApiResponse<Boolean> {
+        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailbox.uuid), POST, draft)
+        fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailbox.uuid, draft.uuid), PUT, draft)
+        return if (draft.uuid.isEmpty()) postDraft() else putDraft()
+    }
 
-//    fun getDraft(mailbox: Mailbox, draftUuid: String): ApiResponse<Draft> =
-//        callApi(ApiRoutes.draft(mailbox.uuid, draftUuid), GET)
+    fun getDraft(mailbox: Mailbox, draftUuid: String): ApiResponse<Draft> =
+        callApi(ApiRoutes.draft(mailbox.uuid, draftUuid), GET)
 
-//    fun deleteDraft(mailbox: Mailbox, draftUuid: String): ApiResponse<EmptyResponse?> =
-//        callApi(ApiRoutes.draft(mailbox.uuid, draftUuid), DELETE)
+    fun deleteDraft(mailbox: Mailbox, draftUuid: String): ApiResponse<EmptyResponse?> =
+        callApi(ApiRoutes.draft(mailbox.uuid, draftUuid), DELETE)
 
 //    fun moveMessage(mailbox: Mailbox, messages: ArrayList<Message>, destinationId: String): ApiResponse<EmptyResponse> =
 //        callApi(ApiRoutes.moveMessage(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }, "to" to destinationId))
@@ -122,8 +122,8 @@ object ApiRepository : ApiRepositoryCore() {
 //        return callApi(ApiRoutes.createAttachment(mailbox.uuid), POST, attachmentData)
 //    }
 
-//    fun getDraft(message: Message): ApiResponse<Draft> =
-//        callApi(ApiRoutes.resource(message.draftResource), GET)
+    fun getDraft(message: Message): ApiResponse<Draft> =
+        callApi(ApiRoutes.resource(message.draftResource), GET)
 
 //    fun starMessage(star: Boolean, mailbox: Mailbox, messageIds: ArrayList<String>): ApiResponse<EmptyResponse> =
 //        callApi(ApiRoutes.starMessage(mailbox.uuid, star), POST, mapOf("uids" to messageIds))
