@@ -17,4 +17,4 @@
  */
 package com.infomaniak.mail.data.models
 
-//data class Draft(val uuid: String)
+data class Draft(val uuid: String)

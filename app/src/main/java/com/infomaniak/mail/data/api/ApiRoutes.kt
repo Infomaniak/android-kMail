@@ -23,14 +23,14 @@ object ApiRoutes {
 
     fun resource(resource: String) = "$MAIL_API$resource"
 
-//    fun addressBooks() = "$MAIL_API/api/pim/addressbook"
+    fun addressBooks() = "$MAIL_API/api/pim/addressbook"
 
-//    fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
+    fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
 
-//    fun user() = "$MAIL_API/api/user"
+    fun user() = "$MAIL_API/api/user"
 
-//    fun signatures(hostingId: Int, mailboxName: String) =
-//        "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
+    fun signatures(hostingId: Int, mailboxName: String) =
+        "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
 
     fun mailbox() = "$MAIL_API/api/mailbox"
 
@@ -56,9 +56,9 @@ object ApiRoutes {
 
 //    fun moveMessage(uuid: String) = "/api/mail/$uuid/message/move"
 
-//    fun draft(uuid: String) = "/api/mail/$uuid/draft"
+    fun draft(uuid: String) = "/api/mail/$uuid/draft"
 
-//    fun draft(uuid: String, draftUuid: String) = "${draft(uuid)}/$draftUuid"
+    fun draft(uuid: String, draftUuid: String) = "${draft(uuid)}/$draftUuid"
 
 //    fun messageSeen(uuid: String) = "/api/mail/$uuid/message/seen"
 
