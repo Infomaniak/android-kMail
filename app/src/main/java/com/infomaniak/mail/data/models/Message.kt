@@ -45,6 +45,8 @@ data class Message(
     val downloadResource: String,
     @SerializedName("is_draft")
     val isDraft: Boolean,
+    @SerializedName("draft_resource")
+    val draftResource: String,
     val body: Body,
     @SerializedName("has_attachments")
     val hasAttachments: Boolean,
@@ -64,7 +66,6 @@ data class Message(
     /**
      * Local
      */
-    val draftResource: String,
     val hasUnsubscribeLink: Boolean,
     val parentLink: Thread,
 ) {
