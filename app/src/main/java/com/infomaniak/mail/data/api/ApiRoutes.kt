@@ -56,19 +56,19 @@ object ApiRoutes {
 
 //    fun moveMessage(uuid: String) = "/api/mail/$uuid/message/move"
 
-    fun draft(uuid: String) = "/api/mail/$uuid/draft"
+    fun draft(uuid: String) = "$MAIL_API/api/mail/$uuid/draft"
 
     fun draft(uuid: String, draftUuid: String) = "${draft(uuid)}/$draftUuid"
 
-//    fun messageSeen(uuid: String) = "/api/mail/$uuid/message/seen"
+//    fun messageSeen(uuid: String) = "$MAIL_API/api/mail/$uuid/message/seen"
 
-//    fun messageUnseen(uuid: String) = "/api/mail/$uuid/message/unseen"
+//    fun messageUnseen(uuid: String) = "$MAIL_API/api/mail/$uuid/message/unseen"
 
-//    fun messageSafe(uuid: String) = "/api/mail/$uuid/message/safe"
+//    fun messageSafe(uuid: String) = "$MAIL_API/api/mail/$uuid/message/safe"
 
 //    fun createAttachment(uuid: String) = "${draft(uuid)}/attachment"
 
-//    fun starMessage(uuid: String, star: Boolean) = "/api/mail/$uuid/message/${if (star) "star" else "unstar"}"
+//    fun starMessage(uuid: String, star: Boolean) = "$MAIL_API/api/mail/$uuid/message/${if (star) "star" else "unstar"}"
 
 //    fun search(uuid: String, folderId: String, searchText: String) =
 //        "${folder(uuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
