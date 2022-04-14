@@ -1,5 +1,5 @@
 /*
- * Infomaniak kDrive - Android
+ * Infomaniak kMail - Android
  * Copyright (C) 2022 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 
-object KDriveHttpClient {
+object KMailHttpClient {
 
     private val mutex = Mutex()
     private var httpClientMap: ArrayMap<Pair<Int, Long?>, OkHttpClient> = ArrayMap()

@@ -19,10 +19,9 @@ package com.infomaniak.mail
 
 import android.app.Application
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.core.app.NotificationCompat
+import android.os.StrictMode
 import androidx.core.app.NotificationManagerCompat
 import com.facebook.stetho.Stetho
 import com.infomaniak.lib.core.InfomaniakCore
@@ -33,8 +32,14 @@ import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.KDriveHttpClient
+import com.infomaniak.mail.utils.KMailHttpClient
+import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
+import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
 import io.realm.Realm
+import io.sentry.SentryEvent
+import io.sentry.SentryOptions
+import io.sentry.android.core.SentryAndroid
+import io.sentry.android.core.SentryAndroidOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,69 +50,104 @@ import java.util.*
 
 class ApplicationMain : Application() {
 
+    private val mutex = Mutex()
+
     override fun onCreate() {
         super.onCreate()
+        if (BuildConfig.DEBUG) configureDebugMode() else configureReleaseMode()
+        configureSentry()
+        configureRealm()
+        configureAppReloading()
+        configureInfomaniakCore()
+        configureNotifications()
+        configureHttpClient()
+    }
 
-        if (BuildConfig.DEBUG) {
-            Stetho.initializeWithDefaults(this)
+    private fun configureDebugMode() {
+        Stetho.initializeWithDefaults(this)
+
+        StrictMode.setVmPolicy(
+            StrictMode.VmPolicy.Builder().apply {
+                detectActivityLeaks()
+                detectLeakedClosableObjects()
+                detectLeakedRegistrationObjects()
+                detectFileUriExposure()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) detectContentUriWithoutPermission()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) detectCredentialProtectedWhileLocked()
+            }.build()
+        )
+    }
+
+    private fun configureReleaseMode() {
+
+    }
+
+    private fun configureSentry() {
+        SentryAndroid.init(this) { options: SentryAndroidOptions ->
+            // Register the callback as an option
+            options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent?, _: Any? ->
+                // If the application is in debug mode, discard the events
+                if (BuildConfig.DEBUG) null else event
+            }
         }
+    }
 
-        runBlocking { initRealm() }
+    private fun configureRealm() {
+        runBlocking {
+            mutex.withLock {
+                try {
+                    Realm.getDefaultInstance()
+                } catch (exception: Exception) {
+                    Realm.init(this@ApplicationMain)
+                    AccountUtils.init(this@ApplicationMain)
+                }
+            }
+        }
+    }
 
+    private fun configureAppReloading() {
+        AccountUtils.reloadApp = { bundle ->
+            val intent = Intent(this, LaunchActivity::class.java)
+                .apply { putExtras(bundle) }
+                .clearStack()
+            startActivity(intent)
+        }
+    }
+
+    private fun configureInfomaniakCore() {
         InfomaniakCore.init(
             appVersionName = BuildConfig.VERSION_NAME,
             clientId = BuildConfig.CLIENT_ID,
             credentialManager = null,
             isDebug = BuildConfig.DEBUG,
         )
+    }
 
-        KDriveHttpClient.onRefreshTokenError = refreshTokenError
+    private fun configureNotifications() {
+        initNotificationChannel()
+    }
+
+    private fun configureHttpClient() {
+        KMailHttpClient.onRefreshTokenError = refreshTokenError
         HttpClient.init(tokenInterceptorListener())
-    }
-
-    private val mutex = Mutex()
-    suspend fun Context.initRealm() {
-        mutex.withLock {
-            try {
-                Realm.getDefaultInstance()
-            } catch (exception: Exception) {
-                Realm.init(this)
-                AccountUtils.init(this)
-            }
-        }
-    }
-
-    private val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-    } else {
-        PendingIntent.FLAG_UPDATE_CURRENT
     }
 
     private val refreshTokenError: (User) -> Unit = { user ->
         val openAppIntent = Intent(this, LaunchActivity::class.java).clearStack()
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, openAppIntent, pendingIntentFlags)
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
         val notificationManagerCompat = NotificationManagerCompat.from(this)
-        showGeneralNotification("refreshTokenError").apply {
+        showGeneralNotification(getString(R.string.refreshTokenError)).apply {
             setContentIntent(pendingIntent)
             notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
         }
 
         CoroutineScope(Dispatchers.IO).launch {
             AccountUtils.removeUser(this@ApplicationMain, user)
-        }
-    }
-
-    private fun Context.showGeneralNotification(
-        title: String,
-        description: String? = null
-    ): NotificationCompat.Builder {
-        val channelId = "notification_channel_id_general"
-        return NotificationCompat.Builder(this, channelId).apply {
-            setTicker(title)
-            setAutoCancel(true)
-            setContentTitle(title)
-            description?.let { setStyle(NotificationCompat.BigTextStyle().bigText(it)) }
-//            setSmallIcon(DEFAULT_SMALL_ICON)
         }
     }
 
@@ -120,8 +160,6 @@ class ApplicationMain : Application() {
             refreshTokenError(AccountUtils.currentUser!!)
         }
 
-        override suspend fun getApiToken(): ApiToken {
-            return AccountUtils.currentUser!!.apiToken
-        }
+        override suspend fun getApiToken(): ApiToken = AccountUtils.currentUser!!.apiToken
     }
 }

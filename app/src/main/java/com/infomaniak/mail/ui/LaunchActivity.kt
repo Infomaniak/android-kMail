@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.ui.main.MainActivity
@@ -36,15 +35,6 @@ class LaunchActivity : AppCompatActivity() {
             val user = AccountUtils.currentUser ?: AccountUtils.requestCurrentUser()
             val destinationClass = if (user != null) MainActivity::class.java else LoginActivity::class.java
             startActivity(Intent(this@LaunchActivity, destinationClass))
-//            Log.e("TOTO", "currentUser1: ${AccountUtils.currentUser}")
-//            Log.e("TOTO", "requestCurrentUser: ${AccountUtils.requestCurrentUser()}")
-//            Log.e("TOTO", "currentUser2: ${AccountUtils.currentUser}")
         }
-
-//        val destinationClass = when {
-//            true -> LoginActivity::class.java // TODO
-//            else -> MainActivity::class.java
-//        }
-//        startActivity(Intent(this, destinationClass))
     }
 }
