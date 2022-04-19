@@ -17,10 +17,19 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.*
 import io.realm.annotations.RealmModule
 
 object RealmModules {
     @RealmModule(classes = [AppSettings::class])
     class AppSettingsModule
+
+    @RealmModule(
+        classes = [
+            AddressBook::class, Attachment::class, Contact::class, Draft::class,
+            Folder::class, Mailbox::class, Message::class, Quotas::class, Recipient::class,
+            Signature::class, SignatureEmail::class, Thread::class, UserInfos::class, UserPreferences::class,
+        ]
+    )
+    class MailsModule
 }

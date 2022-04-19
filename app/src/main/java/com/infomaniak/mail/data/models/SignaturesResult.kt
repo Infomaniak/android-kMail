@@ -18,52 +18,53 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
 
 data class SignaturesResult(
     val signatures: ArrayList<Signature>,
     @SerializedName("default_signature_id")
     val defaultSignatureId: Int,
     @SerializedName("valid_emails")
-    val validEmails: ArrayList<Email>,
+    val validEmails: ArrayList<SignatureEmail>,
     val position: String,
-) {
-    data class Signature(
-        val id: Int,
-        val name: String,
-        @SerializedName("reply_to")
-        val replyTo: String,
-        @SerializedName("reply_to_idn")
-        val replyToIdn: String,
-        @SerializedName("reply_to_id")
-        val replyToId: Int,
-        @SerializedName("full_name")
-        val fullName: String,
-        val sender: String,
-        @SerializedName("sender_idn")
-        val senderIdn: String,
-        @SerializedName("sender_id")
-        val senderId: Int,
-        val hash: String?,
-        @SerializedName("is_default")
-        val isDefault: Boolean,
-        @SerializedName("service_mail_model_id")
-        val serviceMailModelId: Int?,
-        val position: String,
-        @SerializedName("is_editable")
-        val isEditable: Boolean,
-        val content: String,
-    )
+)
 
-    data class Email(
-        val id: Int,
-        val email: String,
-        @SerializedName("email_idn")
-        val emailIdn: String,
-        @SerializedName("is_account")
-        val isAccount: Boolean,
-        @SerializedName("is_verified")
-        val isVerified: Boolean,
-        @SerializedName("is_removable")
-        val isRemovable: Boolean,
-    )
-}
+open class Signature(
+    var id: Int = 0,
+    var name: String = "",
+    @SerializedName("reply_to")
+    var replyTo: String = "",
+    @SerializedName("reply_to_idn")
+    var replyToIdn: String = "",
+    @SerializedName("reply_to_id")
+    var replyToId: Int = 0,
+    @SerializedName("full_name")
+    var fullName: String = "",
+    var sender: String = "",
+    @SerializedName("sender_idn")
+    var senderIdn: String = "",
+    @SerializedName("sender_id")
+    var senderId: Int = 0,
+    var hash: String = "",
+    @SerializedName("is_default")
+    var isDefault: Boolean = false,
+    @SerializedName("service_mail_model_id")
+    var serviceMailModelId: Int = 0,
+    var position: String = "",
+    @SerializedName("is_editable")
+    var isEditable: Boolean = false,
+    var content: String = "",
+) : RealmObject()
+
+open class SignatureEmail(
+    var id: Int = 0,
+    var email: String = "",
+    @SerializedName("email_idn")
+    var emailIdn: String = "",
+    @SerializedName("is_account")
+    var isAccount: Boolean = false,
+    @SerializedName("is_verified")
+    var isVerified: Boolean = false,
+    @SerializedName("is_removable")
+    var isRemovable: Boolean = false,
+) : RealmObject()
