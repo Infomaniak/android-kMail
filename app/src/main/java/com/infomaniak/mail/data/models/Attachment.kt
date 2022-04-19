@@ -17,26 +17,40 @@
  */
 package com.infomaniak.mail.data.models
 
-import android.media.Image
-import java.net.URL
+import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
+import io.realm.annotations.RealmClass
 
-data class Attachment(
-    val uuid: String,
-    val partId: String,
-    val mimeType: String,
-    val encoding: String,
-    val size: Int,
-    val name: String,
-    val disposition: AttachmentDisposition,
-    val contentId: String,
-    val resource: String,
-    val driveUrl: String,
-    val data: Data,
-    val localUrl: URL,
-    val thumbnail: Image,
-) {
+open class Attachment(
+    var uuid: String = "",
+    var partId: String = "",
+    var mimeType: String = "",
+    var encoding: String = "",
+    var size: Int = 0,
+    var name: String = "",
+    @SerializedName("disposition")
+    private var _disposition: String? = null,
+    var contentId: String = "",
+    var resource: String = "",
+    var driveUrl: String = "",
+    var data: AttachmentData? = null,
+    var localUrl: String = "",
+    var thumbnail: String = "",
+) : RealmObject() {
+
+    fun getDisposition(): AttachmentDisposition? = when (_disposition) {
+        AttachmentDisposition.INLINE.name -> AttachmentDisposition.INLINE
+        AttachmentDisposition.ATTACHMENT.name -> AttachmentDisposition.ATTACHMENT
+        else -> null
+    }
+
     enum class AttachmentDisposition {
         INLINE,
         ATTACHMENT,
     }
 }
+
+@RealmClass(embedded = true)
+open class AttachmentData(
+    var id: Int = 0,
+) : RealmObject()

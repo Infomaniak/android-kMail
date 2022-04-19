@@ -18,49 +18,50 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
 
-data class Mailbox(
-    val uuid: String,
-    val email: String,
+open class Mailbox(
+    var uuid: String = "",
+    var email: String = "",
     @SerializedName("email_idn")
-    val emailIdn: String,
-    val mailbox: String,
+    var emailIdn: String = "",
+    var mailbox: String = "",
     @SerializedName("real_mailbox")
-    val realMailbox: String,
+    var realMailbox: String = "",
     @SerializedName("link_id")
-    val linkId: Int,
+    var linkId: Int = 0,
     @SerializedName("mailbox_id")
-    val mailboxId: Int,
+    var mailboxId: Int = 0,
     @SerializedName("hosting_id")
-    val hostingId: Int,
+    var hostingId: Int = 0,
     @SerializedName("is_primary")
-    val isPrimary: Boolean,
+    var isPrimary: Boolean = false,
     @SerializedName("password_status")
-    val passwordStatus: String,
+    var passwordStatus: String = "",
     @SerializedName("is_password_valid")
-    val isPasswordValid: Boolean,
+    var isPasswordValid: Boolean = false,
     @SerializedName("is_valid")
-    val isValid: Boolean,
+    var isMailboxValid: Boolean = false,
     @SerializedName("is_locked")
-    val isLocked: Boolean,
+    var isLocked: Boolean = false,
     @SerializedName("has_social_and_commercial_filtering")
-    val hasSocialAndCommercialFiltering: Boolean,
+    var hasSocialAndCommercialFiltering: Boolean = false,
     @SerializedName("show_config_modal")
-    val showConfigModal: Boolean,
+    var showConfigModal: Boolean = false,
     @SerializedName("force_reset_password")
-    val forceResetPassword: Boolean,
+    var forceResetPassword: Boolean = false,
     @SerializedName("mda_version")
-    val mdaVersion: String,
+    var mdaVersion: String = "",
     @SerializedName("is_limited")
-    val isLimited: Boolean,
+    var isLimited: Boolean = false,
     @SerializedName("is_free")
-    val isFree: Boolean,
+    var isFree: Boolean = false,
     @SerializedName("daily_limit")
-    val dailyLimit: Int,
+    var dailyLimit: Int = 0,
 
     /**
      * Local
      */
-    val userId: Int,
-    val objectId: String,
-)
+    var userId: Int = 0,
+    var objectId: String = "",
+) : RealmObject()

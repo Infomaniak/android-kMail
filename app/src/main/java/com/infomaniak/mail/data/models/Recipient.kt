@@ -17,7 +17,9 @@
  */
 package com.infomaniak.mail.data.models
 
-data class Recipient(
-    val email: String,
-    val name: String,
-)
+import io.realm.RealmObject
+
+open class Recipient(
+    var email: String = "",
+    var name: String = "",
+) : RealmObject()

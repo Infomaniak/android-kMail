@@ -18,17 +18,29 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmList
+import io.realm.RealmObject
+import io.realm.annotations.Ignore
 
-data class Contact(
-    val id: String,
-    val name: String,
+open class Contact(
+    var id: String = "",
+    var name: String = "",
     @SerializedName("firstname")
-    val firstName: String,
+    var firstName: String = "",
     @SerializedName("lastname")
-    val lastName: String,
-    val color: String,
-    val other: Boolean,
+    var lastName: String = "",
+    var color: String = "",
+    var other: Boolean = false,
+    @Ignore
     @SerializedName("contacted_times")
-    val contactedTimes: Pair<String, Int>,
-    val emails: ArrayList<String>,
-)
+    private var _contactedTimes: Map<String?, Int?> = mapOf(),
+    var emails: RealmList<String> = RealmList(),
+) : RealmObject() {
+
+    fun getContactedTimes(): ContactedTimes = with(_contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
+
+    data class ContactedTimes(
+        val email: String?,
+        val count: Int?,
+    )
+}
