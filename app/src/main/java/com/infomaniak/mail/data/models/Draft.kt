@@ -17,4 +17,8 @@
  */
 package com.infomaniak.mail.data.models
 
-data class Draft(val uuid: String)
+import io.realm.RealmObject
+
+open class Draft(
+    var uuid: String = "",
+) : RealmObject()

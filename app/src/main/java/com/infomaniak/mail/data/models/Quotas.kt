@@ -18,9 +18,10 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
 
-data class Quotas(
-    val size: Int,
+open class Quotas(
+    var size: Int = 0,
     @SerializedName("size_checked_at")
-    val sizeCheckedAt: Long,
-)
+    var sizeCheckedAt: Long = 0L,
+) : RealmObject()

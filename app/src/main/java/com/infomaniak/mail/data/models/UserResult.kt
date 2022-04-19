@@ -18,52 +18,60 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
 
 data class UserResult(
     val infos: UserInfos,
     val preferences: UserPreferences
-) {
-    data class UserInfos(
-        val name: String,
-        @SerializedName("firstname")
-        val firstName: String,
-        val login: String,
-        val email: String,
-        @SerializedName("avatar_url")
-        val avatarUrl: String,
-        @SerializedName("hosting_url")
-        val hostingUrl: String,
-        @SerializedName("manager_url")
-        val managerUrl: String,
-        @SerializedName("workspace_url")
-        val workspaceUrl: String,
-        @SerializedName("drive_url")
-        val driveUrl: String,
-        @SerializedName("workspace_only")
-        val workspaceOnly: Boolean,
-        @SerializedName("double_auth")
-        val doubleAuth: Boolean,
-        @SerializedName("old_user")
-        val oldUser: Boolean,
-        val locale: String,
-        val country: String,
-        @SerializedName("is_restricted")
-        val isRestricted: Boolean,
-        @SerializedName("from_webmail1")
-        val fromWebmail1: Boolean,
-    )
+)
 
-    data class UserPreferences(
-        @SerializedName("thread_mode")
-        val threadMode: ThreadMode,
-        @SerializedName("read_pos")
-        val readPosition: String,
-        val density: String,
-        // TODO other preferences
-    ) {
-        enum class ThreadMode {
-            MESSAGES,
-            THREADS,
-        }
+open class UserInfos(
+    var name: String = "",
+    @SerializedName("firstname")
+    var firstName: String = "",
+    var login: String = "",
+    var email: String = "",
+    @SerializedName("avatar_url")
+    var avatarUrl: String = "",
+    @SerializedName("hosting_url")
+    var hostingUrl: String = "",
+    @SerializedName("manager_url")
+    var managerUrl: String = "",
+    @SerializedName("workspace_url")
+    var workspaceUrl: String = "",
+    @SerializedName("drive_url")
+    var driveUrl: String = "",
+    @SerializedName("workspace_only")
+    var workspaceOnly: Boolean = false,
+    @SerializedName("double_auth")
+    var doubleAuth: Boolean = false,
+    @SerializedName("old_user")
+    var oldUser: Boolean = false,
+    var locale: String = "",
+    var country: String = "",
+    @SerializedName("is_restricted")
+    var isRestricted: Boolean = false,
+    @SerializedName("from_webmail1")
+    var fromWebmail1: Boolean = false,
+) : RealmObject()
+
+open class UserPreferences(
+    @SerializedName("thread_mode")
+    private var _threadMode: String? = null,
+    @SerializedName("read_pos")
+    var readPosition: String = "",
+    var density: String = "",
+    // TODO other preferences
+) : RealmObject() {
+
+    fun getThreadMode(): ThreadMode? = when (_threadMode) {
+        ThreadMode.MESSAGES.name -> ThreadMode.MESSAGES
+        ThreadMode.THREADS.name -> ThreadMode.THREADS
+        else -> null
+    }
+
+    enum class ThreadMode {
+        MESSAGES,
+        THREADS,
     }
 }

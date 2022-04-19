@@ -22,7 +22,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.utils.ApiController.callApi
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.ThreadsResult.Thread
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
 
 object ApiRepository : ApiRepositoryCore() {
 
@@ -65,7 +65,7 @@ object ApiRepository : ApiRepositoryCore() {
 //    fun deleteFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
 //        callApi(ApiRoutes.folder(mailbox.uuid, folder.id), DELETE)
 
-    fun getThreads(mailbox: Mailbox, folder: Folder, filter: Thread.Filter?): ApiResponse<ThreadsResult> =
+    fun getThreads(mailbox: Mailbox, folder: Folder, filter: ThreadFilter?): ApiResponse<ThreadsResult> =
         callApi(ApiRoutes.threads(mailbox.uuid, folder.id, filter?.name), GET)
 
     fun getMessage(message: Message): ApiResponse<Message> =
@@ -74,7 +74,7 @@ object ApiRepository : ApiRepositoryCore() {
     fun getQuotas(mailbox: Mailbox): ApiResponse<Quotas> =
         callApi(ApiRoutes.quotas(mailbox.mailbox, mailbox.hostingId), GET)
 
-    fun getAttachment(mailbox: Mailbox, attachment: Attachment): ApiResponse<Data> =
+    fun getAttachment(mailbox: Mailbox, attachment: Attachment): ApiResponse<AttachmentData> =
         callApi(ApiRoutes.resource(attachment.resource), GET)
 
 //    fun markAsSeen(mailbox: Mailbox, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
