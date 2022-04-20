@@ -54,7 +54,7 @@ object ApiRoutes {
 
     fun quotas(mailbox: String, hostingId: Int) = "${mailbox()}/quotas?mailbox=$mailbox&product_id=$hostingId"
 
-//    fun moveMessage(uuid: String) = "/api/mail/$uuid/message/move"
+    fun moveMessage(uuid: String) = "$MAIL_API/api/mail/$uuid/message/move"
 
     fun draft(uuid: String) = "$MAIL_API/api/mail/$uuid/draft"
 
@@ -68,7 +68,7 @@ object ApiRoutes {
 
 //    fun createAttachment(uuid: String) = "${draft(uuid)}/attachment"
 
-//    fun starMessage(uuid: String, star: Boolean) = "$MAIL_API/api/mail/$uuid/message/${if (star) "star" else "unstar"}"
+    fun starMessage(uuid: String, star: Boolean) = "$MAIL_API/api/mail/$uuid/message/${if (star) "star" else "unstar"}"
 
 //    fun search(uuid: String, folderId: String, searchText: String) =
 //        "${folder(uuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"

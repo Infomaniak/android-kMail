@@ -17,8 +17,33 @@
  */
 package com.infomaniak.mail.data.models
 
+import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.models.attachment.Attachment
+import io.realm.RealmList
 import io.realm.RealmObject
 
 open class Draft(
     var uuid: String = "",
+    @SerializedName("identity_id")
+    var identityId: String = "",
+    @SerializedName("in_reply_to_uid")
+    var inReplyToUid: String? = null,
+    @SerializedName("forwarded_uid")
+    var forwardedUid: String? = null,
+    var references: String? = null,
+    @SerializedName("in_reply_to")
+    var inReplyTo: String? = null,
+    @SerializedName("mime_type")
+    var mimeType: String = "any/any",
+    var body: String = "",
+    var to: RealmList<Recipient> = RealmList(),
+    var cc: RealmList<Recipient> = RealmList(),
+    var bcc: RealmList<Recipient> = RealmList(),
+    var subject: String = "",
+    @SerializedName("ack_request")
+    var ackRequest: Boolean = false,
+    var priority: String? = null,
+    @SerializedName("st_uuid")
+    var stUuid: String? = null,
+    var attachments: RealmList<Attachment> = RealmList(),
 ) : RealmObject()

@@ -15,8 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.threads
+package com.infomaniak.mail.utils
 
-data class ThreadsResult(
-    val threads: ArrayList<ThreadMail>,
-)
+object ModelsUtils {
+
+    fun getPriority(priority: String?): MessagePriority? = when (priority?.uppercase()) {
+        MessagePriority.LOW.name -> MessagePriority.LOW
+        MessagePriority.NORMAL.name -> MessagePriority.NORMAL
+        MessagePriority.HIGH.name -> MessagePriority.HIGH
+        else -> null
+    }
+
+    enum class MessagePriority {
+        LOW,
+        NORMAL,
+        HIGH,
+    }
+}

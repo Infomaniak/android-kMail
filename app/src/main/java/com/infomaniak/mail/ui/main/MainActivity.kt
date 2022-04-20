@@ -51,6 +51,12 @@ class MainActivity : AppCompatActivity() {
                 val getMessage = ApiRepository.getMessage(message)
                 Log.i("API", "getMessage: $getMessage")
 
+                // val moveMessageResponse = ApiRepository.moveMessage(mailbox, arrayListOf(message), inbox.id)
+                // Log.i("API", "moveMessageResponse: $moveMessageResponse")
+
+                // val starMessageResponse = ApiRepository.starMessage(true, mailbox, arrayListOf(message.uid))
+                // Log.i("API", "starMessageResponse: $starMessageResponse")
+
                 val getQuotas = ApiRepository.getQuotas(mailbox)
                 Log.i("API", "getQuotas: $getQuotas")
 
@@ -71,14 +77,17 @@ class MainActivity : AppCompatActivity() {
                 val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts, null)
                 Log.i("API", "getDraftsThreads: $getDraftsThreads")
 
-                val draftUuid = getDraftsThreads.data?.threads?.find { it.hasDrafts }
-                    ?.messages?.find { it -> it.isDraft }?.draftResource
-                    ?.substringAfterLast('/')!!
-                val getDraft = ApiRepository.getDraft(mailbox, draftUuid)
-                Log.i("API", "getDraft: $getDraft")
+                val draftMessage = getDraftsThreads.data?.threads?.find { it.hasDrafts }?.messages?.find { it -> it.isDraft }
+                draftMessage?.let {
+                    val draftUuid = draftMessage.draftResource.substringAfterLast('/')
+                    val getDraftFromUuid = ApiRepository.getDraft(mailbox, draftUuid)
+                    Log.i("API", "getDraftFromUuid: $getDraftFromUuid")
+                    val getDraftFromMessage = ApiRepository.getDraft(draftMessage)
+                    Log.i("API", "getDraftFromMessage: $getDraftFromMessage")
 
-                // val deleteDraft = deleteDraft(mailbox, draftUuid)
-                // Log.i("API", "deleteDraft: $deleteDraft")
+                    // val deleteDraft = ApiRepository.deleteDraft(mailbox, draftUuid)
+                    // Log.i("API", "deleteDraft: $deleteDraft")
+                }
             }
         }
     }
