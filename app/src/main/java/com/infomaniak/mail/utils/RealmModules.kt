@@ -18,18 +18,57 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.addressBooks.AddressBook
+import com.infomaniak.mail.data.models.attachment.Attachment
+import com.infomaniak.mail.data.models.attachment.AttachmentData
+import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.signatures.Signature
+import com.infomaniak.mail.data.models.signatures.SignatureEmail
+import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.models.user.UserInfos
+import com.infomaniak.mail.data.models.user.UserPreferences
 import io.realm.annotations.RealmModule
 
 object RealmModules {
-    @RealmModule(classes = [AppSettings::class])
+    @RealmModule(
+        classes = [
+            AppSettings::class,
+        ]
+    )
     class AppSettingsModule
 
     @RealmModule(
         classes = [
-            AddressBook::class, Attachment::class, Contact::class, Draft::class,
-            Folder::class, Mailbox::class, Message::class, Quotas::class, Recipient::class,
-            Signature::class, SignatureEmail::class, Thread::class, UserInfos::class, UserPreferences::class,
+            Mailbox::class,
+        ]
+    )
+    class MailboxModule
+
+    @RealmModule(
+        classes = [
+            Attachment::class,
+            Folder::class,
+            Message::class,
+            Body::class,
+            Recipient::class,
+            Thread::class,
         ]
     )
     class MailsModule
+
+    @RealmModule(
+        classes = [
+            AddressBook::class,
+            AttachmentData::class,
+            Contact::class,
+            Draft::class,
+            Quotas::class,
+            Signature::class,
+            SignatureEmail::class,
+            UserInfos::class,
+            UserPreferences::class,
+        ]
+    )
+    class OtherModule
 }

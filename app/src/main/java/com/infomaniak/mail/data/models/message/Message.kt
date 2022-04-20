@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.message
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.models.attachment.Attachment
 import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.RealmClass
 
 open class Message(
     var uid: String = "",
@@ -51,7 +53,7 @@ open class Message(
     var isDraft: Boolean = false,
     @SerializedName("draft_resource")
     var draftResource: String = "",
-    var body: MessageBody? = null,
+    var body: Body? = null,
     @SerializedName("has_attachments")
     var hasAttachments: Boolean = false,
     @SerializedName("attachments_resources")
@@ -100,10 +102,3 @@ open class Message(
         NOT_SIGNED("not_signed"),
     }
 }
-
-@RealmClass(embedded = true)
-open class MessageBody(
-    var value: String = "",
-    var type: String = "",
-    var subBody: String? = null,
-) : RealmObject()

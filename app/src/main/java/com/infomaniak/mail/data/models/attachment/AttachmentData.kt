@@ -15,8 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.attachment
 
-data class Seen(
-    val rawValue: String,
-)
+import io.realm.RealmObject
+import io.realm.annotations.RealmClass
+
+@RealmClass(embedded = true)
+open class AttachmentData(
+    var id: Int = 0,
+) : RealmObject()

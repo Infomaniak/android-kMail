@@ -22,7 +22,14 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.utils.ApiController.callApi
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.threads.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.addressBooks.AddressBooksResult
+import com.infomaniak.mail.data.models.attachment.Attachment
+import com.infomaniak.mail.data.models.attachment.AttachmentData
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.signatures.SignaturesResult
+import com.infomaniak.mail.data.models.threads.ThreadsResult
+import com.infomaniak.mail.data.models.user.UserResult
 
 object ApiRepository : ApiRepositoryCore() {
 

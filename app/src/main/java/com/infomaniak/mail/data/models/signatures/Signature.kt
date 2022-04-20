@@ -15,32 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.signatures
 
 import com.google.gson.annotations.SerializedName
-import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 
-open class Contact(
-    var id: String = "",
+open class Signature(
+    var id: Int = 0,
     var name: String = "",
-    @SerializedName("firstname")
-    var firstName: String = "",
-    @SerializedName("lastname")
-    var lastName: String = "",
-    var color: String = "",
-    var other: Boolean = false,
-    @Ignore // TODO: Check if we can still get this field from the database even if it's ignored.
-    @SerializedName("contacted_times")
-    private var _contactedTimes: Map<String?, Int?> = mapOf(),
-    var emails: RealmList<String> = RealmList(),
-) : RealmObject() {
-
-    fun getContactedTimes(): ContactedTimes = with(_contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
-
-    data class ContactedTimes(
-        val email: String?,
-        val count: Int?,
-    )
-}
+    @SerializedName("reply_to")
+    var replyTo: String = "",
+    @SerializedName("reply_to_idn")
+    var replyToIdn: String = "",
+    @SerializedName("reply_to_id")
+    var replyToId: Int = 0,
+    @SerializedName("full_name")
+    var fullName: String = "",
+    var sender: String = "",
+    @SerializedName("sender_idn")
+    var senderIdn: String = "",
+    @SerializedName("sender_id")
+    var senderId: Int = 0,
+    var hash: String = "",
+    @SerializedName("is_default")
+    var isDefault: Boolean = false,
+    @SerializedName("service_mail_model_id")
+    var serviceMailModelId: Int = 0,
+    var position: String = "",
+    @SerializedName("is_editable")
+    var isEditable: Boolean = false,
+    var content: String = "",
+) : RealmObject()
