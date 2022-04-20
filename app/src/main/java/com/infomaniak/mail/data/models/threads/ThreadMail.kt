@@ -22,35 +22,43 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.realmListOf
 
-open class ThreadMail(
-    var uid: String = "",
+class ThreadMail : RealmObject {
+    var uid: String = ""
+
     @SerializedName("messages_count")
-    var messagesCount: Int = 0,
+    var messagesCount: Int = 0
+
     @SerializedName("unique_messages_count")
-    var uniqueMessagesCount: Int = 0,
+    var uniqueMessagesCount: Int = 0
+
     @SerializedName("deleted_messages_count")
-    var deletedMessagesCount: Int = 0,
-    var messages: RealmList<Message> = RealmList(),
+    var deletedMessagesCount: Int = 0
+    var messages: RealmList<Message> = realmListOf()
+
     @SerializedName("unseen_messages")
-    var unseenMessages: Int = 0,
-    var from: RealmList<Recipient> = RealmList(),
-    var to: RealmList<Recipient> = RealmList(),
-    var cc: RealmList<Recipient> = RealmList(),
-    var bcc: RealmList<Recipient> = RealmList(),
-    var subject: String = "",
-    var date: String = "",
+    var unseenMessages: Int = 0
+    var from: RealmList<Recipient> = realmListOf()
+    var cc: RealmList<Recipient> = realmListOf()
+    var bcc: RealmList<Recipient> = realmListOf()
+    var to: RealmList<Recipient> = realmListOf()
+    var subject: String = ""
+    var date: String = ""
+
     @SerializedName("has_attachments")
-    var hasAttachments: Boolean = false,
+    var hasAttachments: Boolean = false
+
     @SerializedName("has_st_attachments")
-    var hasStAttachments: Boolean = false,
+    var hasStAttachments: Boolean = false
+
     @SerializedName("has_drafts")
-    var hasDrafts: Boolean = false,
-    var flagged: Boolean = false,
-    var answered: Boolean = false,
-    var forwarded: Boolean = false,
-    var size: Int = 0,
-) : RealmObject() {
+    var hasDrafts: Boolean = false
+    var flagged: Boolean = false
+    var answered: Boolean = false
+    var forwarded: Boolean = false
+    var size: Int = 0
+
     enum class ThreadFilter(title: String) {
         ALL("All"),
         SEEN("Seen"),

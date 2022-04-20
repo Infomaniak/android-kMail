@@ -20,22 +20,22 @@ package com.infomaniak.mail.data.models.attachment
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
 
-open class Attachment(
-    var uuid: String = "",
-    var partId: String = "",
-    var mimeType: String = "",
-    var encoding: String = "",
-    var size: Int = 0,
-    var name: String = "",
+class Attachment : RealmObject {
+    var uuid: String = ""
+    var partId: String = ""
+    var mimeType: String = ""
+    var encoding: String = ""
+    var size: Int = 0
+    var name: String = ""
+
     @SerializedName("disposition")
-    private var _disposition: String? = null,
-    var contentId: String = "",
-    var resource: String = "",
-    var driveUrl: String = "",
-    var data: AttachmentData? = null,
-    var localUrl: String = "",
-    var thumbnail: String = "",
-) : RealmObject() {
+    private var _disposition: String? = null
+    var contentId: String = ""
+    var resource: String = ""
+    var driveUrl: String = ""
+    var data: AttachmentData? = null
+    var localUrl: String = ""
+    var thumbnail: String = ""
 
     fun getDisposition(): AttachmentDisposition? = when (_disposition) {
         AttachmentDisposition.INLINE.name -> AttachmentDisposition.INLINE

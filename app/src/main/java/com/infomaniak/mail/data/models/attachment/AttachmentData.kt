@@ -18,9 +18,8 @@
 package com.infomaniak.mail.data.models.attachment
 
 import io.realm.RealmObject
-import io.realm.annotations.RealmClass
 
-@RealmClass(embedded = true)
-open class AttachmentData(
-    var id: Int = 0,
-) : RealmObject()
+// @RealmClass(embedded = true) // TODO: Is there any Embedded concept in the Realm Kotlin SDK?
+class AttachmentData : RealmObject {
+    var id: Int = 0
+}

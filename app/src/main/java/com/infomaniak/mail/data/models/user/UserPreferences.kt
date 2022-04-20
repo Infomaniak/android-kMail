@@ -20,14 +20,14 @@ package com.infomaniak.mail.data.models.user
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
 
-open class UserPreferences(
+class UserPreferences : RealmObject {
     @SerializedName("thread_mode")
-    private var _threadMode: String? = null,
+    private var _threadMode: String? = null
+
     @SerializedName("read_pos")
-    var readPosition: String = "",
-    var density: String = "",
-    // TODO other preferences
-) : RealmObject() {
+    var readPosition: String = ""
+    var density: String = ""
+    // TODO: Add other preferences.
 
     fun getThreadMode(): ThreadMode? = when (_threadMode) {
         ThreadMode.MESSAGES.name -> ThreadMode.MESSAGES
