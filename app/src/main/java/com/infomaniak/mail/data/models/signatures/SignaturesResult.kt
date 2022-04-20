@@ -15,8 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.signatures
 
-data class Seen(
-    val rawValue: String,
+import com.google.gson.annotations.SerializedName
+
+data class SignaturesResult(
+    val signatures: ArrayList<Signature>,
+    @SerializedName("default_signature_id")
+    val defaultSignatureId: Int,
+    @SerializedName("valid_emails")
+    val validEmails: ArrayList<SignatureEmail>,
+    val position: String,
 )

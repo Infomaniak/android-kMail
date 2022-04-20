@@ -15,46 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.signatures
 
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
-
-data class SignaturesResult(
-    val signatures: ArrayList<Signature>,
-    @SerializedName("default_signature_id")
-    val defaultSignatureId: Int,
-    @SerializedName("valid_emails")
-    val validEmails: ArrayList<SignatureEmail>,
-    val position: String,
-)
-
-open class Signature(
-    var id: Int = 0,
-    var name: String = "",
-    @SerializedName("reply_to")
-    var replyTo: String = "",
-    @SerializedName("reply_to_idn")
-    var replyToIdn: String = "",
-    @SerializedName("reply_to_id")
-    var replyToId: Int = 0,
-    @SerializedName("full_name")
-    var fullName: String = "",
-    var sender: String = "",
-    @SerializedName("sender_idn")
-    var senderIdn: String = "",
-    @SerializedName("sender_id")
-    var senderId: Int = 0,
-    var hash: String = "",
-    @SerializedName("is_default")
-    var isDefault: Boolean = false,
-    @SerializedName("service_mail_model_id")
-    var serviceMailModelId: Int = 0,
-    var position: String = "",
-    @SerializedName("is_editable")
-    var isEditable: Boolean = false,
-    var content: String = "",
-) : RealmObject()
 
 open class SignatureEmail(
     var id: Int = 0,

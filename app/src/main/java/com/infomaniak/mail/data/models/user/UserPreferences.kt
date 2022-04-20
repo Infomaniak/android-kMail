@@ -15,45 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.user
 
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
-
-data class UserResult(
-    val infos: UserInfos,
-    val preferences: UserPreferences
-)
-
-open class UserInfos(
-    var name: String = "",
-    @SerializedName("firstname")
-    var firstName: String = "",
-    var login: String = "",
-    var email: String = "",
-    @SerializedName("avatar_url")
-    var avatarUrl: String = "",
-    @SerializedName("hosting_url")
-    var hostingUrl: String = "",
-    @SerializedName("manager_url")
-    var managerUrl: String = "",
-    @SerializedName("workspace_url")
-    var workspaceUrl: String = "",
-    @SerializedName("drive_url")
-    var driveUrl: String = "",
-    @SerializedName("workspace_only")
-    var workspaceOnly: Boolean = false,
-    @SerializedName("double_auth")
-    var doubleAuth: Boolean = false,
-    @SerializedName("old_user")
-    var oldUser: Boolean = false,
-    var locale: String = "",
-    var country: String = "",
-    @SerializedName("is_restricted")
-    var isRestricted: Boolean = false,
-    @SerializedName("from_webmail1")
-    var fromWebmail1: Boolean = false,
-) : RealmObject()
 
 open class UserPreferences(
     @SerializedName("thread_mode")

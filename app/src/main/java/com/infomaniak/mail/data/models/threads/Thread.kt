@@ -15,15 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.threads
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.message.Message
 import io.realm.RealmList
 import io.realm.RealmObject
-
-data class ThreadsResult(
-    val threads: ArrayList<Thread>,
-)
 
 open class Thread(
     var uid: String = "",

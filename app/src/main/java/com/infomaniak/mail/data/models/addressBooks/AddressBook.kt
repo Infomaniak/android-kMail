@@ -15,32 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.addressBooks
 
 import com.google.gson.annotations.SerializedName
-import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 
-open class Contact(
-    var id: String = "",
+open class AddressBook(
+    var id: Int = 0,
+    @SerializedName("user_id")
+    var userId: Int = 0,
+    @SerializedName("principal_uri")
+    var principalUri: String = "",
     var name: String = "",
-    @SerializedName("firstname")
-    var firstName: String = "",
-    @SerializedName("lastname")
-    var lastName: String = "",
     var color: String = "",
-    var other: Boolean = false,
-    @Ignore // TODO: Check if we can still get this field from the database even if it's ignored.
-    @SerializedName("contacted_times")
-    private var _contactedTimes: Map<String?, Int?> = mapOf(),
-    var emails: RealmList<String> = RealmList(),
-) : RealmObject() {
-
-    fun getContactedTimes(): ContactedTimes = with(_contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
-
-    data class ContactedTimes(
-        val email: String?,
-        val count: Int?,
-    )
-}
+    var uuid: String = "",
+    var description: String = "",
+    @SerializedName("is_shared")
+    var isShared: Boolean = false,
+    var rights: String = "",
+    @SerializedName("is_activated")
+    var isActivated: Boolean = false,
+    @SerializedName("is_hidden")
+    var isHidden: Boolean = false,
+    @SerializedName("is_pending")
+    var isPending: Boolean = false,
+    // var categories: RealmList<Category> = RealmList(),
+) : RealmObject()
