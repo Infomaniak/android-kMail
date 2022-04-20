@@ -22,12 +22,12 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.utils.ApiController.callApi
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.threads.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.addressBooks.AddressBooksResult
 import com.infomaniak.mail.data.models.attachment.Attachment
 import com.infomaniak.mail.data.models.attachment.AttachmentData
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signatures.SignaturesResult
+import com.infomaniak.mail.data.models.threads.ThreadMail.ThreadFilter
 import com.infomaniak.mail.data.models.threads.ThreadsResult
 import com.infomaniak.mail.data.models.user.UserResult
 
@@ -114,8 +114,8 @@ object ApiRepository : ApiRepositoryCore() {
     fun deleteDraft(mailbox: Mailbox, draftUuid: String): ApiResponse<EmptyResponse?> =
         callApi(ApiRoutes.draft(mailbox.uuid, draftUuid), DELETE)
 
-//    fun moveMessage(mailbox: Mailbox, messages: ArrayList<Message>, destinationId: String): ApiResponse<EmptyResponse> =
-//        callApi(ApiRoutes.moveMessage(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }, "to" to destinationId))
+    fun moveMessage(mailbox: Mailbox, messages: ArrayList<Message>, destinationId: String): ApiResponse<MoveResult> =
+        callApi(ApiRoutes.moveMessage(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }, "to" to destinationId))
 
 //    fun createAttachment(
 //        mailbox: Mailbox,
@@ -132,8 +132,8 @@ object ApiRepository : ApiRepositoryCore() {
     fun getDraft(message: Message): ApiResponse<Draft> =
         callApi(ApiRoutes.resource(message.draftResource), GET)
 
-//    fun starMessage(star: Boolean, mailbox: Mailbox, messageIds: ArrayList<String>): ApiResponse<EmptyResponse> =
-//        callApi(ApiRoutes.starMessage(mailbox.uuid, star), POST, mapOf("uids" to messageIds))
+    fun starMessage(star: Boolean, mailbox: Mailbox, messageIds: ArrayList<String>): ApiResponse<StarMessageResult> =
+        callApi(ApiRoutes.starMessage(mailbox.uuid, star), POST, mapOf("uids" to messageIds))
 
 //    fun search(mailbox: Mailbox, folder: Folder, searchText: String): ApiResponse<Thread> =
 //        callApi(ApiRoutes.search(mailbox.uuid, folder.id, searchText), GET)

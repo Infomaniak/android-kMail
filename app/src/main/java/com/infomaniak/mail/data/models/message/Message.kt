@@ -19,8 +19,8 @@ package com.infomaniak.mail.data.models.message
 
 import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.data.models.attachment.Attachment
+import com.infomaniak.mail.data.models.threads.ThreadMail
 import io.realm.RealmList
 import io.realm.RealmObject
 
@@ -36,16 +36,15 @@ open class Message(
     var bcc: RealmList<Recipient> = RealmList(),
     @SerializedName("reply_to")
     var replyTo: RealmList<Recipient> = RealmList(),
-    var references: String = "",
-    @SerializedName("priority")
-    private var _priority: String? = null,
+    var references: String? = null,
+    var priority: String? = null,
     @SerializedName("dkim_status")
     private var _dkimStatus: String? = null,
     @SerializedName("folder_id")
     var folderId: String = "",
     var folder: String = "",
     @SerializedName("st_uuid")
-    var stUuid: String = "",
+    var stUuid: String? = null,
     var resource: String = "",
     @SerializedName("download_resource")
     var downloadResource: String = "",
@@ -57,7 +56,7 @@ open class Message(
     @SerializedName("has_attachments")
     var hasAttachments: Boolean = false,
     @SerializedName("attachments_resources")
-    var attachmentsResource: String = "",
+    var attachmentsResource: String? = null,
     var attachments: RealmList<Attachment> = RealmList(),
     var seen: Boolean = false,
     var forwarded: Boolean = false,
@@ -73,21 +72,8 @@ open class Message(
      * Local
      */
     var hasUnsubscribeLink: Boolean = false,
-    var parentLink: Thread? = null,
+    var parentLink: ThreadMail? = null,
 ) : RealmObject() {
-
-    fun getPriority(): MessagePriority? = when (_priority) {
-        MessagePriority.LOW.name -> MessagePriority.LOW
-        MessagePriority.NORMAL.name -> MessagePriority.NORMAL
-        MessagePriority.HIGH.name -> MessagePriority.HIGH
-        else -> null
-    }
-
-    enum class MessagePriority {
-        LOW,
-        NORMAL,
-        HIGH,
-    }
 
     fun getDkimStatus(): MessageDKIM? = when (_dkimStatus) {
         MessageDKIM.VALID.value -> MessageDKIM.VALID

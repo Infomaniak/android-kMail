@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
-import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.models.threads.ThreadMail
 import io.realm.RealmList
 import io.realm.RealmObject
 
@@ -44,7 +44,7 @@ open class Folder(
     /**
      * Local
      */
-    var threads: RealmList<Thread> = RealmList(),
+    var threads: RealmList<ThreadMail> = RealmList(),
     var parentLink: Folder? = null,
 ) : RealmObject() {
 

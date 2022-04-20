@@ -23,7 +23,7 @@ import com.infomaniak.mail.data.models.message.Message
 import io.realm.RealmList
 import io.realm.RealmObject
 
-open class Thread(
+open class ThreadMail(
     var uid: String = "",
     @SerializedName("messages_count")
     var messagesCount: Int = 0,

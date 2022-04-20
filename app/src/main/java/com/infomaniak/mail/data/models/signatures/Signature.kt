@@ -36,11 +36,11 @@ open class Signature(
     var senderIdn: String = "",
     @SerializedName("sender_id")
     var senderId: Int = 0,
-    var hash: String = "",
+    var hash: String? = null,
     @SerializedName("is_default")
     var isDefault: Boolean = false,
     @SerializedName("service_mail_model_id")
-    var serviceMailModelId: Int = 0,
+    var serviceMailModelId: Int? = null,
     var position: String = "",
     @SerializedName("is_editable")
     var isEditable: Boolean = false,
