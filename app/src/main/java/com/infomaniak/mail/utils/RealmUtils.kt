@@ -28,48 +28,53 @@ import com.infomaniak.mail.data.models.signatures.SignatureEmail
 import com.infomaniak.mail.data.models.threads.ThreadMail
 import com.infomaniak.mail.data.models.user.UserInfos
 import com.infomaniak.mail.data.models.user.UserPreferences
-import io.realm.annotations.RealmModule
+import io.realm.Realm
+import io.realm.RealmConfiguration
 
-object RealmModules {
-    @RealmModule(
-        classes = [
-            AppSettings::class,
-        ]
-    )
-    class AppSettingsModule
+object Realms {
 
-    @RealmModule(
-        classes = [
-            Mailbox::class,
-        ]
-    )
-    class MailboxModule
+    val appSettings = Realm.open(RealmConfigurations.appSettings)
+}
 
-    @RealmModule(
-        classes = [
-            Attachment::class,
-            Folder::class,
-            Message::class,
-            Body::class,
-            Recipient::class,
-            ThreadMail::class,
-        ]
-    )
-    class MailsModule
+object RealmConfigurations {
 
-    @RealmModule(
-        classes = [
-            AddressBook::class,
-            AttachmentData::class,
-            Contact::class,
-            Draft::class,
-            Quotas::class,
-            Signature::class,
-            SignatureEmail::class,
-            UserInfos::class,
-            UserPreferences::class,
-            // TODO: Add missing ones.
-        ]
+    private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
+
+    val appSettings = RealmConfiguration
+        .Builder(RealmSets.appSettings)
+        .name(APP_SETTINGS_DB_NAME)
+        .deleteRealmIfMigrationNeeded()
+        .build()
+}
+
+object RealmSets {
+
+    val appSettings = setOf(
+        AppSettings::class,
     )
-    class OtherModule
+
+    val mailbox = setOf(
+        Mailbox::class,
+    )
+
+    val mails = setOf(
+        Attachment::class,
+        Folder::class,
+        Message::class,
+        Body::class,
+        Recipient::class,
+        ThreadMail::class,
+    )
+
+    val others = setOf(
+        AddressBook::class,
+        AttachmentData::class,
+        Contact::class,
+        Draft::class,
+        Quotas::class,
+        Signature::class,
+        SignatureEmail::class,
+        UserInfos::class,
+        UserPreferences::class,
+    )
 }

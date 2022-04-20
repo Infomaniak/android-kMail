@@ -17,82 +17,56 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.infomaniak.mail.utils.RealmModules
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import com.infomaniak.mail.utils.Realms
 import io.realm.RealmObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import io.realm.query
+import io.realm.query.RealmSingleQuery
 
-open class AppSettings(
-    var _appLaunchesCount: Int = 0,
-    var _appSecurityEnabled: Boolean = false,
-    var _currentUserId: Int = -1,
-    var _migrated: Boolean = false,
-) : RealmObject() {
+@Suppress("PropertyName")
+class AppSettings : RealmObject {
+
+    var _appLaunchesCount: Int = 0
+    var _appSecurityEnabled: Boolean = false
+    var _currentUserId: Int = -1
+    var _migrated: Boolean = false
 
     companion object {
-        private const val DB_NAME = "AppSettings.realm"
-        private val realmConfiguration: RealmConfiguration = RealmConfiguration.Builder().name(DB_NAME)
-            .modules(RealmModules.AppSettingsModule())
-            .build()
 
-        private fun getRealmInstance() = Realm.getInstance(realmConfiguration)
+        private fun getAppSettingsQuery(): RealmSingleQuery<AppSettings> = Realms.appSettings.query<AppSettings>().first()
 
-        private fun getAppSettingsQuery(realm: Realm) = realm.where(AppSettings::class.java).findFirst()
-
-        fun getAppSettings(): AppSettings {
-            return getRealmInstance().use { realm ->
-                getAppSettingsQuery(realm)?.let {
-                    realm.copyFromRealm(it, 0)
-                }
-            } ?: AppSettings()
-        }
+        fun getAppSettings(): AppSettings = getAppSettingsQuery().find() ?: AppSettings()
 
         fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
-            return getRealmInstance().use { realm ->
-                var appSettings = getAppSettingsQuery(realm)
-
-                realm.executeTransaction {
-                    if (appSettings == null) {
-                        appSettings = it.copyToRealm(AppSettings())
-                    }
-                    onUpdate(appSettings!!)
-                }
-            }
+            Realms.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
         }
 
         fun removeAppSettings() {
-            getRealmInstance().use { realm ->
-                realm.executeTransaction {
-                    it.where(AppSettings::class.java).findFirst()?.deleteFromRealm()
-                }
-            }
+            Realms.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
         }
 
-        var appLaunches: Int = getAppSettings()._appLaunchesCount
-            set(value) {
-                field = value
-                GlobalScope.launch(Dispatchers.IO) {
-                    updateAppSettings { appSettings -> appSettings._appLaunchesCount = value }
-                }
-            }
-
-        var appSecurityLock: Boolean = getAppSettings()._appSecurityEnabled
-            set(value) {
-                field = value
-                GlobalScope.launch(Dispatchers.IO) {
-                    updateAppSettings { appSettings -> appSettings._appSecurityEnabled = value }
-                }
-            }
-
-        var migrated: Boolean = getAppSettings()._migrated
-            set(value) {
-                field = value
-                GlobalScope.launch(Dispatchers.IO) {
-                    updateAppSettings { appSettings -> appSettings._migrated = value }
-                }
-            }
+        // TODO: The app crash at start if we uncomment this. Why?
+        // var appLaunches: Int = getAppSettings()._appLaunchesCount
+        //     set(value) {
+        //         field = value
+        //         GlobalScope.launch(Dispatchers.IO) {
+        //             updateAppSettings { appSettings -> appSettings._appLaunchesCount = value }
+        //         }
+        //     }
+        //
+        // var appSecurityLock: Boolean = getAppSettings()._appSecurityEnabled
+        //     set(value) {
+        //         field = value
+        //         GlobalScope.launch(Dispatchers.IO) {
+        //             updateAppSettings { appSettings -> appSettings._appSecurityEnabled = value }
+        //         }
+        //     }
+        //
+        // var migrated: Boolean = getAppSettings()._migrated
+        //     set(value) {
+        //         field = value
+        //         GlobalScope.launch(Dispatchers.IO) {
+        //             updateAppSettings { appSettings -> appSettings._migrated = value }
+        //         }
+        //     }
     }
 }

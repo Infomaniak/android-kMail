@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.models
 
 import io.realm.RealmObject
 
-open class Recipient(
-    var email: String = "",
-    var name: String = "",
-) : RealmObject()
+class Recipient : RealmObject {
+    var email: String = ""
+    var name: String = ""
+}

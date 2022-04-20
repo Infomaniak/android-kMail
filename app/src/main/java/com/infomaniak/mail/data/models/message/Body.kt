@@ -18,11 +18,10 @@
 package com.infomaniak.mail.data.models.message
 
 import io.realm.RealmObject
-import io.realm.annotations.RealmClass
 
-@RealmClass(embedded = true)
-open class Body(
-    var value: String = "",
-    var type: String = "",
-    var subBody: String? = null,
-) : RealmObject()
+// @RealmClass(embedded = true) // TODO: Is there any Embedded concept in the Realm Kotlin SDK?
+class Body : RealmObject {
+    var value: String = ""
+    var type: String = ""
+    var subBody: String? = null
+}

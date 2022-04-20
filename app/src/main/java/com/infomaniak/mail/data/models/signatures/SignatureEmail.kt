@@ -20,15 +20,19 @@ package com.infomaniak.mail.data.models.signatures
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
 
-open class SignatureEmail(
-    var id: Int = 0,
-    var email: String = "",
+class SignatureEmail : RealmObject {
+    var id: Int = 0
+    var email: String = ""
+
     @SerializedName("email_idn")
-    var emailIdn: String = "",
+    var emailIdn: String = ""
+
     @SerializedName("is_account")
-    var isAccount: Boolean = false,
+    var isAccount: Boolean = false
+
     @SerializedName("is_verified")
-    var isVerified: Boolean = false,
+    var isVerified: Boolean = false
+
     @SerializedName("is_removable")
-    var isRemovable: Boolean = false,
-) : RealmObject()
+    var isRemovable: Boolean = false
+}
