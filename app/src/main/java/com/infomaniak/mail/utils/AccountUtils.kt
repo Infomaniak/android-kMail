@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.AppSettings
+import io.realm.isValid
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -55,7 +56,7 @@ object AccountUtils : CredentialManager {
         set(userId) {
             field = userId
             GlobalScope.launch(Dispatchers.IO) {
-                AppSettings.updateAppSettings { appSettings -> if (appSettings.isValid) appSettings._currentUserId = userId }
+                AppSettings.updateAppSettings { appSettings -> if (appSettings.isValid()) appSettings._currentUserId = userId }
             }
         }
 

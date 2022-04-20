@@ -20,32 +20,43 @@ package com.infomaniak.mail.data.models.user
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
 
-open class UserInfos(
-    var name: String = "",
+class UserInfos : RealmObject {
+    var name: String = ""
+
     @SerializedName("firstname")
-    var firstName: String = "",
-    var login: String = "",
-    var email: String = "",
+    var firstName: String = ""
+    var login: String = ""
+    var email: String = ""
+
     @SerializedName("avatar_url")
-    var avatarUrl: String = "",
+    var avatarUrl: String = ""
+
     @SerializedName("hosting_url")
-    var hostingUrl: String = "",
+    var hostingUrl: String = ""
+
     @SerializedName("manager_url")
-    var managerUrl: String = "",
+    var managerUrl: String = ""
+
     @SerializedName("workspace_url")
-    var workspaceUrl: String = "",
+    var workspaceUrl: String = ""
+
     @SerializedName("drive_url")
-    var driveUrl: String = "",
+    var driveUrl: String = ""
+
     @SerializedName("workspace_only")
-    var workspaceOnly: Boolean = false,
+    var workspaceOnly: Boolean = false
+
     @SerializedName("double_auth")
-    var doubleAuth: Boolean = false,
+    var doubleAuth: Boolean = false
+
     @SerializedName("old_user")
-    var oldUser: Boolean = false,
-    var locale: String = "",
-    var country: String = "",
+    var oldUser: Boolean = false
+    var locale: String = ""
+    var country: String = ""
+
     @SerializedName("is_restricted")
-    var isRestricted: Boolean = false,
+    var isRestricted: Boolean = false
+
     @SerializedName("from_webmail1")
-    var fromWebmail1: Boolean = false,
-) : RealmObject()
+    var fromWebmail1: Boolean = false
+}

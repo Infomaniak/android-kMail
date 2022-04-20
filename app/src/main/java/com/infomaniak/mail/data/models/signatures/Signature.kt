@@ -20,29 +20,38 @@ package com.infomaniak.mail.data.models.signatures
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
 
-open class Signature(
-    var id: Int = 0,
-    var name: String = "",
+class Signature : RealmObject {
+    var id: Int = 0
+    var name: String = ""
+
     @SerializedName("reply_to")
-    var replyTo: String = "",
+    var replyTo: String = ""
+
     @SerializedName("reply_to_idn")
-    var replyToIdn: String = "",
+    var replyToIdn: String = ""
+
     @SerializedName("reply_to_id")
-    var replyToId: Int = 0,
+    var replyToId: Int = 0
+
     @SerializedName("full_name")
-    var fullName: String = "",
-    var sender: String = "",
+    var fullName: String = ""
+    var sender: String = ""
+
     @SerializedName("sender_idn")
-    var senderIdn: String = "",
+    var senderIdn: String = ""
+
     @SerializedName("sender_id")
-    var senderId: Int = 0,
-    var hash: String? = null,
+    var senderId: Int = 0
+    var hash: String? = null
+
     @SerializedName("is_default")
-    var isDefault: Boolean = false,
+    var isDefault: Boolean = false
+
     @SerializedName("service_mail_model_id")
-    var serviceMailModelId: Int? = null,
-    var position: String = "",
+    var serviceMailModelId: Int? = null
+    var position: String = ""
+
     @SerializedName("is_editable")
-    var isEditable: Boolean = false,
-    var content: String = "",
-) : RealmObject()
+    var isEditable: Boolean = false
+    var content: String = ""
+}

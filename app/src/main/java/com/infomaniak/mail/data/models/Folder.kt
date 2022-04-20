@@ -21,32 +21,38 @@ import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.models.threads.ThreadMail
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.realmListOf
 
-open class Folder(
-    var id: String = "",
-    var path: String = "",
-    var name: String = "",
+class Folder : RealmObject {
+    var id: String = ""
+    var path: String = ""
+    var name: String = ""
+
     @SerializedName("role")
-    private var _role: String? = null,
+    private var _role: String? = null
+
     @SerializedName("unread_count")
-    var unreadCount: Int = 0,
+    var unreadCount: Int = 0
+
     @SerializedName("total_count")
-    var totalCount: Int = 0,
+    var totalCount: Int = 0
+
     @SerializedName("is_fake")
-    var isFake: Boolean = false,
+    var isFake: Boolean = false
+
     @SerializedName("is_collapsed")
-    var isCollapsed: Boolean = false,
+    var isCollapsed: Boolean = false
+
     @SerializedName("is_favorite")
-    var isFavorite: Boolean = false,
-    var separator: String = "",
-    var children: RealmList<Folder> = RealmList(),
+    var isFavorite: Boolean = false
+    var separator: String = ""
+    var children: RealmList<Folder> = realmListOf()
 
     /**
      * Local
      */
-    var threads: RealmList<ThreadMail> = RealmList(),
-    var parentLink: Folder? = null,
-) : RealmObject() {
+    var threads: RealmList<ThreadMail> = realmListOf()
+    var parentLink: Folder? = null
 
     fun getRole(): FolderRole? = when (_role) {
         FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE
