@@ -15,8 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.threads
+package com.infomaniak.mail.data.models
 
-data class ThreadsResult(
-    val threads: ArrayList<ThreadMail>,
+import com.google.gson.annotations.SerializedName
+
+data class MoveResult(
+    val moved: Int,
+    @SerializedName("undo_resource")
+    val undoResource: String,
 )

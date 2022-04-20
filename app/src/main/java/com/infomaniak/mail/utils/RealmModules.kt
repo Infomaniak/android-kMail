@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signatures.Signature
 import com.infomaniak.mail.data.models.signatures.SignatureEmail
-import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.models.threads.ThreadMail
 import com.infomaniak.mail.data.models.user.UserInfos
 import com.infomaniak.mail.data.models.user.UserPreferences
 import io.realm.annotations.RealmModule
@@ -52,7 +52,7 @@ object RealmModules {
             Message::class,
             Body::class,
             Recipient::class,
-            Thread::class,
+            ThreadMail::class,
         ]
     )
     class MailsModule
@@ -68,6 +68,7 @@ object RealmModules {
             SignatureEmail::class,
             UserInfos::class,
             UserPreferences::class,
+            // TODO: Add missing ones.
         ]
     )
     class OtherModule
