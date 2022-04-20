@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.models.threads.Thread
 import io.realm.RealmList
 import io.realm.RealmObject
 
@@ -48,21 +49,21 @@ open class Folder(
 ) : RealmObject() {
 
     fun getRole(): FolderRole? = when (_role) {
-        FolderRole.ARCHIVE.value -> FolderRole.ARCHIVE
-        FolderRole.DRAFT.value -> FolderRole.DRAFT
-        FolderRole.INBOX.value -> FolderRole.INBOX
-        FolderRole.SENT.value -> FolderRole.SENT
-        FolderRole.SPAM.value -> FolderRole.SPAM
-        FolderRole.TRASH.value -> FolderRole.TRASH
+        FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE
+        FolderRole.DRAFT.name -> FolderRole.DRAFT
+        FolderRole.INBOX.name -> FolderRole.INBOX
+        FolderRole.SENT.name -> FolderRole.SENT
+        FolderRole.SPAM.name -> FolderRole.SPAM
+        FolderRole.TRASH.name -> FolderRole.TRASH
         else -> null
     }
 
-    enum class FolderRole(val value: String, localizedName: String, order: Int) {
-        ARCHIVE("ARCHIVE", "Archives", 6),
-        DRAFT("DRAFT", "Drafts", 2),
-        INBOX("INBOX", "Inbox", 1),
-        SENT("SENT", "Sent", 3),
-        SPAM("SPAM", "Spam", 4),
-        TRASH("TRASH", "Trash", 5),
+    enum class FolderRole(localizedName: String, order: Int) {
+        INBOX("Inbox", 1),
+        DRAFT("Drafts", 2),
+        SENT("Sent", 3),
+        SPAM("Spam", 4),
+        TRASH("Trash", 5),
+        ARCHIVE("Archives", 6),
     }
 }
