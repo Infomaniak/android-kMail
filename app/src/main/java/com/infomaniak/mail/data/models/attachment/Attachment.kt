@@ -19,8 +19,11 @@ package com.infomaniak.mail.data.models.attachment
 
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
+// @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 class Attachment : RealmObject {
+    @PrimaryKey
     var uuid: String = ""
     var partId: String = ""
     var mimeType: String = ""
@@ -29,7 +32,7 @@ class Attachment : RealmObject {
     var name: String = ""
 
     @SerializedName("disposition")
-    private var _disposition: String? = null
+    private var disposition: String? = null
     var contentId: String = ""
     var resource: String = ""
     var driveUrl: String = ""
@@ -37,7 +40,7 @@ class Attachment : RealmObject {
     var localUrl: String = ""
     var thumbnail: String = ""
 
-    fun getDisposition(): AttachmentDisposition? = when (_disposition) {
+    fun getDisposition(): AttachmentDisposition? = when (disposition) {
         AttachmentDisposition.INLINE.name -> AttachmentDisposition.INLINE
         AttachmentDisposition.ATTACHMENT.name -> AttachmentDisposition.ATTACHMENT
         else -> null
