@@ -18,7 +18,9 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
 class Mailbox : RealmObject {
     var uuid: String = ""
@@ -79,6 +81,14 @@ class Mailbox : RealmObject {
     /**
      * Local
      */
-    var userId: Int = 0
-    var objectId: String = ""
+    var userId: Int = -1
+
+    @PrimaryKey
+    var objectId: String? = null
+
+    fun initLocalValues(): Mailbox {
+        userId = AccountUtils.currentUserId
+        objectId = "${mailboxId}_${AccountUtils.currentUserId}"
+        return this
+    }
 }
