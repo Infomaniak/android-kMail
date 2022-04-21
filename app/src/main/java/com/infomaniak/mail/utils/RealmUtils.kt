@@ -32,32 +32,50 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 
 object Realms {
-
     val appSettings = Realm.open(RealmConfigurations.appSettings)
+    val mailboxInfos = Realm.open(RealmConfigurations.mailboxInfos)
+    val mailbox by lazy { Realm.open(RealmConfigurations.mailbox) } // TODO: Handle when the user changes of mailbox.
 }
 
-object RealmConfigurations {
+@Suppress("FunctionName")
+private object RealmConfigurations {
 
     private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
+    private const val MAILBOX_INFOS_DB_NAME = "MailboxInfos.realm"
+    private fun MAILBOX_DB_NAME(usrId: Int, mailboxId: Int) = "$usrId-$mailboxId.realm"
 
     val appSettings = RealmConfiguration
         .Builder(RealmSets.appSettings)
         .name(APP_SETTINGS_DB_NAME)
         .deleteRealmIfMigrationNeeded()
         .build()
+
+    val mailboxInfos = RealmConfiguration
+        .Builder(RealmSets.mailboxInfos)
+        .name(MAILBOX_INFOS_DB_NAME)
+        .deleteRealmIfMigrationNeeded()
+        .build()
+
+    val mailbox by lazy {
+        RealmConfiguration
+            .Builder(RealmSets.mailbox)
+            .name(MAILBOX_DB_NAME(AccountUtils.currentUserId, AccountUtils.currentMailboxId))
+            .deleteRealmIfMigrationNeeded()
+            .build()
+    }
 }
 
-object RealmSets {
+private object RealmSets {
 
     val appSettings = setOf(
         AppSettings::class,
     )
 
-    val mailbox = setOf(
+    val mailboxInfos = setOf(
         Mailbox::class,
     )
 
-    val mails = setOf(
+    val mailbox = setOf(
         Attachment::class,
         Folder::class,
         Message::class,
