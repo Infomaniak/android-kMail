@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailboxController
 import com.infomaniak.mail.data.cache.MailboxInfosController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.AccountUtils
@@ -46,14 +47,17 @@ class MainActivity : AppCompatActivity() {
                 AccountUtils.currentMailboxId = mailbox.mailboxId
                 val getFolders = ApiRepository.getFolders(mailbox)
                 Log.i("API", "getFolders: $getFolders")
+                getFolders.data!!.forEach { MailboxController.upsertFolder(it) }
 
                 val inbox = getFolders.data?.find { it.getRole() == Folder.FolderRole.INBOX }!!
                 val getInboxThreads = ApiRepository.getThreads(mailbox, inbox, null)
                 Log.i("API", "getInboxThreads: $getInboxThreads")
+                getInboxThreads.data!!.threads.forEach { MailboxController.upsertThread(it) }
 
                 val message = getInboxThreads.data!!.threads.first().messages.first()
                 val getMessage = ApiRepository.getMessage(message)
                 Log.i("API", "getMessage: $getMessage")
+                MailboxController.upsertMessage(getMessage.data!!)
 
                 // val moveMessageResponse = ApiRepository.moveMessage(mailbox, arrayListOf(message), inbox.id)
                 // Log.i("API", "moveMessageResponse: $moveMessageResponse")

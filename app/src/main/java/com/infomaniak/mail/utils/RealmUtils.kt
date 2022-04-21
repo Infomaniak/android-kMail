@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signatures.Signature
 import com.infomaniak.mail.data.models.signatures.SignatureEmail
-import com.infomaniak.mail.data.models.threads.ThreadMail
+import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.data.models.user.UserInfos
 import com.infomaniak.mail.data.models.user.UserPreferences
 import io.realm.Realm
@@ -76,17 +76,17 @@ private object RealmSets {
     )
 
     val mailbox = setOf(
-        Attachment::class,
         Folder::class,
+        Thread::class,
         Message::class,
         Body::class,
+        Attachment::class,
+        AttachmentData::class,
         Recipient::class,
-        ThreadMail::class,
     )
 
     val others = setOf(
         AddressBook::class,
-        AttachmentData::class,
         Contact::class,
         Draft::class,
         Quotas::class,
