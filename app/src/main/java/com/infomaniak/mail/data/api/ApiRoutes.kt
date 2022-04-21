@@ -21,55 +21,74 @@ import com.infomaniak.mail.BuildConfig.MAIL_API
 
 object ApiRoutes {
 
-    fun resource(resource: String) = "$MAIL_API$resource"
+    fun resource(resource: String) =
+        "$MAIL_API$resource"
 
-    fun addressBooks() = "$MAIL_API/api/pim/addressbook"
+    fun addressBooks() =
+        "$MAIL_API/api/pim/addressbook"
 
-    fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
+    fun contacts() =
+        "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
 
-    fun user() = "$MAIL_API/api/user"
+    fun user() =
+        "$MAIL_API/api/user"
 
     fun signatures(hostingId: Int, mailboxName: String) =
         "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
 
-    fun mailbox() = "$MAIL_API/api/mailbox"
+    fun mailbox() =
+        "$MAIL_API/api/mailbox"
 
-    fun folders(uuid: String) = "$MAIL_API/api/mail/$uuid/folder"
+    fun folders(uuid: String) =
+        "$MAIL_API/api/mail/$uuid/folder"
 
-    fun folder(uuid: String, folderId: String) = "${folders(uuid)}/$folderId"
+    fun folder(uuid: String, folderId: String) =
+        "${folders(uuid)}/$folderId"
 
-//    fun renameFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/rename"
+    // fun renameFolder(uuid: String, folderId: String) =
+    //     "${folder(uuid, folderId)}/rename"
 
-//    fun favoriteFolder(uuid: String, folderId: String, favorite: Boolean) =
-//        "${folder(uuid, folderId)}/${if (favorite) "favorite" else "unfavorite"}"
+    // fun favoriteFolder(uuid: String, folderId: String, favorite: Boolean) =
+    //     "${folder(uuid, folderId)}/${if (favorite) "favorite" else "unfavorite"}"
 
-//    fun readFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/read"
+    // fun readFolder(uuid: String, folderId: String) =
+    //     "${folder(uuid, folderId)}/read"
 
-//    fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
+    // fun flushFolder(uuid: String, folderId: String) =
+    //     "${folder(uuid, folderId)}/flush"
 
     fun threads(uuid: String, folderId: String, filter: String?) =
         with("${folder(uuid, folderId)}/message?offset=0&thread=on") {
             if (filter != null) "$this&offset=$filter" else this
         }
 
-    fun quotas(mailbox: String, hostingId: Int) = "${mailbox()}/quotas?mailbox=$mailbox&product_id=$hostingId"
+    fun quotas(mailbox: String, hostingId: Int) =
+        "${mailbox()}/quotas?mailbox=$mailbox&product_id=$hostingId"
 
-    fun moveMessage(uuid: String) = "$MAIL_API/api/mail/$uuid/message/move"
+    fun moveMessage(uuid: String) =
+        "$MAIL_API/api/mail/$uuid/message/move"
 
-    fun draft(uuid: String) = "$MAIL_API/api/mail/$uuid/draft"
+    fun draft(uuid: String) =
+        "$MAIL_API/api/mail/$uuid/draft"
 
-    fun draft(uuid: String, draftUuid: String) = "${draft(uuid)}/$draftUuid"
+    fun draft(uuid: String, draftUuid: String) =
+        "${draft(uuid)}/$draftUuid"
 
-//    fun messageSeen(uuid: String) = "$MAIL_API/api/mail/$uuid/message/seen"
+    // fun messageSeen(uuid: String) =
+    //     "$MAIL_API/api/mail/$uuid/message/seen"
 
-//    fun messageUnseen(uuid: String) = "$MAIL_API/api/mail/$uuid/message/unseen"
+    // fun messageUnseen(uuid: String) =
+    //     "$MAIL_API/api/mail/$uuid/message/unseen"
 
-//    fun messageSafe(uuid: String) = "$MAIL_API/api/mail/$uuid/message/safe"
+    // fun messageSafe(uuid: String) =
+    //     "$MAIL_API/api/mail/$uuid/message/safe"
 
-//    fun createAttachment(uuid: String) = "${draft(uuid)}/attachment"
+    // fun createAttachment(uuid: String) =
+    //     "${draft(uuid)}/attachment"
 
-    fun starMessage(uuid: String, star: Boolean) = "$MAIL_API/api/mail/$uuid/message/${if (star) "star" else "unstar"}"
+    fun starMessage(uuid: String, star: Boolean) =
+        "$MAIL_API/api/mail/$uuid/message/${if (star) "star" else "unstar"}"
 
-//    fun search(uuid: String, folderId: String, searchText: String) =
-//        "${folder(uuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
+    // fun search(uuid: String, folderId: String, searchText: String) =
+    //     "${folder(uuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
 }
