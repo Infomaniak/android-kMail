@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailboxInfosController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 
                 val getMailboxes = ApiRepository.getMailboxes()
                 Log.i("API", "getMailboxes: $getMailboxes")
+                getMailboxes.data!!.forEach { MailboxInfosController.upsertMailboxInfos(it.initLocalValues()) }
 
                 val mailbox = getMailboxes.data!!.first()
                 AccountUtils.currentMailboxId = mailbox.mailboxId

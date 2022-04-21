@@ -32,8 +32,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.cache.AppSettingsController
 import io.realm.isValid
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
@@ -65,21 +64,21 @@ object AccountUtils : CredentialManager {
             InfomaniakCore.bearerToken = user?.apiToken?.accessToken.toString()
         }
 
-    var currentUserId: Int = AppSettings.getAppSettings()._currentUserId
+    var currentUserId: Int = AppSettingsController.getAppSettings()._currentUserId
         set(userId) {
             field = userId
             GlobalScope.launch(Dispatchers.IO) {
-                AppSettings.updateAppSettings { appSettings ->
+                AppSettingsController.updateAppSettings { appSettings ->
                     if (appSettings.isValid()) appSettings._currentUserId = userId
                 }
             }
         }
 
-    var currentMailboxId: Int = AppSettings.getAppSettings()._currentMailboxId
+    var currentMailboxId: Int = AppSettingsController.getAppSettings()._currentMailboxId
         set(mailboxId) {
             field = mailboxId
             GlobalScope.launch(Dispatchers.IO) {
-                AppSettings.updateAppSettings { appSettings ->
+                AppSettingsController.updateAppSettings { appSettings ->
                     if (appSettings.isValid()) appSettings._currentMailboxId = mailboxId
                 }
             }
@@ -185,7 +184,7 @@ object AccountUtils : CredentialManager {
 
     private fun resetApp(context: Context) {
         if (getAllUserCount() == 0) {
-            AppSettings.removeAppSettings()
+            AppSettingsController.removeAppSettings()
             // UiSettings(context).removeUiSettings() // TODO?
 
             // Delete all app data
