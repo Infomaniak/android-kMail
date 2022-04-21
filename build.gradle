@@ -10,6 +10,10 @@ buildscript {
     ext.navigation_version = '2.4.2'
     ext.java_version = JavaVersion.VERSION_1_8
 
+	dependencies {
+         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigation_version"
+     }
+
     // Realm Kotlin SNAPSHOT - START /!\
     repositories { maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } }
     dependencies { classpath "io.realm.kotlin:gradle-plugin:$realm_kotlin_version" }
