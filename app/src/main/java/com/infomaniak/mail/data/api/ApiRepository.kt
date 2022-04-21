@@ -27,7 +27,7 @@ import com.infomaniak.mail.data.models.attachment.Attachment
 import com.infomaniak.mail.data.models.attachment.AttachmentData
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signatures.SignaturesResult
-import com.infomaniak.mail.data.models.threads.ThreadMail.ThreadFilter
+import com.infomaniak.mail.data.models.threads.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.threads.ThreadsResult
 import com.infomaniak.mail.data.models.user.UserResult
 

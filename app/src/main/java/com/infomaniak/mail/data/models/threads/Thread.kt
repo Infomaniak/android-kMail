@@ -22,9 +22,11 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
 
-class ThreadMail : RealmObject {
+class Thread : RealmObject {
+    @PrimaryKey
     var uid: String = ""
 
     @SerializedName("messages_count")

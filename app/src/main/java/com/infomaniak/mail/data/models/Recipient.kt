@@ -18,8 +18,11 @@
 package com.infomaniak.mail.data.models
 
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
+// @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 class Recipient : RealmObject {
+    @PrimaryKey
     var email: String = ""
     var name: String = ""
 }

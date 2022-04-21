@@ -18,5 +18,5 @@
 package com.infomaniak.mail.data.models.threads
 
 data class ThreadsResult(
-    val threads: ArrayList<ThreadMail>,
+    val threads: ArrayList<Thread>,
 )
