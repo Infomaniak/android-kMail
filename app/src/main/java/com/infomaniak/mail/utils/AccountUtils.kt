@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.Mailbox
 import io.realm.isValid
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
@@ -49,16 +50,9 @@ object AccountUtils : CredentialManager {
 
     fun init(context: Context) {
         userDatabase = UserDatabase.getDatabase(context)
+
         Sentry.setUser(io.sentry.protocol.User().apply { id = currentUserId.toString() })
     }
-
-    var currentUserId: Int = AppSettings.getAppSettings()._currentUserId
-        set(userId) {
-            field = userId
-            GlobalScope.launch(Dispatchers.IO) {
-                AppSettings.updateAppSettings { appSettings -> if (appSettings.isValid()) appSettings._currentUserId = userId }
-            }
-        }
 
     var currentUser: User? = null
         set(user) {
@@ -69,6 +63,26 @@ object AccountUtils : CredentialManager {
                 email = user?.email
             })
             InfomaniakCore.bearerToken = user?.apiToken?.accessToken.toString()
+        }
+
+    var currentUserId: Int = AppSettings.getAppSettings()._currentUserId
+        set(userId) {
+            field = userId
+            GlobalScope.launch(Dispatchers.IO) {
+                AppSettings.updateAppSettings { appSettings ->
+                    if (appSettings.isValid()) appSettings._currentUserId = userId
+                }
+            }
+        }
+
+    var currentMailboxId: Int = AppSettings.getAppSettings()._currentMailboxId
+        set(mailboxId) {
+            field = mailboxId
+            GlobalScope.launch(Dispatchers.IO) {
+                AppSettings.updateAppSettings { appSettings ->
+                    if (appSettings.isValid()) appSettings._currentMailboxId = mailboxId
+                }
+            }
         }
 
     suspend fun requestCurrentUser(): User? {

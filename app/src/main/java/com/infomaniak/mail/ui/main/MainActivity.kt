@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
                 Log.i("API", "getMailboxes: $getMailboxes")
 
                 val mailbox = getMailboxes.data!!.first()
+                AccountUtils.currentMailboxId = mailbox.mailboxId
                 val getFolders = ApiRepository.getFolders(mailbox)
                 Log.i("API", "getFolders: $getFolders")
 

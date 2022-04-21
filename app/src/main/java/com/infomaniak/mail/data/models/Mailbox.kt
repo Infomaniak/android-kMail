@@ -35,7 +35,7 @@ class Mailbox : RealmObject {
     var linkId: Int = 0
 
     @SerializedName("mailbox_id")
-    var mailboxId: Int = 0
+    var mailboxId: Int = -1
 
     @SerializedName("hosting_id")
     var hostingId: Int = 0
