@@ -20,9 +20,13 @@ package com.infomaniak.mail.data.cache
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.Realms
 import io.realm.MutableRealm.UpdatePolicy
+import io.realm.RealmResults
 import io.realm.query
 
 object MailboxInfosController {
+    fun getMailboxInfos(): RealmResults<Mailbox> =
+        Realms.mailboxInfos.query<Mailbox>().find()
+
     fun getMailboxInfos(objectId: String): Mailbox? =
         Realms.mailboxInfos.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
 
