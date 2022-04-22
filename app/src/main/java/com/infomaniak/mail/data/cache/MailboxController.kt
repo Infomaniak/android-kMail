@@ -19,32 +19,39 @@ package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.utils.Realms
 import io.realm.MutableRealm.UpdatePolicy
+import io.realm.RealmResults
 import io.realm.query
-import com.infomaniak.mail.data.models.threads.Thread
 
 object MailboxController {
 
     /**
      * Folders
      */
-    fun getFolder(id: String): Folder? =
+    fun getFolders(): RealmResults<Folder> =
+        Realms.mailbox.query<Folder>().find()
+
+    fun getFolderById(id: String): Folder? =
         Realms.mailbox.query<Folder>("${Folder::id.name} == '$id'").first().find()
+
+    fun getFolderByRole(role: Folder.FolderRole): Folder? =
+        Realms.mailbox.query<Folder>("${Folder::_role.name} == '${role.name}'").first().find()
 
     fun upsertFolder(folder: Folder) {
         Realms.mailbox.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
     }
 
-    fun updateFolder(objectId: String, onUpdate: (folder: Folder) -> Unit) {
+    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
         Realms.mailbox.writeBlocking {
-            getFolder(objectId)?.let { findLatest(it)?.let(onUpdate) }
+            getFolderById(id)?.let { findLatest(it)?.let(onUpdate) }
         }
     }
 
-    fun removeFolder(objectId: String) {
+    fun removeFolder(id: String) {
         Realms.mailbox.writeBlocking {
-            getFolder(objectId)?.let { findLatest(it)?.let(::delete) }
+            getFolderById(id)?.let { findLatest(it)?.let(::delete) }
         }
     }
 
