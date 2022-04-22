@@ -30,8 +30,9 @@ class Folder : RealmObject {
     var path: String = ""
     var name: String = ""
 
+    @Suppress("PropertyName")
     @SerializedName("role")
-    private var role: String? = null
+    var _role: String? = null
 
     @SerializedName("unread_count")
     var unreadCount: Int = 0
@@ -56,7 +57,7 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     var parentLink: Folder? = null
 
-    fun getRole(): FolderRole? = when (role) {
+    fun getRole(): FolderRole? = when (_role) {
         FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE
         FolderRole.DRAFT.name -> FolderRole.DRAFT
         FolderRole.INBOX.name -> FolderRole.INBOX
