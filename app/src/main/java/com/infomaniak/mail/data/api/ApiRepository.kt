@@ -72,7 +72,7 @@ object ApiRepository : ApiRepositoryCore() {
 //    fun deleteFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
 //        callApi(ApiRoutes.folder(mailbox.uuid, folder.id), DELETE)
 
-    fun getThreads(mailbox: Mailbox, folder: Folder, filter: ThreadFilter?): ApiResponse<ThreadsResult> =
+    fun getThreads(mailbox: Mailbox, folder: Folder, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> =
         callApi(ApiRoutes.threads(mailbox.uuid, folder.id, filter?.name), GET)
 
     fun getMessage(message: Message): ApiResponse<Message> =

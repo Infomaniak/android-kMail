@@ -61,6 +61,11 @@ class Thread : RealmObject {
     var forwarded: Boolean = false
     var size: Int = 0
 
+    fun initLocalValues(): Thread {
+        messages.removeIf { it.isDuplicate }
+        return this
+    }
+
     enum class ThreadFilter(title: String) {
         ALL("All"),
         SEEN("Seen"),
