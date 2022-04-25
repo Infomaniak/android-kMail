@@ -39,40 +39,107 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.startCalls).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                lightlyPopulateRealm()
+                testRealm()
+                // lightlyPopulateRealm()
                 // fullyPopulateRealm()
                 // callAllAPIs()
             }
         }
     }
 
+    private fun testRealm() {
+
+        // Get & save Test mailbox's infos
+        val testMailboxInfos = ApiRepository.getMailboxes()
+            .data
+            ?.firstOrNull { it.email == "kevin.boulongne@ik.me" }
+            ?.initLocalValues()
+            ?: return
+        MailboxInfosController.upsertMailboxInfos(testMailboxInfos)
+        Log.i("Realm", "Upserted MailboxInfos: ${testMailboxInfos.email}")
+
+        // Get Test mailbox
+        val testMailbox = MailboxInfosController.getMailboxInfos().firstOrNull() ?: return
+
+        // Select it
+        AccountUtils.currentMailboxId = testMailbox.mailboxId
+        Realms.selectCurrentMailbox()
+        Log.e("Realm", "Switched to current mailbox: ${testMailbox.email}")
+
+        // Get & save Inbox
+        val folder = ApiRepository.getFolders(testMailbox).data?.firstOrNull { it.getRole() == FolderRole.INBOX } ?: return
+        MailboxController.upsertFolder(folder)
+        Log.i("Realm", "Upserted folder: ${folder.name}")
+
+        // Get & save last thread
+        val lastThread = ApiRepository.getThreads(testMailbox, folder).data?.threads?.firstOrNull()?.initLocalValues() ?: return
+        MailboxController.upsertThread(lastThread)
+        Log.i("Realm", "Upserted thread: ${lastThread.uid} - ${lastThread.date}")
+
+        // folder.threads.addAll(threads)
+
+        // Get last thread's messages
+//        lastThread.messages.forEach { message ->
+//
+//            // Get all completed messages
+//            ApiRepository.getMessage(message).data?.let { completedMessage ->
+//
+//                // Save all completed messages
+//                completedMessage.fullyDownloaded = true
+//                MailboxController.upsertMessage(completedMessage)
+//                Log.d("Realm", "Upserted completed message: ${completedMessage.subject}")
+//            }
+//        }
+    }
+
     private fun lightlyPopulateRealm() {
+
+        // Save all mailboxes infos
         ApiRepository.getMailboxes().data?.forEach {
             val mailbox = it.initLocalValues()
             MailboxInfosController.upsertMailboxInfos(mailbox)
             Log.i("Realm", "Upserted MailboxInfos: ${mailbox.email}")
         }
 
+        // Get the 1st mailbox
         MailboxInfosController.getMailboxInfos().firstOrNull()?.let { mailbox ->
+
+            // Select it
             AccountUtils.currentMailboxId = mailbox.mailboxId
             Realms.selectCurrentMailbox()
             Log.e("Realm", "Switched to current mailbox: ${mailbox.email}")
 
+            // Save all folders
             ApiRepository.getFolders(mailbox).data?.forEach { folder ->
                 MailboxController.upsertFolder(folder)
                 Log.i("Realm", "Upserted folder: ${folder.name}")
             }
 
+            // Get the INBOX
             MailboxController.getFolderByRole(FolderRole.INBOX)?.let { folder ->
                 Log.e("Realm", "Switched to folder: ${folder.name}")
 
-                ApiRepository.getThreads(mailbox, folder, null).data?.threads?.forEach { thread ->
+                // Get all threads
+                val threads = ApiRepository.getThreads(mailbox, folder).data?.threads
+
+                // Save all threads
+                threads?.forEach { thread ->
                     MailboxController.upsertThread(thread)
                     Log.i("Realm", "Upserted thread: ${thread.uid} - ${thread.date}")
+                }
 
-                    thread.messages.forEach { message ->
-                        MailboxController.upsertMessage(message)
-                        Log.d("Realm", "Upserted message: ${message.subject} - ${message.date}")
+                // folder.threads.addAll(threads)
+
+                // Get the 1st thread's messages
+                threads?.firstOrNull()?.messages?.forEach { message ->
+
+                    // Get all completed messages
+                    ApiRepository.getMessage(message).data?.let { completedMessage ->
+
+                        // Save all completed messages
+                        completedMessage.fullyDownloaded = true
+                        MailboxController.upsertMessage(completedMessage)
+                        Log.d("Realm", "Upserted completed message: ${completedMessage.subject}")
                     }
                 }
             }
@@ -93,14 +160,11 @@ class MainActivity : AppCompatActivity() {
                 MailboxController.upsertFolder(folder)
                 Log.e("Realm", "Upserted folder: ${folder.name}")
 
-                ApiRepository.getThreads(mailbox, folder, null).data?.threads?.forEach { thread ->
+                ApiRepository.getThreads(mailbox, folder).data?.threads?.forEach { thread ->
                     MailboxController.upsertThread(thread)
                     Log.i("Realm", "Upserted thread: ${thread.uid}")
 
                     thread.messages.forEach { message ->
-                        MailboxController.upsertMessage(message)
-                        // Log.i("Realm", "Upserted message: ${message.subject}")
-
                         ApiRepository.getMessage(message).data?.let { completedMessage ->
                             completedMessage.fullyDownloaded = true
                             MailboxController.upsertMessage(completedMessage)
@@ -136,7 +200,7 @@ class MainActivity : AppCompatActivity() {
         Log.i("API", "getSignature: $getSignature")
 
         val inbox = getFolders.data?.find { it.getRole() == FolderRole.INBOX }!!
-        val getInboxThreads = ApiRepository.getThreads(mailbox, inbox, null)
+        val getInboxThreads = ApiRepository.getThreads(mailbox, inbox)
         Log.i("API", "getInboxThreads: $getInboxThreads")
 
         val message = getInboxThreads.data!!.threads.first().messages.first()
@@ -150,7 +214,7 @@ class MainActivity : AppCompatActivity() {
         // Log.i("API", "starMessageResponse: $starMessageResponse")
 
         val drafts = getFolders.data?.find { it.getRole() == FolderRole.DRAFT }!!
-        val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts, null)
+        val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts)
         Log.i("API", "getDraftsThreads: $getDraftsThreads")
 
         val draftMessage = getDraftsThreads.data?.threads?.find { it.hasDrafts }?.messages?.find { it -> it.isDraft }
