@@ -22,20 +22,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.threads.Thread
-import com.infomaniak.mail.data.models.threads.ThreadsResult
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
+import com.infomaniak.mail.ui.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ThreadListFragment : DialogFragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     lateinit var binding: FragmentThreadListBinding
-//    :val threadAdapter = ThreadListAdapter()
+    val threadAdapter = ThreadListAdapter()
     lateinit var mailbox: Mailbox
-    lateinit var folders: ArrayList<Folder>
-    lateinit var threadList: ThreadsResult
 
 
     override fun onCreateView(
@@ -43,16 +48,29 @@ class ThreadListFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentThreadListBinding.inflate(inflater, container, false)
+        with(mainViewModel) {
+            threadList = MutableLiveData()
+            threadList.observe(viewLifecycleOwner) { list ->
+                if (list != null) {
+                    threadAdapter.threadList = list.threads
+                    threadAdapter.notifyItemRangeInserted(0, list.threads.size)
+                }
+            }
+        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        binding.threadList.adapter = threadAdapter
-//        ApiRepository.getMailboxes()
-//        mailbox = ApiRepository.getMailboxes().data!![0]
-//        folders = ApiRepository.getFolders(mailbox).data!!
-//        threadList = ApiRepository.getThreads(mailbox, folders[0], Thread.ThreadFilter.ALL).data!!
-//        threadAdapter.threadList = threadList.threads
+        binding.threadList.adapter = threadAdapter
+        lifecycleScope.launch(Dispatchers.IO) {
+            mailbox = ApiRepository.getMailboxes().data!![0]
+            with(mainViewModel) {
+                val foldersResponse = ApiRepository.getFolders(mailbox).data!!
+                folders.postValue(foldersResponse)
+                val inboxFolder = foldersResponse.find { it.getRole() == Folder.FolderRole.INBOX }
+                threadList.postValue(ApiRepository.getThreads(mailbox, inboxFolder!!, Thread.ThreadFilter.ALL).data)
+            }
+        }
     }
 }
