@@ -69,7 +69,7 @@
         android:id="@+id/threadFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
         android:label="ThreadFragment"
-        tools:layout="@layout/fragment_thread">
+        tools:layout="@layout/item_thread">
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />

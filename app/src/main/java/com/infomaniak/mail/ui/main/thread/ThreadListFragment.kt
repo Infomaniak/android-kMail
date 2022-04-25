@@ -22,10 +22,37 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.models.threads.ThreadsResult
+import com.infomaniak.mail.databinding.FragmentThreadListBinding
 
 class ThreadListFragment : DialogFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_thread_list, container, false)
+    lateinit var binding: FragmentThreadListBinding
+//    :val threadAdapter = ThreadListAdapter()
+    lateinit var mailbox: Mailbox
+    lateinit var folders: ArrayList<Folder>
+    lateinit var threadList: ThreadsResult
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentThreadListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+//        binding.threadList.adapter = threadAdapter
+//        ApiRepository.getMailboxes()
+//        mailbox = ApiRepository.getMailboxes().data!![0]
+//        folders = ApiRepository.getFolders(mailbox).data!!
+//        threadList = ApiRepository.getThreads(mailbox, folders[0], Thread.ThreadFilter.ALL).data!!
+//        threadAdapter.threadList = threadList.threads
+    }
 }
