@@ -22,24 +22,37 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.MainActivity">
 
-    <TextView
-        android:id="@+id/helloWorld"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MainActivity"
-        app:layout_constraintBottom_toTopOf="@id/startCalls"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/startCalls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start API calls"
-        android:textAllCaps="false"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/hostFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/helloWorld" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/main_navigation" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/helloWorld"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="MainActivity"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/startCalls"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/startCalls"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Start API calls"-->
+<!--        android:textAllCaps="false"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/helloWorld" />-->
+</androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
