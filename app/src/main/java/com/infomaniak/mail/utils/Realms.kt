@@ -34,19 +34,19 @@ import io.realm.RealmConfiguration
 object Realms {
 
     val appSettings = Realm.open(RealmConfigurations.appSettings)
-    val mailboxInfos = Realm.open(RealmConfigurations.mailboxInfos)
-    lateinit var mailbox: Realm
+    val mailboxInfo = Realm.open(RealmConfigurations.mailboxInfo)
+    lateinit var mailboxContent: Realm
 
     fun selectCurrentMailbox() {
-        if (::mailbox.isInitialized) mailbox.close()
-        mailbox = Realm.open(RealmConfigurations.mailbox())
+        if (::mailboxContent.isInitialized) mailboxContent.close()
+        mailboxContent = Realm.open(RealmConfigurations.mailboxContent())
     }
 
     private object RealmConfigurations {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
-        private const val MAILBOX_INFOS_DB_NAME = "MailboxInfos.realm"
-        private val MAILBOX_DB_NAME = { "${AccountUtils.currentUserId}-${AccountUtils.currentMailboxId}.realm" }
+        private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
+        private val MAILBOX_CONTENT_DB_NAME = { "${AccountUtils.currentUserId}-${AccountUtils.currentMailboxId}.realm" }
 
         val appSettings = RealmConfiguration
             .Builder(RealmSets.appSettings)
@@ -54,16 +54,16 @@ object Realms {
             .deleteRealmIfMigrationNeeded()
             .build()
 
-        val mailboxInfos = RealmConfiguration
-            .Builder(RealmSets.mailboxInfos)
-            .name(MAILBOX_INFOS_DB_NAME)
+        val mailboxInfo = RealmConfiguration
+            .Builder(RealmSets.mailboxInfo)
+            .name(MAILBOX_INFO_DB_NAME)
             .deleteRealmIfMigrationNeeded()
             .build()
 
-        val mailbox = {
+        val mailboxContent = {
             RealmConfiguration
-                .Builder(RealmSets.mailbox)
-                .name(MAILBOX_DB_NAME())
+                .Builder(RealmSets.mailboxContent)
+                .name(MAILBOX_CONTENT_DB_NAME())
                 .deleteRealmIfMigrationNeeded()
                 .build()
         }
@@ -74,11 +74,11 @@ object Realms {
                 AppSettings::class,
             )
 
-            val mailboxInfos = setOf(
+            val mailboxInfo = setOf(
                 Mailbox::class,
             )
 
-            val mailbox = setOf(
+            val mailboxContent = setOf(
                 Folder::class,
                 Thread::class,
                 Message::class,

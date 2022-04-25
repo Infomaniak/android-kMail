@@ -54,8 +54,8 @@ class Folder : RealmObject {
     /**
      * Local
      */
-    var threads: RealmList<Thread> = realmListOf()
-    var parentLink: Folder? = null
+    var threads: RealmList<Thread> = realmListOf() // TODO
+    var parentLink: Folder? = null // TODO
 
     fun getRole(): FolderRole? = when (_role) {
         FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE
