@@ -17,26 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.databinding.ItemThreadBinding
 
-class ThreadListAdapter(var threadList: ArrayList<Thread> = arrayListOf()) :
-    RecyclerView.Adapter<ThreadViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
-        return ThreadViewHolder(ItemThreadBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-    }
-
-    override fun onBindViewHolder(viewHolder: ThreadViewHolder, position: Int) {
-        with(viewHolder.binding) {
-            expeditor.text = threadList[position].from[0].name
-            subject.text = threadList[position].subject
-        }
-    }
-
-    override fun getItemCount() = threadList.size
-
-}
+class ThreadViewHolder(val binding: ItemThreadBinding) : RecyclerView.ViewHolder(binding.root)
