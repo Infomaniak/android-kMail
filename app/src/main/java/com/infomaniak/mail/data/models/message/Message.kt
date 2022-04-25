@@ -18,11 +18,9 @@
 package com.infomaniak.mail.data.models.message
 
 import com.google.gson.annotations.SerializedName
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.attachment.Attachment
 import com.infomaniak.mail.data.models.threads.Thread
-import com.infomaniak.mail.utils.AccountUtils
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -82,6 +80,8 @@ class Message : RealmObject {
 
     @SerializedName("safe_display")
     var safeDisplay: Boolean = false
+
+    @SerializedName("is_duplicate")
     var isDuplicate: Boolean = false
 
     /**
