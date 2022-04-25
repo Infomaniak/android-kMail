@@ -77,6 +77,7 @@ object AccountUtils : CredentialManager {
     var currentMailboxId: Int = AppSettingsController.getAppSettings()._currentMailboxId
         set(mailboxId) {
             field = mailboxId
+            Realms.selectCurrentMailbox()
             GlobalScope.launch(Dispatchers.IO) {
                 AppSettingsController.updateAppSettings { appSettings ->
                     if (appSettings.isValid()) appSettings._currentMailboxId = mailboxId
