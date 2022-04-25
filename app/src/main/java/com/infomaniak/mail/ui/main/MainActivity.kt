@@ -25,9 +25,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.cache.MailboxInfoController
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.cache.MailboxController
+import com.infomaniak.mail.data.cache.MailboxInfosController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Realms
 import io.sentry.Breadcrumb
@@ -44,60 +44,38 @@ class MainActivity : AppCompatActivity() {
 
         val navController = setupNavController()
 
-        navController.addOnDestinationChangedListener { _, dest, args -> onDestinationChanged(dest, args) }
-
 //        findViewById<Button>(R.id.startCalls).setOnClickListener {
 //            lifecycleScope.launch(Dispatchers.IO) {
-//                lightlyPopulateRealm()
+////                lightlyPopulateRealm()
 //                // fullyPopulateRealm()
-//                // callAllAPIs()
+//        callAllAPIs()
+//
 //            }
+//        }
+
+        navController.addOnDestinationChangedListener { _, dest, args -> onDestinationChanged(dest, args) }
+    }
+
+    private fun onDestinationChanged(destination: NavDestination, navigationArgs: Bundle?) {
+        Sentry.addBreadcrumb(Breadcrumb().apply {
+            category = "Navigation"
+            message = "Accessed to destination : ${destination.displayName}"
+            level = SentryLevel.INFO
+        })
+
+        // TODO Matomo
+//        with(destination) {
+//            application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
 //        }
     }
 
-    private fun testRealm() {
-
-        // Get & save Test mailbox's infos
-        val testMailboxInfo = ApiRepository.getMailboxes()
-            .data
-            ?.firstOrNull { it.email == "kevin.boulongne@ik.me" }
-            ?.initLocalValues()
-            ?: return
-        MailboxInfoController.upsertMailboxInfo(testMailboxInfo)
-        Log.i("Realm", "Upserted MailboxInfo: ${testMailboxInfo.email}")
-
-        // Get Test mailbox
-        val testMailbox = MailboxInfoController.getMailboxInfos().firstOrNull() ?: return
-
-        // Select it
-        AccountUtils.currentMailboxId = testMailbox.mailboxId
-        Log.e("Realm", "Switched to current mailbox: ${testMailbox.email}")
-
-        // Get & save Inbox
-        val folder = ApiRepository.getFolders(testMailbox).data?.firstOrNull { it.getRole() == FolderRole.INBOX } ?: return
-        MailboxContentController.upsertFolder(folder)
-        Log.i("Realm", "Upserted folder: ${folder.name}")
-
-        // Get & save last thread
-        val lastThread = ApiRepository.getThreads(testMailbox, folder).data?.threads?.firstOrNull()?.initLocalValues() ?: return
-        MailboxContentController.upsertThread(lastThread)
-        Log.i("Realm", "Upserted thread: ${lastThread.uid} - ${lastThread.date}")
-
-        // folder.threads.addAll(threads)
-
-        // Get last thread's messages
-//        lastThread.messages.forEach { message ->
-//
-//            // Get all completed messages
-//            ApiRepository.getMessage(message).data?.let { completedMessage ->
-//
-//                // Save all completed messages
-//                completedMessage.fullyDownloaded = true
-//                MailboxController.upsertMessage(completedMessage)
-//                Log.d("Realm", "Upserted completed message: ${completedMessage.subject}")
-//            }
-//        }
+    private fun setupNavController(): NavController {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment
+        return navHostFragment.navController.apply {
+            if (currentDestination == null) navigate(graph.startDestinationId)
+        }
     }
+
 
     private fun lightlyPopulateRealm() {
 
@@ -121,8 +99,7 @@ class MainActivity : AppCompatActivity() {
                 Log.i("Realm", "Upserted folder: ${folder.name}")
             }
 
-            // Get the INBOX
-            MailboxContentController.getFolderByRole(FolderRole.INBOX)?.let { folder ->
+            MailboxController.getFolderByRole(Folder.FolderRole.INBOX)?.let { folder ->
                 Log.e("Realm", "Switched to folder: ${folder.name}")
 
                 // Get all threads
@@ -205,11 +182,11 @@ class MainActivity : AppCompatActivity() {
         val getSignature = ApiRepository.getSignatures(mailbox)
         Log.i("API", "getSignature: $getSignature")
 
-        val inbox = getFolders.data?.find { it.getRole() == FolderRole.INBOX }!!
-        val getInboxThreads = ApiRepository.getThreads(mailbox, inbox)
+        val inbox = getFolders.data?.find { it.getRole() == Folder.FolderRole.INBOX }!!
+        val getInboxThreads = ApiRepository.getThreads(mailbox, inbox, null)
         Log.i("API", "getInboxThreads: $getInboxThreads")
 
-        val message = getInboxThreads.data!!.threads.first().messages.first()!!
+        val message = getInboxThreads.data!!.threads.first().messages.first()
         val getMessage = ApiRepository.getMessage(message)
         Log.i("API", "getMessage: $getMessage")
 
@@ -219,8 +196,8 @@ class MainActivity : AppCompatActivity() {
         // val starMessageResponse = ApiRepository.starMessage(true, mailbox, arrayListOf(message.uid))
         // Log.i("API", "starMessageResponse: $starMessageResponse")
 
-        val drafts = getFolders.data?.find { it.getRole() == FolderRole.DRAFT }!!
-        val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts)
+        val drafts = getFolders.data?.find { it.getRole() == Folder.FolderRole.DRAFT }!!
+        val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts, null)
         Log.i("API", "getDraftsThreads: $getDraftsThreads")
 
         val draftMessage = getDraftsThreads.data?.threads?.find { it.hasDrafts }?.messages?.find { it -> it.isDraft }
@@ -233,26 +210,6 @@ class MainActivity : AppCompatActivity() {
 
             // val deleteDraft = ApiRepository.deleteDraft(mailbox, draftUuid)
             // Log.i("API", "deleteDraft: $deleteDraft")
-        }
-    }
-
-    private fun onDestinationChanged(destination: NavDestination, navigationArgs: Bundle?) {
-        Sentry.addBreadcrumb(Breadcrumb().apply {
-            category = "Navigation"
-            message = "Accessed to destination : ${destination.displayName}"
-            level = SentryLevel.INFO
-        })
-
-        // TODO Matomo
-//        with(destination) {
-//            application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
-//        }
-    }
-
-    private fun setupNavController(): NavController {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment
-        return navHostFragment.navController.apply {
-            if (currentDestination == null) navigate(graph.startDestinationId)
         }
     }
 }
