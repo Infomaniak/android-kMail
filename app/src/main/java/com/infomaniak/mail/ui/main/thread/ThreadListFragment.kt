@@ -51,9 +51,11 @@ class ThreadListFragment : DialogFragment() {
         with(mainViewModel) {
             threadList = MutableLiveData()
             threadList.observe(viewLifecycleOwner) { list ->
-                if (list != null) {
-                    threadAdapter.threadList = list.threads
-                    threadAdapter.notifyItemRangeInserted(0, list.threads.size)
+                if (list?.threads != null) {
+                    threadAdapter.apply {
+                        clean()
+                        context?.let { binding.threadList.post { addAll(formatList(list.threads, it)) } }
+                    }
                 }
             }
         }

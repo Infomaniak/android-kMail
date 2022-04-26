@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
   ~ Infomaniak kMail - Android
   ~ Copyright (C) 2022 Infomaniak Network SA
   ~
@@ -15,7 +16,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="appName" translatable="false">kMail</string>
 
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
@@ -23,4 +24,32 @@
     <string name="buttonCancel">Cancel</string><!--TODO: Add translations-->
     <string name="refreshTokenError">You’ve been disconnected due to a problem. Please log in again</string><!--TODO: Add translations-->
     <string name="notificationGeneralChannelName">General notifications</string><!--TODO: Add translations-->
+    <string name="Download">Download</string>
+    <string name="Download_all">Download all</string>
+    <string name="Share">Share</string>
+    <plurals name="attachmentQuantity">
+        <item quantity="one">%d attachment (%s)</item>
+        <item quantity="other">%d attachments (%s)</item>
+    </plurals>
+    <string name="bccTitle">Bcc:\u0020</string>
+    <string name="buttonAddAccount">Add an account</string>
+    <string name="buttonFeedbacks">Feedbacks</string>
+    <string name="buttonFolders">Folders</string>
+    <string name="buttonHelp">Help</string>
+    <string name="buttonImportEmails">Import emails</string>
+    <string name="buttonManageAccount">Manage my account</string>
+    <string name="buttonMoreStorage">Get more storage</string>
+    <string name="buttonRestoreEmails">Restore emails</string>
+    <string name="ccTitle">Cc:</string>
+    <string name="fromTitle">From:</string>
+    <string name="menuDrawerAdvancedActions">Advanced actions</string>
+    <string name="menuDrawerUsed">used</string>
+    <string name="newMessageButton">New Message</string>
+    <string name="newMessagePlaceholderTitle">Type your message</string>
+    <string name="objectTitle">Object:</string>
+    <string name="threadListSectionLastWeek">Last week</string>
+    <string name="threadListSectionThisWeek">This week</string>
+    <string name="threadListSectionToday">Today</string>
+    <string name="threadListSectionTwoWeeks">Two weeks ago</string>
+    <string name="toTitle">To:</string>
 </resources>
