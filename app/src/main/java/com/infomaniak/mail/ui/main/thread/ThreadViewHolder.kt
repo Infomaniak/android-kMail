@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.mail.databinding.ItemThreadBinding
+import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.views.ViewHolder
 
-class ThreadViewHolder(val binding: ItemThreadBinding) : RecyclerView.ViewHolder(binding.root)
+class ThreadViewHolder<T : ViewBinding>(val binding: T) : ViewHolder(binding.root)

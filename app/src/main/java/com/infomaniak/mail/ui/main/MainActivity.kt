@@ -186,8 +186,8 @@ class MainActivity : AppCompatActivity() {
         val getInboxThreads = ApiRepository.getThreads(mailbox, inbox, null)
         Log.i("API", "getInboxThreads: $getInboxThreads")
 
-        val message = getInboxThreads.data!!.threads.first().messages.first()
-        val getMessage = ApiRepository.getMessage(message)
+        val message = getInboxThreads.data!!.threads?.first()?.messages?.first()
+        val getMessage = message?.let { ApiRepository.getMessage(it) }
         Log.i("API", "getMessage: $getMessage")
 
         // val moveMessageResponse = ApiRepository.moveMessage(mailbox, arrayListOf(message), inbox.id)
