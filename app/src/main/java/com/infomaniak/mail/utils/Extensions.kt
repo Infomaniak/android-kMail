@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import android.app.Activity
 import android.view.View
 import com.infomaniak.mail.R
+import java.util.*
 
 fun Activity.showSnackbar(
     title: Int,
@@ -50,3 +51,20 @@ fun Activity.showSnackbar(
         onActionClicked = onActionClicked
     )
 }
+
+fun Date.startOfTheDay(): Date =
+    Calendar.getInstance().apply {
+        time = this@startOfTheDay
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+    }.time
+
+fun Date.startOfTheWeek(): Date =
+    Calendar.getInstance().apply {
+        time = this@startOfTheWeek
+        set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+    }.time

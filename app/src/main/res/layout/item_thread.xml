@@ -30,19 +30,29 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text="ThreadFragment"
-        app:layout_constraintBottom_toTopOf="@id/subject"
+        app:layout_constraintBottom_toTopOf="@id/mailSubject"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/subject"
+        android:id="@+id/mailSubject"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="default subject"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/mailDate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/expeditor" />
+    <TextView
+        android:id="@+id/mailDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="default date"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mailSubject" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
