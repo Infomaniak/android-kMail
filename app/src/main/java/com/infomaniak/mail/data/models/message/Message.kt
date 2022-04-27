@@ -25,6 +25,7 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
+import java.util.*
 
 class Message : RealmObject {
     @PrimaryKey
@@ -32,7 +33,7 @@ class Message : RealmObject {
 
     @SerializedName("msg_id")
     var msgId: String = ""
-    var date: String = ""
+    var date: Date = Date()
     var subject: String = ""
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()

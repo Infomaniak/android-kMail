@@ -38,11 +38,11 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 with(testRealmViewModel) {
                     // testRealm()
-                    testRealm2()
+                    // testRealm2()
                     // updateRealm()
                     // lightlyPopulateRealm()
                     // fullyPopulateRealm()
-                    // callAllAPIs()
+                    callAllAPIs()
                 }
             }
         }

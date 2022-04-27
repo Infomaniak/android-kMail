@@ -363,7 +363,7 @@ class TestRealmViewModel : ViewModel() {
         val getInboxThreads = ApiRepository.getThreads(mailbox, inbox)
         Log.i("API", "getInboxThreads: $getInboxThreads")
 
-        val message = getInboxThreads.data!!.threads.first().messages.first()
+        val message = getInboxThreads.data?.threads?.first()?.messages?.first()!!
         val getMessage = ApiRepository.getMessage(message)
         Log.i("API", "getMessage: $getMessage")
 
