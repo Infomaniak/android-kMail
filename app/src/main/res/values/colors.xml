@@ -16,6 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <color name="previewBackground">#111C28</color>
     <color name="colorPrimary">#F2357A</color>
+    <color name="iconColor">#85A2B6</color>
+    <color name="previewBackground">#111C28</color>
 </resources>

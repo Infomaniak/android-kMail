@@ -74,6 +74,8 @@ class ThreadListFragment : DialogFragment() {
                 threadList.postValue(ApiRepository.getThreads(mailbox, inboxFolder!!, Thread.ThreadFilter.ALL).data)
             }
         }
-        binding.changeMailBoxButton.setOnClickListener {  }
+        binding.openMultiselectButton.setOnClickListener {
+            // TODO multiselection
+        }
     }
 }
