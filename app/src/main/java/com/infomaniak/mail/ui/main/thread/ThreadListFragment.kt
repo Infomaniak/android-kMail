@@ -38,9 +38,9 @@ class ThreadListFragment : DialogFragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    lateinit var binding: FragmentThreadListBinding
-    val threadAdapter = ThreadListAdapter()
-    lateinit var mailbox: Mailbox
+    private lateinit var binding: FragmentThreadListBinding
+    private lateinit var mailbox: Mailbox // TODO Replace with realm mailBox
+    private val threadAdapter = ThreadListAdapter()
 
 
     override fun onCreateView(
@@ -74,5 +74,6 @@ class ThreadListFragment : DialogFragment() {
                 threadList.postValue(ApiRepository.getThreads(mailbox, inboxFolder!!, Thread.ThreadFilter.ALL).data)
             }
         }
+        binding.changeMailBoxButton.setOnClickListener {  }
     }
 }
