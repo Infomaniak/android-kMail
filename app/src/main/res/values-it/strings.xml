@@ -39,6 +39,7 @@
     <string name="newMessageButton"></string>
     <string name="newMessagePlaceholderTitle"></string>
     <string name="objectTitle"></string>
+    <string name="searchViewHint"></string>
     <string name="threadListSectionLastWeek"></string>
     <string name="threadListSectionThisWeek"></string>
     <string name="threadListSectionToday"></string>

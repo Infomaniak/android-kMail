@@ -39,6 +39,7 @@
     <string name="newMessageButton">Nouveau Message</string>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="objectTitle">Objet :</string>
+    <string name="searchViewHint">Rechercher un message</string>
     <string name="threadListSectionLastWeek">La semaine dernière</string>
     <string name="threadListSectionThisWeek">Cette semaine</string>
     <string name="threadListSectionToday">Aujourd‘hui</string>
