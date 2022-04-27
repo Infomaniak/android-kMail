@@ -21,6 +21,7 @@ import com.google.gson.annotations.SerializedName
 
 data class MoveResult(
     val moved: Int,
+
     @SerializedName("undo_resource")
     val undoResource: String,
 )

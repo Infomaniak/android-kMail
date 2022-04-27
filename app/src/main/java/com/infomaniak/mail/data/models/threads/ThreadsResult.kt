@@ -17,6 +17,29 @@
  */
 package com.infomaniak.mail.data.models.threads
 
+import com.google.gson.annotations.SerializedName
+
 data class ThreadsResult(
-    val threads: ArrayList<Thread>,
+    val threads: ArrayList<Thread>?,
+
+    @SerializedName("total_messages_count")
+    val totalMessagesCount: Int = 0,
+
+    @SerializedName("messages_count")
+    val messagesCount: Int = 0,
+
+    @SerializedName("current_offset")
+    val currentOffset: Int = 0,
+
+    @SerializedName("thread_mode")
+    val threadMode: String = "on",
+
+    @SerializedName("folder_unseen_messages")
+    val folderUnseenMessage: Int = 0,
+
+    @SerializedName("resource_previous")
+    val resourcePrevious: String? = null,
+
+    @SerializedName("resource_next")
+    val resourceNext: String? = null,
 )

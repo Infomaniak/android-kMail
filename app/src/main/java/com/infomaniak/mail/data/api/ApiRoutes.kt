@@ -58,9 +58,7 @@ object ApiRoutes {
     //     "${folder(uuid, folderId)}/flush"
 
     fun threads(uuid: String, folderId: String, filter: String?) =
-        with("${folder(uuid, folderId)}/message?offset=0&thread=on") {
-            if (filter != null) "$this&offset=$filter" else this
-        }
+        "${folder(uuid, folderId)}/message?thread=on&offset=0&filter=$filter"
 
     fun quotas(mailbox: String, hostingId: Int) =
         "${mailbox()}/quotas?mailbox=$mailbox&product_id=$hostingId"
