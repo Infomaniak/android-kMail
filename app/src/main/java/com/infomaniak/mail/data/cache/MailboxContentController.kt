@@ -18,11 +18,11 @@
 package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.utils.Realms
 import io.realm.MutableRealm
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmResults
 import io.realm.query
 
@@ -40,15 +40,13 @@ object MailboxContentController {
     fun getFolderByRole(role: Folder.FolderRole): Folder? =
         Realms.mailboxContent.query<Folder>("${Folder::_role.name} == '${role.name}'").first().find()
 
-    private fun MutableRealm.getLatestFolderById(id: String): Folder? {
-        val folder = getFolderById(id)
-        return if (folder != null) findLatest(folder) else folder
-    }
+    private fun MutableRealm.getLatestFolderById(id: String): Folder? =
+        getFolderById(id)?.let(::findLatest)
 
     fun upsertFolder(folder: Folder) {
         Realms.mailboxContent.writeBlocking {
-            removeFolderIfAlreadyExisting(folder) // TODO: remove this when the Upsert is working
-            copyToRealm(folder, UpdatePolicy.ALL)
+            removeFolderIfAlreadyExisting(folder) // TODO: remove this when the UPSERT is working
+            copyToRealm(folder)
         }
     }
 
@@ -70,15 +68,13 @@ object MailboxContentController {
     private fun getThreadByUid(uid: String): Thread? =
         Realms.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
 
-    private fun MutableRealm.getLatestThreadByUid(uid: String): Thread? {
-        val thread = getThreadByUid(uid)
-        return if (thread != null) findLatest(thread) else thread
-    }
+    private fun MutableRealm.getLatestThreadByUid(uid: String): Thread? =
+        getThreadByUid(uid)?.let(::findLatest)
 
     fun upsertThread(thread: Thread) {
         Realms.mailboxContent.writeBlocking {
-            removeThreadIfAlreadyExisting(thread) // TODO: remove this when the Upsert is working
-            copyToRealm(thread, UpdatePolicy.ALL)
+            removeThreadIfAlreadyExisting(thread) // TODO: remove this when the UPSERT is working
+            copyToRealm(thread)
         }
     }
 
@@ -100,15 +96,13 @@ object MailboxContentController {
     private fun getMessageByUid(uid: String): Message? =
         Realms.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first().find()
 
-    private fun MutableRealm.getLatestMessageByUid(uid: String): Message? {
-        val message = getMessageByUid(uid)
-        return if (message != null) findLatest(message) else message
-    }
+    private fun MutableRealm.getLatestMessageByUid(uid: String): Message? =
+        getMessageByUid(uid)?.let(::findLatest)
 
     fun upsertMessage(message: Message) {
         Realms.mailboxContent.writeBlocking {
-            removeMessageIfAlreadyExisting(message) // TODO: remove this when the Upsert is working
-            copyToRealm(message, UpdatePolicy.ALL)
+            removeMessageIfAlreadyExisting(message) // TODO: remove this when the UPSERT is working
+            copyToRealm(message)
         }
     }
 
@@ -122,5 +116,49 @@ object MailboxContentController {
 
     private fun MutableRealm.removeMessageIfAlreadyExisting(message: Message) {
         getMessageByUid(message.uid)?.let { findLatest(it)?.let(::delete) }
+    }
+
+    /**
+     * Recipients
+     */
+    private fun getRecipients(): RealmResults<Recipient> =
+        Realms.mailboxContent.query<Recipient>().find()
+
+    private fun getRecipientsByEmail(email: String): RealmResults<Recipient> =
+        Realms.mailboxContent.query<Recipient>("${Recipient::email.name} == '$email'").find()
+
+    private fun getRecipientByEmail(email: String): Recipient? =
+        getRecipientsByEmail(email).firstOrNull()
+
+    private fun MutableRealm.getLatestRecipientByEmail(email: String): Recipient? =
+        getRecipientByEmail(email)?.let(::findLatest)
+
+    fun upsertRecipient(recipient: Recipient) {
+        Realms.mailboxContent.writeBlocking {
+            removeRecipientIfAlreadyExisting(recipient) // TODO: remove this when the UPSERT is working
+            copyToRealm(recipient)
+        }
+    }
+
+    fun updateRecipient(email: String, onUpdate: (recipient: Recipient) -> Unit) {
+        Realms.mailboxContent.writeBlocking { getLatestRecipientByEmail(email)?.let(onUpdate) }
+    }
+
+    fun removeRecipient(email: String) {
+        Realms.mailboxContent.writeBlocking { getLatestRecipientByEmail(email)?.let(::delete) }
+    }
+
+    private fun MutableRealm.removeRecipientIfAlreadyExisting(recipient: Recipient) {
+        getRecipientByEmail(recipient.email)?.let { findLatest(it)?.let(::delete) }
+    }
+
+    fun cleanRecipients() {
+        Realms.mailboxContent.writeBlocking {
+            getRecipients().map { it.email }.distinct().forEach { email ->
+                getRecipientsByEmail(email).forEachIndexed { index, recipient ->
+                    if (index > 0) findLatest(recipient)?.let(::delete)
+                }
+            }
+        }
     }
 }
