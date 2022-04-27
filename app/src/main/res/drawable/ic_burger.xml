@@ -16,13 +16,17 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="24dp"
-    android:viewportWidth="22"
-    android:viewportHeight="24">
+    android:width="20dp"
+    android:height="14dp"
+    android:viewportWidth="20"
+    android:viewportHeight="14">
     <path
-        android:fillColor="#00000000"
-        android:pathData="M11,1.6996L12.9918,8.1702L13.1004,8.5231H13.4697H19.988L14.6917,12.5849L14.4158,12.7964L14.5181,13.1287L16.5269,19.6547L11.3043,15.6494L11,15.4161L10.6957,15.6494L5.4731,19.6547L7.4819,13.1287L7.5842,12.7964L7.3083,12.5849L2.012,8.5231H8.5303H8.8996L9.0082,8.1702L11,1.6996Z"
-        android:strokeWidth="1"
-        android:strokeColor="#333333" />
+        android:fillColor="#666666"
+        android:pathData="M1,0L19,0A1,1 0,0 1,20 1L20,1A1,1 0,0 1,19 2L1,2A1,1 0,0 1,0 1L0,1A1,1 0,0 1,1 0z" />
+    <path
+        android:fillColor="#666666"
+        android:pathData="M1,6L11,6A1,1 0,0 1,12 7L12,7A1,1 0,0 1,11 8L1,8A1,1 0,0 1,0 7L0,7A1,1 0,0 1,1 6z" />
+    <path
+        android:fillColor="#666666"
+        android:pathData="M1,12L19,12A1,1 0,0 1,20 13L20,13A1,1 0,0 1,19 14L1,14A1,1 0,0 1,0 13L0,13A1,1 0,0 1,1 12z" />
 </vector>
