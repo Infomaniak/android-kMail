@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.Realms
 import io.realm.MutableRealm
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmResults
 import io.realm.query
 
@@ -28,16 +27,20 @@ object MailboxInfoController {
     fun getMailboxInfos(): RealmResults<Mailbox> =
         Realms.mailboxInfo.query<Mailbox>().find()
 
+    fun getMailboxInfoByEmail(email: String): Mailbox? =
+        Realms.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+
     private fun getMailboxInfoByObjectId(objectId: String): Mailbox? =
         Realms.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
 
-    private fun MutableRealm.getLatestMailboxInfoByObjectId(objectId: String): Mailbox? {
-        val mailbox = getMailboxInfoByObjectId(objectId)
-        return if (mailbox != null) findLatest(mailbox) else mailbox
-    }
+    private fun MutableRealm.getLatestMailboxInfoByObjectId(objectId: String): Mailbox? =
+        getMailboxInfoByObjectId(objectId)?.let(::findLatest)
 
     fun upsertMailboxInfo(mailbox: Mailbox) {
-        Realms.mailboxInfo.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
+        Realms.mailboxInfo.writeBlocking {
+            removeMailboxInfoIfAlreadyExisting(mailbox) // TODO: remove this when the UPSERT is working
+            copyToRealm(mailbox)
+        }
     }
 
     fun updateMailboxInfo(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
@@ -46,5 +49,9 @@ object MailboxInfoController {
 
     fun removeMailboxInfo(objectId: String) {
         Realms.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(::delete) }
+    }
+
+    private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {
+        getMailboxInfoByObjectId(mailbox.objectId)?.let { findLatest(it)?.let(::delete) }
     }
 }
