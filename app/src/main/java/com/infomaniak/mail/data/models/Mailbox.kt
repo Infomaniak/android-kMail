@@ -84,7 +84,7 @@ class Mailbox : RealmObject {
     var userId: Int = -1
 
     @PrimaryKey
-    var objectId: String? = null
+    var objectId: String = ""
 
     fun initLocalValues(): Mailbox {
         userId = AccountUtils.currentUserId
