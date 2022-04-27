@@ -19,14 +19,15 @@ package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxController
-import com.infomaniak.mail.data.cache.MailboxInfosController
+import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.Realms
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity() {
                 Log.i("Realm", "Upserted folder: ${folder.name}")
             }
 
-            MailboxController.getFolderByRole(Folder.FolderRole.INBOX)?.let { folder ->
+            MailboxContentController.getFolderByRole(Folder.FolderRole.INBOX)?.let { folder ->
                 Log.e("Realm", "Switched to folder: ${folder.name}")
 
                 // Get all threads
@@ -124,36 +125,6 @@ class MainActivity : AppCompatActivity() {
                         MailboxContentController.upsertMessage(completedMessage)
                         Log.d("Realm", "Upserted completed message: ${completedMessage.subject}")
                     }
-                }
-            }
-        }
-    }
-
-    private fun fullyPopulateRealm() {
-        ApiRepository.getMailboxes().data?.forEach {
-            val mailbox = it.initLocalValues()
-            MailboxInfoController.upsertMailboxInfo(mailbox)
-            Log.i("Realm", "Upserted MailboxInfo: ${mailbox.email}")
-
-            AccountUtils.currentMailboxId = mailbox.mailboxId
-            Log.e("Realm", "Switched to current mailbox: ${mailbox.email}")
-
-            ApiRepository.getFolders(mailbox).data?.forEach { folder ->
-                folder.initLocalValues()
-                MailboxContentController.upsertFolder(folder)
-                Log.e("Realm", "Upserted folder: ${folder.name}")
-
-                ApiRepository.getThreads(mailbox, folder).data?.threads?.forEach { thread ->
-                    MailboxContentController.upsertThread(thread)
-                    Log.i("Realm", "Upserted thread: ${thread.uid}")
-
-                    // thread.messages.forEach { message ->
-                    //     ApiRepository.getMessage(message).data?.let { completedMessage ->
-                    //         completedMessage.fullyDownloaded = true
-                    //         MailboxContentController.upsertMessage(completedMessage)
-                    //         Log.i("Realm", "Upserted completed message: ${completedMessage.subject}")
-                    //     }
-                    // }
                 }
             }
         }

@@ -22,16 +22,33 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.thread.ThreadListFragment">
 
-    <TextView
-        android:id="@+id/mailboxName"
-        android:layout_width="wrap_content"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mailbox"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/marginStandard"
-        android:paddingStart="24dp"
-        android:text="Boite de Reception"
-        app:layout_constraintBottom_toTopOf="@id/threadList"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_margin="@dimen/marginStandard"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/mailboxName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Boite de Reception"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/changeMailBoxButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleX="0.7"
+            android:scaleY="0.76"
+            android:text="Modifier"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/threadList"
@@ -39,6 +56,21 @@
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mailboxName" />
+        app:layout_constraintTop_toBottomOf="@id/mailbox" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/newMessageFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/marginStandard"
+        android:layout_marginBottom="@dimen/marginLarge"
+        android:backgroundTint="@color/colorPrimary"
+        android:contentDescription="@string/newMessageButton"
+        android:drawableEnd="@drawable/ic_pencil_1"
+        android:drawableTint="@color/white"
+        android:text="@string/newMessageButton"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
