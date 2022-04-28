@@ -27,12 +27,14 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginTop="5dp"
         android:src="@drawable/ic_bullet"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
     <LinearLayout
+        android:id="@+id/itemThread"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"

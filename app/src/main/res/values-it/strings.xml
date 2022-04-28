@@ -18,6 +18,8 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="Download"></string>
     <string name="Download_all"></string>
+    <string name="See_all"></string>
+    <string name="Select_all"></string>
     <string name="Share"></string>
     <plurals name="attachmentQuantity">
         <item quantity="one"></item>
@@ -38,6 +40,8 @@
     <string name="menuDrawerUsed"></string>
     <string name="newMessageButton"></string>
     <string name="newMessagePlaceholderTitle"></string>
+    <string name="noEmailDescription"></string>
+    <string name="noEmailTitle"></string>
     <string name="objectTitle"></string>
     <string name="searchViewHint"></string>
     <string name="threadListSectionLastWeek"></string>
