@@ -36,9 +36,7 @@ class RealmInstantConverter : TypeAdapter<RealmInstant>() {
      * Write [RealmInstant] field as a ISO [String] or null
      */
     override fun write(out: JsonWriter?, date: RealmInstant?) {
-        date?.let {
-            out?.value(sdf.format(Date(it.epochSeconds * 1_000L + it.nanosecondsOfSecond / 1_000L)))
-        } ?: out?.nullValue()
+        date?.let { realmInstant -> out?.value(sdf.format(realmInstant.toDate())) } ?: out?.nullValue()
     }
 
     /**
@@ -47,11 +45,7 @@ class RealmInstantConverter : TypeAdapter<RealmInstant>() {
     override fun read(timestamp: JsonReader?): RealmInstant? {
         return timestamp?.let {
             if (it.peek() === JsonToken.STRING) {
-                sdf.parse(it.nextString())?.time?.let { milliseconds ->
-                    val seconds = milliseconds / 1_000L
-                    val nanoseconds = milliseconds - seconds * 1_000L
-                    RealmInstant.fromEpochSeconds(seconds, nanoseconds.toInt())
-                }
+                sdf.parse(it.nextString())?.toRealmInstant()
             } else {
                 it.nextNull()
                 null

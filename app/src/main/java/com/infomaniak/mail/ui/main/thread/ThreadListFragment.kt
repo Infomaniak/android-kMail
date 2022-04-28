@@ -21,10 +21,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
@@ -51,10 +54,13 @@ class ThreadListFragment : DialogFragment() {
         with(mainViewModel) {
             threadList = MutableLiveData()
             threadList.observe(viewLifecycleOwner) { list ->
-                if (list?.threads != null) {
+                if (list?.threads.isNullOrEmpty()) {
+                    displayNoEmailView()
+                } else {
+                    displayThreadList()
                     threadAdapter.apply {
                         clean()
-                        context?.let { binding.threadList.post { addAll(formatList(list.threads, it)) } }
+                        context?.let { binding.threadList.post { addAll(formatList(list?.threads!!, it)) } }
                     }
                 }
             }
@@ -74,8 +80,64 @@ class ThreadListFragment : DialogFragment() {
                 threadList.postValue(ApiRepository.getThreads(mailbox, inboxFolder!!, Thread.ThreadFilter.ALL).data)
             }
         }
-        binding.openMultiselectButton.setOnClickListener {
-            // TODO multiselection
+        setupListeners()
+        setupThreadAdapter()
+    }
+
+    private fun setupThreadAdapter() {
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
+            // TODO manage no internet screen
+//            threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
+//            binding.noNetwork.isGone = isInternetAvailable
+        }
+
+        threadAdapter.apply {
+//            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+//            onEmptyList = { checkIfNoFiles() }
+
+            onThreadClicked = { thread ->
+//                if (thread.isUsable()) {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment())
+//                    }
+            }
+        }
+    }
+
+    private fun setupListeners() {
+        with(binding) {
+            openMultiselectButton.setOnClickListener {
+                // TODO multiselection
+            }
+            header.searchViewCard.apply {
+                // TODO filterButton doesn't propagate the event to root, must display it ?
+                searchView.isGone = true
+                searchViewText.isVisible = true
+                filterButton.isEnabled = false
+                root.setOnClickListener {
+                    safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
+                }
+            }
+            header.userAvatar.setOnClickListener {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
+            }
+            newMessageFab.setOnClickListener {
+                safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
+            }
+        }
+    }
+
+    private fun displayNoEmailView() {
+        with(binding) {
+            threadList.isGone = true
+            noMailLayout.root.isVisible = true
+        }
+    }
+
+    private fun displayThreadList() {
+        with(binding) {
+            threadList.isVisible = true
+            noMailLayout.root.isGone = true
         }
     }
 }

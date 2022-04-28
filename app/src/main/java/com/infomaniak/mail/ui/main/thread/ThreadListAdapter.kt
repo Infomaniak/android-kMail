@@ -21,6 +21,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.LoaderAdapter
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
@@ -28,8 +29,7 @@ import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.databinding.ItemThreadBinding
 import com.infomaniak.mail.databinding.SeeAllRecyclerButtonBinding
 import com.infomaniak.mail.databinding.ThreadListRecyclerSectionBinding
-import com.infomaniak.mail.utils.startOfTheDay
-import com.infomaniak.mail.utils.startOfTheWeek
+import com.infomaniak.mail.utils.toDate
 import java.util.*
 
 class ThreadListAdapter : LoaderAdapter<Any>() {
@@ -37,6 +37,9 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
     @StringRes
     var previousSectionName: Int = -1
     var displaySeeAllButton = false // TODO manage this for intelligent mailbox
+
+    var onEmptyList: (() -> Unit)? = null
+    var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ThreadViewHolder(
@@ -63,7 +66,8 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
                 with(itemList[position] as Thread) {
                     expeditor.text = from[0].name
                     mailSubject.text = subject
-                    mailDate.text = date.toString()
+                    mailDate.text = formatDate(date?.toDate() ?: Date(0))
+                    viewHolder.binding.itemThread.setOnClickListener { onThreadClicked?.invoke(this) }
                 }
             }
         }
@@ -92,7 +96,7 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
         val addItemList: ArrayList<Any> = arrayListOf()
 
         for (thread in newThreadList) {
-            val currentItemDateCategory = getDateCategories(thread.date.time).value
+            val currentItemDateCategory = getDateCategories(thread.date?.toDate()?.time ?: 0).value
             when {
                 currentItemDateCategory != previousSectionName -> {
                     previousSectionName = currentItemDateCategory
@@ -104,6 +108,18 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
         }
 
         return addItemList
+    }
+
+    private fun formatDate(date: Date): String {
+        val now = Date()
+
+        return  with(date) {
+            when {
+                year() != now.year() -> format("d MMM. yyyy")
+                month() == now.month() && day() == now.day() -> "${hours()}:${minutes()}"
+                else -> format("d MMM.")
+            }
+        }
     }
 
     enum class DateFilter(val start: Long, @StringRes val value: Int) {

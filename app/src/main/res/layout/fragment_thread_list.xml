@@ -29,14 +29,14 @@
         android:layout_height="50dp"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
         android:layout_marginTop="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/mailbox"
+        app:layout_constraintBottom_toTopOf="@id/mailboxLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mailbox"
+        android:id="@+id/mailboxLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/marginStandard"
@@ -67,7 +67,19 @@
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mailbox" />
+        app:layout_constraintTop_toBottomOf="@id/mailboxLayout" />
+
+    <include
+        android:id="@+id/noMailLayout"
+        layout="@layout/view_no_mail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginLarge"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mailboxLayout" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/newMessageFab"

@@ -18,6 +18,8 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="Download">Télécharger</string>
     <string name="Download_all">Tout télécharger</string>
+    <string name="See_all">Voir tout</string>
+    <string name="Select_all">Tout sélectionner</string>
     <string name="Share">Partager</string>
     <plurals name="attachmentQuantity">
         <item quantity="one">%d pièce jointe (%s)</item>
@@ -36,8 +38,10 @@
     <string name="fromTitle">De :</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerUsed">utilisés</string>
-    <string name="newMessageButton">Nouveau Message</string>
+    <string name="newMessageButton">Nouveau message</string>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
+    <string name="noEmailDescription">Composez un nouvel email en cliquant sur \"Nouveau message\" en bas à droite</string>
+    <string name="noEmailTitle">Vous n‘avez pas d‘emails</string>
     <string name="objectTitle">Objet :</string>
     <string name="searchViewHint">Rechercher un message</string>
     <string name="threadListSectionLastWeek">La semaine dernière</string>
