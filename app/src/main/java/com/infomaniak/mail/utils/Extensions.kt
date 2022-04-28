@@ -20,7 +20,10 @@ package com.infomaniak.mail.utils
 import android.app.Activity
 import android.view.View
 import com.infomaniak.mail.R
+import io.realm.RealmInstant
 import java.util.*
+
+// TODO Put these methods in Core
 
 fun Activity.showSnackbar(
     title: Int,
@@ -52,19 +55,10 @@ fun Activity.showSnackbar(
     )
 }
 
-fun Date.startOfTheDay(): Date =
-    Calendar.getInstance().apply {
-        time = this@startOfTheDay
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-    }.time
+fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
 
-fun Date.startOfTheWeek(): Date =
-    Calendar.getInstance().apply {
-        time = this@startOfTheWeek
-        set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-    }.time
+fun Date.toRealmInstant(): RealmInstant {
+    val seconds = time / 1_000L
+    val nanoseconds =  (time - seconds * 1_000L).toInt()
+    return RealmInstant.fromEpochSeconds(seconds, nanoseconds)
+}

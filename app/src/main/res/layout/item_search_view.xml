@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="40dp"
-    app:cardCornerRadius="40dp">
+    app:cardCornerRadius="20dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -52,7 +52,6 @@
             app:layout_constraintEnd_toStartOf="@id/filterButton"
             app:layout_constraintStart_toEndOf="@id/iconSearch"
             app:layout_constraintTop_toTopOf="parent"
-            tools:hint="@string/searchViewHint"
             tools:ignore="LabelFor" />
 
         <TextView
@@ -60,8 +59,10 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:ellipsize="end"
             android:gravity="center_vertical"
-            android:text="@string/searchViewHint"
+            android:hint="@string/searchViewHint"
+            android:maxLines="1"
             android:textSize="16sp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"

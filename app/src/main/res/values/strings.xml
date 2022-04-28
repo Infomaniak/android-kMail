@@ -25,6 +25,8 @@
     <string name="notificationGeneralChannelName">General notifications</string><!--TODO: Add translations-->
     <string name="Download">Download</string>
     <string name="Download_all">Download all</string>
+    <string name="See_all">See all</string>
+    <string name="Select_all">Select all</string>
     <string name="Share">Share</string>
     <plurals name="attachmentQuantity">
         <item quantity="one">%d attachment (%s)</item>
@@ -43,8 +45,10 @@
     <string name="fromTitle">From:</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerUsed">used</string>
-    <string name="newMessageButton">New Message</string>
+    <string name="newMessageButton">New message</string>
     <string name="newMessagePlaceholderTitle">Type your message</string>
+    <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
+    <string name="noEmailTitle">You don\'t have any email</string>
     <string name="objectTitle">Object:</string>
     <string name="searchViewHint">Search for a message</string>
     <string name="threadListSectionLastWeek">Last week</string>

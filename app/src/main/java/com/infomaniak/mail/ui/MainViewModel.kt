@@ -26,4 +26,5 @@ import com.infomaniak.mail.data.models.threads.ThreadsResult
 class MainViewModel(appContext: Application) : AndroidViewModel(appContext) {
     var folders = MutableLiveData<ArrayList<Folder>>()
     var threadList = MutableLiveData<ThreadsResult?>()
+    var isInternetAvailable = MutableLiveData(true)
 }
