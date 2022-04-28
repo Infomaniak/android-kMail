@@ -20,11 +20,11 @@ package com.infomaniak.mail.data.models.threads
 import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import io.realm.RealmInstant
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
-import java.util.*
 
 class Thread : RealmObject {
     @PrimaryKey
@@ -47,7 +47,7 @@ class Thread : RealmObject {
     var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String = ""
-    var date: Date = Date()
+    var date: RealmInstant? = null
 
     @SerializedName("has_attachments")
     var hasAttachments: Boolean = false
