@@ -21,11 +21,11 @@ import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.attachment.Attachment
 import com.infomaniak.mail.data.models.threads.Thread
+import io.realm.RealmInstant
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
-import java.util.*
 
 class Message : RealmObject {
     @PrimaryKey
@@ -33,7 +33,7 @@ class Message : RealmObject {
 
     @SerializedName("msg_id")
     var msgId: String = ""
-    var date: Date = Date()
+    var date: RealmInstant? = null
     var subject: String = ""
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
