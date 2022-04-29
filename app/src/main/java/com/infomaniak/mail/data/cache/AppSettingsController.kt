@@ -18,19 +18,18 @@
 package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.utils.Realms
 import io.realm.query
 
 object AppSettingsController {
-    fun getAppSettings(): AppSettings = with(Realms.appSettings) {
+    fun getAppSettings(): AppSettings = with(MailRealm.appSettings) {
         query<AppSettings>().first().find() ?: writeBlocking { copyToRealm(AppSettings()) }
     }
 
     fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
-        Realms.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
+        MailRealm.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
     }
 
     fun removeAppSettings() {
-        Realms.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
+        MailRealm.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
     }
 }
