@@ -33,7 +33,7 @@ import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.attachment.Attachment
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
@@ -102,12 +102,12 @@ class ApplicationMain : Application() {
                 ApiController.init(
                     arrayListOf(
                         RealmInstant::class.java to RealmInstantConverter(),
-                        // typeAdapterOf<Folder>(), // TODO
-                        typeAdapterOf<Folder>(FolderRealmListConverter()),
-                        typeAdapterOf<Recipient>(RecipientRealmListConverter()),
-                        typeAdapterOf<Message>(MessageRealmListConverter()),
-                        typeAdapterOf<Attachment>(AttachmentRealmListConverter()),
-                        typeAdapterOf<String>(StringRealmListConverter()),
+                        // typeAdapterOfRealmListOf<Folder>(), // TODO
+                        typeAdapterOfRealmListOf<Folder>(FolderRealmListConverter()),
+                        typeAdapterOfRealmListOf<Recipient>(RecipientRealmListConverter()),
+                        typeAdapterOfRealmListOf<Message>(MessageRealmListConverter()),
+                        typeAdapterOfRealmListOf<Attachment>(AttachmentRealmListConverter()),
+                        typeAdapterOfRealmListOf<String>(StringRealmListConverter()),
                     )
                 )
 
