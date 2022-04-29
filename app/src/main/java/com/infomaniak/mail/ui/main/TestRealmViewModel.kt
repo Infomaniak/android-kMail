@@ -19,128 +19,61 @@ package com.infomaniak.mail.ui.main
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.threads.Thread
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.Realms
-import io.realm.MutableRealm
-import io.realm.toRealmList
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.thread.Thread
+import java.io.File
 
 class TestRealmViewModel : ViewModel() {
 
-    fun testRealm() {
+    suspend fun testRealm(cacheDir: File) {
 
-        // Get & save Test mailbox's infos
-        val testMailboxInfo = ApiRepository.getMailboxes()
-            .data
-            ?.firstOrNull { it.email == "kevin.boulongne@ik.me" }
-            ?.initLocalValues()
-            ?: return
-        MailboxInfoController.upsertMailboxInfo(testMailboxInfo)
-        Log.i("Realm", "Upserted MailboxInfo: ${testMailboxInfo.email}")
+        val mailboxes = MailRealm.getMailboxes()
+        Log.e("Realm", "testFinal: get mailboxes - ${mailboxes.size}")
+        val mailbox = mailboxes.first { it.email == "kevin.boulongne@ik.me" }
+        Log.e("Realm", "testFinal: select mailbox - ${mailbox.email}")
 
-        // Get Test mailbox
-        val testMailbox = MailboxInfoController.getMailboxInfos().firstOrNull() ?: return
+        val folders = mailbox.getFolders()
+        Log.e("Realm", "testFinal: get folders - ${folders.size}")
 
-        // Select it
-        AccountUtils.currentMailboxId = testMailbox.mailboxId
-        Log.e("Realm", "Switched to current mailbox: ${testMailbox.email}")
+        // val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
+        // testFolder(inboxFolder, cacheDir)
 
-        // Get & save Inbox
-        ApiRepository.getFolders(testMailbox).data?.forEach { folder ->
+        // val sentFolder = folders.first { it.getRole() == FolderRole.SENT }
+        // testFolder(sentFolder)
 
-            ApiRepository.getThreads(testMailbox, folder).data?.threads
-                ?.also { threads -> folder.threads = threads.toRealmList() }
-                ?.forEach { thread ->
-                    // MailboxContentController.upsertThread(thread)
-                    // Log.i("Realm", "Upserted thread: ${thread.uid}")
-                }
-
-            MailboxContentController.upsertFolder(folder)
-            Log.e("Realm", "Upserted folder: ${folder.name}")
-        }
+        val draftFolder = folders.first { it.getRole() == FolderRole.DRAFT }
+        testFolder(draftFolder, cacheDir)
     }
 
-    fun testRealm2() {
+    private suspend fun testFolder(folder: Folder, cacheDir: File) {
 
+        Log.e("Realm", "testFinal: select folder - ${folder.name}")
 
-        Log.e("TOTO", "ApiRepository.getMailboxes")
-        val mailboxInfosFromAPI = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
-        Log.e("TOTO", "mailboxInfosFromAPI.forEach.copyToRealm")
-        Realms.mailboxInfo.writeBlocking { mailboxInfosFromAPI.forEach { copyToRealm(it, MutableRealm.UpdatePolicy.ALL) } }
+        val threads = folder.getThreads()
+        Log.e("Realm", "testFinal: get threads - ${threads.size}")
 
+        val thread1 = threads[0]
+        testThread(thread1, cacheDir)
 
-        Log.e("TOTO", "MailboxInfoController.getMailboxInfoByEmail")
-        val mailbox = MailboxInfoController.getMailboxInfoByEmail("kevin.boulongne@ik.me") ?: return
-        Log.e("TOTO", "AccountUtils.currentMailboxId = mailbox.mailboxId")
-        AccountUtils.currentMailboxId = mailbox.mailboxId
-        Log.e("TOTO", "ApiRepository.getFolders")
-        val foldersFromAPI = ApiRepository.getFolders(mailbox).data ?: emptyList()
-        Realms.mailboxContent.writeBlocking {
-            Log.e("TOTO", "foldersFromAPI.forEach.copyToRealm")
-            foldersFromAPI.forEach { copyToRealm(it, MutableRealm.UpdatePolicy.ALL) }
-        }
-
-
-        Log.e("TOTO", "MailboxContentController.getFolderByRole(FolderRole.INBOX)")
-        val folder = MailboxContentController.getFolderByRole(Folder.FolderRole.INBOX) ?: return
-        Log.e("TOTO", "ApiRepository.getThreads")
-        val threadsFromApi = ApiRepository.getThreads(mailbox, folder).data?.threads ?: emptyList()
-        Log.e("TOTO", "MailboxContentController.updateFolder.threads = threadsFromApi")
-        MailboxContentController.updateFolder(folder.id) { it.threads = threadsFromApi.toRealmList() }
-
-
-        // Update Messages
-        // MailboxContentController.getFolders().forEach { folder -> folder.threads.forEach { updateMessages(mailbox, it) } }
-        // Get current data
-        // Get outdated data
-        // Delete outdated data
-        // Save new data
-
-
-        Realms.mailboxContent.close()
-        Realms.mailboxInfo.close()
-        Realms.appSettings.close()
+        // val thread2 = threads[1]
+        // testThread(thread2)
     }
 
-    fun updateRealm() {
-        // Update MailboxInfos
-        updateMailboxInfos()
+    private suspend fun testThread(thread: Thread, cacheDir: File) {
+        Log.e("Realm", "testFinal: select thread - ${thread.subject}")
 
-        // Update Folders
-        val mailbox = MailboxInfoController.getMailboxInfoByEmail("kevin.boulongne@ik.me") ?: return
-        AccountUtils.currentMailboxId = mailbox.mailboxId
-        updateFolders(mailbox)
+        val messages = thread.getMessages()
+        Log.e("Realm", "testFinal: get messages - ${messages.size}")
+        val message = messages.last()
+        Log.e("Realm", "testFinal: select message - ${message.body?.value}")
 
-        // Update Threads
-        val folder = MailboxContentController.getFolderByRole(Folder.FolderRole.INBOX) ?: return
-        updateThreads(mailbox, folder)
+        message.attachments.first().getAttachmentData(cacheDir)
 
-        // Update Messages
-        // MailboxContentController.getFolders().forEach { folder -> folder.threads.forEach { updateMessages(mailbox, it) } }
-    }
-
-    private fun updateMailboxInfos() {
-        // Get current data
-        Log.e("TOTO", "updateMailboxInfos: Get current data")
-        val mailboxInfosFromRealm = MailboxInfoController.getMailboxInfos()
-        val mailboxInfosFromAPI = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
-
-        // Get outdated data
-        Log.e("TOTO", "updateMailboxInfos: Get outdated data")
-        val mailboxInfosDeletable = mailboxInfosFromRealm.subtract(mailboxInfosFromAPI)
-
-        // Delete outdated data
-        Log.e("TOTO", "updateMailboxInfos: Delete outdated data")
-        mailboxInfosDeletable.forEach { MailboxInfoController.removeMailboxInfo(it.objectId) }
-
-        // Save new data
-        Log.e("TOTO", "updateMailboxInfos: Save new data")
-        mailboxInfosFromAPI.forEach(MailboxInfoController::upsertMailboxInfo)
+        val draft = message.getDraft() ?: return
+        Log.e("Realm", "testFinal: get draft - ${draft.subject}")
+        draft.attachments.first().getAttachmentData(cacheDir)
     }
 
 //    fun testRealm1() {

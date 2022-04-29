@@ -18,9 +18,15 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import io.realm.query
 
 class Mailbox : RealmObject {
     var uuid: String = ""
@@ -90,5 +96,30 @@ class Mailbox : RealmObject {
         userId = AccountUtils.currentUserId
         objectId = "${mailboxId}_${AccountUtils.currentUserId}"
         return this
+    }
+
+    fun getFolders(): List<Folder> {
+
+        fun deleteFolders() { // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+            MailRealm.mailboxContent.writeBlocking {
+                delete(query<Folder>().find())
+                delete(query<Thread>().find())
+                delete(query<Message>().find())
+                delete(query<Recipient>().find())
+                delete(query<Body>().find())
+                delete(query<Attachment>().find())
+            }
+        }
+
+        AccountUtils.currentMailboxId = mailboxId
+        MailRealm.currentMailbox = this
+
+        deleteFolders()
+
+        val apiFolders = ApiRepository.getFolders(this).data ?: emptyList()
+
+        MailRealm.mailboxContent.writeBlocking { apiFolders.forEach(::copyToRealm) }
+
+        return apiFolders
     }
 }

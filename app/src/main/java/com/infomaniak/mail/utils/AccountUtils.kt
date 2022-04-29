@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.AppSettingsController
+import com.infomaniak.mail.data.cache.MailRealm
 import io.realm.isValid
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +78,8 @@ object AccountUtils : CredentialManager {
     var currentMailboxId: Int = AppSettingsController.getAppSettings()._currentMailboxId
         set(mailboxId) {
             field = mailboxId
-            Realms.selectCurrentMailbox()
+            MailRealm.selectCurrentMailbox()
+            // MailboxContentController.deleteCurrentMailboxContent() // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
             GlobalScope.launch(Dispatchers.IO) {
                 AppSettingsController.updateAppSettings { appSettings ->
                     if (appSettings.isValid()) appSettings._currentMailboxId = mailboxId
