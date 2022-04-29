@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.threads
+package com.infomaniak.mail.data.models.thread
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import io.realm.RealmInstant
-import io.realm.RealmList
-import io.realm.RealmObject
+import io.realm.*
+import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.PrimaryKey
-import io.realm.realmListOf
 
 class Thread : RealmObject {
     @PrimaryKey
@@ -65,6 +65,39 @@ class Thread : RealmObject {
     fun initLocalValues(): Thread {
         messages.removeIf { it.isDuplicate }
         return this
+    }
+
+    fun getMessages(): List<Message> {
+
+        fun deleteMessages() { // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+            MailRealm.mailboxContent.writeBlocking {
+                delete(query<Message>().find())
+                // delete(query<Recipient>().find())
+                // delete(query<Body>().find())
+                // delete(query<Attachment>().find())
+            }
+        }
+
+        MailRealm.currentThread = this
+
+        // deleteMessages()
+
+        val apiMessages = mutableListOf<Message>()
+        messages.forEach { message ->
+            ApiRepository.getMessage(message).data?.let { completedMessage ->
+                completedMessage.apply {
+                    fullyDownloaded = true
+                    // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                    attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(uid, index) }
+                }
+                apiMessages.add(completedMessage)
+            }
+        }
+
+        messages = apiMessages.toRealmList()
+        MailRealm.mailboxContent.writeBlocking { copyToRealm(this@Thread, UpdatePolicy.ALL) }
+
+        return apiMessages
     }
 
     enum class ThreadFilter(title: String) {

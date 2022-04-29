@@ -18,12 +18,18 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
-import com.infomaniak.mail.data.models.attachment.Attachment
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
 
 class Draft : RealmObject {
+
+    companion object {
+        const val OFFLINE_DRAFT_UUID_PREFIX = "offline"
+    }
+
+    @PrimaryKey
     var uuid: String = ""
 
     @SerializedName("identity_id")
@@ -54,4 +60,15 @@ class Draft : RealmObject {
     @SerializedName("st_uuid")
     var stUuid: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
+
+    /**
+     * Local
+     */
+    var parentMessageUid: String = ""
+
+    fun initLocalValues(messageUid: String): Draft {
+        uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
+        parentMessageUid = messageUid
+        return this
+    }
 }
