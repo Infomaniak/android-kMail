@@ -21,7 +21,7 @@ import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.attachment.Attachment
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.RealmList
 import io.realm.realmListOf
@@ -47,7 +47,7 @@ import java.lang.reflect.Type
 //     }
 // }
 
-inline fun <reified T> typeAdapterOf(converter: Any): Pair<Type, Any> {
+inline fun <reified T> typeAdapterOfRealmListOf(converter: Any): Pair<Type, Any> {
     return Pair(object : TypeToken<RealmList<T>>() {}.type, converter)
 }
 

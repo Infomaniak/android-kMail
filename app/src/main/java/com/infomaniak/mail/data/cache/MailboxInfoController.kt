@@ -17,41 +17,43 @@
  */
 package com.infomaniak.mail.data.cache
 
-import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.utils.Realms
-import io.realm.MutableRealm
-import io.realm.RealmResults
-import io.realm.query
-
 object MailboxInfoController {
-    fun getMailboxInfos(): RealmResults<Mailbox> =
-        Realms.mailboxInfo.query<Mailbox>().find()
 
-    fun getMailboxInfoByEmail(email: String): Mailbox? =
-        Realms.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+//    fun getMailboxInfos(): RealmResults<Mailbox> =
+//        MailRealm.mailboxInfo.query<Mailbox>().find()
 
-    private fun getMailboxInfoByObjectId(objectId: String): Mailbox? =
-        Realms.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
+//    fun selectMailboxByEmail(email: String) {
+//        currentMailbox = MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+//        currentMailbox?.let { AccountUtils.currentMailboxId = it.mailboxId } ?: throw MailboxNotFoundException(email)
+//    }
 
-    private fun MutableRealm.getLatestMailboxInfoByObjectId(objectId: String): Mailbox? =
-        getMailboxInfoByObjectId(objectId)?.let(::findLatest)
+//    fun getMailboxInfoByEmail(email: String): Mailbox? =
+//        MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
 
-    fun upsertMailboxInfo(mailbox: Mailbox) {
-        Realms.mailboxInfo.writeBlocking {
-            removeMailboxInfoIfAlreadyExisting(mailbox) // TODO: remove this when the UPSERT is working
-            copyToRealm(mailbox)
-        }
-    }
+//    private fun getMailboxInfoByObjectId(objectId: String): Mailbox? =
+//        MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
 
-    fun updateMailboxInfo(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-        Realms.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(onUpdate) }
-    }
+//    private fun MutableRealm.getLatestMailboxInfoByObjectId(objectId: String): Mailbox? =
+//        getMailboxInfoByObjectId(objectId)?.let(::findLatest)
 
-    fun removeMailboxInfo(objectId: String) {
-        Realms.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(::delete) }
-    }
+//    fun upsertMailboxInfo(mailbox: Mailbox) {
+//        MailRealm.mailboxInfo.writeBlocking {
+//            removeMailboxInfoIfAlreadyExisting(mailbox) // TODO: remove this when the UPSERT is working
+//            copyToRealm(mailbox)
+//        }
+//    }
 
-    private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {
-        getMailboxInfoByObjectId(mailbox.objectId)?.let { findLatest(it)?.let(::delete) }
-    }
+//    private fun updateMailboxInfo(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
+//        MailRealm.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(onUpdate) }
+//    }
+
+//    private fun removeMailboxInfo(objectId: String) {
+//        MailRealm.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(::delete) }
+//    }
+
+//    private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {
+//        getMailboxInfoByObjectId(mailbox.objectId)?.let { findLatest(it)?.let(::delete) }
+//    }
+
+//    class MailboxNotFoundException(email: String) : Exception("Mailbox [$email] not found")
 }
