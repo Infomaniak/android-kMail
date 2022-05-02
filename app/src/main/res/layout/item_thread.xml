@@ -84,13 +84,15 @@
 
             <TextView
                 android:id="@+id/mailDate"
+                android:gravity="end"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:maxWidth="50dp"
                 android:maxLines="1"
-                android:text="31 janv."
+                android:text=""
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="31 jan 2000"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
