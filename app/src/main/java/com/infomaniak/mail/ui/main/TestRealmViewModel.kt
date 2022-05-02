@@ -37,11 +37,11 @@ class TestRealmViewModel : ViewModel() {
         val folders = mailbox.getFolders()
         Log.e("Realm", "testFinal: get folders - ${folders.size}")
 
-        // val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
-        // testFolder(inboxFolder, cacheDir)
+        val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
+        testFolder(inboxFolder, cacheDir)
 
-        // val sentFolder = folders.first { it.getRole() == FolderRole.SENT }
-        // testFolder(sentFolder)
+        val sentFolder = folders.first { it.getRole() == FolderRole.SENT }
+        testFolder(sentFolder, cacheDir)
 
         val draftFolder = folders.first { it.getRole() == FolderRole.DRAFT }
         testFolder(draftFolder, cacheDir)
@@ -57,8 +57,8 @@ class TestRealmViewModel : ViewModel() {
         val thread1 = threads[0]
         testThread(thread1, cacheDir)
 
-        // val thread2 = threads[1]
-        // testThread(thread2)
+//        val thread2 = threads[1]
+//        testThread(thread2, cacheDir)
     }
 
     private suspend fun testThread(thread: Thread, cacheDir: File) {
@@ -69,11 +69,11 @@ class TestRealmViewModel : ViewModel() {
         val message = messages.last()
         Log.e("Realm", "testFinal: select message - ${message.body?.value}")
 
-        message.attachments.first().getAttachmentData(cacheDir)
+//        message.attachments?.first()?.getAttachmentData(cacheDir)
 
-        val draft = message.getDraft() ?: return
-        Log.e("Realm", "testFinal: get draft - ${draft.subject}")
-        draft.attachments.first().getAttachmentData(cacheDir)
+//        val draft = message.getDraft() ?: return
+//        Log.e("Realm", "testFinal: get draft - ${draft.subject}")
+//        draft.attachments.first().getAttachmentData(cacheDir)
     }
 
 //    fun testRealm1() {
@@ -179,7 +179,7 @@ class TestRealmViewModel : ViewModel() {
 //
 //        // Get outdated data
 //        Log.d("Realm", "updateMailboxInfos: Get outdated data")
-//        // val mailboxInfosDeletable = mailboxInfosFromRealm.subtract(mailboxInfosFromAPI)
+//        // val mailboxInfosDeletable = mailboxInfosFromRealm._subtract_(mailboxInfosFromAPI)
 //
 //        // Delete outdated data
 //        Log.e("Realm", "updateMailboxInfos: Delete outdated data")
@@ -198,7 +198,7 @@ class TestRealmViewModel : ViewModel() {
 //
 //        // Get outdated data
 //        Log.d("Realm", "updateFolders: Get outdated data")
-//        // val foldersDeletable = foldersFromRealm.subtract(foldersFromAPI)
+//        // val foldersDeletable = foldersFromRealm._subtract_(foldersFromAPI)
 //        // val threadsDeletable = foldersDeletable.flatMap { it.threads }
 //        // val foldersIds = foldersDeletable.map { it.id }
 //        // val messagesDeletable = threadsDeletable.flatMap { thread -> thread.messages.filter { foldersIds.contains(it.folderId) } }
@@ -231,7 +231,7 @@ class TestRealmViewModel : ViewModel() {
 //
 //        // Get outdated data
 //        Log.d("Realm", "updateThreads: Get outdated data")
-//        // val threadsDeletable = threadsFromRealm.subtract(threadsFromApi)
+//        // val threadsDeletable = threadsFromRealm._subtract_(threadsFromApi)
 //        // val messagesDeletable = threadsDeletable.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
 //
 //        // Delete outdated data

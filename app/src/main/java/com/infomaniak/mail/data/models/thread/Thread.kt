@@ -20,10 +20,10 @@ package com.infomaniak.mail.data.models.thread
 import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.*
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.PrimaryKey
 
 class Thread : RealmObject {
@@ -64,38 +64,36 @@ class Thread : RealmObject {
 
     fun initLocalValues(): Thread {
         messages.removeIf { it.isDuplicate }
+
+        from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+
+        messages = messages.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+
         return this
     }
 
     fun getMessages(): List<Message> {
-
-        fun deleteMessages() { // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
-            MailRealm.mailboxContent.writeBlocking {
-                delete(query<Message>().find())
-                // delete(query<Recipient>().find())
-                // delete(query<Body>().find())
-                // delete(query<Attachment>().find())
-            }
-        }
-
-        MailRealm.currentThread = this
-
-        // deleteMessages()
-
         val apiMessages = mutableListOf<Message>()
         messages.forEach { message ->
             ApiRepository.getMessage(message).data?.let { completedMessage ->
-                completedMessage.apply {
-                    fullyDownloaded = true
-                    // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                    attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(uid, index) }
+                completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                completedMessage.fullyDownloaded = true
+                completedMessage.body?.objectId = "body_${completedMessage.uid}" // TODO: Remove this when we have EmbeddedObjects
+                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                completedMessage.attachments?.forEachIndexed { index, attachment ->
+                    attachment.initLocalValues(index, completedMessage.uid)
                 }
                 apiMessages.add(completedMessage)
             }
         }
 
         messages = apiMessages.toRealmList()
-        MailRealm.mailboxContent.writeBlocking { copyToRealm(this@Thread, UpdatePolicy.ALL) }
+        MailboxContentController.upsertThread(this)
+
+        MailRealm.currentThread = this
 
         return apiMessages
     }
