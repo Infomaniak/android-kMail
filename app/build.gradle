@@ -2,13 +2,13 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     // Realm Kotlin PRODUCTION - START /!\
-    id 'io.realm.kotlin'
+    // id 'io.realm.kotlin'
     // Realm Kotlin PRODUCTION - END /!\
 }
 
 // Realm Kotlin SNAPSHOT - START /!\
-// configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
-// apply plugin: "io.realm.kotlin"
+configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
+apply plugin: "io.realm.kotlin"
 // Realm Kotlin SNAPSHOT - END /!\
 
 android {
