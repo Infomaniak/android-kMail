@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.databinding.ItemThreadBinding
 import com.infomaniak.mail.databinding.SeeAllRecyclerButtonBinding
 import com.infomaniak.mail.databinding.ThreadListRecyclerSectionBinding
+import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import java.util.*
 
@@ -64,7 +65,7 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
             }
             DisplayType.THREAD.layout -> with(viewHolder.binding as ItemThreadBinding) {
                 with(itemList[position] as Thread) {
-                    expeditor.text = from[0].name
+                    expeditor.text = from[0].name.ifEmpty { from[0].email }
                     mailSubject.text = subject
                     mailDate.text = formatDate(date?.toDate() ?: Date(0))
                     viewHolder.binding.itemThread.setOnClickListener { onThreadClicked?.invoke(this) }
@@ -110,15 +111,11 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
         return addItemList
     }
 
-    private fun formatDate(date: Date): String {
-        val now = Date()
-
-        return  with(date) {
-            when {
-                year() != now.year() -> format("d MMM. yyyy")
-                month() == now.month() && day() == now.day() -> "${hours()}:${minutes()}"
-                else -> format("d MMM.")
-            }
+    private fun formatDate(date: Date): String = with(date) {
+        when {
+            isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
+            year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
+            else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
         }
     }
 
