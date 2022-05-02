@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.*
+import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.PrimaryKey
 
 class Message : RealmObject {
@@ -92,15 +93,25 @@ class Message : RealmObject {
     var hasUnsubscribeLink: Boolean = false
     var parentLink: Thread? = null
 
+    fun initLocalValues(): Message {
+        from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        to = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        replyTo = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+
+        return this
+    }
+
     fun getDraft(): Draft? {
         val apiDraft = ApiRepository.getDraft(this).data
         apiDraft?.let { draft ->
             draft.apply {
                 initLocalValues(uid)
                 // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(uid, index) }
+                attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
             }
-            MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, MutableRealm.UpdatePolicy.ALL) }
+            MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
         }
         return apiDraft
     }

@@ -69,6 +69,7 @@ class Draft : RealmObject {
     fun initLocalValues(messageUid: String): Draft {
         uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
         parentMessageUid = messageUid
+
         return this
     }
 }
