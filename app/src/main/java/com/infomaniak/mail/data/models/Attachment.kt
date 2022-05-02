@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
-import io.realm.MutableRealm
+import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import okhttp3.OkHttpClient
@@ -62,8 +62,9 @@ class Attachment : RealmObject {
     var thumbnail: String = ""
 
     // TODO: Remove this method when we have EmbeddedObjects
-    fun initLocalValues(messageUid: String, position: Int): Attachment {
-        uuid = "attachment_${position}_${messageUid}"
+    fun initLocalValues(position: Int, parentMessageUid: String): Attachment {
+        uuid = "attachment_${position}_${parentMessageUid}"
+
         return this
     }
 
@@ -77,7 +78,7 @@ class Attachment : RealmObject {
 
         saveAttachmentData(response, file) {
             localUri = file.toURI().toString()
-            MailRealm.mailboxContent.writeBlocking { copyToRealm(this@Attachment, MutableRealm.UpdatePolicy.ALL) }
+            MailRealm.mailboxContent.writeBlocking { copyToRealm(this@Attachment, UpdatePolicy.ALL) }
         }
     }
 

@@ -18,10 +18,17 @@
 package com.infomaniak.mail.data.models.message
 
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 class Body : RealmObject {
     var value: String = ""
     var type: String = ""
     var subBody: String? = null
+
+    /**
+     * Local
+     */
+    @PrimaryKey
+    var objectId: String = "" // TODO: Remove this when we have EmbeddedObjects
 }

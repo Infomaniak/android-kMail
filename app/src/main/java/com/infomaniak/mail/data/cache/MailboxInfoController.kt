@@ -17,10 +17,30 @@
  */
 package com.infomaniak.mail.data.cache
 
+import com.infomaniak.mail.data.models.Mailbox
+import io.realm.MutableRealm
+import io.realm.MutableRealm.UpdatePolicy
+import io.realm.RealmResults
+import io.realm.query
+
 object MailboxInfoController {
 
-//    fun getMailboxInfos(): RealmResults<Mailbox> =
-//        MailRealm.mailboxInfo.query<Mailbox>().find()
+    fun getMailboxes(): RealmResults<Mailbox> =
+        MailRealm.mailboxInfo.query<Mailbox>().find()
+
+    fun upsertMailbox(mailbox: Mailbox) {
+        MailRealm.mailboxInfo.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
+    }
+
+    fun deleteMailbox(objectId: String) {
+        MailRealm.mailboxInfo.writeBlocking { getLatestMailbox(objectId)?.let(::delete) }
+    }
+
+    private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? =
+        getMailbox(objectId)?.let(::findLatest)
+
+    private fun getMailbox(objectId: String): Mailbox? =
+        MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
 
 //    fun selectMailboxByEmail(email: String) {
 //        currentMailbox = MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
@@ -30,25 +50,9 @@ object MailboxInfoController {
 //    fun getMailboxInfoByEmail(email: String): Mailbox? =
 //        MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
 
-//    private fun getMailboxInfoByObjectId(objectId: String): Mailbox? =
-//        MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
-
-//    private fun MutableRealm.getLatestMailboxInfoByObjectId(objectId: String): Mailbox? =
-//        getMailboxInfoByObjectId(objectId)?.let(::findLatest)
-
-//    fun upsertMailboxInfo(mailbox: Mailbox) {
-//        MailRealm.mailboxInfo.writeBlocking {
-//            removeMailboxInfoIfAlreadyExisting(mailbox) // TODO: remove this when the UPSERT is working
-//            copyToRealm(mailbox)
-//        }
-//    }
 
 //    private fun updateMailboxInfo(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
 //        MailRealm.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(onUpdate) }
-//    }
-
-//    private fun removeMailboxInfo(objectId: String) {
-//        MailRealm.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(::delete) }
 //    }
 
 //    private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {

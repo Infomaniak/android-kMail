@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
+import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
@@ -30,7 +31,6 @@ import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.query
 
 object MailRealm {
 
@@ -42,18 +42,36 @@ object MailRealm {
     var currentFolder: Folder? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
     var currentThread: Thread? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
 
-    fun getMailboxes(): List<Mailbox> {
+    /**
+     * Mailboxes
+     */
+    // fun getCachedMailboxes(): List<Mailbox> = MailboxInfoController.getMailboxes()
 
-        fun deleteMailboxes() { // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
-            mailboxInfo.writeBlocking { delete(query<Mailbox>().find()) }
+    fun getMailboxes(): List<Mailbox> {
+        // Get current data
+        Log.d("Realm", "getUpdatedMailboxes: Get current data")
+        val mailboxesFromRealm = MailboxInfoController.getMailboxes()
+        // TODO: Handle connectivity issues. If there is no Internet, all Realm Mailboxes will be deleted. We don't want that.
+        val mailboxesFromAPI = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
+
+        // Get outdated data
+        Log.d("Realm", "getUpdatedMailboxes: Get outdated data")
+        val deletableMailboxes = mailboxesFromRealm.filter { fromRealm ->
+            !mailboxesFromAPI.any { fromApi -> fromApi.mailboxId == fromRealm.mailboxId }
         }
 
-        deleteMailboxes()
+        // Delete outdated data
+        Log.e("Realm", "getUpdatedMailboxes: Delete outdated data")
+        deletableMailboxes.forEach {
+            // TODO: Delete each Realm file in the same time, with `Realm.deleteRealm()`
+            MailboxInfoController.deleteMailbox(it.objectId)
+        }
 
-        val mailboxes = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
-        mailboxInfo.writeBlocking { mailboxes.forEach { copyToRealm(it) } }
+        // Save new data
+        Log.i("Realm", "getUpdatedMailboxes: Save new data")
+        mailboxesFromAPI.forEach(MailboxInfoController::upsertMailbox)
 
-        return mailboxes
+        return mailboxesFromAPI
     }
 
     fun selectCurrentMailbox() {
@@ -61,6 +79,9 @@ object MailRealm {
         mailboxContent = Realm.open(RealmConfigurations.mailboxContent())
     }
 
+    /**
+     * Configurations
+     */
     private object RealmConfigurations {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
