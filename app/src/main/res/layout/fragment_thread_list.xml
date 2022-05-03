@@ -86,7 +86,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/marginStandard"
-        android:layout_marginBottom="@dimen/marginLarge"
+        android:layout_marginBottom="@dimen/marginStandard"
         android:contentDescription="@string/newMessageButton"
         android:text="@string/newMessageButton"
         android:textAllCaps="false"

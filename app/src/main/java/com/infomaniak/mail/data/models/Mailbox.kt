@@ -100,7 +100,6 @@ class Mailbox : RealmObject {
     fun getFolders(): List<Folder> {
 
         AccountUtils.currentMailboxId = mailboxId
-        MailRealm.currentMailbox = this
 
         // Get current data
         Log.d("Realm", "getUpdatedFolders: Get current data")
@@ -130,6 +129,8 @@ class Mailbox : RealmObject {
         // Save new data
         Log.i("Realm", "getUpdatedFolders: Save new data")
         foldersFromAPI.forEach(MailboxContentController::upsertFolder)
+
+        MailRealm.currentMailboxFlow.value = this
 
         return foldersFromAPI
     }

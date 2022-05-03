@@ -25,7 +25,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.LoaderAdapter
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.ItemThreadBinding
 import com.infomaniak.mail.databinding.SeeAllRecyclerButtonBinding
 import com.infomaniak.mail.databinding.ThreadListRecyclerSectionBinding

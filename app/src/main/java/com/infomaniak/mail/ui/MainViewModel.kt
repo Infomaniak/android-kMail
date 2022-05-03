@@ -17,14 +17,36 @@
  */
 package com.infomaniak.mail.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.threads.ThreadsResult
+import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class MainViewModel(appContext: Application) : AndroidViewModel(appContext) {
-    var folders = MutableLiveData<ArrayList<Folder>>()
-    var threadList = MutableLiveData<ThreadsResult?>()
-    var isInternetAvailable = MutableLiveData(true)
+class MainViewModel : ViewModel() {
+
+    fun fetchMailboxesAndFolders() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val mailboxes = MailRealm.getMailboxes()
+            val mailbox1 = mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId } ?: mailboxes.firstOrNull()
+//          val mailbox =  if (mailbox1 == null) {
+//                val mailbox2 =
+//                    mailboxes.firstOrNull()
+//                mailbox2?.mailboxId?.let { AccountUtils.currentMailboxId = it }
+//                MailRealm.currentMailboxFlow.value = mailbox2
+            // MailRealm.currentMailbox = mailbox2
+//            } else {
+//                MailRealm.currentMailboxFlow.value = mailbox1
+            // MailRealm.currentMailbox = mailbox1
+//            }
+
+            val inbox = mailbox1?.getFolders()?.firstOrNull { it.getRole() == Folder.FolderRole.INBOX }
+            inbox?.getThreads()
+//            MailRealm.currentFolderFlow.value = inbox
+        }
+
+//    val mailboxes: List<Mailbox> by lazy { MailRealm.getMailboxes() }
+    }
 }
