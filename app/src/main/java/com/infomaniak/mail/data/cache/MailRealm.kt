@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import kotlinx.coroutines.flow.MutableStateFlow
 
 object MailRealm {
 
@@ -38,8 +39,10 @@ object MailRealm {
     val mailboxInfo = Realm.open(RealmConfigurations.mailboxInfo)
     lateinit var mailboxContent: Realm
 
-    var currentMailbox: Mailbox? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
-    var currentFolder: Folder? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+    var mailboxes2: List<Mailbox> = emptyList()
+    val currentMailboxFlow: MutableStateFlow<Mailbox?> = MutableStateFlow(null)
+    // var currentMailbox: Mailbox? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+    val currentFolderFlow: MutableStateFlow<Folder?> = MutableStateFlow(null) // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
     var currentThread: Thread? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
 
     /**

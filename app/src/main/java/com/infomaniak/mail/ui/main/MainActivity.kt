@@ -18,19 +18,13 @@
 package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.cache.MailboxInfoController
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.Realms
+import com.infomaniak.mail.ui.MainViewModel
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -38,13 +32,13 @@ import io.sentry.SentryLevel
 class MainActivity : AppCompatActivity() {
 
     private val testRealmViewModel: TestRealmViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val navController = setupNavController()
-
+        mainViewModel.fetchMailboxesAndFolders()
 //        findViewById<Button>(R.id.startCalls).setOnClickListener {
 //            lifecycleScope.launch(Dispatchers.IO) {
 ////                lightlyPopulateRealm()
@@ -74,113 +68,6 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment
         return navHostFragment.navController.apply {
             if (currentDestination == null) navigate(graph.startDestinationId)
-        }
-    }
-
-
-    private fun lightlyPopulateRealm() {
-
-        // Save all mailboxes infos
-        ApiRepository.getMailboxes().data?.forEach {
-            val mailbox = it.initLocalValues()
-            MailboxInfoController.upsertMailboxInfo(mailbox)
-            Log.i("Realm", "Upserted MailboxInfo: ${mailbox.email}")
-        }
-
-        // Get the 1st mailbox
-        MailboxInfoController.getMailboxInfos().firstOrNull()?.let { mailbox ->
-
-            // Select it
-            AccountUtils.currentMailboxId = mailbox.mailboxId
-            Log.e("Realm", "Switched to current mailbox: ${mailbox.email}")
-
-            // Save all folders
-            ApiRepository.getFolders(mailbox).data?.forEach { folder ->
-                MailboxContentController.upsertFolder(folder)
-                Log.i("Realm", "Upserted folder: ${folder.name}")
-            }
-
-            MailboxContentController.getFolderByRole(Folder.FolderRole.INBOX)?.let { folder ->
-                Log.e("Realm", "Switched to folder: ${folder.name}")
-
-                // Get all threads
-                val threads = ApiRepository.getThreads(mailbox, folder).data?.threads
-
-                // Save all threads
-                threads?.forEach { thread ->
-                    MailboxContentController.upsertThread(thread)
-                    Log.i("Realm", "Upserted thread: ${thread.uid} - ${thread.date}")
-                }
-
-                // folder.threads.addAll(threads)
-
-                // Get the 1st thread's messages
-                threads?.firstOrNull()?.messages?.forEach { message ->
-
-                    // Get all completed messages
-                    ApiRepository.getMessage(message).data?.let { completedMessage ->
-
-                        // Save all completed messages
-                        completedMessage.fullyDownloaded = true
-                        MailboxContentController.upsertMessage(completedMessage)
-                        Log.d("Realm", "Upserted completed message: ${completedMessage.subject}")
-                    }
-                }
-            }
-        }
-    }
-
-    private fun callAllAPIs() {
-        val getUser = ApiRepository.getUser()
-        Log.i("API", "getUser: $getUser")
-
-        val getAddressBooks = ApiRepository.getAddressBooks()
-        Log.i("API", "getAddressBooks: $getAddressBooks")
-
-        val getContacts = ApiRepository.getContacts()
-        Log.i("API", "getContacts: $getContacts")
-
-        val getMailboxes = ApiRepository.getMailboxes()
-        Log.i("API", "getMailboxes: $getMailboxes")
-
-        val mailbox = getMailboxes.data?.firstOrNull()!!
-        val getFolders = ApiRepository.getFolders(mailbox)
-        Log.i("API", "getFolders: $getFolders")
-
-        val getQuotas = ApiRepository.getQuotas(mailbox)
-        Log.i("API", "getQuotas: $getQuotas")
-
-        val getSignature = ApiRepository.getSignatures(mailbox)
-        Log.i("API", "getSignature: $getSignature")
-
-        val inbox = getFolders.data?.find { it.getRole() == Folder.FolderRole.INBOX }!!
-        val getInboxThreads = ApiRepository.getThreads(mailbox, inbox, null)
-        Log.i("API", "getInboxThreads: $getInboxThreads")
-
-        val message = getInboxThreads.data!!.threads?.first()?.messages?.first()
-        val getMessage = message?.let { ApiRepository.getMessage(it) }
-        Log.i("API", "getMessage: $getMessage")
-
-        // val moveMessageResponse = ApiRepository.moveMessage(mailbox, arrayListOf(message), inbox.id)
-        // Log.i("API", "moveMessageResponse: $moveMessageResponse")
-
-        // val starMessageResponse = ApiRepository.starMessage(true, mailbox, arrayListOf(message.uid))
-        // Log.i("API", "starMessageResponse: $starMessageResponse")
-
-        val drafts = getFolders.data?.find { it.getRole() == Folder.FolderRole.DRAFT }!!
-        val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts, null)
-        Log.i("API", "getDraftsThreads: $getDraftsThreads")
-
-        val draftMessage = getDraftsThreads.data?.threads?.find { it.hasDrafts }?.messages?.find { it -> it.isDraft }
-        draftMessage?.let {
-            val draftUuid = draftMessage.draftResource.substringAfterLast('/')
-            val getDraftFromUuid = ApiRepository.getDraft(mailbox, draftUuid)
-            Log.i("API", "getDraftFromUuid: $getDraftFromUuid")
-            val getDraftFromMessage = ApiRepository.getDraft(draftMessage)
-            Log.i("API", "getDraftFromMessage: $getDraftFromMessage")
-
-            // val deleteDraft = ApiRepository.deleteDraft(mailbox, draftUuid)
-            // Log.i("API", "deleteDraft: $deleteDraft")
         }
     }
 }
