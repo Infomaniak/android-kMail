@@ -48,7 +48,7 @@
     <string name="newMessageButton">New message</string>
     <string name="newMessagePlaceholderTitle">Type your message</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
-    <string name="noEmailTitle">You don\'t have any email</string>
+    <string name="noEmailTitle">You don\'t have any emails</string>
     <string name="objectTitle">Object:</string>
     <string name="searchViewHint">Search for a message</string>
     <string name="threadListSectionLastWeek">Last week</string>
