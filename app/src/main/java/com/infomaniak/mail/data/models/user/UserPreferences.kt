@@ -29,14 +29,30 @@ class UserPreferences : RealmObject {
     var density: String = ""
     // TODO: Add other preferences.
 
+    /**
+     * Local
+     */
+    private var intelligentMode: String = IntelligentMode.DISABLED.name
+
     fun getThreadMode(): ThreadMode? = when (threadMode) {
         ThreadMode.MESSAGES.name -> ThreadMode.MESSAGES
         ThreadMode.THREADS.name -> ThreadMode.THREADS
         else -> null
     }
 
+    fun getIntelligentMode(): IntelligentMode? = when (intelligentMode) {
+        IntelligentMode.ENABLED.name -> IntelligentMode.ENABLED
+        IntelligentMode.DISABLED.name -> IntelligentMode.DISABLED
+        else -> null
+    }
+
     enum class ThreadMode {
         MESSAGES,
         THREADS,
+    }
+
+    enum class IntelligentMode {
+        ENABLED,
+        DISABLED,
     }
 }

@@ -24,68 +24,63 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.threads.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
-import com.infomaniak.mail.ui.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ThreadListFragment : DialogFragment() {
 
-    private val mainViewModel: MainViewModel by activityViewModels()
+    private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
     private lateinit var mailbox: Mailbox // TODO Replace with realm mailBox
     private val threadAdapter = ThreadListAdapter()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentThreadListBinding.inflate(inflater, container, false)
-        with(mainViewModel) {
-            threadList = MutableLiveData()
-            threadList.observe(viewLifecycleOwner) { list ->
-                if (list?.threads.isNullOrEmpty()) {
+
+        return binding.root
+    }
+
+    private fun listenToChanges() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            threadListViewModel.threads.collect { threads ->
+                if (threads == null || threads.list.isNullOrEmpty()) {
                     displayNoEmailView()
-                } else {
-                    displayThreadList()
-                    threadAdapter.apply {
-                        clean()
-                        context?.let { binding.threadList.post { addAll(formatList(list?.threads!!, it)) } }
+                    return@collect
+                }
+
+                displayThreadList()
+                threadAdapter.apply {
+                    clean()
+                    context?.let {
+                        binding.threadList.post { addAll(formatList(newThreadList = ArrayList(threads.list), it)) }
                     }
                 }
             }
         }
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.threadList.adapter = threadAdapter
-        lifecycleScope.launch(Dispatchers.IO) {
-            mailbox = ApiRepository.getMailboxes().data!![0]
-            with(mainViewModel) {
-                val foldersResponse = ApiRepository.getFolders(mailbox).data!!
-                folders.postValue(foldersResponse)
-                val inboxFolder = foldersResponse.find { it.getRole() == Folder.FolderRole.INBOX }
-                threadList.postValue(ApiRepository.getThreads(mailbox, inboxFolder!!, Thread.ThreadFilter.ALL).data)
-            }
-        }
+        listenToChanges()
+        threadListViewModel.fetchThreads()
+
         setupListeners()
         setupThreadAdapter()
     }
 
     private fun setupThreadAdapter() {
-        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
+        threadListViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO manage no internet screen
 //            threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
 //            binding.noNetwork.isGone = isInternetAvailable
