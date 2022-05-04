@@ -21,8 +21,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.*
-import com.infomaniak.lib.core.views.LoaderAdapter
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
@@ -33,7 +34,9 @@ import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import java.util.*
 
-class ThreadListAdapter : LoaderAdapter<Any>() {
+class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use LoaderAdapter from Core instead?
+
+    var itemsList: ArrayList<Any> = ArrayList()
 
     @StringRes
     var previousSectionName: Int = -1
@@ -43,28 +46,26 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ThreadViewHolder(
-            when (viewType) {
-                R.layout.thread_list_recycler_section ->
-                    ThreadListRecyclerSectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                R.layout.see_all_recycler_button ->
-                    SeeAllRecyclerButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                else -> ItemThreadBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            }
-        )
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = when (viewType) {
+            R.layout.thread_list_recycler_section -> ThreadListRecyclerSectionBinding.inflate(layoutInflater, parent, false)
+            R.layout.see_all_recycler_button -> SeeAllRecyclerButtonBinding.inflate(layoutInflater, parent, false)
+            else -> ItemThreadBinding.inflate(layoutInflater, parent, false)
+        }
+        return ThreadViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val viewHolder = holder as ThreadViewHolder<*>
         when (getItemViewType(position)) {
             DisplayType.SECTION_TITLE.layout -> with(viewHolder.binding as ThreadListRecyclerSectionBinding) {
-                sectionTitle.text = itemList[position] as String
+                sectionTitle.text = itemsList[position] as String
             }
             DisplayType.SEE_ALL_BUTTON.layout -> with(viewHolder.binding as SeeAllRecyclerButtonBinding) {
-                seeAllText.append("(${itemList[position]})")
+                seeAllText.append("(${itemsList[position]})")
             }
             DisplayType.THREAD.layout -> with(viewHolder.binding as ItemThreadBinding) {
-                with(itemList[position] as Thread) {
+                with(itemsList[position] as Thread) {
                     expeditor.text = from[0].name.ifEmpty { from[0].email }
                     mailSubject.text = subject
                     mailDate.text = formatDate(date?.toDate() ?: Date(0))
@@ -74,11 +75,11 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
         }
     }
 
-    override fun getItemCount() = itemList.size
+    override fun getItemCount() = itemsList.size
 
     override fun getItemViewType(position: Int): Int {
         return when {
-            itemList[position] is String -> DisplayType.SECTION_TITLE.layout
+            itemsList[position] is String -> DisplayType.SECTION_TITLE.layout
             displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
             else -> DisplayType.THREAD.layout
         }
@@ -93,22 +94,23 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
         }
     }
 
-    fun formatList(newThreadList: ArrayList<Thread>, context: Context): ArrayList<Any> {
-        val addItemList: ArrayList<Any> = arrayListOf()
+    fun formatList(threads: List<Thread>, context: Context): ArrayList<Any> {
+        previousSectionName = -1
+        val formattedList = arrayListOf<Any>()
 
-        for (thread in newThreadList) {
-            val currentItemDateCategory = getDateCategories(thread.date?.toDate()?.time ?: 0).value
+        threads.sortedByDescending { it.date }.forEach { thread ->
+            val currentItemDateCategory = getDateCategories(thread.date?.toDate()?.time ?: 0L).value
             when {
                 currentItemDateCategory != previousSectionName -> {
                     previousSectionName = currentItemDateCategory
-                    addItemList.add(context.getString(currentItemDateCategory))
+                    formattedList.add(context.getString(currentItemDateCategory))
                 }
-                displaySeeAllButton -> addItemList.add(thread.messagesCount - 3)
+                // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
             }
-            addItemList.add(thread)
+            formattedList.add(thread)
         }
 
-        return addItemList
+        return formattedList
     }
 
     private fun formatDate(date: Date): String = with(date) {
@@ -116,6 +118,49 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
             isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
             year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
             else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
+        }
+    }
+
+    fun notifyAdapter(newList: ArrayList<Any>) {
+        DiffUtil.calculateDiff(ThreadListDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
+        itemsList = newList
+    }
+
+    private class ThreadListDiffCallback(
+        private val oldList: List<Any>,
+        private val newList: List<Any>,
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldIndex: Int, newIndex: Int): Boolean {
+            val oldItem = oldList[oldIndex]
+            val newItem = newList[newIndex]
+            return when {
+                oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
+                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
+                else -> (oldItem as Thread).uid == (newItem as Thread).uid // Both are Threads
+            }
+        }
+
+        override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
+            val oldItem = oldList[oldIndex]
+            val newItem = newList[newIndex]
+            return when {
+                oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
+                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
+                else -> { // Both are Threads
+                    if ((oldItem as Thread).uid == (newItem as Thread).uid) { // Same items
+                        oldItem.subject == newItem.subject &&
+                                oldItem.messagesCount == newItem.messagesCount
+                        // TODO: Add other fields checks
+                    } else { // Not same items
+                        false
+                    }
+                }
+            }
         }
     }
 
@@ -133,7 +178,6 @@ class ThreadListAdapter : LoaderAdapter<Any>() {
     }
 
     companion object {
-        const val DAY_LENGTH_MS = 1000 * 3600 * 24
+        const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
     }
-
 }

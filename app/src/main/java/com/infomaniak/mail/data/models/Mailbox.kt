@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.utils.AccountUtils
+import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
@@ -97,19 +98,26 @@ class Mailbox : RealmObject {
         return this
     }
 
-    fun getFolders(): List<Folder> {
+    fun select() {
+        if (MailRealm.currentMailboxObjectIdFlow.value != objectId) {
+            AccountUtils.currentMailboxId = mailboxId
+            MailRealm.mutableCurrentMailboxObjectIdFlow.value = objectId
+        }
+    }
 
-        AccountUtils.currentMailboxId = mailboxId
+    fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFolders()
+
+    fun fetchFoldersFromAPI(): List<Folder> {
 
         // Get current data
         Log.d("Realm", "getUpdatedFolders: Get current data")
-        val folderFromRealm = MailboxContentController.getFolders()
+        val foldersFromRealm = MailboxContentController.getFolders()
         // TODO: Handle connectivity issues. If there is no Internet, all Realm Folders will be deleted. We don't want that.
         val foldersFromAPI = ApiRepository.getFolders(this).data ?: emptyList()
 
         // Get outdated data
         Log.d("Realm", "getUpdatedFolders: Get outdated data")
-        val deletableFolders = folderFromRealm.filter { fromRealm ->
+        val deletableFolders = foldersFromRealm.filter { fromRealm ->
             !foldersFromAPI.any { fromApi -> fromApi.id == fromRealm.id }
         }
         val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
@@ -128,9 +136,14 @@ class Mailbox : RealmObject {
 
         // Save new data
         Log.i("Realm", "getUpdatedFolders: Save new data")
-        foldersFromAPI.forEach(MailboxContentController::upsertFolder)
-
-        MailRealm.currentMailboxFlow.value = this
+        MailRealm.mailboxContent.writeBlocking {
+            foldersFromAPI.forEach { folderFromAPI ->
+                val folder = copyToRealm(folderFromAPI, UpdatePolicy.ALL)
+                foldersFromRealm.firstOrNull { it.id == folderFromAPI.id }?.threads
+                    ?.mapNotNull(::findLatest)
+                    ?.let(folder.threads::addAll)
+            }
+        }
 
         return foldersFromAPI
     }
