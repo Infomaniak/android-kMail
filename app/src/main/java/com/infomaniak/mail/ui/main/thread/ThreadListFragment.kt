@@ -25,7 +25,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -49,25 +51,6 @@ class ThreadListFragment : DialogFragment() {
         return binding.root
     }
 
-    private fun listenToChanges() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            threadListViewModel.threads.collect { threads ->
-                if (threads == null || threads.list.isNullOrEmpty()) {
-                    displayNoEmailView()
-                    return@collect
-                }
-
-                displayThreadList()
-                threadAdapter.apply {
-                    clean()
-                    context?.let {
-                        binding.threadList.post { addAll(formatList(newThreadList = ArrayList(threads.list), it)) }
-                    }
-                }
-            }
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -77,6 +60,27 @@ class ThreadListFragment : DialogFragment() {
 
         setupListeners()
         setupThreadAdapter()
+    }
+
+    private fun listenToChanges() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                threadListViewModel.threads.collect { threads ->
+                    if (threads.list.isNullOrEmpty()) {
+                        displayNoEmailView()
+                        return@collect
+                    }
+
+                    displayThreadList()
+                    threadAdapter.apply {
+                        clean()
+                        context?.let {
+                            binding.threadList.post { addAll(formatList(newThreadList = ArrayList(threads.list), it)) }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun setupThreadAdapter() {
