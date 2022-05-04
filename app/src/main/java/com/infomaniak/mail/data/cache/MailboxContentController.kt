@@ -33,18 +33,17 @@ object MailboxContentController {
     fun getFolders(): RealmResults<Folder> =
         MailRealm.mailboxContent.query<Folder>().find()
 
-    fun upsertFolder(folder: Folder) {
+    fun upsertFolder(folder: Folder): Folder =
         MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
-    }
 
     fun deleteFolder(id: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
     }
 
-    private fun MutableRealm.getLatestFolder(id: String): Folder? =
+    fun MutableRealm.getLatestFolder(id: String): Folder? =
         getFolder(id)?.let(::findLatest)
 
-    private fun getFolder(id: String): Folder? =
+    fun getFolder(id: String): Folder? =
         MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
 
 //    fun getFolderByRole(role: Folder.FolderRole): Folder? =
@@ -75,7 +74,7 @@ object MailboxContentController {
     private fun MutableRealm.getLatestThread(uid: String): Thread? =
         getThread(uid)?.let(::findLatest)
 
-    private fun getThread(uid: String): Thread? =
+    fun getThread(uid: String): Thread? =
         MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
 
 //    private fun getThreadByUid(uid: String): Thread? =

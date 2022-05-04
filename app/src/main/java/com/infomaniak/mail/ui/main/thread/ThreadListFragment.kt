@@ -18,28 +18,26 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ThreadListFragment : DialogFragment() {
+class ThreadListFragment : Fragment() {
 
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
-    private lateinit var mailbox: Mailbox // TODO Replace with realm mailBox
     private val threadAdapter = ThreadListAdapter()
 
     override fun onCreateView(
@@ -56,27 +54,32 @@ class ThreadListFragment : DialogFragment() {
 
         binding.threadList.adapter = threadAdapter
         listenToChanges()
-        threadListViewModel.fetchThreads()
+        threadListViewModel.getThreads()
 
         setupListeners()
         setupThreadAdapter()
     }
 
     private fun listenToChanges() {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 threadListViewModel.threads.collect { threads ->
-                    if (threads.list.isNullOrEmpty()) {
-                        displayNoEmailView()
-                        return@collect
+
+                    try {
+                        Log.e("Realm", "listenToChanges: Received threads (${threads?.size})")
+                        threads?.forEach { Log.d("Realm", "listenToChanges: ${it.subject}") }
+                    } catch (e: RuntimeException) {
+                        Log.e("Realm", "listenToChanges: Received threads crashed")
                     }
 
-                    displayThreadList()
-                    threadAdapter.apply {
-                        clean()
-                        context?.let {
-                            binding.threadList.post { addAll(formatList(newThreadList = ArrayList(threads.list), it)) }
+                    if (threads?.isNotEmpty() == true) {
+                        displayThreadList()
+                        with(threadAdapter) {
+                            val newList = formatList(threads, requireContext())
+                            notifyAdapter(newList)
                         }
+                    } else {
+                        displayNoEmailView()
                     }
                 }
             }

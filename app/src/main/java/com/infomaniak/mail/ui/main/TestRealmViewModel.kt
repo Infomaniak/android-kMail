@@ -29,12 +29,13 @@ class TestRealmViewModel : ViewModel() {
 
     suspend fun testRealm(cacheDir: File) {
 
-        val mailboxes = MailRealm.getMailboxes()
+        val mailboxes = MailRealm.fetchMailboxesFromApi()
         Log.e("Realm", "testFinal: get mailboxes - ${mailboxes.size}")
         val mailbox = mailboxes.first { it.email == "kevin.boulongne@ik.me" }
         Log.e("Realm", "testFinal: select mailbox - ${mailbox.email}")
 
-        val folders = mailbox.getFolders()
+        mailbox.select()
+        val folders = mailbox.fetchFoldersFromAPI()
         Log.e("Realm", "testFinal: get folders - ${folders.size}")
 
         val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
@@ -51,7 +52,9 @@ class TestRealmViewModel : ViewModel() {
 
         Log.e("Realm", "testFinal: select folder - ${folder.name}")
 
-        val threads = folder.getThreads()
+        folder.fetchThreadsFromAPI()
+        folder.select()
+        val threads = folder.threads //TODO: Check if this data is not empty there?
         Log.e("Realm", "testFinal: get threads - ${threads.size}")
 
         val thread1 = threads[0]
@@ -64,6 +67,7 @@ class TestRealmViewModel : ViewModel() {
     private suspend fun testThread(thread: Thread, cacheDir: File) {
         Log.e("Realm", "testFinal: select thread - ${thread.subject}")
 
+        thread.select()
         val messages = thread.getMessages()
         Log.e("Realm", "testFinal: get messages - ${messages.size}")
         val message = messages.last()

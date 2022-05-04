@@ -74,6 +74,10 @@ class Thread : RealmObject {
         return this
     }
 
+    fun select() {
+        MailRealm.mutableCurrentThreadUidFlow.value = uid
+    }
+
     fun getMessages(): List<Message> {
         val apiMessages = mutableListOf<Message>()
         messages.forEach { message ->
@@ -92,8 +96,6 @@ class Thread : RealmObject {
 
         messages = apiMessages.toRealmList()
         MailboxContentController.upsertThread(this)
-
-        MailRealm.currentThread = this
 
         return apiMessages
     }

@@ -32,6 +32,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 object MailRealm {
 
@@ -39,18 +40,24 @@ object MailRealm {
     val mailboxInfo = Realm.open(RealmConfigurations.mailboxInfo)
     lateinit var mailboxContent: Realm
 
-    var mailboxes2: List<Mailbox> = emptyList()
-    val currentMailboxFlow: MutableStateFlow<Mailbox?> = MutableStateFlow(null)
-    // var currentMailbox: Mailbox? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
-    val currentFolderFlow: MutableStateFlow<Folder?> = MutableStateFlow(null) // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
-    var currentThread: Thread? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+    // Current mailbox flow
+    val mutableCurrentMailboxObjectIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentMailboxObjectIdFlow = mutableCurrentMailboxObjectIdFlow.asStateFlow()
+
+    // Current folder flow
+    val mutableCurrentFolderIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentFolderIdFlow = mutableCurrentFolderIdFlow.asStateFlow()
+
+    // Current thread flow
+    val mutableCurrentThreadUidFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentThreadUidFlow = mutableCurrentThreadUidFlow.asStateFlow()
 
     /**
      * Mailboxes
      */
-    // fun getCachedMailboxes(): List<Mailbox> = MailboxInfoController.getMailboxes()
+    fun readMailboxesFromRealm(): List<Mailbox> = MailboxInfoController.getMailboxes()
 
-    fun getMailboxes(): List<Mailbox> {
+    fun fetchMailboxesFromApi(): List<Mailbox> {
         // Get current data
         Log.d("Realm", "getUpdatedMailboxes: Get current data")
         val mailboxesFromRealm = MailboxInfoController.getMailboxes()
