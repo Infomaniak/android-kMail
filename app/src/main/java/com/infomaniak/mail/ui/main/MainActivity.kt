@@ -31,22 +31,18 @@ import io.sentry.SentryLevel
 
 class MainActivity : AppCompatActivity() {
 
-    private val testRealmViewModel: TestRealmViewModel by viewModels()
+    // private val testRealmViewModel: TestRealmViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val navController = setupNavController()
-        mainViewModel.fetchMailboxesAndFolders()
-//        findViewById<Button>(R.id.startCalls).setOnClickListener {
-//            lifecycleScope.launch(Dispatchers.IO) {
-////                lightlyPopulateRealm()
-//                // fullyPopulateRealm()
-//        callAllAPIs()
-//
-//            }
-//        }
+        mainViewModel.getData()
+
+        // findViewById<Button>(R.id.startCalls).setOnClickListener {
+        //     lifecycleScope.launch(Dispatchers.IO) { testRealmViewModel.testRealm(cacheDir) }
+        // }
 
         navController.addOnDestinationChangedListener { _, dest, args -> onDestinationChanged(dest, args) }
     }

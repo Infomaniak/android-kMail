@@ -21,13 +21,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.thread.Thread
-import io.realm.notifications.InitialResults
-import io.realm.notifications.ResultsChange
-import io.realm.notifications.UpdatedResults
-import io.realm.query
-import io.realm.query.Sort
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -37,17 +32,15 @@ class ThreadListViewModel : ViewModel() {
 
     var isInternetAvailable = MutableLiveData(true)
 
-    private val _threads = MutableStateFlow<ResultsChange<Thread>?>(null)
-    val threads = _threads.asStateFlow().filterNotNull()
+    private val _threads = MutableStateFlow<List<Thread>?>(null)
+    val threads = _threads.asStateFlow()
 
-    fun fetchThreads() {
-        viewModelScope.launch(Dispatchers.IO) {
-            MailRealm.currentFolderFlow.filterNotNull().collect {
-                MailRealm.mailboxContent.query<Thread>().sort("date", Sort.DESCENDING).asFlow().collect { threadsResults ->
-                    when (threadsResults) {
-                        is InitialResults -> if (_threads.value == null) _threads.value = threadsResults
-                        is UpdatedResults -> _threads.value = threadsResults
-                    }
+    fun getThreads() {
+        viewModelScope.launch {
+            MailRealm.currentFolderIdFlow.filterNotNull().collect { id ->
+                MailboxContentController.getFolder(id)?.threads?.asFlow()?.collect { changes ->
+                    // _threads.value = changes.list // TODO: Use this, blocked by https://github.com/realm/realm-kotlin/issues/827
+                    _threads.value = MailboxContentController.getFolder(id)?.threads
                 }
             }
         }

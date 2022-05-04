@@ -22,6 +22,8 @@ import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
+import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -59,16 +61,24 @@ class Folder : RealmObject {
     /**
      * Local
      */
-    var threads: RealmList<Thread> = realmListOf() // TODO
+    var threads: RealmList<Thread> = realmListOf()
     var parentLink: Folder? = null // TODO
 
-    fun getThreads(): List<Thread> {
+    fun select() {
+        MailRealm.mutableCurrentFolderIdFlow.value = id
+    }
+
+    fun fetchThreadsFromAPI() {
         // Get current data
         Log.d("Realm", "getUpdatedThreads: Get current data")
-        val threadsFromRealm = threads
+        val threadsFromRealm = MailRealm.mailboxContent.writeBlocking { getLatestFolder(id) }?.threads ?: emptyList()
         // TODO: Handle connectivity issues. If there is no Internet, all Realm Threads will be deleted. We don't want that.
-        val threadsFromApi = MailRealm.currentMailboxFlow.value?.let { mailbox ->
+        val threadsFromApi = MailRealm.currentMailboxObjectIdFlow.value?.let { objectId ->
+            val mailbox = MailboxInfoController.getMailbox(objectId)!!
             ApiRepository.getThreads(mailbox, this).data?.threads?.map { it.initLocalValues() }
+            // ?.filterIndexed { index, _ -> index < 7 }
+            // ?.filterIndexed { index, _ -> index < 5 }
+            // ?.filterIndexed { index, _ -> index < 3 }
         } ?: emptyList()
 
         // Get outdated data
@@ -87,10 +97,6 @@ class Folder : RealmObject {
         Log.i("Realm", "getUpdatedThreads: Save new data")
         threads = threadsFromApi.toRealmList()
         MailboxContentController.upsertFolder(this)
-
-        MailRealm.currentFolderFlow.value = this
-
-        return threadsFromApi
     }
 
     fun getRole(): FolderRole? = when (_role) {

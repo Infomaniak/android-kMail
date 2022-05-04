@@ -2,9 +2,9 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     // Realm Kotlin PRODUCTION - START /!\
-    id 'io.realm.kotlin'
-    id 'androidx.navigation.safeargs.kotlin'
+    // id 'io.realm.kotlin'
     // Realm Kotlin PRODUCTION - END /!\
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 // Realm Kotlin SNAPSHOT - START /!\
