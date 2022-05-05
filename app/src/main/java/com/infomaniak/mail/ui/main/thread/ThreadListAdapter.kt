@@ -21,6 +21,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.*
@@ -43,7 +45,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     var displaySeeAllButton = false // TODO manage this for intelligent mailbox
 
     var onEmptyList: (() -> Unit)? = null
-    var onThreadClicked: ((thread: Thread) -> Unit)? = null
+    var onThreadClicked: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -52,11 +54,11 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
             R.layout.see_all_recycler_button -> SeeAllRecyclerButtonBinding.inflate(layoutInflater, parent, false)
             else -> ItemThreadBinding.inflate(layoutInflater, parent, false)
         }
-        return ThreadViewHolder(binding)
+        return BoundViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val viewHolder = holder as ThreadViewHolder<*>
+        val viewHolder = holder as BoundViewHolder<*>
         when (getItemViewType(position)) {
             DisplayType.SECTION_TITLE.layout -> with(viewHolder.binding as ThreadListRecyclerSectionBinding) {
                 sectionTitle.text = itemsList[position] as String
@@ -65,17 +67,21 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 seeAllText.append("(${itemsList[position]})")
             }
             DisplayType.THREAD.layout -> with(viewHolder.binding as ItemThreadBinding) {
-                with(itemsList[position] as Thread) {
-                    expeditor.text = from[0].name.ifEmpty { from[0].email }
-                    mailSubject.text = subject
-                    mailDate.text = formatDate(date?.toDate() ?: Date(0))
-                    viewHolder.binding.itemThread.setOnClickListener { onThreadClicked?.invoke(this) }
+                val thread = itemsList[position] as Thread
+                expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
+                mailSubject.text = thread.subject
+                mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
+                iconAttachment.isVisible = thread.hasAttachments
+                iconCalendar.isGone = true // TODO see with api when we should display this icon
+                iconFavorite.isVisible = thread.flagged
+                newMailBullet.isVisible = thread.unseenMessagesCount > 0
+                viewHolder.binding.itemThread.setOnClickListener {
+                    thread.select()
+                    onThreadClicked?.invoke()
                 }
             }
         }
     }
-
-    override fun getItemCount() = itemsList.size
 
     override fun getItemViewType(position: Int): Int {
         return when {
@@ -180,4 +186,6 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     companion object {
         const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
     }
+
+    override fun getItemCount(): Int = itemsList.size
 }
