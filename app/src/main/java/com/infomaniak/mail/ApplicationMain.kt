@@ -31,9 +31,9 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*

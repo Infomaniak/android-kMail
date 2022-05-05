@@ -20,4 +20,4 @@ package com.infomaniak.mail.ui.main.thread
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.views.ViewHolder
 
-class ThreadViewHolder<T : ViewBinding>(val binding: T) : ViewHolder(binding.root)
+class BoundViewHolder<T : ViewBinding>(val binding: T) : ViewHolder(binding.root)

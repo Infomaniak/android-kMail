@@ -45,19 +45,18 @@ class ThreadListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentThreadListBinding.inflate(inflater, container, false)
-
+        binding.threadList.adapter = threadAdapter
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.threadList.adapter = threadAdapter
-        listenToChanges()
-        threadListViewModel.getThreads()
-
         setupListeners()
         setupThreadAdapter()
+
+        listenToChanges()
+        threadListViewModel.getThreads()
     }
 
     private fun listenToChanges() {
@@ -93,7 +92,7 @@ class ThreadListFragment : Fragment() {
 
 //            onEmptyList = { checkIfNoFiles() }
 
-            onThreadClicked = { thread ->
+            onThreadClicked = {
 //                if (thread.isUsable()) {
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment())
 //                    }

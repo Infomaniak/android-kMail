@@ -77,7 +77,7 @@ object MailboxContentController {
     private fun MutableRealm.getLatestThread(uid: String): Thread? =
         getThread(uid)?.let(::findLatest)
 
-    private fun getThread(uid: String): Thread? =
+    fun getThread(uid: String): Thread? =
         MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
 
 //    private fun getThreadByUid(uid: String): Thread? =

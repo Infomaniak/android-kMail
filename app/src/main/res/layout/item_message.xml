@@ -113,12 +113,13 @@
     </com.google.android.material.chip.ChipGroup>
 
     <TextView
+        android:layout_marginTop="@dimen/marginStandardMedium"
         android:id="@+id/messageBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras eu lacus ornare, tristique nibh quis,
         placerat massa. \n\n a facilisi. Fusce varius elit nec enim placerat, non accumsan dolor feugiat. Nulla facilisi. Nunc
-        maximus felis lectus, nec fermentum orci lobortis in. Nulla ultrices facilisis molestie. \n\n Meilleurs Messages, Anne P"
+        maximus felis lectus, nec fermentum orci lobortis in. Nulla ultrices facilisis molestie. \n\n Meilleurs Messages,\n Anne P"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attachmentsChipGroup" />

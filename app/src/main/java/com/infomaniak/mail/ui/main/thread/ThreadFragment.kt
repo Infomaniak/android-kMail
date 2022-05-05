@@ -18,15 +18,24 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.databinding.FragmentThreadBinding
+import kotlinx.coroutines.launch
 
 class ThreadFragment : Fragment() {
 
     private lateinit var binding: FragmentThreadBinding
+    private val messageAdapter = ThreadAdapter()
+    private val threadViewModel: ThreadViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentThreadBinding.inflate(inflater, container, false)
@@ -35,6 +44,27 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.messageList.adapter = messageAdapter
+        binding.backButton.setOnClickListener { findNavController().popBackStack() }
+
+        listenToChanges()
+        threadViewModel.getMessages()
     }
 
+    private fun listenToChanges() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                threadViewModel.messages.collect { messages ->
+
+                    Log.i("UI", "Received messages (${messages.size})")
+                    messages.forEach { Log.v("UI", "Sender: ${it.from.firstOrNull()?.email}") }
+
+                    if (messages.isNotEmpty()) {
+                        messageAdapter.notifyAdapter(ArrayList(messages))
+                        // messageAdapter.apply { binding.messageList.post { addAll(ArrayList(messages.list)) } }
+                    }
+                }
+            }
+        }
+    }
 }
