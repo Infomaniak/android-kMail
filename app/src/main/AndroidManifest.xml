@@ -21,9 +21,9 @@
     <application
         android:name=".ApplicationMain"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_kmail"
         android:label="@string/appName"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_kmail"
         android:theme="@style/AppTheme">
 
         <meta-data
