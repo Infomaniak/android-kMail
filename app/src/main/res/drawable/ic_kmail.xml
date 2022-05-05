@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="38dp"
+    android:height="40dp"
+    android:viewportWidth="38"
+    android:viewportHeight="40">
+    <path
+        android:fillAlpha="0.5"
+        android:fillColor="#FF9ABF"
+        android:fillType="nonZero"
+        android:pathData="M13.2875,0.8406L36.5097,7.9859C37.3955,8.2585 38,9.0769 38,10.0037L38,29.8639C38,31.0298 37.0548,31.975 35.8889,31.975C35.6784,31.975 35.4692,31.9435 35.268,31.8816L12.0458,24.7363C11.16,24.4638 10.5556,23.6454 10.5556,22.7186L10.5556,2.8584C10.5556,1.6924 11.5007,0.7472 12.6667,0.7472C12.8771,0.7472 13.0864,0.7787 13.2875,0.8406Z"
+        android:strokeWidth="1"
+        android:strokeAlpha="0.5"
+        android:strokeColor="#00000000" />
+    <path
+        android:fillAlpha="0.8"
+        android:fillColor="#F789B2"
+        android:fillType="nonZero"
+        android:pathData="M8.0097,4.2184L31.232,11.3637C32.1178,11.6362 32.7222,12.4546 32.7222,13.3814L32.7222,33.2416C32.7222,34.4076 31.777,35.3528 30.6111,35.3528C30.4007,35.3528 30.1914,35.3213 29.9903,35.2594L6.768,28.1141C5.8822,27.8415 5.2778,27.0231 5.2778,26.0963L5.2778,6.2361C5.2778,5.0702 6.223,4.125 7.3889,4.125C7.5993,4.125 7.8086,4.1565 8.0097,4.2184Z"
+        android:strokeWidth="1"
+        android:strokeAlpha="0.8"
+        android:strokeColor="#00000000" />
+    <path
+        android:fillColor="#FF5B97"
+        android:fillType="nonZero"
+        android:pathData="M2.732,8.4406L25.9542,15.5859C26.84,15.8585 27.4444,16.6769 27.4444,17.6037L27.4444,37.4639C27.4444,38.6298 26.4993,39.575 25.3333,39.575C25.1229,39.575 24.9136,39.5435 24.7125,39.4816L1.4903,32.3363C0.6045,32.0638 0,31.2454 0,30.3186L0,10.4584C0,9.2924 0.9452,8.3472 2.1111,8.3472C2.3216,8.3472 2.5308,8.3787 2.732,8.4406Z"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
+    <path
+        android:fillColor="#E50322"
+        android:fillType="nonZero"
+        android:pathData="M0,7.6L0.6757,8.9103C1.0524,8.5609 1.5568,8.3472 2.1111,8.3472C2.3191,8.3472 2.526,8.378 2.725,8.4385L2.717,8.436L25.9654,15.5894C26.3622,15.7139 26.7019,15.9481 26.9553,16.2524L27.059,16.387L13.6452,28.3384C12.7747,29.114 11.4402,29.037 10.6646,28.1664C10.5464,28.0337 10.4454,27.8866 10.364,27.7285L0,7.6Z"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
+</vector>
