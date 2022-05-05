@@ -19,9 +19,9 @@ package com.infomaniak.mail.utils
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.RealmList
 import io.realm.realmListOf

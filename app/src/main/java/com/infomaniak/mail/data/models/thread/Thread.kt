@@ -39,10 +39,11 @@ class Thread : RealmObject {
 
     @SerializedName("deleted_messages_count")
     var deletedMessagesCount: Int = 0
+
     var messages: RealmList<Message> = realmListOf()
 
     @SerializedName("unseen_messages")
-    var unseenMessages: Int = 0
+    var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
