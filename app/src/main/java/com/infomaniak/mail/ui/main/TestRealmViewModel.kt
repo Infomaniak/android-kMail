@@ -39,20 +39,20 @@ class TestRealmViewModel : ViewModel() {
         Log.e("Realm", "testFinal: get folders - ${folders.size}")
 
         val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
-        testFolder(inboxFolder, cacheDir)
+        testFolder(mailbox.uuid, inboxFolder, cacheDir)
 
         val sentFolder = folders.first { it.getRole() == FolderRole.SENT }
-        testFolder(sentFolder, cacheDir)
+        testFolder(mailbox.uuid, sentFolder, cacheDir)
 
         val draftFolder = folders.first { it.getRole() == FolderRole.DRAFT }
-        testFolder(draftFolder, cacheDir)
+        testFolder(mailbox.uuid, draftFolder, cacheDir)
     }
 
-    private suspend fun testFolder(folder: Folder, cacheDir: File) {
+    private suspend fun testFolder(mailboxUuid: String, folder: Folder, cacheDir: File) {
 
         Log.e("Realm", "testFinal: select folder - ${folder.name}")
 
-        folder.fetchThreadsFromAPI()
+        folder.fetchThreadsFromAPI(mailboxUuid)
         folder.select()
         val threads = folder.threads //TODO: Check if this data is not empty there?
         Log.e("Realm", "testFinal: get threads - ${threads.size}")
@@ -167,7 +167,7 @@ class TestRealmViewModel : ViewModel() {
 //        val folder = updateFolders(mailbox) ?: return
 //
 //        // Update Threads
-//        // val folder = MailboxContentController.getFolderByRole(Folder.FolderRole.INBOX) ?: return
+//        // val folder = MailboxContentController.getFolderByRole(FolderRole.INBOX) ?: return
 //        updateThreads(mailbox, folder)
 //
 //        // Update Messages

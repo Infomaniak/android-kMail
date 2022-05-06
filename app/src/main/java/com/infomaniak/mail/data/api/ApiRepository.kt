@@ -43,95 +43,95 @@ object ApiRepository : ApiRepositoryCore() {
 //    fun getContactImage(path: String): ApiResponse<Data> =
 //        callApi(ApiRoutes.resource(path), GET)
 
-    fun getSignatures(mailbox: Mailbox): ApiResponse<SignaturesResult> =
-        callApi(ApiRoutes.signatures(mailbox.hostingId, mailbox.mailbox), GET)
+    fun getSignatures(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<SignaturesResult> =
+        callApi(ApiRoutes.signatures(mailboxHostingId, mailboxMailbox), GET)
 
     fun getMailboxes(): ApiResponse<ArrayList<Mailbox>> =
         callApi(ApiRoutes.mailbox(), GET)
 
-    fun getFolders(mailbox: Mailbox): ApiResponse<ArrayList<Folder>> =
-        callApi(ApiRoutes.folders(mailbox.uuid), GET)
+    fun getFolders(mailboxUuid: String): ApiResponse<ArrayList<Folder>> =
+        callApi(ApiRoutes.folders(mailboxUuid), GET)
 
-//    fun createFolder(mailbox: Mailbox, name: String, path: String?): ApiResponse<Folder> =
-//        callApi(ApiRoutes.folders(mailbox.uuid), POST, mutableMapOf("name" to name).apply { path?.let { "path" to it } })
+    // fun createFolder(mailboxUuid: String, name: String, path: String?): ApiResponse<Folder> =
+    //     callApi(ApiRoutes.folders(mailboxUuid), POST, mutableMapOf("name" to name).apply { path?.let { "path" to it } })
 
-//    fun renameFolder(mailbox: Mailbox, folder: Folder, newName: String): ApiResponse<Folder> =
-//        callApi(ApiRoutes.renameFolder(mailbox.uuid, folder.id), POST, mapOf("name" to newName))
+    // fun renameFolder(mailboxUuid: String, folderId: String, newName: String): ApiResponse<Folder> =
+    //     callApi(ApiRoutes.renameFolder(mailboxUuid, folderId), POST, mapOf("name" to newName))
 
-//    fun favoriteFolder(mailbox: Mailbox, folder: Folder, favorite: Boolean): ApiResponse<Boolean> =
-//        callApi(ApiRoutes.favoriteFolder(mailbox.uuid, folder.id, favorite), POST)
+    // fun favoriteFolder(mailboxUuid: String, folderId: String, favorite: Boolean): ApiResponse<Boolean> =
+    //     callApi(ApiRoutes.favoriteFolder(mailboxUuid, folderId, favorite), POST)
 
-//    fun readFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
-//        callApi(ApiRoutes.readFolder(mailbox.uuid, folder.id), POST)
+    // fun readFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> =
+    //     callApi(ApiRoutes.readFolder(mailboxUuid, folderId), POST)
 
-//    fun flushFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
-//        callApi(ApiRoutes.flushFolder(mailbox.uuid, folder.id), POST)
+    // fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> =
+    //     callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
 
-//    fun deleteFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
-//        callApi(ApiRoutes.folder(mailbox.uuid, folder.id), DELETE)
+    // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> =
+    //     callApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getThreads(mailbox: Mailbox, folder: Folder, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> =
-        callApi(ApiRoutes.threads(mailbox.uuid, folder.id, filter?.name), GET)
+    fun getThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> =
+        callApi(ApiRoutes.threads(mailboxUuid, folderId, filter?.name), GET)
 
-    fun getMessage(message: Message): ApiResponse<Message> =
-        callApi(ApiRoutes.resource("${message.resource}?name=prefered_format&value=html"), GET)
+    fun getMessage(messageResource: String): ApiResponse<Message> =
+        callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
 
-    fun getQuotas(mailbox: Mailbox): ApiResponse<Quotas> =
-        callApi(ApiRoutes.quotas(mailbox.mailbox, mailbox.hostingId), GET)
+    fun getQuotas(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<Quotas> =
+        callApi(ApiRoutes.quotas(mailboxMailbox, mailboxHostingId), GET)
 
-//    fun markAsSeen(mailbox: Mailbox, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
-//        callApi(ApiRoutes.messageSeen(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }))
+    // fun markAsSeen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
+    //     callApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
 
-//    fun markAsUnseen(mailbox: Mailbox, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
-//        callApi(ApiRoutes.messageUnseen(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }))
+    // fun markAsUnseen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
+    //     callApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
 
-//    fun markAsSafe(mailbox: Mailbox, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
-//        callApi(ApiRoutes.messageSafe(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }))
+    // fun markAsSafe(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
+    //     callApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
 
-//    fun trustSender(mailbox: Mailbox, message: Message): ApiResponse<EmptyResponse> =
-//        callApi(ApiRoutes.resource("${message.resource}/trustForm"), POST)
+    // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> =
+    //     callApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
-    fun saveDraft(mailbox: Mailbox, draft: Draft): ApiResponse<Draft> {
-        fun postDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailbox.uuid), POST, draft)
-        fun putDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailbox.uuid, draft.uuid), PUT, draft)
+    fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<Draft> {
+        fun postDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailboxUuid), POST, draft)
+        fun putDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, draft)
         return if (draft.uuid.isEmpty()) postDraft() else putDraft()
     }
 
-    fun send(mailbox: Mailbox, draft: Draft): ApiResponse<Boolean> {
-        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailbox.uuid), POST, draft)
-        fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailbox.uuid, draft.uuid), PUT, draft)
+    fun send(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
+        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, draft)
+        fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, draft)
         return if (draft.uuid.isEmpty()) postDraft() else putDraft()
     }
 
-    fun getDraft(mailbox: Mailbox, draftUuid: String): ApiResponse<Draft> =
-        callApi(ApiRoutes.draft(mailbox.uuid, draftUuid), GET)
+    fun getDraft(mailboxUuid: String, draftUuid: String): ApiResponse<Draft> =
+        callApi(ApiRoutes.draft(mailboxUuid, draftUuid), GET)
 
-    fun deleteDraft(mailbox: Mailbox, draftUuid: String): ApiResponse<EmptyResponse?> =
-        callApi(ApiRoutes.draft(mailbox.uuid, draftUuid), DELETE)
+    fun deleteDraft(mailboxUuid: String, draftUuid: String): ApiResponse<EmptyResponse?> =
+        callApi(ApiRoutes.draft(mailboxUuid, draftUuid), DELETE)
 
-    fun moveMessage(mailbox: Mailbox, messages: ArrayList<Message>, destinationId: String): ApiResponse<MoveResult> =
-        callApi(ApiRoutes.moveMessage(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }, "to" to destinationId))
+    fun moveMessage(mailboxUuid: String, messages: ArrayList<Message>, destinationId: String): ApiResponse<MoveResult> =
+        callApi(ApiRoutes.moveMessage(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }, "to" to destinationId))
 
-//    fun createAttachment(
-//        mailbox: Mailbox,
-//        attachmentData: Data,
-//        disposition: AttachmentDisposition,
-//        attachmentName: String,
-//        mimeType: String,
-//    ): ApiResponse<Attachment> {
-//        // TODO: Add headers
-//        // let headers = ["x-ws-attachment-filename": attachmentName, "x-ws-attachment-mime-type": mimeType, "x-ws-attachment-disposition": disposition.rawValue]
-//        return callApi(ApiRoutes.createAttachment(mailbox.uuid), POST, attachmentData)
-//    }
+    // fun createAttachment(
+    //     mailboxUuid: String,
+    //     attachmentData: Data,
+    //     disposition: Attachment.AttachmentDisposition,
+    //     attachmentName: String,
+    //     mimeType: String,
+    // ): ApiResponse<Attachment> {
+    //     // TODO: Add headers
+    //     // let headers = ["x-ws-attachment-filename": attachmentName, "x-ws-attachment-mime-type": mimeType, "x-ws-attachment-disposition": disposition.rawValue]
+    //     return callApi(ApiRoutes.createAttachment(mailboxUuid), POST, attachmentData)
+    // }
 
-    fun getDraft(message: Message): ApiResponse<Draft> =
-        callApi(ApiRoutes.resource(message.draftResource), GET)
+    fun getDraft(messageDraftResource: String): ApiResponse<Draft> =
+        callApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun starMessage(star: Boolean, mailbox: Mailbox, messageIds: ArrayList<String>): ApiResponse<StarMessageResult> =
-        callApi(ApiRoutes.starMessage(mailbox.uuid, star), POST, mapOf("uids" to messageIds))
+    fun starMessage(star: Boolean, mailboxUuid: String, messageIds: ArrayList<String>): ApiResponse<StarMessageResult> =
+        callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
 
-//    fun search(mailbox: Mailbox, folder: Folder, searchText: String): ApiResponse<Thread> =
-//        callApi(ApiRoutes.search(mailbox.uuid, folder.id, searchText), GET)
+    // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> =
+    //     callApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
 
     private fun pagination(page: Int, perPage: Int = PER_PAGE) = "page=$page&per_page=$perPage"
 }
