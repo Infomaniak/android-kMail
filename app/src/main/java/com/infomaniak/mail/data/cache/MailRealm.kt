@@ -73,8 +73,8 @@ object MailRealm {
         // Delete outdated data
         Log.e("API", "getUpdatedMailboxes: Delete outdated data")
         deletableMailboxes.forEach {
-            // TODO: Delete each Realm file in the same time, with `Realm.deleteRealm()`
             MailboxInfoController.deleteMailbox(it.objectId)
+            Realm.deleteRealm(RealmConfigurations.mailboxContent(it.mailboxId))
         }
 
         // Save new data
@@ -86,17 +86,18 @@ object MailRealm {
 
     fun selectCurrentMailbox() {
         if (MailRealm::mailboxContent.isInitialized) mailboxContent.close()
-        mailboxContent = Realm.open(RealmConfigurations.mailboxContent())
+        mailboxContent = Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId))
     }
 
     /**
      * Configurations
      */
+    @Suppress("FunctionName")
     private object RealmConfigurations {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
         private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
-        private val MAILBOX_CONTENT_DB_NAME = { "${AccountUtils.currentUserId}-${AccountUtils.currentMailboxId}.realm" }
+        private fun MAILBOX_CONTENT_DB_NAME(currentMailboxId: Int) = "${AccountUtils.currentUserId}-${currentMailboxId}.realm"
 
         val appSettings = RealmConfiguration
             .Builder(RealmSets.appSettings)
@@ -110,13 +111,11 @@ object MailRealm {
             .deleteRealmIfMigrationNeeded()
             .build()
 
-        val mailboxContent = {
-            RealmConfiguration
-                .Builder(RealmSets.mailboxContent)
-                .name(MAILBOX_CONTENT_DB_NAME())
-                .deleteRealmIfMigrationNeeded()
-                .build()
-        }
+        fun mailboxContent(currentMailboxId: Int) = RealmConfiguration
+            .Builder(RealmSets.mailboxContent)
+            .name(MAILBOX_CONTENT_DB_NAME(currentMailboxId))
+            .deleteRealmIfMigrationNeeded()
+            .build()
 
         private object RealmSets {
 
