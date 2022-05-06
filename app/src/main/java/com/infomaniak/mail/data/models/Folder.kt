@@ -69,7 +69,7 @@ class Folder : RealmObject {
 
     fun fetchThreadsFromAPI(mailboxUuid: String) {
         // Get current data
-        Log.d("API", "getUpdatedThreads: Get current data")
+        Log.d("API", "Threads: Get current data")
         val threadsFromRealm = MailRealm.mailboxContent.writeBlocking { getLatestFolder(id) }?.threads ?: emptyList()
         // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Threads will be deleted. We don't want that.
         val threadsFromApi = ApiRepository.getThreads(mailboxUuid, id).data?.threads?.map { it.initLocalValues() }
@@ -79,21 +79,21 @@ class Folder : RealmObject {
             ?: emptyList()
 
         // Get outdated data
-        Log.d("API", "getUpdatedThreads: Get outdated data")
+        Log.d("API", "Threads: Get outdated data")
         val deletableThreads = threadsFromRealm.filter { fromRealm ->
             !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
         }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == id } }
 
-        // Delete outdated data
-        Log.e("API", "getUpdatedThreads: Delete outdated data")
-        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
-        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
-
         // Save new data
-        Log.i("API", "getUpdatedThreads: Save new data")
+        Log.i("API", "Threads: Save new data")
         threads = threadsFromApi.toRealmList()
         MailboxContentController.upsertFolder(this)
+
+        // Delete outdated data
+        Log.e("API", "Threads: Delete outdated data")
+        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
     }
 
     fun getRole(): FolderRole? = when (_role) {

@@ -66,7 +66,9 @@ class MainViewModel : ViewModel() {
 
         fun getCurrentMailbox(): Mailbox? {
             val mailboxes = MailRealm.fetchMailboxesFromApi()
-            return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId } ?: mailboxes.firstOrNull()
+            return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId }
+                ?: mailboxes.firstOrNull { it.email == "kevin.boulongne@infomaniak.com" }
+                ?: mailboxes.firstOrNull()
         }
 
         fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
