@@ -65,8 +65,8 @@ class ThreadListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 threadListViewModel.threads.collect { threads ->
 
-                    Log.i("UI", "Received ${threads.size} threads")
-                    threads.forEach { Log.e("UI", "Subject: ${it.subject}") }
+                    Log.i("UI", "Received threads (${threads.size})")
+                    threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
 
                     if (threads.isEmpty()) {
                         displayNoEmailView()
