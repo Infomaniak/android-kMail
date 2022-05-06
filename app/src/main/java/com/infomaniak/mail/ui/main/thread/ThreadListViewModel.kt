@@ -39,8 +39,7 @@ class ThreadListViewModel : ViewModel() {
         viewModelScope.launch {
             MailRealm.currentFolderIdFlow.filterNotNull().collect { id ->
                 MailboxContentController.getFolder(id)?.threads?.asFlow()?.collect { changes ->
-                    // _threads.value = changes.list // TODO: Use this, blocked by https://github.com/realm/realm-kotlin/issues/827
-                    _threads.value = MailboxContentController.getFolder(id)?.threads
+                    _threads.value = changes.list
                 }
             }
         }

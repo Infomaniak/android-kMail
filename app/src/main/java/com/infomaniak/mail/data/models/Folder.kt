@@ -74,11 +74,9 @@ class Folder : RealmObject {
         val threadsFromRealm = MailRealm.mailboxContent.writeBlocking { getLatestFolder(id) }?.threads ?: emptyList()
         // TODO: Handle connectivity issues. If there is no Internet, all Realm Threads will be deleted. We don't want that.
         val threadsFromApi = MailRealm.currentMailboxObjectIdFlow.value?.let { objectId ->
-            val mailbox = MailboxInfoController.getMailbox(objectId)!!
-            ApiRepository.getThreads(mailbox, this).data?.threads?.map { it.initLocalValues() }
-            // ?.filterIndexed { index, _ -> index < 7 }
-            // ?.filterIndexed { index, _ -> index < 5 }
-            // ?.filterIndexed { index, _ -> index < 3 }
+            MailboxInfoController.getMailbox(objectId)?.let { mailbox ->
+                ApiRepository.getThreads(mailbox, this).data?.threads?.map { it.initLocalValues() }
+            }
         } ?: emptyList()
 
         // Get outdated data
