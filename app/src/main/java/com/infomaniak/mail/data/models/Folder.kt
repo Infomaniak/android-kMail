@@ -22,7 +22,6 @@ import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -70,7 +69,7 @@ class Folder : RealmObject {
     fun fetchThreadsFromAPI(mailboxUuid: String) {
         // Get current data
         Log.d("API", "Threads: Get current data")
-        val threadsFromRealm = MailRealm.mailboxContent.writeBlocking { getLatestFolder(id) }?.threads ?: emptyList()
+        val threadsFromRealm = threads
         // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Threads will be deleted. We don't want that.
         val threadsFromApi = ApiRepository.getThreads(mailboxUuid, id).data?.threads?.map { it.initLocalValues() }
         // ?.filterIndexed { index, _ -> index < 7 }

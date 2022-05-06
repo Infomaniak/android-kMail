@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models.thread
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
@@ -78,10 +79,13 @@ class Thread : RealmObject {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
-    fun getMessages(): List<Message> {
-        val apiMessages = mutableListOf<Message>()
-        messages.forEach { message ->
-            ApiRepository.getMessage(message.resource).data?.let { completedMessage ->
+    fun fetchMessagesFromAPI(): List<Message> {
+        // Get current data
+        Log.d("API", "Messages: Get current data")
+        val messagesFromRealm = messages
+        // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Messages will be deleted. We don't want that.
+        val messagesFromApi = messages.mapNotNull {
+            ApiRepository.getMessage(it.resource).data?.also { completedMessage ->
                 completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
                 completedMessage.fullyDownloaded = true
                 completedMessage.body?.objectId = "body_${completedMessage.uid}" // TODO: Remove this when we have EmbeddedObjects
@@ -90,14 +94,25 @@ class Thread : RealmObject {
                 completedMessage.attachments?.forEachIndexed { index, attachment ->
                     attachment.initLocalValues(index, completedMessage.uid)
                 }
-                apiMessages.add(completedMessage)
             }
         }
 
-        messages = apiMessages.toRealmList()
+        // Get outdated data
+        Log.d("API", "Messages: Get outdated data")
+        val deletableMessages = messagesFromRealm.filter { fromRealm ->
+            !messagesFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+        }
+
+        // Save new data
+        Log.i("API", "Messages: Save new data")
+        messages = messagesFromApi.toRealmList()
         MailboxContentController.upsertThread(this)
 
-        return apiMessages
+        // Delete outdated data
+        Log.e("API", "Messages: Delete outdated data")
+        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+
+        return messagesFromApi
     }
 
     enum class ThreadFilter(title: String) {
