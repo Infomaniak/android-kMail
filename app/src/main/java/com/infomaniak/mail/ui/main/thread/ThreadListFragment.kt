@@ -65,21 +65,16 @@ class ThreadListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 threadListViewModel.threads.collect { threads ->
 
-                    try {
-                        Log.e("Realm", "listenToChanges: Received threads (${threads?.size})")
-                        threads?.forEach { Log.d("Realm", "listenToChanges: ${it.subject}") }
-                    } catch (e: RuntimeException) {
-                        Log.e("Realm", "listenToChanges: Received threads crashed")
-                    }
+                    Log.i("UI", "Received ${threads.size} threads")
+                    threads.forEach { Log.e("UI", "Subject: ${it.subject}") }
 
-                    if (threads?.isNotEmpty() == true) {
-                        displayThreadList()
-                        with(threadAdapter) {
-                            val newList = formatList(threads, requireContext())
-                            notifyAdapter(newList)
-                        }
-                    } else {
+                    if (threads.isEmpty()) {
                         displayNoEmailView()
+                    } else
+                        displayThreadList()
+                    with(threadAdapter) {
+                        val newList = formatList(threads, requireContext())
+                        notifyAdapter(newList)
                     }
                 }
             }

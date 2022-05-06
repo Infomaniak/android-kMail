@@ -46,7 +46,7 @@ object MailboxContentController {
     fun getFolder(id: String): Folder? =
         MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
 
-//    fun getFolderByRole(role: Folder.FolderRole): Folder? =
+//    fun getFolderByRole(role: FolderRole): Folder? =
 //        MailRealm.mailboxContent.query<Folder>("${Folder::_role.name} == '${role.name}'").first().find()
 
 //    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
