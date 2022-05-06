@@ -81,7 +81,7 @@ class Thread : RealmObject {
     fun getMessages(): List<Message> {
         val apiMessages = mutableListOf<Message>()
         messages.forEach { message ->
-            ApiRepository.getMessage(message).data?.let { completedMessage ->
+            ApiRepository.getMessage(message.resource).data?.let { completedMessage ->
                 completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
                 completedMessage.fullyDownloaded = true
                 completedMessage.body?.objectId = "body_${completedMessage.uid}" // TODO: Remove this when we have EmbeddedObjects

@@ -104,7 +104,7 @@ class Message : RealmObject {
     }
 
     fun getDraft(): Draft? {
-        val apiDraft = ApiRepository.getDraft(this).data
+        val apiDraft = ApiRepository.getDraft(draftResource).data
         apiDraft?.let { draft ->
             draft.apply {
                 initLocalValues(uid)

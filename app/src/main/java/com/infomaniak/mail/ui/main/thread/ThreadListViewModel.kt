@@ -32,7 +32,7 @@ class ThreadListViewModel : ViewModel() {
 
     var isInternetAvailable = MutableLiveData(true)
 
-    private val _threads = MutableStateFlow<List<Thread>?>(null)
+    private val _threads = MutableStateFlow<List<Thread>>(emptyList())
     val threads = _threads.asStateFlow()
 
     fun getThreads() {

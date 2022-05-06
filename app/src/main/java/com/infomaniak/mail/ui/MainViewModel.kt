@@ -21,8 +21,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
@@ -30,15 +30,14 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
+    private companion object {
+        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
+    }
+
     fun getData() {
         viewModelScope.launch(Dispatchers.IO) {
             readDataFromRealm()
-            val threadsFromRealm = MailRealm.currentFolderIdFlow.value?.let(MailboxContentController::getFolder)?.threads
-            Log.e("Realm", "readData: ${threadsFromRealm?.size}")
-
             fetchDataFromAPI()
-            val threadsFromAPI = MailRealm.currentFolderIdFlow.value?.let(MailboxContentController::getFolder)?.threads
-            Log.e("Realm", "fetchData: ${threadsFromAPI?.size}")
         }
     }
 
@@ -49,14 +48,14 @@ class MainViewModel : ViewModel() {
             return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId } ?: mailboxes.firstOrNull()
         }
 
-        fun getInbox(mailbox: Mailbox): Folder? =
-            mailbox.readFoldersFromRealm().firstOrNull { it.getRole() == Folder.FolderRole.INBOX }
+        fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
+            mailbox.readFoldersFromRealm().firstOrNull { it.getRole() == folderRole }
 
         Log.e("Realm", "Start reading data")
 
         getCurrentMailbox()?.let { mailbox ->
             mailbox.select()
-            getInbox(mailbox)?.let { folder ->
+            getFolder(mailbox, DEFAULT_FOLDER_ROLE)?.let { folder ->
                 folder.select()
                 Log.e("Realm", "End of reading data")
             }
@@ -70,15 +69,15 @@ class MainViewModel : ViewModel() {
             return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId } ?: mailboxes.firstOrNull()
         }
 
-        fun getInbox(mailbox: Mailbox): Folder? =
-            mailbox.fetchFoldersFromAPI().firstOrNull { it.getRole() == Folder.FolderRole.INBOX }
+        fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
+            mailbox.fetchFoldersFromAPI().firstOrNull { it.getRole() == folderRole }
 
         Log.e("API", "Start fetching data")
 
         getCurrentMailbox()?.let { mailbox ->
             mailbox.select()
-            getInbox(mailbox)?.let { folder ->
-                folder.fetchThreadsFromAPI()
+            getFolder(mailbox, DEFAULT_FOLDER_ROLE)?.let { folder ->
+                folder.fetchThreadsFromAPI(mailbox.uuid)
                 folder.select()
                 Log.e("API", "End of fetching data")
             }

@@ -37,13 +37,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val navController = setupNavController()
-        mainViewModel.getData()
 
+        mainViewModel.getData()
         // findViewById<Button>(R.id.startCalls).setOnClickListener {
         //     lifecycleScope.launch(Dispatchers.IO) { testRealmViewModel.testRealm(cacheDir) }
         // }
 
+        val navController = setupNavController()
         navController.addOnDestinationChangedListener { _, dest, args -> onDestinationChanged(dest, args) }
     }
 
