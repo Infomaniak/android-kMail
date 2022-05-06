@@ -68,7 +68,7 @@ class TestRealmViewModel : ViewModel() {
         Log.e("Realm", "testFinal: select thread - ${thread.subject}")
 
         thread.select()
-        val messages = thread.getMessages()
+        val messages = thread.fetchMessagesFromAPI()
         Log.e("Realm", "testFinal: get messages - ${messages.size}")
         val message = messages.last()
         Log.e("Realm", "testFinal: select message - ${message.body?.value}")

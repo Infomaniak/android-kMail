@@ -103,6 +103,10 @@ class Message : RealmObject {
         return this
     }
 
+    fun select() {
+        MailRealm.mutableCurrentMessageUidFlow.value = uid
+    }
+
     fun getDraft(): Draft? {
         val apiDraft = ApiRepository.getDraft(draftResource).data
         apiDraft?.let { draft ->

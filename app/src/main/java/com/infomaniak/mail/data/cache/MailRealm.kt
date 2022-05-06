@@ -52,6 +52,10 @@ object MailRealm {
     val mutableCurrentThreadUidFlow: MutableStateFlow<String?> = MutableStateFlow(null)
     val currentThreadUidFlow = mutableCurrentThreadUidFlow.asStateFlow()
 
+    // Current message flow
+    val mutableCurrentMessageUidFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentMessageUidFlow = mutableCurrentMessageUidFlow.asStateFlow()
+
     /**
      * Mailboxes
      */
