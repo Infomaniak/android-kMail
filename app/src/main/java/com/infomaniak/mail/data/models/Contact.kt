@@ -35,7 +35,7 @@ class Contact : RealmObject {
     var color: String = ""
     var other: Boolean = false
 
-    @Ignore // TODO: Check if we can still get this field from the database even if it's ignored.
+    @Ignore // TODO: Why is this field ignored?
     @SerializedName("contacted_times")
     private var contactedTimes: Map<String?, Int?> = mapOf()
     var emails: RealmList<String> = realmListOf()
