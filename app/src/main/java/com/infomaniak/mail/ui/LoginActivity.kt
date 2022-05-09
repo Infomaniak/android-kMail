@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
@@ -68,12 +69,17 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        infomaniakLogin = InfomaniakLogin(context = this, appUID = BuildConfig.APPLICATION_ID, clientID = BuildConfig.CLIENT_ID)
-        infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
+        infomaniakLogin = InfomaniakLogin(
+            context = this,
+            appUID = BuildConfig.APPLICATION_ID,
+            clientID = BuildConfig.CLIENT_ID,
+        ).also {
+            it.startWebViewLogin(webViewLoginResultLauncher)
+        }
     }
 
     private fun authenticateUser(authCode: String) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             infomaniakLogin.getToken(
                 okHttpClient = HttpClient.okHttpClientNoInterceptor,
                 code = authCode,
@@ -85,17 +91,15 @@ class LoginActivity : AppCompatActivity() {
                                 // trackAccountEvent("loggedIn") // TODO: Matomo
                                 launchMainActivity()
                             }
-                            is ApiResponse<*> -> withContext(Dispatchers.Main) {
-                                showError(getString(user.translatedError))
-                            }
+                            is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
                             else -> withContext(Dispatchers.Main) { showError(getString(R.string.anErrorHasOccurred)) }
                         }
                     }
                 },
                 onError = {
                     val error = when (it) {
-                        InfomaniakLogin.ErrorStatus.SERVER -> R.string.serverError
-                        InfomaniakLogin.ErrorStatus.CONNECTION -> R.string.connectionError
+                        ErrorStatus.SERVER -> R.string.serverError
+                        ErrorStatus.CONNECTION -> R.string.connectionError
                         else -> R.string.anErrorHasOccurred
                     }
                     showError(getString(error))
@@ -115,33 +119,33 @@ class LoginActivity : AppCompatActivity() {
     companion object {
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
-            AccountUtils.getUserById(apiToken.userId)?.let {
-                return getErrorResponse(R.string.errorUserAlreadyPresent)
-            } ?: run {
+            return if (AccountUtils.getUserById(apiToken.userId) == null) {
                 InfomaniakCore.bearerToken = apiToken.accessToken
                 val userProfileResponse = ApiRepository.getUserProfile(HttpClient.okHttpClientNoInterceptor)
+
                 if (userProfileResponse.result == ApiResponse.Status.ERROR) {
-                    return userProfileResponse
+                    userProfileResponse
                 } else {
-                    val user: User? = userProfileResponse.data?.apply {
+                    val user = userProfileResponse.data?.apply {
                         this.apiToken = apiToken
                         this.organizations = ArrayList()
                     }
 
-                    return user?.let {
+                    if (user == null) {
+                        getErrorResponse(R.string.anErrorHasOccurred)
+                    } else {
                         // DriveInfosController.storeDriveInfos(user.id, driveInfo) // TODO?
                         // CloudStorageProvider.notifyRootsChanged(context) // TODO?
                         AccountUtils.addUser(user)
                         user
-                    } ?: run {
-                        getErrorResponse(R.string.anErrorHasOccurred)
                     }
                 }
+            } else {
+                getErrorResponse(R.string.errorUserAlreadyPresent)
             }
         }
 
-        private fun getErrorResponse(@StringRes text: Int): ApiResponse<Any> {
-            return ApiResponse(result = ApiResponse.Status.ERROR, translatedError = text)
-        }
+        private fun getErrorResponse(@StringRes text: Int): ApiResponse<Any> =
+            ApiResponse(result = ApiResponse.Status.ERROR, translatedError = text)
     }
 }
