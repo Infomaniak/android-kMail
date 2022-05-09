@@ -92,7 +92,7 @@ class Message : RealmObject {
      */
     var fullyDownloaded: Boolean = false
     var hasUnsubscribeLink: Boolean = false
-    var parentLink: Thread? = null
+    var parentLink: Thread? = null // TODO
 
     @Ignore
     var isExpandedHeaderMode = false
