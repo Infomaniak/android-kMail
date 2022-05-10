@@ -61,7 +61,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/threadList"
+        android:id="@+id/threadsList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone"
