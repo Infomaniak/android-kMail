@@ -134,7 +134,7 @@ class Mailbox : RealmObject {
         MailRealm.mailboxContent.writeBlocking {
             foldersFromAPI.forEach { folderFromAPI ->
                 val folder = copyToRealm(folderFromAPI, UpdatePolicy.ALL)
-                foldersFromRealm.firstOrNull { it.id == folderFromAPI.id }?.threads
+                foldersFromRealm.find { it.id == folderFromAPI.id }?.threads
                     ?.mapNotNull(::findLatest)
                     ?.let { folder.threads = it.toRealmList() }
             }

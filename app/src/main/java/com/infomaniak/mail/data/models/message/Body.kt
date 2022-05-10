@@ -31,4 +31,9 @@ class Body : RealmObject {
      */
     @PrimaryKey
     var objectId: String = "" // TODO: Remove this when we have EmbeddedObjects
+
+    // TODO: Remove this when we have EmbeddedObjects
+    fun initLocalValues(completedMessageUid: String) {
+        objectId = "body_${completedMessageUid}"
+    }
 }

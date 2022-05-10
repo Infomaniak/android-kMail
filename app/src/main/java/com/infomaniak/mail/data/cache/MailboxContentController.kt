@@ -33,38 +33,31 @@ object MailboxContentController {
     fun getFolders(): RealmResults<Folder> =
         MailRealm.mailboxContent.query<Folder>().find()
 
+    fun getFolder(id: String): Folder? =
+        MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
+
     fun upsertFolder(folder: Folder): Folder =
         MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
+
+    // fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
+    //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
+    // }
 
     fun deleteFolder(id: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
     }
 
-    fun MutableRealm.getLatestFolder(id: String): Folder? =
+    private fun MutableRealm.getLatestFolder(id: String): Folder? =
         getFolder(id)?.let(::findLatest)
-
-    fun getFolder(id: String): Folder? =
-        MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
-
-//    fun getFolderByRole(role: FolderRole): Folder? =
-//        MailRealm.mailboxContent.query<Folder>("${Folder::_role.name} == '${role.name}'").first().find()
-
-//    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-//        MailRealm.mailboxContent.writeBlocking { getLatestFolderById(id)?.let(onUpdate) }
-//    }
-
-//    private fun MutableRealm.removeFolderIfAlreadyExisting(folder: Folder) {
-//        getFolderById(folder.id)?.let { findLatest(it)?.let(::delete) }
-//    }
 
     /**
      * Threads
      */
-//    fun getThreads(): RealmResults<Thread> =
-//        MailRealm.mailboxContent.query<Thread>().find()
-
     fun getFolderThreads(folderId: String): List<Thread> =
         MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
+
+    fun getThread(uid: String): Thread? =
+        MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
 
     fun getLatestThread(uid: String): Thread? =
         MailRealm.mailboxContent.writeBlocking { getLatestThread(uid) }
@@ -77,6 +70,10 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
+    // fun updateThread(uid: String, onUpdate: (thread: Thread) -> Unit) {
+    //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(onUpdate) }
+    // }
+
     fun deleteThread(uid: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(::delete) }
     }
@@ -84,36 +81,15 @@ object MailboxContentController {
     private fun MutableRealm.getLatestThread(uid: String): Thread? =
         getThread(uid)?.let(::findLatest)
 
-    private fun getThread(uid: String): Thread? =
-        MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
-
-//    fun upsertThread(thread: Thread) {
-//        MailRealm.mailboxContent.writeBlocking {
-//            removeThreadIfAlreadyExisting(thread) // TODO: remove this when the UPSERT is working
-//            copyToRealm(thread)
-//        }
-//    }
-
-//    fun updateThread(uid: String, onUpdate: (thread: Thread) -> Unit) {
-//        MailRealm.mailboxContent.writeBlocking { getLatestThreadByUid(uid)?.let(onUpdate) }
-//    }
-
-//    fun removeThread(uid: String) {
-//        MailRealm.mailboxContent.writeBlocking { getLatestThreadByUid(uid)?.let(::delete) }
-//    }
-
-//    private fun MutableRealm.removeThreadIfAlreadyExisting(thread: Thread) {
-//        getThreadByUid(thread.uid)?.let { findLatest(it)?.let(::delete) }
-//    }
-
     /**
      * Messages
      */
-//    fun getMessages(): RealmResults<Message> =
-//        MailRealm.mailboxContent.query<Message>().find()
-
     fun upsertMessage(message: Message): Message =
         MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
+
+    // fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
+    //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
+    // }
 
     fun deleteMessage(uid: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
@@ -124,31 +100,6 @@ object MailboxContentController {
 
     private fun getMessage(uid: String): Message? =
         MailRealm.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first().find()
-
-//    private fun getMessageByUid(uid: String): Message? =
-//        MailRealm.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first().find()
-
-//    private fun MutableRealm.getLatestMessageByUid(uid: String): Message? =
-//        getMessageByUid(uid)?.let(::findLatest)
-
-//    fun upsertMessage(message: Message) {
-//        MailRealm.mailboxContent.writeBlocking {
-//            removeMessageIfAlreadyExisting(message) // TODO: remove this when the UPSERT is working
-//            copyToRealm(message)
-//        }
-//    }
-
-//    fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
-//        MailRealm.mailboxContent.writeBlocking { getLatestMessageByUid(uid)?.let(onUpdate) }
-//    }
-
-//    fun removeMessage(uid: String) {
-//        MailRealm.mailboxContent.writeBlocking { getLatestMessageByUid(uid)?.let(::delete) }
-//    }
-
-//    private fun MutableRealm.removeMessageIfAlreadyExisting(message: Message) {
-//        getMessageByUid(message.uid)?.let { findLatest(it)?.let(::delete) }
-//    }
 
     /**
      * Recipients

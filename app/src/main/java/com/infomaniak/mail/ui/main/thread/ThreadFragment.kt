@@ -24,32 +24,39 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadFragment : Fragment() {
 
     private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val threadViewModel: ThreadViewModel by viewModels()
+
     private lateinit var binding: FragmentThreadBinding
     private lateinit var threadAdapter: ThreadAdapter
+
+    private var jobMessagesFromAPI: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initUI()
-        listenToChanges()
-        threadViewModel.getMessages(navigationArgs.threadUid)
+
+        setupUi()
+
+        displayMessagesFromRealm()
+        displayMessagesFromAPI()
     }
 
-    private fun initUI() {
+    private fun setupUi() {
         with(binding) {
             messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
             backButton.setOnClickListener { findNavController().popBackStack() }
@@ -57,19 +64,33 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun listenToChanges() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                threadViewModel.messages.collect { messages ->
+    private fun displayMessagesFromRealm() {
+        val messages = with(threadViewModel) {
+            messagesFromAPI.value = null
+            getMessagesFromRealmThenFetchFromAPI(navigationArgs.threadUid)
+        }
+        displayMessages(messages)
+    }
 
-                    Log.i("UI", "Received messages (${messages.size})")
-                    messages.forEach { Log.v("UI", "Sender: ${it.from.firstOrNull()?.email}") }
+    private fun displayMessagesFromAPI() {
+        if (jobMessagesFromAPI != null) jobMessagesFromAPI?.cancel()
 
-                    if (messages.isNotEmpty()) {
-                        threadAdapter.notifyAdapter(ArrayList(messages))
-                    }
-                }
+        jobMessagesFromAPI = with(threadViewModel) {
+            viewModelScope.launch(Dispatchers.Main) {
+                messagesFromAPI.filterNotNull().collect { displayMessages(it) }
             }
         }
+    }
+
+    private fun displayMessages(messages: List<Message>) {
+        Log.i("UI", "Received messages (${messages.size})")
+        messages.forEach {
+            val displayedBody = with(it.body?.value) {
+                this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
+            }
+            Log.v("UI", "Sender: ${it.from.firstOrNull()?.email} | $displayedBody")
+        }
+
+        threadAdapter.notifyAdapter(ArrayList(messages))
     }
 }
