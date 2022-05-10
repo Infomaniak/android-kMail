@@ -117,7 +117,7 @@
                 android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="TODO real ui"
+                android:text="TODO short body when api returns it"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconFavorite"
                 app:layout_constraintStart_toStartOf="parent" />
