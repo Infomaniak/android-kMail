@@ -19,12 +19,12 @@ package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
@@ -34,13 +34,20 @@ class ThreadViewModel : ViewModel() {
 
     val isExpandedHeaderMode = false
 
-    fun getMessages() {
-        viewModelScope.launch {
-            MailRealm.currentThreadUidFlow.filterNotNull().collect { uid ->
-                MailboxContentController.getThread(uid)?.messages?.asFlow()?.collect { changes ->
-                    _messages.value = changes.list
-                }
+    fun getMessages(threadUid: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val thread = getThread(threadUid) ?: return@launch
+
+            thread.messages.asFlow().collect { changes ->
+                _messages.value = changes.list
             }
         }
+    }
+
+    private fun getThread(threadUid: String): Thread? {
+        val thread = MailboxContentController.getLatestThread(threadUid)
+        thread?.updateAndSelect()
+        return thread
     }
 }

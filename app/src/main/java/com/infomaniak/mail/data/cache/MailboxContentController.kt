@@ -66,8 +66,15 @@ object MailboxContentController {
     fun getFolderThreads(folderId: String): List<Thread> =
         MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
 
+    fun getLatestThread(uid: String): Thread? =
+        MailRealm.mailboxContent.writeBlocking { getLatestThread(uid) }
+
     fun upsertThread(thread: Thread) {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
+    }
+
+    fun upsertLatestThread(uid: String) {
+        MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     fun deleteThread(uid: String) {
@@ -77,14 +84,8 @@ object MailboxContentController {
     private fun MutableRealm.getLatestThread(uid: String): Thread? =
         getThread(uid)?.let(::findLatest)
 
-    fun getThread(uid: String): Thread? =
+    private fun getThread(uid: String): Thread? =
         MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
-
-//    private fun getThreadByUid(uid: String): Thread? =
-//        MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
-
-//    private fun MutableRealm.getLatestThreadByUid(uid: String): Thread? =
-//        getThreadByUid(uid)?.let(::findLatest)
 
 //    fun upsertThread(thread: Thread) {
 //        MailRealm.mailboxContent.writeBlocking {
@@ -111,9 +112,8 @@ object MailboxContentController {
 //    fun getMessages(): RealmResults<Message> =
 //        MailRealm.mailboxContent.query<Message>().find()
 
-    fun upsertMessage(message: Message) {
+    fun upsertMessage(message: Message): Message =
         MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
-    }
 
     fun deleteMessage(uid: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }

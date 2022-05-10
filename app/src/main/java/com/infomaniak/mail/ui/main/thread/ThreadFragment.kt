@@ -29,15 +29,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import kotlinx.coroutines.launch
 
 class ThreadFragment : Fragment() {
 
+    private val navigationArgs: ThreadFragmentArgs by navArgs()
+    private val threadViewModel: ThreadViewModel by viewModels()
+
     private lateinit var binding: FragmentThreadBinding
     private val messageAdapter = ThreadAdapter()
-    private val threadViewModel: ThreadViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentThreadBinding.inflate(inflater, container, false)
@@ -50,10 +51,11 @@ class ThreadFragment : Fragment() {
         with(binding) {
             messageList.adapter = messageAdapter
             backButton.setOnClickListener { findNavController().popBackStack() }
-            threadTitle.text = navigationArgs.threadTitle
+            threadTitle.text = navigationArgs.threadSubject
         }
+
         listenToChanges()
-        threadViewModel.getMessages()
+        threadViewModel.getMessages(navigationArgs.threadUid)
     }
 
     private fun listenToChanges() {

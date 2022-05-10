@@ -52,8 +52,7 @@ class TestRealmViewModel : ViewModel() {
 
         Log.e("Realm", "testFinal: select folder - ${folder.name}")
 
-        folder.fetchThreadsFromAPI(mailboxUuid)
-        folder.select()
+        folder.updateAndSelect(mailboxUuid)
         val threads = folder.threads //TODO: Check if this data is not empty there?
         Log.e("Realm", "testFinal: get threads - ${threads.size}")
 
@@ -67,8 +66,8 @@ class TestRealmViewModel : ViewModel() {
     private suspend fun testThread(thread: Thread, cacheDir: File) {
         Log.e("Realm", "testFinal: select thread - ${thread.subject}")
 
-        thread.select()
-        val messages = thread.fetchMessagesFromAPI()
+        thread.updateAndSelect()
+        val messages = thread.messages
         Log.e("Realm", "testFinal: get messages - ${messages.size}")
         val message = messages.last()
         Log.e("Realm", "testFinal: select message - ${message.body?.value}")
