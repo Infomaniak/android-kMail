@@ -30,39 +30,44 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemHeaderThreadBinding
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.utils.toDate
 
-class ThreadAdapter : RecyclerView.Adapter<BoundViewHolder<ItemMessageBinding>>() {
+class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
 
     private var messageList: ArrayList<Message> = arrayListOf()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoundViewHolder<ItemMessageBinding> {
-        return BoundViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun getItemCount() = messageList.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> =
+        BindingViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+
+    override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int) {
+        val message = messageList[position]
+        displayHeader(holder.binding, message)
+        displayBody(holder.binding, message.body)
     }
 
-    override fun onBindViewHolder(holder: BoundViewHolder<ItemMessageBinding>, position: Int) {
-        val message = messageList[position]
-
-        with(holder.binding) {
-            messageBody.text = message.body?.value
-            with(headerThread) {
-                expeditorName.text = message.from[0].name.ifBlank { message.from[0].email }
-                expeditorEmail.text = message.from[0].email
-                recipient.text = formatRecipientsName(message)
-                expandHeaderButton.setOnClickListener {
-                    val isExpanded = !message.isExpandedHeaderMode
-                    message.isExpandedHeaderMode = isExpanded
-                    expandHeader(this, message)
-                }
-                messageDate.text = message.date?.toDate()?.format("d MMM YYYY à HH:mm")
+    private fun displayHeader(binding: ItemMessageBinding, message: Message) {
+        with(binding.headerThread) {
+            expeditorName.text = message.from[0].name.ifBlank { message.from[0].email }
+            expeditorEmail.text = message.from[0].email
+            recipient.text = formatRecipientsName(message)
+            expandHeaderButton.setOnClickListener {
+                val isExpanded = !message.isExpandedHeaderMode
+                message.isExpandedHeaderMode = isExpanded
+                expandHeader(this, message)
             }
+            messageDate.text = message.date?.toDate()?.format("d MMM YYYY à HH:mm")
         }
     }
 
-    override fun getItemCount() = messageList.size
+    private fun displayBody(binding: ItemMessageBinding, body: Body?) {
+        binding.messageBody.text = body?.value
+    }
 
     fun notifyAdapter(newList: ArrayList<Message>) {
         DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
@@ -80,7 +85,6 @@ class ThreadAdapter : RecyclerView.Adapter<BoundViewHolder<ItemMessageBinding>>(
                 append(cc)
             }
         }.dropLast(2) as SpannedString
-
     }
 
     private fun recipientsToSpannedString(
@@ -102,7 +106,8 @@ class ThreadAdapter : RecyclerView.Adapter<BoundViewHolder<ItemMessageBinding>>(
                     }
                 } else {
                     "${it.name.ifBlank { it.email }}, "
-                })
+                }
+                )
             }
         }
     }
@@ -113,14 +118,14 @@ class ThreadAdapter : RecyclerView.Adapter<BoundViewHolder<ItemMessageBinding>>(
                 expeditorEmail.isVisible = true
                 recipient.maxLines = Int.MAX_VALUE
                 recipient.ellipsize = null
-                recipient.textSize = 14f
-                expandHeaderButton.rotation = 0f
+                recipient.textSize = 14.0f
+                expandHeaderButton.rotation = 0.0f
             } else {
                 expeditorEmail.isGone = true
                 recipient.maxLines = 1
-                recipient.textSize = 16f
+                recipient.textSize = 16.0f
                 recipient.ellipsize = TextUtils.TruncateAt.END
-                expandHeaderButton.rotation = 180f
+                expandHeaderButton.rotation = 180.0f
             }
             recipient.text = formatRecipientsName(message)
         }
@@ -150,4 +155,3 @@ class ThreadAdapter : RecyclerView.Adapter<BoundViewHolder<ItemMessageBinding>>(
         }
     }
 }
-

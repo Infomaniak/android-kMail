@@ -29,5 +29,5 @@
         android:layout_marginStart="@dimen/marginStandard"
         android:minWidth="120dp"
         app:loader_corner="12dp"
-        tools:text="Voir tout" />
+        tools:text="@string/See_all" />
 </LinearLayout>

@@ -36,26 +36,25 @@ class ThreadFragment : Fragment() {
 
     private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val threadViewModel: ThreadViewModel by viewModels()
-
     private lateinit var binding: FragmentThreadBinding
-    private val messageAdapter = ThreadAdapter()
+    private lateinit var threadAdapter: ThreadAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentThreadBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initUI()
+        listenToChanges()
+        threadViewModel.getMessages(navigationArgs.threadUid)
+    }
 
+    private fun initUI() {
         with(binding) {
-            messageList.adapter = messageAdapter
+            messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
             backButton.setOnClickListener { findNavController().popBackStack() }
             threadTitle.text = navigationArgs.threadSubject
         }
-
-        listenToChanges()
-        threadViewModel.getMessages(navigationArgs.threadUid)
     }
 
     private fun listenToChanges() {
@@ -67,7 +66,7 @@ class ThreadFragment : Fragment() {
                     messages.forEach { Log.v("UI", "Sender: ${it.from.firstOrNull()?.email}") }
 
                     if (messages.isNotEmpty()) {
-                        messageAdapter.notifyAdapter(ArrayList(messages))
+                        threadAdapter.notifyAdapter(ArrayList(messages))
                     }
                 }
             }
