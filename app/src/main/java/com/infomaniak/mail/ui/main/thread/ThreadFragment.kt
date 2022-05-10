@@ -28,6 +28,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import kotlinx.coroutines.launch
 
@@ -44,9 +46,12 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.messageList.adapter = messageAdapter
-        binding.backButton.setOnClickListener { findNavController().popBackStack() }
 
+        with(binding) {
+            messageList.adapter = messageAdapter
+            backButton.setOnClickListener { findNavController().popBackStack() }
+            threadTitle.text = navigationArgs.threadTitle
+        }
         listenToChanges()
         threadViewModel.getMessages()
     }
@@ -61,7 +66,6 @@ class ThreadFragment : Fragment() {
 
                     if (messages.isNotEmpty()) {
                         messageAdapter.notifyAdapter(ArrayList(messages))
-                        // messageAdapter.apply { binding.messageList.post { addAll(ArrayList(messages.list)) } }
                     }
                 }
             }

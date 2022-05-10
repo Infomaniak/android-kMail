@@ -29,8 +29,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
+import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.launch
 
 class ThreadListFragment : Fragment() {
@@ -69,8 +72,10 @@ class ThreadListFragment : Fragment() {
 
                     if (threads.isEmpty()) {
                         displayNoEmailView()
-                    } else
+                    } else {
                         displayThreadList()
+                    }
+
                     with(threadAdapter) {
                         val newList = formatList(threads, requireContext())
                         notifyAdapter(newList)

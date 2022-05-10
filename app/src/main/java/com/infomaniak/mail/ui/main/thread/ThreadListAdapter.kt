@@ -45,7 +45,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     var displaySeeAllButton = false // TODO manage this for intelligent mailbox
 
     var onEmptyList: (() -> Unit)? = null
-    var onThreadClicked: (() -> Unit)? = null
+    var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -77,7 +77,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 newMailBullet.isVisible = thread.unseenMessagesCount > 0
                 viewHolder.binding.itemThread.setOnClickListener {
                     thread.select()
-                    onThreadClicked?.invoke()
+                    onThreadClicked?.invoke(thread)
                 }
             }
         }

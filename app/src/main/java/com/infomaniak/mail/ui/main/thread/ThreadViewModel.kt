@@ -32,6 +32,8 @@ class ThreadViewModel : ViewModel() {
     private var _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages = _messages.asStateFlow()
 
+    val isExpandedHeaderMode = false
+
     fun getMessages() {
         viewModelScope.launch {
             MailRealm.currentThreadUidFlow.filterNotNull().collect { uid ->

@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
     app:layout_constraintTop_toTopOf="parent">
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -27,7 +28,6 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/placeholder"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/CircleImageView"
@@ -36,22 +36,24 @@
     <TextView
         android:id="@+id/expeditorName"
         android:layout_width="wrap_content"
+        android:maxWidth="190dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardSmall"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@id/recipient"
         app:layout_constraintStart_toEndOf="@id/userAvatar"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Steph Guy" />
+        tools:text="Steph Guyazfazfagaegaegagazgaegaegaeg" />
 
     <TextView
         android:id="@+id/expeditorEmail"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardSmall"
         android:visibility="gone"
+        android:layout_marginVertical="@dimen/marginStandardVerySmall"
         app:layout_constraintBottom_toTopOf="@id/recipient"
         app:layout_constraintStart_toEndOf="@id/userAvatar"
+        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
         app:layout_constraintTop_toBottomOf="@id/expeditorName"
         tools:text="steph.guy@infomaniak.com"
         tools:visibility="visible"/>
@@ -59,23 +61,27 @@
 
     <TextView
         android:id="@+id/recipient"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardSmall"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/userAvatar"
         app:layout_constraintTop_toBottomOf="@id/expeditorEmail"
+        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
         tools:text="Myriam Rais, George Li" />
 
 
     <TextView
         android:id="@+id/messageDate"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardMedium"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/expeditorName"
         app:layout_constraintStart_toEndOf="@id/expeditorName"
+        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
         tools:text="9 déc 2021 à 11:00" />
 
     <com.google.android.material.button.MaterialButton
@@ -84,7 +90,6 @@
         android:rotation="180"
         app:icon="@drawable/ic_chevron"
         app:iconSize="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
