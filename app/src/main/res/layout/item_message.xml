@@ -19,9 +19,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:layout_marginHorizontal="@dimen/marginStandardMedium">
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+    android:animateLayoutChanges="true">
 
     <include
         android:id="@+id/headerThread"
@@ -113,16 +113,18 @@
             tools:text="+ 2" />
     </com.google.android.material.chip.ChipGroup>
 
-    <TextView
-        android:layout_marginTop="@dimen/marginStandardMedium"
-        android:id="@+id/messageBody"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras eu lacus ornare, tristique nibh quis,
-        placerat massa. \n\n a facilisi. Fusce varius elit nec enim placerat, non accumsan dolor feugiat. Nulla facilisi. Nunc
-        maximus felis lectus, nec fermentum orci lobortis in. Nulla ultrices facilisis molestie. \n\n Meilleurs Messages,\n Anne P"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsChipGroup" />
+        app:layout_constraintTop_toBottomOf="@id/attachmentsChipGroup">
 
+        <WebView
+            android:id="@+id/messageBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandardMedium" />
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

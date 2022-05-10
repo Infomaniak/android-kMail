@@ -70,7 +70,3 @@ fun Date.toRealmInstant(): RealmInstant {
 }
 
 fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }
-
-fun String.bold() : SpannedString {
-    return buildSpannedString { bold { append(this@bold) } }
-}
