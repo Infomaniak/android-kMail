@@ -84,7 +84,7 @@ class TestRealmViewModel : ViewModel() {
 //        // Get & save Test mailbox's infos
 //        val testMailboxInfo = ApiRepository.getMailboxes()
 //            .data
-//            ?.firstOrNull { it.email == "kevin.boulongne@ik.me" }
+//            ?.find { it.email == "kevin.boulongne@ik.me" }
 //            ?.initLocalValues()
 //            ?: return
 //        MailboxInfoController.upsertMailboxInfo(testMailboxInfo)

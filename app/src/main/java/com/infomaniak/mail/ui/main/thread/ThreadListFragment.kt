@@ -26,18 +26,23 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListFragment : Fragment() {
 
     private val threadListViewModel: ThreadListViewModel by viewModels()
+
     private lateinit var binding: FragmentThreadListBinding
     private lateinit var threadListAdapter: ThreadListAdapter
+
+    private var jobThreadsFromAPI: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -48,8 +53,8 @@ class ThreadListFragment : Fragment() {
         setupAdapter()
         setupListeners()
 
-        listenToChanges()
-        threadListViewModel.getThreads()
+        displayThreadsFromRealm()
+        displayThreadsFromAPI()
     }
 
     private fun setupAdapter() {
@@ -95,26 +100,37 @@ class ThreadListFragment : Fragment() {
         }
     }
 
-    private fun listenToChanges() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                threadListViewModel.threads.collect { threads ->
+    private fun displayThreadsFromRealm() {
+        val threads = with(threadListViewModel) {
+            threadsFromAPI.value = null
+            getDataFromRealmThenFetchFromAPI()
+        }
+        displayThreads(threads)
+    }
 
-                    Log.i("UI", "Received threads (${threads.size})")
-                    // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
+    private fun displayThreadsFromAPI() {
+        if (jobThreadsFromAPI != null) jobThreadsFromAPI?.cancel()
 
-                    if (threads.isEmpty()) {
-                        displayNoEmailView()
-                    } else {
-                        displayThreadList()
-                    }
-
-                    with(threadListAdapter) {
-                        val newList = formatList(threads, requireContext())
-                        notifyAdapter(newList)
-                    }
-                }
+        jobThreadsFromAPI = with(threadListViewModel) {
+            viewModelScope.launch(Dispatchers.Main) {
+                threadsFromAPI.filterNotNull().collect { displayThreads(it) }
             }
+        }
+    }
+
+    private fun displayThreads(threads: List<Thread>) {
+        Log.i("UI", "Received threads (${threads.size})")
+        // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
+
+        if (threads.isEmpty()) {
+            displayNoEmailView()
+        } else {
+            displayThreadList()
+        }
+
+        with(threadListAdapter) {
+            val newList = formatList(threads, requireContext())
+            notifyAdapter(newList)
         }
     }
 
