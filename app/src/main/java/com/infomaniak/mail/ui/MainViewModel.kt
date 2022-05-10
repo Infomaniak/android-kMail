@@ -79,8 +79,7 @@ class MainViewModel : ViewModel() {
         getCurrentMailbox()?.let { mailbox ->
             mailbox.select()
             getFolder(mailbox, DEFAULT_FOLDER_ROLE)?.let { folder ->
-                folder.fetchThreadsFromAPI(mailbox.uuid)
-                folder.select()
+                folder.updateAndSelect(mailbox.uuid)
                 Log.e("API", "End of fetching data")
             }
         }

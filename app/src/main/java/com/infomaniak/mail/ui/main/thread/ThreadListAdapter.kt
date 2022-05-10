@@ -38,7 +38,7 @@ import java.util.*
 
 class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use LoaderAdapter from Core instead?
 
-    var itemsList: ArrayList<Any> = ArrayList()
+    private var itemsList: ArrayList<Any> = ArrayList()
 
     @StringRes
     var previousSectionName: Int = -1
@@ -75,10 +75,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 iconCalendar.isGone = true // TODO see with api when we should display this icon
                 iconFavorite.isVisible = thread.flagged
                 newMailBullet.isVisible = thread.unseenMessagesCount > 0
-                viewHolder.binding.itemThread.setOnClickListener {
-                    thread.select()
-                    onThreadClicked?.invoke(thread)
-                }
+                viewHolder.binding.itemThread.setOnClickListener { onThreadClicked?.invoke(thread) }
             }
         }
     }
