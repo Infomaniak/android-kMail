@@ -65,8 +65,10 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         }
     }
 
-    private fun displayBody(binding: ItemMessageBinding, body: Body?) {
-        binding.messageBody.text = body?.value
+    private fun displayBody(binding: ItemMessageBinding, body: Body?) = with(binding) {
+        // TODO make prettier webview, Add button to hide / display the conversation inside message body like webapp
+        // Log.e("TOTO", "body : ${body?.value} \n\n\n\n\n\ntype = ${body?.type}"  )
+        body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
 
     fun notifyAdapter(newList: ArrayList<Message>) {
@@ -118,12 +120,12 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
                 expeditorEmail.isVisible = true
                 recipient.maxLines = Int.MAX_VALUE
                 recipient.ellipsize = null
-                recipient.textSize = 14.0f
+                recipient.textSize = 12.0f
                 expandHeaderButton.rotation = 0.0f
             } else {
                 expeditorEmail.isGone = true
                 recipient.maxLines = 1
-                recipient.textSize = 16.0f
+                recipient.textSize = 14.0f
                 recipient.ellipsize = TextUtils.TruncateAt.END
                 expandHeaderButton.rotation = 180.0f
             }

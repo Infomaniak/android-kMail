@@ -31,8 +31,8 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="@dimen/marginStandardMedium"
-            android:src="@drawable/ic_search"
             android:contentDescription="search button"
+            android:src="@drawable/ic_search"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
