@@ -18,7 +18,10 @@
 package com.infomaniak.mail.utils
 
 import android.app.Activity
+import android.text.SpannedString
 import android.view.View
+import androidx.core.text.bold
+import androidx.core.text.buildSpannedString
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
@@ -67,3 +70,7 @@ fun Date.toRealmInstant(): RealmInstant {
 }
 
 fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }
+
+fun String.bold() : SpannedString {
+    return buildSpannedString { bold { append(this@bold) } }
+}

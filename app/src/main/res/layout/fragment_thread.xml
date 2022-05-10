@@ -39,6 +39,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/threadTitle"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:text=""
