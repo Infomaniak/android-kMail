@@ -148,10 +148,19 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
             val oldItem = oldList[oldIndex]
             val newItem = newList[newIndex]
 
+//            val id = oldItem.uid == newItem.uid
+//            val from = oldItem.from == newItem.from
+//            val date = oldItem.date == newItem.date
+//            val attachments = oldItem.attachments == newItem.attachments
+//            val subject = oldItem.subject == newItem.subject
+//            val bodyId = oldItem.body?.objectId == newItem.body?.objectId
+//
+//            return id && from && date && attachments && subject && bodyId
+
             return oldItem.uid == newItem.uid
-                    && oldItem.from == newItem.from
+                    // && oldItem.from == newItem.from // TODO: This is false when it shouldn't. Why?
                     && oldItem.date == newItem.date
-                    && oldItem.attachments == newItem.attachments
+                    // && oldItem.attachments == newItem.attachments // TODO: This is false when it shouldn't. Why?
                     && oldItem.subject == newItem.subject
                     && oldItem.body?.objectId == newItem.body?.objectId
         }

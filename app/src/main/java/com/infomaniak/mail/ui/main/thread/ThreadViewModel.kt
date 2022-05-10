@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -24,30 +25,34 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    private var _messages = MutableStateFlow<List<Message>>(emptyList())
-    val messages = _messages.asStateFlow()
+    val messagesFromAPI = MutableStateFlow<List<Message>?>(null)
 
     val isExpandedHeaderMode = false
 
-    fun getMessages(threadUid: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            val thread = getThread(threadUid) ?: return@launch
-
-            thread.messages.asFlow().collect { changes ->
-                _messages.value = changes.list
-            }
-        }
+    fun getMessagesFromRealmThenFetchFromAPI(threadUid: String): List<Message> {
+        val thread = readThreadFromRealm(threadUid)
+        thread?.let(::fetchThreadFromAPI)
+        return thread?.messages ?: emptyList()
     }
 
-    private fun getThread(threadUid: String): Thread? {
+    private fun readThreadFromRealm(threadUid: String): Thread? {
+        Log.e("Realm", "Start reading thread")
         val thread = MailboxContentController.getLatestThread(threadUid)
-        thread?.updateAndSelect()
+        thread?.select()
+        Log.e("Realm", "End of reading thread")
         return thread
+    }
+
+    private fun fetchThreadFromAPI(thread: Thread) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.e("API", "Start fetching thread")
+            thread.updateAndSelect()
+            Log.e("API", "End of fetching thread")
+            messagesFromAPI.value = MailboxContentController.getThread(thread.uid)?.messages
+        }
     }
 }

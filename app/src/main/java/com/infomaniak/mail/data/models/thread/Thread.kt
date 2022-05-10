@@ -81,7 +81,7 @@ class Thread : RealmObject {
         select()
     }
 
-    private fun select() {
+    fun select() {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
@@ -94,7 +94,7 @@ class Thread : RealmObject {
             ApiRepository.getMessage(it.resource).data?.also { completedMessage ->
                 completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
                 completedMessage.fullyDownloaded = true
-                completedMessage.body?.objectId = "body_${completedMessage.uid}" // TODO: Remove this when we have EmbeddedObjects
+                completedMessage.body?.initLocalValues(completedMessage.uid) // TODO: Remove this when we have EmbeddedObjects
                 // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
                 @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
                 completedMessage.attachments?.forEachIndexed { index, attachment ->
