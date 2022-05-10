@@ -62,11 +62,16 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     var parentLink: Folder? = null // TODO
 
+    fun updateAndSelect(mailboxUuid: String) {
+        fetchThreadsFromAPI(mailboxUuid)
+        select()
+    }
+
     fun select() {
         MailRealm.mutableCurrentFolderIdFlow.value = id
     }
 
-    fun fetchThreadsFromAPI(mailboxUuid: String) {
+    private fun fetchThreadsFromAPI(mailboxUuid: String) {
         // Get current data
         Log.d("API", "Threads: Get current data")
         val threadsFromRealm = threads

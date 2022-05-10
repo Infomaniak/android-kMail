@@ -76,11 +76,16 @@ class Thread : RealmObject {
         return this
     }
 
-    fun select() {
+    fun updateAndSelect() {
+        fetchMessagesFromAPI()
+        select()
+    }
+
+    private fun select() {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
-    fun fetchMessagesFromAPI(): List<Message> {
+    private fun fetchMessagesFromAPI() {
         // Get current data
         Log.d("API", "Messages: Get current data")
         val messagesFromRealm = messages
@@ -106,14 +111,12 @@ class Thread : RealmObject {
 
         // Save new data
         Log.i("API", "Messages: Save new data")
-        messages = messagesFromApi.toRealmList()
-        MailboxContentController.upsertThread(this)
+        messagesFromApi.forEach(MailboxContentController::upsertMessage)
+        MailboxContentController.upsertLatestThread(uid)
 
         // Delete outdated data
         Log.e("API", "Messages: Delete outdated data")
         deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
-
-        return messagesFromApi
     }
 
     enum class ThreadFilter(title: String) {

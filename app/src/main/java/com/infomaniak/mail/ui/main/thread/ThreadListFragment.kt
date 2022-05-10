@@ -29,11 +29,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
-import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.launch
 
 class ThreadListFragment : Fragment() {
@@ -68,7 +65,7 @@ class ThreadListFragment : Fragment() {
                 threadListViewModel.threads.collect { threads ->
 
                     Log.i("UI", "Received threads (${threads.size})")
-                    threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
+                    // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
 
                     if (threads.isEmpty()) {
                         displayNoEmailView()
@@ -97,11 +94,7 @@ class ThreadListFragment : Fragment() {
 
 //            onEmptyList = { checkIfNoFiles() }
 
-            onThreadClicked = {
-//                if (thread.isUsable()) {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment())
-//                    }
-            }
+            onThreadClicked = { safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(it.uid, it.subject)) }
         }
     }
 
