@@ -36,65 +36,39 @@ import kotlinx.coroutines.launch
 class ThreadListFragment : Fragment() {
 
     private val threadListViewModel: ThreadListViewModel by viewModels()
-
     private lateinit var binding: FragmentThreadListBinding
-    private val threadAdapter = ThreadListAdapter()
+    private lateinit var threadListAdapter: ThreadListAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentThreadListBinding.inflate(inflater, container, false)
-        binding.threadList.adapter = threadAdapter
-        return binding.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupAdapter()
         setupListeners()
-        setupThreadAdapter()
 
         listenToChanges()
         threadListViewModel.getThreads()
     }
 
-    private fun listenToChanges() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                threadListViewModel.threads.collect { threads ->
+    private fun setupAdapter() {
+        binding.threadsList.adapter = ThreadListAdapter().also { threadListAdapter = it }
 
-                    Log.i("UI", "Received threads (${threads.size})")
-                    // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
-
-                    if (threads.isEmpty()) {
-                        displayNoEmailView()
-                    } else {
-                        displayThreadList()
-                    }
-
-                    with(threadAdapter) {
-                        val newList = formatList(threads, requireContext())
-                        notifyAdapter(newList)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setupThreadAdapter() {
         threadListViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
-            // TODO manage no internet screen
-//            threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
-//            binding.noNetwork.isGone = isInternetAvailable
+            // TODO: Manage no Internet screen
+            // threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
+            // binding.noNetwork.isGone = isInternetAvailable
         }
 
-        threadAdapter.apply {
-//            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        threadListAdapter.apply {
+            // stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-//            onEmptyList = { checkIfNoFiles() }
+            // onEmptyList = { checkIfNoFiles() }
 
-            onThreadClicked = { safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(it.uid, it.subject)) }
+            onThreadClicked = {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(it.uid, it.subject))
+            }
         }
     }
 
@@ -121,16 +95,39 @@ class ThreadListFragment : Fragment() {
         }
     }
 
+    private fun listenToChanges() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                threadListViewModel.threads.collect { threads ->
+
+                    Log.i("UI", "Received threads (${threads.size})")
+                    // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
+
+                    if (threads.isEmpty()) {
+                        displayNoEmailView()
+                    } else {
+                        displayThreadList()
+                    }
+
+                    with(threadListAdapter) {
+                        val newList = formatList(threads, requireContext())
+                        notifyAdapter(newList)
+                    }
+                }
+            }
+        }
+    }
+
     private fun displayNoEmailView() {
         with(binding) {
-            threadList.isGone = true
+            threadsList.isGone = true
             noMailLayout.root.isVisible = true
         }
     }
 
     private fun displayThreadList() {
         with(binding) {
-            threadList.isVisible = true
+            threadsList.isVisible = true
             noMailLayout.root.isGone = true
         }
     }

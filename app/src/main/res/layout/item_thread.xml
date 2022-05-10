@@ -26,8 +26,8 @@
         android:id="@+id/newMailBullet"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
         android:layout_marginTop="5dp"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
         android:src="@drawable/ic_bullet"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -37,8 +37,8 @@
         android:id="@+id/itemThread"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="40dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -85,15 +85,15 @@
 
             <TextView
                 android:id="@+id/mailDate"
-                android:gravity="end"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:maxWidth="50dp"
                 android:maxLines="1"
                 android:text=""
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:text="31 jan 2000"/>
+                tools:text="31 jan 2000" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -104,7 +104,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text=""
-            tools:text="default subject"/>
+            tools:text="default subject" />
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -127,11 +127,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="icon favorite"
-                android:visibility="gone"
                 android:src="@drawable/ic_star"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible"/>
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
