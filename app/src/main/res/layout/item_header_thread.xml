@@ -88,7 +88,7 @@
         android:id="@+id/expandHeaderButton"
         style="@style/IconButton"
         android:rotation="180"
-        app:icon="@drawable/ic_chevron"
+        app:icon="@drawable/ic_chevron_up"
         app:iconSize="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
