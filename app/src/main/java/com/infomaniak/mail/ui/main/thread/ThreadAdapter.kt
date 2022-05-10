@@ -17,9 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.text.SpannedString
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.text.bold
+import androidx.core.text.buildSpannedString
+import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -65,26 +69,41 @@ class ThreadAdapter : RecyclerView.Adapter<BoundViewHolder<ItemMessageBinding>>(
         messageList = newList
     }
 
-    private fun formatRecipientsName(message: Message): String = with(message) {
-        val to = recipientsToString(to, isExpandedHeaderMode)
-        val cc = recipientsToString(cc, isExpandedHeaderMode)
+    private fun formatRecipientsName(message: Message): SpannedString = with(message) {
+        val to = recipientsToSpannedString(to, isExpandedHeaderMode)
+        val cc = recipientsToSpannedString(cc, isExpandedHeaderMode)
 
-        return if (isExpandedHeaderMode) {
-            "À : $to${if (cc.isBlank()) "" else ",\n$cc"}"
-        } else {
-            "$to${if (cc.isBlank()) "" else ", $cc"}"
-        }
+        return buildSpannedString {
+            if (isExpandedHeaderMode) scale(0.9f) { append("À : ") }
+            append(to)
+            if (cc.isNotBlank()) {
+                append(cc)
+            }
+        }.dropLast(2) as SpannedString
+
     }
 
-    private fun recipientsToString(
+    private fun recipientsToSpannedString(
         recipientsList: List<Recipient>,
         isExpandedHeaderMode: Boolean,
-    ): String {
+    ): SpannedString {
 
-        return recipientsList.joinToString(",\n") {
-            if (isExpandedHeaderMode) {
-                if (it.name.isBlank()) it.email else "${it.name} (${it.email})"
-            } else it.name.ifBlank { it.email }
+        return buildSpannedString {
+            recipientsList.forEach {
+                append(if (isExpandedHeaderMode) {
+                    buildSpannedString {
+                        if (it.name.isNotBlank()) {
+                            bold { append(it.name) }
+                            scale(0.9f) { append(" (${it.email})") }
+                        } else {
+                            bold { append(it.email) }
+                        }
+                        append(",\n")
+                    }
+                } else {
+                    "${it.name.ifBlank { it.email }}, "
+                })
+            }
         }
     }
 
@@ -94,10 +113,12 @@ class ThreadAdapter : RecyclerView.Adapter<BoundViewHolder<ItemMessageBinding>>(
                 expeditorEmail.isVisible = true
                 recipient.maxLines = Int.MAX_VALUE
                 recipient.ellipsize = null
+                recipient.textSize = 14f
                 expandHeaderButton.rotation = 0f
             } else {
                 expeditorEmail.isGone = true
                 recipient.maxLines = 1
+                recipient.textSize = 16f
                 recipient.ellipsize = TextUtils.TruncateAt.END
                 expandHeaderButton.rotation = 180f
             }
