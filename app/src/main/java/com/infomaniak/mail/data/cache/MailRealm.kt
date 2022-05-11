@@ -66,17 +66,17 @@ object MailRealm {
         Log.d("API", "Mailboxes: Get current data")
         val mailboxesFromRealm = MailboxInfoController.getMailboxes()
         // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Mailboxes will be deleted. We don't want that.
-        val mailboxesFromAPI = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
+        val mailboxesFromApi = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
 
         // Get outdated data
         Log.d("API", "Mailboxes: Get outdated data")
         val deletableMailboxes = mailboxesFromRealm.filter { fromRealm ->
-            !mailboxesFromAPI.any { fromApi -> fromApi.mailboxId == fromRealm.mailboxId }
+            !mailboxesFromApi.any { fromApi -> fromApi.mailboxId == fromRealm.mailboxId }
         }
 
         // Save new data
         Log.i("API", "Mailboxes: Save new data")
-        mailboxesFromAPI.forEach(MailboxInfoController::upsertMailbox)
+        mailboxesFromApi.forEach(MailboxInfoController::upsertMailbox)
 
         // Delete outdated data
         Log.e("API", "Mailboxes: Delete outdated data")
@@ -85,7 +85,7 @@ object MailRealm {
             Realm.deleteRealm(RealmConfigurations.mailboxContent(it.mailboxId))
         }
 
-        return mailboxesFromAPI
+        return mailboxesFromApi
     }
 
     fun selectCurrentMailbox() {

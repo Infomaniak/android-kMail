@@ -42,7 +42,7 @@ class ThreadListFragment : Fragment() {
     private lateinit var binding: FragmentThreadListBinding
     private lateinit var threadListAdapter: ThreadListAdapter
 
-    private var jobThreadsFromAPI: Job? = null
+    private var jobThreadsFromApi: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -54,7 +54,7 @@ class ThreadListFragment : Fragment() {
         setupListeners()
 
         displayThreadsFromRealm()
-        displayThreadsFromAPI()
+        displayThreadsFromApi()
     }
 
     private fun setupAdapter() {
@@ -102,18 +102,18 @@ class ThreadListFragment : Fragment() {
 
     private fun displayThreadsFromRealm() {
         val threads = with(threadListViewModel) {
-            threadsFromAPI.value = null
-            getDataFromRealmThenFetchFromAPI()
+            threadsFromApi.value = null
+            getDataFromRealmThenFetchFromApi()
         }
         displayThreads(threads)
     }
 
-    private fun displayThreadsFromAPI() {
-        if (jobThreadsFromAPI != null) jobThreadsFromAPI?.cancel()
+    private fun displayThreadsFromApi() {
+        if (jobThreadsFromApi != null) jobThreadsFromApi?.cancel()
 
-        jobThreadsFromAPI = with(threadListViewModel) {
+        jobThreadsFromApi = with(threadListViewModel) {
             viewModelScope.launch(Dispatchers.Main) {
-                threadsFromAPI.filterNotNull().collect { displayThreads(it) }
+                threadsFromApi.filterNotNull().collect { displayThreads(it) }
             }
         }
     }

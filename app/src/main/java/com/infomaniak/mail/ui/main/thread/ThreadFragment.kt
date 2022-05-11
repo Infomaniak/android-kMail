@@ -42,7 +42,7 @@ class ThreadFragment : Fragment() {
     private lateinit var binding: FragmentThreadBinding
     private lateinit var threadAdapter: ThreadAdapter
 
-    private var jobMessagesFromAPI: Job? = null
+    private var jobMessagesFromApi: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -53,7 +53,7 @@ class ThreadFragment : Fragment() {
         setupUi()
 
         displayMessagesFromRealm()
-        displayMessagesFromAPI()
+        displayMessagesFromApi()
     }
 
     private fun setupUi() {
@@ -66,18 +66,18 @@ class ThreadFragment : Fragment() {
 
     private fun displayMessagesFromRealm() {
         val messages = with(threadViewModel) {
-            messagesFromAPI.value = null
-            getMessagesFromRealmThenFetchFromAPI(navigationArgs.threadUid)
+            messagesFromApi.value = null
+            getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
         }
         displayMessages(messages)
     }
 
-    private fun displayMessagesFromAPI() {
-        if (jobMessagesFromAPI != null) jobMessagesFromAPI?.cancel()
+    private fun displayMessagesFromApi() {
+        if (jobMessagesFromApi != null) jobMessagesFromApi?.cancel()
 
-        jobMessagesFromAPI = with(threadViewModel) {
+        jobMessagesFromApi = with(threadViewModel) {
             viewModelScope.launch(Dispatchers.Main) {
-                messagesFromAPI.filterNotNull().collect { displayMessages(it) }
+                messagesFromApi.filterNotNull().collect { displayMessages(it) }
             }
         }
     }
@@ -88,7 +88,7 @@ class ThreadFragment : Fragment() {
             val displayedBody = with(it.body?.value) {
                 this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
             }
-            Log.v("UI", "Sender: ${it.from.firstOrNull()?.email} | $displayedBody")
+            Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")// | $displayedBody")
         }
 
         threadAdapter.notifyAdapter(ArrayList(messages))

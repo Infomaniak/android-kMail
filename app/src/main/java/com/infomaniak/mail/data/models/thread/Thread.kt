@@ -77,7 +77,7 @@ class Thread : RealmObject {
     }
 
     fun updateAndSelect() {
-        fetchMessagesFromAPI()
+        fetchMessagesFromApi()
         select()
     }
 
@@ -85,7 +85,7 @@ class Thread : RealmObject {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
-    private fun fetchMessagesFromAPI() {
+    private fun fetchMessagesFromApi() {
         // Get current data
         Log.d("API", "Messages: Get current data")
         val messagesFromRealm = messages

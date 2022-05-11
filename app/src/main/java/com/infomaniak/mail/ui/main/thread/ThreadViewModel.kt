@@ -29,13 +29,13 @@ import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    val messagesFromAPI = MutableStateFlow<List<Message>?>(null)
+    val messagesFromApi = MutableStateFlow<List<Message>?>(null)
 
     val isExpandedHeaderMode = false
 
-    fun getMessagesFromRealmThenFetchFromAPI(threadUid: String): List<Message> {
+    fun getMessagesFromRealmThenFetchFromApi(threadUid: String): List<Message> {
         val thread = readThreadFromRealm(threadUid)
-        thread?.let(::fetchThreadFromAPI)
+        thread?.let(::fetchThreadFromApi)
         return thread?.messages ?: emptyList()
     }
 
@@ -47,12 +47,12 @@ class ThreadViewModel : ViewModel() {
         return thread
     }
 
-    private fun fetchThreadFromAPI(thread: Thread) {
+    private fun fetchThreadFromApi(thread: Thread) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching thread")
             thread.updateAndSelect()
             Log.e("API", "End of fetching thread")
-            messagesFromAPI.value = MailboxContentController.getThread(thread.uid)?.messages
+            messagesFromApi.value = MailboxContentController.getThread(thread.uid)?.messages
         }
     }
 }

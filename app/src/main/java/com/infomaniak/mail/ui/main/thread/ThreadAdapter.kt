@@ -158,9 +158,9 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 //            return id && from && date && attachments && subject && bodyId
 
             return oldItem.uid == newItem.uid
-                    // && oldItem.from == newItem.from // TODO: This is false when it shouldn't. Why?
+                    && oldItem.from == newItem.from // TODO: This is false when it shouldn't. Why?
                     && oldItem.date == newItem.date
-                    // && oldItem.attachments == newItem.attachments // TODO: This is false when it shouldn't. Why?
+                    && oldItem.attachments == newItem.attachments // TODO: This is false when it shouldn't. Why?
                     && oldItem.subject == newItem.subject
                     && oldItem.body?.objectId == newItem.body?.objectId
         }

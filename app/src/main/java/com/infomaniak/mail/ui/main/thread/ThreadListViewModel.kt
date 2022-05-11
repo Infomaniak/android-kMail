@@ -39,11 +39,11 @@ class ThreadListViewModel : ViewModel() {
 
     var isInternetAvailable = MutableLiveData(true)
 
-    val threadsFromAPI = MutableStateFlow<List<Thread>?>(null)
+    val threadsFromApi = MutableStateFlow<List<Thread>?>(null)
 
-    fun getDataFromRealmThenFetchFromAPI(): List<Thread> {
+    fun getDataFromRealmThenFetchFromApi(): List<Thread> {
         val threads = readDataFromRealm()
-        fetchDataFromAPI()
+        fetchDataFromApi()
         return threads
     }
 
@@ -66,7 +66,7 @@ class ThreadListViewModel : ViewModel() {
         return folder.threads
     }
 
-    private fun fetchDataFromAPI() {
+    private fun fetchDataFromApi() {
 
         fun fetchCurrentMailbox(): Mailbox? {
             val mailboxes = MailRealm.fetchMailboxesFromApi()
@@ -79,7 +79,7 @@ class ThreadListViewModel : ViewModel() {
         }
 
         fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            mailbox.fetchFoldersFromAPI().find { it.getRole() == folderRole }
+            mailbox.fetchFoldersFromApi().find { it.getRole() == folderRole }
 
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching data")
@@ -88,7 +88,7 @@ class ThreadListViewModel : ViewModel() {
             val folder = fetchFolder(mailbox, DEFAULT_FOLDER_ROLE) ?: return@launch
             folder.updateAndSelect(mailbox.uuid)
             Log.e("API", "End of fetching data")
-            threadsFromAPI.value = folder.threads
+            threadsFromApi.value = folder.threads
         }
     }
 }

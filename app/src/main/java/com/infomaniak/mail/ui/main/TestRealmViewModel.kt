@@ -35,7 +35,7 @@ class TestRealmViewModel : ViewModel() {
         Log.e("Realm", "testFinal: select mailbox - ${mailbox.email}")
 
         mailbox.select()
-        val folders = mailbox.fetchFoldersFromAPI()
+        val folders = mailbox.fetchFoldersFromApi()
         Log.e("Realm", "testFinal: get folders - ${folders.size}")
 
         val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
