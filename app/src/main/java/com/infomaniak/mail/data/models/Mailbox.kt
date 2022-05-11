@@ -108,18 +108,18 @@ class Mailbox : RealmObject {
 
     fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFolders()
 
-    fun fetchFoldersFromAPI(): List<Folder> {
+    fun fetchFoldersFromApi(): List<Folder> {
 
         // Get current data
         Log.d("API", "Folders: Get current data")
         val foldersFromRealm = MailboxContentController.getFolders()
         // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Folders will be deleted. We don't want that.
-        val foldersFromAPI = ApiRepository.getFolders(uuid).data ?: emptyList()
+        val foldersFromApi = ApiRepository.getFolders(uuid).data ?: emptyList()
 
         // Get outdated data
         Log.d("API", "Folders: Get outdated data")
         val deletableFolders = foldersFromRealm.filter { fromRealm ->
-            !foldersFromAPI.any { fromApi -> fromApi.id == fromRealm.id }
+            !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
         }
         val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
         val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
@@ -132,9 +132,9 @@ class Mailbox : RealmObject {
         // Save new data
         Log.i("API", "Folders: Save new data")
         MailRealm.mailboxContent.writeBlocking {
-            foldersFromAPI.forEach { folderFromAPI ->
-                val folder = copyToRealm(folderFromAPI, UpdatePolicy.ALL)
-                foldersFromRealm.find { it.id == folderFromAPI.id }?.threads
+            foldersFromApi.forEach { folderFromApi ->
+                val folder = copyToRealm(folderFromApi, UpdatePolicy.ALL)
+                foldersFromRealm.find { it.id == folderFromApi.id }?.threads
                     ?.mapNotNull(::findLatest)
                     ?.let { folder.threads = it.toRealmList() }
             }
@@ -146,6 +146,6 @@ class Mailbox : RealmObject {
         deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
         deletableFolders.forEach { MailboxContentController.deleteFolder(it.id) }
 
-        return foldersFromAPI
+        return foldersFromApi
     }
 }
