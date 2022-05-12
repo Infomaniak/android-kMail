@@ -22,11 +22,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +65,10 @@ class ThreadFragment : Fragment() {
             messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
             backButton.setOnClickListener { findNavController().popBackStack() }
             threadTitle.text = navigationArgs.threadSubject
+
+            AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
+                messagesList.addItemDecoration(DividerItemDecorator(it))
+            }
         }
     }
 

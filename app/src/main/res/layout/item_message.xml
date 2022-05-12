@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+    android:layout_marginBottom="@dimen/marginStandard"
     android:animateLayoutChanges="true">
 
     <include
@@ -29,11 +29,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandard"
-        app:layout_constraintBottom_toTopOf="@id/attachments"
+        app:layout_constraintBottom_toTopOf="@id/attachmentsLayout"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/attachments"
+        android:id="@+id/attachmentsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandard"
@@ -42,76 +42,56 @@
         app:layout_constraintTop_toBottomOf="@id/headerThread">
 
         <ImageView
+            android:id="@+id/attachmentsIcon"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginEnd="@dimen/marginStandardSmall"
+            android:contentDescription="Attachment icon"
             android:src="@drawable/ic_attachment_inclined" />
 
         <TextView
+            android:id="@+id/attachmentsCountText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""
+            android:layout_marginEnd="@dimen/marginStandardSmall"
             tools:text="4 pièces jointes (3 MB)" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/attachmentsSeeAllButton"
             style="@style/TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="0dp"
             android:text="@string/See_all" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/attachmentsDownloadAllButton"
             style="@style/TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/Download_all" />
     </LinearLayout>
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/attachmentsChipGroup"
+    <HorizontalScrollView
+        android:id="@+id/attachmentsScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:flow_maxElementsWrap="5"
-        app:layout_constraintTop_toBottomOf="@id/attachments">
+        android:scrollbarSize="1dp"
+        android:scrollbarThumbHorizontal="@color/buttonBlue"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsLayout"
+        tools:visibility="visible">
 
-        <com.google.android.material.chip.Chip
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/attachmentsChipGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="middle"
-            android:maxWidth="120dp"
-            android:text="TODO programatically" />
+            app:singleLine="true" />
 
-        <com.google.android.material.chip.Chip
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="middle"
-            android:maxWidth="120dp"
-            android:text=""
-            tools:text="contrat-préremplis.pdf" />
-
-        <com.google.android.material.chip.Chip
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="middle"
-            android:maxWidth="120dp"
-            android:text=""
-            tools:text="music.mp3" />
-
-        <com.google.android.material.chip.Chip
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="middle"
-            android:maxWidth="120dp"
-            android:text=""
-            tools:text="music.mp3" />
-
-        <com.google.android.material.chip.Chip
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="middle"
-            android:maxWidth="120dp"
-            android:text=""
-            tools:text="+ 2" />
-    </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -119,7 +99,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsChipGroup">
+        app:layout_constraintTop_toBottomOf="@id/attachmentsScrollView">
 
         <WebView
             android:id="@+id/messageBody"

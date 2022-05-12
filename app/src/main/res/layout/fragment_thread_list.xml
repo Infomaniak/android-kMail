@@ -87,6 +87,7 @@
         android:layout_marginEnd="@dimen/marginStandard"
         android:layout_marginBottom="@dimen/marginStandard"
         android:contentDescription="@string/newMessageButton"
+        android:paddingHorizontal="18dp"
         android:text="@string/newMessageButton"
         android:textAllCaps="false"
         app:backgroundTint="@color/colorPrimary"

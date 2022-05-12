@@ -42,7 +42,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
 
     @StringRes
     var previousSectionName: Int = -1
-    var displaySeeAllButton = false // TODO manage this for intelligent mailbox
+    private var displaySeeAllButton = false // TODO manage this for intelligent mailbox
 
     var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
