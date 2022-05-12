@@ -30,8 +30,8 @@
             android:name="io.sentry.dsn"
             android:value="https://8ddfc8b292d14e69b12ea723aa3287b7@sentry.infomaniak.com/45" />
 
-        <!-- Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-             TODO: We recommend adjusting this value in production. -->
+        <!-- Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring. -->
+        <!-- TODO: We recommend adjusting this value in production. -->
         <meta-data
             android:name="io.sentry.traces.sample-rate"
             android:value="1.0" />
