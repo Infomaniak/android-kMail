@@ -1,19 +1,30 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    // Realm Kotlin PRODUCTION - START /!\
+    // id 'io.realm.kotlin'
+    // Realm Kotlin PRODUCTION - END /!\
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
+// Realm Kotlin SNAPSHOT - START /!\
+configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
+apply plugin: "io.realm.kotlin"
+// Realm Kotlin SNAPSHOT - END /!\
+
 android {
-    compileSdk 32
+    compileSdk 31
 
     defaultConfig {
         applicationId 'com.infomaniak.mail'
         minSdk 24
-        targetSdk 32
+        targetSdk 31
         versionCode 1
         versionName '1.0'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
+        buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
+        buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
     }
 
     buildTypes {
@@ -29,10 +40,18 @@ android {
     }
 
     kotlinOptions { jvmTarget = rootProject.ext.java_version }
+
+    buildFeatures { viewBinding true }
 }
 
 dependencies {
     implementation project(path: ':Core')
+
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
+
+    // Realm Kotlin - START /!\
+    implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
+    // Realm Kotlin - END /!\
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
