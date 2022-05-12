@@ -53,10 +53,43 @@ class ApplicationMain : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        if (BuildConfig.DEBUG) configureDebugMode() else configureReleaseMode()
+        configureSentry()
         configureApiController()
         configureAccountUtils()
+        configureAppReloading()
         configureInfomaniakCore()
+        configureNotifications()
         configureHttpClient()
+    }
+
+    private fun configureDebugMode() {
+        Stetho.initializeWithDefaults(this)
+
+        StrictMode.setVmPolicy(
+            StrictMode.VmPolicy.Builder().apply {
+                detectActivityLeaks()
+                detectLeakedClosableObjects()
+                detectLeakedRegistrationObjects()
+                detectFileUriExposure()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) detectContentUriWithoutPermission()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) detectCredentialProtectedWhileLocked()
+            }.build()
+        )
+    }
+
+    private fun configureReleaseMode() {
+        // No-op
+    }
+
+    private fun configureSentry() {
+        SentryAndroid.init(this) { options: SentryAndroidOptions ->
+            // Register the callback as an option
+            options.beforeSend = SentryOptions.BeforeSendCallback { event: SentryEvent?, _: Any? ->
+                // If the application is in debug mode, discard the events
+                if (BuildConfig.DEBUG) null else event
+            }
+        }
     }
 
     private fun configureApiController() {
@@ -76,6 +109,15 @@ class ApplicationMain : Application() {
         AccountUtils.init(this@ApplicationMain)
     }
 
+    private fun configureAppReloading() {
+        AccountUtils.reloadApp = { bundle ->
+            val intent = Intent(this, LaunchActivity::class.java)
+                .apply { putExtras(bundle) }
+                .clearStack()
+            startActivity(intent)
+        }
+    }
+
     private fun configureInfomaniakCore() {
         InfomaniakCore.init(
             appVersionName = BuildConfig.VERSION_NAME,
@@ -83,6 +125,10 @@ class ApplicationMain : Application() {
             credentialManager = null,
             isDebug = BuildConfig.DEBUG,
         )
+    }
+
+    private fun configureNotifications() {
+        initNotificationChannel()
     }
 
     private fun configureHttpClient() {
