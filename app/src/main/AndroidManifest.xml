@@ -22,7 +22,6 @@
 
     <application
         android:name=".ApplicationMain"
-        android:allowBackup="false"
         android:icon="@drawable/ic_kmail"
         android:label="@string/appName"
         android:roundIcon="@drawable/ic_kmail"
@@ -55,6 +54,10 @@
         <activity
             android:name=".ui.LoginActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.infomaniak.lib.login.WebViewLoginActivity"
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name=".ui.main.MainActivity"

@@ -20,17 +20,23 @@ package com.infomaniak.mail.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.ui.main.MainActivity
+import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LaunchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val destinationClass = when {
-            true -> LoginActivity::class.java // TODO
-            else -> MainActivity::class.java
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            val user = AccountUtils.currentUser ?: AccountUtils.requestCurrentUser()
+            val destinationClass = if (user == null) LoginActivity::class.java else MainActivity::class.java
+
+            startActivity(Intent(this@LaunchActivity, destinationClass))
         }
-        startActivity(Intent(this, destinationClass))
     }
 }

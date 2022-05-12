@@ -54,6 +54,7 @@ class ApplicationMain : Application() {
     override fun onCreate() {
         super.onCreate()
         configureApiController()
+        configureAccountUtils()
         configureInfomaniakCore()
         configureHttpClient()
     }
@@ -69,6 +70,10 @@ class ApplicationMain : Application() {
                 typeAdapterOfRealmListOf<String>(StringRealmListConverter()),
             )
         )
+    }
+
+    private fun configureAccountUtils() {
+        AccountUtils.init(this@ApplicationMain)
     }
 
     private fun configureInfomaniakCore() {
