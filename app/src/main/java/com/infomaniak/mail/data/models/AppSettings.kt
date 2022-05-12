@@ -30,7 +30,6 @@ open class AppSettings(
     var _appSecurityEnabled: Boolean = false,
     var _currentUserId: Int = -1,
     var _migrated: Boolean = false,
-    var _onlyWifiSync: Boolean = false,
 ) : RealmObject() {
 
     companion object {
@@ -93,14 +92,6 @@ open class AppSettings(
                 field = value
                 GlobalScope.launch(Dispatchers.IO) {
                     updateAppSettings { appSettings -> appSettings._migrated = value }
-                }
-            }
-
-        var onlyWifiSync: Boolean = getAppSettings()._onlyWifiSync
-            set(value) {
-                field = value
-                GlobalScope.launch(Dispatchers.IO) {
-                    updateAppSettings { appSettings -> appSettings._onlyWifiSync = value }
                 }
             }
     }

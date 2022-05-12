@@ -20,13 +20,11 @@ package com.infomaniak.mail.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.InfomaniakCore
-import com.infomaniak.lib.core.R
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
@@ -34,6 +32,7 @@ import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.ui.main.MainActivity
@@ -57,7 +56,7 @@ class LoginActivity : AppCompatActivity() {
                 when {
                     translatedError?.isNotBlank() == true -> showError(translatedError)
                     authCode?.isNotBlank() == true -> authenticateUser(authCode)
-                    else -> showError("anErrorHasOccurred 1")
+                    else -> showError(getString(R.string.anErrorHasOccurred))
                 }
             }
         }
@@ -79,56 +78,42 @@ class LoginActivity : AppCompatActivity() {
                 okHttpClient = HttpClient.okHttpClientNoInterceptor,
                 code = authCode,
                 onSuccess = {
-                    Log.e("TOTO", "apiToken: $it")
                     lifecycleScope.launch(Dispatchers.IO) {
                         when (val user = authenticateUser(this@LoginActivity, it)) {
                             is User -> {
-//                                application.trackCurrentUserId()
-//                                trackAccountEvent("loggedIn")
-                                launchMainActivity(user)
+                                // application.trackCurrentUserId() // TODO: Matomo
+                                // trackAccountEvent("loggedIn") // TODO: Matomo
+                                launchMainActivity()
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) {
-                                if (user.error?.code?.equals("no_drive") == true) {
-                                    launchNoDriveActivity()
-                                } else {
-                                    showError(getString(user.translatedError))
-                                }
+                                showError(getString(user.translatedError))
                             }
-                            else -> withContext(Dispatchers.Main) { showError("anErrorHasOccurred 2") }
+                            else -> withContext(Dispatchers.Main) { showError(getString(R.string.anErrorHasOccurred)) }
                         }
                     }
                 },
                 onError = {
                     val error = when (it) {
-                        InfomaniakLogin.ErrorStatus.SERVER -> "serverError"
-                        InfomaniakLogin.ErrorStatus.CONNECTION -> "connectionError"
-                        else -> "anErrorHasOccurred 3"
+                        InfomaniakLogin.ErrorStatus.SERVER -> R.string.serverError
+                        InfomaniakLogin.ErrorStatus.CONNECTION -> R.string.connectionError
+                        else -> R.string.anErrorHasOccurred
                     }
-                    showError(error)
+                    showError(getString(error))
                 },
             )
         }
+    }
+
+    private fun launchMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java).clearStack())
     }
 
     private fun showError(error: String) {
         showSnackbar(error)
     }
 
-    private fun launchMainActivity(user: User) {
-        Log.e("TOTO", "launchMainActivity: $user")
-        startActivity(Intent(this, MainActivity::class.java).clearStack())
-    }
-
-    private fun launchNoDriveActivity() {
-        Log.e("TOTO", "launchNoDriveActivity: ")
-        startActivity(Intent(this, LaunchActivity::class.java))
-    }
-
     companion object {
-        const val MIN_HEIGHT_FOR_LANDSCAPE = 4
-
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
-            Log.e("TOTO", "authenticateUser: ")
 
             AccountUtils.getUserById(apiToken.userId)?.let {
                 return getErrorResponse(R.string.errorUserAlreadyPresent)
@@ -143,11 +128,13 @@ class LoginActivity : AppCompatActivity() {
                         this.organizations = ArrayList()
                     }
 
-                    user?.let {
+                    return user?.let {
+                        // DriveInfosController.storeDriveInfos(user.id, driveInfo) // TODO?
+                        // CloudStorageProvider.notifyRootsChanged(context) // TODO?
                         AccountUtils.addUser(user)
-                        return user
+                        user
                     } ?: run {
-                        return getErrorResponse(R.string.anErrorHasOccurred)
+                        getErrorResponse(R.string.anErrorHasOccurred)
                     }
                 }
             }

@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.app.Activity
 import android.view.View
-import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
 
 fun Activity.showSnackbar(
@@ -51,21 +50,3 @@ fun Activity.showSnackbar(
         onActionClicked = onActionClicked
     )
 }
-
-//fun Fragment.showSnackbar(
-//    titleId: Int,
-//    showAboveFab: Boolean = false,
-//    actionButtonTitle: Int = R.string.buttonCancel,
-//    onActionClicked: (() -> Unit)? = null,
-//) {
-//    showSnackbar(getString(titleId), showAboveFab, actionButtonTitle, onActionClicked)
-//}
-
-//fun Fragment.showSnackbar(
-//    title: String,
-//    showAboveFab: Boolean = false,
-//    actionButtonTitle: Int = R.string.buttonCancel,
-//    onActionClicked: (() -> Unit)? = null,
-//) {
-//    activity?.let { it.showSnackbar(title, if (showAboveFab) it.mainFab else null, actionButtonTitle, onActionClicked) }
-//}

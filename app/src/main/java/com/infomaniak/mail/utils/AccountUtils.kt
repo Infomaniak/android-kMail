@@ -18,6 +18,9 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.os.Bundle
+import android.util.Log
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
@@ -41,6 +44,7 @@ import java.util.concurrent.TimeUnit
 object AccountUtils : CredentialManager {
 
     private lateinit var userDatabase: UserDatabase
+    var reloadApp: ((bundle: Bundle) -> Unit)? = null
 
     fun init(context: Context) {
         userDatabase = UserDatabase.getDatabase(context)
@@ -79,6 +83,10 @@ object AccountUtils : CredentialManager {
         userDatabase.userDao().insert(user)
     }
 
+    private fun reloadApp() {
+        GlobalScope.launch(Dispatchers.Main) { reloadApp?.invoke(bundleOf()) }
+    }
+
     private suspend fun requestUser(user: User) {
         TokenAuthenticator.mutex.withLock {
             if (currentUserId == user.id) {
@@ -95,23 +103,15 @@ object AccountUtils : CredentialManager {
 
     suspend fun removeUser(context: Context, userRemoved: User) {
         userDatabase.userDao().delete(userRemoved)
-//        FileController.deleteUserDriveFiles(userRemoved.id)
-
-//        if (UploadFile.getAppSyncSettings()?.userId == userRemoved.id) {
-//            Sentry.captureMessage(DISABLE_AUTO_SYNC)
-//            context.disableAutoSync()
-//        }
+        // FileController.deleteUserDriveFiles(userRemoved.id) // TODO?
 
         if (currentUserId == userRemoved.id) {
             requestCurrentUser()
-//            currentDriveId = -1
 
-//            resetApp(context)
-//            GlobalScope.launch(Dispatchers.Main) {
-//                reloadApp?.invoke(bundleOf())
-//            }
+            resetApp(context)
+            GlobalScope.launch(Dispatchers.Main) { reloadApp?.invoke(bundleOf()) }
 
-//            CloudStorageProvider.notifyRootsChanged(context)
+            // CloudStorageProvider.notifyRootsChanged(context) // TODO?
         }
     }
 
@@ -167,4 +167,18 @@ object AccountUtils : CredentialManager {
     }
 
     suspend fun getUserById(id: Int): User? = userDatabase.userDao().findById(id)
+
+    private fun resetApp(context: Context) {
+        if (getAllUserCount() == 0) {
+            AppSettings.removeAppSettings()
+            // UiSettings(context).removeUiSettings() // TODO?
+
+            // Delete all app data
+            with(context) {
+                filesDir.deleteRecursively()
+                cacheDir.deleteRecursively()
+            }
+            Log.i("AccountUtils", "resetApp> all user data has been deleted")
+        }
+    }
 }
