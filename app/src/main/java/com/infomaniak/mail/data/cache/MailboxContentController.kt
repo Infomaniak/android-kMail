@@ -66,9 +66,9 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
     }
 
-    fun upsertLatestThread(uid: String) {
-        MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let { copyToRealm(it, UpdatePolicy.ALL) } }
-    }
+    // fun upsertLatestThread(uid: String) {
+    //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let { copyToRealm(it, UpdatePolicy.ALL) } }
+    // }
 
     // fun updateThread(uid: String, onUpdate: (thread: Thread) -> Unit) {
     //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(onUpdate) }

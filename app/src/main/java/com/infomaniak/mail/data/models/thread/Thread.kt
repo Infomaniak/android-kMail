@@ -112,7 +112,6 @@ class Thread : RealmObject {
         // Save new data
         Log.i("API", "Messages: Save new data")
         messagesFromApi.forEach(MailboxContentController::upsertMessage)
-        MailboxContentController.upsertLatestThread(uid)
 
         // Delete outdated data
         Log.e("API", "Messages: Delete outdated data")

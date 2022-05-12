@@ -17,67 +17,61 @@
  */
 package com.infomaniak.mail.ui.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.thread.Thread
-import java.io.File
 
 class TestRealmViewModel : ViewModel() {
 
-    suspend fun testRealm(cacheDir: File) {
+//    suspend fun testRealm(cacheDir: File) {
+//
+//        val mailboxes = MailRealm.fetchMailboxesFromApi()
+//        Log.e("Realm", "testFinal: get mailboxes - ${mailboxes.size}")
+//        val mailbox = mailboxes.first { it.email == "kevin.boulongne@ik.me" }
+//        Log.e("Realm", "testFinal: select mailbox - ${mailbox.email}")
+//
+//        mailbox.select()
+//        val folders = mailbox.fetchFoldersFromApi()
+//        Log.e("Realm", "testFinal: get folders - ${folders.size}")
+//
+//        val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
+//        testFolder(mailbox.uuid, inboxFolder, cacheDir)
+//
+//        val sentFolder = folders.first { it.getRole() == FolderRole.SENT }
+//        testFolder(mailbox.uuid, sentFolder, cacheDir)
+//
+//        val draftFolder = folders.first { it.getRole() == FolderRole.DRAFT }
+//        testFolder(mailbox.uuid, draftFolder, cacheDir)
+//    }
 
-        val mailboxes = MailRealm.fetchMailboxesFromApi()
-        Log.e("Realm", "testFinal: get mailboxes - ${mailboxes.size}")
-        val mailbox = mailboxes.first { it.email == "kevin.boulongne@ik.me" }
-        Log.e("Realm", "testFinal: select mailbox - ${mailbox.email}")
+//    private suspend fun testFolder(mailboxUuid: String, folder: Folder, cacheDir: File) {
+//
+//        Log.e("Realm", "testFinal: select folder - ${folder.name}")
+//
+//        folder.updateAndSelect(mailboxUuid)
+//        val threads = folder.threads //TODO: Check if this data is not empty there?
+//        Log.e("Realm", "testFinal: get threads - ${threads.size}")
+//
+//        val thread1 = threads[0]
+//        testThread(thread1, cacheDir)
+//
+////        val thread2 = threads[1]
+////        testThread(thread2, cacheDir)
+//    }
 
-        mailbox.select()
-        val folders = mailbox.fetchFoldersFromApi()
-        Log.e("Realm", "testFinal: get folders - ${folders.size}")
-
-        val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
-        testFolder(mailbox.uuid, inboxFolder, cacheDir)
-
-        val sentFolder = folders.first { it.getRole() == FolderRole.SENT }
-        testFolder(mailbox.uuid, sentFolder, cacheDir)
-
-        val draftFolder = folders.first { it.getRole() == FolderRole.DRAFT }
-        testFolder(mailbox.uuid, draftFolder, cacheDir)
-    }
-
-    private suspend fun testFolder(mailboxUuid: String, folder: Folder, cacheDir: File) {
-
-        Log.e("Realm", "testFinal: select folder - ${folder.name}")
-
-        folder.updateAndSelect(mailboxUuid)
-        val threads = folder.threads //TODO: Check if this data is not empty there?
-        Log.e("Realm", "testFinal: get threads - ${threads.size}")
-
-        val thread1 = threads[0]
-        testThread(thread1, cacheDir)
-
-//        val thread2 = threads[1]
-//        testThread(thread2, cacheDir)
-    }
-
-    private suspend fun testThread(thread: Thread, cacheDir: File) {
-        Log.e("Realm", "testFinal: select thread - ${thread.subject}")
-
-        thread.updateAndSelect()
-        val messages = thread.messages
-        Log.e("Realm", "testFinal: get messages - ${messages.size}")
-        val message = messages.last()
-        Log.e("Realm", "testFinal: select message - ${message.body?.value}")
-
-//        message.attachments?.first()?.getAttachmentData(cacheDir)
-
-//        val draft = message.getDraft() ?: return
-//        Log.e("Realm", "testFinal: get draft - ${draft.subject}")
-//        draft.attachments.first().getAttachmentData(cacheDir)
-    }
+//    private suspend fun testThread(thread: Thread, cacheDir: File) {
+//        Log.e("Realm", "testFinal: select thread - ${thread.subject}")
+//
+//        thread.updateAndSelect()
+//        val messages = thread.messages
+//        Log.e("Realm", "testFinal: get messages - ${messages.size}")
+//        val message = messages.last()
+//        Log.e("Realm", "testFinal: select message - ${message.body?.value}")
+//
+////        message.attachments?.first()?.getAttachmentData(cacheDir)
+//
+////        val draft = message.getDraft() ?: return
+////        Log.e("Realm", "testFinal: get draft - ${draft.subject}")
+////        draft.attachments.first().getAttachmentData(cacheDir)
+//    }
 
 //    fun testRealm1() {
 //
