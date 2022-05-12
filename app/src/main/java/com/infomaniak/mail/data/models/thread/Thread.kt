@@ -85,6 +85,18 @@ class Thread : RealmObject {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
+    fun markAsSeen(mailboxUuid: String) {
+        MailRealm.mailboxContent.writeBlocking {
+            MailboxContentController.getThread(uid)?.let { coldThread ->
+                findLatest(coldThread)?.let { hotThread ->
+                    hotThread.messages.forEach { it.seen = true }
+                    hotThread.unseenMessagesCount = 0
+                    ApiRepository.markMessagesAsSeen(mailboxUuid, ArrayList(messages))
+                }
+            }
+        }
+    }
+
     private fun fetchMessagesFromApi() {
         // Get current data
         Log.d("API", "Messages: Get current data")

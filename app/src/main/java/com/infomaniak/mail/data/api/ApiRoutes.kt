@@ -72,11 +72,11 @@ object ApiRoutes {
     fun draft(uuid: String, draftUuid: String) =
         "${draft(uuid)}/$draftUuid"
 
-    // fun messageSeen(uuid: String) =
-    //     "$MAIL_API/api/mail/$uuid/message/seen"
+    fun messageSeen(uuid: String) =
+        "$MAIL_API/api/mail/$uuid/message/seen"
 
-    // fun messageUnseen(uuid: String) =
-    //     "$MAIL_API/api/mail/$uuid/message/unseen"
+    fun messageUnseen(uuid: String) =
+        "$MAIL_API/api/mail/$uuid/message/unseen"
 
     // fun messageSafe(uuid: String) =
     //     "$MAIL_API/api/mail/$uuid/message/safe"

@@ -17,6 +17,6 @@
  */
 package com.infomaniak.mail.data.models
 
-// data class Seen(
-//     val rawValue: String,
-// )
+data class Seen(
+    val flagged: Int,
+)

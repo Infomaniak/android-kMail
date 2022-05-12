@@ -20,7 +20,9 @@ package com.infomaniak.mail.ui.main.thread
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +37,10 @@ class ThreadViewModel : ViewModel() {
 
     fun getMessagesFromRealmThenFetchFromApi(threadUid: String): List<Message> {
         val thread = readThreadFromRealm(threadUid)
+        thread?.select()
+        MailRealm.currentMailboxObjectIdFlow.value?.let {
+            thread?.markAsSeen(MailboxInfoController.getMailbox(it)?.uuid ?: "")
+        }
         thread?.let(::fetchThreadFromApi)
         return thread?.messages ?: emptyList()
     }
@@ -42,7 +48,6 @@ class ThreadViewModel : ViewModel() {
     private fun readThreadFromRealm(threadUid: String): Thread? {
         Log.e("Realm", "Start reading thread")
         val thread = MailboxContentController.getLatestThread(threadUid)
-        thread?.select()
         Log.e("Realm", "End of reading thread")
         return thread
     }
