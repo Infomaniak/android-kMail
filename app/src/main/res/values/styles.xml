@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<resources>
+
+    <style name="AppTheme" parent="AppThemeBase" />
+
+    <!-- Text -->
+    <style name="headerText">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="primaryText">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="primaryTextHighlighted">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="secondaryText">
+        <item name="android:textColor">@color/secondaryTextColor</item>
+    </style>
+
+    <style name="highlightedText">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+
+    <style name="menuItemText">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="menuItemTextSelected">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textColor">@color/infomaniak</item>
+    </style>
+
+    <style name="menuTitleText">
+        <item name="android:textColor">@color/sectionHeaderTextColor</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="badgeText">
+        <item name="android:textColor">@color/infomaniak</item>
+    </style>
+
+    <style name="smallActionText">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textColor">@color/infomaniak</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="descriptionText">
+        <item name="android:textColor">@color/secondaryTextColor</item>
+    </style>
+
+    <style name="hintText">
+        <item name="android:textColor">@color/hintTextColor</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!--Snackbar-->
+
+    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="actionTextColorAlpha">0.8</item>
+        <item name="android:backgroundTint">@color/backgroundSnackBarColor</item>
+        <item name="android:layout_margin">@dimen/marginStandard</item>
+    </style>
+
+    <style name="Widget.App.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/primaryLight</item>
+    </style>
+
+    <style name="Widget.App.SnackbarTextView" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/snackBarTextColor</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+</resources>
