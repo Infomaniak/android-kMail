@@ -23,16 +23,23 @@
     <color name="backgroundHeaderColor">#1A1A1A</color>
     <color name="backgroundNotificationColor">#000000</color>
     <color name="backgroundSnackBarColor">#000000</color>
+    <color name="previewBackground">#111C28</color>
 
     <!-- Text -->
+    <color name="titleColor">#FAFAFA</color>
     <color name="unreadColor">#FAFAFA</color>
+    <color name="primaryTextColor">#FAFAFA</color>
+    <color name="secondaryTextColor">#9F9F9F</color>
     <color name="snackBarTextColor">#F5F5F5</color>
+    <color name="sectionHeaderTextColor">#666666</color>
     <color name="hintTextColor">#666666</color>
 
     <!-- Drawable -->
     <color name="separatorColor">#333333</color>
 
     <!-- Icon -->
+    <color name="chevronColor">#FAFAFA</color>
     <color name="iconColor">#FAFAFA</color>
+    <color name="iconToolbarButton">#FAFAFA</color>
 
 </resources>

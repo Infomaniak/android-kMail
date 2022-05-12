@@ -17,8 +17,6 @@
   -->
 <resources>
 
-    <color name="buttonBlue">#4295F7</color>
-
     <color name="primaryLight">#4CB7FF</color>
     <color name="mailPinkColor">#F2357A</color>
     <color name="warningColor">#FF8500</color>
@@ -33,8 +31,12 @@
     <color name="previewBackground">#111C28</color>
 
     <!-- Text -->
+    <color name="titleColor">#333333</color>
     <color name="unreadColor">#333333</color>
+    <color name="primaryTextColor">#333333</color>
+    <color name="secondaryTextColor">#666666</color>
     <color name="snackBarTextColor">#666666</color>
+    <color name="sectionHeaderTextColor">#888888</color>
     <color name="hintTextColor">#888888</color>
     <color name="notificationTextColor">#F5F5F5</color>
 
@@ -42,6 +44,8 @@
     <color name="separatorColor">#ECECEC</color>
 
     <!-- Icon -->
+    <color name="chevronColor">#666666</color>
     <color name="iconColor">#666666</color>
+    <color name="iconToolbarButton">#333333</color>
 
 </resources>
