@@ -85,6 +85,11 @@ class Thread : RealmObject {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
+    fun markAsRead() {
+        // Update Realm
+        // Call API
+    }
+
     private fun fetchMessagesFromApi() {
         // Get current data
         Log.d("API", "Messages: Get current data")

@@ -35,6 +35,8 @@ class ThreadViewModel : ViewModel() {
 
     fun getMessagesFromRealmThenFetchFromApi(threadUid: String): List<Message> {
         val thread = readThreadFromRealm(threadUid)
+        thread?.select()
+        thread?.markAsRead()
         thread?.let(::fetchThreadFromApi)
         return thread?.messages ?: emptyList()
     }
@@ -42,7 +44,6 @@ class ThreadViewModel : ViewModel() {
     private fun readThreadFromRealm(threadUid: String): Thread? {
         Log.e("Realm", "Start reading thread")
         val thread = MailboxContentController.getLatestThread(threadUid)
-        thread?.select()
         Log.e("Realm", "End of reading thread")
         return thread
     }
