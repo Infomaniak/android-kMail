@@ -26,9 +26,6 @@ import com.infomaniak.mail.R
 
 class NewFolderDialog : DialogFragment() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.dialog_new_folder, container, false)
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.dialog_new_folder, container, false)
 }
