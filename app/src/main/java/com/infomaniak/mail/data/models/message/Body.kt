@@ -36,4 +36,13 @@ class Body : RealmObject {
     fun initLocalValues(completedMessageUid: String) {
         objectId = "body_${completedMessageUid}"
     }
+
+    override fun equals(other: Any?): Boolean =
+        when {
+            other !is Body -> false
+            objectId != other.objectId -> false
+            else -> true
+        }
+
+    override fun hashCode(): Int = javaClass.hashCode()
 }
