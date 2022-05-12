@@ -22,6 +22,7 @@ import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.*
@@ -85,13 +86,19 @@ class Thread : RealmObject {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
-    fun markAsSeen(mailboxUuid: String) {
-        MailRealm.mailboxContent.writeBlocking {
-            MailboxContentController.getThread(uid)?.let { coldThread ->
-                findLatest(coldThread)?.let { hotThread ->
-                    hotThread.messages.forEach { it.seen = true }
-                    hotThread.unseenMessagesCount = 0
-                    ApiRepository.markMessagesAsSeen(mailboxUuid, ArrayList(messages))
+    fun markAsSeen() {
+        MailRealm.currentMailboxObjectIdFlow.value?.let { mailboxObjectId ->
+            MailboxInfoController.getMailbox(mailboxObjectId)?.let { mailbox ->
+                MailboxContentController.getThread(uid)?.let { coldThread ->
+                    MailRealm.mailboxContent.writeBlocking {
+                        findLatest(coldThread)?.let { hotThread ->
+                            hotThread.apply {
+                                messages.forEach { it.seen = true }
+                                unseenMessagesCount = 0
+                            }
+                            ApiRepository.markMessagesAsSeen(mailbox.uuid, ArrayList(messages))
+                        }
+                    }
                 }
             }
         }
