@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.models.message
 import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
@@ -105,6 +106,11 @@ class Message : RealmObject {
         replyTo = replyTo.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         return this
+    }
+
+    fun markAsSeen(mailboxUuid : String) {
+        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.seen = true }
+        ApiRepository.markMessagesAsSeen(mailboxUuid, arrayListOf(this))
     }
 
     fun select() {
