@@ -1,15 +1,33 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlin_version = '1.6.20'
-    ext.navigation_version = '2.4.2'
     ext.gradle_version = '7.1.3'
+    ext.kotlin_version = '1.6.20'
+    // Realm Kotlin PRODUCTION - START /!\
+    // ext.realm_kotlin_version = '0.10.2'
+    // Realm Kotlin PRODUCTION - END /!\
+    // Realm Kotlin SNAPSHOT - START /!\
+    ext.realm_kotlin_version = '0.12.0-SNAPSHOT' // https://github.com/realm/realm-kotlin/blob/master/buildSrc/src/main/kotlin/Config.kt
+    // Realm Kotlin SNAPSHOT - END /!\
+    ext.navigation_version = '2.4.2'
     ext.java_version = JavaVersion.VERSION_1_8
+
+    // Realm Kotlin SNAPSHOT - START /!\
+    repositories { maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } }
+    // Realm Kotlin SNAPSHOT - END /!\
+    dependencies {
+        // Realm Kotlin SNAPSHOT - START /!\
+        classpath "io.realm.kotlin:gradle-plugin:$realm_kotlin_version"
+        // Realm Kotlin SNAPSHOT - END /!\
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigation_version"
+    }
 }
 
 plugins {
     id 'com.android.application' version "$gradle_version" apply false
     id 'com.android.library' version "$gradle_version" apply false
     id 'org.jetbrains.kotlin.android' version "$kotlin_version" apply false
+    // Realm Kotlin PRODUCTION - START /!\
+    // id 'io.realm.kotlin' version "$realm_kotlin_version" apply false
+    // Realm Kotlin PRODUCTION - END /!\
 }
 
 task clean(type: Delete) { delete rootProject.buildDir }
