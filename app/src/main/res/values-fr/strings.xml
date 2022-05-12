@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="Add_to_contacts">Ajouter aux contacts</string>
+    <string name="Ads_and_social_networks_filter">Filtre publicitaire et réseaux sociaux</string>
+    <string name="Alias">Alias</string>
+    <string name="Always">Toujours</string>
+    <string name="Appearance">Apparence</string>
+    <string name="As_an_attachment">En pièce jointe</string>
+    <string name="Ask_me">Me demander</string>
+    <string name="Autoreply">Répondeur</string>
+    <string name="Blocked_authorised_recipients">Expéditeurs bloqués / autorisés</string>
+    <string name="Code_lock">Verrouillage par code</string>
+    <string name="Compact">Compact</string>
+    <string name="Copy_email_address">Copier l\'adresse email</string>
+    <string name="Dark">Sombre</string>
+    <string name="Default">Par défaut</string>
+    <string name="Delete_search_history">Effacer l\'historique des recherches</string>
+    <string name="Discussions">Discussions</string>
+    <string name="Display_external_content">Afficher le contenu externe</string>
+    <string name="Download">Télécharger</string>
+    <string name="Download_all">Tout télécharger</string>
+    <string name="Folders_settings">Paramètres des dossiers</string>
+    <string name="General">Général</string>
+    <string name="In_the_message_body">Dans le corps du message</string>
+    <string name="Inbox">Boite de réception</string>
+    <string name="Inbox_type">Type de boite de réception</string>
+    <string name="Include_the_original_message_in_the_reply">Inclure le message original dans la réponse</string>
+    <string name="Large">Large</string>
+    <string name="Light">Clair</string>
+    <string name="Mail_addresses">Adresses mail</string>
+    <string name="Message_display_mode">Mode d\'affichage des messages</string>
+    <string name="Messages">Messages</string>
+    <string name="Notifications">Notifications</string>
+    <string name="Privacy">Confidentialité</string>
+    <string name="Redirections">Redirections</string>
+    <string name="Request_an_acknowledgement_of_receipt_for_every_em">Demander un accusé de réception pour chaque message envoyé</string>
+    <string name="Rules">Règles</string>
+    <string name="Security">Sécurité</string>
+    <string name="See_all">Voir tout</string>
+    <string name="Select_a_display_mode">Sélectionnez un mode d\'affichage</string>
+    <string name="Select_all">Tout sélectionner</string>
+    <string name="Send">Envoi</string>
+    <string name="Send_cancellation_period">Délai d\'annulation d\'envoi</string>
+    <string name="Share">Partager</string>
+    <string name="Signature_settings">Paramètres de signature</string>
+    <string name="Spam_filter">Filtre anti-spam</string>
+    <string name="Swipe_actions">Actions de balayage dans la messagerie</string>
+    <string name="Theme">Thème</string>
+    <string name="Theme_choice">Choix du thème</string>
+    <string name="Thread_list_density">Densité de la liste de conversation</string>
+    <string name="Transfer_emails">Transférer les mails</string>
+    <string name="View_logs">Consulter les logs</string>
+    <string name="Write_an_email">Ecrire un email</string>
+    <plurals name="attachmentQuantity">
+        <item quantity="one">%d pièce jointe (%s)</item>
+        <item quantity="other">%d pièces jointes (%s)</item>
+    </plurals>
+    <string name="bccTitle">Cci :</string>
+    <string name="buttonAddAccount">Ajouter un compte</string>
+    <string name="buttonFeedbacks">Feedbacks</string>
+    <string name="buttonFolders">Dossiers</string>
+    <string name="buttonHelp">Aide</string>
+    <string name="buttonImportEmails">Importer des mails</string>
+    <string name="buttonManageAccount">Gérer mon compte</string>
+    <string name="buttonMoreStorage">Obtenir plus de stockage</string>
+    <string name="buttonRestoreEmails">Restaurer des mails</string>
+    <string name="ccTitle">Cc :</string>
+    <string name="fromTitle">De :</string>
+    <string name="menuDrawerAdvancedActions">Actions avancées</string>
+    <string name="menuDrawerUsed">utilisés</string>
+    <string name="newMessageButton">Nouveau message</string>
+    <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
+    <string name="noEmailDescription">Composez un nouvel email en cliquant sur \"Nouveau message\" en bas à droite</string>
+    <string name="noEmailTitle">Vous n‘avez pas d‘emails</string>
+    <string name="objectTitle">Objet :</string>
+    <string name="searchViewHint">Rechercher un message</string>
+    <string name="threadListSectionLastWeek">La semaine dernière</string>
+    <string name="threadListSectionThisWeek">Cette semaine</string>
+    <string name="threadListSectionToday">Aujourd‘hui</string>
+    <string name="threadListSectionTwoWeeks">Il y a deux semaines</string>
+    <string name="toTitle">À :</string>
+</resources>
