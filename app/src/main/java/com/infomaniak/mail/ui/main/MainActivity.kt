@@ -29,21 +29,14 @@ import io.sentry.SentryLevel
 
 class MainActivity : AppCompatActivity() {
 
-    // private val testRealmViewModel: TestRealmViewModel by viewModels()
-    // private val mainViewModel: MainViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // mainViewModel.getData()
-
-        // findViewById<Button>(R.id.startCalls).setOnClickListener {
-        //     lifecycleScope.launch(Dispatchers.IO) { testRealmViewModel.testRealm(cacheDir) }
-        // }
-
         val navController = setupNavController()
-        navController.addOnDestinationChangedListener { _, dest, args -> onDestinationChanged(dest, args) }
+        navController.addOnDestinationChangedListener { _, dest, args ->
+            onDestinationChanged(dest, args)
+        }
     }
 
     private fun onDestinationChanged(destination: NavDestination, navigationArgs: Bundle?) {
@@ -54,9 +47,9 @@ class MainActivity : AppCompatActivity() {
         })
 
         // TODO Matomo
-//        with(destination) {
-//            application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
-//        }
+        // with(destination) {
+        //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
+        // }
     }
 
     private fun setupNavController(): NavController {

@@ -27,26 +27,6 @@ import io.realm.RealmList
 import io.realm.realmListOf
 import java.lang.reflect.Type
 
-// TODO
-// inline fun <reified T> typeAdapterOf(): Pair<Type, RealmListConverter<Any>> {
-//     return Pair(object : TypeToken<RealmList<T>>() {}.type, RealmListConverter(T::class))
-// }
-
-// TODO
-// class RealmListConverter<T : Any>(private val type: KClass<T>) : JsonSerializer<RealmList<T>>, JsonDeserializer<RealmList<T>> {
-//     override fun serialize(src: RealmList<T>, typeOfSrc: Type?, context: JsonSerializationContext): JsonElement {
-//         val jsonArray = JsonArray()
-//         src.forEach { jsonArray.add(context.serialize(it)) }
-//         return jsonArray
-//     }
-//
-//     override fun deserialize(json: JsonElement, typeOfT: Type?, context: JsonDeserializationContext): RealmList<T> {
-//         val folders = realmListOf<T>()
-//         json.asJsonArray.forEach { folders.add(context.deserialize(it, type::class.java) as T) }
-//         return folders
-//     }
-// }
-
 inline fun <reified T> typeAdapterOfRealmListOf(converter: Any): Pair<Type, Any> {
     return Pair(object : TypeToken<RealmList<T>>() {}.type, converter)
 }

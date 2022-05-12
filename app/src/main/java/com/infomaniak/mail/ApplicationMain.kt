@@ -96,7 +96,6 @@ class ApplicationMain : Application() {
         ApiController.init(
             arrayListOf(
                 RealmInstant::class.java to RealmInstantConverter(),
-                // typeAdapterOfRealmListOf<Folder>(), // TODO
                 typeAdapterOfRealmListOf<Folder>(FolderRealmListConverter()),
                 typeAdapterOfRealmListOf<Recipient>(RecipientRealmListConverter()),
                 typeAdapterOfRealmListOf<Message>(MessageRealmListConverter()),

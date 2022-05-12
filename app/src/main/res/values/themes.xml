@@ -37,8 +37,8 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorSecondary">@color/primary</item>
-        <item name="windowActionBar">false</item><!--TODO: Remove this-->
-        <item name="windowNoTitle">true</item><!--TODO: Remove this-->
+        <item name="windowActionBar">false</item><!-- TODO: Is it the right way to fix the LoginActivity crash? -->
+        <item name="windowNoTitle">true</item><!-- TODO: Is it the right way to fix the LoginActivity crash? -->
     </style>
 
     <style name="AppTheme" parent="AppThemeBase" />

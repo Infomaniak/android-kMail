@@ -79,7 +79,6 @@ object AccountUtils : CredentialManager {
         set(mailboxId) {
             field = mailboxId
             MailRealm.selectCurrentMailbox()
-            // MailboxContentController.deleteCurrentMailboxContent() // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
             GlobalScope.launch(Dispatchers.IO) {
                 AppSettingsController.updateAppSettings { appSettings ->
                     if (appSettings.isValid()) appSettings._currentMailboxId = mailboxId

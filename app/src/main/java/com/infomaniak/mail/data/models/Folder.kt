@@ -79,7 +79,7 @@ class Folder : RealmObject {
         val threadsFromApi = ApiRepository.getThreads(mailboxUuid, id).data?.threads
             ?.map { threadFromApi ->
                 threadFromApi.initLocalValues()
-                // TODO: Put this back when there is no more Realm issue
+                // TODO: Put this back (and make it work) when we have EmbeddedObjects
                 // threadsFromRealm.find { it.uid == threadFromApi.uid }?.let { threadFromRealm ->
                 //     threadFromApi.messages.forEach { messageFromApi ->
                 //         threadFromRealm.messages.find { it.uid == messageFromApi.uid }?.let { messageFromRealm ->
@@ -93,9 +93,6 @@ class Folder : RealmObject {
                 // }
                 // threadFromApi
             }
-        // ?.filterIndexed { index, _ -> index < 7 }
-        // ?.filterIndexed { index, _ -> index < 5 }
-        // ?.filterIndexed { index, _ -> index < 3 }
             ?: emptyList()
 
         // Get outdated data
