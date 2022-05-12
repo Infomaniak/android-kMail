@@ -19,19 +19,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.main.MainActivity">
+    android:layout_height="wrap_content">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/hostFragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:defaultNavHost="true"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/menuDrawerButton"
+        style="@style/IconButton"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_burger"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/searchViewCard"
+        layout="@layout/item_search_view"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="@dimen/marginStandard"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/userAvatar"
+        app:layout_constraintStart_toEndOf="@id/menuDrawerButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/userAvatar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/placeholder"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/main_navigation" />
+        app:shapeAppearanceOverlay="@style/CircleImageView"
+        tools:src="@tools:sample/avatars" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

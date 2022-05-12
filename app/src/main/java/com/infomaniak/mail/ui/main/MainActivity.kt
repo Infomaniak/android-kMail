@@ -19,11 +19,43 @@ package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.R
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val navController = setupNavController()
+        navController.addOnDestinationChangedListener { _, dest, args ->
+            onDestinationChanged(dest, args)
+        }
+    }
+
+    private fun onDestinationChanged(destination: NavDestination, navigationArgs: Bundle?) {
+        Sentry.addBreadcrumb(Breadcrumb().apply {
+            category = "Navigation"
+            message = "Accessed to destination : ${destination.displayName}"
+            level = SentryLevel.INFO
+        })
+
+        // TODO Matomo
+        // with(destination) {
+        //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
+        // }
+    }
+
+    private fun setupNavController(): NavController {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment
+        return navHostFragment.navController.apply {
+            if (currentDestination == null) navigate(graph.startDestinationId)
+        }
     }
 }
