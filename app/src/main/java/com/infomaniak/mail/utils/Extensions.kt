@@ -18,10 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.app.Activity
-import android.text.SpannedString
 import android.view.View
-import androidx.core.text.bold
-import androidx.core.text.buildSpannedString
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year

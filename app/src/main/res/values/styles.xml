@@ -20,6 +20,7 @@
     <!--Buttons-->
 
     <style name="TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/buttonBlue</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>

@@ -27,6 +27,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -82,6 +84,7 @@ class ThreadListFragment : Fragment() {
             openMultiselectButton.setOnClickListener {
                 // TODO multiselection
             }
+
             header.searchViewCard.apply {
                 // TODO filterButton doesn't propagate the event to root, must display it ?
                 searchView.isGone = true
@@ -91,12 +94,28 @@ class ThreadListFragment : Fragment() {
                     safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
                 }
             }
+
             header.userAvatar.setOnClickListener {
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
             }
+
             newMessageFab.setOnClickListener {
                 safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
             }
+
+            threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 ||
+                        layoutManager.findLastCompletelyVisibleItemPosition() == threadListAdapter.itemCount - 1
+                    ) {
+                        newMessageFab.extend()
+                    } else {
+                        newMessageFab.shrink()
+                    }
+                }
+            })
         }
     }
 

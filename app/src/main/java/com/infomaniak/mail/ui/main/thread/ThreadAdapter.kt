@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.content.Context
 import android.text.SpannedString
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -28,7 +29,12 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
@@ -49,6 +55,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         val message = messageList[position]
         displayHeader(holder.binding, message)
         displayBody(holder.binding, message.body)
+        displayAttachments(holder.binding, message.attachments)
     }
 
     private fun displayHeader(binding: ItemMessageBinding, message: Message) {
@@ -63,6 +70,50 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
             }
             messageDate.text = message.date?.toDate()?.format("d MMM YYYY à HH:mm")
         }
+    }
+
+    private fun displayAttachments(binding: ItemMessageBinding, attachments: List<Attachment>) {
+        with(binding) {
+            // TODO add attachment onClickListener and attachmentsListBottomSheetView
+            if (attachments.isEmpty()) {
+                attachmentsLayout.isGone = true
+                attachmentsScrollView.isGone = true
+            } else {
+                attachmentsLayout.isVisible = true
+
+                val fileSize = formatAttachmentFileSize(attachments, root.context)
+                attachmentsCountText.text = root.context.resources.getQuantityString(
+                    R.plurals.attachmentQuantity,
+                    attachments.size,
+                    attachments.size,
+                    fileSize
+                )
+
+                with(attachmentsChipGroup) {
+                    removeAllViews()
+                    attachments.forEach {
+                        addView(createChip(binding, it.name))
+                    }
+                }
+
+                attachmentsSeeAllButton.setOnClickListener {
+                    attachmentsScrollView.isVisible = true
+                    it.isGone = true
+                }
+
+                attachmentsDownloadAllButton.setOnClickListener {
+                    // TODO attachmentList Fragment
+                }
+            }
+        }
+    }
+
+    private fun formatAttachmentFileSize(attachments: List<Attachment>, context: Context): String {
+        val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
+            attachment.size.toLong()
+        }.reduce { acc: Long, size: Long -> acc + size }
+
+        return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
     private fun displayBody(binding: ItemMessageBinding, body: Body?) = with(binding) {
@@ -96,19 +147,20 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
         return buildSpannedString {
             recipientsList.forEach {
-                append(if (isExpandedHeaderMode) {
-                    buildSpannedString {
-                        if (it.name.isNotBlank()) {
-                            bold { append(it.name) }
-                            scale(0.9f) { append(" (${it.email})") }
-                        } else {
-                            bold { append(it.email) }
+                append(
+                    if (isExpandedHeaderMode) {
+                        buildSpannedString {
+                            if (it.name.isNotBlank()) {
+                                bold { append(it.name) }
+                                scale(0.9f) { append(" (${it.email})") }
+                            } else {
+                                bold { append(it.email) }
+                            }
+                            append(",\n")
                         }
-                        append(",\n")
+                    } else {
+                        "${it.name.ifBlank { it.email }}, "
                     }
-                } else {
-                    "${it.name.ifBlank { it.email }}, "
-                }
                 )
             }
         }
@@ -130,6 +182,17 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
                 expandHeaderButton.rotation = 180.0f
             }
             recipient.text = formatRecipientsName(message)
+        }
+    }
+
+    private fun createChip(binding: ItemMessageBinding, attachmentName: String): Chip {
+        return Chip(binding.root.context).apply {
+            text = attachmentName
+            ellipsize = TextUtils.TruncateAt.MIDDLE
+            // TODO put magic values in values/styles
+            maxWidth = 160.toPx()
+            textSize = 14.0f
+            maxLines = 1
         }
     }
 
