@@ -31,6 +31,7 @@
     <style name="H2.Secondary">
         <item name="android:fontFamily">@font/suisseintl_regular</item>
         <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="H3">
@@ -63,6 +64,7 @@
 
     <style name="Callout.Secondary">
         <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Callout.Tertiary">
@@ -71,6 +73,12 @@
 
     <style name="Callout.Highlighted">
         <item name="android:textColor">@color/infomaniak</item>
+    </style>
+
+
+    <style name="calloutHighlighted">
+        <item name="android:textColor">@color/infomaniak</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <!--Snackbar-->
@@ -90,6 +98,7 @@
         <item name="android:textColor">@color/snackbarTextColor</item>
         <item name="android:textSize">@dimen/textHintSize</item>
     </style>
+
 
     <!--Buttons-->
 
