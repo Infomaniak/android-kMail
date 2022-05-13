@@ -17,8 +17,11 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.content.Context
 import android.util.Log
+import androidx.annotation.IdRes
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -116,6 +119,8 @@ class Folder : RealmObject {
         deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
     }
 
+    fun getLocalizedName(context: Context): String = getRole()?.folderNameRes?.let(context::getString) ?: name
+
     fun getRole(): FolderRole? = when (_role) {
         FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE
         FolderRole.DRAFT.name -> FolderRole.DRAFT
@@ -126,12 +131,12 @@ class Folder : RealmObject {
         else -> null
     }
 
-    enum class FolderRole(localizedName: String, order: Int) {
-        INBOX("Inbox", 1),
-        DRAFT("Drafts", 2),
-        SENT("Sent", 3),
-        SPAM("Spam", 4),
-        TRASH("Trash", 5),
-        ARCHIVE("Archives", 6),
+    enum class FolderRole(@IdRes val folderNameRes: Int, val order: Int) {
+        INBOX(R.string.InboxFolder, 1),
+        DRAFT(R.string.DraftFolder, 2),
+        SENT(R.string.SentFolder, 3),
+        SPAM(R.string.SpamFolder, 4),
+        TRASH(R.string.TrashFolder, 5),
+        ARCHIVE(R.string.ArchiveFolder, 6),
     }
 }
