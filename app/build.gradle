@@ -47,8 +47,6 @@ android {
 dependencies {
     implementation project(path: ':Core')
 
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
-
     // Realm Kotlin - START /!\
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
     // Realm Kotlin - END /!\
