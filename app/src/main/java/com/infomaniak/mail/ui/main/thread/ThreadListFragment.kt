@@ -59,11 +59,6 @@ class ThreadListFragment : Fragment() {
 
         setupAdapter()
         setupListeners()
-
-        val threads = getData()
-        displayThreadsFromRealm(threads)
-        displayFolderName()
-        displayThreadsFromApi()
     }
 
     private fun setupAdapter() {
@@ -124,6 +119,21 @@ class ThreadListFragment : Fragment() {
                 }
             })
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val threads = getData()
+        displayThreadsFromRealm(threads)
+        displayFolderName()
+        displayThreadsFromApi()
+    }
+
+    override fun onPause() {
+        jobFolderName?.cancel()
+        jobThreadsFromApi?.cancel()
+        super.onPause()
     }
 
     private fun getData(): List<Thread> {
