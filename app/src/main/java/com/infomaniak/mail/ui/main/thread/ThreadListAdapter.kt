@@ -18,9 +18,14 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -97,14 +102,38 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
 
     private fun displayThread(binding: ItemThreadBinding, position: Int) = with(binding) {
         val thread = itemsList[position] as Thread
+        val context = itemThread.context
+
         expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
-        mailSubject.text = thread.subject.displayedSubject(itemThread.context)
+        mailSubject.text = thread.subject.displayedSubject(context)
+        handleSeenState(thread, context, this)
+
         mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
+
         iconAttachment.isVisible = thread.hasAttachments
-        iconCalendar.isGone = true // TODO see with api when we should display this icon
+        iconCalendar.isGone = true // TODO: See with API when we should display this icon
         iconFavorite.isVisible = thread.flagged
         newMailBullet.isVisible = thread.unseenMessagesCount > 0
+
         itemThread.setOnClickListener { onThreadClicked?.invoke(thread) }
+    }
+
+    private fun handleSeenState(thread: Thread, context: Context, binding: ItemThreadBinding) = with(binding) {
+        val (textColorRes, typeFaceRes) = if (thread.unseenMessagesCount > 0) {
+            R.color.unreadColor to R.font.suisseintl_semibold
+        } else {
+            R.color.primaryText to R.font.suisseintl_regular
+        }
+        val textColor = ContextCompat.getColor(context, textColorRes)
+        val typeFace = ResourcesCompat.getFont(context, typeFaceRes)
+
+        fun TextView.applyState(@IdRes textColor: Int, typeFace: Typeface?) {
+            setTextColor(textColor)
+            typeface = typeFace
+        }
+
+        expeditor.applyState(textColor, typeFace)
+        mailSubject.applyState(textColor, typeFace)
     }
 
     private fun formatDate(date: Date): String = with(date) {

@@ -15,10 +15,24 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="@color/mailPinkColor" />
-    <size
-        android:width="8dp"
-        android:height="8dp" />
-</shape>
+<resources>
+
+    <!-- Background -->
+    <color name="backgroundCardSelectedColor">#333333</color>
+    <color name="backgroundColor">#1A1A1A</color>
+    <color name="backgroundHeaderColor">#1A1A1A</color>
+    <color name="backgroundNotificationColor">#000000</color>
+    <color name="backgroundSnackBarColor">#000000</color>
+
+    <!-- Text -->
+    <color name="unreadColor">#FAFAFA</color>
+    <color name="snackBarTextColor">#F5F5F5</color>
+    <color name="hintTextColor">#666666</color>
+
+    <!-- Drawable -->
+    <color name="separatorColor">#333333</color>
+
+    <!-- Icon -->
+    <color name="iconColor">#FAFAFA</color>
+
+</resources>

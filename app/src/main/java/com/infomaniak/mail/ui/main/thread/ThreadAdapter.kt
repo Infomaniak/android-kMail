@@ -186,7 +186,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         return Chip(binding.root.context).apply {
             text = attachmentName
             ellipsize = TextUtils.TruncateAt.MIDDLE
-            // TODO put magic values in values/styles
+            // TODO: Put magic values in values/themes
             maxWidth = 160.toPx()
             textSize = 14.0f
             maxLines = 1
