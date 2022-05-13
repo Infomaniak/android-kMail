@@ -33,11 +33,11 @@ class ThreadViewModel : ViewModel() {
 
     val isExpandedHeaderMode = false
 
-    fun getMessagesFromRealmThenFetchFromApi(threadUid: String): List<Message> {
+    fun getMessagesFromRealmThenFetchFromApi(isInternetAvailable: Boolean, threadUid: String): List<Message> {
         return readThreadFromRealm(threadUid)?.also { thread ->
             thread.select()
             thread.markAsSeen()
-            fetchThreadFromApi(thread)
+            fetchThreadFromApi(isInternetAvailable, thread)
         }?.messages ?: emptyList()
     }
 
@@ -48,10 +48,10 @@ class ThreadViewModel : ViewModel() {
         return thread
     }
 
-    private fun fetchThreadFromApi(thread: Thread) {
+    private fun fetchThreadFromApi(isInternetAvailable: Boolean, thread: Thread) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching thread")
-            thread.updateAndSelect()
+            thread.updateAndSelect(isInternetAvailable)
             Log.e("API", "End of fetching thread")
             messagesFromApi.value = MailboxContentController.getThread(thread.uid)?.messages
         }
