@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -39,6 +40,7 @@ import kotlinx.coroutines.launch
 
 class ThreadListFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by viewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
@@ -62,7 +64,7 @@ class ThreadListFragment : Fragment() {
     private fun setupAdapter() {
         binding.threadsList.adapter = ThreadListAdapter().also { threadListAdapter = it }
 
-        threadListViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO: Manage no Internet screen
             // threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
             // binding.noNetwork.isGone = isInternetAvailable
@@ -122,7 +124,7 @@ class ThreadListFragment : Fragment() {
     private fun displayThreadsFromRealm() {
         val threads = with(threadListViewModel) {
             threadsFromApi.value = null
-            getDataFromRealmThenFetchFromApi()
+            getDataFromRealmThenFetchFromApi(mainViewModel.isInternetAvailable.value ?: false)
         }
         displayThreads(threads)
     }

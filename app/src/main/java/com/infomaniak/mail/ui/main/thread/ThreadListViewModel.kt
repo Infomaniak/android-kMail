@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.MailRealm
@@ -37,13 +36,11 @@ class ThreadListViewModel : ViewModel() {
         val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
     }
 
-    var isInternetAvailable = MutableLiveData(true)
-
     val threadsFromApi = MutableStateFlow<List<Thread>?>(null)
 
-    fun getDataFromRealmThenFetchFromApi(): List<Thread> {
+    fun getDataFromRealmThenFetchFromApi(isInternetAvailable: Boolean): List<Thread> {
         val threads = readDataFromRealm()
-        fetchDataFromApi()
+        fetchDataFromApi(isInternetAvailable)
         return threads
     }
 
@@ -66,10 +63,10 @@ class ThreadListViewModel : ViewModel() {
         return folder.threads
     }
 
-    private fun fetchDataFromApi() {
+    private fun fetchDataFromApi(isInternetAvailable: Boolean) {
 
         fun fetchCurrentMailbox(): Mailbox? {
-            val mailboxes = MailRealm.fetchMailboxesFromApi()
+            val mailboxes = MailRealm.fetchMailboxesFromApi(isInternetAvailable)
             return with(mailboxes) {
                 find { it.mailboxId == AccountUtils.currentMailboxId }
                 // ?: find { it.email == "kevin.boulongne@ik.me" }
@@ -79,14 +76,14 @@ class ThreadListViewModel : ViewModel() {
         }
 
         fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            mailbox.fetchFoldersFromApi().find { it.getRole() == folderRole }
+            mailbox.fetchFoldersFromApi(isInternetAvailable).find { it.getRole() == folderRole }
 
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching data")
             val mailbox = fetchCurrentMailbox() ?: return@launch
             mailbox.select()
             val folder = fetchFolder(mailbox, DEFAULT_FOLDER_ROLE) ?: return@launch
-            folder.updateAndSelect(mailbox.uuid)
+            folder.updateAndSelect(isInternetAvailable, mailbox.uuid)
             Log.e("API", "End of fetching data")
             threadsFromApi.value = folder.threads
         }

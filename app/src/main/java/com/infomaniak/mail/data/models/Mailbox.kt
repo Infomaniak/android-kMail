@@ -108,18 +108,21 @@ class Mailbox : RealmObject {
 
     fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFolders()
 
-    fun fetchFoldersFromApi(): List<Folder> {
+    fun fetchFoldersFromApi(isInternetAvailable: Boolean): List<Folder> {
 
         // Get current data
         Log.d("API", "Folders: Get current data")
         val foldersFromRealm = MailboxContentController.getFolders()
-        // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Folders will be deleted. We don't want that.
         val foldersFromApi = ApiRepository.getFolders(uuid).data ?: emptyList()
 
         // Get outdated data
         Log.d("API", "Folders: Get outdated data")
-        val deletableFolders = foldersFromRealm.filter { fromRealm ->
-            !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
+        val deletableFolders = if (isInternetAvailable) {
+            foldersFromRealm.filter { fromRealm ->
+                !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
+            }
+        } else {
+            emptyList()
         }
         val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
         val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->

@@ -32,6 +32,7 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 class ThreadFragment : Fragment() {
 
     private val navigationArgs: ThreadFragmentArgs by navArgs()
+    private val mainViewModel: MainViewModel by viewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadBinding
@@ -75,7 +77,7 @@ class ThreadFragment : Fragment() {
     private fun displayMessagesFromRealm() {
         val messages = with(threadViewModel) {
             messagesFromApi.value = null
-            getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
+            getMessagesFromRealmThenFetchFromApi(mainViewModel.isInternetAvailable.value ?: false, navigationArgs.threadUid)
         }
         displayMessages(messages)
     }
