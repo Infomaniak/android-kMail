@@ -90,7 +90,7 @@
         android:paddingHorizontal="18dp"
         android:text="@string/newMessageButton"
         android:textAllCaps="false"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/mailPinkColor"
         app:icon="@drawable/ic_pencil_1"
         app:iconGravity="end"
         app:iconSize="16dp"

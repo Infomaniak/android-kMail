@@ -28,6 +28,8 @@
         android:layout_marginVertical="@dimen/marginStandardMedium"
         android:layout_marginStart="@dimen/marginStandard"
         android:minWidth="120dp"
+        android:textColor="@color/hintTextColor"
         app:loader_corner="12dp"
-        tools:text="Aujourd'hui" />
+        tools:text="Today" />
+
 </LinearLayout>
