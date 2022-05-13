@@ -32,6 +32,7 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
+import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -63,7 +64,7 @@ class ThreadFragment : Fragment() {
         with(binding) {
             messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
             backButton.setOnClickListener { findNavController().popBackStack() }
-            threadTitle.text = navigationArgs.threadSubject
+            threadTitle.text = navigationArgs.threadSubject.displayedSubject(requireContext())
 
             AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
                 messagesList.addItemDecoration(DividerItemDecorator(it))

@@ -81,6 +81,7 @@
     <string name="buttonMoreStorage"></string>
     <string name="buttonRestoreEmails"></string>
     <string name="ccTitle"></string>
+    <string name="contactMe"></string>
     <string name="fromTitle"></string>
     <string name="menuDrawerAdvancedActions"></string>
     <string name="menuDrawerUsed"></string>
@@ -88,6 +89,7 @@
     <string name="newMessagePlaceholderTitle"></string>
     <string name="noEmailDescription"></string>
     <string name="noEmailTitle"></string>
+    <string name="noSubject"></string>
     <string name="objectTitle"></string>
     <string name="searchViewHint"></string>
     <string name="threadListSectionLastWeek"></string>

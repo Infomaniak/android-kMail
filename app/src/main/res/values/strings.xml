@@ -76,8 +76,8 @@
     <string name="View_logs">View logs</string>
     <string name="Write_an_email">Write an email</string>
     <plurals name="attachmentQuantity">
-        <item quantity="one">%d attachment (%s)</item>
-        <item quantity="other">%d attachments (%s)</item>
+        <item quantity="one">%d attachment</item>
+        <item quantity="other">%d attachments</item>
     </plurals>
     <string name="bccTitle">Bcc:\u0020</string>
     <string name="buttonAddAccount">Add an account</string>
@@ -89,6 +89,7 @@
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="ccTitle">Cc:</string>
+    <string name="contactMe">Me</string>
     <string name="fromTitle">From:</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerUsed">used</string>
@@ -96,6 +97,7 @@
     <string name="newMessagePlaceholderTitle">Type your message</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
     <string name="noEmailTitle">You don\'t have any emails</string>
+    <string name="noSubject">No subject</string>
     <string name="objectTitle">Object:</string>
     <string name="searchViewHint">Search for a message</string>
     <string name="threadListSectionLastWeek">Last week</string>

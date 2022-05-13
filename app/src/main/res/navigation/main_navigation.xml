@@ -75,7 +75,8 @@
             app:argType="string" />
         <argument
             android:name="threadSubject"
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />

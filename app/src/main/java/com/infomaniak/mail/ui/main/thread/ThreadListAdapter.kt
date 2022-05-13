@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.ItemThreadBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
+import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
 import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import java.util.*
@@ -97,7 +98,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     private fun displayThread(binding: ItemThreadBinding, position: Int) = with(binding) {
         val thread = itemsList[position] as Thread
         expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
-        mailSubject.text = thread.subject
+        mailSubject.text = thread.subject.displayedSubject(itemThread.context)
         mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
         iconAttachment.isVisible = thread.hasAttachments
         iconCalendar.isGone = true // TODO see with api when we should display this icon
