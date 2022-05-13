@@ -1,0 +1,59 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.13533835"
+        android:scaleY="0.13533835"
+        android:translateX="27"
+        android:translateY="27">
+        <path
+            android:fillAlpha="0.5"
+            android:fillColor="#FF78A9"
+            android:fillType="evenOdd"
+            android:pathData="M132.11,64.38C132.11,53.29 143.08,45.36 153.91,48.62L339.23,104.42C346.3,106.55 351.12,112.94 351.12,120.18V275.27C351.12,286.36 340.15,294.29 329.32,291.03L144.01,235.23C136.94,233.1 132.11,226.71 132.11,219.47V64.38Z"
+            android:strokeAlpha="0.5" />
+        <path
+            android:fillColor="#FF79AC"
+            android:fillType="evenOdd"
+            android:pathData="M90,90.76C90,79.66 100.96,71.74 111.8,75L297.11,130.8C304.18,132.93 309,139.32 309,146.56V301.65C309,312.74 298.04,320.67 287.2,317.41L101.89,261.61C94.82,259.48 90,253.09 90,245.85V90.76Z" />
+        <path
+            android:fillColor="#FFA5C6"
+            android:fillType="evenOdd"
+            android:pathData="M47.88,123.73C47.88,112.64 58.85,104.71 69.68,107.97L254.99,163.77C262.06,165.9 266.89,172.29 266.89,179.53V334.62C266.89,345.71 255.92,353.64 245.09,350.38L59.77,294.58C52.7,292.45 47.88,286.06 47.88,278.82V123.73Z" />
+        <group>
+            <clip-path
+                android:fillType="evenOdd"
+                android:pathData="M47.88,123.73C47.88,112.64 58.85,104.71 69.68,107.97L254.99,163.77C262.06,165.9 266.89,172.29 266.89,179.53V334.62C266.89,345.71 255.92,353.64 245.09,350.38L59.77,294.58C52.7,292.45 47.88,286.06 47.88,278.82V123.73Z" />
+            <path
+                android:fillColor="#ffffff"
+                android:fillType="evenOdd"
+                android:pathData="M47.88,101.41L266.89,167.35L156.77,263.36C148.55,270.53 135.63,268.18 130.59,258.6L47.88,101.41Z" />
+            <path
+                android:fillColor="#ffffff"
+                android:fillType="evenOdd"
+                android:pathData="M47.88,101.41L266.89,167.35L156.77,263.36C148.55,270.53 135.63,268.18 130.59,258.6L47.88,101.41Z" />
+        </group>
+        <path
+            android:fillColor="#ffffff"
+            android:pathData="M247.68,34.25H279.13V91.33L302.12,64.75H339.99L311.19,92.84L341.66,144.95H306.96L290.7,112.78L279.13,124.1V144.95H247.68V34.25Z" />
+    </group>
+</vector>
