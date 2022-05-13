@@ -37,7 +37,7 @@ class Message : RealmObject {
     @SerializedName("msg_id")
     var msgId: String = ""
     var date: RealmInstant? = null
-    var subject: String = ""
+    var subject: String? = null
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()

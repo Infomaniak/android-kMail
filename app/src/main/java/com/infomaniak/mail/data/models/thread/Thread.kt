@@ -49,7 +49,7 @@ class Thread : RealmObject {
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
-    var subject: String = ""
+    var subject: String? = null
     var date: RealmInstant? = null
 
     @SerializedName("has_attachments")

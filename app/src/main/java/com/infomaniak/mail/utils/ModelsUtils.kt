@@ -17,7 +17,20 @@
  */
 package com.infomaniak.mail.utils
 
+import android.content.Context
+import android.text.Spanned
+import androidx.core.text.HtmlCompat
+import androidx.core.text.toSpanned
+import com.infomaniak.mail.R
+
 object ModelsUtils {
+
+    fun String?.displayedSubject(context: Context): Spanned {
+        return this?.toSpanned() ?: HtmlCompat.fromHtml(
+            "<i>${context.getString(R.string.noSubject)}</i>",
+            HtmlCompat.FROM_HTML_MODE_COMPACT,
+        )
+    }
 
     fun getPriority(priority: String?): MessagePriority? = when (priority?.uppercase()) {
         MessagePriority.LOW.name -> MessagePriority.LOW
