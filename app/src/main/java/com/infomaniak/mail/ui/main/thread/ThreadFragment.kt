@@ -87,7 +87,7 @@ class ThreadFragment : Fragment() {
 
         jobMessagesFromApi = with(threadViewModel) {
             viewModelScope.launch(Dispatchers.Main) {
-                messagesFromApi.filterNotNull().collect { displayMessages(it) }
+                messagesFromApi.filterNotNull().collect(::displayMessages)
             }
         }
     }

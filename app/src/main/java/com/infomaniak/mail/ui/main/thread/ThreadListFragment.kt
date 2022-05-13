@@ -30,6 +30,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
@@ -46,6 +48,7 @@ class ThreadListFragment : Fragment() {
     private lateinit var binding: FragmentThreadListBinding
     private lateinit var threadListAdapter: ThreadListAdapter
 
+    private var jobFolderName: Job? = null
     private var jobThreadsFromApi: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -57,7 +60,9 @@ class ThreadListFragment : Fragment() {
         setupAdapter()
         setupListeners()
 
-        displayThreadsFromRealm()
+        val threads = getData()
+        displayThreadsFromRealm(threads)
+        displayFolderName()
         displayThreadsFromApi()
     }
 
@@ -121,12 +126,29 @@ class ThreadListFragment : Fragment() {
         }
     }
 
-    private fun displayThreadsFromRealm() {
-        val threads = with(threadListViewModel) {
+    private fun getData(): List<Thread> {
+        return with(threadListViewModel) {
             threadsFromApi.value = null
             getDataFromRealmThenFetchFromApi(mainViewModel.isInternetAvailable.value ?: false)
         }
+    }
+
+    private fun displayThreadsFromRealm(threads: List<Thread>) {
         displayThreads(threads)
+    }
+
+    private fun displayFolderName() {
+        if (jobFolderName != null) jobFolderName?.cancel()
+
+        jobFolderName = with(threadListViewModel) {
+            viewModelScope.launch(Dispatchers.Main) {
+                MailRealm.currentFolderIdFlow.filterNotNull().collect {
+                    MailboxContentController.getFolder(it)?.let { folder ->
+                        binding.mailboxName.text = folder.getLocalizedName(requireContext())
+                    }
+                }
+            }
+        }
     }
 
     private fun displayThreadsFromApi() {
@@ -134,7 +156,7 @@ class ThreadListFragment : Fragment() {
 
         jobThreadsFromApi = with(threadListViewModel) {
             viewModelScope.launch(Dispatchers.Main) {
-                threadsFromApi.filterNotNull().collect { displayThreads(it) }
+                threadsFromApi.filterNotNull().collect(::displayThreads)
             }
         }
     }
