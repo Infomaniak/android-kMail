@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.asStateFlow
 
 object MailRealm {
 
-    val appSettings = Realm.open(RealmConfigurations.appSettings)
     val mailboxInfo = Realm.open(RealmConfigurations.mailboxInfo)
     lateinit var mailboxContent: Realm
 
@@ -102,15 +101,8 @@ object MailRealm {
     @Suppress("FunctionName")
     private object RealmConfigurations {
 
-        private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
         private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
         private fun MAILBOX_CONTENT_DB_NAME(currentMailboxId: Int) = "${AccountUtils.currentUserId}-${currentMailboxId}.realm"
-
-        val appSettings = RealmConfiguration
-            .Builder(RealmSets.appSettings)
-            .name(APP_SETTINGS_DB_NAME)
-            .deleteRealmIfMigrationNeeded()
-            .build()
 
         val mailboxInfo = RealmConfiguration
             .Builder(RealmSets.mailboxInfo)
@@ -125,10 +117,6 @@ object MailRealm {
             .build()
 
         private object RealmSets {
-
-            val appSettings = setOf(
-                AppSettings::class,
-            )
 
             val mailboxInfo = setOf(
                 Mailbox::class,
