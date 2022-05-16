@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.data.cache.SettingsPreferences
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Recipient
@@ -55,6 +56,7 @@ class ApplicationMain : Application() {
         super.onCreate()
         if (BuildConfig.DEBUG) configureDebugMode() else configureReleaseMode()
         configureSentry()
+        configureSettingsPreferences()
         configureApiController()
         configureAccountUtils()
         configureAppReloading()
@@ -90,6 +92,10 @@ class ApplicationMain : Application() {
                 if (BuildConfig.DEBUG) null else event
             }
         }
+    }
+
+    private fun configureSettingsPreferences() {
+        SettingsPreferences.initInstance(this)
     }
 
     private fun configureApiController() {
