@@ -94,7 +94,7 @@ class Mailbox : RealmObject {
 
     fun initLocalValues(): Mailbox {
         userId = AccountUtils.currentUserId
-        objectId = "${mailboxId}_${AccountUtils.currentUserId}"
+        objectId = "${AccountUtils.currentUserId}_${mailboxId}"
 
         return this
     }
