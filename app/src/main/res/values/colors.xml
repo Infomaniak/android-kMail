@@ -27,7 +27,7 @@
     <color name="backgroundColor">#FFFFFF</color>
     <color name="backgroundHeaderColor">#F4F6FD</color>
     <color name="backgroundNotificationColor">#666666</color>
-    <color name="backgroundSnackBarColor">#FAFAFA</color>
+    <color name="backgroundSnackbarColor">#FAFAFA</color>
     <color name="previewBackground">#111C28</color>
 
     <!-- Text -->
@@ -35,7 +35,7 @@
     <color name="unreadColor">#333333</color>
     <color name="primaryTextColor">#333333</color>
     <color name="secondaryTextColor">#666666</color>
-    <color name="snackBarTextColor">#666666</color>
+    <color name="snackbarTextColor">#666666</color>
     <color name="sectionHeaderTextColor">#888888</color>
     <color name="hintTextColor">#888888</color>
     <color name="notificationTextColor">#F5F5F5</color>
