@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.data.cache
 
-import android.util.Log
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Body
@@ -60,40 +58,13 @@ object MailRealm {
      */
     fun readMailboxesFromRealm(): List<Mailbox> = MailboxInfoController.getMailboxes()
 
-    fun fetchMailboxesFromApi(isInternetAvailable: Boolean): List<Mailbox> {
-        // Get current data
-        Log.d("API", "Mailboxes: Get current data")
-        val mailboxesFromRealm = MailboxInfoController.getMailboxes()
-        val mailboxesFromApi = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
-
-        // Get outdated data
-        Log.d("API", "Mailboxes: Get outdated data")
-        val deletableMailboxes = if (isInternetAvailable) {
-            mailboxesFromRealm.filter { fromRealm ->
-                !mailboxesFromApi.any { fromApi -> fromApi.mailboxId == fromRealm.mailboxId }
-            }
-        } else {
-            emptyList()
-        }
-
-        // Save new data
-        Log.i("API", "Mailboxes: Save new data")
-        mailboxesFromApi.forEach(MailboxInfoController::upsertMailbox)
-
-        // Delete outdated data
-        Log.e("API", "Mailboxes: Delete outdated data")
-        deletableMailboxes.forEach {
-            MailboxInfoController.deleteMailbox(it.objectId)
-            Realm.deleteRealm(RealmConfigurations.mailboxContent(it.mailboxId))
-        }
-
-        return mailboxesFromApi
-    }
-
     fun selectCurrentMailbox() {
         if (MailRealm::mailboxContent.isInitialized) mailboxContent.close()
         mailboxContent = Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId))
     }
+
+    fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration =
+        RealmConfigurations.mailboxContent(mailboxId)
 
     /**
      * Configurations

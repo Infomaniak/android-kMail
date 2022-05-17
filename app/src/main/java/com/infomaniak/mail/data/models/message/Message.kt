@@ -15,10 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+
 package com.infomaniak.mail.data.models.message
 
-import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.models.Attachment
@@ -29,12 +33,15 @@ import io.realm.*
 import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
+@Serializable
 class Message : RealmObject {
     @PrimaryKey
     var uid: String = ""
-
-    @SerializedName("msg_id")
+    @SerialName("msg_id")
     var msgId: String = ""
     var date: RealmInstant? = null
     var subject: String? = null
@@ -42,37 +49,28 @@ class Message : RealmObject {
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
-
-    @SerializedName("reply_to")
+    @SerialName("reply_to")
     var replyTo: RealmList<Recipient> = realmListOf()
     var references: String? = null
     var priority: String? = null
-
-    @SerializedName("dkim_status")
+    @SerialName("dkim_status")
     private var dkimStatus: String? = null
-
-    @SerializedName("folder_id")
+    @SerialName("folder_id")
     var folderId: String = ""
     var folder: String = ""
-
-    @SerializedName("st_uuid")
+    @SerialName("st_uuid")
     var stUuid: String? = null
     var resource: String = ""
-
-    @SerializedName("download_resource")
+    @SerialName("download_resource")
     var downloadResource: String = ""
-
-    @SerializedName("is_draft")
+    @SerialName("is_draft")
     var isDraft: Boolean = false
-
-    @SerializedName("draft_resource")
+    @SerialName("draft_resource")
     var draftResource: String = ""
     var body: Body? = null
-
-    @SerializedName("has_attachments")
+    @SerialName("has_attachments")
     var hasAttachments: Boolean = false
-
-    @SerializedName("attachments_resources")
+    @SerialName("attachments_resources")
     var attachmentsResource: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
     var seen: Boolean = false
@@ -81,11 +79,9 @@ class Message : RealmObject {
     var flagged: Boolean = false
     var scheduled: Boolean = false
     var size: Int = 0
-
-    @SerializedName("safe_display")
+    @SerialName("safe_display")
     var safeDisplay: Boolean = false
-
-    @SerializedName("is_duplicate")
+    @SerialName("is_duplicate")
     var isDuplicate: Boolean = false
 
     /**
@@ -108,7 +104,7 @@ class Message : RealmObject {
         return this
     }
 
-    fun markAsSeen(mailboxUuid : String) {
+    fun markAsSeen(mailboxUuid: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.seen = true }
         ApiRepository.markMessagesAsSeen(mailboxUuid, arrayListOf(this))
     }

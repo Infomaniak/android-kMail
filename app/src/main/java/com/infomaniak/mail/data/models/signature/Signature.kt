@@ -17,41 +17,34 @@
  */
 package com.infomaniak.mail.data.models.signature
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Signature : RealmObject {
     var id: Int = 0
     var name: String = ""
-
-    @SerializedName("reply_to")
+    @SerialName("reply_to")
     var replyTo: String = ""
-
-    @SerializedName("reply_to_idn")
+    @SerialName("reply_to_idn")
     var replyToIdn: String = ""
-
-    @SerializedName("reply_to_id")
+    @SerialName("reply_to_id")
     var replyToId: Int = 0
-
-    @SerializedName("full_name")
+    @SerialName("full_name")
     var fullName: String = ""
     var sender: String = ""
-
-    @SerializedName("sender_idn")
+    @SerialName("sender_idn")
     var senderIdn: String = ""
-
-    @SerializedName("sender_id")
+    @SerialName("sender_id")
     var senderId: Int = 0
     var hash: String? = null
-
-    @SerializedName("is_default")
+    @SerialName("is_default")
     var isDefault: Boolean = false
-
-    @SerializedName("service_mail_model_id")
+    @SerialName("service_mail_model_id")
     var serviceMailModelId: Int? = null
     var position: String = ""
-
-    @SerializedName("is_editable")
+    @SerialName("is_editable")
     var isEditable: Boolean = false
     var content: String = ""
 }

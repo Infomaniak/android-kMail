@@ -17,12 +17,13 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Quotas : RealmObject {
     var size: Int = 0
-
-    @SerializedName("size_checked_at")
+    @SerialName("size_checked_at")
     var sizeCheckedAt: Long = 0L
 }

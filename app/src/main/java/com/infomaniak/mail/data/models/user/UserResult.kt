@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.data.models.user
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserResult(
     val infos: UserInfos,
     val preferences: UserPreferences

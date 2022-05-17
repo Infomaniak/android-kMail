@@ -17,15 +17,15 @@
  */
 package com.infomaniak.mail.data.models.signature
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SignaturesResult(
     val signatures: ArrayList<Signature>,
-
-    @SerializedName("default_signature_id")
+    @SerialName("default_signature_id")
     val defaultSignatureId: Int,
-
-    @SerializedName("valid_emails")
+    @SerialName("valid_emails")
     val validEmails: ArrayList<SignatureEmail>,
     val position: String,
 )

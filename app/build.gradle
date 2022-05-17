@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'kotlin-parcelize'
     // Realm Kotlin PRODUCTION - START /!\
     // id 'io.realm.kotlin'
     // Realm Kotlin PRODUCTION - END /!\
@@ -46,6 +48,8 @@ android {
 
 dependencies {
     implementation project(path: ':Core')
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$rootProject.ext.kotlinx_serialization_version"
 
     // Realm Kotlin - START /!\
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"

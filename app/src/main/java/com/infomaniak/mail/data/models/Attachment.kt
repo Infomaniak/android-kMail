@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models
 
 import android.util.Log
-import com.google.gson.annotations.SerializedName
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.api.ApiRoutes
@@ -28,6 +27,8 @@ import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -36,28 +37,22 @@ import java.io.BufferedInputStream
 import java.io.File
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
+@Serializable
 class Attachment : RealmObject {
     @PrimaryKey // TODO: Remove `@PrimaryKey` when we have EmbeddedObjects
     var uuid: String = ""
-
-    @SerializedName("part_id")
-    var partId: String = ""
-
-    @SerializedName("mime_type")
+    @SerialName("mime_type")
     var mimeType: String = ""
     var encoding: String = ""
     var size: Int = 0
     var name: String = ""
-
-    @SerializedName("disposition")
+    @SerialName("disposition")
     private var disposition: String? = null
-
-    @SerializedName("content_id")
-    var contentId: String = ""
+    @SerialName("content_id")
+    var contentId: String? = null
     var resource: String = ""
-
-    @SerializedName("drive_url")
-    var driveUrl: String = ""
+    @SerialName("drive_url")
+    var driveUrl: String? = null
     var localUri: String = ""
     var thumbnail: String = ""
 

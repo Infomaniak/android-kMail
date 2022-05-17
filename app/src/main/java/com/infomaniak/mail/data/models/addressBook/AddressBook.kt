@@ -17,33 +17,29 @@
  */
 package com.infomaniak.mail.data.models.addressBook
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class AddressBook : RealmObject {
     var id: Int = 0
-
-    @SerializedName("user_id")
+    @SerialName("user_id")
     var userId: Int = 0
-
-    @SerializedName("principal_uri")
+    @SerialName("principal_uri")
     var principalUri: String = ""
     var name: String = ""
     var color: String = ""
     var uuid: String = ""
     var description: String = ""
-
-    @SerializedName("is_shared")
+    @SerialName("is_shared")
     var isShared: Boolean = false
     var rights: String = ""
-
-    @SerializedName("is_activated")
+    @SerialName("is_activated")
     var isActivated: Boolean = false
-
-    @SerializedName("is_hidden")
+    @SerialName("is_hidden")
     var isHidden: Boolean = false
-
-    @SerializedName("is_pending")
+    @SerialName("is_pending")
     var isPending: Boolean = false
     // var categories: RealmList<Category> = realmListOf() // TODO: Add Category model
 }

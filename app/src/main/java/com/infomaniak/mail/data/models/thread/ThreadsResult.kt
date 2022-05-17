@@ -17,29 +17,24 @@
  */
 package com.infomaniak.mail.data.models.thread
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ThreadsResult(
     val threads: ArrayList<Thread>?,
-
-    @SerializedName("total_messages_count")
+    @SerialName("total_messages_count")
     val totalMessagesCount: Int = 0,
-
-    @SerializedName("messages_count")
+    @SerialName("messages_count")
     val messagesCount: Int = 0,
-
-    @SerializedName("current_offset")
+    @SerialName("current_offset")
     val currentOffset: Int = 0,
-
-    @SerializedName("thread_mode")
+    @SerialName("thread_mode")
     val threadMode: String = "on",
-
-    @SerializedName("folder_unseen_messages")
+    @SerialName("folder_unseen_messages")
     val folderUnseenMessage: Int = 0,
-
-    @SerializedName("resource_previous")
+    @SerialName("resource_previous")
     val resourcePrevious: String? = null,
-
-    @SerializedName("resource_next")
+    @SerialName("resource_next")
     val resourceNext: String? = null,
 )

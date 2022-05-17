@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -66,7 +67,7 @@ class ThreadListViewModel : ViewModel() {
     private fun fetchDataFromApi(isInternetAvailable: Boolean) {
 
         fun fetchCurrentMailbox(): Mailbox? {
-            val mailboxes = MailRealm.fetchMailboxesFromApi(isInternetAvailable)
+            val mailboxes = MailApi.fetchMailboxesFromApi(isInternetAvailable)
             return with(mailboxes) {
                 find { it.mailboxId == AccountUtils.currentMailboxId }
                 // ?: find { it.email == "kevin.boulongne@ik.me" }
