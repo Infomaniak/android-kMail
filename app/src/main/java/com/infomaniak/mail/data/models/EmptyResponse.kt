@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.data.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class EmptyResponse(
     val id: Int,
 )

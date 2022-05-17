@@ -17,46 +17,37 @@
  */
 package com.infomaniak.mail.data.models.user
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class UserInfos : RealmObject {
     var name: String = ""
-
-    @SerializedName("firstname")
+    @SerialName("firstname")
     var firstName: String = ""
     var login: String = ""
     var email: String = ""
-
-    @SerializedName("avatar_url")
+    @SerialName("avatar_url")
     var avatarUrl: String = ""
-
-    @SerializedName("hosting_url")
+    @SerialName("hosting_url")
     var hostingUrl: String = ""
-
-    @SerializedName("manager_url")
+    @SerialName("manager_url")
     var managerUrl: String = ""
-
-    @SerializedName("workspace_url")
+    @SerialName("workspace_url")
     var workspaceUrl: String = ""
-
-    @SerializedName("drive_url")
+    @SerialName("drive_url")
     var driveUrl: String = ""
-
-    @SerializedName("workspace_only")
+    @SerialName("workspace_only")
     var workspaceOnly: Boolean = false
-
-    @SerializedName("double_auth")
+    @SerialName("double_auth")
     var doubleAuth: Boolean = false
-
-    @SerializedName("old_user")
+    @SerialName("old_user")
     var oldUser: Boolean = false
     var locale: String = ""
     var country: String = ""
-
-    @SerializedName("is_restricted")
+    @SerialName("is_restricted")
     var isRestricted: Boolean = false
-
-    @SerializedName("from_webmail1")
+    @SerialName("from_webmail1")
     var fromWebmail1: Boolean = false
 }

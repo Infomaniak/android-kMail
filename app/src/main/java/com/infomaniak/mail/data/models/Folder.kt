@@ -15,14 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+@file:UseSerializers(RealmListSerializer::class)
+
 package com.infomaniak.mail.data.models
 
 import android.content.Context
 import android.util.Log
 import androidx.annotation.IdRes
-import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.thread.Thread
@@ -31,30 +34,28 @@ import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
 import io.realm.toRealmList
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
+@Serializable
 class Folder : RealmObject {
     @PrimaryKey
     var id: String = ""
     var path: String = ""
     var name: String = ""
-
     @Suppress("PropertyName")
-    @SerializedName("role")
+    @SerialName("role")
     var _role: String? = null
-
-    @SerializedName("unread_count")
+    @SerialName("unread_count")
     var unreadCount: Int = 0
-
-    @SerializedName("total_count")
+    @SerialName("total_count")
     var totalCount: Int = 0
-
-    @SerializedName("is_fake")
+    @SerialName("is_fake")
     var isFake: Boolean = false
-
-    @SerializedName("is_collapsed")
+    @SerialName("is_collapsed")
     var isCollapsed: Boolean = false
-
-    @SerializedName("is_favorite")
+    @SerialName("is_favorite")
     var isFavorite: Boolean = false
     var separator: String = ""
     var children: RealmList<Folder> = realmListOf()
