@@ -17,24 +17,23 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.realmListOf
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Contact : RealmObject {
     var id: String = ""
     var name: String = ""
-
-    @SerializedName("firstname")
+    @SerialName("firstname")
     var firstName: String = ""
-
-    @SerializedName("lastname")
+    @SerialName("lastname")
     var lastName: String = ""
     var color: String = ""
     var other: Boolean = false
-
-    @SerializedName("contacted_times")
+    @SerialName("contacted_times")
     private var contactedTimes: Map<String?, Int?> = mapOf()
     var emails: RealmList<String> = realmListOf()
 
