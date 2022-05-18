@@ -63,8 +63,7 @@ object MailRealm {
         mailboxContent = Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId))
     }
 
-    fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration =
-        RealmConfigurations.mailboxContent(mailboxId)
+    fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
 
     /**
      * Configurations

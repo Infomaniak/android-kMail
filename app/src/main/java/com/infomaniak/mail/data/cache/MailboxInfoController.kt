@@ -25,8 +25,7 @@ import io.realm.query
 
 object MailboxInfoController {
 
-    fun getMailboxes(): RealmResults<Mailbox> =
-        MailRealm.mailboxInfo.query<Mailbox>().find()
+    fun getMailboxes(): RealmResults<Mailbox> = MailRealm.mailboxInfo.query<Mailbox>().find()
 
     fun upsertMailbox(mailbox: Mailbox) {
         MailRealm.mailboxInfo.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
@@ -36,20 +35,18 @@ object MailboxInfoController {
         MailRealm.mailboxInfo.writeBlocking { getLatestMailbox(objectId)?.let(::delete) }
     }
 
-    private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? =
-        getMailbox(objectId)?.let(::findLatest)
+    private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? = getMailbox(objectId)?.let(::findLatest)
 
-    fun getMailbox(objectId: String): Mailbox? =
-        MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
+    fun getMailbox(objectId: String): Mailbox? {
+        return MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
+    }
 
 //    fun selectMailboxByEmail(email: String) {
 //        currentMailbox = MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
 //        currentMailbox?.let { AccountUtils.currentMailboxId = it.mailboxId } ?: throw MailboxNotFoundException(email)
 //    }
 
-//    fun getMailboxInfoByEmail(email: String): Mailbox? =
-//        MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
-
+//    fun getMailboxInfoByEmail(email: String): Mailbox? = MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
 
 //    private fun updateMailboxInfo(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
 //        MailRealm.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(onUpdate) }
