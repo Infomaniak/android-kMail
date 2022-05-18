@@ -32,12 +32,7 @@ object ModelsUtils {
         )
     }
 
-    fun getPriority(priority: String?): MessagePriority? = when (priority?.uppercase()) {
-        MessagePriority.LOW.name -> MessagePriority.LOW
-        MessagePriority.NORMAL.name -> MessagePriority.NORMAL
-        MessagePriority.HIGH.name -> MessagePriority.HIGH
-        else -> null
-    }
+    fun getPriority(priority: String?): MessagePriority? = enumValueOfOrNull<MessagePriority>(priority?.uppercase())
 
     enum class MessagePriority {
         LOW,

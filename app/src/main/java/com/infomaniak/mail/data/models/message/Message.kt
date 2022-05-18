@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.enumValueOfOrNull
 import io.realm.*
 import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.Ignore
@@ -126,12 +127,7 @@ class Message : RealmObject {
         return apiDraft
     }
 
-    fun getDkimStatus(): MessageDKIM? = when (dkimStatus) {
-        MessageDKIM.VALID.value -> MessageDKIM.VALID
-        MessageDKIM.NOT_VALID.value -> MessageDKIM.NOT_VALID
-        MessageDKIM.NOT_SIGNED.value -> MessageDKIM.NOT_SIGNED
-        else -> null
-    }
+    fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)
 
     enum class MessageDKIM(val value: String?) {
         VALID(null),

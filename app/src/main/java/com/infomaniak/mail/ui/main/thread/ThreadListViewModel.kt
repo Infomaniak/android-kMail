@@ -49,7 +49,7 @@ class ThreadListViewModel : ViewModel() {
         }
 
         fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            mailbox.readFoldersFromRealm().find { it.getRole() == folderRole }
+            mailbox.readFoldersFromRealm().find { it.role == folderRole }
 
         Log.e("Realm", "Start reading data")
         val mailbox = getCurrentMailbox() ?: return emptyList()
@@ -73,7 +73,7 @@ class ThreadListViewModel : ViewModel() {
         }
 
         fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            MailApi.fetchFoldersFromApi(mailbox.uuid, isInternetAvailable).find { it.getRole() == folderRole }
+            MailApi.fetchFoldersFromApi(mailbox.uuid, isInternetAvailable).find { it.role == folderRole }
 
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching data")

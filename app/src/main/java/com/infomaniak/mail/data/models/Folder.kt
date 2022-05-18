@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.enumValueOfOrNull
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -63,6 +64,9 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     var parentLink: Folder? = null // TODO
 
+    val role: FolderRole?
+        get() = enumValueOfOrNull<FolderRole>(_role)
+
     fun updateAndSelect(isInternetAvailable: Boolean, mailboxUuid: String) {
         MailApi.fetchThreadsFromApi(this, isInternetAvailable, mailboxUuid)
         select()
@@ -72,16 +76,8 @@ class Folder : RealmObject {
         MailRealm.mutableCurrentFolderIdFlow.value = id
     }
 
-    fun getLocalizedName(context: Context): String = getRole()?.folderNameRes?.let(context::getString) ?: name
-
-    fun getRole(): FolderRole? = when (_role) {
-        FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE
-        FolderRole.DRAFT.name -> FolderRole.DRAFT
-        FolderRole.INBOX.name -> FolderRole.INBOX
-        FolderRole.SENT.name -> FolderRole.SENT
-        FolderRole.SPAM.name -> FolderRole.SPAM
-        FolderRole.TRASH.name -> FolderRole.TRASH
-        else -> null
+    fun getLocalizedName(context: Context): String {
+        return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name
     }
 
     enum class FolderRole(@IdRes val folderNameRes: Int, val order: Int) {
