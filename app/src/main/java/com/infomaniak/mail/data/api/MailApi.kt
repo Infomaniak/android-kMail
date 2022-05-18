@@ -29,7 +29,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
-import io.realm.MutableRealm
+import io.realm.MutableRealm.UpdatePolicy
 import io.realm.Realm
 import io.realm.toRealmList
 import okhttp3.OkHttpClient
@@ -56,7 +56,7 @@ object MailApi {
 
         // Save new data
         Log.i("API", "Mailboxes: Save new data")
-        mailboxesFromApi.forEach(MailboxInfoController::upsertMailbox)
+        MailboxInfoController.upsertMailboxes(mailboxesFromApi)
 
         // Delete outdated data
         Log.e("API", "Mailboxes: Delete outdated data")
@@ -103,7 +103,7 @@ object MailApi {
         Log.i("API", "Folders: Save new data")
         MailRealm.mailboxContent.writeBlocking {
             foldersFromApi.forEach { folderFromApi ->
-                val folder = copyToRealm(folderFromApi, MutableRealm.UpdatePolicy.ALL)
+                val folder = copyToRealm(folderFromApi, UpdatePolicy.ALL)
                 foldersFromRealm.find { it.id == folderFromApi.id }?.threads
                     ?.mapNotNull(::findLatest)
                     ?.let { folder.threads = it.toRealmList() }
@@ -189,7 +189,7 @@ object MailApi {
 
         // Save new data
         Log.i("API", "Messages: Save new data")
-        messagesFromApi.forEach(MailboxContentController::upsertMessage)
+        MailboxContentController.upsertMessages(messagesFromApi)
 
         // Delete outdated data
         Log.e("API", "Messages: Delete outdated data")
@@ -222,7 +222,7 @@ object MailApi {
 
         saveAttachmentData(response, file) {
             attachment.localUri = file.toURI().toString()
-            MailRealm.mailboxContent.writeBlocking { copyToRealm(attachment, MutableRealm.UpdatePolicy.ALL) }
+            MailRealm.mailboxContent.writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
         }
     }
 }

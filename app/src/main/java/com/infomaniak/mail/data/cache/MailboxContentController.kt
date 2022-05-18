@@ -78,8 +78,12 @@ object MailboxContentController {
     /**
      * Messages
      */
-    fun upsertMessage(message: Message): Message {
-        return MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
+    fun upsertMessage(message: Message) {
+        MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
+    }
+
+    fun upsertMessages(messages: List<Message>) {
+        MailRealm.mailboxContent.writeBlocking { messages.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     // fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
