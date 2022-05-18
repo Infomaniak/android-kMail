@@ -18,10 +18,25 @@
 package com.infomaniak.mail.data.api
 
 import android.util.Log
+import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.KMailHttpClient
+import io.realm.MutableRealm
 import io.realm.Realm
+import io.realm.toRealmList
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okio.use
+import java.io.BufferedInputStream
+import java.io.File
 
 object MailApi {
 
@@ -53,5 +68,160 @@ object MailApi {
         }
 
         return mailboxesFromApi
+    }
+
+    fun fetchFoldersFromApi(mailboxUuid: String, isInternetAvailable: Boolean): List<Folder> {
+
+        // Get current data
+        Log.d("API", "Folders: Get current data")
+        val foldersFromRealm = MailboxContentController.getFolders()
+        val foldersFromApi = ApiRepository.getFolders(mailboxUuid).data ?: emptyList()
+
+        // Get outdated data
+        Log.d("API", "Folders: Get outdated data")
+        val deletableFolders = if (isInternetAvailable) {
+            foldersFromRealm.filter { fromRealm ->
+                !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
+            }
+        } else {
+            emptyList()
+        }
+        val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
+        val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
+            deletableFolders.any { folder -> folder.id == message.folderId }
+        }
+        val deletableThreads = possiblyDeletableThreads.filter { thread ->
+            thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
+        }
+
+        // Save new data
+        Log.i("API", "Folders: Save new data")
+        MailRealm.mailboxContent.writeBlocking {
+            foldersFromApi.forEach { folderFromApi ->
+                val folder = copyToRealm(folderFromApi, MutableRealm.UpdatePolicy.ALL)
+                foldersFromRealm.find { it.id == folderFromApi.id }?.threads
+                    ?.mapNotNull(::findLatest)
+                    ?.let { folder.threads = it.toRealmList() }
+            }
+        }
+
+        // Delete outdated data
+        Log.e("API", "Folders: Delete outdated data")
+        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
+        deletableFolders.forEach { MailboxContentController.deleteFolder(it.id) }
+
+        return foldersFromApi
+    }
+
+    fun fetchThreadsFromApi(folder: Folder, isInternetAvailable: Boolean, mailboxUuid: String) {
+        // Get current data
+        Log.d("API", "Threads: Get current data")
+        val threadsFromRealm = folder.threads
+        val threadsFromApi = ApiRepository.getThreads(mailboxUuid, folder.id).data?.threads
+            ?.map { threadFromApi ->
+                threadFromApi.initLocalValues()
+                // TODO: Put this back (and make it work) when we have EmbeddedObjects
+                // threadsFromRealm.find { it.uid == threadFromApi.uid }?.let { threadFromRealm ->
+                //     threadFromApi.messages.forEach { messageFromApi ->
+                //         threadFromRealm.messages.find { it.uid == messageFromApi.uid }?.let { messageFromRealm ->
+                //             messageFromApi.apply {
+                //                 fullyDownloaded = messageFromRealm.fullyDownloaded
+                //                 body = messageFromRealm.body
+                //                 attachments = messageFromRealm.attachments
+                //             }
+                //         }
+                //     }
+                // }
+                // threadFromApi
+            }
+            ?: emptyList()
+
+        // Get outdated data
+        Log.d("API", "Threads: Get outdated data")
+        val deletableThreads = if (isInternetAvailable) {
+            threadsFromRealm.filter { fromRealm ->
+                !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+            }
+        } else {
+            emptyList()
+        }
+        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
+
+        // Save new data
+        Log.i("API", "Threads: Save new data")
+        folder.threads = threadsFromApi.toRealmList()
+        MailboxContentController.upsertFolder(folder)
+
+        // Delete outdated data
+        Log.e("API", "Threads: Delete outdated data")
+        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
+    }
+
+    fun fetchMessagesFromApi(thread: Thread, isInternetAvailable: Boolean) {
+        // Get current data
+        Log.d("API", "Messages: Get current data")
+        val messagesFromRealm = thread.messages
+        val messagesFromApi = messagesFromRealm.mapNotNull {
+            ApiRepository.getMessage(it.resource).data?.also { completedMessage ->
+                completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                completedMessage.fullyDownloaded = true
+                completedMessage.body?.initLocalValues(completedMessage.uid) // TODO: Remove this when we have EmbeddedObjects
+                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                completedMessage.attachments?.forEachIndexed { index, attachment ->
+                    attachment.initLocalValues(index, completedMessage.uid)
+                }
+            }
+        }
+
+        // Get outdated data
+        Log.d("API", "Messages: Get outdated data")
+        val deletableMessages = if (isInternetAvailable) {
+            messagesFromRealm.filter { fromRealm ->
+                !messagesFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+            }
+        } else {
+            emptyList()
+        }
+
+        // Save new data
+        Log.i("API", "Messages: Save new data")
+        messagesFromApi.forEach(MailboxContentController::upsertMessage)
+
+        // Delete outdated data
+        Log.e("API", "Messages: Delete outdated data")
+        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+    }
+
+    suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
+
+        fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
+            val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
+            return okHttpClient.newBuilder().build().newCall(request).execute()
+        }
+
+        fun saveAttachmentData(response: Response, outputFile: File, onFinish: (() -> Unit)) {
+            Log.d("TAG", "Save remote data to ${outputFile.path}")
+            BufferedInputStream(response.body?.byteStream()).use { input ->
+                outputFile.outputStream().use { output ->
+                    input.copyTo(output)
+                    onFinish()
+                }
+            }
+        }
+
+        val response = downloadAttachmentData(
+            fileUrl = ApiRoutes.resource(attachment.resource),
+            okHttpClient = KMailHttpClient.getHttpClient(AccountUtils.currentUserId),
+        )
+
+        val file = File(cacheDir, "${attachment.uuid}_${attachment.name}")
+
+        saveAttachmentData(response, file) {
+            attachment.localUri = file.toURI().toString()
+            MailRealm.mailboxContent.writeBlocking { copyToRealm(attachment, MutableRealm.UpdatePolicy.ALL) }
+        }
     }
 }

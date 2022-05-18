@@ -17,24 +17,10 @@
  */
 package com.infomaniak.mail.data.models
 
-import android.util.Log
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.KMailHttpClient
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okio.use
-import java.io.BufferedInputStream
-import java.io.File
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 @Serializable
@@ -61,35 +47,6 @@ class Attachment : RealmObject {
         uuid = "attachment_${position}_${parentMessageUid}"
 
         return this
-    }
-
-    suspend fun getAttachmentData(cacheDir: File) {
-        val response = downloadAttachmentData(
-            fileUrl = ApiRoutes.resource(resource),
-            okHttpClient = KMailHttpClient.getHttpClient(AccountUtils.currentUserId),
-        )
-
-        val file = File(cacheDir, "${uuid}_${name}")
-
-        saveAttachmentData(response, file) {
-            localUri = file.toURI().toString()
-            MailRealm.mailboxContent.writeBlocking { copyToRealm(this@Attachment, UpdatePolicy.ALL) }
-        }
-    }
-
-    private fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient = HttpClient.okHttpClient): Response {
-        val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
-        return okHttpClient.newBuilder().build().newCall(request).execute()
-    }
-
-    private fun saveAttachmentData(response: Response, outputFile: File, onFinish: (() -> Unit)) {
-        Log.d("TAG", "save remote data to ${outputFile.path}")
-        BufferedInputStream(response.body?.byteStream()).use { input ->
-            outputFile.outputStream().use { output ->
-                input.copyTo(output)
-                onFinish()
-            }
-        }
     }
 
     fun getDisposition(): AttachmentDisposition? = when (disposition) {
