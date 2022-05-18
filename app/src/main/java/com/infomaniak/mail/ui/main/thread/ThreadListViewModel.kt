@@ -77,7 +77,7 @@ class ThreadListViewModel : ViewModel() {
         }
 
         fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            mailbox.fetchFoldersFromApi(isInternetAvailable).find { it.getRole() == folderRole }
+            MailApi.fetchFoldersFromApi(mailbox.uuid, isInternetAvailable).find { it.getRole() == folderRole }
 
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching data")

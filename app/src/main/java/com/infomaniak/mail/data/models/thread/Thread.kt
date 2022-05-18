@@ -20,8 +20,8 @@
 
 package com.infomaniak.mail.data.models.thread
 
-import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
@@ -79,7 +79,7 @@ class Thread : RealmObject {
     }
 
     fun updateAndSelect(isInternetAvailable: Boolean) {
-        fetchMessagesFromApi(isInternetAvailable)
+        MailApi.fetchMessagesFromApi(this, isInternetAvailable)
         select()
     }
 
@@ -103,42 +103,6 @@ class Thread : RealmObject {
                 }
             }
         }
-    }
-
-    private fun fetchMessagesFromApi(isInternetAvailable: Boolean) {
-        // Get current data
-        Log.d("API", "Messages: Get current data")
-        val messagesFromRealm = messages
-        val messagesFromApi = messages.mapNotNull {
-            ApiRepository.getMessage(it.resource).data?.also { completedMessage ->
-                completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
-                completedMessage.fullyDownloaded = true
-                completedMessage.body?.initLocalValues(completedMessage.uid) // TODO: Remove this when we have EmbeddedObjects
-                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
-                completedMessage.attachments?.forEachIndexed { index, attachment ->
-                    attachment.initLocalValues(index, completedMessage.uid)
-                }
-            }
-        }
-
-        // Get outdated data
-        Log.d("API", "Messages: Get outdated data")
-        val deletableMessages = if (isInternetAvailable) {
-            messagesFromRealm.filter { fromRealm ->
-                !messagesFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
-            }
-        } else {
-            emptyList()
-        }
-
-        // Save new data
-        Log.i("API", "Messages: Save new data")
-        messagesFromApi.forEach(MailboxContentController::upsertMessage)
-
-        // Delete outdated data
-        Log.e("API", "Messages: Delete outdated data")
-        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
     }
 
     enum class ThreadFilter(title: String) {

@@ -21,19 +21,16 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.IdRes
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
-import io.realm.toRealmList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -67,57 +64,12 @@ class Folder : RealmObject {
     var parentLink: Folder? = null // TODO
 
     fun updateAndSelect(isInternetAvailable: Boolean, mailboxUuid: String) {
-        fetchThreadsFromApi(isInternetAvailable, mailboxUuid)
+        MailApi.fetchThreadsFromApi(this, isInternetAvailable, mailboxUuid)
         select()
     }
 
     fun select() {
         MailRealm.mutableCurrentFolderIdFlow.value = id
-    }
-
-    private fun fetchThreadsFromApi(isInternetAvailable: Boolean, mailboxUuid: String) {
-        // Get current data
-        Log.d("API", "Threads: Get current data")
-        val threadsFromRealm = threads
-        val threadsFromApi = ApiRepository.getThreads(mailboxUuid, id).data?.threads
-            ?.map { threadFromApi ->
-                threadFromApi.initLocalValues()
-                // TODO: Put this back (and make it work) when we have EmbeddedObjects
-                // threadsFromRealm.find { it.uid == threadFromApi.uid }?.let { threadFromRealm ->
-                //     threadFromApi.messages.forEach { messageFromApi ->
-                //         threadFromRealm.messages.find { it.uid == messageFromApi.uid }?.let { messageFromRealm ->
-                //             messageFromApi.apply {
-                //                 fullyDownloaded = messageFromRealm.fullyDownloaded
-                //                 body = messageFromRealm.body
-                //                 attachments = messageFromRealm.attachments
-                //             }
-                //         }
-                //     }
-                // }
-                // threadFromApi
-            }
-            ?: emptyList()
-
-        // Get outdated data
-        Log.d("API", "Threads: Get outdated data")
-        val deletableThreads = if (isInternetAvailable) {
-            threadsFromRealm.filter { fromRealm ->
-                !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
-            }
-        } else {
-            emptyList()
-        }
-        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == id } }
-
-        // Save new data
-        Log.i("API", "Threads: Save new data")
-        threads = threadsFromApi.toRealmList()
-        MailboxContentController.upsertFolder(this)
-
-        // Delete outdated data
-        Log.e("API", "Threads: Delete outdated data")
-        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
-        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
     }
 
     fun getLocalizedName(context: Context): String = getRole()?.folderNameRes?.let(context::getString) ?: name
