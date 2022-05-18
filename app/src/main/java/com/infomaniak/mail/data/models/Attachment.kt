@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -32,7 +33,6 @@ class Attachment : RealmObject {
     var encoding: String = ""
     var size: Int = 0
     var name: String = ""
-    @SerialName("disposition")
     private var disposition: String? = null
     @SerialName("content_id")
     var contentId: String? = null
@@ -49,11 +49,7 @@ class Attachment : RealmObject {
         return this
     }
 
-    fun getDisposition(): AttachmentDisposition? = when (disposition) {
-        AttachmentDisposition.INLINE.name -> AttachmentDisposition.INLINE
-        AttachmentDisposition.ATTACHMENT.name -> AttachmentDisposition.ATTACHMENT
-        else -> null
-    }
+    fun getDisposition(): AttachmentDisposition? = enumValueOfOrNull<AttachmentDisposition>(disposition)
 
     override fun equals(other: Any?): Boolean =
         when {
