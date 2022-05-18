@@ -53,10 +53,6 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
-    companion object {
-        const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
-    }
-
     override fun getItemCount(): Int = itemsList.size
 
     override fun getItemViewType(position: Int): Int {
@@ -227,5 +223,9 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 }
             }
         }
+    }
+
+    companion object {
+        const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
     }
 }
