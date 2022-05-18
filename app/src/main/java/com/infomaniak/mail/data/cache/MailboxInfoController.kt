@@ -31,6 +31,10 @@ object MailboxInfoController {
         MailRealm.mailboxInfo.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
     }
 
+    fun upsertMailboxes(mailboxes: List<Mailbox>) {
+        MailRealm.mailboxInfo.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+    }
+
     fun deleteMailbox(objectId: String) {
         MailRealm.mailboxInfo.writeBlocking { getLatestMailbox(objectId)?.let(::delete) }
     }
