@@ -33,10 +33,6 @@ import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
-    private companion object {
-        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
-    }
-
     val threadsFromApi = MutableStateFlow<List<Thread>?>(null)
 
     fun getDataFromRealmThenFetchFromApi(isInternetAvailable: Boolean): List<Thread> {
@@ -88,5 +84,9 @@ class ThreadListViewModel : ViewModel() {
             Log.e("API", "End of fetching data")
             threadsFromApi.value = folder.threads
         }
+    }
+
+    private companion object {
+        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
     }
 }
