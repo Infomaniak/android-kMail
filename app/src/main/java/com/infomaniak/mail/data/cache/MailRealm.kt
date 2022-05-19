@@ -32,10 +32,45 @@ import io.realm.RealmConfiguration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+@Suppress("ObjectPropertyName")
 object MailRealm {
 
-    val mailboxInfo = Realm.open(RealmConfigurations.mailboxInfo)
-    lateinit var mailboxContent: Realm
+    private var _appSettings: Realm? = null
+    private var _mailboxInfo: Realm? = null
+    private var _mailboxContent: Realm? = null
+
+    val appSettings: Realm
+        get() = _appSettings
+            ?: Realm.open(RealmConfigurations.appSettings).also { _appSettings = it }
+
+    val mailboxInfo
+        get() = _mailboxInfo
+            ?: Realm.open(RealmConfigurations.mailboxInfo).also { _mailboxInfo = it }
+
+    val mailboxContent
+        get() = _mailboxContent
+            ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
+
+    fun closeRealms() {
+        closeMailboxContent()
+        closeMailboxInfo()
+        closeAppSettings()
+    }
+
+    private fun closeAppSettings() {
+        _appSettings?.close()
+        _appSettings = null
+    }
+
+    private fun closeMailboxInfo() {
+        _mailboxInfo?.close()
+        _mailboxInfo = null
+    }
+
+    fun closeMailboxContent() {
+        _mailboxContent?.close()
+        _mailboxContent = null
+    }
 
     // Current mailbox flow
     val mutableCurrentMailboxIdFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
@@ -58,11 +93,6 @@ object MailRealm {
      */
     fun readMailboxesFromRealm(): List<Mailbox> = MailboxInfoController.getMailboxes()
 
-    fun selectCurrentMailbox() {
-        if (MailRealm::mailboxContent.isInitialized) mailboxContent.close()
-        mailboxContent = Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId))
-    }
-
     fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
 
     /**
@@ -71,8 +101,15 @@ object MailRealm {
     @Suppress("FunctionName")
     private object RealmConfigurations {
 
+        private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
         private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
         private fun MAILBOX_CONTENT_DB_NAME(currentMailboxId: Int) = "${AccountUtils.currentUserId}-${currentMailboxId}.realm"
+
+        val appSettings = RealmConfiguration
+            .Builder(RealmSets.appSettings)
+            .name(APP_SETTINGS_DB_NAME)
+            .deleteRealmIfMigrationNeeded()
+            .build()
 
         val mailboxInfo = RealmConfiguration
             .Builder(RealmSets.mailboxInfo)
@@ -87,6 +124,10 @@ object MailRealm {
             .build()
 
         private object RealmSets {
+
+            val appSettings = setOf(
+                AppSettings::class,
+            )
 
             val mailboxInfo = setOf(
                 Mailbox::class,

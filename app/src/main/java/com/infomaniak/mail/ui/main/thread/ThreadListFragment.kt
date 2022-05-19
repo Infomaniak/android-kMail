@@ -139,7 +139,7 @@ class ThreadListFragment : Fragment() {
     private fun getData(): List<Thread> {
         return with(threadListViewModel) {
             threadsFromApi.value = null
-            getDataFromRealmThenFetchFromApi(mainViewModel.isInternetAvailable.value ?: false)
+            getDataFromRealmThenFetchFromApi()
         }
     }
 
