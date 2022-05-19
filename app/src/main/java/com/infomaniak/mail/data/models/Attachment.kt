@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.infomaniak.mail.utils.enumValueOfOrNull
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import kotlinx.serialization.SerialName

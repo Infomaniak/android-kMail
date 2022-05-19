@@ -20,6 +20,7 @@
 
 package com.infomaniak.mail.data.models.message
 
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
@@ -29,7 +30,6 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.enumValueOfOrNull
 import io.realm.*
 import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.Ignore

@@ -67,7 +67,3 @@ fun Date.toRealmInstant(): RealmInstant {
 }
 
 fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }
-
-inline fun <reified T : Enum<T>> enumValueOfOrNull(value: String?): T? {
-    return runCatching { value?.let { enumValueOf<T>(it) } }.getOrNull()
-}

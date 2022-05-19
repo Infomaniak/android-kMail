@@ -22,12 +22,12 @@ package com.infomaniak.mail.data.models
 
 import android.content.Context
 import androidx.annotation.IdRes
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.enumValueOfOrNull
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey

@@ -21,6 +21,7 @@ import android.content.Context
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpanned
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 
 object ModelsUtils {
