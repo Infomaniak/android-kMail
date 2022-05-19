@@ -21,8 +21,8 @@ import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.annotation.IdRes
+import android.widget.ImageView
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -80,7 +80,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 (viewHolder.binding as ItemThreadDateSeparatorBinding).displayDateSeparator(position)
             }
             DisplayType.SEE_ALL_BUTTON.layout -> {
-                (viewHolder.binding as ItemThreadSeeAllButtonBinding).displaySeeAllButton(position)
+                (viewHolder.binding as ItemThreadSeeAllButtonBinding).displaySeeAllButton()
             }
             DisplayType.THREAD.layout -> {
                 (viewHolder.binding as ItemThreadBinding).displayThread(position)
@@ -90,10 +90,12 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(position: Int) {
         sectionTitle.text = itemsList[position] as String
+        sectionTitle.setTextAppearance(R.style.Callout)
+        sectionTitle.setTextColor(root.context.getColor(R.color.sectionHeaderTextColor))
     }
 
-    private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(position: Int) {
-        seeAllText.append("(${itemsList[position]})")
+    private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton() {
+        seeAllText.append(" (${itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER})")
     }
 
     private fun ItemThreadBinding.displayThread(position: Int) {
@@ -109,12 +111,31 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         iconAttachment.isVisible = thread.hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
         iconFavorite.isVisible = thread.flagged
-        newMailBullet.isVisible = thread.unseenMessagesCount > 0
 
+        if (thread.unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         itemThread.setOnClickListener { onThreadClicked?.invoke(thread) }
     }
 
-    private fun handleSeenState(thread: Thread, context: Context, binding: ItemThreadBinding) = with(binding) {
+    private fun ItemThreadBinding.setThreadUiUnread() {
+        newMailBullet.isVisible = true
+        expeditor.setTextAppearance(R.style.H2)
+        mailSubject.setTextAppearance(R.style.H3)
+        mailDate.setTextAppearance(R.style.Callout_Strong)
+        iconAttachment.setDrawableColor(root.context, R.color.primaryTextColor)
+        iconCalendar.setDrawableColor(root.context, R.color.primaryTextColor)
+    }
+
+    private fun ItemThreadBinding.setThreadUiRead() {
+        newMailBullet.isGone = true
+        expeditor.setTextAppearance(R.style.H2_Secondary)
+        mailSubject.setTextAppearance(R.style.Body_Secondary)
+        mailDate.setTextAppearance(R.style.Callout_Secondary)
+        iconAttachment.setDrawableColor(root.context, R.color.secondaryTextColor)
+        iconCalendar.setDrawableColor(root.context, R.color.secondaryTextColor)
+    }
+
+	// TODO This is duplicated, remove one
+	private fun handleSeenState(thread: Thread, context: Context, binding: ItemThreadBinding) = with(binding) {
         val (textColorRes, typeFaceRes) = if (thread.unseenMessagesCount > 0) {
             R.color.unreadColor to R.font.suisseintl_semibold
         } else {
@@ -167,6 +188,8 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
             else -> DateFilter.TWO_WEEKS
         }
     }
+
+    private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
 
     fun notifyAdapter(newList: ArrayList<Any>) {
         DiffUtil.calculateDiff(ThreadListDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
@@ -226,6 +249,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     }
 
     companion object {
+        const val NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER = 3
         const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
     }
 }

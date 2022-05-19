@@ -24,7 +24,7 @@
 
     <ImageView
         android:id="@+id/illuNoMail"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="0dp"
         android:src="@drawable/ic_zero_mail"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,6 +33,7 @@
 
     <TextView
         android:id="@+id/noMailTitle"
+        style="@style/H2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
@@ -44,9 +45,12 @@
 
     <TextView
         android:id="@+id/noMailDescription"
+        style="@style/Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandardVerySmall"
         android:gravity="center"
+        android:lineSpacingMultiplier="1"
         android:text="@string/noEmailDescription"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

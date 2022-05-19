@@ -43,14 +43,15 @@
 
         <ImageView
             android:id="@+id/attachmentsIcon"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="@dimen/textHintSize"
+            android:layout_height="@dimen/textHintSize"
             android:layout_marginEnd="@dimen/marginStandardSmall"
             android:contentDescription="Attachment icon"
             android:src="@drawable/ic_attachment_inclined" />
 
         <TextView
-            android:id="@+id/attachmentsCountText"
+            android:id="@+id/attachmentsSizeText"
+            style="@style/Callout.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/marginStandardSmall"
