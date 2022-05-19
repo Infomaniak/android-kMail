@@ -36,6 +36,18 @@ object MailboxContentController {
 
     fun getFolders(): RealmResults<Folder> = MailRealm.mailboxContent.query<Folder>().find()
 
+    // TODO: RealmKotlin doesn't fully support `IN` for now.
+    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
+    fun getDeletableFolders(foldersToKeep: List<Folder>): RealmResults<Folder> {
+        val foldersIds = foldersToKeep.map { it.id }
+        val query = foldersIds.joinToString(
+            prefix = "NOT (${Folder::id.name} == '",
+            separator = "' OR ${Folder::id.name} == '",
+            postfix = "')"
+        )
+        return MailRealm.mailboxContent.query<Folder>(query).find()
+    }
+
     fun upsertFolder(folder: Folder): Folder = MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
 
     // fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
@@ -62,6 +74,18 @@ object MailboxContentController {
     private fun MutableRealm.getLatestThread(uid: String): Thread? = getThread(uid)?.let(::findLatest)
 
     fun getLatestThread(uid: String): Thread? = MailRealm.mailboxContent.writeBlocking { getLatestThread(uid) }
+
+    // TODO: RealmKotlin doesn't fully support `IN` for now.
+    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
+    fun getDeletableThreads(threadsToKeep: List<Thread>): RealmResults<Thread> {
+        val threadsIds = threadsToKeep.map { it.uid }
+        val query = threadsIds.joinToString(
+            prefix = "NOT (${Thread::uid.name} == '",
+            separator = "' OR ${Thread::uid.name} == '",
+            postfix = "')"
+        )
+        return MailRealm.mailboxContent.query<Thread>(query).find()
+    }
 
     // fun upsertThread(thread: Thread) {
     //     mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
@@ -97,6 +121,18 @@ object MailboxContentController {
     fun getLatestMessage(uid: String): Message? = MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid) }
 
     private fun MutableRealm.getLatestMessage(uid: String): Message? = getMessage(uid)?.let(::findLatest)
+
+    // TODO: RealmKotlin doesn't fully support `IN` for now.
+    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
+    fun getDeletableMessages(messagesToKeep: List<Message>): RealmResults<Message> {
+        val messagesIds = messagesToKeep.map { it.uid }
+        val query = messagesIds.joinToString(
+            prefix = "NOT (${Message::uid.name} == '",
+            separator = "' OR ${Message::uid.name} == '",
+            postfix = "')"
+        )
+        return MailRealm.mailboxContent.query<Message>(query).find()
+    }
 
     fun upsertMessages(messages: List<Message>) {
         MailRealm.mailboxContent.writeBlocking { messages.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
