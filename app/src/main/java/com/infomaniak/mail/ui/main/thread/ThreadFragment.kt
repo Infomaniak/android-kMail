@@ -86,7 +86,7 @@ class ThreadFragment : Fragment() {
     private fun displayMessagesFromRealm() {
         val messages = with(threadViewModel) {
             messagesFromApi.value = null
-            getMessagesFromRealmThenFetchFromApi(mainViewModel.isInternetAvailable.value ?: false, navigationArgs.threadUid)
+            getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
         }
         displayMessages(messages)
     }

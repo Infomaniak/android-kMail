@@ -35,10 +35,10 @@ class ThreadListViewModel : ViewModel() {
 
     val threadsFromApi = MutableStateFlow<List<Thread>?>(null)
 
-    fun getDataFromRealmThenFetchFromApi(isInternetAvailable: Boolean): List<Thread> {
+    fun getDataFromRealmThenFetchFromApi(): List<Thread> {
         val threads = readDataFromRealm()
-        fetchDataFromApi(isInternetAvailable)
-        return threads
+        val isCurrentRealmClosed = fetchDataFromApi()
+        return if (isCurrentRealmClosed) emptyList() else threads
     }
 
     private fun readDataFromRealm(): List<Thread> {
@@ -60,10 +60,10 @@ class ThreadListViewModel : ViewModel() {
         return folder.threads
     }
 
-    private fun fetchDataFromApi(isInternetAvailable: Boolean) {
+    private fun fetchDataFromApi(): Boolean {
 
         fun fetchCurrentMailbox(): Mailbox? {
-            val mailboxes = MailApi.fetchMailboxesFromApi(isInternetAvailable)
+            val mailboxes = MailApi.fetchMailboxesFromApi()
             return with(mailboxes) {
                 find { it.mailboxId == AccountUtils.currentMailboxId }
                 // ?: find { it.email == "kevin.boulongne@ik.me" } // TODO: Remove this, it's for dev only
@@ -73,17 +73,22 @@ class ThreadListViewModel : ViewModel() {
         }
 
         fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            MailApi.fetchFoldersFromApi(mailbox.uuid, isInternetAvailable).find { it.role == folderRole }
+            MailApi.fetchFoldersFromApi(mailbox.uuid).find { it.role == folderRole }
 
+        var isCurrentRealmClosed = false
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching data")
-            val mailbox = fetchCurrentMailbox() ?: return@launch
-            mailbox.select()
-            val folder = fetchFolder(mailbox, DEFAULT_FOLDER_ROLE) ?: return@launch
-            folder.updateAndSelect(isInternetAvailable, mailbox.uuid)
-            Log.e("API", "End of fetching data")
-            threadsFromApi.value = folder.threads
+            fetchCurrentMailbox()?.let { mailbox ->
+                mailbox.select()
+                fetchFolder(mailbox, DEFAULT_FOLDER_ROLE)?.let { folder ->
+                    folder.updateAndSelect(mailbox.uuid)
+                    Log.e("API", "End of fetching data")
+                    threadsFromApi.value = folder.threads
+                }
+            } ?: run { isCurrentRealmClosed = true }
         }
+
+        return isCurrentRealmClosed
     }
 
     private companion object {
