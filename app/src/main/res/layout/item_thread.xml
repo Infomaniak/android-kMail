@@ -20,15 +20,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/marginStandardSmall">
+    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+    android:layout_marginTop="@dimen/marginStandardMedium">
 
     <ImageView
         android:id="@+id/newMailBullet"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginTop="5dp"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
         android:src="@drawable/ic_bullet"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
@@ -37,7 +38,7 @@
         android:id="@+id/itemThread"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="@dimen/marginStandard"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,42 +50,41 @@
 
             <TextView
                 android:id="@+id/expeditor"
+                style="@style/H2.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:maxWidth="235dp"
+                android:maxWidth="@dimen/itemThreadTextViewSize"
                 android:maxLines="1"
-                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Expeditor name" />
+                tools:text="Expeditor name looooooooooooooooooooooooooooooong" />
 
             <ImageView
                 android:id="@+id/iconCalendar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardSmall"
                 android:layout_marginEnd="@dimen/marginStandardSmall"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:contentDescription="icon calendar"
-                android:paddingHorizontal="@dimen/marginStandardSmall"
                 android:src="@drawable/ic_calendar"
-                app:layout_constraintEnd_toStartOf="@id/iconAttachment"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iconAttachment" />
 
             <ImageView
                 android:id="@+id/iconAttachment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 android:contentDescription="icon attachment"
                 android:src="@drawable/ic_attachment"
-                app:layout_constraintEnd_toStartOf="@id/mailDate"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/black" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/mailDate" />
 
             <TextView
                 android:id="@+id/mailDate"
+                style="@style/Callout.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="end"
@@ -96,43 +96,45 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/mailSubject"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textSize="16sp"
-            tools:text="Subject" />
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/mailBodyStart"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:id="@+id/mailSubject"
+                style="@style/Body.Secondary"
+                android:layout_width="@dimen/itemThreadTextViewSize"
+                android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Display the short body when the API returns it"
-                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/iconFavorite"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="default subject" />
 
             <ImageView
                 android:id="@+id/iconFavorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:contentDescription="icon favorite"
                 android:src="@drawable/ic_star"
                 android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/mailBodyStart"
+            style="@style/Body.Secondary"
+            android:layout_width="@dimen/itemThreadTextViewSize"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="TODO short body when api returns it"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </LinearLayout>
 
