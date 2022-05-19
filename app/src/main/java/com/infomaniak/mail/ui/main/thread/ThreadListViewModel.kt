@@ -66,8 +66,8 @@ class ThreadListViewModel : ViewModel() {
             val mailboxes = MailApi.fetchMailboxesFromApi(isInternetAvailable)
             return with(mailboxes) {
                 find { it.mailboxId == AccountUtils.currentMailboxId }
-                // ?: find { it.email == "kevin.boulongne@ik.me" }
-                    ?: find { it.email == "kevin.boulongne@infomaniak.com" }
+                // ?: find { it.email == "kevin.boulongne@ik.me" } // TODO: Remove this, it's for dev only
+                    ?: find { it.email == "kevin.boulongne@infomaniak.com" } // TODO: Remove this, it's for dev only
                     ?: firstOrNull()
             }
         }
