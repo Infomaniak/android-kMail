@@ -32,10 +32,11 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.data.cache.AppSettingsController
 import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.cache.SettingsPreferences
-import com.infomaniak.mail.data.cache.SettingsPreferences.Companion.DEFAULT_ID
+import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -46,7 +47,6 @@ import io.sentry.protocol.User as SentryUser
 
 object AccountUtils : CredentialManager {
 
-    private val settingsPreferences = SettingsPreferences.INSTANCE
     private lateinit var userDatabase: UserDatabase
 
     var reloadApp: ((bundle: Bundle) -> Unit)? = null
@@ -60,7 +60,7 @@ object AccountUtils : CredentialManager {
     var currentUser: User? = null
         set(user) {
             field = user
-            currentUserId = user?.id ?: DEFAULT_ID
+            currentUserId = user?.id ?: AppSettings.DEFAULT_ID
             Sentry.setUser(SentryUser().apply {
                 id = currentUserId.toString()
                 email = user?.email
@@ -68,17 +68,17 @@ object AccountUtils : CredentialManager {
             InfomaniakCore.bearerToken = user?.apiToken?.accessToken.toString()
         }
 
-    var currentUserId: Int = settingsPreferences.currentUserId
+    var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
-            settingsPreferences.currentUserId = userId
+            AppSettingsController.updateAppSettings { appSettings -> appSettings.currentUserId = userId }
         }
 
-    var currentMailboxId: Int = settingsPreferences.currentMailboxId
+    var currentMailboxId: Int = AppSettingsController.getAppSettings().currentMailboxId
         set(mailboxId) {
             field = mailboxId
-            if (mailboxId != DEFAULT_ID) MailRealm.selectCurrentMailbox()
-            settingsPreferences.currentMailboxId = mailboxId
+            MailRealm.closeMailboxContent()
+            AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMailboxId = mailboxId }
         }
 
     suspend fun requestCurrentUser(): User? {
@@ -94,8 +94,8 @@ object AccountUtils : CredentialManager {
         userDatabase.userDao().insert(user)
     }
 
-    private fun reloadApp() {
-        GlobalScope.launch(Dispatchers.Main) { reloadApp?.invoke(bundleOf()) }
+    fun reloadApp() {
+        CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke(bundleOf()) }
     }
 
     private suspend fun requestUser(user: User) {
@@ -181,7 +181,7 @@ object AccountUtils : CredentialManager {
 
     private fun resetApp(context: Context) {
         if (getAllUserCount() == 0) {
-            flush()
+            AppSettingsController.removeAppSettings()
             // UiSettings(context).removeUiSettings() // TODO?
 
             // Delete all app data
@@ -191,11 +191,5 @@ object AccountUtils : CredentialManager {
             }
             Log.i("AccountUtils", "resetApp> all user data has been deleted")
         }
-    }
-
-    private fun flush() {
-        currentUserId = DEFAULT_ID
-        currentMailboxId = DEFAULT_ID
-        settingsPreferences.flush()
     }
 }

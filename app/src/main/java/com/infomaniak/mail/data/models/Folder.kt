@@ -67,8 +67,8 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun updateAndSelect(isInternetAvailable: Boolean, mailboxUuid: String) {
-        MailApi.fetchThreadsFromApi(this, isInternetAvailable, mailboxUuid)
+    fun updateAndSelect(mailboxUuid: String) {
+        MailApi.fetchThreadsFromApi(this, mailboxUuid)
         select()
     }
 
