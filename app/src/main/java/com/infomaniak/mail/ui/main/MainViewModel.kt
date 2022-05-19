@@ -19,8 +19,14 @@ package com.infomaniak.mail.ui.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.infomaniak.mail.data.cache.MailRealm
 
 class MainViewModel : ViewModel() {
 
     val isInternetAvailable = MutableLiveData(false)
+
+    override fun onCleared() {
+        MailRealm.closeRealms()
+        super.onCleared()
+    }
 }
