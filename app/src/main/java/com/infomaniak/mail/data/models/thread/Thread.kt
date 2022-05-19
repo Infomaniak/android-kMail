@@ -105,7 +105,8 @@ class Thread : RealmObject {
         }
     }
 
-    enum class ThreadFilter(title: String) {
+    // enum class ThreadFilter(@IdRes val filterNameRes: Int) {
+    enum class ThreadFilter(filterNameRes: String) { // TODO: Put these strings in strings.xml (like the `FolderRole` enum class)
         ALL("All"),
         SEEN("Seen"),
         UNSEEN("Unseen"),
