@@ -77,26 +77,26 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         val viewHolder = holder as BindingViewHolder<*>
         when (getItemViewType(position)) {
             DisplayType.DATE_SEPARATOR.layout -> {
-                displayDateSeparator(viewHolder.binding as ItemThreadDateSeparatorBinding, position)
+                (viewHolder.binding as ItemThreadDateSeparatorBinding).displayDateSeparator(position)
             }
             DisplayType.SEE_ALL_BUTTON.layout -> {
-                displaySeeAllButton(viewHolder.binding as ItemThreadSeeAllButtonBinding, position)
+                (viewHolder.binding as ItemThreadSeeAllButtonBinding).displaySeeAllButton(position)
             }
             DisplayType.THREAD.layout -> {
-                displayThread(viewHolder.binding as ItemThreadBinding, position)
+                (viewHolder.binding as ItemThreadBinding).displayThread(position)
             }
         }
     }
 
-    private fun displayDateSeparator(binding: ItemThreadDateSeparatorBinding, position: Int) = with(binding) {
+    private fun ItemThreadDateSeparatorBinding.displayDateSeparator(position: Int) {
         sectionTitle.text = itemsList[position] as String
     }
 
-    private fun displaySeeAllButton(binding: ItemThreadSeeAllButtonBinding, position: Int) = with(binding) {
+    private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(position: Int) {
         seeAllText.append("(${itemsList[position]})")
     }
 
-    private fun displayThread(binding: ItemThreadBinding, position: Int) = with(binding) {
+    private fun ItemThreadBinding.displayThread(position: Int) {
         val thread = itemsList[position] as Thread
         val context = itemThread.context
 

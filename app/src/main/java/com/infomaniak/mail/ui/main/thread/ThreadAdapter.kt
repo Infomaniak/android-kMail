@@ -115,7 +115,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     private fun displayBody(binding: ItemMessageBinding, body: Body?) = with(binding) {
         // TODO make prettier webview, Add button to hide / display the conversation inside message body like webapp
-        // Log.e("TOTO", "body : ${body?.value} \n\n\n\n\n\ntype = ${body?.type}"  )
+        // Log.e("Body", "displayBody: ${body?.value} \n\n\n\n\n\ntype = ${body?.type}"  )
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
 
