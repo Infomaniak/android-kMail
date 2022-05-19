@@ -112,9 +112,9 @@ object MailApi {
 
         // Delete outdated data
         Log.e("API", "Folders: Delete outdated data")
-        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
-        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
-        deletableFolders.forEach { MailboxContentController.deleteFolder(it.id) }
+        MailboxContentController.deleteMessages(deletableMessages)
+        MailboxContentController.deleteThreads(deletableThreads)
+        MailboxContentController.deleteFolders(deletableFolders)
 
         return foldersFromApi
     }
@@ -159,8 +159,8 @@ object MailApi {
 
         // Delete outdated data
         Log.e("API", "Threads: Delete outdated data")
-        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
-        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
+        MailboxContentController.deleteMessages(deletableMessages)
+        MailboxContentController.deleteThreads(deletableThreads)
     }
 
     fun fetchMessagesFromApi(thread: Thread) {
@@ -193,7 +193,7 @@ object MailApi {
 
         // Delete outdated data
         Log.e("API", "Messages: Delete outdated data")
-        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+        MailboxContentController.deleteMessages(deletableMessages)
     }
 
     suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
