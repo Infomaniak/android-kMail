@@ -17,94 +17,86 @@
   -->
 <resources>
 
-    <!-- Text -->
-    <style name="h1">
+    <!--Text-->
+    <style name="H1">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">@dimen/h1</item>
     </style>
 
-    <style name="h2">
+    <style name="H2">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/h2</item>
     </style>
 
-    <style name="h2Secondary">
-        <item name="android:textColor">@color/secondaryTextColor</item>
-        <item name="android:textSize">18sp</item>
-    </style>
-
-    <style name="h3">
-        <item name="android:fontFamily">@font/suisseintl_semibold</item>
-    </style>
-
-    <style name="bodySecondary">
+    <style name="H2.Secondary">
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
-    <style name="bodyHighlighted">
+    <style name="H3">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+    </style>
+
+    <style name="Body" />
+
+    <style name="Body.Highlighted">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
         <item name="android:textColor">@color/infomaniak</item>
     </style>
 
-    <style name="highlightedText">
-        <item name="android:textSize">19sp</item>
+    <style name="Body.Secondary">
+        <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
-    <style name="buttonPill">
+    <style name="ButtonPill">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="callout">
-        <item name="android:textSize">14sp</item>
+    <style name="Callout">
+        <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
-    <style name="calloutStrong">
+    <style name="Callout.Strong">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="calloutSecondary">
+    <style name="Callout.Secondary">
         <item name="android:textColor">@color/secondaryTextColor</item>
-        <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="calloutTertiary">
+    <style name="Callout.Tertiary">
         <item name="android:textColor">@color/hintTextColor</item>
-        <item name="android:textSize">14sp</item>
     </style>
 
-
-    <style name="calloutHighlighted">
+    <style name="Callout.Highlighted">
         <item name="android:textColor">@color/infomaniak</item>
-        <item name="android:textSize">14sp</item>
     </style>
 
     <!--Snackbar-->
 
     <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
         <item name="actionTextColorAlpha">0.8</item>
-        <item name="android:backgroundTint">@color/backgroundSnackBarColor</item>
+        <item name="android:backgroundTint">@color/backgroundSnackbarColor</item>
         <item name="android:layout_margin">@dimen/marginStandard</item>
     </style>
 
     <style name="Widget.App.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
-        <item name="android:textColor">@color/primaryLight</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/blue_button_light</item>
+        <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
     <style name="Widget.App.SnackbarTextView" parent="Widget.MaterialComponents.Snackbar.TextView">
         <item name="android:textColor">@color/snackbarTextColor</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/textHintSize</item>
     </style>
-
 
     <!--Buttons-->
 
     <style name="TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/infomaniak</item>
         <item name="android:letterSpacing">0</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/textHintSize</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
