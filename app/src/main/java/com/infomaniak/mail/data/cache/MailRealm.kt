@@ -38,8 +38,8 @@ object MailRealm {
     lateinit var mailboxContent: Realm
 
     // Current mailbox flow
-    val mutableCurrentMailboxObjectIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
-    val currentMailboxObjectIdFlow = mutableCurrentMailboxObjectIdFlow.asStateFlow()
+    val mutableCurrentMailboxIdFlow: MutableStateFlow<Int?> = MutableStateFlow(null)
+    val currentMailboxIdFlow = mutableCurrentMailboxIdFlow.asStateFlow()
 
     // Current folder flow
     val mutableCurrentFolderIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
