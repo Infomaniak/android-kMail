@@ -33,8 +33,11 @@ class LaunchActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
 
-            val user = AccountUtils.currentUser ?: AccountUtils.requestCurrentUser()
-            val destinationClass = if (user == null) LoginActivity::class.java else MainActivity::class.java
+            val destinationClass = if (AccountUtils.requestCurrentUser() == null) {
+                LoginActivity::class.java
+            } else {
+                MainActivity::class.java
+            }
 
             startActivity(Intent(this@LaunchActivity, destinationClass))
         }
