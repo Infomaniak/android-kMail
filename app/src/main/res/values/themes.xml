@@ -28,7 +28,7 @@
         <item name="android:textColorHint">@color/hintTextColor</item>
         <item name="android:textColorPrimary">@color/title</item>
         <item name="android:textColorSecondary">@color/secondaryTextColor</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/textRegularSize</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -61,11 +61,11 @@
 
     <style name="AppTheme.CollapsingToolbarLayoutTheme">
         <item name="collapsedTitleGravity">center</item>
-        <item name="collapsedTitleTextAppearance">@style/h1</item>
+        <item name="collapsedTitleTextAppearance">@style/H1</item>
         <item name="expandedTitleGravity">bottom</item>
         <item name="expandedTitleMarginBottom">@dimen/marginStandardSmall</item>
         <item name="expandedTitleMarginStart">@dimen/marginStandard</item>
-        <item name="expandedTitleTextAppearance">@style/h1</item>
+        <item name="expandedTitleTextAppearance">@style/H1</item>
         <item name="maxLines">2</item>
     </style>
 
