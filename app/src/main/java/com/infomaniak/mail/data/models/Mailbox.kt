@@ -27,9 +27,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class Mailbox : RealmObject {
-    @PrimaryKey
-    @SerialName("mailbox_id")
-    var mailboxId: Int = -1
     var uuid: String = ""
     var email: String = ""
     @SerialName("email_idn")
@@ -39,6 +36,8 @@ class Mailbox : RealmObject {
     var realMailbox: String = ""
     @SerialName("link_id")
     var linkId: Int = 0
+    @SerialName("mailbox_id")
+    var mailboxId: Int = -1
     @SerialName("hosting_id")
     var hostingId: Int = 0
     @SerialName("is_primary")
@@ -69,18 +68,21 @@ class Mailbox : RealmObject {
     /**
      * Local
      */
+    @PrimaryKey
+    var objectId: String = ""
     var userId: Int = -1
 
     fun initLocalValues(): Mailbox {
+        objectId = "${AccountUtils.currentUserId}_${mailboxId}"
         userId = AccountUtils.currentUserId
 
         return this
     }
 
     fun select() {
-        if (MailRealm.currentMailboxIdFlow.value != mailboxId) {
+        if (MailRealm.currentMailboxObjectIdFlow.value != objectId) {
             AccountUtils.currentMailboxId = mailboxId
-            MailRealm.mutableCurrentMailboxIdFlow.value = mailboxId
+            MailRealm.mutableCurrentMailboxObjectIdFlow.value = objectId
         }
     }
 

@@ -88,7 +88,7 @@ class Thread : RealmObject {
     }
 
     fun markAsSeen() {
-        MailRealm.currentMailboxIdFlow.value?.let { mailboxObjectId ->
+        MailRealm.currentMailboxObjectIdFlow.value?.let { mailboxObjectId ->
             MailboxInfoController.getMailbox(mailboxObjectId)?.let { mailbox ->
                 MailboxContentController.getThread(uid)?.let { coldThread ->
                     MailRealm.mailboxContent.writeBlocking {
