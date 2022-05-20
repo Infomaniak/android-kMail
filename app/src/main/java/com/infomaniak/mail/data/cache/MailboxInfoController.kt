@@ -25,21 +25,21 @@ import io.realm.query
 
 object MailboxInfoController {
 
-    fun getMailbox(id: Int): Mailbox? {
-        return MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::mailboxId.name} == '$id'").first().find()
+    fun getMailbox(objectId: String): Mailbox? {
+        return MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
     }
 
-    private fun MutableRealm.getLatestMailbox(id: Int): Mailbox? = getMailbox(id)?.let(::findLatest)
+    private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? = getMailbox(objectId)?.let(::findLatest)
 
     fun getMailboxes(): RealmResults<Mailbox> = MailRealm.mailboxInfo.query<Mailbox>().find()
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
     fun getDeletableMailboxes(mailboxesToKeep: List<Mailbox>): RealmResults<Mailbox> {
-        val mailboxesIds = mailboxesToKeep.map { it.mailboxId }
-        val query = mailboxesIds.joinToString(
-            prefix = "NOT (${Mailbox::mailboxId.name} == '",
-            separator = "' OR ${Mailbox::mailboxId.name} == '",
+        val objectIds = mailboxesToKeep.map { it.objectId }
+        val query = objectIds.joinToString(
+            prefix = "NOT (${Mailbox::objectId.name} == '",
+            separator = "' OR ${Mailbox::objectId.name} == '",
             postfix = "')"
         )
         return MailRealm.mailboxInfo.query<Mailbox>(query).find()
@@ -58,7 +58,7 @@ object MailboxInfoController {
     // }
 
     fun deleteMailboxes(mailboxes: List<Mailbox>) {
-        MailRealm.mailboxInfo.writeBlocking { mailboxes.forEach { getLatestMailbox(it.mailboxId)?.let(::delete) } }
+        MailRealm.mailboxInfo.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
     }
 
     // fun selectMailboxByEmail(email: String) {
