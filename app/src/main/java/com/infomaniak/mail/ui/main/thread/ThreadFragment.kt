@@ -33,7 +33,6 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
-import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
