@@ -18,14 +18,11 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
-import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -104,7 +101,6 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
 
         expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
         mailSubject.text = thread.subject.displayedSubject(context)
-        handleSeenState(thread, context, this)
 
         mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
 
@@ -113,16 +109,8 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         iconFavorite.isVisible = thread.flagged
 
         if (thread.unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
-        itemThread.setOnClickListener { onThreadClicked?.invoke(thread) }
-    }
 
-    private fun ItemThreadBinding.setThreadUiUnread() {
-        newMailBullet.isVisible = true
-        expeditor.setTextAppearance(R.style.H2)
-        mailSubject.setTextAppearance(R.style.H3)
-        mailDate.setTextAppearance(R.style.Callout_Strong)
-        iconAttachment.setDrawableColor(root.context, R.color.primaryTextColor)
-        iconCalendar.setDrawableColor(root.context, R.color.primaryTextColor)
+        itemThread.setOnClickListener { onThreadClicked?.invoke(thread) }
     }
 
     private fun ItemThreadBinding.setThreadUiRead() {
@@ -134,23 +122,13 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         iconCalendar.setDrawableColor(root.context, R.color.secondaryTextColor)
     }
 
-	// TODO This is duplicated, remove one
-	private fun handleSeenState(thread: Thread, context: Context, binding: ItemThreadBinding) = with(binding) {
-        val (textColorRes, typeFaceRes) = if (thread.unseenMessagesCount > 0) {
-            R.color.unreadColor to R.font.suisseintl_semibold
-        } else {
-            R.color.primaryText to R.font.suisseintl_regular
-        }
-        val textColor = ContextCompat.getColor(context, textColorRes)
-        val typeFace = ResourcesCompat.getFont(context, typeFaceRes)
-
-        fun TextView.applyState(@IdRes textColor: Int, typeFace: Typeface?) {
-            setTextColor(textColor)
-            typeface = typeFace
-        }
-
-        expeditor.applyState(textColor, typeFace)
-        mailSubject.applyState(textColor, typeFace)
+    private fun ItemThreadBinding.setThreadUiUnread() {
+        newMailBullet.isVisible = true
+        expeditor.setTextAppearance(R.style.H2)
+        mailSubject.setTextAppearance(R.style.H3)
+        mailDate.setTextAppearance(R.style.Callout_Strong)
+        iconAttachment.setDrawableColor(root.context, R.color.primaryTextColor)
+        iconCalendar.setDrawableColor(root.context, R.color.primaryTextColor)
     }
 
     private fun formatDate(date: Date): String = with(date) {
