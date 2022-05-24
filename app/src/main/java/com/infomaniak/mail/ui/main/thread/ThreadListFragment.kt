@@ -29,6 +29,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -40,7 +41,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
-class ThreadListFragment : Fragment() {
+class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by viewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
@@ -57,8 +58,17 @@ class ThreadListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupOnRefresh()
         setupAdapter()
         setupListeners()
+    }
+
+    private fun setupOnRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener(this)
+    }
+
+    override fun onRefresh() {
+        getData()
     }
 
     private fun setupAdapter() {
@@ -183,6 +193,8 @@ class ThreadListFragment : Fragment() {
     private fun displayThreads(threads: List<Thread>) {
         Log.i("UI", "Received threads (${threads.size})")
         // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
+
+        binding.swipeRefreshLayout.isRefreshing = false
 
         if (threads.isEmpty()) {
             displayNoEmailView()
