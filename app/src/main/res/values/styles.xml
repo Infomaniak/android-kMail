@@ -82,7 +82,7 @@
     </style>
 
     <style name="Widget.App.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
-        <item name="android:textColor">@color/blue_button_light</item>
+        <item name="android:textColor">@color/textButtonBlueLight</item>
         <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
