@@ -39,6 +39,7 @@
     <color name="backgroundSnackbarColor">#FAFAFA</color>
 
     <!-- Text -->
+    <color name="unreadColor">#333333</color>
     <color name="primaryTextColor">@color/title</color>
     <color name="secondaryTextColor">@color/grey_text</color>
     <color name="snackbarTextColor">@color/grey_text</color>
