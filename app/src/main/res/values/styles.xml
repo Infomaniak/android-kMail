@@ -17,7 +17,8 @@
   -->
 <resources>
 
-    <!--Text-->
+    <!-- Texts -->
+
     <style name="H1">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
         <item name="android:textSize">@dimen/h1</item>
@@ -73,7 +74,7 @@
         <item name="android:textColor">@color/infomaniak</item>
     </style>
 
-    <!--Snackbar-->
+    <!-- Snackbar -->
 
     <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
         <item name="actionTextColorAlpha">0.8</item>
@@ -91,7 +92,7 @@
         <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
-    <!--Buttons-->
+    <!-- Buttons -->
 
     <style name="TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">@color/infomaniak</item>
@@ -114,7 +115,8 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
-    <!--Other-->
+    <!-- Other -->
+
     <style name="CircleImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
