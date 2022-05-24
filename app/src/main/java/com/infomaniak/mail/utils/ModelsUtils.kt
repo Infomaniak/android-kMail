@@ -28,7 +28,7 @@ object ModelsUtils {
 
     fun String?.displayedSubject(context: Context): Spanned {
         return this?.toSpanned() ?: HtmlCompat.fromHtml(
-            "<i>${context.getString(R.string.noSubject)}</i>",
+            "<i>${context.getString(R.string.messageNoSubject)}</i>",
             HtmlCompat.FROM_HTML_MODE_COMPACT,
         )
     }
