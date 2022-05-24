@@ -56,8 +56,14 @@
     <string name="contactActionCopyEmailAddress">Copy email address</string>
     <string name="contactActionWriteEmail">Write an email</string>
     <string name="contactMe">Me</string>
-    <string name="contentDescriptionHasAttachments">Has attachments</string>
-    <string name="contentDescriptionIsFavorite">Is favorite</string>
+    <string name="contentDescriptionButtonBack">Back</string>
+    <string name="contentDescriptionButtonExpandHeader">Expand header</string>
+    <string name="contentDescriptionButtonFilterSearch">Filter search</string>
+    <string name="contentDescriptionButtonMenu">Menu</string>
+    <string name="contentDescriptionIconAttachments">Has attachments</string>
+    <string name="contentDescriptionIconCalendar">Has Calendar event</string>
+    <string name="contentDescriptionIconFavorite">Is favorite</string>
+    <string name="contentDescriptionIconNewMail">New</string>
     <string name="draftFolder">Drafts</string>
     <string name="fromTitle">From:</string>
     <string name="inboxFolder">Inbox</string>

@@ -32,11 +32,11 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="@dimen/marginStandardMedium"
-            android:contentDescription="search button"
             android:src="@drawable/ic_search"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
 
         <EditText
             android:id="@+id/searchView"
@@ -77,6 +77,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:contentDescription="@string/contentDescriptionButtonFilterSearch"
             app:icon="@drawable/ic_filter"
             app:iconTint="@color/secondaryText"
             app:layout_constraintBottom_toBottomOf="parent"
