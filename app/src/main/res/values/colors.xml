@@ -30,7 +30,7 @@
     <!-- Color Tones -->
     <color name="blue_text_light">#4CB7FF</color>
 
-    <!-- Background -->
+    <!-- Backgrounds -->
     <color name="backgroundCardSelectedColor">#F5F5F5</color>
     <color name="backgroundChipColor">@color/background</color>
     <color name="backgroundColor">@color/white</color>
@@ -38,8 +38,7 @@
     <color name="backgroundNotificationColor">@color/grey_text</color>
     <color name="backgroundSnackbarColor">#FAFAFA</color>
 
-    <!-- Text -->
-    <color name="unreadColor">#333333</color>
+    <!-- Texts -->
     <color name="primaryTextColor">@color/title</color>
     <color name="secondaryTextColor">@color/grey_text</color>
     <color name="snackbarTextColor">@color/grey_text</color>
@@ -47,15 +46,15 @@
     <color name="sectionHeaderTextColor">@color/grey_text_light</color>
     <color name="notificationTextColor">#F5F5F5</color>
 
-    <!-- Drawable -->
+    <!-- Drawables -->
     <color name="separatorColor">#ECECEC</color>
 
-    <!-- Icon -->
+    <!-- Icons -->
     <color name="chevronColor">@color/grey_text</color>
     <color name="iconColor">@color/grey_text</color>
     <color name="iconToolbarButton">@color/primaryTextColor</color>
 
-    <!-- Button -->
+    <!-- Buttons -->
     <color name="textButtonBlueLight">@color/blue_text_light</color>
 
 </resources>

@@ -25,6 +25,6 @@
         style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/See_all"
+        android:text="@string/buttonSeeAll"
         app:loader_corner="12dp" />
 </LinearLayout>
