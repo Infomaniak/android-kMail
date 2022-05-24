@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
@@ -39,11 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         listenToNetworkStatus()
-
-        val navController = setupNavController()
-        navController.addOnDestinationChangedListener { _, dest, args ->
-            onDestinationChanged(dest, args)
-        }
+        setupNavController()
     }
 
     private fun listenToNetworkStatus() {
@@ -61,7 +56,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onDestinationChanged(destination: NavDestination, navigationArgs: Bundle?) {
+    private fun setupNavController() {
+        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment)
+            .navController
+            .addOnDestinationChangedListener { _, destination, _ ->
+                onDestinationChanged(destination)
+            }
+    }
+
+    private fun onDestinationChanged(destination: NavDestination) {
         Sentry.addBreadcrumb(Breadcrumb().apply {
             category = "Navigation"
             message = "Accessed to destination : ${destination.displayName}"
@@ -72,12 +75,5 @@ class MainActivity : AppCompatActivity() {
         // with(destination) {
         //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
         // }
-    }
-
-    private fun setupNavController(): NavController {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment
-        return navHostFragment.navController.apply {
-            if (currentDestination == null) navigate(graph.startDestinationId)
-        }
     }
 }
