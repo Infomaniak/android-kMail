@@ -90,6 +90,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/expandHeaderButton"
         style="@style/IconButton"
+        android:contentDescription="@string/contentDescriptionButtonExpandHeader"
         android:rotation="180"
         app:icon="@drawable/ic_chevron_up"
         app:iconSize="24dp"
