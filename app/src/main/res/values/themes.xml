@@ -106,7 +106,7 @@
         <item name="contentInsetEnd">54dp</item>
         <item name="contentInsetStartWithNavigation">0dp</item>
         <item name="iconTint">@color/iconToolbarButton</item>
-        <item name="navigationContentDescription">"Back"</item>00
+        <item name="navigationContentDescription">@string/contentDescriptionButtonBack</item>
         <item name="navigationIcon">@drawable/ic_chevron_left</item>
         <item name="titleMarginTop">8dp</item>
     </style>

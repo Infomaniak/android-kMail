@@ -48,8 +48,14 @@
     <string name="contactActionCopyEmailAddress"></string>
     <string name="contactActionWriteEmail"></string>
     <string name="contactMe"></string>
-    <string name="contentDescriptionHasAttachments"></string>
-    <string name="contentDescriptionIsFavorite"></string>
+    <string name="contentDescriptionButtonBack"></string>
+    <string name="contentDescriptionButtonExpandHeader"></string>
+    <string name="contentDescriptionButtonFilterSearch"></string>
+    <string name="contentDescriptionButtonMenu"></string>
+    <string name="contentDescriptionIconAttachments"></string>
+    <string name="contentDescriptionIconCalendar"></string>
+    <string name="contentDescriptionIconFavorite"></string>
+    <string name="contentDescriptionIconNewMail"></string>
     <string name="draftFolder"></string>
     <string name="fromTitle"></string>
     <string name="inboxFolder"></string>
