@@ -93,12 +93,12 @@
 
     <style name="AppTheme.CollapsingToolbarLayoutTheme">
         <item name="collapsedTitleGravity">center</item>
-        <item name="collapsedTitleTextAppearance">@style/H1</item>
+        <item name="collapsedTitleTextAppearance">@style/H2</item>
         <item name="expandedTitleGravity">bottom</item>
         <item name="expandedTitleMarginBottom">@dimen/marginStandardSmall</item>
         <item name="expandedTitleMarginStart">@dimen/marginStandard</item>
         <item name="expandedTitleTextAppearance">@style/H1</item>
-        <item name="maxLines">2</item>
+        <item name="maxLines">1</item>
     </style>
 
     <style name="AppTheme.ToolbarTheme" parent="Widget.MaterialComponents.Toolbar">
