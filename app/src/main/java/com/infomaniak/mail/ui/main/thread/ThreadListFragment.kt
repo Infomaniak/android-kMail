@@ -76,7 +76,14 @@ class ThreadListFragment : Fragment() {
             // onEmptyList = { checkIfNoFiles() }
 
             onThreadClicked = {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(it.uid, it.subject))
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
+                        threadUid = it.uid,
+                        threadSubject = it.subject,
+                        // TODO see if favorite Icon must be displayed
+                        // threadIsFavorite = it.flagged
+                    )
+                )
             }
         }
     }

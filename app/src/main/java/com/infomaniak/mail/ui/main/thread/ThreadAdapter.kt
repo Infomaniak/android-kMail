@@ -25,7 +25,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.DimenRes
-import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.core.text.color
 import androidx.core.text.scale
@@ -160,10 +159,10 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
                     if (isExpandedHeaderMode) {
                         buildSpannedString {
                             if (it.name.isNotBlank()) {
-                                bold { color(context.getColor(R.color.primaryTextColor)) { append(it.name) } }
+                                color(context.getColor(R.color.primaryTextColor)) { append(it.name) }
                                 scale(RECIPIENT_TEXT_SCALE_FACTOR) { append(" (${it.email})") }
                             } else {
-                                bold { color(context.getColor(R.color.primaryTextColor)) { append(it.email) } }
+                                color(context.getColor(R.color.primaryTextColor)) { append(it.email) }
                             }
                             append(",\n")
                         }
