@@ -15,59 +15,55 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/threadHeader"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="@dimen/marginStandardMedium"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="@dimen/appBarHeight">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/backButton"
-            style="@style/IconButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            app:icon="@drawable/ic_chevron_left"
-            app:iconSize="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapse"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="@color/backgroundColor"
+            app:collapsedTitleGravity="start"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            tools:title="text">
 
-        <TextView
-            android:id="@+id/threadTitle"
-            style="@style/H2"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            app:layout_constraintEnd_toStartOf="@id/iconFavorite"
-            app:layout_constraintStart_toEndOf="@id/backButton"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Lorem Ipsum" />
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin" />
 
-        <ImageView
-            android:id="@+id/iconFavorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:contentDescription="icon favorite"
-            android:src="@drawable/ic_star"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!-- TODO see in meeting how the star must be displayed-->
+<!--                <ImageView-->
+<!--                    android:id="@+id/iconFavorite"-->
+<!--                    android:layout_gravity="end"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    app:layout_collapseMode="pin"-->
+<!--                    android:layout_marginHorizontal="@dimen/marginStandardMedium"-->
+<!--                    android:layout_marginTop="@dimen/marginStandardMedium"-->
+<!--                    android:contentDescription="@string/contentDescriptionIsFavorite"-->
+<!--                    android:src="@drawable/ic_star" />-->
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/marginStandardMedium"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/threadHeader" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_message" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -77,6 +77,11 @@
             android:name="threadSubject"
             app:argType="string"
             app:nullable="true" />
+<!-- TODO see if favorite Icon must be displayed in thread -->
+<!--        <argument-->
+<!--            android:name="threadIsFavorite"-->
+<!--            app:argType="boolean"-->
+<!--            android:defaultValue="false" />-->
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />
