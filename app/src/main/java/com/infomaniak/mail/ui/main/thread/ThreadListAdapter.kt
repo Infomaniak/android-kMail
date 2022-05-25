@@ -97,10 +97,9 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
 
     private fun ItemThreadBinding.displayThread(position: Int) {
         val thread = itemsList[position] as Thread
-        val context = itemThread.context
 
         expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
-        mailSubject.text = thread.subject.displayedSubject(context)
+        mailSubject.text = thread.subject.displayedSubject(root.context)
 
         mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
 
@@ -110,7 +109,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
 
         if (thread.unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
-        itemThread.setOnClickListener { onThreadClicked?.invoke(thread) }
+        root.setOnClickListener { onThreadClicked?.invoke(thread) }
     }
 
     private fun ItemThreadBinding.setThreadUiRead() {

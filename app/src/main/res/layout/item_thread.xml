@@ -15,128 +15,134 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardViewMail"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/marginStandardMedium"
-    android:layout_marginTop="@dimen/marginStandardMedium">
+    android:layout_marginTop="@dimen/marginStandardMedium"
+    app:rippleColor="@color/pink_mail">
 
-    <ImageView
-        android:id="@+id/newMailBullet"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/marginStandardSmall"
-        android:contentDescription="@string/contentDescriptionIconNewMail"
-        android:src="@drawable/ic_bullet"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
-
-    <LinearLayout
-        android:id="@+id/itemThread"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandard"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:paddingHorizontal="@dimen/marginStandardMedium">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/newMailBullet"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:contentDescription="@string/contentDescriptionIconNewMail"
+            android:src="@drawable/ic_bullet"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandard"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/expeditor"
+                    style="@style/H2.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxWidth="@dimen/itemThreadTextViewSize"
+                    android:maxLines="1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:text="Expeditor name looooooooooooooooooooooooooooooong" />
+
+                <ImageView
+                    android:id="@+id/iconCalendar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:contentDescription="@string/contentDescriptionIconCalendar"
+                    android:src="@drawable/ic_calendar"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/iconAttachment" />
+
+                <ImageView
+                    android:id="@+id/iconAttachment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                    android:contentDescription="@string/contentDescriptionIconAttachments"
+                    android:src="@drawable/ic_attachment"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/mailDate" />
+
+                <TextView
+                    android:id="@+id/mailDate"
+                    style="@style/Callout.Secondary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:maxWidth="50dp"
+                    android:maxLines="1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="31 jan 2000" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/mailSubject"
+                    style="@style/Body.Secondary"
+                    android:layout_width="@dimen/itemThreadTextViewSize"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:text="default subject" />
+
+                <ImageView
+                    android:id="@+id/iconFavorite"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/contentDescriptionIconFavorite"
+                    android:src="@drawable/ic_star"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/expeditor"
-                style="@style/H2.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxWidth="@dimen/itemThreadTextViewSize"
-                android:maxLines="1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="Expeditor name looooooooooooooooooooooooooooooong" />
-
-            <ImageView
-                android:id="@+id/iconCalendar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardSmall"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:contentDescription="@string/contentDescriptionIconCalendar"
-                android:src="@drawable/ic_calendar"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/iconAttachment" />
-
-            <ImageView
-                android:id="@+id/iconAttachment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:contentDescription="@string/contentDescriptionIconAttachments"
-                android:src="@drawable/ic_attachment"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/mailDate" />
-
-            <TextView
-                android:id="@+id/mailDate"
-                style="@style/Callout.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:maxWidth="50dp"
-                android:maxLines="1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:text="31 jan 2000" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/mailSubject"
+                android:id="@+id/mailBodyStart"
                 style="@style/Body.Secondary"
                 android:layout_width="@dimen/itemThreadTextViewSize"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:maxLines="1"
+                android:text="TODO short body when api returns it"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="default subject" />
+                app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageView
-                android:id="@+id/iconFavorite"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:contentDescription="@string/contentDescriptionIconFavorite"
-                android:src="@drawable/ic_star"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible" />
+        </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:id="@+id/mailBodyStart"
-            style="@style/Body.Secondary"
-            android:layout_width="@dimen/itemThreadTextViewSize"
-            android:layout_height="match_parent"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="TODO short body when api returns it"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
