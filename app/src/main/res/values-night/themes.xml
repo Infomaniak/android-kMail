@@ -18,7 +18,14 @@
 <resources>
 
     <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:navigationBarColor">@color/backgroundColor</item>
         <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="AppTheme.Login" parent="AppTheme" />
+
+    <style name="LoginAppBarTheme" parent="AppTheme.AppBarOverlayBase">
+        <item name="backgroundTint">@color/backgroundColor</item>
     </style>
 
 </resources>
