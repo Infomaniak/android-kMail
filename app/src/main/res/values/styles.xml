@@ -122,4 +122,12 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <!-- Cardview -->
+
+    <style name="CardViewMail" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/backgroundColor</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
+    </style>
+
 </resources>
