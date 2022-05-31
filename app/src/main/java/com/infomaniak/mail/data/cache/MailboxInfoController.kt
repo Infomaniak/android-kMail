@@ -19,8 +19,8 @@ package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.Mailbox
 import io.realm.MutableRealm
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmResults
+import io.realm.UpdatePolicy
 import io.realm.query
 
 object MailboxInfoController {
