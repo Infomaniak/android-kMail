@@ -77,7 +77,7 @@ object MailboxContentController {
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    fun getDeletableThreads(threadsToKeep: List<Thread>): RealmResults<Thread> {
+    fun getDeletableThreads(folder: Folder, threadsToKeep: List<Thread>): RealmResults<Thread> {
         val threadsIds = threadsToKeep.map { it.uid }
         val query = threadsIds.joinToString(
             prefix = "NOT (${Thread::uid.name} == '",
@@ -124,7 +124,7 @@ object MailboxContentController {
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    fun getDeletableMessages(messagesToKeep: List<Message>): RealmResults<Message> {
+    fun getDeletableMessages(thread: Thread, messagesToKeep: List<Message>): RealmResults<Message> {
         val messagesIds = messagesToKeep.map { it.uid }
         val query = messagesIds.joinToString(
             prefix = "NOT (${Message::uid.name} == '",
