@@ -22,10 +22,7 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.cache.MailboxInfoController
-import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
@@ -197,6 +194,20 @@ object MailApi {
         // Delete outdated data
         Log.e("API", "Messages: Delete outdated data")
         MailboxContentController.deleteMessages(deletableMessages)
+    }
+
+    private fun fetchDraftFromApi(draftResource: String, parentUid: String): Draft? {
+        val apiDraft = ApiRepository.getDraft(draftResource).data
+        apiDraft?.let { draft ->
+            draft.apply {
+                initLocalValues(parentUid)
+                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
+            }
+            MailboxContentController.upsertDraft(draft)
+        }
+
+        return apiDraft
     }
 
     suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
