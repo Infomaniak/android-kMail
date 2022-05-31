@@ -43,10 +43,8 @@ class Attachment : RealmObject {
     var thumbnail: String = ""
 
     // TODO: Remove this method when we have EmbeddedObjects
-    fun initLocalValues(position: Int, parentMessageUid: String): Attachment {
+    fun initLocalValues(position: Int, parentMessageUid: String) {
         uuid = "attachment_${position}_${parentMessageUid}"
-
-        return this
     }
 
     fun getDisposition(): AttachmentDisposition? = enumValueOfOrNull<AttachmentDisposition>(disposition)

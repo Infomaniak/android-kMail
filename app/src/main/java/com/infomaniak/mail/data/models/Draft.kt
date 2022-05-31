@@ -61,15 +61,13 @@ class Draft : RealmObject {
      */
     var parentMessageUid: String = ""
 
-    fun initLocalValues(messageUid: String): Draft {
+    fun initLocalValues(messageUid: String) {
         uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
         parentMessageUid = messageUid
 
         cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-
-        return this
     }
 
     companion object {
