@@ -93,7 +93,7 @@ object ApiRepository : ApiRepositoryCore() {
         return if (draft.uuid.isEmpty()) postDraft() else putDraft()
     }
 
-    fun send(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
+    fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
         fun postDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, draft)
         fun putDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, draft)
         return if (draft.uuid.isEmpty()) postDraft() else putDraft()
