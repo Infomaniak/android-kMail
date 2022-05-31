@@ -21,8 +21,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.MutableRealm
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmResults
+import io.realm.UpdatePolicy
 import io.realm.query
 
 object MailboxContentController {
