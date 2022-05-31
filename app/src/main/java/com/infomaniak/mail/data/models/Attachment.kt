@@ -53,7 +53,7 @@ class Attachment : RealmObject {
 
     override fun equals(other: Any?): Boolean = other is Attachment && other.uuid == uuid
 
-    override fun hashCode(): Int = javaClass.hashCode()
+    override fun hashCode(): Int = uuid.hashCode()
 
     enum class AttachmentDisposition {
         INLINE,
