@@ -96,10 +96,6 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
                     attachments.forEach { addView(createChip(binding.root.context, it.name)) }
                 }
 
-                attachmentsSeeAllButton.setOnClickListener {
-                    // TODO attachmentList Fragment
-                }
-
                 attachmentsDownloadAllButton.setOnClickListener {
                     // TODO attachmentList Fragment
                 }
@@ -108,12 +104,12 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
     }
 
     private fun ItemMessageBinding.hideAttachments() {
-        attachmentsLayout.isGone = true
+        attachmentsGroup.isGone = true
         attachmentsScrollView.isGone = true
     }
 
     private fun ItemMessageBinding.showAttachments() {
-        attachmentsLayout.isVisible = true
+        attachmentsGroup.isVisible = true
         attachmentsScrollView.isVisible = true
     }
 
