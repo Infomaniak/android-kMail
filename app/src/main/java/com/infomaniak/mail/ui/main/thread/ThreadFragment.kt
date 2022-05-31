@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -64,15 +65,16 @@ class ThreadFragment : Fragment() {
 
         threadSubject.text = navigationArgs.threadSubject.displayedSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
+        
         messagesList.adapter = ThreadAdapter().apply {
-                    onDeleteDraftClicked = { message ->
-                        // TODO: Delete Message & Draft on API. If the call success, then delete on Realm, then update Adapter's list.
-                        message.draftUuid?.let(MailboxContentController::deleteDraft)
-                        // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
-                        MailboxContentController.deleteMessage(message.uid)
-                        threadAdapter.removeMessage(message)
-                    }
-                }.also { threadAdapter = it }
+            onDeleteDraftClicked = { message ->
+                // TODO: Delete Message & Draft on API. If the call success, then delete on Realm, then update Adapter's list.
+                message.draftUuid?.let(MailboxContentController::deleteDraft)
+                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
+                MailboxContentController.deleteMessage(message.uid)
+                threadAdapter.removeMessage(message)
+            }
+        }.also { threadAdapter = it }
 
         AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(it))
