@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.*
@@ -110,19 +109,6 @@ class Message : RealmObject {
 
     fun select() {
         MailRealm.mutableCurrentMessageUidFlow.value = uid
-    }
-
-    fun getDraft(): Draft? {
-        val apiDraft = ApiRepository.getDraft(draftResource).data
-        apiDraft?.let { draft ->
-            draft.apply {
-                initLocalValues(uid)
-                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
-            }
-            MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
-        }
-        return apiDraft
     }
 
     fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)
