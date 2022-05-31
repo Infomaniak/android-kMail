@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.*
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
