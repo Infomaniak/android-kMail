@@ -42,5 +42,5 @@ class Recipient : RealmObject {
 
     override fun equals(other: Any?): Boolean = other is Recipient && other.objectId == objectId
 
-    override fun hashCode(): Int = javaClass.hashCode()
+    override fun hashCode(): Int = objectId.hashCode()
 }
