@@ -30,6 +30,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
@@ -63,7 +64,15 @@ class ThreadFragment : Fragment() {
 
         threadSubject.text = navigationArgs.threadSubject.displayedSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
-        messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
+        messagesList.adapter = ThreadAdapter().apply {
+                    onDeleteDraftClicked = { message ->
+                        // TODO: Delete Message & Draft on API. If the call success, then delete on Realm, then update Adapter's list.
+                        message.draftUuid?.let(MailboxContentController::deleteDraft)
+                        // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
+                        MailboxContentController.deleteMessage(message.uid)
+                        threadAdapter.removeMessage(message)
+                    }
+                }.also { threadAdapter = it }
 
         AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(it))

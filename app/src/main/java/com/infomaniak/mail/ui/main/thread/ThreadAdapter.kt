@@ -48,6 +48,8 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     private var messageList: ArrayList<Message> = arrayListOf()
 
+    var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
+
     override fun getItemCount() = messageList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> {
