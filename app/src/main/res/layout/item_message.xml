@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/marginStandard"
+    android:layout_marginVertical="@dimen/marginStandard"
     android:animateLayoutChanges="true">
 
     <include
@@ -28,50 +28,51 @@
         layout="@layout/item_header_thread"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandard"
-        app:layout_constraintBottom_toTopOf="@id/attachmentsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/attachmentsLayout"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/attachmentsIcon"
+        android:layout_width="@dimen/textHintSize"
+        android:layout_height="@dimen/textHintSize"
+        android:src="@drawable/ic_attachment_inclined"
+        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/attachmentsSizeText"
+        style="@style/Callout.Secondary"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandard"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/headerThread">
+        android:layout_marginStart="@dimen/marginStandardVerySmall"
+        app:layout_constraintBottom_toTopOf="@id/attachmentsScrollView"
+        app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
+        app:layout_constraintTop_toBottomOf="@id/headerThread"
+        tools:text="4 pièces jointes (3 MB)" />
 
-        <ImageView
-            android:id="@+id/attachmentsIcon"
-            android:layout_width="@dimen/textHintSize"
-            android:layout_height="@dimen/textHintSize"
-            android:layout_marginEnd="@dimen/marginStandardSmall"
-            android:src="@drawable/ic_attachment_inclined"
-            tools:ignore="ContentDescription" />
 
-        <TextView
-            android:id="@+id/attachmentsSizeText"
-            style="@style/Callout.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/marginStandardSmall"
-            tools:text="4 pièces jointes (3 MB)" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/attachmentsDownloadAllButton"
+        style="@style/TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:text="@string/buttonDownloadAll"
+        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+        app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
+        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/attachmentsSeeAllButton"
-            style="@style/TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:text="@string/buttonSeeAll" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/attachmentsDownloadAllButton"
-            style="@style/TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonDownloadAll" />
-    </LinearLayout>
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/attachmentsGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton"
+        tools:visibility="visible" />
 
     <HorizontalScrollView
         android:id="@+id/attachmentsScrollView"
@@ -80,9 +81,10 @@
         android:scrollbarSize="1dp"
         android:scrollbarThumbHorizontal="@color/infomaniak"
         android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/webViewFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsLayout"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsSizeText"
         tools:visibility="visible">
 
         <com.google.android.material.chip.ChipGroup
@@ -93,9 +95,11 @@
 
     </HorizontalScrollView>
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/webViewFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/marginStandard"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,8 +108,8 @@
         <WebView
             android:id="@+id/messageBody"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/marginStandardMedium" />
-    </RelativeLayout>
+            android:layout_height="wrap_content" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
