@@ -22,13 +22,14 @@
     android:layout_height="wrap_content">
 
     <com.infomaniak.lib.core.views.LoaderTextView
+        style="@style/Callout"
         android:id="@+id/sectionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardMedium"
         android:layout_marginTop="@dimen/marginStandard"
         android:minWidth="120dp"
-        android:textColor="@color/hintTextColor"
+        android:textColor="@color/sectionHeaderTextColor"
         app:loader_corner="12dp"
         tools:text="Today" />
 

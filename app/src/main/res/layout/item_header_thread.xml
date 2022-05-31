@@ -52,6 +52,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandardVerySmall"
+        android:ellipsize="end"
         android:layout_marginStart="@dimen/marginStandardSmall"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/recipient"
