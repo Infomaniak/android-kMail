@@ -20,17 +20,101 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/marginStandardMedium"
     android:layout_marginVertical="@dimen/marginStandard"
     android:animateLayoutChanges="true">
 
-    <include
-        android:id="@+id/headerThread"
-        layout="@layout/item_header_thread"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/userAvatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/placeholder"
+        app:cardCornerRadius="100dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/titleMyAccount"
+            android:src="@drawable/placeholder"
+            tools:src="@tools:sample/avatars" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/expeditorName"
+        style="@style/H3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:ellipsize="end"
+        android:maxWidth="145dp"
+        android:maxLines="1"
+        app:layout_constraintStart_toEndOf="@id/userAvatar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Steph Guyazfazfagaegaegagazgaegaegaeg" />
+
+    <TextView
+        android:id="@+id/expeditorEmail"
+        style="@style/Callout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/marginStandardVerySmall"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:ellipsize="end"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/recipient"
+        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
+        app:layout_constraintStart_toEndOf="@id/userAvatar"
+        app:layout_constraintTop_toBottomOf="@id/expeditorName"
+        tools:text="steph.guy@infomaniak.com"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/recipient"
+        style="@style/Callout.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
+        app:layout_constraintStart_toEndOf="@id/userAvatar"
+        app:layout_constraintTop_toBottomOf="@id/expeditorEmail"
+        tools:text="Myriam Rais, George Li" />
+
+    <TextView
+        android:id="@+id/messageDate"
+        style="@style/Callout.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/expeditorName"
+        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
+        app:layout_constraintStart_toEndOf="@id/expeditorName"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="9 déc 2021 à 11:00" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/expandHeaderButton"
+        style="@style/IconButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@string/contentDescriptionButtonExpandHeader"
+        android:rotation="180"
+        app:icon="@drawable/ic_chevron_up"
+        app:iconSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/messageHeaderBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="userAvatar, recipient, expandHeaderButton" />
 
     <ImageView
         android:id="@+id/attachmentsIcon"
@@ -47,20 +131,20 @@
         style="@style/Callout.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandard"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
+        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+        android:layout_marginTop="@dimen/marginStandard"
+        android:layout_marginBottom="@dimen/marginStandardSmall"
         app:layout_constraintBottom_toTopOf="@id/attachmentsScrollView"
+        app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
         app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
-        app:layout_constraintTop_toBottomOf="@id/headerThread"
+        app:layout_constraintTop_toBottomOf="@id/messageHeaderBarrier"
         tools:text="4 pièces jointes (3 MB)" />
-
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/attachmentsDownloadAllButton"
         style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardSmall"
         android:text="@string/buttonDownloadAll"
         app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
         app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
@@ -74,6 +158,7 @@
         app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton"
         tools:visibility="visible" />
 
+    <!-- TODO see with UI/UX if we really handle attachments preview -->
     <HorizontalScrollView
         android:id="@+id/attachmentsScrollView"
         android:layout_width="match_parent"

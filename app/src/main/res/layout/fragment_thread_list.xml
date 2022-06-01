@@ -22,48 +22,73 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.thread.ThreadListFragment">
 
-    <include
-        android:id="@+id/header"
-        layout="@layout/item_header_threadlist"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/menuDrawerButton"
+        style="@style/IconButton"
+        android:layout_width="32dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="@dimen/marginStandardMedium"
         android:layout_marginTop="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/mailboxLayout"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/contentDescriptionButtonMenu"
+        app:icon="@drawable/ic_burger"
+        app:layout_constraintBottom_toTopOf="@id/mailboxName"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <include
+        android:id="@+id/searchViewCard"
+        layout="@layout/item_search_view"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="@dimen/marginStandard"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        app:layout_constraintBottom_toTopOf="@id/mailboxName"
+        app:layout_constraintEnd_toStartOf="@id/userAvatar"
+        app:layout_constraintStart_toEndOf="@id/menuDrawerButton"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mailboxLayout"
-        android:layout_width="match_parent"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/userAvatar"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="@dimen/marginStandardMedium"
+        app:cardCornerRadius="100dp"
+        app:layout_constraintBottom_toBottomOf="@+id/searchViewCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/searchViewCard">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/titleMyAccount"
+            android:src="@drawable/placeholder"
+            tools:src="@tools:sample/avatars" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/mailboxName"
+        style="@style/H1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/marginStandardMedium"
-        app:layout_constraintTop_toBottomOf="@id/header">
+        android:layout_marginStart="@dimen/marginLarge"
+        android:layout_marginTop="@dimen/marginStandard"
+        android:text="@string/inboxFolder"
+        app:layout_constraintBottom_toTopOf="@id/swipeRefreshLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchViewCard"
+        tools:text="Boite de Reception" />
 
-        <TextView
-            android:id="@+id/mailboxName"
-            style="@style/H1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandard"
-            android:text="@string/inboxFolder"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Boite de Reception" />
-
-        <!-- TODO: multiselect -->
-        <!--        <com.google.android.material.button.MaterialButton-->
-        <!--            android:id="@+id/openMultiselectButton"-->
-        <!--            style="@style/TextButton"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:text="Modifier"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- TODO: multiselect -->
+    <!--        <com.google.android.material.button.MaterialButton-->
+    <!--            android:id="@+id/openMultiselectButton"-->
+    <!--            style="@style/TextButton"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="Modifier"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintTop_toBottomOf="@id/searchViewCard" />-->
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -71,7 +96,7 @@
         android:layout_height="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mailboxLayout">
+        app:layout_constraintTop_toBottomOf="@id/mailboxName">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -81,59 +106,58 @@
                 android:id="@+id/threadsList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <ImageView
+                android:id="@+id/illuNoMail"
+                android:layout_width="@dimen/noMailIlluViewSize"
+                android:layout_height="@dimen/noMailIlluViewSize"
+                android:src="@drawable/ic_zero_mail"
+                app:layout_constraintBottom_toTopOf="@id/noMailTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/noMailTitle"
+                style="@style/H2"
+                android:layout_width="@dimen/noMailTextViewSize"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/marginStandard"
+                android:gravity="center"
+                android:text="@string/noEmailTitle"
+                app:layout_constraintBottom_toTopOf="@id/noMailDescription"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/illuNoMail"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/noMailDescription"
+                style="@style/Body.Secondary"
+                android:layout_width="@dimen/noMailTextViewSize"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1"
+                android:text="@string/noEmailDescription"
+                app:layout_constraintBottom_toTopOf="@id/newMessageFab"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/noMailTitle"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/noMailLayoutGroup"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/illuNoMail"
-                    android:layout_width="150dp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/ic_zero_mail"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription" />
-
-                <TextView
-                    android:id="@+id/noMailTitle"
-                    style="@style/H2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandard"
-                    android:gravity="center"
-                    android:text="@string/noEmailTitle"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/illuNoMail" />
-
-                <TextView
-                    android:id="@+id/noMailDescription"
-                    style="@style/Body.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandardVerySmall"
-                    android:gravity="center"
-                    android:lineSpacingMultiplier="1"
-                    android:text="@string/noEmailDescription"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/noMailTitle" />
-
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/recyclerViewDeviceGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    app:constraint_referenced_ids="illuNoMail,noMailTitle,noMailDescription"
-                    tools:visibility="visible"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="illuNoMail,noMailTitle,noMailDescription"
+                tools:visibility="visible" />
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/newMessageFab"
@@ -142,7 +166,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandard"
                 android:layout_marginBottom="@dimen/marginStandard"
-                android:contentDescription="@string/buttonNewMessage"
                 android:paddingHorizontal="18dp"
                 android:text="@string/buttonNewMessage"
                 android:textAllCaps="false"
@@ -152,6 +175,7 @@
                 app:iconSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

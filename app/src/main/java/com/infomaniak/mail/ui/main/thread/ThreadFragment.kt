@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -58,11 +59,11 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        collapse.title = navigationArgs.threadSubject.displayedSubject(requireContext())
-        // TODO see if favorite icon must be visible or not
-        // iconFavorite.isVisible = navigationArgs.threadIsFavorite
+
+        threadSubject.text = navigationArgs.threadSubject.displayedSubject(requireContext())
+        iconFavorite.isVisible = navigationArgs.threadIsFavorite
+        messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
 
         AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(it))
