@@ -91,8 +91,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
                         threadUid = it.uid,
                         threadSubject = it.subject,
-                        // TODO see if favorite Icon must be displayed
-                        // threadIsFavorite = it.flagged
+                        threadIsFavorite = it.flagged
                     )
                 )
             }
@@ -103,7 +102,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         // TODO multiselection
         // openMultiselectButton.setOnClickListener {}
 
-        header.searchViewCard.apply {
+        searchViewCard.apply {
             // TODO filterButton doesn't propagate the event to root, must display it ?
             searchView.isGone = true
             searchViewText.isVisible = true
@@ -113,7 +112,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
 
-        header.userAvatar.setOnClickListener {
+        userAvatar.setOnClickListener {
             safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
         }
 
