@@ -50,55 +50,50 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     override fun getItemCount() = messageList.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> =
-        BindingViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> {
+        return BindingViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    }
 
-    override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int) {
+    override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder) {
         val message = messageList[position]
-        with(holder) {
-            displayHeader(binding, message)
-            displayAttachments(binding, message.attachments)
-            displayBody(binding, message.body)
+        displayHeader(binding, message)
+        displayAttachments(binding, message.attachments)
+        displayBody(binding, message.body)
+    }
+
+    private fun displayHeader(binding: ItemMessageBinding, message: Message) = with(binding.headerThread) {
+        expeditorName.text = message.from[0].name.ifBlank { message.from[0].email }
+        expeditorEmail.text = message.from[0].email
+        messageDate.text = message.date?.toDate()?.format("d MMM YYYY à HH:mm")
+        recipient.text = formatRecipientsName(binding.root.context, message)
+        expandHeaderButton.setOnClickListener {
+            val isExpanded = !message.isExpandedHeaderMode
+            message.isExpandedHeaderMode = isExpanded
+            expandHeader(this, message)
         }
     }
 
-    private fun displayHeader(binding: ItemMessageBinding, message: Message) {
-        with(binding.headerThread) {
-            expeditorName.text = message.from[0].name.ifBlank { message.from[0].email }
-            expeditorEmail.text = message.from[0].email
-            recipient.text = formatRecipientsName(binding.root.context, message)
-            expandHeaderButton.setOnClickListener {
-                val isExpanded = !message.isExpandedHeaderMode
-                message.isExpandedHeaderMode = isExpanded
-                expandHeader(this, message)
+    private fun displayAttachments(binding: ItemMessageBinding, attachments: List<Attachment>) = with(binding) {
+        if (attachments.isEmpty()) {
+            hideAttachments()
+        } else {
+            showAttachments()
+
+            val fileSize = formatAttachmentFileSize(root.context, attachments)
+            attachmentsSizeText.text = root.context.resources.getQuantityString(
+                R.plurals.attachmentQuantity,
+                attachments.size,
+                attachments.size,
+                fileSize
+            )
+
+            with(attachmentsChipGroup) {
+                removeAllViews()
+                attachments.forEach { addView(createChip(binding.root.context, it.name)) }
             }
-            messageDate.text = message.date?.toDate()?.format("d MMM YYYY à HH:mm")
-        }
-    }
 
-    private fun displayAttachments(binding: ItemMessageBinding, attachments: List<Attachment>) {
-        with(binding) {
-            if (attachments.isEmpty()) {
-                hideAttachments()
-            } else {
-                showAttachments()
-
-                val fileSize = formatAttachmentFileSize(root.context, attachments)
-                attachmentsSizeText.text = root.context.resources.getQuantityString(
-                    R.plurals.attachmentQuantity,
-                    attachments.size,
-                    attachments.size,
-                    fileSize
-                )
-
-                with(attachmentsChipGroup) {
-                    removeAllViews()
-                    attachments.forEach { addView(createChip(binding.root.context, it.name)) }
-                }
-
-                attachmentsDownloadAllButton.setOnClickListener {
-                    // TODO attachmentList Fragment
-                }
+            attachmentsDownloadAllButton.setOnClickListener {
+                // TODO attachmentList Fragment
             }
         }
     }
@@ -116,7 +111,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
     private fun formatAttachmentFileSize(context: Context, attachments: List<Attachment>): String {
         val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
             attachment.size.toLong()
-        }.reduce { acc: Long, size: Long -> acc + size }
+        }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
@@ -147,47 +142,33 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         context: Context,
         recipientsList: List<Recipient>,
         isExpandedHeaderMode: Boolean,
-    ): SpannedString {
-
-        return buildSpannedString {
-            recipientsList.forEach {
-                append(
-                    if (isExpandedHeaderMode) {
-                        buildSpannedString {
-                            if (it.name.isNotBlank()) {
-                                color(context.getColor(R.color.primaryTextColor)) { append(it.name) }
-                                scale(RECIPIENT_TEXT_SCALE_FACTOR) { append(" (${it.email})") }
-                            } else {
-                                color(context.getColor(R.color.primaryTextColor)) { append(it.email) }
-                            }
-                            append(",\n")
+    ) = buildSpannedString {
+        recipientsList.forEach {
+            append(
+                if (isExpandedHeaderMode) {
+                    buildSpannedString {
+                        if (it.name.isNotBlank()) {
+                            color(context.getColor(R.color.primaryTextColor)) { append(it.name) }
+                            scale(RECIPIENT_TEXT_SCALE_FACTOR) { append(" (${it.email})") }
+                        } else {
+                            color(context.getColor(R.color.primaryTextColor)) { append(it.email) }
                         }
-                    } else {
-                        "${it.name.ifBlank { it.email }}, "
+                        append(",\n")
                     }
-                )
-            }
+                } else {
+                    "${it.name.ifBlank { it.email }}, "
+                }
+            )
         }
     }
 
-    private fun expandHeader(binding: ItemHeaderThreadBinding, message: Message) {
-        with(binding) {
-            val context = root.context
-            if (message.isExpandedHeaderMode) {
-                expandHeaderButton.rotation = 0.0f
-                expeditorEmail.isVisible = true
-                recipient.ellipsize = null
-                recipient.maxLines = Int.MAX_VALUE
-                changeViewTextSize(context, recipient, R.dimen.textSmallSize)
-            } else {
-                expandHeaderButton.rotation = 180.0f
-                expeditorEmail.isGone = true
-                recipient.ellipsize = TextUtils.TruncateAt.END
-                recipient.maxLines = 1
-                changeViewTextSize(context, recipient, R.dimen.textHintSize)
-            }
-            recipient.text = formatRecipientsName(context, message)
-        }
+    private fun expandHeader(binding: ItemHeaderThreadBinding, message: Message) = with(binding) {
+        expeditorEmail.isVisible = message.isExpandedHeaderMode
+        expandHeaderButton.rotation = if (message.isExpandedHeaderMode) 0.0f else 180.0f
+        recipient.maxLines = if (message.isExpandedHeaderMode) Int.MAX_VALUE else 1
+        recipient.changeSize(if (message.isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
+
+        recipient.text = formatRecipientsName(root.context, message)
     }
 
     private fun createChip(context: Context, attachmentName: String): Chip {
@@ -196,12 +177,12 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
             maxLines = 1
             maxWidth = context.resources.getDimensionPixelSize(R.dimen.attachmentChipMaxSize)
             text = attachmentName
-            changeViewTextSize(context, this, R.dimen.textHintSize)
+            changeSize(R.dimen.textHintSize)
         }
     }
 
-    private fun changeViewTextSize(context: Context, view: TextView, @DimenRes dimension: Int) {
-        view.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(dimension))
+    private fun TextView.changeSize(@DimenRes dimension: Int) {
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(dimension))
     }
 
     private class MessageListDiffCallback(

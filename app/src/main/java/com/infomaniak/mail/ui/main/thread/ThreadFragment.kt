@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -58,17 +57,15 @@ class ThreadFragment : Fragment() {
         setupUi()
     }
 
-    private fun setupUi() {
-        with(binding) {
-            messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
-            toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-            collapse.title = navigationArgs.threadSubject.displayedSubject(requireContext())
-            // TODO see if favorite icon must be visible or not
-            // iconFavorite.isVisible = navigationArgs.threadIsFavorite
+    private fun setupUi() = with(binding) {
+        messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        collapse.title = navigationArgs.threadSubject.displayedSubject(requireContext())
+        // TODO see if favorite icon must be visible or not
+        // iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
-            AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
-                messagesList.addItemDecoration(DividerItemDecorator(it))
-            }
+        AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
+            messagesList.addItemDecoration(DividerItemDecorator(it))
         }
     }
 
@@ -84,11 +81,9 @@ class ThreadFragment : Fragment() {
         super.onPause()
     }
 
-    private fun displayMessagesFromRealm() {
-        val messages = with(threadViewModel) {
-            messagesFromApi.value = null
-            getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
-        }
+    private fun displayMessagesFromRealm() = with(threadViewModel) {
+        messagesFromApi.value = null
+        val messages = getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
         displayMessages(messages)
     }
 
