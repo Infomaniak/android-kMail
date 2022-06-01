@@ -52,8 +52,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var jobFolderName: Job? = null
     private var jobThreadsFromApi: Job? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -98,44 +99,41 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupListeners() {
-        with(binding) {
-            openMultiselectButton.setOnClickListener {
-                // TODO multiselection
-            }
+    private fun setupListeners() = with(binding) {
+        // TODO multiselection
+        // openMultiselectButton.setOnClickListener {}
 
-            header.searchViewCard.apply {
-                // TODO filterButton doesn't propagate the event to root, must display it ?
-                searchView.isGone = true
-                searchViewText.isVisible = true
-                filterButton.isEnabled = false
-                root.setOnClickListener {
-                    safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
-                }
+        header.searchViewCard.apply {
+            // TODO filterButton doesn't propagate the event to root, must display it ?
+            searchView.isGone = true
+            searchViewText.isVisible = true
+            filterButton.isEnabled = false
+            root.setOnClickListener {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
             }
-
-            header.userAvatar.setOnClickListener {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
-            }
-
-            newMessageFab.setOnClickListener {
-                safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
-            }
-
-            threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 ||
-                        layoutManager.findLastCompletelyVisibleItemPosition() == threadListAdapter.itemCount - 1
-                    ) {
-                        newMessageFab.extend()
-                    } else {
-                        newMessageFab.shrink()
-                    }
-                }
-            })
         }
+
+        header.userAvatar.setOnClickListener {
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
+        }
+
+        newMessageFab.setOnClickListener {
+            safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
+        }
+
+        threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 ||
+                    layoutManager.findLastCompletelyVisibleItemPosition() == threadListAdapter.itemCount - 1
+                ) {
+                    newMessageFab.extend()
+                } else {
+                    newMessageFab.shrink()
+                }
+            }
+        })
     }
 
     override fun onResume() {
@@ -153,11 +151,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onPause()
     }
 
-    private fun getData(): List<Thread> {
-        return with(threadListViewModel) {
-            threadsFromApi.value = null
-            getDataFromRealmThenFetchFromApi()
-        }
+    private fun getData(): List<Thread> = with(threadListViewModel) {
+        threadsFromApi.value = null
+        getDataFromRealmThenFetchFromApi()
     }
 
     private fun displayThreadsFromRealm(threads: List<Thread>) {
@@ -210,17 +206,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayNoEmailView() {
-        with(binding) {
-            threadsList.isGone = true
-            noMailLayout.root.isVisible = true
-        }
+    private fun displayNoEmailView() = with(binding) {
+        threadsList.isGone = true
+        noMailLayoutGroup.isVisible = true
     }
 
-    private fun displayThreadList() {
-        with(binding) {
-            threadsList.isVisible = true
-            noMailLayout.root.isGone = true
-        }
+    private fun displayThreadList() = with(binding) {
+        threadsList.isVisible = true
+        noMailLayoutGroup.isGone = true
     }
 }
