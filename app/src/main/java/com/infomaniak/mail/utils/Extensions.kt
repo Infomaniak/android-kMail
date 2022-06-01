@@ -23,7 +23,7 @@ import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
-import io.realm.RealmInstant
+import io.realm.kotlin.RealmInstant
 import java.util.*
 
 // TODO Put these methods in Core

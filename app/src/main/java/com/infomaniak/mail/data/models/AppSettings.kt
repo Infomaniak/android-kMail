@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
-import io.realm.RealmObject
+import io.realm.kotlin.RealmObject
 
 @Suppress("PropertyName")
 class AppSettings : RealmObject {

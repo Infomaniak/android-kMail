@@ -26,9 +26,9 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
-import io.realm.Realm
-import io.realm.UpdatePolicy
-import io.realm.toRealmList
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.toRealmList
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response

@@ -20,11 +20,11 @@
 package com.infomaniak.mail.data.models
 
 import com.infomaniak.mail.data.api.RealmListSerializer
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.realmListOf
-import io.realm.toRealmList
+import io.realm.kotlin.RealmList
+import io.realm.kotlin.RealmObject
+import io.realm.kotlin.annotations.PrimaryKey
+import io.realm.kotlin.realmListOf
+import io.realm.kotlin.toRealmList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers

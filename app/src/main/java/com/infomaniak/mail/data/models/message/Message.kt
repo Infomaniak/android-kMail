@@ -28,9 +28,9 @@ import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
-import io.realm.*
-import io.realm.annotations.Ignore
-import io.realm.annotations.PrimaryKey
+import io.realm.kotlin.*
+import io.realm.kotlin.annotations.Ignore
+import io.realm.kotlin.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
