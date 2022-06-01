@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.data.models.message
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
