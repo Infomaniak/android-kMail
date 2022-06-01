@@ -17,82 +17,51 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.api.MailApi
-import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
-    val threadsFromApi = MutableStateFlow<List<Thread>?>(null)
+    private var listenToThreadsJob: Job? = null
 
-    fun getDataFromRealmThenFetchFromApi(): List<Thread> {
-        val threads = readDataFromRealm()
-        val isCurrentRealmClosed = fetchDataFromApi()
-        return if (isCurrentRealmClosed) emptyList() else threads
+    private val mutableUiThreadsFlow: MutableStateFlow<List<Thread>?> = MutableStateFlow(null)
+    val uiThreadsFlow = mutableUiThreadsFlow.asStateFlow()
+
+    fun setup() {
+        listenToThreads()
     }
 
-    private fun readDataFromRealm(): List<Thread> {
+    private fun listenToThreads() {
+        if (listenToThreadsJob != null) listenToThreadsJob?.cancel()
 
-        fun getCurrentMailbox(): Mailbox? {
-            val mailboxes = MailRealm.readMailboxesFromRealm()
-            return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId } ?: mailboxes.firstOrNull()
-        }
-
-        fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            mailbox.readFoldersFromRealm().find { it.role == folderRole }
-
-        Log.e("Realm", "Start reading data")
-        val mailbox = getCurrentMailbox() ?: return emptyList()
-        mailbox.select()
-        val folder = getFolder(mailbox, DEFAULT_FOLDER_ROLE) ?: return emptyList()
-        folder.select()
-        Log.e("Realm", "End of reading data")
-        return folder.threads
-    }
-
-    private fun fetchDataFromApi(): Boolean {
-
-        fun fetchCurrentMailbox(): Mailbox? {
-            val mailboxes = MailApi.fetchMailboxesFromApi()
-
-            return with(mailboxes) {
-                find { it.mailboxId == AccountUtils.currentMailboxId }
-                // ?: find { it.email == "kevin.boulongne@ik.me" } // TODO: Remove this, it's for dev only
-                    ?: find { it.email == "kevin.boulongne@infomaniak.com" } // TODO: Remove this, it's for dev only
-                    ?: firstOrNull()
+        listenToThreadsJob = CoroutineScope(Dispatchers.IO).launch {
+            MailData.threadsFlow.collect { threads ->
+                mutableUiThreadsFlow.value = threads
             }
         }
-
-        fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            MailApi.fetchFoldersFromApi(mailbox.uuid).find { it.role == folderRole }
-
-        var isCurrentRealmClosed = false
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.e("API", "Start fetching data")
-            fetchCurrentMailbox()?.let { mailbox ->
-                mailbox.select()
-                fetchFolder(mailbox, DEFAULT_FOLDER_ROLE)?.let { folder ->
-                    folder.updateAndSelect(mailbox.uuid)
-                    Log.e("API", "End of fetching data")
-                    threadsFromApi.value = folder.threads
-                }
-            } ?: run { isCurrentRealmClosed = true }
-        }
-
-        return isCurrentRealmClosed
     }
 
-    private companion object {
-        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
+    fun loadMailData() {
+        MailData.loadMailData()
+    }
+
+    fun refreshThreads() {
+        val folder = MailData.currentFolder ?: return
+        val mailbox = MailData.currentMailbox ?: return
+        MailData.fetchThreads(folder, mailbox)
+    }
+
+    override fun onCleared() {
+        listenToThreadsJob?.cancel()
+        listenToThreadsJob = null
+
+        super.onCleared()
     }
 }

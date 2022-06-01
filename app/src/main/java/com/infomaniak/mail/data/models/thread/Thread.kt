@@ -20,7 +20,6 @@
 package com.infomaniak.mail.data.models.thread
 
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
@@ -79,15 +78,6 @@ class Thread : RealmObject {
         messages = messages.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         return this
-    }
-
-    fun updateAndSelect() {
-        MailApi.fetchMessagesFromApi(this)
-        select()
-    }
-
-    fun select() {
-        MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
     fun markAsSeen() {
