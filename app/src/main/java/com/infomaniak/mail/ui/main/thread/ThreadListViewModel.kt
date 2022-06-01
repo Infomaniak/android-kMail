@@ -64,6 +64,7 @@ class ThreadListViewModel : ViewModel() {
 
         fun fetchCurrentMailbox(): Mailbox? {
             val mailboxes = MailApi.fetchMailboxesFromApi()
+
             return with(mailboxes) {
                 find { it.mailboxId == AccountUtils.currentMailboxId }
                 // ?: find { it.email == "kevin.boulongne@ik.me" } // TODO: Remove this, it's for dev only
