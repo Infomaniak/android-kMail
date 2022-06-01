@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.AppSettings
-import io.realm.query
+import io.realm.kotlin.ext.query
 
 object AppSettingsController {
     fun getAppSettings(): AppSettings = with(MailRealm.appSettings) {
