@@ -21,183 +21,56 @@ import android.util.Log
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.cache.MailboxInfoController
-import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
-import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.toRealmList
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import okio.use
 import java.io.BufferedInputStream
 import java.io.File
 
 object MailApi {
 
-    fun fetchMailboxesFromApi(): List<Mailbox> {
-        // Get current data
-        Log.d("API", "Mailboxes: Get current data")
-        val mailboxesFromRealm = MailboxInfoController.getMailboxes()
-        val mailboxesFromApi = with(ApiRepository.getMailboxes()) {
-            if (!isSuccess()) return mailboxesFromRealm
-            data?.map { it.initLocalValues() } ?: emptyList()
-        }
-
-        // Get outdated data
-        Log.d("API", "Mailboxes: Get outdated data")
-        val deletableMailboxes = MailboxInfoController.getDeletableMailboxes(mailboxesFromApi)
-
-        // Save new data
-        Log.i("API", "Mailboxes: Save new data")
-        MailboxInfoController.upsertMailboxes(mailboxesFromApi)
-
-        // Delete outdated data
-        Log.e("API", "Mailboxes: Delete outdated data")
-        val isCurrentMailboxDeleted = deletableMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
-        if (isCurrentMailboxDeleted) {
-            MailRealm.closeMailboxContent()
-            AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
-        }
-        MailboxInfoController.deleteMailboxes(deletableMailboxes)
-        deletableMailboxes.forEach { Realm.deleteRealm(MailRealm.getMailboxConfiguration(it.mailboxId)) }
-
-        return if (isCurrentMailboxDeleted) {
-            AccountUtils.reloadApp()
-            emptyList()
-        } else {
-            mailboxesFromApi
-        }
+    fun fetchMailboxes(): List<Mailbox>? {
+        return ApiRepository.getMailboxes().data?.map { it.initLocalValues() }
     }
 
-    fun fetchFoldersFromApi(mailboxUuid: String): List<Folder> {
-
-        // Get current data
-        Log.d("API", "Folders: Get current data")
-        val foldersFromRealm = MailboxContentController.getFolders()
-        val foldersFromApi = with(ApiRepository.getFolders(mailboxUuid)) {
-            if (!isSuccess()) return foldersFromRealm
-            data ?: emptyList()
-        }
-
-        // Get outdated data
-        Log.d("API", "Folders: Get outdated data")
-        // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
-        val deletableFolders = foldersFromRealm.filter { fromRealm   ->
-            !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
-        }
-        val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
-        val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
-            deletableFolders.any { folder -> folder.id == message.folderId }
-        }
-        val deletableThreads = possiblyDeletableThreads.filter { thread ->
-            thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
-        }
-
-        // Save new data
-        Log.i("API", "Folders: Save new data")
-        MailRealm.mailboxContent.writeBlocking {
-            foldersFromApi.forEach { folderFromApi ->
-                val folder = copyToRealm(folderFromApi, UpdatePolicy.ALL)
-                foldersFromRealm.find { it.id == folderFromApi.id }?.threads
-                    ?.mapNotNull(::findLatest)
-                    ?.let { folder.threads = it.toRealmList() }
-            }
-        }
-
-        // Delete outdated data
-        Log.e("API", "Folders: Delete outdated data")
-        MailboxContentController.deleteMessages(deletableMessages)
-        MailboxContentController.deleteThreads(deletableThreads)
-        MailboxContentController.deleteFolders(deletableFolders)
-
-        return foldersFromApi
+    fun fetchFolders(mailbox: Mailbox): List<Folder>? {
+        return ApiRepository.getFolders(mailbox.uuid).data
     }
 
-    fun fetchThreadsFromApi(folder: Folder, mailboxUuid: String) {
-        // Get current data
-        Log.d("API", "Threads: Get current data")
-        val threadsFromRealm = folder.threads
-        val threadsFromApi = with(ApiRepository.getThreads(mailboxUuid, folder.id)) {
-            if (!isSuccess()) return
-            data?.threads
-                ?.map { threadFromApi ->
-                    threadFromApi.initLocalValues()
-                    // TODO: Put this back (and make it work) when we have EmbeddedObjects
-                    // threadsFromRealm.find { it.uid == threadFromApi.uid }?.let { threadFromRealm ->
-                    //     threadFromApi.messages.forEach { messageFromApi ->
-                    //         threadFromRealm.messages.find { it.uid == messageFromApi.uid }?.let { messageFromRealm ->
-                    //             messageFromApi.apply {
-                    //                 fullyDownloaded = messageFromRealm.fullyDownloaded
-                    //                 body = messageFromRealm.body
-                    //                 attachments = messageFromRealm.attachments
-                    //             }
-                    //         }
-                    //     }
-                    // }
-                    // threadFromApi
-                }
-                ?: emptyList()
-        }
-
-        // Get outdated data
-        Log.d("API", "Threads: Get outdated data")
-        // val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
-        val deletableThreads = threadsFromRealm.filter { fromRealm ->
-            !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
-        }
-        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
-
-        // Save new data
-        Log.i("API", "Threads: Save new data")
-        folder.threads = threadsFromApi.toRealmList()
-        MailboxContentController.upsertFolder(folder)
-
-        // Delete outdated data
-        Log.e("API", "Threads: Delete outdated data")
-        MailboxContentController.deleteMessages(deletableMessages)
-        MailboxContentController.deleteThreads(deletableThreads)
+    fun fetchThreads(folder: Folder, mailboxUuid: String): List<Thread>? {
+        return ApiRepository.getThreads(mailboxUuid, folder.id).data?.threads?.map { it.initLocalValues() }
     }
 
-    fun fetchMessagesFromApi(thread: Thread) {
-        // Get current data
-        Log.d("API", "Messages: Get current data")
-        val messagesFromRealm = thread.messages
-        val messagesFromApi = messagesFromRealm.mapNotNull {
+    fun fetchMessages(thread: Thread): List<Message> {
+        return thread.messages.map { realmMessage ->
             // TODO: Handle if this API call fails
-            ApiRepository.getMessage(it.resource).data?.also { completedMessage ->
-                completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
-                completedMessage.fullyDownloaded = true
-                completedMessage.body?.initLocalValues(completedMessage.uid) // TODO: Remove this when we have EmbeddedObjects
-                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
-                completedMessage.attachments?.forEachIndexed { index, attachment ->
-                    attachment.initLocalValues(index, completedMessage.uid)
+            ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
+                completedMessage.apply {
+                    initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                    fullyDownloaded = true
+                    body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
+                    // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                    @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                    attachments?.forEachIndexed { index, attachment ->
+                        attachment.initLocalValues(index, uid)
+                    }
                 }
-            }
+            } ?: realmMessage
         }
-
-        // Get outdated data
-        Log.d("API", "Messages: Get outdated data")
-        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
-        val deletableMessages = messagesFromRealm.filter { fromRealm ->
-            !messagesFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
-        }
-
-        // Save new data
-        Log.i("API", "Messages: Save new data")
-        MailboxContentController.upsertMessages(messagesFromApi)
-
-        // Delete outdated data
-        Log.e("API", "Messages: Delete outdated data")
-        MailboxContentController.deleteMessages(deletableMessages)
     }
 
-    private fun fetchDraftFromApi(draftResource: String, parentUid: String): Draft? {
+    private fun fetchDraft(draftResource: String, parentUid: String): Draft? {
         val apiDraft = ApiRepository.getDraft(draftResource).data
+
         apiDraft?.let { draft ->
             draft.apply {
                 initLocalValues(parentUid)
@@ -210,7 +83,7 @@ object MailApi {
         return apiDraft
     }
 
-    suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
+    suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
 
         fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
             val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()

@@ -19,9 +19,12 @@ package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
+import kotlinx.coroutines.flow.Flow
 
 object MailboxInfoController {
 
@@ -31,7 +34,9 @@ object MailboxInfoController {
 
     private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? = getMailbox(objectId)?.let(::findLatest)
 
-    fun getMailboxes(): RealmResults<Mailbox> = MailRealm.mailboxInfo.query<Mailbox>().find()
+    private fun getMailboxes(): RealmQuery<Mailbox> = MailRealm.mailboxInfo.query()
+    fun getMailboxesSync(): RealmResults<Mailbox> = getMailboxes().find()
+    fun getMailboxesAsync(): Flow<ResultsChange<Mailbox>> = getMailboxes().asFlow()
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640

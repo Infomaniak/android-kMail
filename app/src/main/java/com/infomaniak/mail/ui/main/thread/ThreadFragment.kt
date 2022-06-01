@@ -47,7 +47,7 @@ class ThreadFragment : Fragment() {
     private lateinit var binding: FragmentThreadBinding
     private lateinit var threadAdapter: ThreadAdapter
 
-    private var jobMessagesFromApi: Job? = null
+    private var messagesJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -56,6 +56,7 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUi()
+        threadViewModel.setup()
     }
 
     private fun setupUi() = with(binding) {
@@ -73,33 +74,31 @@ class ThreadFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        displayMessagesFromRealm()
-        displayMessagesFromApi()
+        listenToMessages()
+        threadViewModel.loadMessages(navigationArgs.threadUid)
     }
 
     override fun onPause() {
-        jobMessagesFromApi?.cancel()
+        messagesJob?.cancel()
+        messagesJob = null
+
         super.onPause()
     }
 
-    private fun displayMessagesFromRealm() = with(threadViewModel) {
-        messagesFromApi.value = null
-        val messages = getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
-        displayMessages(messages)
-    }
+    private fun listenToMessages() {
+        with(threadViewModel) {
 
-    private fun displayMessagesFromApi() {
-        if (jobMessagesFromApi != null) jobMessagesFromApi?.cancel()
+            if (messagesJob != null) messagesJob?.cancel()
 
-        jobMessagesFromApi = with(threadViewModel) {
-            viewModelScope.launch(Dispatchers.Main) {
-                messagesFromApi.filterNotNull().collect(::displayMessages)
+            messagesJob = viewModelScope.launch(Dispatchers.Main) {
+                uiMessagesFlow.filterNotNull().collect(::displayMessages)
             }
         }
     }
 
     private fun displayMessages(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
+
         messages.forEach {
             val displayedBody = with(it.body?.value) {
                 this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
