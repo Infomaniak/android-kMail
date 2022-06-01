@@ -27,8 +27,8 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.user.UserInfos
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
