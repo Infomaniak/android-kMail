@@ -24,36 +24,33 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/appBarHeight">
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapse"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:contentScrim="@color/backgroundColor"
-            app:collapsedTitleGravity="start"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-            tools:title="text">
+            android:layout_height="?attr/actionBarSize">
 
-                <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin" />
+            <ImageView
+                android:id="@+id/iconFavorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:contentDescription="@string/contentDescriptionIconFavorite"
+                android:src="@drawable/ic_star"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-<!-- TODO see in meeting how the star must be displayed-->
-<!--                <ImageView-->
-<!--                    android:id="@+id/iconFavorite"-->
-<!--                    android:layout_gravity="end"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    app:layout_collapseMode="pin"-->
-<!--                    android:layout_marginHorizontal="@dimen/marginStandardMedium"-->
-<!--                    android:layout_marginTop="@dimen/marginStandardMedium"-->
-<!--                    android:contentDescription="@string/contentDescriptionIsFavorite"-->
-<!--                    android:src="@drawable/ic_star" />-->
+        </com.google.android.material.appbar.MaterialToolbar>
 
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
+        <TextView
+            android:id="@+id/threadSubject"
+            style="@style/H1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            tools:text="Mail subject long, very long, very very long, reeeeeeeeeeeaaaaaaaaaally long, so long" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -61,7 +58,6 @@
         android:id="@+id/messagesList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/item_message" />
