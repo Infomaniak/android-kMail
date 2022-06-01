@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,8 +32,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
@@ -49,8 +50,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
     private lateinit var threadListAdapter: ThreadListAdapter
 
-    private var jobFolderName: Job? = null
-    private var jobThreadsFromApi: Job? = null
+    private var folderNameJob: Job? = null
+    private var threadsJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -62,6 +63,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupOnRefresh()
         setupAdapter()
         setupListeners()
+
+        threadListViewModel.setup()
     }
 
     private fun setupOnRefresh() {
@@ -69,7 +72,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        getData()
+        threadListViewModel.refreshThreads()
     }
 
     private fun setupAdapter() {
@@ -138,49 +141,48 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onResume() {
         super.onResume()
 
-        val threads = getData()
-        displayThreadsFromRealm(threads)
-        displayFolderName()
-        displayThreadsFromApi()
+        listenToFolderName()
+        listenToThreads()
+
+        threadListViewModel.loadMailData()
     }
 
     override fun onPause() {
-        jobFolderName?.cancel()
-        jobThreadsFromApi?.cancel()
+        folderNameJob?.cancel()
+        folderNameJob = null
+
+        threadsJob?.cancel()
+        threadsJob = null
+
         super.onPause()
     }
 
-    private fun getData(): List<Thread> = with(threadListViewModel) {
-        threadsFromApi.value = null
-        getDataFromRealmThenFetchFromApi()
-    }
+    private fun listenToFolderName() {
+        with(threadListViewModel) {
 
-    private fun displayThreadsFromRealm(threads: List<Thread>) {
-        displayThreads(threads)
-    }
+            if (folderNameJob != null) folderNameJob?.cancel()
 
-    private fun displayFolderName() {
-        if (jobFolderName != null) jobFolderName?.cancel()
-
-        jobFolderName = with(threadListViewModel) {
-            viewModelScope.launch(Dispatchers.Main) {
-                MailRealm.currentFolderIdFlow.filterNotNull().collect { folderId ->
-                    context?.let {
-                        MailboxContentController.getFolder(folderId)?.let { folder ->
-                            binding.mailboxName.text = folder.getLocalizedName(it)
-                        }
-                    }
+            folderNameJob = viewModelScope.launch(Dispatchers.Main) {
+                MailRealm.currentFolderIdFlow.filterNotNull().collect {
+                    context?.let(::displayFolderName)
                 }
             }
         }
     }
 
-    private fun displayThreadsFromApi() {
-        if (jobThreadsFromApi != null) jobThreadsFromApi?.cancel()
+    private fun displayFolderName(context: Context) {
+        val folderName = MailData.currentFolder?.getLocalizedName(context)
+        Log.i("UI", "Received folder name (${folderName})")
+        binding.mailboxName.text = folderName
+    }
 
-        jobThreadsFromApi = with(threadListViewModel) {
-            viewModelScope.launch(Dispatchers.Main) {
-                threadsFromApi.filterNotNull().collect(::displayThreads)
+    private fun listenToThreads() {
+        with(threadListViewModel) {
+
+            if (threadsJob != null) threadsJob?.cancel()
+
+            threadsJob = viewModelScope.launch(Dispatchers.Main) {
+                uiThreadsFlow.filterNotNull().collect(::displayThreads)
             }
         }
     }

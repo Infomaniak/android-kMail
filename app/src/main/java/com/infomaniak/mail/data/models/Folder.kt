@@ -23,9 +23,7 @@ import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
@@ -65,15 +63,6 @@ class Folder : RealmObject {
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
-
-    fun updateAndSelect(mailboxUuid: String) {
-        MailApi.fetchThreadsFromApi(this, mailboxUuid)
-        select()
-    }
-
-    fun select() {
-        MailRealm.mutableCurrentFolderIdFlow.value = id
-    }
 
     fun getLocalizedName(context: Context): String {
         return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name

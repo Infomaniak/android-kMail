@@ -17,43 +17,50 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    val messagesFromApi = MutableStateFlow<List<Message>?>(null)
+    private var listenToMessagesJob: Job? = null
+
+    private val mutableUiMessagesFlow: MutableStateFlow<List<Message>?> = MutableStateFlow(null)
+    val uiMessagesFlow = mutableUiMessagesFlow.asStateFlow()
 
     val isExpandedHeaderMode = false
 
-    fun getMessagesFromRealmThenFetchFromApi(threadUid: String): List<Message> {
-        return readThreadFromRealm(threadUid)?.also { thread ->
-            thread.select()
-            thread.markAsSeen()
-            fetchThreadFromApi(thread)
-        }?.messages ?: emptyList()
+    fun setup() {
+        listenToMessages()
     }
 
-    private fun readThreadFromRealm(threadUid: String): Thread? {
-        Log.e("Realm", "Start reading thread")
-        val thread = MailboxContentController.getLatestThread(threadUid)
-        Log.e("Realm", "End of reading thread")
-        return thread
-    }
+    private fun listenToMessages() {
+        if (listenToMessagesJob != null) listenToMessagesJob?.cancel()
 
-    private fun fetchThreadFromApi(thread: Thread) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.e("API", "Start fetching thread")
-            thread.updateAndSelect()
-            Log.e("API", "End of fetching thread")
-            messagesFromApi.value = MailboxContentController.getThread(thread.uid)?.messages
+        listenToMessagesJob = CoroutineScope(Dispatchers.IO).launch {
+            MailData.messagesFlow.collect { messages ->
+                mutableUiMessagesFlow.value = messages
+            }
         }
+    }
+
+    fun loadMessages(threadUid: String) {
+        val thread = MailboxContentController.getThread(threadUid) ?: return
+        MailData.selectThread(thread)
+        MailData.loadMessages(thread)
+    }
+
+    override fun onCleared() {
+        listenToMessagesJob?.cancel()
+        listenToMessagesJob = null
+
+        super.onCleared()
     }
 }

@@ -29,8 +29,10 @@ import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import io.realm.kotlin.notifications.ResultsChange
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 
 @Suppress("ObjectPropertyName")
 object MailRealm {
@@ -91,9 +93,33 @@ object MailRealm {
     /**
      * Mailboxes
      */
-    fun readMailboxesFromRealm(): List<Mailbox> = MailboxInfoController.getMailboxes()
+    fun readMailboxesFromRealm(): List<Mailbox> = MailboxInfoController.getMailboxesSync()
 
     fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
+
+    fun readMailboxes(): SharedFlow<ResultsChange<Mailbox>> {
+        return MailboxInfoController.getMailboxesAsync().toSharedFlow()
+    }
+
+    fun readFolders(): SharedFlow<ResultsChange<Folder>> {
+        return MailboxContentController.getFoldersAsync().toSharedFlow()
+    }
+
+    fun readThreads(folder: Folder): List<Thread> {
+        return folder.threads
+    }
+
+    fun readMessages(thread: Thread): List<Message> {
+        return thread.messages
+    }
+
+    private fun <T> Flow<T>.toSharedFlow(): SharedFlow<T> {
+        return distinctUntilChanged().shareIn(
+            scope = CoroutineScope(Dispatchers.IO),
+            started = SharingStarted.Eagerly,
+            replay = 1,
+        )
+    }
 
     /**
      * Configurations
@@ -143,7 +169,7 @@ object MailRealm {
                 Attachment::class,
             )
 
-            val others = setOf(
+            val miscellaneous = setOf(
                 AddressBook::class,
                 Contact::class,
                 Quotas::class,

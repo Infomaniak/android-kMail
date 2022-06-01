@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.types.RealmObject
@@ -79,12 +78,5 @@ class Mailbox : RealmObject {
         return this
     }
 
-    fun select() {
-        if (MailRealm.currentMailboxObjectIdFlow.value != objectId) {
-            AccountUtils.currentMailboxId = mailboxId
-            MailRealm.mutableCurrentMailboxObjectIdFlow.value = objectId
-        }
-    }
-
-    fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFolders()
+    fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFoldersSync()
 }
