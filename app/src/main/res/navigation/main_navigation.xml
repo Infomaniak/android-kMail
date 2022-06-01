@@ -69,7 +69,7 @@
         android:id="@+id/threadFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
         android:label="ThreadFragment"
-        tools:layout="@layout/item_thread">
+        tools:layout="@layout/cardview_thread_item">
         <argument
             android:name="threadUid"
             app:argType="string" />
@@ -77,11 +77,10 @@
             android:name="threadSubject"
             app:argType="string"
             app:nullable="true" />
-<!-- TODO see if favorite Icon must be displayed in thread -->
-<!--        <argument-->
-<!--            android:name="threadIsFavorite"-->
-<!--            app:argType="boolean"-->
-<!--            android:defaultValue="false" />-->
+        <argument
+            android:name="threadIsFavorite"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />

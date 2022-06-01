@@ -59,7 +59,7 @@
         <activity
             android:name="com.infomaniak.lib.login.WebViewLoginActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/WebViewTheme"  />
+            android:theme="@style/WebViewTheme" />
 
         <activity
             android:name=".ui.main.MainActivity"
