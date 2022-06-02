@@ -80,6 +80,7 @@ class Message : RealmObject {
     var answered: Boolean = false
     var flagged: Boolean = false
     var scheduled: Boolean = false
+    var preview: String = ""
     var size: Int = 0
     @SerialName("safe_display")
     var safeDisplay: Boolean = false
@@ -89,6 +90,7 @@ class Message : RealmObject {
     /**
      * Local
      */
+    var draftUuid: String? = null
     var fullyDownloaded: Boolean = false
     var hasUnsubscribeLink: Boolean = false
     var parentLink: Thread? = null // TODO

@@ -34,6 +34,7 @@
     <string name="buttonForward"></string>
     <string name="buttonHelp"></string>
     <string name="buttonImportEmails"></string>
+    <string name="buttonLogin"></string>
     <string name="buttonManageAccount"></string>
     <string name="buttonMore"></string>
     <string name="buttonMoreStorage"></string>
@@ -49,6 +50,7 @@
     <string name="contactActionWriteEmail"></string>
     <string name="contactMe"></string>
     <string name="contentDescriptionButtonBack"></string>
+    <string name="contentDescriptionButtonDeleteDraft"></string>
     <string name="contentDescriptionButtonExpandHeader"></string>
     <string name="contentDescriptionButtonFilterSearch"></string>
     <string name="contentDescriptionButtonMenu"></string>
@@ -56,11 +58,17 @@
     <string name="contentDescriptionIconCalendar"></string>
     <string name="contentDescriptionIconFavorite"></string>
     <string name="contentDescriptionIconNewMail"></string>
+    <string name="dateTitle"></string>
     <string name="draftFolder"></string>
+    <string name="errorLoginDescription"></string>
+    <string name="errorLoginTitle"></string>
     <string name="fromTitle"></string>
     <string name="inboxFolder"></string>
+    <string name="loginViewDescription"></string>
+    <string name="loginViewTitle"></string>
     <string name="menuDrawerAdvancedActions"></string>
     <string name="menuDrawerUsed"></string>
+    <string name="messageForwardHeader"></string>
     <string name="messageIsDraftOption"></string>
     <string name="messageNoSubject"></string>
     <string name="messageReplyHeader"></string>
@@ -73,8 +81,10 @@
     <string name="settingsCancellationPeriodTitle"></string>
     <string name="settingsCodeLock"></string>
     <string name="settingsDefault"></string>
+    <string name="settingsDelaySeconds"></string>
     <string name="settingsDensityOptionCompact"></string>
     <string name="settingsDensityOptionLarge"></string>
+    <string name="settingsDisabled"></string>
     <string name="settingsExternalContentTitle"></string>
     <string name="settingsInboxAlias"></string>
     <string name="settingsInboxRedirect"></string>
@@ -106,6 +116,10 @@
     <string name="settingsSendIncludeOriginalMessage"></string>
     <string name="settingsSendTitle"></string>
     <string name="settingsSwipeActionsTitle"></string>
+    <string name="settingsSwipeLongLeft"></string>
+    <string name="settingsSwipeLongRight"></string>
+    <string name="settingsSwipeShortLeft"></string>
+    <string name="settingsSwipeShortRight"></string>
     <string name="settingsTheme"></string>
     <string name="settingsThemeChoiceTitle"></string>
     <string name="settingsThreadListDensityTitle"></string>

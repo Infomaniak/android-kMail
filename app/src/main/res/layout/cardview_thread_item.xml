@@ -132,7 +132,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/mailBodyStart"
+                android:id="@+id/mailBodyPreview"
                 style="@style/Body.Secondary"
                 android:layout_width="@dimen/itemThreadTextViewSize"
                 android:layout_height="match_parent"
