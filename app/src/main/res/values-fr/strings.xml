@@ -34,6 +34,7 @@
     <string name="buttonForward">Transférer</string>
     <string name="buttonHelp">Aide</string>
     <string name="buttonImportEmails">Importer des mails</string>
+    <string name="buttonLogin">Connexion</string>
     <string name="buttonManageAccount">Gérer mon compte</string>
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
@@ -49,6 +50,7 @@
     <string name="contactActionWriteEmail">Ecrire un email</string>
     <string name="contactMe">Moi</string>
     <string name="contentDescriptionButtonBack">Retour</string>
+    <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
     <string name="contentDescriptionButtonExpandHeader">Déplier l’entête</string>
     <string name="contentDescriptionButtonFilterSearch">Filtrer la recherche</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
@@ -56,12 +58,18 @@
     <string name="contentDescriptionIconCalendar">Contient un évènement Calendar</string>
     <string name="contentDescriptionIconFavorite">Est favori</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
+    <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
+    <string name="errorLoginDescription">La connexion a échoué.</string>
+    <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="fromTitle">De :</string>
     <string name="inboxFolder">Boîte de réception</string>
+    <string name="loginViewDescription">Connectez-vous à votre compte et gérez tous vos emails Infomaniak depuis l’app.</string>
+    <string name="loginViewTitle">Bienvenue sur l’App Mail Infomaniak</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerUsed">utilisés</string>
-    <string name="messageIsDraftOption">(Brouillon)</string>
+    <string name="messageForwardHeader">Message transféré</string>
+    <string name="messageIsDraftOption">Brouillon</string>
     <string name="messageNoSubject">Pas de sujet</string>
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
@@ -73,8 +81,10 @@
     <string name="settingsCancellationPeriodTitle">Délai d’annulation d’envoi</string>
     <string name="settingsCodeLock">Verrouillage par code</string>
     <string name="settingsDefault">Par défaut</string>
+    <string name="settingsDelaySeconds">%d secondes</string>
     <string name="settingsDensityOptionCompact">Compact</string>
     <string name="settingsDensityOptionLarge">Large</string>
+    <string name="settingsDisabled">Désactivé</string>
     <string name="settingsExternalContentTitle">Afficher le contenu externe</string>
     <string name="settingsInboxAlias">Alias</string>
     <string name="settingsInboxRedirect">Redirections</string>
@@ -106,6 +116,10 @@
     <string name="settingsSendIncludeOriginalMessage">Inclure le message original dans la réponse</string>
     <string name="settingsSendTitle">Envoi</string>
     <string name="settingsSwipeActionsTitle">Actions de balayage dans la messagerie</string>
+    <string name="settingsSwipeLongLeft">Balayage long vers la gauche</string>
+    <string name="settingsSwipeLongRight">Balayage long vers la droite</string>
+    <string name="settingsSwipeShortLeft">Balayage court vers la gauche</string>
+    <string name="settingsSwipeShortRight">Balayage court vers la droite</string>
     <string name="settingsTheme">Thème</string>
     <string name="settingsThemeChoiceTitle">Choix du thème</string>
     <string name="settingsThreadListDensityTitle">Densité de la liste de conversation</string>

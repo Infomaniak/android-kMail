@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
+import android.text.Html
 import android.text.SpannedString
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -55,9 +56,19 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
-        displayHeader(message)
-        displayAttachments(message.attachments)
-        displayBody(message.body)
+        val isExpanded = (position == messageList.size - 1 || !message.seen) && !message.isDraft
+        displayHeader(message, isExpanded)
+        hideAttachments()
+        if (isExpanded) {
+            displayAttachments(message.attachments)
+            displayBody(message.body)
+        }
+    }
+
+    fun removeMessage(message: Message) {
+        val position = messageList.indexOf(message)
+        messageList.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     fun notifyAdapter(newList: ArrayList<Message>) {
@@ -65,15 +76,30 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         messageList = newList
     }
 
-    private fun ItemMessageBinding.displayHeader(message: Message) {
-        expeditorName.text = message.from[0].name.ifBlank { message.from[0].email }
-        expeditorEmail.text = message.from[0].email
-        messageDate.text = message.date?.toDate()?.format("d MMM YYYY à HH:mm")
-        recipient.text = formatRecipientsName(root.context, message)
-        expandHeaderButton.setOnClickListener {
-            val isExpanded = !message.isExpandedHeaderMode
-            message.isExpandedHeaderMode = isExpanded
-            expandHeader(message)
+    private fun ItemMessageBinding.displayHeader(message: Message, isExpanded: Boolean) = with(message) {
+        deleteDraftButton.isVisible = isDraft
+        messageDate.text = if (isDraft) "" else date?.toDate()?.format("d MMM YYYY à HH:mm")
+        expeditorName.setTextColor(root.context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
+        expeditorName.text = if (isDraft) {
+            root.context.getString(R.string.messageIsDraftOption)
+        } else {
+            from[0].name.ifBlank { from[0].email }
+        }
+
+        expandHeaderButton.isVisible = isExpanded
+        webViewFrameLayout.isVisible = isExpanded
+        recipient.text = if (isExpanded) {
+            formatRecipientsName(root.context, message)
+        } else {
+            Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
+        }
+        expeditorEmail.text = if (isExpanded) from[0].email else ""
+
+        if (isExpanded) {
+            expandHeaderButton.setOnClickListener {
+                isExpandedHeaderMode = !isExpandedHeaderMode
+                expandHeader(message)
+            }
         }
     }
 
