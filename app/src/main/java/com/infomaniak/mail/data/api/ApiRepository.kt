@@ -99,10 +99,6 @@ object ApiRepository : ApiRepositoryCore() {
         return if (draft.uuid.isEmpty()) postDraft() else putDraft()
     }
 
-    fun getDraft(mailboxUuid: String, draftUuid: String): ApiResponse<Draft> {
-        return callKotlinxApi(ApiRoutes.draft(mailboxUuid, draftUuid), GET)
-    }
-
     fun deleteDraft(mailboxUuid: String, draftUuid: String): ApiResponse<EmptyResponse?> {
         return callKotlinxApi(ApiRoutes.draft(mailboxUuid, draftUuid), DELETE)
     }
