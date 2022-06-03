@@ -32,6 +32,7 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
@@ -73,17 +74,24 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun setupAdapter()= with(binding) {
+    private fun setupAdapter() = with(binding) {
         messagesList.adapter = ThreadAdapter().apply {
-            onDeleteDraftClicked = { message ->
-                // TODO: Delete Message & Draft on API. If the call success, then delete on Realm, then update Adapter's list.
-                message.draftUuid?.let(MailboxContentController::deleteDraft)
-                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
-                MailboxContentController.deleteMessage(message.uid)
-                threadAdapter.removeMessage(message)
-            }
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
+            }
+            onDraftClicked = { message ->
+                threadViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    val draft = MailApi.fetchDraft(message.draftResource, message.uid)
+                    message.setDraftId(draft?.uuid)
+                    // TODO: Open the draft in draft editor
+                }
+            }
+            onDeleteDraftClicked = { message ->
+                // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
+                // MailApi.deleteMessageOnApi(currentMailbox?.uuid, message.uid, message.draftUuid)
+                MailboxContentController.deleteMessage(message.uid)
+                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
+                threadAdapter.removeMessage(message)
             }
         }.also { threadAdapter = it }
     }

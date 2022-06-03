@@ -108,6 +108,10 @@ class Message : RealmObject {
         return this
     }
 
+    fun setDraftId(draftUuid: String?) {
+        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.draftUuid = draftUuid }
+    }
+
     fun markAsSeen(mailboxUuid: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.seen = true }
         ApiRepository.markMessagesAsSeen(mailboxUuid, arrayListOf(this))
