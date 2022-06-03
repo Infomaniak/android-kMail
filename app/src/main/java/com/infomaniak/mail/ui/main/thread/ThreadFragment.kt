@@ -29,6 +29,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -61,11 +62,18 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
+        setupAdapter()
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         threadSubject.text = navigationArgs.threadSubject.displayedSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
-        
+
+        AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
+            messagesList.addItemDecoration(DividerItemDecorator(it))
+        }
+    }
+
+    private fun setupAdapter()= with(binding) {
         messagesList.adapter = ThreadAdapter().apply {
             onDeleteDraftClicked = { message ->
                 // TODO: Delete Message & Draft on API. If the call success, then delete on Realm, then update Adapter's list.
@@ -74,11 +82,10 @@ class ThreadFragment : Fragment() {
                 MailboxContentController.deleteMessage(message.uid)
                 threadAdapter.removeMessage(message)
             }
+            onContactClicked = { contact ->
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
+            }
         }.also { threadAdapter = it }
-
-        AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(it))
-        }
     }
 
     override fun onResume() {
@@ -110,10 +117,10 @@ class ThreadFragment : Fragment() {
         Log.i("UI", "Received messages (${messages.size})")
 
         messages.forEach {
-            val displayedBody = with(it.body?.value) {
+            with(it.body?.value) {
                 this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
             }
-            Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")// | $displayedBody")
+            Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")
         }
 
         threadAdapter.notifyAdapter(ArrayList(messages))

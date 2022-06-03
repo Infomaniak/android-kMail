@@ -67,8 +67,14 @@ object MailApi {
                             attachment.initLocalValues(index, uid)
                         }
                     }
-                } ?: realmMessage
-            }
+// TODO: uncomment this when managing draft folder
+//                if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
+//                    Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
+//                    val draft = fetchDraftFromApi(completedMessage.draftResource, completedMessage.uid)
+//                    completedMessage.draftUuid = draft?.uuid
+//                }
+                }
+            } ?: realmMessage
         }
     }
 
