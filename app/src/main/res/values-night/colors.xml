@@ -30,6 +30,7 @@
     <color name="snackbarTextColor">#F5F5F5</color>
     <color name="sectionHeaderTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/grey_text</color>
+    <color name="emphasizedTextColor">@color/blue_text_light</color>
 
     <!-- Drawables -->
     <color name="separatorColor">#333333</color>
@@ -38,5 +39,8 @@
     <color name="chevronColor">#FAFAFA</color>
     <color name="iconColor">#FAFAFA</color>
     <color name="iconToolbarButton">#FAFAFA</color>
+
+    <!-- Cardview -->
+    <color name="cardviewStrokeColor">#242424</color>
 
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Infomaniak kMail - Android
   ~ Copyright (C) 2022 Infomaniak Network SA
   ~
@@ -15,25 +15,13 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
-
-    <!-- Text sizes -->
-
-    <dimen name="h1">22sp</dimen>
-    <dimen name="h2">18sp</dimen>
-    <dimen name="textRegularSize">16sp</dimen>
-    <dimen name="textHintSize">14sp</dimen>
-    <dimen name="textSmallSize">12sp</dimen>
-
-    <!-- View sizes -->
-
-    <dimen name="attachmentChipMaxSize">160dp</dimen>
-    <dimen name="itemThreadTextViewSize">235dp</dimen>
-    <dimen name="noMailIlluViewSize">180dp</dimen>
-    <dimen name="noMailTextViewSize">300dp</dimen>
-
-    <!-- Cardview -->
-    <dimen name="materialCardviewRadius">33dp</dimen>
-
-
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:tint="@color/emphasizedTextColor"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M8,1.333C11.676,1.333 14.667,4.324 14.667,8C14.667,11.676 11.676,14.667 8,14.667C4.324,14.667 1.333,11.676 1.333,8C1.333,4.324 4.324,1.333 8,1.333ZM8,0C3.582,0 0,3.582 0,8C0,12.418 3.582,16 8,16C12.418,16 16,12.418 16,8C16,3.582 12.418,0 8,0ZM12,8.667H8.667V12H7.333V8.667H4V7.333H7.333V4H8.667V7.333H12V8.667Z" />
+</vector>

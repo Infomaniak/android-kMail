@@ -42,7 +42,7 @@
 
     <style name="Body.Highlighted">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textColor">@color/infomaniak</item>
+        <item name="android:textColor">@color/emphasizedTextColor</item>
     </style>
 
     <style name="Body.Secondary">
@@ -71,7 +71,7 @@
     </style>
 
     <style name="Callout.Highlighted">
-        <item name="android:textColor">@color/infomaniak</item>
+        <item name="android:textColor">@color/emphasizedTextColor</item>
     </style>
 
     <!-- Snackbar -->
@@ -95,7 +95,7 @@
     <!-- Buttons -->
 
     <style name="TextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/infomaniak</item>
+        <item name="android:textColor">@color/emphasizedTextColor</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">@dimen/textHintSize</item>
         <item name="android:textAllCaps">false</item>
@@ -128,6 +128,20 @@
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="cardCornerRadius">0dp</item>
         <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
+    </style>
+
+    <style name="CardviewTopRounded" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/backgroundColor</item>
+        <item name="shapeAppearanceOverlay">@style/CardviewTopRounded.ShapeAppearance</item>
+        <item name="cardElevation">10dp</item>
+    </style>
+
+    <style name="CardviewTopRounded.ShapeAppearance" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">@dimen/materialCardviewRadius</item>
+        <item name="cornerSizeTopLeft">@dimen/materialCardviewRadius</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
 </resources>
