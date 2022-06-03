@@ -21,7 +21,6 @@ import android.content.Context
 import android.text.SpannedString
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.DimenRes
@@ -42,6 +41,7 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.toggleChevron
 
 class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
 
@@ -110,7 +110,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     private fun ItemMessageBinding.expandHeader(message: Message) {
         expeditorEmail.isVisible = message.isExpandedHeaderMode
-        expandHeaderButton.rotateView(if (message.isExpandedHeaderMode) EXPANDED_ANGLE else COLLAPSED_ANGLE)
+        expandHeaderButton.toggleChevron(!message.isExpandedHeaderMode)
         recipient.maxLines = if (message.isExpandedHeaderMode) Int.MAX_VALUE else 1
         recipient.changeSize(if (message.isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
 
@@ -119,10 +119,6 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     private fun TextView.changeSize(@DimenRes dimension: Int) {
         setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(dimension))
-    }
-
-    private fun View.rotateView(angle: Float) {
-        animate().rotation(angle).setDuration(EXPAND_COLLAPSE_DURATION).start()
     }
 
     private fun ItemMessageBinding.displayAttachments(attachments: List<Attachment>) {
@@ -205,8 +201,5 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     companion object {
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
-        private const val EXPANDED_ANGLE = 0.0f
-        private const val COLLAPSED_ANGLE = 180.0f
-        private const val EXPAND_COLLAPSE_DURATION = 300L
     }
 }

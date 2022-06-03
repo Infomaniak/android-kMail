@@ -31,12 +31,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -47,15 +49,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val mainViewModel: MainViewModel by viewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
-    private lateinit var binding: FragmentThreadListBinding
+    private val binding by lazy { FragmentThreadListBinding.inflate(layoutInflater) }
     private lateinit var threadListAdapter: ThreadListAdapter
 
     private var folderNameJob: Job? = null
     private var threadsJob: Job? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,6 +63,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupOnRefresh()
         setupAdapter()
         setupListeners()
+        setupUserAvatar()
 
         threadListViewModel.setup()
     }
@@ -134,6 +135,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }
             }
         })
+    }
+
+    private fun setupUserAvatar() {
+        AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
     }
 
     override fun onResume() {
