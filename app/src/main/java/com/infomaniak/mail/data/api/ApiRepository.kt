@@ -71,6 +71,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callKotlinxApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
     }
 
+    fun deleteMessage(mailboxUuid: String, messageUid: String): ApiResponse<EmptyResponse?> {
+        return callKotlinxApi(ApiRoutes.draft(mailboxUuid, messageUid), DELETE)
+    }
+
     fun getQuotas(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<Quotas> {
         return callKotlinxApi(ApiRoutes.quotas(mailboxMailbox, mailboxHostingId), GET)
     }

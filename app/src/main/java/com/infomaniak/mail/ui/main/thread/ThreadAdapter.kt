@@ -37,7 +37,6 @@ import com.google.android.material.chip.Chip
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
@@ -53,6 +52,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
     private var messageList: ArrayList<Message> = arrayListOf()
 
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
+    var onDraftClicked: ((message: Message) -> Unit)? = null
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
 
     override fun getItemCount() = messageList.size
@@ -70,9 +70,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
                 isExpanded = true
                 if (message.isDraft) {
                     Log.e("TAG", "fetchMessagesFromApi: ${message.subject} | ${message.body?.value}")
-                    val draft = MailApi.fetchDraftFromApi(message.draftResource, message.uid)
-                    message.draftUuid = draft?.uuid
-                    // TODO: Open the draft in draft editor
+                    onDraftClicked?.invoke(message)
                 } else {
                     displayMessage(message)
                 }
@@ -104,7 +102,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     private fun ItemMessageBinding.displayHeader(message: Message) = with(message) {
         deleteDraftButton.isVisible = isDraft
-        deleteDraftButton.setOnClickListener { message.draftUuid?.let { onDeleteDraftClicked?.invoke(message) } }
+        deleteDraftButton.setOnClickListener { onDeleteDraftClicked?.invoke(message) }
         messageDate.text = if (isDraft) "" else date?.toDate()?.format("d MMM YYYY à HH:mm")
         expeditorName.setTextColor(root.context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
         expeditorName.text = if (isDraft) {

@@ -78,7 +78,7 @@ object MailApi {
         }
     }
 
-    private fun fetchDraft(draftResource: String, parentUid: String): Draft? {
+    fun fetchDraft(draftResource: String, parentUid: String): Draft? {
         val apiDraft = ApiRepository.getDraft(draftResource).data
 
         apiDraft?.let { draft ->
@@ -93,7 +93,17 @@ object MailApi {
         return apiDraft
     }
 
-    suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
+    fun deleteMessageOnApi(mailboxUuid: String, messageUid: String, draftUuid: String?) {
+        if (draftUuid?.isNotEmpty() == true) {
+            if (!ApiRepository.deleteDraft(mailboxUuid, draftUuid).isSuccess()) return
+        }
+
+        if (ApiRepository.deleteMessage(mailboxUuid, messageUid).isSuccess()) {
+            MailboxContentController.deleteMessage(messageUid)
+        }
+    }
+
+    suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
 
         fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
             val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()

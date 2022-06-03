@@ -146,12 +146,22 @@ object MailboxContentController {
     //     mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
     // }
 
-    // fun deleteMessage(uid: String) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
-    // }
+    fun deleteMessage(uid: String) {
+        MailRealm.mailboxContent.writeBlocking {
+            getLatestMessage(uid)?.apply {
+                draftUuid?.let { getLatestDraft(it) }?.let(::delete)
+            }?.let(::delete)
+        }
+    }
 
     fun deleteMessages(messages: List<Message>) {
-        MailRealm.mailboxContent.writeBlocking { messages.forEach { getLatestMessage(it.uid)?.let(::delete) } }
+        MailRealm.mailboxContent.writeBlocking {
+            messages.forEach { message ->
+                getLatestMessage(message.uid)?.apply {
+                    draftUuid?.let { getLatestDraft(it) }?.let(::delete)
+                }?.let(::delete)
+            }
+        }
     }
 
     /**
@@ -163,14 +173,6 @@ object MailboxContentController {
     }
 
     private fun MutableRealm.getLatestDraft(uuid: String): Draft? = getDraft(uuid)?.let(::findLatest)
-
-    // fun deleteDraft(uuid: String) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestDraft(uuid)?.let(::delete) }
-    // }
-
-    // fun deleteDrafts(drafts: List<Draft>) {
-    //     MailRealm.mailboxContent.writeBlocking { drafts.forEach { getLatestDraft(it.uuid)?.let(::delete) } }
-    // }
 
     fun upsertDraft(draft: Draft) {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
