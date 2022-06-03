@@ -28,7 +28,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.toRealmList
+import io.realm.kotlin.ext.toRealmList
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -86,7 +86,7 @@ object MailApi {
         // Get outdated data
         Log.d("API", "Folders: Get outdated data")
         // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
-        val deletableFolders = foldersFromRealm.filter { fromRealm ->
+        val deletableFolders = foldersFromRealm.filter { fromRealm   ->
             !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
         }
         val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }

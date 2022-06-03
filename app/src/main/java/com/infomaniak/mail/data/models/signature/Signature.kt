@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.models.signature
 
-import io.realm.kotlin.RealmObject
+import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

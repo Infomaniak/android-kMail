@@ -22,9 +22,9 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.RealmResults
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.query
+import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmResults
 
 object MailboxContentController {
 

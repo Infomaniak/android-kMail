@@ -18,8 +18,8 @@
 package com.infomaniak.mail.data.models
 
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import io.realm.kotlin.RealmObject
-import io.realm.kotlin.annotations.PrimaryKey
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

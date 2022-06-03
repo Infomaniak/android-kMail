@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
-import io.realm.kotlin.RealmInstant
+import io.realm.kotlin.types.RealmInstant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
