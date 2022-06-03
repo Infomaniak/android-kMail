@@ -22,10 +22,37 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
+import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiAccount
+import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiMailbox
+import com.infomaniak.mail.utils.AccountUtils
 
 class SwitchUserFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_switch_user, container, false)
+    private val binding: FragmentSwitchUserBinding by lazy { FragmentSwitchUserBinding.inflate(layoutInflater) }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // TODO: Handle multiple accounts
+        // TODO: Order accounts with selected one first
+        val count = MailboxContentController.getFolders().map { it.unreadCount }.reduce { acc, count -> acc + count }
+        val uiAccount = UiAccount(
+            AccountUtils.currentUser!!,
+            MailboxInfoController.getMailboxes().map { UiMailbox(it.objectId, it.email, count) }
+        )
+        val accounts = listOf(uiAccount)
+        orderUiAccount(accounts)
+        recyclerViewAccount.adapter = SettingAccountAdapter(accounts)
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    }
+
+    private fun orderUiAccount(uiAccounts: List<UiAccount>) {
+        uiAccounts.forEach { account -> account.mailboxes.sortedByDescending { it.unreadCount } }
+    }
 }

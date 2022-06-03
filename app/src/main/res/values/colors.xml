@@ -45,6 +45,7 @@
     <color name="hintTextColor">@color/grey_text_light</color>
     <color name="sectionHeaderTextColor">@color/grey_text_light</color>
     <color name="notificationTextColor">#F5F5F5</color>
+    <color name="emphasizedTextColor">@color/infomaniak</color>
 
     <!-- Drawables -->
     <color name="separatorColor">#ECECEC</color>
@@ -56,5 +57,8 @@
 
     <!-- Buttons -->
     <color name="textButtonBlueLight">@color/blue_text_light</color>
+
+    <!-- Cardview -->
+    <color name="cardviewStrokeColor">@android:color/transparent</color>
 
 </resources>

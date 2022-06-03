@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Infomaniak kMail - Android
   ~ Copyright (C) 2022 Infomaniak Network SA
   ~
@@ -15,25 +16,11 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
-
-    <!-- Text sizes -->
-
-    <dimen name="h1">22sp</dimen>
-    <dimen name="h2">18sp</dimen>
-    <dimen name="textRegularSize">16sp</dimen>
-    <dimen name="textHintSize">14sp</dimen>
-    <dimen name="textSmallSize">12sp</dimen>
-
-    <!-- View sizes -->
-
-    <dimen name="attachmentChipMaxSize">160dp</dimen>
-    <dimen name="itemThreadTextViewSize">235dp</dimen>
-    <dimen name="noMailIlluViewSize">180dp</dimen>
-    <dimen name="noMailTextViewSize">300dp</dimen>
-
-    <!-- Cardview -->
-    <dimen name="materialCardviewRadius">33dp</dimen>
-
-
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/searchItem"
+        android:icon="@drawable/ic_plus_rounded"
+        android:title="@string/buttonAddAccount"
+        app:showAsAction="ifRoom" />
+</menu>
