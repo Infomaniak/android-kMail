@@ -25,110 +25,122 @@
     android:animateLayoutChanges="true">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/userAvatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/placeholder"
-        app:cardCornerRadius="100dp"
+        android:id="@+id/messageHeader"
+        style="@style/CardViewMail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/titleMyAccount"
-            android:src="@drawable/placeholder"
-            tools:src="@tools:sample/avatars" />
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/userAvatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/placeholder"
+                app:cardCornerRadius="100dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/titleMyAccount"
+                    android:src="@drawable/placeholder"
+                    tools:src="@tools:sample/avatars" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/expeditorName"
+                style="@style/H3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:ellipsize="end"
+                android:maxWidth="145dp"
+                android:maxLines="1"
+                app:layout_constraintStart_toEndOf="@id/userAvatar"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Steph Guyazfazfagaegaegagazgaegaegaeg" />
+
+            <TextView
+                android:id="@+id/expeditorEmail"
+                style="@style/Callout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/recipient"
+                app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
+                app:layout_constraintStart_toEndOf="@id/userAvatar"
+                app:layout_constraintTop_toBottomOf="@id/expeditorName"
+                tools:text="steph.guy@infomaniak.com"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/recipient"
+                style="@style/Callout.Secondary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:ellipsize="end"
+                android:maxLines="1"
+                app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
+                app:layout_constraintStart_toEndOf="@id/userAvatar"
+                app:layout_constraintTop_toBottomOf="@id/expeditorEmail"
+                tools:text="Myriam Rais, George Li"
+                tools:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/messageDate"
+                style="@style/Callout.Secondary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="@id/expeditorName"
+                app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
+                app:layout_constraintStart_toEndOf="@id/expeditorName"
+                app:layout_constraintTop_toTopOf="@+id/expeditorName"
+                tools:text="9 déc 2021 à 11:00" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/expandHeaderButton"
+                style="@style/IconButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/contentDescriptionButtonExpandHeader"
+                android:rotation="180"
+                app:icon="@drawable/ic_chevron_up"
+                app:iconSize="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteDraftButton"
+                style="@style/IconButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
+                android:paddingTop="0dp"
+                android:visibility="gone"
+                app:icon="@drawable/ic_bin"
+                app:iconSize="18dp"
+                app:iconTint="@color/red_destructive_action"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:id="@+id/expeditorName"
-        style="@style/H3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardSmall"
-        android:ellipsize="end"
-        android:maxWidth="145dp"
-        android:maxLines="1"
-        app:layout_constraintStart_toEndOf="@id/userAvatar"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Steph Guyazfazfagaegaegagazgaegaegaeg" />
-
-    <TextView
-        android:id="@+id/expeditorEmail"
-        style="@style/Callout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardSmall"
-        android:ellipsize="end"
-        android:paddingBottom="@dimen/marginStandardVerySmall"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
-        app:layout_constraintStart_toEndOf="@id/userAvatar"
-        app:layout_constraintTop_toBottomOf="@id/expeditorName"
-        tools:text="steph.guy@infomaniak.com"
-        tools:visibility="visible" />
-
-    <TextView
-        android:id="@+id/recipient"
-        style="@style/Callout.Secondary"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardSmall"
-        android:ellipsize="end"
-        android:maxLines="1"
-        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
-        app:layout_constraintStart_toEndOf="@id/userAvatar"
-        app:layout_constraintTop_toBottomOf="@id/expeditorEmail"
-        tools:text="Myriam Rais, George Li" />
-
-    <TextView
-        android:id="@+id/messageDate"
-        style="@style/Callout.Secondary"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@id/expeditorName"
-        app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
-        app:layout_constraintStart_toEndOf="@id/expeditorName"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="9 déc 2021 à 11:00" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/expandHeaderButton"
-        style="@style/IconButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:contentDescription="@string/contentDescriptionButtonExpandHeader"
-        android:rotation="180"
-        app:icon="@drawable/ic_chevron_up"
-        app:iconSize="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/deleteDraftButton"
-        style="@style/IconButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
-        android:paddingTop="0dp"
-        android:visibility="gone"
-        app:icon="@drawable/ic_bin"
-        app:iconSize="18dp"
-        app:iconTint="@color/red_destructive_action"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/messageHeaderBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="userAvatar,recipient,expandHeaderButton,deleteDraftButton" />
 
     <ImageView
         android:id="@+id/attachmentsIcon"
@@ -151,7 +163,7 @@
         app:layout_constraintBottom_toTopOf="@id/attachmentsScrollView"
         app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
         app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
-        app:layout_constraintTop_toBottomOf="@id/messageHeaderBarrier"
+        app:layout_constraintTop_toBottomOf="@id/messageHeader"
         tools:text="4 pièces jointes (3 MB)" />
 
     <com.google.android.material.button.MaterialButton
