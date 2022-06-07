@@ -33,7 +33,6 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.ui.main.MainActivity
@@ -42,6 +41,7 @@ import com.infomaniak.mail.utils.showSnackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.infomaniak.lib.core.R as RCore
 
 class LoginActivity : AppCompatActivity() {
 
@@ -57,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
                 when {
                     translatedError?.isNotBlank() == true -> showError(translatedError)
                     authCode?.isNotBlank() == true -> authenticateUser(authCode)
-                    else -> showError(getString(R.string.anErrorHasOccurred))
+                    else -> showError(getString(RCore.string.anErrorHasOccurred))
                 }
             }
         }
@@ -92,15 +92,15 @@ class LoginActivity : AppCompatActivity() {
                                 launchMainActivity()
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
-                            else -> withContext(Dispatchers.Main) { showError(getString(R.string.anErrorHasOccurred)) }
+                            else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
                         }
                     }
                 },
                 onError = {
                     val error = when (it) {
-                        ErrorStatus.SERVER -> R.string.serverError
-                        ErrorStatus.CONNECTION -> R.string.connectionError
-                        else -> R.string.anErrorHasOccurred
+                        ErrorStatus.SERVER -> RCore.string.serverError
+                        ErrorStatus.CONNECTION -> RCore.string.connectionError
+                        else -> RCore.string.anErrorHasOccurred
                     }
                     showError(getString(error))
                 },
@@ -132,7 +132,7 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     if (user == null) {
-                        getErrorResponse(R.string.anErrorHasOccurred)
+                        getErrorResponse(RCore.string.anErrorHasOccurred)
                     } else {
                         // DriveInfosController.storeDriveInfos(user.id, driveInfo) // TODO?
                         // CloudStorageProvider.notifyRootsChanged(context) // TODO?
@@ -141,7 +141,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                getErrorResponse(R.string.errorUserAlreadyPresent)
+                getErrorResponse(RCore.string.errorUserAlreadyPresent)
             }
         }
 
