@@ -41,6 +41,7 @@ class SwitchUserFragment : Fragment() {
 
         // TODO: Handle multiple accounts
         // TODO: Order accounts with selected one first
+        // TODO: Get the unread count for all mailboxes and not only the current one
         val count = MailboxContentController.getFolders().map { it.unreadCount }.reduce { acc, count -> acc + count }
         val uiAccount = UiAccount(
             AccountUtils.currentUser!!,

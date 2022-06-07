@@ -41,7 +41,6 @@ class SettingAddressAdapter(
         val uiMailbox = uiMailboxes[position]
         emailAddress.text = uiMailbox.email
 
-        // TODO: Get the unread count for all mailboxes and not only the current one (and then order mailboxes by most unread first)
         val unread = uiMailbox.unreadCount
         var unreadText = unread.toString()
         if (unread > 100) unreadText = "99+"
