@@ -25,6 +25,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.infomaniak.mail.R
+import com.infomaniak.lib.core.R as RCore
 
 object NotificationUtils {
 
@@ -71,7 +72,7 @@ object NotificationUtils {
                 NotificationManager.IMPORTANCE_HIGH -> {
                     enableLights(true)
                     setShowBadge(true)
-                    lightColor = getColor(R.color.primary)
+                    lightColor = getColor(RCore.color.primary)
                 }
                 else -> {
                     enableLights(false)
