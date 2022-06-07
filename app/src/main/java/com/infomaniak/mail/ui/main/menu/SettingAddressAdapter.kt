@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.cache.AppSettingsController
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.databinding.ItemSettingAddressBinding
 import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiMailbox
+import com.infomaniak.lib.core.R as RCore
 
 class SettingAddressAdapter(
     private val uiMailboxes: List<UiMailbox> = listOf()
@@ -63,7 +64,7 @@ class SettingAddressAdapter(
 
     private fun ItemSettingAddressBinding.computeStyle(isSelected: Boolean, mailbox: UiMailbox) =
         if (isSelected) ContextCompat.getColor(root.context, R.color.emphasizedTextColor) to R.style.Body_Highlighted
-        else ContextCompat.getColor(root.context, R.color.title) to R.style.Body
+        else ContextCompat.getColor(root.context, RCore.color.title) to R.style.Body
 
     override fun getItemCount(): Int = uiMailboxes.count()
 
