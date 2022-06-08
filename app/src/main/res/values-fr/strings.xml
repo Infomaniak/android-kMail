@@ -54,6 +54,7 @@
     <string name="contentDescriptionButtonExpandHeader">Déplier l’entête</string>
     <string name="contentDescriptionButtonFilterSearch">Filtrer la recherche</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
+    <string name="contentDescriptionButtonSettings">Paramètres</string>
     <string name="contentDescriptionIconAttachments">Contient des pièces jointes</string>
     <string name="contentDescriptionIconCalendar">Contient un évènement Calendar</string>
     <string name="contentDescriptionIconFavorite">Est favori</string>

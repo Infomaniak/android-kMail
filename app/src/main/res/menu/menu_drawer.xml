@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/ic_drawer_mailbox"
+        android:title="@string/inboxFolder" />
+    <group android:id="@+id/defaultFolder">
+        <item
+            android:icon="@drawable/ic_sent_messages"
+            android:title="@string/sentFolder" />
+        <item
+            android:icon="@drawable/ic_edit_draft"
+            android:title="@string/draftFolder" />
+        <item
+            android:icon="@drawable/ic_spam"
+            android:title="@string/spamFolder" />
+        <item
+            android:icon="@drawable/ic_bin"
+            android:title="@string/trashFolder" />
+        <item
+            android:icon="@drawable/ic_archive_folder"
+            android:title="@string/archiveFolder" />
+    </group>
+    <item
+        android:id="@+id/folders"
+        android:title="@string/buttonFolders">
+        <menu />
+    </item>
+    <item
+        android:id="@+id/feedbacks"
+        android:icon="@drawable/ic_feedbacks"
+        android:title="@string/buttonFeedbacks" />
+    <item
+        android:id="@+id/help"
+        android:icon="@drawable/ic_help"
+        android:title="@string/buttonHelp" />
+    <item
+        android:id="@+id/advancedActions"
+        android:title="@string/menuDrawerAdvancedActions">
+        <menu>
+            <item
+                android:id="@+id/importMails"
+                android:icon="@drawable/ic_drawer_download"
+                android:title="@string/buttonImportEmails" />
+            <item
+                android:id="@+id/restoreMails"
+                android:icon="@drawable/ic_restore_arrow"
+                android:title="@string/buttonRestoreEmails" />
+        </menu>
+    </item>
+</menu>

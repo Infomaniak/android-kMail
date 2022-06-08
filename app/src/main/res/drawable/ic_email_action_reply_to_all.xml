@@ -1,0 +1,29 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M23.5,20C23.316,20 23.146,19.899 23.059,19.735C20.788,15.476 17.559,14.582 15.252,14.582C14.238,14.582 13.425,14.756 13,14.87V18.499C13,18.691 12.887,18.869 12.714,18.951C12.649,18.982 12.575,18.999 12.5,18.999C12.384,18.999 12.271,18.958 12.182,18.884L3.682,11.884C3.566,11.791 3.5,11.65 3.5,11.5C3.5,11.35 3.566,11.209 3.682,11.114L12.182,4.114C12.273,4.04 12.385,4 12.5,4C12.575,4 12.648,4.017 12.715,4.048C12.887,4.13 13,4.308 13,4.5V8C14.403,8.037 18.093,8.4 20.851,11.036C22.941,13.033 24,15.881 24,19.501C24,19.731 23.844,19.93 23.622,19.986C23.583,19.995 23.542,20 23.5,20ZM15.193,13.615C17.413,13.615 20.475,14.328 22.885,17.584C22.58,15.154 21.666,13.197 20.16,11.758C17.41,9.13 13.448,8.997 12.682,8.997C12.587,8.997 12.533,8.999 12.524,8.999C12.524,8.999 12.523,8.999 12.521,8.999C12.368,8.999 12.248,8.951 12.153,8.86C12.057,8.768 12,8.636 12,8.5V5.56L4.787,11.5L12,17.441V14.501C12,14.29 12.134,14.101 12.333,14.03C12.342,14.025 13.523,13.615 15.193,13.615Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M9,19C8.884,19 8.771,18.959 8.682,18.885L0.182,11.886C0.066,11.791 0,11.65 0,11.5C0,11.35 0.066,11.209 0.182,11.114L8.682,4.114C8.771,4.041 8.884,4 9,4C9.15,4 9.291,4.066 9.386,4.182C9.561,4.395 9.531,4.711 9.318,4.886L1.287,11.5L9.318,18.114C9.421,18.199 9.485,18.319 9.498,18.452C9.511,18.585 9.471,18.715 9.386,18.818C9.291,18.934 9.15,19 9,19Z" />
+</vector>
