@@ -17,6 +17,7 @@
   -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="appName" translatable="false">kMail</string>
+    <string name="appNameFull" translatable="false">Infomaniak Mail</string>
 
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
 
@@ -62,6 +63,7 @@
     <string name="contentDescriptionButtonExpandHeader">Expand header</string>
     <string name="contentDescriptionButtonFilterSearch">Filter search</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
+    <string name="contentDescriptionButtonSettings">Settings</string>
     <string name="contentDescriptionIconAttachments">Has attachments</string>
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
     <string name="contentDescriptionIconFavorite">Is favorite</string>

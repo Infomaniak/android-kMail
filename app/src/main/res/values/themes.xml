@@ -107,7 +107,7 @@
         <item name="contentInsetStartWithNavigation">0dp</item>
         <item name="iconTint">@color/iconToolbarButton</item>
         <item name="navigationContentDescription">@string/contentDescriptionButtonBack</item>
-        <item name="navigationIcon">@drawable/ic_chevron_left</item>
+        <item name="navigationIcon">@drawable/ic_arrow_left</item>
         <item name="titleMarginTop">8dp</item>
         <item name="titleTextAppearance">@style/H1</item>
     </style>

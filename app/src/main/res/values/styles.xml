@@ -115,6 +115,14 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
+    <!-- Cardview -->
+
+    <style name="CardViewMail" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/backgroundColor</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
+    </style>
+
     <!-- Other -->
 
     <style name="CircleImageView">
@@ -122,12 +130,19 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <!-- Cardview -->
-
-    <style name="CardViewMail" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/backgroundColor</item>
-        <item name="cardCornerRadius">0dp</item>
-        <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
+    <style name="NavigationDrawerMail" parent="ThemeOverlay.Material3.NavigationView">
+        <item name="android:backgroundTint">@color/backgroundColor</item>
+        <item name="dividerInsetEnd">@dimen/marginLarge</item>
+        <item name="dividerInsetStart">@dimen/marginStandard</item>
+        <item name="itemHorizontalPadding">@dimen/marginStandard</item>
+        <item name="itemIconPadding">@dimen/marginStandard</item>
+        <item name="itemIconTint">@color/infomaniak</item>
+        <item name="layout_constraintBottom_toBottomOf">parent</item>
+        <item name="layout_constraintStart_toStartOf">parent</item>
+        <item name="layout_constraintTop_toTopOf">parent</item>
+        <item name="subheaderInsetStart">@dimen/marginStandard</item>
+        <item name="subheaderInsetEnd">@dimen/marginStandard</item>
+        <item name="subheaderTextAppearance">@style/Callout.Tertiary</item>
     </style>
 
     <style name="CardviewTopRounded" parent="Widget.MaterialComponents.CardView">

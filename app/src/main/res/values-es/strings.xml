@@ -54,6 +54,7 @@
     <string name="contentDescriptionButtonExpandHeader"></string>
     <string name="contentDescriptionButtonFilterSearch"></string>
     <string name="contentDescriptionButtonMenu"></string>
+    <string name="contentDescriptionButtonSettings"></string>
     <string name="contentDescriptionIconAttachments"></string>
     <string name="contentDescriptionIconCalendar"></string>
     <string name="contentDescriptionIconFavorite"></string>
