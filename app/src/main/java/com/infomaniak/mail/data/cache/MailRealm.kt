@@ -53,10 +53,19 @@ object MailRealm {
         get() = _mailboxContent
             ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
 
-    fun closeRealms() {
+    fun close() {
+        closeCurrentFlows()
+
         closeMailboxContent()
         closeMailboxInfo()
         closeAppSettings()
+    }
+
+    private fun closeCurrentFlows() {
+        mutableCurrentMessageUidFlow.value = null
+        mutableCurrentThreadUidFlow.value = null
+        mutableCurrentFolderIdFlow.value = null
+        mutableCurrentMailboxObjectIdFlow.value = null
     }
 
     private fun closeAppSettings() {
