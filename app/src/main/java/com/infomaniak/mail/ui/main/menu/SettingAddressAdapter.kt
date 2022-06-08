@@ -54,14 +54,14 @@ class SettingAddressAdapter(
     }
 
     private fun ItemSettingAddressBinding.setSelectedState(isSelected: Boolean, mailbox: UiMailbox) {
-        val (color, style) = computeStyle(isSelected, mailbox)
+        val (color, style) = computeStyle(isSelected)
         envelopeIcon.setColorFilter(color)
         emailAddress.setTextColor(color)
         emailAddress.setTextAppearance(style)
         unreadCount.setTextAppearance(style)
     }
 
-    private fun ItemSettingAddressBinding.computeStyle(isSelected: Boolean, mailbox: UiMailbox) =
+    private fun ItemSettingAddressBinding.computeStyle(isSelected: Boolean) =
         if (isSelected) ContextCompat.getColor(root.context, R.color.emphasizedTextColor) to R.style.Body_Highlighted
         else ContextCompat.getColor(root.context, RCore.color.title) to R.style.Body
 
