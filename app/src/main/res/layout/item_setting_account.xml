@@ -83,7 +83,7 @@
                 android:id="@+id/chevron"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="TODO"
+                android:rotation="-180"
                 android:src="@drawable/ic_chevron_up"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -106,5 +106,3 @@
         tools:visibility="visible" />
 
 </LinearLayout>
-
-
