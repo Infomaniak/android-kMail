@@ -63,6 +63,8 @@ class Mailbox : RealmObject {
     var isFree: Boolean = false
     @SerialName("daily_limit")
     var dailyLimit: Int = 0
+    @SerialName("unseen_messages")
+    var unseenMessages: Int = 0
 
     /**
      * Local
