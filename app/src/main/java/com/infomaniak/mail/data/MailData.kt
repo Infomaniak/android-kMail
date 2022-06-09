@@ -101,7 +101,7 @@ object MailData {
         readMessages(thread)
     }
 
-    private fun selectMailbox(mailbox: Mailbox) {
+    fun selectMailbox(mailbox: Mailbox) {
         if (MailRealm.currentMailboxObjectIdFlow.value != mailbox.objectId) {
             AccountUtils.currentMailboxId = mailbox.mailboxId
             MailRealm.mutableCurrentMailboxObjectIdFlow.value = mailbox.objectId

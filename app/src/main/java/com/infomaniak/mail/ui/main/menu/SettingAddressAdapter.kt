@@ -47,10 +47,11 @@ class SettingAddressAdapter(
         unreadCount.isGone = unread == 0
         unreadCount.text = unreadText
 
-        // TODO: Adapt to new select method not in mailbox anymore
         val mailbox = MailboxInfoController.getMailbox(uiMailbox.objectId)
         setSelectedState(mailbox?.mailboxId == AppSettingsController.getAppSettings().currentMailboxId, uiMailbox)
-        addressCardview.setOnClickListener { mailbox?.select() }
+        addressCardview.setOnClickListener {
+            MailData.selectMailbox(mailbox)
+        }
     }
 
     private fun ItemSettingAddressBinding.setSelectedState(isSelected: Boolean, mailbox: UiMailbox) {
