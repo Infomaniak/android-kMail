@@ -24,11 +24,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.databinding.ItemSettingAccountBinding
+import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.SettingAccountViewHolder
 import com.infomaniak.mail.utils.toggleChevron
 
 class SettingAccountAdapter(
-    private val accounts: List<UiAccount> = listOf()
-) : RecyclerView.Adapter<SettingAccountAdapter.SettingAccountViewHolder>() {
+    private val accounts: List<UiAccount> = listOf(),
+    private val popBackStack: () -> Unit,
+) : RecyclerView.Adapter<SettingAccountViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingAccountViewHolder {
         return SettingAccountViewHolder(ItemSettingAccountBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -36,11 +38,19 @@ class SettingAccountAdapter(
 
     override fun onBindViewHolder(holder: SettingAccountViewHolder, position: Int): Unit = with(holder.binding) {
         val account = accounts[position]
+        expandFirstMailbox(account, position)
         userAvatarImage.loadAvatar(account.user)
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(account) }
         recyclerViewAddress.adapter = SettingAddressAdapter(account.mailboxes)
+    }
+
+    private fun ItemSettingAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
+        if (position == 0) {
+            chevron.rotation = 0.0f
+            toggleMailboxes(account)
+        }
     }
 
     private fun ItemSettingAccountBinding.toggleMailboxes(account: UiAccount) {
