@@ -23,6 +23,7 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.loadAvatar
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSettingAccountBinding
 import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.SettingAccountViewHolder
 import com.infomaniak.mail.utils.toggleChevron
@@ -43,7 +44,7 @@ class SettingAccountAdapter(
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(account) }
-        recyclerViewAddress.adapter = SettingAddressAdapter(account.mailboxes)
+        recyclerViewAddress.adapter = SettingAddressAdapter(account.mailboxes, popBackStack)
     }
 
     private fun ItemSettingAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
@@ -65,13 +66,7 @@ class SettingAccountAdapter(
 
     data class UiAccount(
         val user: User,
-        var mailboxes: List<UiMailbox>,
+        var mailboxes: List<Mailbox>,
         var collapsed: Boolean = true,
-    )
-
-    data class UiMailbox(
-        val objectId: String,
-        val email: String,
-        val unreadCount: Int,
     )
 }

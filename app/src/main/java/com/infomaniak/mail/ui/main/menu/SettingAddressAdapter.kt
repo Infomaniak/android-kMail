@@ -23,42 +23,47 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.AppSettingsController
-import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSettingAddressBinding
-import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiMailbox
+import com.infomaniak.mail.ui.main.menu.SettingAddressAdapter.SettingAddressViewHolder
 import com.infomaniak.lib.core.R as RCore
 
 class SettingAddressAdapter(
-    private val uiMailboxes: List<UiMailbox> = listOf()
-) : RecyclerView.Adapter<SettingAddressAdapter.SettingAddressViewHolder>() {
+    private val mailboxes: List<Mailbox> = listOf(),
+    private val popBackStack: () -> Unit,
+) : RecyclerView.Adapter<SettingAddressViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingAddressViewHolder {
         return SettingAddressViewHolder(ItemSettingAddressBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: SettingAddressViewHolder, position: Int): Unit = with(holder.binding) {
-        val uiMailbox = uiMailboxes[position]
-        emailAddress.text = uiMailbox.email
+        val mailbox = mailboxes[position]
+        emailAddress.text = mailbox.email
 
-        val unread = uiMailbox.unreadCount
+        val unread = mailbox.unseenMessages
         var unreadText = unread.toString()
-        if (unread > 100) unreadText = "99+"
-        unreadCount.isGone = unread == 0
-        unreadCount.text = unreadText
+        if (unread >= 100) unreadText = "99+"
+        unreadCount.apply {
+            isGone = unread <= 0
+            text = unreadText
+        }
 
-        val mailbox = MailboxInfoController.getMailbox(uiMailbox.objectId)
-        setSelectedState(mailbox?.mailboxId == AppSettingsController.getAppSettings().currentMailboxId, uiMailbox)
+        setSelectedState(mailbox.objectId == MailData.currentMailbox?.objectId)
         addressCardview.setOnClickListener {
             MailData.selectMailbox(mailbox)
+            popBackStack()
         }
     }
 
-    private fun ItemSettingAddressBinding.setSelectedState(isSelected: Boolean, mailbox: UiMailbox) {
+    private fun ItemSettingAddressBinding.setSelectedState(isSelected: Boolean) {
         val (color, style) = computeStyle(isSelected)
         envelopeIcon.setColorFilter(color)
-        emailAddress.setTextColor(color)
-        emailAddress.setTextAppearance(style)
+        emailAddress.apply {
+            setTextColor(color)
+            setTextAppearance(style)
+        }
         unreadCount.setTextAppearance(style)
     }
 
@@ -66,7 +71,7 @@ class SettingAddressAdapter(
         if (isSelected) ContextCompat.getColor(root.context, R.color.emphasizedTextColor) to R.style.Body_Highlighted
         else ContextCompat.getColor(root.context, RCore.color.title) to R.style.Body
 
-    override fun getItemCount(): Int = uiMailboxes.count()
+    override fun getItemCount(): Int = mailboxes.count()
 
     class SettingAddressViewHolder(val binding: ItemSettingAddressBinding) : RecyclerView.ViewHolder(binding.root)
 }
