@@ -119,6 +119,15 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
+    <!-- Other -->
+
+    <style name="EmailAddressTextView">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <!-- Cardview -->
 
     <style name="CardViewMail" parent="Widget.MaterialComponents.CardView">

@@ -19,12 +19,26 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.R
+import androidx.core.view.isVisible
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 
 class NewMessageActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
+    private val mails = MailboxInfoController.getMailboxesSync().map { it.email }
+
+    override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_new_message)
+        setContentView(root)
+
+        fromMailAddress.text = MailData.currentMailbox?.email
+        fromMailAddress.setOnClickListener { selectAddress() }
+
+        chevron.setOnClickListener { /*TODO toggleChevron()*/ advancedFields.isVisible = !advancedFields.isVisible }
+    }
+
+    private fun selectAddress() {
     }
 }
