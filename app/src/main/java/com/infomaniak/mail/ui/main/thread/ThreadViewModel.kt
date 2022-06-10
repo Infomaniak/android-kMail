@@ -36,8 +36,6 @@ class ThreadViewModel : ViewModel() {
     private val mutableUiMessagesFlow: MutableStateFlow<List<Message>?> = MutableStateFlow(null)
     val uiMessagesFlow = mutableUiMessagesFlow.asStateFlow()
 
-    val isExpandedHeaderMode = false
-
     fun setup() {
         listenToMessages()
     }

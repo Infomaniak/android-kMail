@@ -48,7 +48,6 @@ import com.infomaniak.mail.utils.toggleChevron
 
 class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
 
-    private var isExpanded: Boolean = false
     private var messageList: ArrayList<Message> = arrayListOf()
 
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -63,15 +62,14 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
-        isExpanded = (position == messageList.size - 1 || !message.seen) && !message.isDraft
-
-        if (!isExpanded) {
+        root.setOnClickListener(null)
+        if ((position == messageList.size - 1 || !message.seen) && !message.isDraft) message.isExpanded = true
+        if (!message.isExpanded) {
             root.setOnClickListener {
-                isExpanded = true
                 if (message.isDraft) {
-                    Log.e("TAG", "fetchMessagesFromApi: ${message.subject} | ${message.body?.value}")
                     onDraftClicked?.invoke(message)
                 } else {
+                    message.isExpanded = true
                     displayMessage(message)
                 }
             }
@@ -91,12 +89,12 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         messageList = newList
     }
 
-    private fun ItemMessageBinding.displayMessage(message: Message) {
+    private fun ItemMessageBinding.displayMessage(message: Message) = with(message) {
         displayHeader(message)
         hideAttachments()
         if (isExpanded) {
-            displayAttachments(message.attachments)
-            displayBody(message.body)
+            displayAttachments(attachments)
+            displayBody(body)
         }
     }
 
