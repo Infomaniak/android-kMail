@@ -96,6 +96,8 @@ class Message : RealmObject {
     var parentLink: Thread? = null // TODO
 
     @Ignore
+    var isExpanded = false
+    @Ignore
     var isExpandedHeaderMode = false
 
     fun initLocalValues(): Message {

@@ -29,6 +29,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
@@ -76,6 +77,7 @@ class ThreadFragment : Fragment() {
 
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = ThreadAdapter().apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
             }
@@ -132,5 +134,6 @@ class ThreadFragment : Fragment() {
         }
 
         threadAdapter.notifyAdapter(ArrayList(messages))
+        binding.messagesList.scrollToPosition(threadAdapter.itemCount - 1)
     }
 }
