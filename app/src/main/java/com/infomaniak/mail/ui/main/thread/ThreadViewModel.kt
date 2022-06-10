@@ -54,6 +54,7 @@ class ThreadViewModel : ViewModel() {
     fun loadMessages(threadUid: String) {
         val thread = MailboxContentController.getThread(threadUid) ?: return
         MailData.selectThread(thread)
+        thread.markAsSeen()
         MailData.loadMessages(thread)
     }
 
