@@ -37,8 +37,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardMedium"
         android:text="@string/fromTitle"
-        app:layout_constraintBottom_toTopOf="@id/divider1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
@@ -53,7 +53,7 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/fromPrefix"
         app:layout_constraintTop_toTopOf="@id/fromPrefix"
-        tools:text="myriam.rais@ik.me." />
+        tools:text="myriam.rais@ik.me" />
 
 
     <com.google.android.material.divider.MaterialDivider
@@ -61,10 +61,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/toPrefix"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        app:layout_constraintBottom_toTopOf="@id/toField"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fromMailAddress" />
+        app:layout_constraintTop_toBottomOf="@id/fromPrefix" />
 
 
     <TextView
@@ -74,21 +75,46 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandardMedium"
         android:text="@string/toTitle"
-        app:layout_constraintBottom_toTopOf="@id/divider2"
+        app:layout_constraintBottom_toTopOf="@id/barrier2"
         app:layout_constraintStart_toStartOf="@id/fromPrefix"
         app:layout_constraintTop_toBottomOf="@id/divider1" />
 
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/toAutocompleteInput"
-        style="@style/EmailAddressTextView"
+    <LinearLayout
+        android:id="@+id/toField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-        android:inputType="textEmailAddress"
-        app:layout_constraintBottom_toBottomOf="@id/toPrefix"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/divider2"
         app:layout_constraintEnd_toStartOf="@id/chevron"
         app:layout_constraintStart_toEndOf="@id/toPrefix"
-        app:layout_constraintTop_toTopOf="@id/toPrefix" />
+        app:layout_constraintTop_toBottomOf="@id/divider1">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/toItemsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            app:chipSpacingVertical="@dimen/marginStandardVerySmall" />
+
+        <!--        <TextView-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
+        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
+
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/toAutocompleteInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+            android:backgroundTint="@android:color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:textSize="16sp" />
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/chevron"
@@ -99,16 +125,27 @@
         app:layout_constraintEnd_toEndOf="@id/divider1"
         app:layout_constraintTop_toBottomOf="@id/toPrefix" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="toPrefix,toField" />
+
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/ccPrefix"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toPrefix" />
+        app:layout_constraintTop_toBottomOf="@id/barrier2" />
+
+
+    <!--    -->
+    <!--    -->
+    <!--    -->
 
 
     <TextView
@@ -118,21 +155,53 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandardMedium"
         android:text="@string/ccTitle"
-        app:layout_constraintBottom_toTopOf="@id/divider3"
+        app:layout_constraintBottom_toTopOf="@id/barrier3"
         app:layout_constraintStart_toStartOf="@id/fromPrefix"
         app:layout_constraintTop_toBottomOf="@id/divider2" />
 
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/ccAutocompleteInput"
-        style="@style/EmailAddressTextView"
+    <LinearLayout
+        android:id="@+id/ccField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:inputType="textEmailAddress"
-        app:layout_constraintBottom_toBottomOf="@id/ccPrefix"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/divider3"
         app:layout_constraintEnd_toEndOf="@id/divider2"
         app:layout_constraintStart_toEndOf="@id/ccPrefix"
-        app:layout_constraintTop_toTopOf="@id/ccPrefix" />
+        app:layout_constraintTop_toBottomOf="@id/divider2">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/ccItemsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            app:chipSpacingVertical="@dimen/marginStandardVerySmall" />
+
+        <!--        <TextView-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
+        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
+
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/ccAutocompleteInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+            android:backgroundTint="@android:color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="ccPrefix,ccField" />
 
 
     <com.google.android.material.divider.MaterialDivider
@@ -140,10 +209,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/bccPrefix"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ccPrefix" />
+        app:layout_constraintTop_toBottomOf="@id/barrier3" />
+
+
+    <!--    -->
+    <!--    -->
+    <!--    -->
 
 
     <TextView
@@ -153,21 +226,53 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/marginStandardMedium"
         android:text="@string/bccTitle"
-        app:layout_constraintBottom_toTopOf="@id/divider4"
+        app:layout_constraintBottom_toTopOf="@id/barrier4"
         app:layout_constraintStart_toStartOf="@id/fromPrefix"
         app:layout_constraintTop_toBottomOf="@id/divider3" />
 
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/bccAutocompleteInput"
-        style="@style/EmailAddressTextView"
+    <LinearLayout
+        android:id="@+id/bccField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:inputType="textEmailAddress"
-        app:layout_constraintBottom_toBottomOf="@id/bccPrefix"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/divider4"
         app:layout_constraintEnd_toEndOf="@id/divider3"
         app:layout_constraintStart_toEndOf="@id/bccPrefix"
-        app:layout_constraintTop_toTopOf="@id/bccPrefix" />
+        app:layout_constraintTop_toBottomOf="@id/divider3">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/bccItemsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            app:chipSpacingVertical="@dimen/marginStandardVerySmall" />
+
+        <!--        <TextView-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
+        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
+
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/bccAutocompleteInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+            android:backgroundTint="@android:color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="bccPrefix,bccField" />
 
 
     <com.google.android.material.divider.MaterialDivider
@@ -175,10 +280,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/objectPrefix"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bccPrefix" />
+        app:layout_constraintTop_toBottomOf="@id/barrier4" />
 
 
     <TextView
@@ -186,7 +290,7 @@
         style="@style/Callout.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardMedium"
         android:text="@string/objectTitle"
         app:layout_constraintBottom_toTopOf="@id/divider5"
         app:layout_constraintStart_toStartOf="@id/fromPrefix"
@@ -200,7 +304,7 @@
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         android:inputType="textEmailSubject"
         app:layout_constraintBottom_toBottomOf="@id/objectPrefix"
-        app:layout_constraintEnd_toEndOf="@id/divider3"
+        app:layout_constraintEnd_toEndOf="@id/divider5"
         app:layout_constraintStart_toEndOf="@id/objectPrefix"
         app:layout_constraintTop_toTopOf="@id/objectPrefix" />
 
@@ -210,7 +314,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/bodyLayout"
+        android:layout_marginTop="@dimen/marginStandardMedium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/objectPrefix" />
@@ -245,7 +349,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="divider4,bccAutocompleteInput,bccPrefix,divider3,ccAutocompleteInput,ccPrefix"
+        app:constraint_referenced_ids="divider4,bccField,bccPrefix,divider3,ccField,ccPrefix"
         tools:visibility="visible" />
 
 

@@ -21,11 +21,15 @@ import android.app.Activity
 import android.content.Context
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import android.view.inputmethod.EditorInfo
 import androidx.viewbinding.ViewBinding
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Contact
+import com.infomaniak.mail.ui.main.newmessage.ContactAdapter
 import io.realm.kotlin.types.RealmInstant
 import java.util.*
 
@@ -83,6 +87,24 @@ fun View.toggleChevron(
         expandedAngle ?: ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
     }
     animate().rotation(angle).setDuration(duration).start()
+}
+
+fun MaterialAutoCompleteTextView.setupAvailableContactItems(
+    context: Context,
+    itemList: List<Contact>,
+    alreadyUsedContactIds: ArrayList<Int> = arrayListOf(),
+    onDataPassed: (item: Contact) -> Unit
+): ContactAdapter {
+    setDropDownBackgroundResource(R.drawable.background_popup)
+
+    val availableUsersAdapter = ContactAdapter(context, ArrayList(itemList), alreadyUsedContactIds, onDataPassed)
+    setAdapter(availableUsersAdapter)
+    setOnEditorActionListener { _, actionId, _ ->
+        if (actionId == EditorInfo.IME_ACTION_DONE) availableUsersAdapter.addFirstAvailableItem()
+        true // Keep keyboard open
+    }
+
+    return availableUsersAdapter
 }
 
 inline val ViewBinding.context: Context get() = root.context
