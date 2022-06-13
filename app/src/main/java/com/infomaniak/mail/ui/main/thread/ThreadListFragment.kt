@@ -34,7 +34,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
@@ -166,15 +166,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             if (folderNameJob != null) folderNameJob?.cancel()
 
             folderNameJob = viewModelScope.launch(Dispatchers.Main) {
-                MailRealm.currentFolderIdFlow.filterNotNull().collect {
-                    context?.let(::displayFolderName)
+                MailData.currentFolderFlow.filterNotNull().collect { folder ->
+                    context?.let { displayFolderName(it, folder) }
                 }
             }
         }
     }
 
-    private fun displayFolderName(context: Context) {
-        val folderName = MailData.currentFolder?.getLocalizedName(context)
+    private fun displayFolderName(context: Context, folder: Folder) {
+        val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
         binding.mailboxName.text = folderName
     }
