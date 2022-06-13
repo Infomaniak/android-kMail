@@ -52,19 +52,23 @@ object MailApi {
 
     fun fetchMessages(thread: Thread): List<Message> {
         return thread.messages.map { realmMessage ->
-            // TODO: Handle if this API call fails
-            ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
-                completedMessage.apply {
-                    initLocalValues() // TODO: Remove this when we have EmbeddedObjects
-                    fullyDownloaded = true
-                    body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
-                    // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                    @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
-                    attachments?.forEachIndexed { index, attachment ->
-                        attachment.initLocalValues(index, uid)
+            if (realmMessage.fullyDownloaded) {
+                realmMessage
+            } else {
+                // TODO: Handle if this API call fails
+                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
+                    completedMessage.apply {
+                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                        fullyDownloaded = true
+                        body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
+                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                        @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                        attachments?.forEachIndexed { index, attachment ->
+                            attachment.initLocalValues(index, uid)
+                        }
                     }
-                }
-            } ?: realmMessage
+                } ?: realmMessage
+            }
         }
     }
 
