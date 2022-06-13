@@ -54,18 +54,9 @@ object MailRealm {
             ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
 
     fun close() {
-        closeCurrentFlows()
-
         closeMailboxContent()
         closeMailboxInfo()
         closeAppSettings()
-    }
-
-    private fun closeCurrentFlows() {
-        mutableCurrentMessageUidFlow.value = null
-        mutableCurrentThreadUidFlow.value = null
-        mutableCurrentFolderIdFlow.value = null
-        mutableCurrentMailboxObjectIdFlow.value = null
     }
 
     private fun closeAppSettings() {
@@ -82,22 +73,6 @@ object MailRealm {
         _mailboxContent?.close()
         _mailboxContent = null
     }
-
-    // Current mailbox flow
-    val mutableCurrentMailboxObjectIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
-    val currentMailboxObjectIdFlow = mutableCurrentMailboxObjectIdFlow.asStateFlow()
-
-    // Current folder flow
-    val mutableCurrentFolderIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
-    val currentFolderIdFlow = mutableCurrentFolderIdFlow.asStateFlow()
-
-    // Current thread flow
-    val mutableCurrentThreadUidFlow: MutableStateFlow<String?> = MutableStateFlow(null)
-    val currentThreadUidFlow = mutableCurrentThreadUidFlow.asStateFlow()
-
-    // Current message flow
-    val mutableCurrentMessageUidFlow: MutableStateFlow<String?> = MutableStateFlow(null)
-    val currentMessageUidFlow = mutableCurrentMessageUidFlow.asStateFlow()
 
     /**
      * Mailboxes
