@@ -55,6 +55,8 @@ object ApiRoutes {
 
     fun moveMessage(uuid: String) = "$MAIL_API/api/mail/$uuid/message/move"
 
+    fun deleteMessage(uuid: String) = "$MAIL_API/api/mail/$uuid/message/delete"
+
     fun draft(uuid: String) = "$MAIL_API/api/mail/$uuid/draft"
 
     fun draft(uuid: String, draftUuid: String) = "${draft(uuid)}/$draftUuid"

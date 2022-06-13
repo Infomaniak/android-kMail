@@ -89,7 +89,7 @@ class Thread : RealmObject {
                             messages.forEach { it.seen = true }
                             unseenMessagesCount = 0
                         }
-                        ApiRepository.markMessagesAsSeen(mailbox.uuid, ArrayList(messages))
+                        ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid })
                     }
                 }
             }
