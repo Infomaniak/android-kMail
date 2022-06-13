@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.Context
 import android.text.Html
 import android.text.SpannedString
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup

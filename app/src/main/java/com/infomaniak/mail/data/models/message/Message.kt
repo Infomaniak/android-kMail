@@ -116,7 +116,7 @@ class Message : RealmObject {
 
     fun markAsSeen(mailboxUuid: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.seen = true }
-        ApiRepository.markMessagesAsSeen(mailboxUuid, arrayListOf(this))
+        ApiRepository.markMessagesAsSeen(mailboxUuid, arrayListOf(uid))
     }
 
     fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)

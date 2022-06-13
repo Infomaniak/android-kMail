@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data
 
 import android.util.Log
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -92,7 +93,7 @@ object MailData {
     }
 
     fun loadMailboxes() {
-        readMailboxes() {
+        readMailboxes {
             fetchMailboxes()
         }
     }
@@ -164,7 +165,7 @@ object MailData {
     ////////////////
 
     private fun readRealmData() {
-        readMailboxes() { realmMailboxes ->
+        readMailboxes { realmMailboxes ->
             if (realmMailboxes.isEmpty()) {
                 fetchApiData()
             } else {
@@ -225,12 +226,16 @@ object MailData {
         fetchMessages(thread)
     }
 
+    fun deleteDraft(message: Message) {
+        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MailboxContentController.deleteMessage(message.uid)
+    }
+
     ///////////////
     // FETCH API //
     ///////////////
 
     private fun fetchApiData() {
-        fetchMailboxes() { mergedMailboxes ->
+        fetchMailboxes { mergedMailboxes ->
             handleMailboxes(mergedMailboxes) { mailbox ->
                 fetchFolders(mailbox)
             }

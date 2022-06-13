@@ -26,6 +26,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -33,8 +34,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
-import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
@@ -87,12 +88,14 @@ class ThreadFragment : Fragment() {
                     message.setDraftId(draft?.uuid)
                     // TODO: Open the draft in draft editor
                 }
+
             }
             onDeleteDraftClicked = { message ->
                 // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
-                // MailApi.deleteMessageOnApi(currentMailbox?.uuid, message.uid, message.draftUuid)
-                MailboxContentController.deleteMessage(message.uid)
-                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
+                lifecycleScope.launch(Dispatchers.IO) {
+                    MailData.deleteDraft(message)
+                    // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
+                }
                 threadAdapter.removeMessage(message)
             }
         }.also { threadAdapter = it }

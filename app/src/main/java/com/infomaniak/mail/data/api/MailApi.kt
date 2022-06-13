@@ -93,16 +93,6 @@ object MailApi {
         return apiDraft
     }
 
-    fun deleteMessageOnApi(mailboxUuid: String, messageUid: String, draftUuid: String?) {
-        if (draftUuid?.isNotEmpty() == true) {
-            if (!ApiRepository.deleteDraft(mailboxUuid, draftUuid).isSuccess()) return
-        }
-
-        if (ApiRepository.deleteMessage(mailboxUuid, messageUid).isSuccess()) {
-            MailboxContentController.deleteMessage(messageUid)
-        }
-    }
-
     suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
 
         fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
