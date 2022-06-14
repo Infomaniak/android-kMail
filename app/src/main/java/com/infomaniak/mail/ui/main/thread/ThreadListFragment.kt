@@ -31,6 +31,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
@@ -109,14 +110,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         toolbar.setNavigationOnClickListener { drawerLayout.open() }
 
+        menuDrawerNavigation.getHeaderView(0).findViewById<MaterialButton>(R.id.settingsButton).setOnClickListener {
+            // TODO safeNavigate to settings fragment
+        }
         menuDrawerNavigation.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.feedbacks -> {}
                 R.id.help -> {}
                 R.id.importMails -> {}
                 R.id.restoreMails -> {}
-                else -> context?.let { threadListViewModel.openFolder(item.title.toString(), it) }
+                else -> context?.let {
+                    threadListViewModel.openFolder(item.title.toString(), it)
+                }
             }
+            item.isChecked = true
             drawerLayout.close()
             true
         }

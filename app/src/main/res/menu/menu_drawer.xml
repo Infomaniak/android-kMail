@@ -15,11 +15,17 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:icon="@drawable/ic_drawer_mailbox"
-        android:title="@string/inboxFolder" />
-    <group android:id="@+id/defaultFolder">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item
+            android:checked="true"
+            android:icon="@drawable/ic_drawer_mailbox"
+            android:title="@string/inboxFolder" />
+    </group>
+    <group
+        android:id="@+id/defaultFolders"
+        android:checkableBehavior="single">
         <item
             android:icon="@drawable/ic_sent_messages"
             android:title="@string/sentFolder" />
@@ -36,19 +42,25 @@
             android:icon="@drawable/ic_archive_folder"
             android:title="@string/archiveFolder" />
     </group>
-    <item
-        android:id="@+id/folders"
-        android:title="@string/buttonFolders">
-        <menu />
-    </item>
-    <item
-        android:id="@+id/feedbacks"
-        android:icon="@drawable/ic_feedbacks"
-        android:title="@string/buttonFeedbacks" />
-    <item
-        android:id="@+id/help"
-        android:icon="@drawable/ic_help"
-        android:title="@string/buttonHelp" />
+    <group
+        android:id="@+id/customFolders"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/folders"
+            android:title="@string/buttonFolders" />
+    </group>
+    <group
+        android:id="@+id/helpers"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/feedbacks"
+            android:icon="@drawable/ic_feedbacks"
+            android:title="@string/buttonFeedbacks" />
+        <item
+            android:id="@+id/help"
+            android:icon="@drawable/ic_help"
+            android:title="@string/buttonHelp" />
+    </group>
     <item
         android:id="@+id/advancedActions"
         android:title="@string/menuDrawerAdvancedActions">

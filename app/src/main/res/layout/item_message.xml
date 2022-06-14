@@ -118,7 +118,7 @@
                 android:layout_height="24dp"
                 android:contentDescription="@string/contentDescriptionButtonExpandHeader"
                 android:rotation="180"
-                app:icon="@drawable/ic_chevron_up"
+                app:icon="@drawable/ic_arrow_up"
                 app:iconSize="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
