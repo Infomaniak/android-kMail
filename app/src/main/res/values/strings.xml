@@ -17,4 +17,10 @@
   -->
 <resources>
     <string name="appName" translatable="false">kMail</string>
+
+    <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
+
+    <string name="buttonCancel">Cancel</string><!--TODO: Add translations-->
+    <string name="refreshTokenError">You’ve been disconnected due to a problem. Please log in again</string><!--TODO: Add translations-->
+    <string name="notificationGeneralChannelName">General notifications</string><!--TODO: Add translations-->
 </resources>

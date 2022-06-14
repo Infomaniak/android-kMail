@@ -18,6 +18,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.infomaniak.mail">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".ApplicationMain"
         android:allowBackup="false"
@@ -53,6 +55,10 @@
         <activity
             android:name=".ui.LoginActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.infomaniak.lib.login.WebViewLoginActivity"
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name=".ui.main.MainActivity"
