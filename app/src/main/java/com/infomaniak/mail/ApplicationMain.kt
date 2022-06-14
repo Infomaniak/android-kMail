@@ -28,14 +28,17 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.attachment.Attachment
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.KMailHttpClient
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
-import io.realm.Realm
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -95,12 +98,23 @@ class ApplicationMain : Application() {
     private fun configureRealm() {
         runBlocking {
             mutex.withLock {
-                try {
-                    Realm.getDefaultInstance()
-                } catch (exception: Exception) {
-                    Realm.init(this@ApplicationMain)
-                    AccountUtils.init(this@ApplicationMain)
-                }
+                ApiController.init(
+                    arrayListOf(
+                        // typeAdapterOf<Folder>(), // TODO
+                        typeAdapterOf<Folder>(FolderRealmListConverter()),
+                        typeAdapterOf<Recipient>(RecipientRealmListConverter()),
+                        typeAdapterOf<Message>(MessageRealmListConverter()),
+                        typeAdapterOf<Attachment>(AttachmentRealmListConverter()),
+                        typeAdapterOf<String>(StringRealmListConverter()),
+                    )
+                )
+
+                // try {
+                // Realm.getDefaultInstance() // TODO
+                // } catch (exception: Exception) {
+                // Realm.init(this@ApplicationMain) // TODO
+                AccountUtils.init(this@ApplicationMain)
+                // }
             }
         }
     }

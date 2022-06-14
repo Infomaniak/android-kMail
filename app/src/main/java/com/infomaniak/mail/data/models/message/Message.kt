@@ -23,57 +23,68 @@ import com.infomaniak.mail.data.models.attachment.Attachment
 import com.infomaniak.mail.data.models.threads.ThreadMail
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.realmListOf
 
-open class Message(
-    var uid: String = "",
+class Message : RealmObject {
+    var uid: String = ""
+
     @SerializedName("msg_id")
-    var msgId: String = "",
-    var date: String = "",
-    var subject: String = "",
-    var from: RealmList<Recipient> = RealmList(),
-    var to: RealmList<Recipient> = RealmList(),
-    var cc: RealmList<Recipient> = RealmList(),
-    var bcc: RealmList<Recipient> = RealmList(),
+    var msgId: String = ""
+    var date: String = ""
+    var subject: String = ""
+    var from: RealmList<Recipient> = realmListOf()
+    var cc: RealmList<Recipient> = realmListOf()
+    var bcc: RealmList<Recipient> = realmListOf()
+    var to: RealmList<Recipient> = realmListOf()
+
     @SerializedName("reply_to")
-    var replyTo: RealmList<Recipient> = RealmList(),
-    var references: String? = null,
-    var priority: String? = null,
+    var replyTo: RealmList<Recipient> = realmListOf()
+    var references: String? = null
+    var priority: String? = null
+
     @SerializedName("dkim_status")
-    private var _dkimStatus: String? = null,
+    private var _dkimStatus: String? = null
+
     @SerializedName("folder_id")
-    var folderId: String = "",
-    var folder: String = "",
+    var folderId: String = ""
+    var folder: String = ""
+
     @SerializedName("st_uuid")
-    var stUuid: String? = null,
-    var resource: String = "",
+    var stUuid: String? = null
+    var resource: String = ""
+
     @SerializedName("download_resource")
-    var downloadResource: String = "",
+    var downloadResource: String = ""
+
     @SerializedName("is_draft")
-    var isDraft: Boolean = false,
+    var isDraft: Boolean = false
+
     @SerializedName("draft_resource")
-    var draftResource: String = "",
-    var body: Body? = null,
+    var draftResource: String = ""
+    var body: Body? = null
+
     @SerializedName("has_attachments")
-    var hasAttachments: Boolean = false,
+    var hasAttachments: Boolean = false
+
     @SerializedName("attachments_resources")
-    var attachmentsResource: String? = null,
-    var attachments: RealmList<Attachment> = RealmList(),
-    var seen: Boolean = false,
-    var forwarded: Boolean = false,
-    var answered: Boolean = false,
-    var flagged: Boolean = false,
-    var scheduled: Boolean = false,
-    var size: Int = 0,
+    var attachmentsResource: String? = null
+    var attachments: RealmList<Attachment> = realmListOf()
+    var seen: Boolean = false
+    var forwarded: Boolean = false
+    var answered: Boolean = false
+    var flagged: Boolean = false
+    var scheduled: Boolean = false
+    var size: Int = 0
+
     @SerializedName("safe_display")
-    var safeDisplay: Boolean = false,
-    var isDuplicate: Boolean = false,
+    var safeDisplay: Boolean = false
+    var isDuplicate: Boolean = false
 
     /**
      * Local
      */
-    var hasUnsubscribeLink: Boolean = false,
-    var parentLink: ThreadMail? = null,
-) : RealmObject() {
+    var hasUnsubscribeLink: Boolean = false
+    var parentLink: ThreadMail? = null
 
     fun getDkimStatus(): MessageDKIM? = when (_dkimStatus) {
         MessageDKIM.VALID.value -> MessageDKIM.VALID

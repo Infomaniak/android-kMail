@@ -21,21 +21,24 @@ import com.google.gson.annotations.SerializedName
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.Ignore
+import io.realm.realmListOf
 
-open class Contact(
-    var id: String = "",
-    var name: String = "",
+class Contact : RealmObject {
+    var id: String = ""
+    var name: String = ""
+
     @SerializedName("firstname")
-    var firstName: String = "",
+    var firstName: String = ""
+
     @SerializedName("lastname")
-    var lastName: String = "",
-    var color: String = "",
-    var other: Boolean = false,
+    var lastName: String = ""
+    var color: String = ""
+    var other: Boolean = false
+
     @Ignore // TODO: Check if we can still get this field from the database even if it's ignored.
     @SerializedName("contacted_times")
-    private var _contactedTimes: Map<String?, Int?> = mapOf(),
-    var emails: RealmList<String> = RealmList(),
-) : RealmObject() {
+    private var _contactedTimes: Map<String?, Int?> = mapOf()
+    var emails: RealmList<String> = realmListOf()
 
     fun getContactedTimes(): ContactedTimes = with(_contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
