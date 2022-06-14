@@ -19,7 +19,14 @@ package com.infomaniak.mail.utils
 
 import android.app.Activity
 import android.view.View
+import com.infomaniak.lib.core.utils.day
+import com.infomaniak.lib.core.utils.month
+import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
+import io.realm.RealmInstant
+import java.util.*
+
+// TODO Put these methods in Core
 
 fun Activity.showSnackbar(
     title: Int,
@@ -50,3 +57,13 @@ fun Activity.showSnackbar(
         onActionClicked = onActionClicked
     )
 }
+
+fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
+
+fun Date.toRealmInstant(): RealmInstant {
+    val seconds = time / 1_000L
+    val nanoseconds =  (time - seconds * 1_000L).toInt()
+    return RealmInstant.fromEpochSeconds(seconds, nanoseconds)
+}
+
+fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }

@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/threadListFragment">
+
+    <fragment
+        android:id="@+id/threadListFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadListFragment"
+        android:label="ThreadListFragment"
+        tools:layout="@layout/fragment_thread_list">
+        <action
+            android:id="@+id/action_threadListFragment_to_newFolderDialog"
+            app:destination="@id/newFolderDialog" />
+        <action
+            android:id="@+id/action_homeFragment_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
+        <action
+            android:id="@+id/action_threadListFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_threadFragment"
+            app:destination="@id/threadFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_switchUserFragment"
+            app:destination="@id/switchUserFragment" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/newFolderDialog"
+        android:name="com.infomaniak.mail.ui.main.NewFolderDialog"
+        android:label="NewFolderDialog"
+        tools:layout="@layout/dialog_new_folder" />
+
+    <activity
+        android:id="@+id/newMessageActivity"
+        android:name="com.infomaniak.mail.ui.main.newmessage.NewMessageActivity"
+        android:label="NewMessageActivity"
+        tools:layout="@layout/activity_new_message" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.infomaniak.mail.ui.main.SearchFragment"
+        android:label="SearchFragment"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_contactFragment"
+            app:destination="@id/contactFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/threadFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
+        android:label="ThreadFragment"
+        tools:layout="@layout/item_thread">
+        <action
+            android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
+            app:destination="@id/messageActionBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadFragment_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/switchUserFragment"
+        android:name="com.infomaniak.mail.ui.main.menu.SwitchUserFragment"
+        android:label="SwitchUSerFragment"
+        tools:layout="@layout/fragment_switch_user" />
+
+    <fragment
+        android:id="@+id/contactFragment"
+        android:name="com.infomaniak.mail.ui.main.ContactFragment"
+        android:label="ContactFragment"
+        tools:layout="@layout/fragment_contact" />
+
+    <dialog
+        android:id="@+id/messageActionBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.MessageActionsBottomSheetDialog"
+        android:label="MessageActionBottomSheetDialog"
+        tools:layout="@layout/fragment_bottom_sheet_message_actions" />
+
+    <fragment
+        android:id="@+id/menuDrawerFragment"
+        android:name="com.infomaniak.mail.ui.main.menu.MenuDrawerFragment"
+        android:label="MenuDrawerFragment"
+        tools:layout="@layout/fragment_menu_drawer">
+        <action
+            android:id="@+id/action_menuDrawerFragment_to_ManageMailAddressFragment"
+            app:destination="@id/manageMailAddressFragment" />
+        <action
+            android:id="@+id/action_menuDrawerFragment_to_SettingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageMailAddressFragment"
+        android:name="com.infomaniak.mail.ui.main.menu.ManageMailAddressFragment"
+        android:label="ManageMailAddressFragment"
+        tools:layout="@layout/fragment_manager_mail_address" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_emailAddressSettingsFragment"
+            app:destination="@id/emailAddressSettingsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_cancelDelaySettingFragment"
+            app:destination="@id/cancelDelaySettingFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_messageListDensitySettingFragment"
+            app:destination="@id/messageListDensitySettingFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_messageDisplayModeSettingFragment"
+            app:destination="@id/messageDisplayModeSettingFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_externalContentSettingFragment"
+            app:destination="@id/externalContentSettingFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_themeSettingFragment"
+            app:destination="@id/themeSettingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/emailAddressSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.email.EmailAddressSettingsFragment"
+        android:label="EmailAddressSettingsFragment"
+        tools:layout="@layout/fragment_email_address_settings">
+        <action
+            android:id="@+id/action_emailAddressSettingsFragment_to_spamSettingFragment"
+            app:destination="@id/spamSettingFragment" />
+        <action
+            android:id="@+id/action_emailAddressSettingsFragment_to_autoReplaySettingFragment"
+            app:destination="@id/autoReplaySettingFragment" />
+        <action
+            android:id="@+id/action_emailAddressSettingsFragment_to_signatureSettingFragment"
+            app:destination="@id/signatureSettingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/cancelDelaySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.CancelDelaySettingFragment"
+        android:label="CancelDelaySettingFragment"
+        tools:layout="@layout/fragment_cancel_delay_setting">
+        <action
+            android:id="@+id/action_cancelDelaySettingFragment_to_selectSettingsFragment"
+            app:destination="@id/selectSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/messageListDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.MessageListDensitySettingFragment"
+        android:label="MessageListDensitySettingFragment"
+        tools:layout="@layout/fragment_message_list_density_setting">
+        <action
+            android:id="@+id/action_messageListDensitySettingFragment_to_selectSettingsFragment"
+            app:destination="@id/selectSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/messageDisplayModeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.MessageDisplayModeSettingFragment"
+        android:label="messageDisplayModeSettingFragment"
+        tools:layout="@layout/fragment_message_display_mode_setting">
+        <action
+            android:id="@+id/action_messageDisplayModeSettingFragment_to_selectSettingsFragment"
+            app:destination="@id/selectSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/externalContentSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.ExternalContentSettingFragment"
+        android:label="externalContentSettingFragment"
+        tools:layout="@layout/fragment_external_content_setting">
+        <action
+            android:id="@+id/action_externalContentSettingFragment_to_selectSettingsFragment"
+            app:destination="@id/selectSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/themeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.ThemeSettingFragment"
+        android:label="themeSettingFragment"
+        tools:layout="@layout/fragment_theme_setting">
+        <action
+            android:id="@+id/action_themeSettingFragment_to_selectSettingsFragment"
+            app:destination="@id/selectSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/spamSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.email.SpamSettingFragment"
+        android:label="SpamSettingFragment"
+        tools:layout="@layout/fragment_spam_settings" />
+
+    <fragment
+        android:id="@+id/autoReplaySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.email.AutoReplaySettingFragment"
+        android:label="AutoReplySettingFragment"
+        tools:layout="@layout/fragment_auto_replay_settings" />
+
+    <fragment
+        android:id="@+id/signatureSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.email.SignatureSettingFragment"
+        android:label="SignatureFragmentSetting"
+        tools:layout="@layout/fragment_signature_setting">
+        <action
+            android:id="@+id/action_signatureSettingFragment_to_selectSettingsFragment"
+            app:destination="@id/selectSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.SelectSettingsFragment"
+        android:label="SelectSettingsFragment"
+        tools:layout="@layout/fragment_select_settings" />
+
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.infomaniak.mail.ui.main.MainActivity"
+        android:label="MainActivity"
+        tools:layout="@layout/activity_main" />
+
+</navigation>

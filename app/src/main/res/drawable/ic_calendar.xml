@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="15dp"
+    android:height="11dp"
+    android:viewportWidth="15"
+    android:viewportHeight="11">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M14.7439,9.8333V1.9028C14.7439,1.3505 14.2962,0.9028 13.7439,0.9028H12.9009V1.3542C12.9009,1.852 12.3499,2.2569 11.6723,2.2569C10.9947,2.2569 10.4436,1.852 10.4436,1.3542V0.9028H4.3003V1.3542C4.3003,1.852 3.7492,2.2569 3.0717,2.2569C2.394,2.2569 1.843,1.852 1.843,1.3542V0.9028H1C0.4477,0.9028 0,1.3505 0,1.9028V9.8333C0,10.3856 0.4477,10.8333 1,10.8333H13.7439C14.2962,10.8333 14.7439,10.3856 14.7439,9.8333Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M11.6723,0C12.012,0 12.2866,0.2022 12.2866,0.4514V1.3542C12.2866,1.6033 12.012,1.8056 11.6723,1.8056C11.3325,1.8056 11.0579,1.6033 11.0579,1.3542V0.4514C11.0579,0.2022 11.3325,0 11.6723,0Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M3.0717,1.8056C3.4114,1.8056 3.686,1.6033 3.686,1.3542V0.4514C3.686,0.2022 3.4114,0 3.0717,0C2.7319,0 2.4573,0.2022 2.4573,0.4514V1.3542C2.4573,1.6033 2.7319,1.8056 3.0717,1.8056Z" />
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M1.2295,3.791h12.2866v5.9583h-12.2866z" />
+</vector>

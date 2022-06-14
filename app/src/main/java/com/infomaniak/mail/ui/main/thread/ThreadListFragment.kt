@@ -21,11 +21,123 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
-import com.infomaniak.mail.R
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.databinding.FragmentThreadListBinding
+import com.infomaniak.mail.ui.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ThreadListFragment : DialogFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_thread_list, container, false)
+    private val mainViewModel: MainViewModel by activityViewModels()
+
+    private lateinit var binding: FragmentThreadListBinding
+    private lateinit var mailbox: Mailbox // TODO Replace with realm mailBox
+    private val threadAdapter = ThreadListAdapter()
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentThreadListBinding.inflate(inflater, container, false)
+        with(mainViewModel) {
+            threadList = MutableLiveData()
+            threadList.observe(viewLifecycleOwner) { list ->
+                if (list?.threads.isNullOrEmpty()) {
+                    displayNoEmailView()
+                } else {
+                    displayThreadList()
+                    threadAdapter.apply {
+                        clean()
+                        context?.let { binding.threadList.post { addAll(formatList(list?.threads!!, it)) } }
+                    }
+                }
+            }
+        }
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.threadList.adapter = threadAdapter
+        lifecycleScope.launch(Dispatchers.IO) {
+            mailbox = ApiRepository.getMailboxes().data!![0]
+            with(mainViewModel) {
+                val foldersResponse = ApiRepository.getFolders(mailbox).data!!
+                folders.postValue(foldersResponse)
+                val inboxFolder = foldersResponse.find { it.getRole() == Folder.FolderRole.INBOX }
+                threadList.postValue(ApiRepository.getThreads(mailbox, inboxFolder!!, Thread.ThreadFilter.ALL).data)
+            }
+        }
+        setupListeners()
+        setupThreadAdapter()
+    }
+
+    private fun setupThreadAdapter() {
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
+            // TODO manage no internet screen
+//            threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
+//            binding.noNetwork.isGone = isInternetAvailable
+        }
+
+        threadAdapter.apply {
+//            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+//            onEmptyList = { checkIfNoFiles() }
+
+            onThreadClicked = { thread ->
+//                if (thread.isUsable()) {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment())
+//                    }
+            }
+        }
+    }
+
+    private fun setupListeners() {
+        with(binding) {
+            openMultiselectButton.setOnClickListener {
+                // TODO multiselection
+            }
+            header.searchViewCard.apply {
+                // TODO filterButton doesn't propagate the event to root, must display it ?
+                searchView.isGone = true
+                searchViewText.isVisible = true
+                filterButton.isEnabled = false
+                root.setOnClickListener {
+                    safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
+                }
+            }
+            header.userAvatar.setOnClickListener {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
+            }
+            newMessageFab.setOnClickListener {
+                safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
+            }
+        }
+    }
+
+    private fun displayNoEmailView() {
+        with(binding) {
+            threadList.isGone = true
+            noMailLayout.root.isVisible = true
+        }
+    }
+
+    private fun displayThreadList() {
+        with(binding) {
+            threadList.isVisible = true
+            noMailLayout.root.isGone = true
+        }
+    }
 }

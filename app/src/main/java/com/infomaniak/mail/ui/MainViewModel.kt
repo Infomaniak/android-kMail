@@ -15,17 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.email
+package com.infomaniak.mail.ui
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.threads.ThreadsResult
 
-class SignatureSettingFragment : Fragment() {
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_signature_setting, container, false)
+class MainViewModel(appContext: Application) : AndroidViewModel(appContext) {
+    var folders = MutableLiveData<ArrayList<Folder>>()
+    var threadList = MutableLiveData<ThreadsResult?>()
+    var isInternetAvailable = MutableLiveData(true)
 }

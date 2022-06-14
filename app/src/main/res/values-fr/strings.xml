@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="Download">Télécharger</string>
+    <string name="Download_all">Tout télécharger</string>
+    <string name="See_all">Voir tout</string>
+    <string name="Select_all">Tout sélectionner</string>
+    <string name="Share">Partager</string>
+    <plurals name="attachmentQuantity">
+        <item quantity="one">%d pièce jointe (%s)</item>
+        <item quantity="other">%d pièces jointes (%s)</item>
+    </plurals>
+    <string name="bccTitle">Cci :</string>
+    <string name="buttonAddAccount">Ajouter un compte</string>
+    <string name="buttonFeedbacks">Feedbacks</string>
+    <string name="buttonFolders">Dossiers</string>
+    <string name="buttonHelp">Aide</string>
+    <string name="buttonImportEmails">Importer des mails</string>
+    <string name="buttonManageAccount">Gérer mon compte</string>
+    <string name="buttonMoreStorage">Obtenir plus de stockage</string>
+    <string name="buttonRestoreEmails">Restaurer des mails</string>
+    <string name="ccTitle">Cc :</string>
+    <string name="fromTitle">De :</string>
+    <string name="menuDrawerAdvancedActions">Actions avancées</string>
+    <string name="menuDrawerUsed">utilisés</string>
+    <string name="newMessageButton">Nouveau message</string>
+    <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
+    <string name="noEmailDescription">Composez un nouvel email en cliquant sur \"Nouveau message\" en bas à droite</string>
+    <string name="noEmailTitle">Vous n‘avez pas d‘emails</string>
+    <string name="objectTitle">Objet :</string>
+    <string name="searchViewHint">Rechercher un message</string>
+    <string name="threadListSectionLastWeek">La semaine dernière</string>
+    <string name="threadListSectionThisWeek">Cette semaine</string>
+    <string name="threadListSectionToday">Aujourd‘hui</string>
+    <string name="threadListSectionTwoWeeks">Il y a deux semaines</string>
+    <string name="toTitle">À :</string>
+</resources>
