@@ -22,14 +22,14 @@ import io.realm.RealmObject
 
 class UserPreferences : RealmObject {
     @SerializedName("thread_mode")
-    private var _threadMode: String? = null
+    private var threadMode: String? = null
 
     @SerializedName("read_pos")
     var readPosition: String = ""
     var density: String = ""
     // TODO: Add other preferences.
 
-    fun getThreadMode(): ThreadMode? = when (_threadMode) {
+    fun getThreadMode(): ThreadMode? = when (threadMode) {
         ThreadMode.MESSAGES.name -> ThreadMode.MESSAGES
         ThreadMode.THREADS.name -> ThreadMode.THREADS
         else -> null

@@ -20,11 +20,14 @@ package com.infomaniak.mail.data.models.threads
 import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import io.realm.RealmInstant
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
 
-class ThreadMail : RealmObject {
+class Thread : RealmObject {
+    @PrimaryKey
     var uid: String = ""
 
     @SerializedName("messages_count")
@@ -44,7 +47,7 @@ class ThreadMail : RealmObject {
     var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String = ""
-    var date: String = ""
+    var date: RealmInstant? = null
 
     @SerializedName("has_attachments")
     var hasAttachments: Boolean = false
@@ -58,6 +61,11 @@ class ThreadMail : RealmObject {
     var answered: Boolean = false
     var forwarded: Boolean = false
     var size: Int = 0
+
+    fun initLocalValues(): Thread {
+        messages.removeIf { it.isDuplicate }
+        return this
+    }
 
     enum class ThreadFilter(title: String) {
         ALL("All"),

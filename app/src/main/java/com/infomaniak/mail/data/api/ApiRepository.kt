@@ -27,7 +27,7 @@ import com.infomaniak.mail.data.models.attachment.Attachment
 import com.infomaniak.mail.data.models.attachment.AttachmentData
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signatures.SignaturesResult
-import com.infomaniak.mail.data.models.threads.ThreadMail.ThreadFilter
+import com.infomaniak.mail.data.models.threads.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.threads.ThreadsResult
 import com.infomaniak.mail.data.models.user.UserResult
 
@@ -72,7 +72,7 @@ object ApiRepository : ApiRepositoryCore() {
 //    fun deleteFolder(mailbox: Mailbox, folder: Folder): ApiResponse<Boolean> =
 //        callApi(ApiRoutes.folder(mailbox.uuid, folder.id), DELETE)
 
-    fun getThreads(mailbox: Mailbox, folder: Folder, filter: ThreadFilter?): ApiResponse<ThreadsResult> =
+    fun getThreads(mailbox: Mailbox, folder: Folder, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> =
         callApi(ApiRoutes.threads(mailbox.uuid, folder.id, filter?.name), GET)
 
     fun getMessage(message: Message): ApiResponse<Message> =

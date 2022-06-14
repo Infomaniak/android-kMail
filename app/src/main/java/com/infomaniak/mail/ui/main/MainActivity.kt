@@ -18,75 +18,31 @@
 package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.models.Folder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
+    private val testRealmViewModel: TestRealmViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.startCalls).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
-
-                val getMailboxes = ApiRepository.getMailboxes()
-                Log.i("API", "getMailboxes: $getMailboxes")
-
-                val mailbox = getMailboxes.data!!.first()
-                val getFolders = ApiRepository.getFolders(mailbox)
-                Log.i("API", "getFolders: $getFolders")
-
-                val inbox = getFolders.data?.find { it.getRole() == Folder.FolderRole.INBOX }!!
-                val getInboxThreads = ApiRepository.getThreads(mailbox, inbox, null)
-                Log.i("API", "getInboxThreads: $getInboxThreads")
-
-                val message = getInboxThreads.data!!.threads.first().messages.first()
-                val getMessage = ApiRepository.getMessage(message)
-                Log.i("API", "getMessage: $getMessage")
-
-                // val moveMessageResponse = ApiRepository.moveMessage(mailbox, arrayListOf(message), inbox.id)
-                // Log.i("API", "moveMessageResponse: $moveMessageResponse")
-
-                // val starMessageResponse = ApiRepository.starMessage(true, mailbox, arrayListOf(message.uid))
-                // Log.i("API", "starMessageResponse: $starMessageResponse")
-
-                val getQuotas = ApiRepository.getQuotas(mailbox)
-                Log.i("API", "getQuotas: $getQuotas")
-
-                val getAddressBooks = ApiRepository.getAddressBooks()
-                Log.i("API", "getAddressBooks: $getAddressBooks")
-
-                val getContacts = ApiRepository.getContacts()
-                Log.i("API", "getContacts: $getContacts")
-                // getContacts.data?.forEach { Log.e("Contacts", "${it.getContactedTimes()}") }
-
-                val getUser = ApiRepository.getUser()
-                Log.i("API", "getUser: $getUser")
-
-                val getSignature = ApiRepository.getSignatures(mailbox)
-                Log.i("API", "getSignature: $getSignature")
-
-                val drafts = getFolders.data?.find { it.getRole() == Folder.FolderRole.DRAFT }!!
-                val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts, null)
-                Log.i("API", "getDraftsThreads: $getDraftsThreads")
-
-                val draftMessage = getDraftsThreads.data?.threads?.find { it.hasDrafts }?.messages?.find { it -> it.isDraft }
-                draftMessage?.let {
-                    val draftUuid = draftMessage.draftResource.substringAfterLast('/')
-                    val getDraftFromUuid = ApiRepository.getDraft(mailbox, draftUuid)
-                    Log.i("API", "getDraftFromUuid: $getDraftFromUuid")
-                    val getDraftFromMessage = ApiRepository.getDraft(draftMessage)
-                    Log.i("API", "getDraftFromMessage: $getDraftFromMessage")
-
-                    // val deleteDraft = ApiRepository.deleteDraft(mailbox, draftUuid)
-                    // Log.i("API", "deleteDraft: $deleteDraft")
+                with(testRealmViewModel) {
+                    // testRealm()
+                    // testRealm2()
+                    // updateRealm()
+                    // lightlyPopulateRealm()
+                    // fullyPopulateRealm()
+                    callAllAPIs()
                 }
             }
         }

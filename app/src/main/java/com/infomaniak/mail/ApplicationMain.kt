@@ -39,6 +39,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
+import io.realm.RealmInstant
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -100,6 +101,7 @@ class ApplicationMain : Application() {
             mutex.withLock {
                 ApiController.init(
                     arrayListOf(
+                        RealmInstant::class.java to RealmInstantConverter(),
                         // typeAdapterOf<Folder>(), // TODO
                         typeAdapterOf<Folder>(FolderRealmListConverter()),
                         typeAdapterOf<Recipient>(RecipientRealmListConverter()),

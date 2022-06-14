@@ -21,8 +21,10 @@ import com.google.gson.annotations.SerializedName
 
 data class SignaturesResult(
     val signatures: ArrayList<Signature>,
+
     @SerializedName("default_signature_id")
     val defaultSignatureId: Int,
+
     @SerializedName("valid_emails")
     val validEmails: ArrayList<SignatureEmail>,
     val position: String,

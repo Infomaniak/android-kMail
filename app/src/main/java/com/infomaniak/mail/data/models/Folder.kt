@@ -18,18 +18,21 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
-import com.infomaniak.mail.data.models.threads.ThreadMail
+import com.infomaniak.mail.data.models.threads.Thread
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
 
 class Folder : RealmObject {
+    @PrimaryKey
     var id: String = ""
     var path: String = ""
     var name: String = ""
 
+    @Suppress("PropertyName")
     @SerializedName("role")
-    private var _role: String? = null
+    var _role: String? = null
 
     @SerializedName("unread_count")
     var unreadCount: Int = 0
@@ -51,8 +54,8 @@ class Folder : RealmObject {
     /**
      * Local
      */
-    var threads: RealmList<ThreadMail> = realmListOf()
-    var parentLink: Folder? = null
+    var threads: RealmList<Thread> = realmListOf() // TODO
+    var parentLink: Folder? = null // TODO
 
     fun getRole(): FolderRole? = when (_role) {
         FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE

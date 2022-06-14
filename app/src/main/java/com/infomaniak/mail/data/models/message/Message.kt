@@ -20,17 +20,20 @@ package com.infomaniak.mail.data.models.message
 import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.attachment.Attachment
-import com.infomaniak.mail.data.models.threads.ThreadMail
+import com.infomaniak.mail.data.models.threads.Thread
+import io.realm.RealmInstant
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
 
 class Message : RealmObject {
+    @PrimaryKey
     var uid: String = ""
 
     @SerializedName("msg_id")
     var msgId: String = ""
-    var date: String = ""
+    var date: RealmInstant? = null
     var subject: String = ""
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
@@ -43,7 +46,7 @@ class Message : RealmObject {
     var priority: String? = null
 
     @SerializedName("dkim_status")
-    private var _dkimStatus: String? = null
+    private var dkimStatus: String? = null
 
     @SerializedName("folder_id")
     var folderId: String = ""
@@ -78,15 +81,18 @@ class Message : RealmObject {
 
     @SerializedName("safe_display")
     var safeDisplay: Boolean = false
+
+    @SerializedName("is_duplicate")
     var isDuplicate: Boolean = false
 
     /**
      * Local
      */
+    var fullyDownloaded: Boolean = false
     var hasUnsubscribeLink: Boolean = false
-    var parentLink: ThreadMail? = null
+    var parentLink: Thread? = null
 
-    fun getDkimStatus(): MessageDKIM? = when (_dkimStatus) {
+    fun getDkimStatus(): MessageDKIM? = when (dkimStatus) {
         MessageDKIM.VALID.value -> MessageDKIM.VALID
         MessageDKIM.NOT_VALID.value -> MessageDKIM.NOT_VALID
         MessageDKIM.NOT_SIGNED.value -> MessageDKIM.NOT_SIGNED

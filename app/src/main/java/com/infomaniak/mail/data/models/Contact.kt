@@ -37,10 +37,10 @@ class Contact : RealmObject {
 
     @Ignore // TODO: Check if we can still get this field from the database even if it's ignored.
     @SerializedName("contacted_times")
-    private var _contactedTimes: Map<String?, Int?> = mapOf()
+    private var contactedTimes: Map<String?, Int?> = mapOf()
     var emails: RealmList<String> = realmListOf()
 
-    fun getContactedTimes(): ContactedTimes = with(_contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
+    fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
     data class ContactedTimes(
         val email: String?,

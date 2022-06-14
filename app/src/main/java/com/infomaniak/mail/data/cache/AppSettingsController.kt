@@ -15,17 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main
+package com.infomaniak.mail.data.cache
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
-import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.utils.Realms
+import io.realm.query
 
-class NewFolderDialog : DialogFragment() {
+object AppSettingsController {
+    fun getAppSettings(): AppSettings = with(Realms.appSettings) {
+        query<AppSettings>().first().find() ?: writeBlocking { copyToRealm(AppSettings()) }
+    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.dialog_new_folder, container, false)
+    fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
+        Realms.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
+    }
+
+    fun removeAppSettings() {
+        Realms.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
+    }
 }
