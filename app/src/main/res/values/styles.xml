@@ -123,6 +123,20 @@
         <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
     </style>
 
+    <style name="CardviewTopRounded" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/backgroundColor</item>
+        <item name="shapeAppearanceOverlay">@style/CardviewTopRounded.ShapeAppearance</item>
+        <item name="cardElevation">10dp</item>
+    </style>
+
+    <style name="CardviewTopRounded.ShapeAppearance" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">@dimen/materialCardviewRadius</item>
+        <item name="cornerSizeTopLeft">@dimen/materialCardviewRadius</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
     <!-- Other -->
 
     <style name="CircleImageView">
@@ -143,20 +157,6 @@
         <item name="subheaderInsetStart">@dimen/marginStandard</item>
         <item name="subheaderInsetEnd">@dimen/marginStandard</item>
         <item name="subheaderTextAppearance">@style/Callout.Tertiary</item>
-    </style>
-
-    <style name="CardviewTopRounded" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/backgroundColor</item>
-        <item name="shapeAppearanceOverlay">@style/CardviewTopRounded.ShapeAppearance</item>
-        <item name="cardElevation">10dp</item>
-    </style>
-
-    <style name="CardviewTopRounded.ShapeAppearance" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopRight">@dimen/materialCardviewRadius</item>
-        <item name="cornerSizeTopLeft">@dimen/materialCardviewRadius</item>
-        <item name="cornerSizeBottomRight">0dp</item>
-        <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
 </resources>

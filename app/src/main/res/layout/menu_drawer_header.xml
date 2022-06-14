@@ -17,6 +17,7 @@
   -->
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawerHeader"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/CardViewMail"
     android:layout_width="match_parent"
@@ -45,6 +46,7 @@
             android:layout_weight="1" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/settingsButton"
             style="@style/IconButton"
             android:layout_width="30dp"
             android:layout_height="30dp"

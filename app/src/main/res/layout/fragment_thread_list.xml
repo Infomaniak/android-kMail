@@ -30,7 +30,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".ui.main.thread.ThreadListFragment">
+        tools:context=".ui.main.thread.ThreadListFragment"
+        tools:openDrawer="start">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
