@@ -15,8 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.signatures
 
-data class EmptyResponse(
-    val id: Int,
-)
+import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
+
+open class SignatureEmail(
+    var id: Int = 0,
+    var email: String = "",
+    @SerializedName("email_idn")
+    var emailIdn: String = "",
+    @SerializedName("is_account")
+    var isAccount: Boolean = false,
+    @SerializedName("is_verified")
+    var isVerified: Boolean = false,
+    @SerializedName("is_removable")
+    var isRemovable: Boolean = false,
+) : RealmObject()

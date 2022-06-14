@@ -15,32 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.attachment
 
 import com.google.gson.annotations.SerializedName
-import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 
-open class Contact(
-    var id: String = "",
+open class Attachment(
+    var uuid: String = "",
+    var partId: String = "",
+    var mimeType: String = "",
+    var encoding: String = "",
+    var size: Int = 0,
     var name: String = "",
-    @SerializedName("firstname")
-    var firstName: String = "",
-    @SerializedName("lastname")
-    var lastName: String = "",
-    var color: String = "",
-    var other: Boolean = false,
-    @Ignore // TODO: Check if we can still get this field from the database even if it's ignored.
-    @SerializedName("contacted_times")
-    private var _contactedTimes: Map<String?, Int?> = mapOf(),
-    var emails: RealmList<String> = RealmList(),
+    @SerializedName("disposition")
+    private var _disposition: String? = null,
+    var contentId: String = "",
+    var resource: String = "",
+    var driveUrl: String = "",
+    var data: AttachmentData? = null,
+    var localUrl: String = "",
+    var thumbnail: String = "",
 ) : RealmObject() {
 
-    fun getContactedTimes(): ContactedTimes = with(_contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
+    fun getDisposition(): AttachmentDisposition? = when (_disposition) {
+        AttachmentDisposition.INLINE.name -> AttachmentDisposition.INLINE
+        AttachmentDisposition.ATTACHMENT.name -> AttachmentDisposition.ATTACHMENT
+        else -> null
+    }
 
-    data class ContactedTimes(
-        val email: String?,
-        val count: Int?,
-    )
+    enum class AttachmentDisposition {
+        INLINE,
+        ATTACHMENT,
+    }
 }

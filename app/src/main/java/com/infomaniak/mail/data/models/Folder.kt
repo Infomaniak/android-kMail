@@ -18,37 +18,52 @@
 package com.infomaniak.mail.data.models
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.models.threads.ThreadMail
+import io.realm.RealmList
+import io.realm.RealmObject
 
-data class Folder(
-    val id: String,
-    val path: String,
-    val name: String,
-    val role: FolderRole,
+open class Folder(
+    var id: String = "",
+    var path: String = "",
+    var name: String = "",
+    @SerializedName("role")
+    private var _role: String? = null,
     @SerializedName("unread_count")
-    val unreadCount: Int,
+    var unreadCount: Int = 0,
     @SerializedName("total_count")
-    val totalCount: Int,
+    var totalCount: Int = 0,
     @SerializedName("is_fake")
-    val isFake: Boolean,
+    var isFake: Boolean = false,
     @SerializedName("is_collapsed")
-    val isCollapsed: Boolean,
+    var isCollapsed: Boolean = false,
     @SerializedName("is_favorite")
-    val isFavorite: Boolean,
-    val separator: String,
-    val children: ArrayList<Folder>,
+    var isFavorite: Boolean = false,
+    var separator: String = "",
+    var children: RealmList<Folder> = RealmList(),
 
     /**
      * Local
      */
-    val threads: ArrayList<Thread>,
-    val parentLink: Folder?,
-) {
-    enum class FolderRole(name: String, localizedName: String, order: Int) {
-        ARCHIVE("ARCHIVE", "Archives", 6),
-        DRAFT("DRAFT", "Drafts", 2),
-        INBOX("INBOX", "Inbox", 1),
-        SENT("SENT", "Sent", 3),
-        SPAM("SPAM", "Spam", 4),
-        TRASH("TRASH", "Trash", 5),
+    var threads: RealmList<ThreadMail> = RealmList(),
+    var parentLink: Folder? = null,
+) : RealmObject() {
+
+    fun getRole(): FolderRole? = when (_role) {
+        FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE
+        FolderRole.DRAFT.name -> FolderRole.DRAFT
+        FolderRole.INBOX.name -> FolderRole.INBOX
+        FolderRole.SENT.name -> FolderRole.SENT
+        FolderRole.SPAM.name -> FolderRole.SPAM
+        FolderRole.TRASH.name -> FolderRole.TRASH
+        else -> null
+    }
+
+    enum class FolderRole(localizedName: String, order: Int) {
+        INBOX("Inbox", 1),
+        DRAFT("Drafts", 2),
+        SENT("Sent", 3),
+        SPAM("Spam", 4),
+        TRASH("Trash", 5),
+        ARCHIVE("Archives", 6),
     }
 }

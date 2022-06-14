@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.api.ApiRepository.deleteDraft
 import com.infomaniak.mail.data.models.Folder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,13 +43,19 @@ class MainActivity : AppCompatActivity() {
                 val getFolders = ApiRepository.getFolders(mailbox)
                 Log.i("API", "getFolders: $getFolders")
 
-                val inbox = getFolders.data?.find { it.role == Folder.FolderRole.INBOX }!!
+                val inbox = getFolders.data?.find { it.getRole() == Folder.FolderRole.INBOX }!!
                 val getInboxThreads = ApiRepository.getThreads(mailbox, inbox, null)
                 Log.i("API", "getInboxThreads: $getInboxThreads")
 
-                val message = getInboxThreads.data!!.threads.first().messages.first()
+                val message = getInboxThreads.data!!.threads.first().messages.first()!!
                 val getMessage = ApiRepository.getMessage(message)
                 Log.i("API", "getMessage: $getMessage")
+
+                // val moveMessageResponse = ApiRepository.moveMessage(mailbox, arrayListOf(message), inbox.id)
+                // Log.i("API", "moveMessageResponse: $moveMessageResponse")
+
+                // val starMessageResponse = ApiRepository.starMessage(true, mailbox, arrayListOf(message.uid))
+                // Log.i("API", "starMessageResponse: $starMessageResponse")
 
                 val getQuotas = ApiRepository.getQuotas(mailbox)
                 Log.i("API", "getQuotas: $getQuotas")
@@ -60,6 +65,7 @@ class MainActivity : AppCompatActivity() {
 
                 val getContacts = ApiRepository.getContacts()
                 Log.i("API", "getContacts: $getContacts")
+                // getContacts.data?.forEach { Log.e("Contacts", "${it.getContactedTimes()}") }
 
                 val getUser = ApiRepository.getUser()
                 Log.i("API", "getUser: $getUser")
@@ -67,18 +73,21 @@ class MainActivity : AppCompatActivity() {
                 val getSignature = ApiRepository.getSignatures(mailbox)
                 Log.i("API", "getSignature: $getSignature")
 
-                val drafts = getFolders.data?.find { it.role == Folder.FolderRole.DRAFT }!!
+                val drafts = getFolders.data?.find { it.getRole() == Folder.FolderRole.DRAFT }!!
                 val getDraftsThreads = ApiRepository.getThreads(mailbox, drafts, null)
                 Log.i("API", "getDraftsThreads: $getDraftsThreads")
 
-                val draftUuid = getDraftsThreads.data?.threads?.find { it.hasDrafts }
-                    ?.messages?.find { it -> it.isDraft }?.draftResource
-                    ?.substringAfterLast('/')!!
-                val getDraft = ApiRepository.getDraft(mailbox, draftUuid)
-                Log.i("API", "getDraft: $getDraft")
+                val draftMessage = getDraftsThreads.data?.threads?.find { it.hasDrafts }?.messages?.find { it -> it.isDraft }
+                draftMessage?.let {
+                    val draftUuid = draftMessage.draftResource.substringAfterLast('/')
+                    val getDraftFromUuid = ApiRepository.getDraft(mailbox, draftUuid)
+                    Log.i("API", "getDraftFromUuid: $getDraftFromUuid")
+                    val getDraftFromMessage = ApiRepository.getDraft(draftMessage)
+                    Log.i("API", "getDraftFromMessage: $getDraftFromMessage")
 
-                // val deleteDraft = deleteDraft(mailbox, draftUuid)
-                // Log.i("API", "deleteDraft: $deleteDraft")
+                    // val deleteDraft = ApiRepository.deleteDraft(mailbox, draftUuid)
+                    // Log.i("API", "deleteDraft: $deleteDraft")
+                }
             }
         }
     }

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.threads
 
-data class EmptyResponse(
-    val id: Int,
+data class ThreadsResult(
+    val threads: ArrayList<ThreadMail>,
 )

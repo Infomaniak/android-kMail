@@ -15,8 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.user
 
-data class EmptyResponse(
-    val id: Int,
-)
+import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
+
+open class UserPreferences(
+    @SerializedName("thread_mode")
+    private var _threadMode: String? = null,
+    @SerializedName("read_pos")
+    var readPosition: String = "",
+    var density: String = "",
+    // TODO other preferences
+) : RealmObject() {
+
+    fun getThreadMode(): ThreadMode? = when (_threadMode) {
+        ThreadMode.MESSAGES.name -> ThreadMode.MESSAGES
+        ThreadMode.THREADS.name -> ThreadMode.THREADS
+        else -> null
+    }
+
+    enum class ThreadMode {
+        MESSAGES,
+        THREADS,
+    }
+}

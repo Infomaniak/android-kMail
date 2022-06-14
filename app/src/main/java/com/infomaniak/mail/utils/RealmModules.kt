@@ -17,10 +17,59 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.addressBooks.AddressBook
+import com.infomaniak.mail.data.models.attachment.Attachment
+import com.infomaniak.mail.data.models.attachment.AttachmentData
+import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.signatures.Signature
+import com.infomaniak.mail.data.models.signatures.SignatureEmail
+import com.infomaniak.mail.data.models.threads.ThreadMail
+import com.infomaniak.mail.data.models.user.UserInfos
+import com.infomaniak.mail.data.models.user.UserPreferences
 import io.realm.annotations.RealmModule
 
 object RealmModules {
-    @RealmModule(classes = [AppSettings::class])
+    @RealmModule(
+        classes = [
+            AppSettings::class,
+        ]
+    )
     class AppSettingsModule
+
+    @RealmModule(
+        classes = [
+            Mailbox::class,
+        ]
+    )
+    class MailboxModule
+
+    @RealmModule(
+        classes = [
+            Attachment::class,
+            Folder::class,
+            Message::class,
+            Body::class,
+            Recipient::class,
+            ThreadMail::class,
+        ]
+    )
+    class MailsModule
+
+    @RealmModule(
+        classes = [
+            AddressBook::class,
+            AttachmentData::class,
+            Contact::class,
+            Draft::class,
+            Quotas::class,
+            Signature::class,
+            SignatureEmail::class,
+            UserInfos::class,
+            UserPreferences::class,
+            // TODO: Add missing ones.
+        ]
+    )
+    class OtherModule
 }

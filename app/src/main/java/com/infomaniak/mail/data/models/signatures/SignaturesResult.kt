@@ -15,28 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.signatures
 
-import android.media.Image
-import java.net.URL
+import com.google.gson.annotations.SerializedName
 
-data class Attachment(
-    val uuid: String,
-    val partId: String,
-    val mimeType: String,
-    val encoding: String,
-    val size: Int,
-    val name: String,
-    val disposition: AttachmentDisposition,
-    val contentId: String,
-    val resource: String,
-    val driveUrl: String,
-    val data: Data,
-    val localUrl: URL,
-    val thumbnail: Image,
-) {
-    enum class AttachmentDisposition {
-        INLINE,
-        ATTACHMENT,
-    }
-}
+data class SignaturesResult(
+    val signatures: ArrayList<Signature>,
+    @SerializedName("default_signature_id")
+    val defaultSignatureId: Int,
+    @SerializedName("valid_emails")
+    val validEmails: ArrayList<SignatureEmail>,
+    val position: String,
+)

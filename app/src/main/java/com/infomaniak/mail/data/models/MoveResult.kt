@@ -17,6 +17,10 @@
  */
 package com.infomaniak.mail.data.models
 
-data class EmptyResponse(
-    val id: Int,
+import com.google.gson.annotations.SerializedName
+
+data class MoveResult(
+    val moved: Int,
+    @SerializedName("undo_resource")
+    val undoResource: String,
 )

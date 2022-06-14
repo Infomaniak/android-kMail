@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.addressBooks
 
 import com.google.gson.annotations.SerializedName
 
@@ -23,26 +23,4 @@ data class AddressBooksResult(
     @SerializedName("addressbooks")
     val addressBooks: ArrayList<AddressBook>,
     val default: AddressBook?,
-) {
-    data class AddressBook(
-        val id: Int,
-        @SerializedName("user_id")
-        val userId: Int,
-        @SerializedName("principal_uri")
-        val principalUri: String,
-        val name: String,
-        val color: String,
-        val uuid: String,
-        val description: String,
-        @SerializedName("is_shared")
-        val isShared: Boolean,
-        val rights: String,
-        @SerializedName("is_activated")
-        val isActivated: Boolean,
-        @SerializedName("is_hidden")
-        val isHidden: Boolean,
-        @SerializedName("is_pending")
-        val isPending: Boolean,
-        // val categories: ArrayList<Category>,
-    )
-}
+)
