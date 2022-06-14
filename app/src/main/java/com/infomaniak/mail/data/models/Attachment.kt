@@ -103,6 +103,15 @@ class Attachment : RealmObject {
         else -> null
     }
 
+    override fun equals(other: Any?): Boolean =
+        when {
+            other !is Attachment -> false
+            uuid != other.uuid -> false
+            else -> true
+        }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
     enum class AttachmentDisposition {
         INLINE,
         ATTACHMENT,

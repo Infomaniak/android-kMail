@@ -26,11 +26,15 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListFragment : Fragment() {
@@ -38,65 +42,39 @@ class ThreadListFragment : Fragment() {
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
-    private val threadAdapter = ThreadListAdapter()
+    private lateinit var threadListAdapter: ThreadListAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentThreadListBinding.inflate(inflater, container, false)
+    private var jobThreadsFromApi: Job? = null
 
-        return binding.root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.threadList.adapter = threadAdapter
-        listenToChanges()
-        threadListViewModel.getThreads()
-
+        setupAdapter()
         setupListeners()
-        setupThreadAdapter()
+
+        displayThreadsFromRealm()
+        displayThreadsFromApi()
     }
 
-    private fun listenToChanges() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                threadListViewModel.threads.collect { threads ->
+    private fun setupAdapter() {
+        binding.threadsList.adapter = ThreadListAdapter().also { threadListAdapter = it }
 
-                    Log.i("UI", "Received threads (${threads.size})")
-                    threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
-
-                    if (threads.isEmpty()) {
-                        displayNoEmailView()
-                    } else
-                        displayThreadList()
-                    with(threadAdapter) {
-                        val newList = formatList(threads, requireContext())
-                        notifyAdapter(newList)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setupThreadAdapter() {
         threadListViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
-            // TODO manage no internet screen
-//            threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
-//            binding.noNetwork.isGone = isInternetAvailable
+            // TODO: Manage no Internet screen
+            // threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
+            // binding.noNetwork.isGone = isInternetAvailable
         }
 
-        threadAdapter.apply {
-//            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        threadListAdapter.apply {
+            // stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-//            onEmptyList = { checkIfNoFiles() }
+            // onEmptyList = { checkIfNoFiles() }
 
-            onThreadClicked = { thread ->
-//                if (thread.isUsable()) {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment())
-//                    }
+            onThreadClicked = {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(it.uid, it.subject))
             }
         }
     }
@@ -106,6 +84,7 @@ class ThreadListFragment : Fragment() {
             openMultiselectButton.setOnClickListener {
                 // TODO multiselection
             }
+
             header.searchViewCard.apply {
                 // TODO filterButton doesn't propagate the event to root, must display it ?
                 searchView.isGone = true
@@ -115,25 +94,75 @@ class ThreadListFragment : Fragment() {
                     safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
                 }
             }
+
             header.userAvatar.setOnClickListener {
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
             }
+
             newMessageFab.setOnClickListener {
                 safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
             }
+
+            threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 ||
+                        layoutManager.findLastCompletelyVisibleItemPosition() == threadListAdapter.itemCount - 1
+                    ) {
+                        newMessageFab.extend()
+                    } else {
+                        newMessageFab.shrink()
+                    }
+                }
+            })
+        }
+    }
+
+    private fun displayThreadsFromRealm() {
+        val threads = with(threadListViewModel) {
+            threadsFromApi.value = null
+            getDataFromRealmThenFetchFromApi()
+        }
+        displayThreads(threads)
+    }
+
+    private fun displayThreadsFromApi() {
+        if (jobThreadsFromApi != null) jobThreadsFromApi?.cancel()
+
+        jobThreadsFromApi = with(threadListViewModel) {
+            viewModelScope.launch(Dispatchers.Main) {
+                threadsFromApi.filterNotNull().collect { displayThreads(it) }
+            }
+        }
+    }
+
+    private fun displayThreads(threads: List<Thread>) {
+        Log.i("UI", "Received threads (${threads.size})")
+        // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
+
+        if (threads.isEmpty()) {
+            displayNoEmailView()
+        } else {
+            displayThreadList()
+        }
+
+        with(threadListAdapter) {
+            val newList = formatList(threads, requireContext())
+            notifyAdapter(newList)
         }
     }
 
     private fun displayNoEmailView() {
         with(binding) {
-            threadList.isGone = true
+            threadsList.isGone = true
             noMailLayout.root.isVisible = true
         }
     }
 
     private fun displayThreadList() {
         with(binding) {
-            threadList.isVisible = true
+            threadsList.isVisible = true
             noMailLayout.root.isGone = true
         }
     }

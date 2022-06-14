@@ -31,4 +31,18 @@ class Body : RealmObject {
      */
     @PrimaryKey
     var objectId: String = "" // TODO: Remove this when we have EmbeddedObjects
+
+    // TODO: Remove this when we have EmbeddedObjects
+    fun initLocalValues(completedMessageUid: String) {
+        objectId = "body_${completedMessageUid}"
+    }
+
+    override fun equals(other: Any?): Boolean =
+        when {
+            other !is Body -> false
+            objectId != other.objectId -> false
+            else -> true
+        }
+
+    override fun hashCode(): Int = javaClass.hashCode()
 }

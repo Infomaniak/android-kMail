@@ -21,6 +21,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.*
@@ -28,69 +30,87 @@ import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.ItemThreadBinding
-import com.infomaniak.mail.databinding.SeeAllRecyclerButtonBinding
-import com.infomaniak.mail.databinding.ThreadListRecyclerSectionBinding
+import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
+import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import java.util.*
 
 class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use LoaderAdapter from Core instead?
 
-    var itemsList: ArrayList<Any> = ArrayList()
+    private var itemsList: ArrayList<Any> = ArrayList()
 
     @StringRes
     var previousSectionName: Int = -1
-    var displaySeeAllButton = false // TODO manage this for intelligent mailbox
+    private var displaySeeAllButton = false // TODO manage this for intelligent mailbox
 
     var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = when (viewType) {
-            R.layout.thread_list_recycler_section -> ThreadListRecyclerSectionBinding.inflate(layoutInflater, parent, false)
-            R.layout.see_all_recycler_button -> SeeAllRecyclerButtonBinding.inflate(layoutInflater, parent, false)
-            else -> ItemThreadBinding.inflate(layoutInflater, parent, false)
-        }
-        return ThreadViewHolder(binding)
+    companion object {
+        const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val viewHolder = holder as ThreadViewHolder<*>
-        when (getItemViewType(position)) {
-            DisplayType.SECTION_TITLE.layout -> with(viewHolder.binding as ThreadListRecyclerSectionBinding) {
-                sectionTitle.text = itemsList[position] as String
-            }
-            DisplayType.SEE_ALL_BUTTON.layout -> with(viewHolder.binding as SeeAllRecyclerButtonBinding) {
-                seeAllText.append("(${itemsList[position]})")
-            }
-            DisplayType.THREAD.layout -> with(viewHolder.binding as ItemThreadBinding) {
-                with(itemsList[position] as Thread) {
-                    expeditor.text = from[0].name.ifEmpty { from[0].email }
-                    mailSubject.text = subject
-                    mailDate.text = formatDate(date?.toDate() ?: Date(0))
-                    viewHolder.binding.itemThread.setOnClickListener { onThreadClicked?.invoke(this) }
-                }
-            }
-        }
-    }
-
-    override fun getItemCount() = itemsList.size
+    override fun getItemCount(): Int = itemsList.size
 
     override fun getItemViewType(position: Int): Int {
         return when {
-            itemsList[position] is String -> DisplayType.SECTION_TITLE.layout
+            itemsList[position] is String -> DisplayType.DATE_SEPARATOR.layout
             displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
             else -> DisplayType.THREAD.layout
         }
     }
 
-    private fun getDateCategories(dateTime: Long): DateFilter {
-        return when {
-            dateTime >= DateFilter.TODAY.start -> DateFilter.TODAY
-            dateTime >= DateFilter.CURRENT_WEEK.start -> DateFilter.CURRENT_WEEK
-            dateTime >= DateFilter.LAST_WEEK.start -> DateFilter.LAST_WEEK
-            else -> DateFilter.TWO_WEEKS
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = when (viewType) {
+            R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
+            else -> ItemThreadBinding.inflate(layoutInflater, parent, false)
+        }
+        return BindingViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val viewHolder = holder as BindingViewHolder<*>
+        when (getItemViewType(position)) {
+            DisplayType.DATE_SEPARATOR.layout -> {
+                displayDateSeparator(viewHolder.binding as ItemThreadDateSeparatorBinding, position)
+            }
+            DisplayType.SEE_ALL_BUTTON.layout -> {
+                displaySeeAllButton(viewHolder.binding as ItemThreadSeeAllButtonBinding, position)
+            }
+            DisplayType.THREAD.layout -> {
+                displayThread(viewHolder.binding as ItemThreadBinding, position)
+            }
+        }
+    }
+
+    private fun displayDateSeparator(binding: ItemThreadDateSeparatorBinding, position: Int) = with(binding) {
+        sectionTitle.text = itemsList[position] as String
+    }
+
+    private fun displaySeeAllButton(binding: ItemThreadSeeAllButtonBinding, position: Int) = with(binding) {
+        seeAllText.append("(${itemsList[position]})")
+    }
+
+    private fun displayThread(binding: ItemThreadBinding, position: Int) = with(binding) {
+        val thread = itemsList[position] as Thread
+        expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
+        mailSubject.text = thread.subject
+        mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
+        iconAttachment.isVisible = thread.hasAttachments
+        iconCalendar.isGone = true // TODO see with api when we should display this icon
+        iconFavorite.isVisible = thread.flagged
+        newMailBullet.isVisible = thread.unseenMessagesCount > 0
+        itemThread.setOnClickListener { onThreadClicked?.invoke(thread) }
+    }
+
+    private fun formatDate(date: Date): String = with(date) {
+        when {
+            isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
+            year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
+            else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
         }
     }
 
@@ -113,17 +133,31 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         return formattedList
     }
 
-    private fun formatDate(date: Date): String = with(date) {
-        when {
-            isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-            year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
-            else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
+    private fun getDateCategories(dateTime: Long): DateFilter {
+        return when {
+            dateTime >= DateFilter.TODAY.start -> DateFilter.TODAY
+            dateTime >= DateFilter.CURRENT_WEEK.start -> DateFilter.CURRENT_WEEK
+            dateTime >= DateFilter.LAST_WEEK.start -> DateFilter.LAST_WEEK
+            else -> DateFilter.TWO_WEEKS
         }
     }
 
     fun notifyAdapter(newList: ArrayList<Any>) {
         DiffUtil.calculateDiff(ThreadListDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
         itemsList = newList
+    }
+
+    private enum class DisplayType(val layout: Int) {
+        THREAD(R.layout.item_thread),
+        DATE_SEPARATOR(R.layout.item_thread_date_separator),
+        SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
+    }
+
+    private enum class DateFilter(val start: Long, @StringRes val value: Int) {
+        TODAY(Date().startOfTheDay().time, R.string.threadListSectionToday),
+        CURRENT_WEEK(Date().startOfTheWeek().time, R.string.threadListSectionThisWeek),
+        LAST_WEEK(Date().startOfTheWeek().time - DAY_LENGTH_MS * 7, R.string.threadListSectionLastWeek),
+        TWO_WEEKS(Date().startOfTheWeek().time - DAY_LENGTH_MS * 14, R.string.threadListSectionTwoWeeks),
     }
 
     private class ThreadListDiffCallback(
@@ -162,22 +196,5 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 }
             }
         }
-    }
-
-    enum class DateFilter(val start: Long, @StringRes val value: Int) {
-        TODAY(Date().startOfTheDay().time, R.string.threadListSectionToday),
-        CURRENT_WEEK(Date().startOfTheWeek().time, R.string.threadListSectionThisWeek),
-        LAST_WEEK(Date().startOfTheWeek().time - DAY_LENGTH_MS * 7, R.string.threadListSectionLastWeek),
-        TWO_WEEKS(Date().startOfTheWeek().time - DAY_LENGTH_MS * 14, R.string.threadListSectionTwoWeeks),
-    }
-
-    enum class DisplayType(val layout: Int) {
-        THREAD(R.layout.item_thread),
-        SECTION_TITLE(R.layout.thread_list_recycler_section),
-        SEE_ALL_BUTTON(R.layout.see_all_recycler_button),
-    }
-
-    companion object {
-        const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
     }
 }

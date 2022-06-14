@@ -39,10 +39,11 @@ class Thread : RealmObject {
 
     @SerializedName("deleted_messages_count")
     var deletedMessagesCount: Int = 0
+
     var messages: RealmList<Message> = realmListOf()
 
     @SerializedName("unseen_messages")
-    var unseenMessages: Int = 0
+    var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
@@ -67,19 +68,24 @@ class Thread : RealmObject {
         messages.removeIf { it.isDuplicate }
 
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        cc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        bcc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         messages = messages.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         return this
     }
 
+    fun updateAndSelect() {
+        fetchMessagesFromApi()
+        select()
+    }
+
     fun select() {
         MailRealm.mutableCurrentThreadUidFlow.value = uid
     }
 
-    fun fetchMessagesFromAPI(): List<Message> {
+    private fun fetchMessagesFromApi() {
         // Get current data
         Log.d("API", "Messages: Get current data")
         val messagesFromRealm = messages
@@ -88,7 +94,7 @@ class Thread : RealmObject {
             ApiRepository.getMessage(it.resource).data?.also { completedMessage ->
                 completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
                 completedMessage.fullyDownloaded = true
-                completedMessage.body?.objectId = "body_${completedMessage.uid}" // TODO: Remove this when we have EmbeddedObjects
+                completedMessage.body?.initLocalValues(completedMessage.uid) // TODO: Remove this when we have EmbeddedObjects
                 // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
                 @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
                 completedMessage.attachments?.forEachIndexed { index, attachment ->
@@ -105,14 +111,11 @@ class Thread : RealmObject {
 
         // Save new data
         Log.i("API", "Messages: Save new data")
-        messages = messagesFromApi.toRealmList()
-        MailboxContentController.upsertThread(this)
+        messagesFromApi.forEach(MailboxContentController::upsertMessage)
 
         // Delete outdated data
         Log.e("API", "Messages: Delete outdated data")
         deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
-
-        return messagesFromApi
     }
 
     enum class ThreadFilter(title: String) {

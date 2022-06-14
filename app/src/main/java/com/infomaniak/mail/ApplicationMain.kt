@@ -31,9 +31,9 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.*
@@ -47,20 +47,16 @@ import io.sentry.android.core.SentryAndroidOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.util.*
 
 class ApplicationMain : Application() {
-
-    private val mutex = Mutex()
 
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) configureDebugMode() else configureReleaseMode()
         configureSentry()
-        configureRealm()
+        configureApiController()
+        configureAccountUtils()
         configureAppReloading()
         configureInfomaniakCore()
         configureNotifications()
@@ -83,7 +79,7 @@ class ApplicationMain : Application() {
     }
 
     private fun configureReleaseMode() {
-
+        // No-op
     }
 
     private fun configureSentry() {
@@ -96,29 +92,22 @@ class ApplicationMain : Application() {
         }
     }
 
-    private fun configureRealm() {
-        runBlocking {
-            mutex.withLock {
-                ApiController.init(
-                    arrayListOf(
-                        RealmInstant::class.java to RealmInstantConverter(),
-                        // typeAdapterOfRealmListOf<Folder>(), // TODO
-                        typeAdapterOfRealmListOf<Folder>(FolderRealmListConverter()),
-                        typeAdapterOfRealmListOf<Recipient>(RecipientRealmListConverter()),
-                        typeAdapterOfRealmListOf<Message>(MessageRealmListConverter()),
-                        typeAdapterOfRealmListOf<Attachment>(AttachmentRealmListConverter()),
-                        typeAdapterOfRealmListOf<String>(StringRealmListConverter()),
-                    )
-                )
+    private fun configureApiController() {
+        ApiController.init(
+            arrayListOf(
+                RealmInstant::class.java to RealmInstantConverter(),
+                // typeAdapterOfRealmListOf<Folder>(), // TODO
+                typeAdapterOfRealmListOf<Folder>(FolderRealmListConverter()),
+                typeAdapterOfRealmListOf<Recipient>(RecipientRealmListConverter()),
+                typeAdapterOfRealmListOf<Message>(MessageRealmListConverter()),
+                typeAdapterOfRealmListOf<Attachment>(AttachmentRealmListConverter()),
+                typeAdapterOfRealmListOf<String>(StringRealmListConverter()),
+            )
+        )
+    }
 
-                // try {
-                // Realm.getDefaultInstance() // TODO
-                // } catch (exception: Exception) {
-                // Realm.init(this@ApplicationMain) // TODO
-                AccountUtils.init(this@ApplicationMain)
-                // }
-            }
-        }
+    private fun configureAccountUtils() {
+        AccountUtils.init(this@ApplicationMain)
     }
 
     private fun configureAppReloading() {
@@ -151,20 +140,17 @@ class ApplicationMain : Application() {
     private val refreshTokenError: (User) -> Unit = { user ->
         val openAppIntent = Intent(this, LaunchActivity::class.java).clearStack()
         val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            openAppIntent,
+            this, 0, openAppIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+
         val notificationManagerCompat = NotificationManagerCompat.from(this)
         showGeneralNotification(getString(R.string.refreshTokenError)).apply {
             setContentIntent(pendingIntent)
             notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            AccountUtils.removeUser(this@ApplicationMain, user)
-        }
+        CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {

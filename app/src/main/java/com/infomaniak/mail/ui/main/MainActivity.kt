@@ -18,13 +18,11 @@
 package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.ui.MainViewModel
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -32,13 +30,14 @@ import io.sentry.SentryLevel
 class MainActivity : AppCompatActivity() {
 
     // private val testRealmViewModel: TestRealmViewModel by viewModels()
-    private val mainViewModel: MainViewModel by viewModels()
+    // private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainViewModel.getData()
+        // mainViewModel.getData()
+
         // findViewById<Button>(R.id.startCalls).setOnClickListener {
         //     lifecycleScope.launch(Dispatchers.IO) { testRealmViewModel.testRealm(cacheDir) }
         // }

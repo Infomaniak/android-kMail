@@ -1,0 +1,32 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#666666"
+        android:fillType="evenOdd"
+        android:pathData="M11.9482,9.2647C11.6428,9.2643 11.352,9.3802 11.1502,9.5827L6.622,14.1298C6.4124,14.3308 6.3424,14.6163 6.4391,14.8758C6.5359,15.1354 6.7841,15.3283 7.0878,15.38C7.3915,15.4316 7.7031,15.3338 7.9019,15.1245L11.8614,11.1483C11.8833,11.1262 11.915,11.1136 11.9482,11.1136C11.9814,11.1136 12.0131,11.1262 12.035,11.1483L15.9945,15.1253C16.1933,15.3346 16.5048,15.4324 16.8086,15.3808C17.1123,15.3291 17.3605,15.1362 17.4572,14.8766C17.5539,14.6171 17.484,14.3316 17.2743,14.1306L12.7476,9.5844C12.5454,9.3814 12.2542,9.2649 11.9482,9.2647Z" />
+    <group>
+        <clip-path
+            android:fillType="evenOdd"
+            android:pathData="M11.9482,9.2647C11.6428,9.2643 11.352,9.3802 11.1502,9.5827L6.622,14.1298C6.4124,14.3308 6.3424,14.6163 6.4391,14.8758C6.5359,15.1354 6.7841,15.3283 7.0878,15.38C7.3915,15.4316 7.7031,15.3338 7.9019,15.1245L11.8614,11.1483C11.8833,11.1262 11.915,11.1136 11.9482,11.1136C11.9814,11.1136 12.0131,11.1262 12.035,11.1483L15.9945,15.1253C16.1933,15.3346 16.5048,15.4324 16.8086,15.3808C17.1123,15.3291 17.3605,15.1362 17.4572,14.8766C17.5539,14.6171 17.484,14.3316 17.2743,14.1306L12.7476,9.5844C12.5454,9.3814 12.2542,9.2649 11.9482,9.2647Z" />
+    </group>
+</vector>

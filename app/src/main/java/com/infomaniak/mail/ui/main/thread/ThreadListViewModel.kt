@@ -17,31 +17,78 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
+    private companion object {
+        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
+    }
+
     var isInternetAvailable = MutableLiveData(true)
 
-    private val _threads = MutableStateFlow<List<Thread>>(emptyList())
-    val threads = _threads.asStateFlow()
+    val threadsFromApi = MutableStateFlow<List<Thread>?>(null)
 
-    fun getThreads() {
-        viewModelScope.launch {
-            MailRealm.currentFolderIdFlow.filterNotNull().collect { id ->
-                MailboxContentController.getFolder(id)?.threads?.asFlow()?.collect { changes ->
-                    _threads.value = changes.list
-                }
+    fun getDataFromRealmThenFetchFromApi(): List<Thread> {
+        val threads = readDataFromRealm()
+        fetchDataFromApi()
+        return threads
+    }
+
+    private fun readDataFromRealm(): List<Thread> {
+
+        fun getCurrentMailbox(): Mailbox? {
+            val mailboxes = MailRealm.readMailboxesFromRealm()
+            return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId } ?: mailboxes.firstOrNull()
+        }
+
+        fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
+            mailbox.readFoldersFromRealm().find { it.getRole() == folderRole }
+
+        Log.e("Realm", "Start reading data")
+        val mailbox = getCurrentMailbox() ?: return emptyList()
+        mailbox.select()
+        val folder = getFolder(mailbox, DEFAULT_FOLDER_ROLE) ?: return emptyList()
+        folder.select()
+        Log.e("Realm", "End of reading data")
+        return folder.threads
+    }
+
+    private fun fetchDataFromApi() {
+
+        fun fetchCurrentMailbox(): Mailbox? {
+            val mailboxes = MailRealm.fetchMailboxesFromApi()
+            return with(mailboxes) {
+                find { it.mailboxId == AccountUtils.currentMailboxId }
+                // ?: find { it.email == "kevin.boulongne@ik.me" }
+                    ?: find { it.email == "kevin.boulongne@infomaniak.com" }
+                    ?: firstOrNull()
             }
+        }
+
+        fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
+            mailbox.fetchFoldersFromApi().find { it.getRole() == folderRole }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.e("API", "Start fetching data")
+            val mailbox = fetchCurrentMailbox() ?: return@launch
+            mailbox.select()
+            val folder = fetchFolder(mailbox, DEFAULT_FOLDER_ROLE) ?: return@launch
+            folder.updateAndSelect(mailbox.uuid)
+            Log.e("API", "End of fetching data")
+            threadsFromApi.value = folder.threads
         }
     }
 }

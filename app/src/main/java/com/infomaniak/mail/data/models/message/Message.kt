@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.*
 import io.realm.MutableRealm.UpdatePolicy
+import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
 
 class Message : RealmObject {
@@ -91,14 +92,17 @@ class Message : RealmObject {
      */
     var fullyDownloaded: Boolean = false
     var hasUnsubscribeLink: Boolean = false
-    var parentLink: Thread? = null
+    var parentLink: Thread? = null // TODO
+
+    @Ignore
+    var isExpandedHeaderMode = false
 
     fun initLocalValues(): Message {
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        cc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        bcc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        to = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        replyTo = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        replyTo = replyTo.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         return this
     }

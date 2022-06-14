@@ -15,19 +15,8 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <com.infomaniak.lib.core.views.LoaderTextView
-        android:id="@+id/seeAllText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
-        android:layout_marginStart="@dimen/marginStandard"
-        android:minWidth="120dp"
-        app:loader_corner="12dp"
-        tools:text="Voir tout" />
-</LinearLayout>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#ECECEC" />
+    <size android:height="1dp" />
+</shape>

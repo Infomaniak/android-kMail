@@ -62,16 +62,37 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     var parentLink: Folder? = null // TODO
 
+    fun updateAndSelect(mailboxUuid: String) {
+        fetchThreadsFromApi(mailboxUuid)
+        select()
+    }
+
     fun select() {
         MailRealm.mutableCurrentFolderIdFlow.value = id
     }
 
-    fun fetchThreadsFromAPI(mailboxUuid: String) {
+    private fun fetchThreadsFromApi(mailboxUuid: String) {
         // Get current data
         Log.d("API", "Threads: Get current data")
         val threadsFromRealm = threads
         // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Threads will be deleted. We don't want that.
-        val threadsFromApi = ApiRepository.getThreads(mailboxUuid, id).data?.threads?.map { it.initLocalValues() }
+        val threadsFromApi = ApiRepository.getThreads(mailboxUuid, id).data?.threads
+            ?.map { threadFromApi ->
+                threadFromApi.initLocalValues()
+                // TODO: Put this back when there is no more Realm issue
+                // threadsFromRealm.find { it.uid == threadFromApi.uid }?.let { threadFromRealm ->
+                //     threadFromApi.messages.forEach { messageFromApi ->
+                //         threadFromRealm.messages.find { it.uid == messageFromApi.uid }?.let { messageFromRealm ->
+                //             messageFromApi.apply {
+                //                 fullyDownloaded = messageFromRealm.fullyDownloaded
+                //                 body = messageFromRealm.body
+                //                 attachments = messageFromRealm.attachments
+                //             }
+                //         }
+                //     }
+                // }
+                // threadFromApi
+            }
         // ?.filterIndexed { index, _ -> index < 7 }
         // ?.filterIndexed { index, _ -> index < 5 }
         // ?.filterIndexed { index, _ -> index < 3 }

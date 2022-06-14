@@ -61,7 +61,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/threadList"
+        android:id="@+id/threadsList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone"
@@ -87,6 +87,7 @@
         android:layout_marginEnd="@dimen/marginStandard"
         android:layout_marginBottom="@dimen/marginStandard"
         android:contentDescription="@string/newMessageButton"
+        android:paddingHorizontal="18dp"
         android:text="@string/newMessageButton"
         android:textAllCaps="false"
         app:backgroundTint="@color/colorPrimary"
