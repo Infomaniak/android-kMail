@@ -17,73 +17,60 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
-import android.content.Context
 import android.util.Patterns
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
-import android.widget.TextView
-import com.google.android.material.imageview.ShapeableImageView
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.loadAvatar
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ItemContactBinding
 
 class ContactAdapter(
-    val context: Context,
-    var allContacts: ArrayList<Contact> = arrayListOf(),
-    var alreadyUsedContactIds: ArrayList<Int>,
+    private val allContacts: List<Contact> = emptyList(),
     private val onItemClick: (item: Contact) -> Unit,
-) : BaseAdapter(), Filterable {
-    private var contacts: ArrayList<Contact> = allContacts
+) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>(), Filterable {
+    private var contacts = ArrayList<Contact>()
+    private var alreadyUsedContactIds = ArrayList<String>()
 
     init {
-        cleanItemList()
+        setHasStableIds(true)
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
+        return ContactViewHolder(ItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    }
+
+    override fun onBindViewHolder(holder: ContactViewHolder, position: Int): Unit = with(holder.binding) {
+        val contact = contacts[position]
+        userName.text = contact.name
+        userEmail.text = contact.emails[0] // TODO adapt to all emails?
+        userAvatar.loadAvatar(contact.id.hashCode(), null, contact.name.firstOrEmpty().toString())
+        root.setOnClickListener { onItemClick(contact) }
+    }
+
+    override fun getItemCount(): Int = contacts.count()
+
+    override fun getItemId(position: Int): Long = contacts[position].id.hashCode().toLong()
+
     fun addFirstAvailableItem(): Boolean {
-        val item = contacts.firstOrNull()
-        return if (item == null) {
+        val contact = contacts.firstOrNull()
+        return if (contact == null) {
             false
         } else {
-            onItemClick(item)
+            onItemClick(contact)
             true
         }
     }
 
-    private fun cleanItemList() = contacts.sortBy { it.name }
-
-    override fun notifyDataSetChanged() {
-        cleanItemList()
-        super.notifyDataSetChanged()
+    fun clear() {
+        contacts.clear()
+        notifyDataSetChanged()
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val contact = getItem(position)
-
-        return (convertView ?: ItemContactBinding.inflate(inflater).root).apply {
-            findViewById<TextView>(R.id.userName).text = contact.name
-            findViewById<TextView>(R.id.userEmail).text = contact.emails[0] // TODO adapt to all emails?
-            findViewById<ShapeableImageView>(R.id.userAvatar).loadAvatar(
-                contact.id.toInt(),
-                null,
-                contact.name.firstOrEmpty().toString()
-            )
-
-            setOnClickListener { onItemClick(contact) }
-        }
-    }
-
-    override fun getCount(): Int = contacts.count()
-
-    override fun getItem(position: Int): Contact = contacts[position]
-
-    override fun getItemId(position: Int): Long = getItem(position).id.toLong()
+    private fun orderItemList() = contacts.sortBy { it.name }
 
     override fun getFilter(): Filter {
         return object : Filter() {
@@ -91,7 +78,7 @@ class ContactAdapter(
                 val searchTerm = constraint?.standardize() ?: ""
                 val finalUserList = allContacts
                     .filter { it.name.standardize().contains(searchTerm) || it.emails[0].standardize().contains(searchTerm) }
-                    .filterNot { displayedItem -> alreadyUsedContactIds.any { it == displayedItem.id.toInt() } }
+                    .filterNot { displayedItem -> alreadyUsedContactIds.any { it == displayedItem.id } }
                 return FilterResults().apply {
                     values = finalUserList
                     count = finalUserList.size
@@ -100,13 +87,13 @@ class ContactAdapter(
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                 val searchTerm = constraint?.standardize()
-                if (searchTerm?.isEmail() == true && !searchTerm.existsInAvailableItems()) {
-                    contacts = arrayListOf()
-                    notifyDataSetChanged()
+                contacts = if (searchTerm?.isEmail() == true && !searchTerm.existsInAvailableItems()) {
+                    arrayListOf()
                 } else {
-                    contacts = results.values as ArrayList<Contact> // Normal warning
-                    notifyDataSetChanged()
+                    results.values as ArrayList<Contact> // Normal warning
                 }
+                orderItemList()
+                notifyDataSetChanged()
             }
         }
     }
@@ -117,4 +104,6 @@ class ContactAdapter(
 
     private fun String.existsInAvailableItems(): Boolean =
         allContacts.any { availableItem -> availableItem.emails[0].standardize() == this }
+
+    class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 }

@@ -29,6 +29,8 @@
     <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
 
     <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+<!--        <item name="android:windowContentTransitions">true</item>-->
         <item name="android:adjustViewBounds">true</item>
         <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="android:fontFamily">@font/suisseintl_regular</item>

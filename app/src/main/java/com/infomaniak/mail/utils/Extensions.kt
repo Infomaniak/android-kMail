@@ -89,22 +89,4 @@ fun View.toggleChevron(
     animate().rotation(angle).setDuration(duration).start()
 }
 
-fun MaterialAutoCompleteTextView.setupAvailableContactItems(
-    context: Context,
-    itemList: List<Contact>,
-    alreadyUsedContactIds: ArrayList<Int> = arrayListOf(),
-    onDataPassed: (item: Contact) -> Unit
-): ContactAdapter {
-    setDropDownBackgroundResource(R.drawable.background_popup)
-
-    val availableUsersAdapter = ContactAdapter(context, ArrayList(itemList), alreadyUsedContactIds, onDataPassed)
-    setAdapter(availableUsersAdapter)
-    setOnEditorActionListener { _, actionId, _ ->
-        if (actionId == EditorInfo.IME_ACTION_DONE) availableUsersAdapter.addFirstAvailableItem()
-        true // Keep keyboard open
-    }
-
-    return availableUsersAdapter
-}
-
 inline val ViewBinding.context: Context get() = root.context
