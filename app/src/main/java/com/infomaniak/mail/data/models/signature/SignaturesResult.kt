@@ -15,11 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.attachment
+package com.infomaniak.mail.data.models.signature
 
-import io.realm.RealmObject
+import com.google.gson.annotations.SerializedName
 
-// @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
-class AttachmentData : RealmObject {
-    var id: Int = 0
-}
+data class SignaturesResult(
+    val signatures: ArrayList<Signature>,
+
+    @SerializedName("default_signature_id")
+    val defaultSignatureId: Int,
+
+    @SerializedName("valid_emails")
+    val validEmails: ArrayList<SignatureEmail>,
+    val position: String,
+)

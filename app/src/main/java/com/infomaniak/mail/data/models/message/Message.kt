@@ -18,14 +18,15 @@
 package com.infomaniak.mail.data.models.message
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.attachment.Attachment
-import com.infomaniak.mail.data.models.threads.Thread
-import io.realm.RealmInstant
-import io.realm.RealmList
-import io.realm.RealmObject
+import com.infomaniak.mail.data.models.thread.Thread
+import io.realm.*
+import io.realm.MutableRealm.UpdatePolicy
 import io.realm.annotations.PrimaryKey
-import io.realm.realmListOf
 
 class Message : RealmObject {
     @PrimaryKey
@@ -91,6 +92,29 @@ class Message : RealmObject {
     var fullyDownloaded: Boolean = false
     var hasUnsubscribeLink: Boolean = false
     var parentLink: Thread? = null
+
+    fun initLocalValues(): Message {
+        from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        to = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        replyTo = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+
+        return this
+    }
+
+    fun getDraft(): Draft? {
+        val apiDraft = ApiRepository.getDraft(this).data
+        apiDraft?.let { draft ->
+            draft.apply {
+                initLocalValues(uid)
+                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
+            }
+            MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
+        }
+        return apiDraft
+    }
 
     fun getDkimStatus(): MessageDKIM? = when (dkimStatus) {
         MessageDKIM.VALID.value -> MessageDKIM.VALID

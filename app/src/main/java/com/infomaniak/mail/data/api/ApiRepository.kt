@@ -22,13 +22,11 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.utils.ApiController.callApi
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.addressBooks.AddressBooksResult
-import com.infomaniak.mail.data.models.attachment.Attachment
-import com.infomaniak.mail.data.models.attachment.AttachmentData
+import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.signatures.SignaturesResult
-import com.infomaniak.mail.data.models.threads.Thread.ThreadFilter
-import com.infomaniak.mail.data.models.threads.ThreadsResult
+import com.infomaniak.mail.data.models.signature.SignaturesResult
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.data.models.user.UserResult
 
 object ApiRepository : ApiRepositoryCore() {
@@ -80,9 +78,6 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getQuotas(mailbox: Mailbox): ApiResponse<Quotas> =
         callApi(ApiRoutes.quotas(mailbox.mailbox, mailbox.hostingId), GET)
-
-    fun getAttachment(mailbox: Mailbox, attachment: Attachment): ApiResponse<AttachmentData> =
-        callApi(ApiRoutes.resource(attachment.resource), GET)
 
 //    fun markAsSeen(mailbox: Mailbox, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
 //        callApi(ApiRoutes.messageSeen(mailbox.uuid), POST, mapOf("uids" to messages.map { it.uid }))

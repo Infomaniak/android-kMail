@@ -17,12 +17,17 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
-import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
+import io.realm.toRealmList
 
 class Folder : RealmObject {
     @PrimaryKey
@@ -56,6 +61,37 @@ class Folder : RealmObject {
      */
     var threads: RealmList<Thread> = realmListOf() // TODO
     var parentLink: Folder? = null // TODO
+
+    fun getThreads(): List<Thread> {
+        // Get current data
+        Log.d("Realm", "getUpdatedThreads: Get current data")
+        val threadsFromRealm = threads
+        // TODO: Handle connectivity issues. If there is no Internet, all Realm Threads will be deleted. We don't want that.
+        val threadsFromApi = MailRealm.currentMailbox?.let { mailbox ->
+            ApiRepository.getThreads(mailbox, this).data?.threads?.map { it.initLocalValues() }
+        } ?: emptyList()
+
+        // Get outdated data
+        Log.d("Realm", "getUpdatedThreads: Get outdated data")
+        val deletableThreads = threadsFromRealm.filter { fromRealm ->
+            !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+        }
+        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == id } }
+
+        // Delete outdated data
+        Log.e("Realm", "getUpdatedThreads: Delete outdated data")
+        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
+
+        // Save new data
+        Log.i("Realm", "getUpdatedThreads: Save new data")
+        threads = threadsFromApi.toRealmList()
+        MailboxContentController.upsertFolder(this)
+
+        MailRealm.currentFolder = this
+
+        return threadsFromApi
+    }
 
     fun getRole(): FolderRole? = when (_role) {
         FolderRole.ARCHIVE.name -> FolderRole.ARCHIVE

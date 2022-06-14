@@ -37,12 +37,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.startCalls).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 with(testRealmViewModel) {
-                    // testRealm()
+                    testRealm(cacheDir)
+                    // testRealm1()
                     // testRealm2()
                     // updateRealm()
                     // lightlyPopulateRealm()
                     // fullyPopulateRealm()
-                    callAllAPIs()
+                    // callAllAPIs()
                 }
             }
         }

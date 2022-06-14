@@ -2,21 +2,14 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     // Realm Kotlin PRODUCTION - START /!\
-    id 'io.realm.kotlin'
+    // id 'io.realm.kotlin'
     // Realm Kotlin PRODUCTION - END /!\
-    // Realm Java PRODUCTION - START /!\
-    // id 'org.jetbrains.kotlin.kapt'
-    // Realm Java PRODUCTION - END /!\
 }
 
 // Realm Kotlin SNAPSHOT - START /!\
-// configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
-// apply plugin: "io.realm.kotlin"
+configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
+apply plugin: "io.realm.kotlin"
 // Realm Kotlin SNAPSHOT - END /!\
-
-// Realm Java PRODUCTION - START /!\
-// apply plugin: "realm-android"
-// Realm Java PRODUCTION - END /!\
 
 android {
     compileSdk 31
@@ -53,7 +46,9 @@ android {
 dependencies {
     implementation project(path: ':Core')
 
+    // Realm Kotlin - START /!\
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
+    // Realm Kotlin - END /!\
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }

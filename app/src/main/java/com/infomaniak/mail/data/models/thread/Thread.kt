@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.threads
+package com.infomaniak.mail.data.models.thread
 
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import io.realm.RealmInstant
-import io.realm.RealmList
-import io.realm.RealmObject
+import io.realm.*
 import io.realm.annotations.PrimaryKey
-import io.realm.realmListOf
 
 class Thread : RealmObject {
     @PrimaryKey
@@ -64,7 +64,38 @@ class Thread : RealmObject {
 
     fun initLocalValues(): Thread {
         messages.removeIf { it.isDuplicate }
+
+        from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+
+        messages = messages.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+
         return this
+    }
+
+    fun getMessages(): List<Message> {
+        val apiMessages = mutableListOf<Message>()
+        messages.forEach { message ->
+            ApiRepository.getMessage(message).data?.let { completedMessage ->
+                completedMessage.initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                completedMessage.fullyDownloaded = true
+                completedMessage.body?.objectId = "body_${completedMessage.uid}" // TODO: Remove this when we have EmbeddedObjects
+                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                completedMessage.attachments?.forEachIndexed { index, attachment ->
+                    attachment.initLocalValues(index, completedMessage.uid)
+                }
+                apiMessages.add(completedMessage)
+            }
+        }
+
+        messages = apiMessages.toRealmList()
+        MailboxContentController.upsertThread(this)
+
+        MailRealm.currentThread = this
+
+        return apiMessages
     }
 
     enum class ThreadFilter(title: String) {

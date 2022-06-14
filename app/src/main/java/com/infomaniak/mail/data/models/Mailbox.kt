@@ -17,7 +17,11 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailRealm
+import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -89,6 +93,44 @@ class Mailbox : RealmObject {
     fun initLocalValues(): Mailbox {
         userId = AccountUtils.currentUserId
         objectId = "${mailboxId}_${AccountUtils.currentUserId}"
+
         return this
+    }
+
+    fun getFolders(): List<Folder> {
+
+        AccountUtils.currentMailboxId = mailboxId
+        MailRealm.currentMailbox = this
+
+        // Get current data
+        Log.d("Realm", "getUpdatedFolders: Get current data")
+        val folderFromRealm = MailboxContentController.getFolders()
+        // TODO: Handle connectivity issues. If there is no Internet, all Realm Folders will be deleted. We don't want that.
+        val foldersFromAPI = ApiRepository.getFolders(this).data ?: emptyList()
+
+        // Get outdated data
+        Log.d("Realm", "getUpdatedFolders: Get outdated data")
+        val deletableFolders = folderFromRealm.filter { fromRealm ->
+            !foldersFromAPI.any { fromApi -> fromApi.id == fromRealm.id }
+        }
+        val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
+        val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
+            deletableFolders.any { folder -> folder.id == message.folderId }
+        }
+        val deletableThreads = possiblyDeletableThreads.filter { thread ->
+            thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
+        }
+
+        // Delete outdated data
+        Log.e("Realm", "getUpdatedFolders: Delete outdated data")
+        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
+        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
+        deletableFolders.forEach { MailboxContentController.deleteFolder(it.id) }
+
+        // Save new data
+        Log.i("Realm", "getUpdatedFolders: Save new data")
+        foldersFromAPI.forEach(MailboxContentController::upsertFolder)
+
+        return foldersFromAPI
     }
 }

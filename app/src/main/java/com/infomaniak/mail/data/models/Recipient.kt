@@ -22,7 +22,19 @@ import io.realm.annotations.PrimaryKey
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 class Recipient : RealmObject {
-    @PrimaryKey
     var email: String = ""
     var name: String = ""
+
+    /**
+     * Local
+     */
+    @PrimaryKey
+    var objectId: String = "" // TODO: Remove this variable when we have EmbeddedObjects
+
+    // TODO: Remove this method when we have EmbeddedObjects
+    fun initLocalValues(): Recipient {
+        objectId = "${email}_${name}"
+
+        return this
+    }
 }

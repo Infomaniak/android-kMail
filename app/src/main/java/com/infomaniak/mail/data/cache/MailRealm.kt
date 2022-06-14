@@ -15,33 +15,73 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
+package com.infomaniak.mail.data.cache
 
+import android.util.Log
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.addressBooks.AddressBook
-import com.infomaniak.mail.data.models.attachment.Attachment
-import com.infomaniak.mail.data.models.attachment.AttachmentData
+import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.signatures.Signature
-import com.infomaniak.mail.data.models.signatures.SignatureEmail
-import com.infomaniak.mail.data.models.threads.Thread
+import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.data.models.signature.SignatureEmail
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.user.UserInfos
 import com.infomaniak.mail.data.models.user.UserPreferences
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
-object Realms {
+object MailRealm {
 
     val appSettings = Realm.open(RealmConfigurations.appSettings)
     val mailboxInfo = Realm.open(RealmConfigurations.mailboxInfo)
     lateinit var mailboxContent: Realm
 
+    var currentMailbox: Mailbox? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+    var currentFolder: Folder? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+    var currentThread: Thread? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+
+    /**
+     * Mailboxes
+     */
+    // fun getCachedMailboxes(): List<Mailbox> = MailboxInfoController.getMailboxes()
+
+    fun getMailboxes(): List<Mailbox> {
+        // Get current data
+        Log.d("Realm", "getUpdatedMailboxes: Get current data")
+        val mailboxesFromRealm = MailboxInfoController.getMailboxes()
+        // TODO: Handle connectivity issues. If there is no Internet, all Realm Mailboxes will be deleted. We don't want that.
+        val mailboxesFromAPI = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
+
+        // Get outdated data
+        Log.d("Realm", "getUpdatedMailboxes: Get outdated data")
+        val deletableMailboxes = mailboxesFromRealm.filter { fromRealm ->
+            !mailboxesFromAPI.any { fromApi -> fromApi.mailboxId == fromRealm.mailboxId }
+        }
+
+        // Delete outdated data
+        Log.e("Realm", "getUpdatedMailboxes: Delete outdated data")
+        deletableMailboxes.forEach {
+            // TODO: Delete each Realm file in the same time, with `Realm.deleteRealm()`
+            MailboxInfoController.deleteMailbox(it.objectId)
+        }
+
+        // Save new data
+        Log.i("Realm", "getUpdatedMailboxes: Save new data")
+        mailboxesFromAPI.forEach(MailboxInfoController::upsertMailbox)
+
+        return mailboxesFromAPI
+    }
+
     fun selectCurrentMailbox() {
-        if (::mailboxContent.isInitialized) mailboxContent.close()
+        if (MailRealm::mailboxContent.isInitialized) mailboxContent.close()
         mailboxContent = Realm.open(RealmConfigurations.mailboxContent())
     }
 
+    /**
+     * Configurations
+     */
     private object RealmConfigurations {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
@@ -82,16 +122,15 @@ object Realms {
                 Folder::class,
                 Thread::class,
                 Message::class,
+                Draft::class,
+                Recipient::class,
                 Body::class,
                 Attachment::class,
-                AttachmentData::class,
-                Recipient::class,
             )
 
             val others = setOf(
                 AddressBook::class,
                 Contact::class,
-                Draft::class,
                 Quotas::class,
                 Signature::class,
                 SignatureEmail::class,

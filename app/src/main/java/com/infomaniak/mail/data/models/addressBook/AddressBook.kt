@@ -15,31 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.threads
+package com.infomaniak.mail.data.models.addressBook
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
 
-data class ThreadsResult(
-    val threads: ArrayList<Thread>?,
+class AddressBook : RealmObject {
+    var id: Int = 0
 
-    @SerializedName("total_messages_count")
-    val totalMessagesCount: Int = 0,
+    @SerializedName("user_id")
+    var userId: Int = 0
 
-    @SerializedName("messages_count")
-    val messagesCount: Int = 0,
+    @SerializedName("principal_uri")
+    var principalUri: String = ""
+    var name: String = ""
+    var color: String = ""
+    var uuid: String = ""
+    var description: String = ""
 
-    @SerializedName("current_offset")
-    val currentOffset: Int = 0,
+    @SerializedName("is_shared")
+    var isShared: Boolean = false
+    var rights: String = ""
 
-    @SerializedName("thread_mode")
-    val threadMode: String = "on",
+    @SerializedName("is_activated")
+    var isActivated: Boolean = false
 
-    @SerializedName("folder_unseen_messages")
-    val folderUnseenMessage: Int = 0,
+    @SerializedName("is_hidden")
+    var isHidden: Boolean = false
 
-    @SerializedName("resource_previous")
-    val resourcePrevious: String? = null,
-
-    @SerializedName("resource_next")
-    val resourceNext: String? = null,
-)
+    @SerializedName("is_pending")
+    var isPending: Boolean = false
+    // var categories: RealmList<Category> = realmListOf()
+}
