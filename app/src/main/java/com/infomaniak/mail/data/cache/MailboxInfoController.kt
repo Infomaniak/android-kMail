@@ -39,7 +39,7 @@ object MailboxInfoController {
     private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? =
         getMailbox(objectId)?.let(::findLatest)
 
-    private fun getMailbox(objectId: String): Mailbox? =
+    fun getMailbox(objectId: String): Mailbox? =
         MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
 
 //    fun selectMailboxByEmail(email: String) {

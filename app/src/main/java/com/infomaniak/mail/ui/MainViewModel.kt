@@ -17,14 +17,72 @@
  */
 package com.infomaniak.mail.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.threads.ThreadsResult
+import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class MainViewModel(appContext: Application) : AndroidViewModel(appContext) {
-    var folders = MutableLiveData<ArrayList<Folder>>()
-    var threadList = MutableLiveData<ThreadsResult?>()
-    var isInternetAvailable = MutableLiveData(true)
+class MainViewModel : ViewModel() {
+
+    private companion object {
+        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
+    }
+
+    fun getData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            readDataFromRealm()
+            fetchDataFromAPI()
+        }
+    }
+
+    private fun readDataFromRealm() {
+
+        fun getCurrentMailbox(): Mailbox? {
+            val mailboxes = MailRealm.readMailboxesFromRealm()
+            return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId } ?: mailboxes.firstOrNull()
+        }
+
+        fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
+            mailbox.readFoldersFromRealm().firstOrNull { it.getRole() == folderRole }
+
+        Log.e("Realm", "Start reading data")
+
+        getCurrentMailbox()?.let { mailbox ->
+            mailbox.select()
+            getFolder(mailbox, DEFAULT_FOLDER_ROLE)?.let { folder ->
+                folder.select()
+                Log.e("Realm", "End of reading data")
+            }
+        }
+    }
+
+    private fun fetchDataFromAPI() {
+
+        fun getCurrentMailbox(): Mailbox? {
+            val mailboxes = MailRealm.fetchMailboxesFromApi()
+            return mailboxes.find { it.mailboxId == AccountUtils.currentMailboxId }
+                ?: mailboxes.firstOrNull { it.email == "kevin.boulongne@infomaniak.com" }
+                ?: mailboxes.firstOrNull()
+        }
+
+        fun getFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
+            mailbox.fetchFoldersFromAPI().firstOrNull { it.getRole() == folderRole }
+
+        Log.e("API", "Start fetching data")
+
+        getCurrentMailbox()?.let { mailbox ->
+            mailbox.select()
+            getFolder(mailbox, DEFAULT_FOLDER_ROLE)?.let { folder ->
+                folder.fetchThreadsFromAPI(mailbox.uuid)
+                folder.select()
+                Log.e("API", "End of fetching data")
+            }
+        }
+    }
 }

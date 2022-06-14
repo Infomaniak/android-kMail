@@ -31,6 +31,8 @@ import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 object MailRealm {
 
@@ -38,55 +40,68 @@ object MailRealm {
     val mailboxInfo = Realm.open(RealmConfigurations.mailboxInfo)
     lateinit var mailboxContent: Realm
 
-    var currentMailbox: Mailbox? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
-    var currentFolder: Folder? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
-    var currentThread: Thread? = null // TODO: Remove it (blocked by https://github.com/realm/realm-kotlin/issues/805)
+    // Current mailbox flow
+    val mutableCurrentMailboxObjectIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentMailboxObjectIdFlow = mutableCurrentMailboxObjectIdFlow.asStateFlow()
+
+    // Current folder flow
+    val mutableCurrentFolderIdFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentFolderIdFlow = mutableCurrentFolderIdFlow.asStateFlow()
+
+    // Current thread flow
+    val mutableCurrentThreadUidFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentThreadUidFlow = mutableCurrentThreadUidFlow.asStateFlow()
+
+    // Current message flow
+    val mutableCurrentMessageUidFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+    val currentMessageUidFlow = mutableCurrentMessageUidFlow.asStateFlow()
 
     /**
      * Mailboxes
      */
-    // fun getCachedMailboxes(): List<Mailbox> = MailboxInfoController.getMailboxes()
+    fun readMailboxesFromRealm(): List<Mailbox> = MailboxInfoController.getMailboxes()
 
-    fun getMailboxes(): List<Mailbox> {
+    fun fetchMailboxesFromApi(): List<Mailbox> {
         // Get current data
-        Log.d("Realm", "getUpdatedMailboxes: Get current data")
+        Log.d("API", "Mailboxes: Get current data")
         val mailboxesFromRealm = MailboxInfoController.getMailboxes()
-        // TODO: Handle connectivity issues. If there is no Internet, all Realm Mailboxes will be deleted. We don't want that.
+        // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Mailboxes will be deleted. We don't want that.
         val mailboxesFromAPI = ApiRepository.getMailboxes().data?.map { it.initLocalValues() } ?: emptyList()
 
         // Get outdated data
-        Log.d("Realm", "getUpdatedMailboxes: Get outdated data")
+        Log.d("API", "Mailboxes: Get outdated data")
         val deletableMailboxes = mailboxesFromRealm.filter { fromRealm ->
             !mailboxesFromAPI.any { fromApi -> fromApi.mailboxId == fromRealm.mailboxId }
         }
 
-        // Delete outdated data
-        Log.e("Realm", "getUpdatedMailboxes: Delete outdated data")
-        deletableMailboxes.forEach {
-            // TODO: Delete each Realm file in the same time, with `Realm.deleteRealm()`
-            MailboxInfoController.deleteMailbox(it.objectId)
-        }
-
         // Save new data
-        Log.i("Realm", "getUpdatedMailboxes: Save new data")
+        Log.i("API", "Mailboxes: Save new data")
         mailboxesFromAPI.forEach(MailboxInfoController::upsertMailbox)
+
+        // Delete outdated data
+        Log.e("API", "Mailboxes: Delete outdated data")
+        deletableMailboxes.forEach {
+            MailboxInfoController.deleteMailbox(it.objectId)
+            Realm.deleteRealm(RealmConfigurations.mailboxContent(it.mailboxId))
+        }
 
         return mailboxesFromAPI
     }
 
     fun selectCurrentMailbox() {
         if (MailRealm::mailboxContent.isInitialized) mailboxContent.close()
-        mailboxContent = Realm.open(RealmConfigurations.mailboxContent())
+        mailboxContent = Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId))
     }
 
     /**
      * Configurations
      */
+    @Suppress("FunctionName")
     private object RealmConfigurations {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
         private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
-        private val MAILBOX_CONTENT_DB_NAME = { "${AccountUtils.currentUserId}-${AccountUtils.currentMailboxId}.realm" }
+        private fun MAILBOX_CONTENT_DB_NAME(currentMailboxId: Int) = "${AccountUtils.currentUserId}-${currentMailboxId}.realm"
 
         val appSettings = RealmConfiguration
             .Builder(RealmSets.appSettings)
@@ -100,13 +115,11 @@ object MailRealm {
             .deleteRealmIfMigrationNeeded()
             .build()
 
-        val mailboxContent = {
-            RealmConfiguration
-                .Builder(RealmSets.mailboxContent)
-                .name(MAILBOX_CONTENT_DB_NAME())
-                .deleteRealmIfMigrationNeeded()
-                .build()
-        }
+        fun mailboxContent(currentMailboxId: Int) = RealmConfiguration
+            .Builder(RealmSets.mailboxContent)
+            .name(MAILBOX_CONTENT_DB_NAME(currentMailboxId))
+            .deleteRealmIfMigrationNeeded()
+            .build()
 
         private object RealmSets {
 

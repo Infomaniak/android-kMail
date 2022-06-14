@@ -33,21 +33,20 @@ object MailboxContentController {
     fun getFolders(): RealmResults<Folder> =
         MailRealm.mailboxContent.query<Folder>().find()
 
-    fun upsertFolder(folder: Folder) {
+    fun upsertFolder(folder: Folder): Folder =
         MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
-    }
 
     fun deleteFolder(id: String) {
         MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
     }
 
-    private fun MutableRealm.getLatestFolder(id: String): Folder? =
+    fun MutableRealm.getLatestFolder(id: String): Folder? =
         getFolder(id)?.let(::findLatest)
 
-    private fun getFolder(id: String): Folder? =
+    fun getFolder(id: String): Folder? =
         MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
 
-//    fun getFolderByRole(role: Folder.FolderRole): Folder? =
+//    fun getFolderByRole(role: FolderRole): Folder? =
 //        MailRealm.mailboxContent.query<Folder>("${Folder::_role.name} == '${role.name}'").first().find()
 
 //    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
@@ -63,6 +62,9 @@ object MailboxContentController {
      */
 //    fun getThreads(): RealmResults<Thread> =
 //        MailRealm.mailboxContent.query<Thread>().find()
+
+    fun getFolderThreads(folderId: String): List<Thread> =
+        MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
 
     fun upsertThread(thread: Thread) {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }

@@ -23,8 +23,10 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.utils.AccountUtils
+import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import io.realm.toRealmList
 
 class Mailbox : RealmObject {
     var uuid: String = ""
@@ -97,20 +99,26 @@ class Mailbox : RealmObject {
         return this
     }
 
-    fun getFolders(): List<Folder> {
+    fun select() {
+        if (MailRealm.currentMailboxObjectIdFlow.value != objectId) {
+            AccountUtils.currentMailboxId = mailboxId
+            MailRealm.mutableCurrentMailboxObjectIdFlow.value = objectId
+        }
+    }
 
-        AccountUtils.currentMailboxId = mailboxId
-        MailRealm.currentMailbox = this
+    fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFolders()
+
+    fun fetchFoldersFromAPI(): List<Folder> {
 
         // Get current data
-        Log.d("Realm", "getUpdatedFolders: Get current data")
-        val folderFromRealm = MailboxContentController.getFolders()
-        // TODO: Handle connectivity issues. If there is no Internet, all Realm Folders will be deleted. We don't want that.
-        val foldersFromAPI = ApiRepository.getFolders(this).data ?: emptyList()
+        Log.d("API", "Folders: Get current data")
+        val foldersFromRealm = MailboxContentController.getFolders()
+        // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Folders will be deleted. We don't want that.
+        val foldersFromAPI = ApiRepository.getFolders(uuid).data ?: emptyList()
 
         // Get outdated data
-        Log.d("Realm", "getUpdatedFolders: Get outdated data")
-        val deletableFolders = folderFromRealm.filter { fromRealm ->
+        Log.d("API", "Folders: Get outdated data")
+        val deletableFolders = foldersFromRealm.filter { fromRealm ->
             !foldersFromAPI.any { fromApi -> fromApi.id == fromRealm.id }
         }
         val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
@@ -121,15 +129,22 @@ class Mailbox : RealmObject {
             thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
         }
 
+        // Save new data
+        Log.i("API", "Folders: Save new data")
+        MailRealm.mailboxContent.writeBlocking {
+            foldersFromAPI.forEach { folderFromAPI ->
+                val folder = copyToRealm(folderFromAPI, UpdatePolicy.ALL)
+                foldersFromRealm.firstOrNull { it.id == folderFromAPI.id }?.threads
+                    ?.mapNotNull(::findLatest)
+                    ?.let { folder.threads = it.toRealmList() }
+            }
+        }
+
         // Delete outdated data
-        Log.e("Realm", "getUpdatedFolders: Delete outdated data")
+        Log.e("API", "Folders: Delete outdated data")
         deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
         deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
         deletableFolders.forEach { MailboxContentController.deleteFolder(it.id) }
-
-        // Save new data
-        Log.i("Realm", "getUpdatedFolders: Save new data")
-        foldersFromAPI.forEach(MailboxContentController::upsertFolder)
 
         return foldersFromAPI
     }

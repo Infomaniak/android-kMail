@@ -29,29 +29,32 @@ class TestRealmViewModel : ViewModel() {
 
     suspend fun testRealm(cacheDir: File) {
 
-        val mailboxes = MailRealm.getMailboxes()
+        val mailboxes = MailRealm.fetchMailboxesFromApi()
         Log.e("Realm", "testFinal: get mailboxes - ${mailboxes.size}")
         val mailbox = mailboxes.first { it.email == "kevin.boulongne@ik.me" }
         Log.e("Realm", "testFinal: select mailbox - ${mailbox.email}")
 
-        val folders = mailbox.getFolders()
+        mailbox.select()
+        val folders = mailbox.fetchFoldersFromAPI()
         Log.e("Realm", "testFinal: get folders - ${folders.size}")
 
         val inboxFolder = folders.first { it.getRole() == FolderRole.INBOX }
-        testFolder(inboxFolder, cacheDir)
+        testFolder(mailbox.uuid, inboxFolder, cacheDir)
 
         val sentFolder = folders.first { it.getRole() == FolderRole.SENT }
-        testFolder(sentFolder, cacheDir)
+        testFolder(mailbox.uuid, sentFolder, cacheDir)
 
         val draftFolder = folders.first { it.getRole() == FolderRole.DRAFT }
-        testFolder(draftFolder, cacheDir)
+        testFolder(mailbox.uuid, draftFolder, cacheDir)
     }
 
-    private suspend fun testFolder(folder: Folder, cacheDir: File) {
+    private suspend fun testFolder(mailboxUuid: String, folder: Folder, cacheDir: File) {
 
         Log.e("Realm", "testFinal: select folder - ${folder.name}")
 
-        val threads = folder.getThreads()
+        folder.fetchThreadsFromAPI(mailboxUuid)
+        folder.select()
+        val threads = folder.threads //TODO: Check if this data is not empty there?
         Log.e("Realm", "testFinal: get threads - ${threads.size}")
 
         val thread1 = threads[0]
@@ -64,7 +67,8 @@ class TestRealmViewModel : ViewModel() {
     private suspend fun testThread(thread: Thread, cacheDir: File) {
         Log.e("Realm", "testFinal: select thread - ${thread.subject}")
 
-        val messages = thread.getMessages()
+        thread.select()
+        val messages = thread.fetchMessagesFromAPI()
         Log.e("Realm", "testFinal: get messages - ${messages.size}")
         val message = messages.last()
         Log.e("Realm", "testFinal: select message - ${message.body?.value}")
@@ -163,7 +167,7 @@ class TestRealmViewModel : ViewModel() {
 //        val folder = updateFolders(mailbox) ?: return
 //
 //        // Update Threads
-//        // val folder = MailboxContentController.getFolderByRole(Folder.FolderRole.INBOX) ?: return
+//        // val folder = MailboxContentController.getFolderByRole(FolderRole.INBOX) ?: return
 //        updateThreads(mailbox, folder)
 //
 //        // Update Messages
