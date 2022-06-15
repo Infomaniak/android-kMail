@@ -30,8 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".ui.main.thread.ThreadListFragment"
-        tools:openDrawer="start">
+        tools:context=".ui.main.thread.ThreadListFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -206,12 +205,17 @@
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/menuDrawerNavigation"
-            style="@style/NavigationDrawerMail"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/menu_drawer_header"
-            app:menu="@menu/menu_drawer" />
+            android:layout_gravity="start">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/menuDrawerFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.infomaniak.mail.ui.main.menu.MenuDrawerFragment" />
+
+        </com.google.android.material.navigation.NavigationView>
 
     </androidx.drawerlayout.widget.DrawerLayout>
 

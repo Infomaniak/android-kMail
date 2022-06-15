@@ -137,26 +137,44 @@
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
+    <!-- MenuDrawer -->
+    <style name="MenuDrawerBadge" parent="Callout.Highlighted">
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">24dp</item>
+    </style>
+
+    <style name="MenuDrawerDivider" parent="Widget.MaterialComponents.MaterialDivider">
+        <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
+        <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
+        <item name="dividerColor">@color/separatorColor</item>
+        <item name="dividerInsetEnd">@dimen/marginStandard</item>
+        <item name="dividerInsetStart">@dimen/marginStandard</item>
+    </style>
+
+    <style name="MenuDrawerItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/menuDrawerItemViewHeight</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingEnd">@dimen/marginStandard</item>
+        <item name="android:paddingStart">@dimen/marginStandard</item>
+    </style>
+
+    <style name="MenuDrawerItemText">
+        <item name="android:drawablePadding">@dimen/marginStandard</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">start|center</item>
+        <item name="android:lineSpacingMultiplier">1</item>
+        <item name="android:maxLines">2</item>
+        <item name="drawableStartCompat">@drawable/ic_folder</item>
+    </style>
+
     <!-- Other -->
 
     <style name="CircleImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
-    </style>
-
-    <style name="NavigationDrawerMail" parent="ThemeOverlay.Material3.NavigationView">
-        <item name="android:backgroundTint">@color/backgroundColor</item>
-        <item name="dividerInsetEnd">@dimen/marginLarge</item>
-        <item name="dividerInsetStart">@dimen/marginStandard</item>
-        <item name="itemHorizontalPadding">@dimen/marginStandard</item>
-        <item name="itemIconPadding">@dimen/marginStandard</item>
-        <item name="itemIconTint">@color/infomaniak</item>
-        <item name="layout_constraintBottom_toBottomOf">parent</item>
-        <item name="layout_constraintStart_toStartOf">parent</item>
-        <item name="layout_constraintTop_toTopOf">parent</item>
-        <item name="subheaderInsetStart">@dimen/marginStandard</item>
-        <item name="subheaderInsetEnd">@dimen/marginStandard</item>
-        <item name="subheaderTextAppearance">@style/Callout.Tertiary</item>
     </style>
 
 </resources>

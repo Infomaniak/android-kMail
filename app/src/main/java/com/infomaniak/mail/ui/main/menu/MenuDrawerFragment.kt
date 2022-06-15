@@ -22,10 +22,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
+import com.infomaniak.mail.utils.AccountUtils
 
 class MenuDrawerFragment : Fragment() {
 
+    private lateinit var binding: FragmentMenuDrawerBinding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_menu_drawer, container, false)
+        FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupUi()
+    }
+
+    private fun setupUi() = with(binding) {
+        accountSwitcherText.text = AccountUtils.currentUser?.email
+
+        // TODO continue setup
+    }
 }

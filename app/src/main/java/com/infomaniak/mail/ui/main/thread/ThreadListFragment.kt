@@ -110,24 +110,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         toolbar.setNavigationOnClickListener { drawerLayout.open() }
 
-        menuDrawerNavigation.getHeaderView(0).findViewById<MaterialButton>(R.id.settingsButton).setOnClickListener {
-            // TODO safeNavigate to settings fragment
-        }
-        menuDrawerNavigation.setNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.feedbacks -> {}
-                R.id.help -> {}
-                R.id.importMails -> {}
-                R.id.restoreMails -> {}
-                else -> context?.let {
-                    threadListViewModel.openFolder(item.title.toString(), it)
-                }
-            }
-            item.isChecked = true
-            drawerLayout.close()
-            true
-        }
-
         searchViewCard.apply {
             // TODO filterButton doesn't propagate the event to root, must display it ?
             searchView.isGone = true
