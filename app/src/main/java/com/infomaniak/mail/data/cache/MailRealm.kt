@@ -40,6 +40,7 @@ object MailRealm {
     private var _appSettings: Realm? = null
     private var _mailboxInfo: Realm? = null
     private var _mailboxContent: Realm? = null
+    private var _contacts: Realm? = null
 
     val appSettings: Realm
         get() = _appSettings
@@ -53,7 +54,12 @@ object MailRealm {
         get() = _mailboxContent
             ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
 
+    val contacts
+        get() = _contacts
+            ?: Realm.open(RealmConfigurations.contacts).also { _contacts = it }
+
     fun close() {
+        closeContacts()
         closeMailboxContent()
         closeMailboxInfo()
         closeAppSettings()
@@ -72,6 +78,11 @@ object MailRealm {
     fun closeMailboxContent() {
         _mailboxContent?.close()
         _mailboxContent = null
+    }
+
+    fun closeContacts() {
+        _contacts?.close()
+        _contacts = null
     }
 
     /**
@@ -97,6 +108,14 @@ object MailRealm {
         return thread.messages
     }
 
+    /**
+     * Contacts
+     */
+    fun readContacts(): SharedFlow<ResultsChange<Contact>> = ContactsController.getContacts().toSharedFlow()
+
+    /**
+     * Utils
+     */
     private fun <T> Flow<T>.toSharedFlow(): SharedFlow<T> {
         return distinctUntilChanged().shareIn(
             scope = CoroutineScope(Dispatchers.IO),
@@ -113,25 +132,36 @@ object MailRealm {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
         private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
-        private fun MAILBOX_CONTENT_DB_NAME(currentMailboxId: Int) = "${AccountUtils.currentUserId}-${currentMailboxId}.realm"
+        private fun MAILBOX_CONTENT_DB_NAME(mailboxId: Int) = "${AccountUtils.currentUserId}-${mailboxId}.realm"
+        private val CONTACTS_DB_NAME get() = "${AccountUtils.currentUserId}.realm"
 
-        val appSettings = RealmConfiguration
-            .Builder(RealmSets.appSettings)
-            .name(APP_SETTINGS_DB_NAME)
-            .deleteRealmIfMigrationNeeded()
-            .build()
+        val appSettings =
+            RealmConfiguration
+                .Builder(RealmSets.appSettings)
+                .name(APP_SETTINGS_DB_NAME)
+                .deleteRealmIfMigrationNeeded()
+                .build()
 
-        val mailboxInfo = RealmConfiguration
-            .Builder(RealmSets.mailboxInfo)
-            .name(MAILBOX_INFO_DB_NAME)
-            .deleteRealmIfMigrationNeeded()
-            .build()
+        val mailboxInfo =
+            RealmConfiguration
+                .Builder(RealmSets.mailboxInfo)
+                .name(MAILBOX_INFO_DB_NAME)
+                .deleteRealmIfMigrationNeeded()
+                .build()
 
-        fun mailboxContent(currentMailboxId: Int) = RealmConfiguration
-            .Builder(RealmSets.mailboxContent)
-            .name(MAILBOX_CONTENT_DB_NAME(currentMailboxId))
-            .deleteRealmIfMigrationNeeded()
-            .build()
+        fun mailboxContent(mailboxId: Int) =
+            RealmConfiguration
+                .Builder(RealmSets.mailboxContent)
+                .name(MAILBOX_CONTENT_DB_NAME(mailboxId))
+                .deleteRealmIfMigrationNeeded()
+                .build()
+
+        val contacts
+            get() = RealmConfiguration
+                .Builder(RealmSets.contacts)
+                .name(CONTACTS_DB_NAME)
+                .deleteRealmIfMigrationNeeded()
+                .build()
 
         private object RealmSets {
 
@@ -153,9 +183,12 @@ object MailRealm {
                 Attachment::class,
             )
 
-            val miscellaneous = setOf(
+            val contacts = setOf(
                 AddressBook::class,
                 Contact::class,
+            )
+
+            val miscellaneous = setOf(
                 Quotas::class,
                 Signature::class,
                 SignatureEmail::class,

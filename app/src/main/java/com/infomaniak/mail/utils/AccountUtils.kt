@@ -71,6 +71,7 @@ object AccountUtils : CredentialManager {
     var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
+            MailRealm.closeContacts()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentUserId = userId }
         }
 

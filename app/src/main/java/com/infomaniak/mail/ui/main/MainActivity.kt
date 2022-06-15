@@ -25,6 +25,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -39,6 +40,8 @@ class MainActivity : AppCompatActivity() {
 
         listenToNetworkStatus()
         setupNavController()
+
+        MailData.loadContacts()
     }
 
     private fun listenToNetworkStatus() {
