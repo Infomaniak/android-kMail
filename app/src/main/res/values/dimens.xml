@@ -35,5 +35,7 @@
     <!-- Cardview -->
     <dimen name="materialCardviewRadius">33dp</dimen>
 
+    <!-- Menu Drawer -->
+    <dimen name="menuDrawerItemViewHeight">48dp</dimen>
 
 </resources>
