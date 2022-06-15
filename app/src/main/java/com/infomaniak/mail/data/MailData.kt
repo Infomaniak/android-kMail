@@ -22,6 +22,8 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
+import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Folder
@@ -117,23 +119,29 @@ object MailData {
     }
 
     fun selectFolder(folder: Folder) {
-        mutableCurrentFolderFlow.value = folder
+        if (folder.id != currentFolderFlow.value?.id) {
+            mutableCurrentFolderFlow.value = folder
 
-        mutableCurrentMessageFlow.value = null
-        mutableCurrentThreadFlow.value = null
-        mutableMessagesFlow.value = null
-        mutableThreadsFlow.value = null
+            mutableCurrentMessageFlow.value = null
+            mutableCurrentThreadFlow.value = null
+            mutableMessagesFlow.value = null
+            mutableThreadsFlow.value = null
+        }
     }
 
     fun selectThread(thread: Thread) {
-        mutableCurrentThreadFlow.value = thread
+        if (thread.uid != currentThreadFlow.value?.uid) {
+            mutableCurrentThreadFlow.value = thread
 
-        mutableCurrentMessageFlow.value = null
-        mutableMessagesFlow.value = null
+            mutableCurrentMessageFlow.value = null
+            mutableMessagesFlow.value = null
+        }
     }
 
     fun selectMessage(message: Message) {
-        mutableCurrentMessageFlow.value = message
+        if (message.uid != currentMessageFlow.value?.uid) {
+            mutableCurrentMessageFlow.value = message
+        }
     }
 
     private fun handleMailboxes(mailboxes: List<Mailbox>, completion: (mailbox: Mailbox) -> Unit) {
@@ -366,22 +374,29 @@ object MailData {
 
         // Save new data
         Log.d("API", "Threads: Save new data")
-        folder.threads = apiThreads.toRealmList()
-        // TODO: Put this back (and make it work) when we have EmbeddedObjects
-        // folder.threads = apiThreads.map { apiThread ->
-        //     realmThreads?.find { it.uid == apiThread.uid }?.also { realmThread ->
-        //         apiThread.messages.forEach { apiMessage ->
-        //             realmThread.messages.find { it.uid == apiMessage.uid }?.also { realmMessage ->
-        //                 apiMessage.apply {
-        //                     fullyDownloaded = realmMessage.fullyDownloaded
-        //                     body = realmMessage.body
-        //                     attachments = realmMessage.attachments
-        //                 }
-        //             }
-        //         }
-        //     } ?: apiThread
-        // }.toRealmList()
-        MailboxContentController.upsertFolder(folder)
+        MailRealm.mailboxContent.writeBlocking {
+            apiThreads.forEach { apiThread ->
+                realmThreads?.find { it.uid == apiThread.uid }?.let { realmThread ->
+                    apiThread.messages.forEach { apiMessage ->
+                        realmThread.messages.find { it.uid == apiMessage.uid }
+                            ?.let { getLatestMessage(it.uid) }
+                            ?.let { realmMessage ->
+                                apiMessage.apply {
+                                    fullyDownloaded = realmMessage.fullyDownloaded
+                                    body = realmMessage.body
+                                    attachments = realmMessage.attachments
+                                }
+                                copyToRealm(apiMessage, UpdatePolicy.ALL)
+                            }
+                    }
+                    copyToRealm(apiThread, UpdatePolicy.ALL)
+                }
+            }
+
+            val liveFolder = getLatestFolder(folder.id) ?: folder
+            liveFolder.threads = apiThreads.toRealmList()
+            copyToRealm(liveFolder, UpdatePolicy.ALL)
+        }
 
         // Delete outdated data
         Log.d("API", "Threads: Delete outdated data")
@@ -391,23 +406,27 @@ object MailData {
         return apiThreads
     }
 
-    private fun mergeMessages(realmMessages: List<Message>?, apiMessages: List<Message>): List<Message> {
+    private fun mergeMessages(realmMessages: List<Message>?, apiMessages: List<Pair<Message, Boolean>>): List<Message> {
 
         // Get outdated data
         Log.d("API", "Messages: Get outdated data")
         // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
         val deletableMessages = realmMessages?.filter { realmMessage ->
-            !apiMessages.any { apiMessage -> apiMessage.uid == realmMessage.uid }
+            !apiMessages.any { (apiMessage, _) -> apiMessage.uid == realmMessage.uid }
         } ?: emptyList()
 
         // Save new data
         Log.d("API", "Messages: Save new data")
-        MailboxContentController.upsertMessages(apiMessages)
+        MailRealm.mailboxContent.writeBlocking {
+            apiMessages.forEach { (apiMessage, isFromRealm) ->
+                if (!isFromRealm) copyToRealm(apiMessage, UpdatePolicy.ALL)
+            }
+        }
 
         // Delete outdated data
         Log.d("API", "Messages: Delete outdated data")
         MailboxContentController.deleteMessages(deletableMessages)
 
-        return apiMessages
+        return apiMessages.map { (apiMessage, _) -> apiMessage }
     }
 }
