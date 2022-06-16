@@ -39,6 +39,7 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.types.BaseRealmObject
+import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -401,21 +402,28 @@ object MailData {
         Log.d("API", "Threads: Save new data")
         MailRealm.mailboxContent.writeBlocking {
             apiThreads.forEach { apiThread ->
-                realmThreads?.find { it.uid == apiThread.uid }?.let { realmThread ->
-                    apiThread.messages.forEach { apiMessage ->
-                        realmThread.messages.find { it.uid == apiMessage.uid }
-                            ?.let { getLatestMessage(it.uid) }
-                            ?.let { realmMessage ->
-                                apiMessage.apply {
-                                    fullyDownloaded = realmMessage.fullyDownloaded
-                                    body = realmMessage.body
-                                    attachments = realmMessage.attachments
+                val realmThread = realmThreads?.find { it.uid == apiThread.uid }
+                val mergedThread = if (realmThread == null) {
+                    apiThread
+                } else {
+                    apiThread.apply {
+                        messages.forEach { apiMessage ->
+                            realmThread.messages.find { it.uid == apiMessage.uid }
+                                ?.let { getLatestMessage(it.uid) }
+                                ?.let { realmMessage ->
+                                    apiMessage.apply {
+                                        fullyDownloaded = realmMessage.fullyDownloaded
+                                        body = realmMessage.body
+                                        attachmentsResource = realmMessage.attachmentsResource
+                                        attachments.setRealmListValues(realmMessage.attachments)
+                                    }
+                                    copyToRealm(apiMessage, UpdatePolicy.ALL)
                                 }
-                                copyToRealm(apiMessage, UpdatePolicy.ALL)
-                            }
+                        }
                     }
-                    copyToRealm(apiThread, UpdatePolicy.ALL)
                 }
+
+                copyToRealm(mergedThread, UpdatePolicy.ALL)
             }
 
             val liveFolder = getLatestFolder(folder.id) ?: folder
@@ -467,5 +475,10 @@ object MailData {
                 job?.cancel()
             }
         }
+    }
+
+    private fun <T> RealmList<T>.setRealmListValues(values: RealmList<T>) {
+        if (isNotEmpty()) clear()
+        addAll(values)
     }
 }
