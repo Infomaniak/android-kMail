@@ -110,8 +110,15 @@ object MailData {
         }
     }
 
-    fun loadMailData() {
-        readRealmData()
+    fun loadData() {
+        readMailboxes { realmMailboxes ->
+            if (realmMailboxes.isEmpty()) {
+                fetchData()
+            } else {
+                computeMailboxToSelect(realmMailboxes)
+                readFolders()
+            }
+        }
     }
 
     fun loadMailboxes() {
@@ -122,6 +129,7 @@ object MailData {
 
     fun loadMessages(thread: Thread) {
         readMessages(thread)
+        fetchMessages(thread)
     }
 
     fun deleteDraft(message: Message) {
@@ -168,45 +176,33 @@ object MailData {
         }
     }
 
-    private fun handleMailboxes(mailboxes: List<Mailbox>, completion: (mailbox: Mailbox) -> Unit) {
+    private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox? {
         val mailbox = with(mailboxes) {
             find { it.mailboxId == AccountUtils.currentMailboxId }
             // ?: find { it.email == "kevin.boulongne@ik.me" } // TODO: Remove this, it's for dev only
                 ?: find { it.email == "kevin.boulongne@infomaniak.com" } // TODO: Remove this, it's for dev only
                 ?: firstOrNull()
-                ?: return
+                ?: return null
         }
 
         selectMailbox(mailbox)
-        completion(mailbox)
+        return mailbox
     }
 
-    private fun handleFolders(folders: List<Folder>, completion: (folder: Folder) -> Unit) {
+    private fun computeFolderToSelect(folders: List<Folder>): Folder? {
         val folder = with(folders) {
             find { it.role == DEFAULT_FOLDER_ROLE }
                 ?: firstOrNull()
-                ?: return
+                ?: return null
         }
 
         selectFolder(folder)
-        completion(folder)
+        return folder
     }
 
     /**
      * Read Realm
      */
-
-    private fun readRealmData() {
-        readMailboxes { realmMailboxes ->
-            if (realmMailboxes.isEmpty()) {
-                fetchApiData()
-            } else {
-                handleMailboxes(realmMailboxes) {
-                    readFolders()
-                }
-            }
-        }
-    }
 
     private fun readMailboxes(completion: (List<Mailbox>) -> Unit) {
         var job: Job? = null
@@ -232,10 +228,11 @@ object MailData {
                 mutableFoldersFlow.value = realmFolders
 
                 if (realmFolders.isEmpty()) {
-                    fetchApiData()
+                    fetchData()
                 } else {
-                    handleFolders(realmFolders) { folder ->
-                        readThreads(folder)
+                    computeFolderToSelect(realmFolders)?.let { selectedFolder ->
+                        readThreads(selectedFolder)
+                        fetchData()
                     }
                 }
 
@@ -247,37 +244,31 @@ object MailData {
     private fun readThreads(folder: Folder) {
         val realmThreads = MailRealm.readThreads(folder)
         mutableThreadsFlow.value = realmThreads
-
-        fetchApiData()
     }
 
     private fun readMessages(thread: Thread) {
         val realmMessages = MailRealm.readMessages(thread)
         mutableMessagesFlow.value = realmMessages
-
-        fetchMessages(thread)
     }
 
     /**
      * Fetch API
      */
 
-    private fun fetchApiData() {
-        fetchMailboxes { mergedMailboxes ->
-            handleMailboxes(mergedMailboxes) { mailbox ->
-                fetchFolders(mailbox)
-            }
-        }
+    private fun fetchData() {
+        val mergedMailboxes = fetchMailboxes()
+        val selectedMailbox = computeMailboxToSelect(mergedMailboxes) ?: return
+        fetchFolders(selectedMailbox)
     }
 
-    private fun fetchMailboxes(completion: ((List<Mailbox>) -> Unit)? = null) {
+    private fun fetchMailboxes(): List<Mailbox> {
         val realmMailboxes = mutableMailboxesFlow.value
         val apiMailboxes = MailApi.fetchMailboxes()
         val mergedMailboxes = mergeMailboxes(realmMailboxes, apiMailboxes)
 
         mutableMailboxesFlow.value = mergedMailboxes
 
-        completion?.invoke(mergedMailboxes)
+        return mergedMailboxes
     }
 
     private fun fetchFolders(mailbox: Mailbox) {
@@ -287,9 +278,8 @@ object MailData {
 
         mutableFoldersFlow.value = mergedFolders
 
-        handleFolders(mergedFolders) { folder ->
-            fetchThreads(folder, mailbox)
-        }
+        val selectedFolder = computeFolderToSelect(mergedFolders) ?: return
+        fetchThreads(selectedFolder, mailbox)
     }
 
     fun fetchThreads(folder: Folder, mailbox: Mailbox) {
