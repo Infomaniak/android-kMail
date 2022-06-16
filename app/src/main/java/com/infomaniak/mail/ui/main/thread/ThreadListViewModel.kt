@@ -50,7 +50,7 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun loadMailData() {
-        MailData.loadMailData()
+        MailData.loadData()
     }
 
     fun refreshThreads() {
