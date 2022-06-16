@@ -29,7 +29,7 @@ import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.SettingAccountView
 import com.infomaniak.mail.utils.toggleChevron
 
 class SettingAccountAdapter(
-    private val accounts: List<UiAccount> = listOf(),
+    private val accounts: List<UiAccount> = emptyList(),
     private val popBackStack: () -> Unit,
 ) : RecyclerView.Adapter<SettingAccountViewHolder>() {
 

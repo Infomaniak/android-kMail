@@ -22,10 +22,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SignaturesResult(
-    val signatures: ArrayList<Signature>,
+    val signatures: List<Signature>,
     @SerialName("default_signature_id")
     val defaultSignatureId: Int,
     @SerialName("valid_emails")
-    val validEmails: ArrayList<SignatureEmail>,
+    val validEmails: List<SignatureEmail>,
     val position: String,
 )

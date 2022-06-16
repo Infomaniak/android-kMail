@@ -48,7 +48,7 @@ import com.infomaniak.mail.utils.toggleChevron
 
 class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
 
-    private var messageList: ArrayList<Message> = arrayListOf()
+    private var messageList = mutableListOf<Message>()
 
     var onContactClicked: ((contact: Recipient, isExpanded: Boolean) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -84,7 +84,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         notifyItemRemoved(position)
     }
 
-    fun notifyAdapter(newList: ArrayList<Message>) {
+    fun notifyAdapter(newList: MutableList<Message>) {
         DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
         messageList = newList
     }

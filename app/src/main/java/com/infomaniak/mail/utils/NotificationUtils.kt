@@ -33,7 +33,7 @@ object NotificationUtils {
 
     fun Context.initNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelList = ArrayList<NotificationChannel>()
+            val channelList = mutableListOf<NotificationChannel>()
 
             val generalChannel = createNotificationChannel(
                 getString(R.string.notification_channel_id_general),

@@ -138,7 +138,7 @@ class ThreadFragment : Fragment() {
             Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")
         }
 
-        threadAdapter.notifyAdapter(ArrayList(messages))
+        threadAdapter.notifyAdapter(messages.toMutableList())
         binding.messagesList.scrollToPosition(threadAdapter.itemCount - 1)
     }
 }

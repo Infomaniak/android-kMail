@@ -37,7 +37,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callKotlinxApi(ApiRoutes.addressBooks(), GET)
 
-    fun getContacts(): ApiResponse<ArrayList<Contact>> = callKotlinxApi(ApiRoutes.contacts(), GET)
+    fun getContacts(): ApiResponse<List<Contact>> = callKotlinxApi(ApiRoutes.contacts(), GET)
 
     fun getUser(): ApiResponse<UserResult> = callKotlinxApi(ApiRoutes.user(), GET)
 
@@ -47,9 +47,9 @@ object ApiRepository : ApiRepositoryCore() {
         return callKotlinxApi(ApiRoutes.signatures(mailboxHostingId, mailboxMailbox), GET)
     }
 
-    fun getMailboxes(): ApiResponse<ArrayList<Mailbox>> = callKotlinxApi("${ApiRoutes.mailbox()}?with=unseen", GET)
+    fun getMailboxes(): ApiResponse<List<Mailbox>> = callKotlinxApi("${ApiRoutes.mailbox()}?with=unseen", GET)
 
-    fun getFolders(mailboxUuid: String): ApiResponse<ArrayList<Folder>> = callKotlinxApi(ApiRoutes.folders(mailboxUuid), GET)
+    fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callKotlinxApi(ApiRoutes.folders(mailboxUuid), GET)
 
     // fun createFolder(mailboxUuid: String, name: String, path: String?): ApiResponse<Folder> = callKotlinxApi(ApiRoutes.folders(mailboxUuid), POST, mutableMapOf("name" to name).apply { path?.let { "path" to it } })
 
@@ -83,7 +83,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callKotlinxApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
-    // fun markAsSafe(mailboxUuid: String, messagesUids: List<String>): ApiResponse<ArrayList<Seen>> = callKotlinxApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messagesUids))
+    // fun markAsSafe(mailboxUuid: String, messagesUids: List<String>): ApiResponse<List<Seen>> = callKotlinxApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messagesUids))
 
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
@@ -129,7 +129,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callKotlinxApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun starMessage(star: Boolean, mailboxUuid: String, messageIds: ArrayList<String>): ApiResponse<StarMessageResult> {
+    fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> {
         return callKotlinxApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
     }
 

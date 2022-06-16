@@ -41,7 +41,7 @@ import java.util.*
 
 class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use LoaderAdapter from Core instead?
 
-    private var itemsList: ArrayList<Any> = ArrayList()
+    private var itemsList = mutableListOf<Any>()
 
     @StringRes
     var previousSectionName: Int = -1
@@ -140,9 +140,9 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         }
     }
 
-    fun formatList(threads: List<Thread>, context: Context): ArrayList<Any> {
+    fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
         previousSectionName = -1
-        val formattedList = arrayListOf<Any>()
+        val formattedList = mutableListOf<Any>()
 
         threads.sortedByDescending { it.date }.forEach { thread ->
             val currentItemDateCategory = getDateCategories(thread.date?.toDate()?.time ?: 0L).value
@@ -170,7 +170,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
 
     private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
 
-    fun notifyAdapter(newList: ArrayList<Any>) {
+    fun notifyAdapter(newList: MutableList<Any>) {
         DiffUtil.calculateDiff(ThreadListDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
         itemsList = newList
     }
