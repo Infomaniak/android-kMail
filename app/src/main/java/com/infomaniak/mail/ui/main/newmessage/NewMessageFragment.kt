@@ -17,14 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
+import android.animation.LayoutTransition
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -43,46 +42,63 @@ class NewMessageFragment : Fragment() {
     private val binding: FragmentNewMessageBinding by lazy { FragmentNewMessageBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by activityViewModels()
     private var mails = MailboxInfoController.getMailboxesSync().map { it.email }
+    private var areAdvancedFieldsOpened = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         with(binding) {
             fromMailAddress.text = MailData.currentMailboxFlow.value?.email
-            fromMailAddress.setOnClickListener { it.showMenu() }
+            fromMailAddress.setOnClickListener { it.chooseFromAddress() }
 
             displayChips()
 
-            toAutocompleteInput.setOnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    parentFragmentManager.commit {
-                        setReorderingAllowed(true)
-                        addSharedElement(toPrefix, "prefixTextView")
-                        addSharedElement(toAutocompleteInput, "fieldTransition")
-                        addSharedElement(toItemsChipGroup, "chipGroup")
-                        replace(R.id.fragmentContainer, FieldFragment())
-                        addToBackStack("mailWritingMain")
-                    }
-                }
-            }
-
-            chevron.setOnClickListener {
-                advancedFields.isVisible = !advancedFields.isVisible
-                chevron.toggleChevron(advancedFields.isGone)
-            }
+            toAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment() }
+            toTransparentButton.setOnClickListener { openAdvancedFields() }
+            chevron.setOnClickListener { openAdvancedFields() }
 
             return root
         }
 
-    // TODO : Merge logic with field fragment?
+    private fun View.chooseFromAddress() {
+        val adapter = ArrayAdapter(context, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, mails)
+        ListPopupWindow(context).apply {
+            setAdapter(adapter)
+            anchorView = this@chooseFromAddress
+            width = this@chooseFromAddress.width
+            setOnItemClickListener { _, _, position, _ ->
+                binding.fromMailAddress.text = mails[position]
+                dismiss()
+            }
+        }.show()
+    }
+
     private fun FragmentNewMessageBinding.displayChips() {
+        refreshChips()
+        updateSingleChipText()
+
+        singleChip.root.setOnClickListener {
+            removeRecipient(0)
+            updateChipVisibility()
+        }
+
+        updateChipVisibility()
+    }
+
+    private fun FragmentNewMessageBinding.removeRecipient(index: Int) {
+        val contact = viewModel.recipients[index]
+        viewModel.recipients.remove(contact)
+//        availableUsersAdapter.alreadyUsedContactIds.remove(contact.id) // TODO : Remove email from list of forbbiden emails
+        toItemsChipGroup.removeViewAt(index)
+        updateSingleChipText()
+    }
+
+    private fun FragmentNewMessageBinding.updateSingleChipText() {
+        viewModel.recipients.firstOrNull()?.let { singleChip.root.text = it.name }
+    }
+
+    private fun FragmentNewMessageBinding.refreshChips() {
         toItemsChipGroup.removeAllViews()
-        // TODO: Merge logic of all 4 createChip.setOnClickListener
-        for (recipient in viewModel.recipients) createChip(recipient).setOnClickListener {
-            Log.e("gibran", "displayChips: chip ${recipient.name} got clicked", );
-            Log.e("gibran", "displayChips - The value viewModel.recipients before is: ${viewModel.recipients.map { it.name }}")
-            viewModel.recipients.remove(recipient)
-//            availableUsersAdapter.alreadyUsedContactIds.remove(contact.id) // TODO : Remove email from list of forbbiden emails
-            toItemsChipGroup.removeView(it)
-            Log.e("gibran", "displayChips - The value viewModel.recipients before is: ${viewModel.recipients.map { it.name }}")
+        viewModel.recipients.forEachIndexed { index, contact ->
+            createChip(contact).setOnClickListener { _ -> removeRecipient(index) }
         }
     }
 
@@ -92,16 +108,39 @@ class NewMessageFragment : Fragment() {
         return chip
     }
 
-    private fun View.showMenu() {
-        val adapter = ArrayAdapter(context, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, mails)
-        ListPopupWindow(context).apply {
-            setAdapter(adapter)
-            anchorView = this@showMenu
-            width = this@showMenu.width
-            setOnItemClickListener { _, _, position, _ ->
-                binding.fromMailAddress.text = mails[position]
-                dismiss()
-            }
-        }.show()
+    private fun FragmentNewMessageBinding.updateChipVisibility() {
+        singleChipGroup.isVisible = !areAdvancedFieldsOpened && viewModel.recipients.isNotEmpty()
+        toItemsChipGroup.isVisible = areAdvancedFieldsOpened
+        toTransparentButton.isVisible = viewModel.recipients.isNotEmpty() && !areAdvancedFieldsOpened
+        doNotAnimate(root) { plusOthers.isVisible = viewModel.recipients.count() > 1 && !areAdvancedFieldsOpened }
+        plusOthers.text = "+${viewModel.recipients.count() - 1} others" // TODO : extract string
+    }
+
+    private fun doNotAnimate(parent: View, body: () -> Unit) {
+        val lt: LayoutTransition = (parent as ViewGroup).layoutTransition
+        lt.disableTransitionType(LayoutTransition.DISAPPEARING)
+        body()
+        lt.enableTransitionType(LayoutTransition.DISAPPEARING)
+    }
+
+    private fun FragmentNewMessageBinding.openFieldFragment() {
+        parentFragmentManager.commit {
+            setReorderingAllowed(true)
+            addSharedElement(toPrefix, "prefixTextView")
+            addSharedElement(toAutocompleteInput, "fieldTransition")
+            addSharedElement(toItemsChipGroup, "chipGroup")
+            replace(R.id.fragmentContainer, FieldFragment())
+            addToBackStack("mailWritingMain")
+        }
+    }
+
+    private fun FragmentNewMessageBinding.openAdvancedFields() {
+        areAdvancedFieldsOpened = !areAdvancedFieldsOpened
+
+        advancedFields.isVisible = areAdvancedFieldsOpened
+        chevron.toggleChevron(!areAdvancedFieldsOpened)
+
+        refreshChips()
+        updateChipVisibility()
     }
 }

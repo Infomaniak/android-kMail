@@ -76,52 +76,88 @@
 
 
     <TextView
-        android:transitionName="prefixTextView"
         android:id="@+id/toPrefix"
         style="@style/Callout.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/toTitle"
+        android:transitionName="prefixTextView"
         app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+        app:layout_constraintStart_toStartOf="@id/fromPrefix"
+        app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
+
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/toItemsChipGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:transitionName="chipGroup"
+        app:chipSpacingVertical="0dp"
+        app:layout_constraintBottom_toTopOf="@id/toAutocompleteInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider1" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/singleChipGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardVerySmall"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@id/toPrefix"
         app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
-        app:layout_constraintStart_toStartOf="@id/fromPrefix" />
+        tools:visibility="visible">
+
+        <include
+            android:id="@+id/singleChip"
+            layout="@layout/chip_contact" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/plusOthers"
+        style="@style/Callout.Highlighted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardVerySmall"
+        app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+        app:layout_constraintStart_toEndOf="@id/singleChipGroup"
+        app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
+        tools:text="+2 autres" />
+
+    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+        android:id="@+id/toAutocompleteInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+        android:layout_marginTop="@dimen/marginStandardVerySmall"
+        android:backgroundTint="@android:color/transparent"
+        android:imeOptions="actionDone"
+        android:inputType="textEmailAddress"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:transitionName="fieldTransition"
+        app:layout_constraintBottom_toTopOf="@id/divider2"
+        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintStart_toEndOf="@id/singleChipGroup"
+        app:layout_constraintTop_toBottomOf="@id/toItemsChipGroup" />
 
 
-        <com.google.android.material.chip.ChipGroup
-            android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:transitionName="chipGroup"
-            android:id="@+id/toItemsChipGroup"
-            app:layout_constraintTop_toBottomOf="@id/divider1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/toAutocompleteInput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            app:chipSpacingVertical="0dp" />
-
-        <!--        <TextView-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
-        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
-
-
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:transitionName="fieldTransition"
-            app:layout_constraintTop_toBottomOf="@id/toItemsChipGroup"
-            app:layout_constraintBottom_toTopOf="@id/divider2"
-            app:layout_constraintEnd_toStartOf="@id/chevron"
-            app:layout_constraintStart_toEndOf="@id/toPrefix"
-            android:id="@+id/toAutocompleteInput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-            android:backgroundTint="@android:color/transparent"
-            android:imeOptions="actionDone"
-            android:inputType="textEmailAddress"
-            android:maxLines="1"
-            android:textSize="16sp" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/toTransparentButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintStart_toEndOf="@id/singleChipGroup"
+        app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/chevron"
@@ -132,22 +168,16 @@
         app:layout_constraintEnd_toEndOf="@id/divider1"
         app:layout_constraintTop_toBottomOf="@id/toPrefix" />
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="toPrefix,toField" />
-
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardVerySmall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrier2" />
+        app:layout_constraintTop_toBottomOf="@id/toAutocompleteInput" />
 
 
     <!--    -->
