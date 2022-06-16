@@ -38,7 +38,6 @@ import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
@@ -113,15 +112,15 @@ object AccountUtils : CredentialManager {
         }
     }
 
-    suspend fun removeUser(context: Context, userRemoved: User) {
-        userDatabase.userDao().delete(userRemoved)
+    suspend fun removeUser(context: Context, user: User) {
+        userDatabase.userDao().delete(user)
         // FileController.deleteUserDriveFiles(userRemoved.id) // TODO?
 
-        if (currentUserId == userRemoved.id) {
+        if (currentUserId == user.id) {
             requestCurrentUser()
 
             resetApp(context)
-            GlobalScope.launch(Dispatchers.Main) { reloadApp?.invoke(bundleOf()) }
+            CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke(bundleOf()) }
 
             // CloudStorageProvider.notifyRootsChanged(context) // TODO?
         }
