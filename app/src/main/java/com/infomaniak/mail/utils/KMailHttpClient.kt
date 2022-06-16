@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
-import androidx.collection.ArrayMap
+import androidx.collection.arrayMapOf
 import com.infomaniak.lib.core.models.user.User
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -26,7 +26,7 @@ import okhttp3.OkHttpClient
 object KMailHttpClient {
 
     private val mutex = Mutex()
-    private var httpClientMap: ArrayMap<Pair<Int, Long?>, OkHttpClient> = ArrayMap()
+    private var httpClientMap = arrayMapOf<Pair<Int, Long?>, OkHttpClient>()
 
     var onRefreshTokenError: ((user: User) -> Unit)? = null
 

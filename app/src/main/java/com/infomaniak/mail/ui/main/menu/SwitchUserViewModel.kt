@@ -32,7 +32,7 @@ class SwitchUserViewModel : ViewModel() {
 
     private var listenToMailboxesJob: Job? = null
 
-    private val mutableUiMailboxesFlow: MutableStateFlow<List<Mailbox>?> = MutableStateFlow(null)
+    private val mutableUiMailboxesFlow = MutableStateFlow<List<Mailbox>?>(null)
     val uiMailboxesFlow = mutableUiMailboxesFlow.asStateFlow()
 
     fun setup() {

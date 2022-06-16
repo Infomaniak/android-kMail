@@ -32,7 +32,7 @@ class ThreadListViewModel : ViewModel() {
 
     private var listenToThreadsJob: Job? = null
 
-    private val mutableUiThreadsFlow: MutableStateFlow<List<Thread>?> = MutableStateFlow(null)
+    private val mutableUiThreadsFlow = MutableStateFlow<List<Thread>?>(null)
     val uiThreadsFlow = mutableUiThreadsFlow.asStateFlow()
 
     fun setup() {

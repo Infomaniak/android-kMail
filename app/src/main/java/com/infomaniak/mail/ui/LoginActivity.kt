@@ -128,7 +128,7 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     val user = userProfileResponse.data?.apply {
                         this.apiToken = apiToken
-                        this.organizations = ArrayList()
+                        this.organizations = arrayListOf()
                     }
 
                     if (user == null) {
