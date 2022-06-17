@@ -30,77 +30,63 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".ui.main.thread.ThreadListFragment"
-        tools:openDrawer="start">
-
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/menuDrawerNavigation"
-            style="@style/NavigationDrawerMail"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/menu_drawer_header"
-            app:menu="@menu/menu_drawer" />
+        tools:context=".ui.main.thread.ThreadListFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/menuDrawerButton"
-                style="@style/IconButton"
-                android:layout_width="32dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="@dimen/marginStandardMedium"
-                android:contentDescription="@string/contentDescriptionButtonMenu"
-                app:icon="@drawable/ic_burger"
-                app:layout_constraintBottom_toBottomOf="@+id/searchViewCard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:ignore="ContentDescription" />
-
-            <TextView
-                android:id="@+id/noMailTitle"
-                style="@style/H2"
-                android:layout_width="@dimen/noMailTextViewSize"
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/marginStandard"
-                android:gravity="center"
-                android:text="@string/noEmailTitle"
-                app:layout_constraintBottom_toTopOf="@id/noMailDescription"
-                app:layout_constraintTop_toTopOf="@+id/searchViewCard" />
-
-            <include
-                android:id="@+id/searchViewCard"
-                layout="@layout/item_search_view"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginHorizontal="@dimen/marginStandard"
-                android:layout_marginTop="@dimen/marginStandardMedium"
-                app:layout_constraintBottom_toTopOf="@id/mailboxName"
-                app:layout_constraintEnd_toStartOf="@id/userAvatar"
-                app:layout_constraintStart_toEndOf="@id/menuDrawerButton"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/userAvatar"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="@dimen/marginStandardMedium"
-                app:cardCornerRadius="100dp"
-                app:layout_constraintBottom_toBottomOf="@+id/searchViewCard"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/searchViewCard">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/titleMyAccount"
-                    android:src="@drawable/placeholder"
-                    tools:src="@tools:sample/avatars" />
+                    android:layout_height="wrap_content"
+                    app:contentInsetEnd="0dp"
+                    app:navigationContentDescription="@string/contentDescriptionButtonMenu"
+                    app:navigationIcon="@drawable/ic_burger">
 
-            </com.google.android.material.card.MaterialCardView>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <include
+                            android:id="@+id/searchViewCard"
+                            layout="@layout/item_search_view"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/userAvatar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_marginHorizontal="@dimen/marginStandard"
+                            app:cardCornerRadius="100dp">
+
+                            <ImageView
+                                android:id="@+id/userAvatarImage"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/titleMyAccount"
+                                android:src="@drawable/placeholder"
+                                tools:src="@tools:sample/avatars" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+                </com.google.android.material.appbar.MaterialToolbar>
+
+            </com.google.android.material.appbar.AppBarLayout>
 
             <TextView
                 android:id="@+id/mailboxName"
@@ -112,7 +98,7 @@
                 android:text="@string/inboxFolder"
                 app:layout_constraintBottom_toTopOf="@id/swipeRefreshLayout"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/searchViewCard"
+                app:layout_constraintTop_toBottomOf="@id/appBarLayout"
                 tools:text="Boite de Reception" />
 
             <!-- TODO: multiselect -->
@@ -216,6 +202,15 @@
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/menuDrawerNavigation"
+            style="@style/NavigationDrawerMail"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:headerLayout="@layout/menu_drawer_header"
+            app:menu="@menu/menu_drawer" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
 

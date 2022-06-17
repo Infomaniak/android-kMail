@@ -71,9 +71,9 @@ object MailboxContentController {
     /**
      * Threads
      */
-    // fun getFolderThreads(folderId: String): List<Thread> {
-    //     return MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
-    // }
+    fun getFolderThreads(folderId: String): List<Thread> {
+        return MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
+    }
 
     fun getThread(uid: String): Thread? = MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
 

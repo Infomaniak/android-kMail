@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.thread.Thread
@@ -65,5 +66,20 @@ class ThreadListViewModel : ViewModel() {
         listenToThreadsJob = null
 
         super.onCleared()
+    }
+
+    fun openFolder(folderName: String, context: Context) {
+        var job: Job? = null
+        job = CoroutineScope(Dispatchers.IO).launch {
+            MailData.foldersFlow.filterNotNull().collect { folders ->
+                MailData.currentMailboxFlow.value?.let { mailbox ->
+                    folders.find { it.getLocalizedName(context) == folderName }?.let { folder ->
+                        MailData.selectFolder(folder)
+                        MailData.loadThreads(folder, mailbox)
+                    }
+                }
+                job?.cancel()
+            }
+        }
     }
 }

@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ThreadsResult(
-    val threads: List<Thread>?,
+    val threads: List<Thread> = emptyList(),
     @SerialName("total_messages_count")
     val totalMessagesCount: Int = 0,
     @SerialName("messages_count")

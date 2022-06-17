@@ -104,7 +104,7 @@ object MailRealm {
     }
 
     fun readThreads(folder: Folder): List<Thread> {
-        return folder.threads
+        return MailboxContentController.getFolderThreads(folder.id)
     }
 
     fun readMessages(thread: Thread): List<Message> {
