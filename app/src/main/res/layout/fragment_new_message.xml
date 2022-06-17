@@ -106,9 +106,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         android:visibility="gone"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintEnd_toStartOf="@id/plusOthers"
         app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/toPrefix"
         app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
         tools:visibility="visible">
@@ -126,6 +128,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+        app:layout_constraintEnd_toStartOf="@id/chevron"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/singleChipGroup"
         app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
         tools:text="+2 autres" />
