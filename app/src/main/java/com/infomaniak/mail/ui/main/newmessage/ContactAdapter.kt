@@ -30,10 +30,10 @@ import com.infomaniak.mail.databinding.ItemContactBinding
 
 class ContactAdapter(
     private val allContacts: List<Contact> = emptyList(),
+    val alreadyUsedContactIds: ArrayList<String> = ArrayList(),
     private val onItemClick: (item: Contact) -> Unit,
 ) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>(), Filterable {
     private var contacts = ArrayList<Contact>()
-    private var alreadyUsedContactIds = ArrayList<String>()
 
     init {
         setHasStableIds(true)
@@ -48,7 +48,7 @@ class ContactAdapter(
         userName.text = contact.name
         userEmail.text = contact.emails[0] // TODO adapt to all emails?
         userAvatar.loadAvatar(contact.id.hashCode(), null, contact.name.firstOrEmpty().toString())
-        root.setOnClickListener { onItemClick(contact) }
+        root.setOnClickListener { selectContact(contact) }
     }
 
     override fun getItemCount(): Int = contacts.count()
@@ -60,7 +60,7 @@ class ContactAdapter(
         return if (contact == null) {
             false
         } else {
-            onItemClick(contact)
+            selectContact(contact)
             true
         }
     }
@@ -71,6 +71,15 @@ class ContactAdapter(
     }
 
     private fun orderItemList() = contacts.sortBy { it.name }
+
+    private fun selectContact(contact: Contact) {
+        onItemClick(contact)
+        alreadyUsedContactIds.add(contact.id)
+    }
+
+    fun removeUsedContact(contact: Contact) {
+        alreadyUsedContactIds.remove(contact.id)
+    }
 
     override fun getFilter(): Filter {
         return object : Filter() {

@@ -28,7 +28,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
-import com.google.android.material.chip.Chip
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailboxInfoController
@@ -85,9 +84,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun FragmentNewMessageBinding.removeRecipient(index: Int) {
-        val contact = viewModel.recipients[index]
-        viewModel.recipients.remove(contact)
-//        availableUsersAdapter.alreadyUsedContactIds.remove(contact.id) // TODO : Remove email from list of forbbiden emails
+        viewModel.recipients.removeAt(index)
         toItemsChipGroup.removeViewAt(index)
         updateSingleChipText()
     }
@@ -103,13 +100,15 @@ class NewMessageFragment : Fragment() {
 
     private fun FragmentNewMessageBinding.refreshChips() {
         toItemsChipGroup.removeAllViews()
-        for (contact in viewModel.recipients) createChip(contact).setOnClickListener { _ -> removeRecipient(contact) }
+        for (contact in viewModel.recipients) createChip(contact)
     }
 
-    private fun FragmentNewMessageBinding.createChip(contact: Contact): Chip {
-        val chip = ChipContactBinding.inflate(layoutInflater).root.apply { text = contact.name }
-        toItemsChipGroup.addView(chip)
-        return chip
+    private fun FragmentNewMessageBinding.createChip(contact: Contact) {
+        ChipContactBinding.inflate(layoutInflater).root.apply {
+            text = contact.name
+            setOnClickListener { removeRecipient(contact) }
+            toItemsChipGroup.addView(this)
+        }
     }
 
     private fun FragmentNewMessageBinding.updateChipVisibility() {

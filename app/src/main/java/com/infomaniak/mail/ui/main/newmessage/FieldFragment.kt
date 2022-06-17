@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.newmessage
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,17 +26,16 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.transition.TransitionInflater
-import com.google.android.material.chip.Chip
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentFieldBinding
-import io.realm.kotlin.ext.realmListOf
 
 class FieldFragment : Fragment() {
 
     private val binding: FragmentFieldBinding by lazy { FragmentFieldBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by activityViewModels()
+    private lateinit var contactAdapter: ContactAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,9 +56,17 @@ class FieldFragment : Fragment() {
 //        val cont3 = Contact().apply { name = "Fabian Devel"; emails = realmListOf("fabian.devel@infomaniak.com"); uuid = "295232131" }
 //        val cont4 = Contact().apply { name = "Abdourahamane Boinaidi"; emails = realmListOf("abdourahamane.boinaidi@infomaniak.com"); uuid = "296232131" }
 //        val contactAdapter = Contact2Adapter(arrayListOf(cont1, cont2, cont3, cont4)) {
-        val contactAdapter = ContactAdapter(MailData.contactsFlow.value ?: emptyList()) {
-            ccAutocompleteInput.setText("")
-            addRecipient(it)
+//        contactAdapter = ContactAdapter(MailData.contactsFlow.value ?: emptyList()) {
+//            ccAutocompleteInput.setText("")
+//            addRecipient(it)
+//        }
+
+        val allContacts = MailData.contactsFlow.value ?: emptyList()
+        val alreadyUsedContactIds = ArrayList(viewModel.recipients.map { it.id })
+
+        contactAdapter = ContactAdapter(allContacts, alreadyUsedContactIds) {
+            binding.ccAutocompleteInput.setText("")
+            binding.addRecipient(it)
         }
         autoCompleteRecyclerView.adapter = contactAdapter
 
@@ -79,29 +85,23 @@ class FieldFragment : Fragment() {
     }
 
     private fun FragmentFieldBinding.displayChips() {
-        for (recipient in viewModel.recipients) createChip(recipient).setOnClickListener {
-            viewModel.recipients.remove(recipient)
-//            availableUsersAdapter.alreadyUsedContactIds.remove(contact.id) // TODO : Remove email from list of forbbiden emails
-            ccItemsChipGroup.removeView(it)
-        }
+        for (recipient in viewModel.recipients) createChip(recipient)
     }
 
     private fun FragmentFieldBinding.addRecipient(contact: Contact) {
         viewModel.recipients.add(contact)
-        Log.e("gibran", "addRecipient - The value viewModel.recipients is: ${viewModel.recipients.map { it.name }}")
-        // TODO : Prevent from reusing same email twice
-
-        createChip(contact).setOnClickListener {
-            viewModel.recipients.remove(contact)
-//            availableUsersAdapter.alreadyUsedContactIds.remove(contact.id) // TODO : Remove email from list of forbbiden emails
-            ccItemsChipGroup.removeView(it)
-        }
+        createChip(contact)
     }
 
-    // TODO Centralize logic with NewMessagFragment createChip()
-    private fun FragmentFieldBinding.createChip(contact: Contact): Chip {
-        val chip = ChipContactBinding.inflate(layoutInflater).root.apply { text = contact.name }
-        ccItemsChipGroup.addView(chip)
-        return chip
+    private fun FragmentFieldBinding.createChip(contact: Contact) {
+        ChipContactBinding.inflate(layoutInflater).root.apply {
+            text = contact.name
+            setOnClickListener {
+                viewModel.recipients.remove(contact)
+                contactAdapter.removeUsedContact(contact)
+                ccItemsChipGroup.removeView(it)
+            }
+            ccItemsChipGroup.addView(this)
+        }
     }
 }
