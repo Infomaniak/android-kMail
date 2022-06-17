@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
@@ -62,7 +63,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         setupOnRefresh()
         setupAdapter()
-        setupListeners()
+        binding.setupListeners()
         setupUserAvatar()
 
         threadListViewModel.setup()
@@ -102,11 +103,23 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupListeners() = with(binding) {
+    private fun FragmentThreadListBinding.setupListeners() {
         // TODO multiselection
         // openMultiselectButton.setOnClickListener {}
 
-        menuDrawerButton.setOnClickListener { drawerLayout.open() }
+        toolbar.setNavigationOnClickListener { drawerLayout.open() }
+
+        menuDrawerNavigation.setNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.feedbacks -> {}
+                R.id.help -> {}
+                R.id.importMails -> {}
+                R.id.restoreMails -> {}
+                else -> context?.let { threadListViewModel.openFolder(item.title.toString(), it) }
+            }
+            drawerLayout.close()
+            true
+        }
 
         searchViewCard.apply {
             // TODO filterButton doesn't propagate the event to root, must display it ?

@@ -127,6 +127,11 @@ object MailData {
         }
     }
 
+    fun loadThreads(folder: Folder, mailbox: Mailbox) {
+        readThreads(folder)
+        fetchThreads(folder, mailbox)
+    }
+
     fun loadMessages(thread: Thread) {
         getMessagesFromRealm(thread)
         getMessagesFromApi(thread)
@@ -195,7 +200,8 @@ object MailData {
 
     private fun computeFolderToSelect(folders: List<Folder>): Folder? {
         val folder = with(folders) {
-            find { it.role == DEFAULT_FOLDER_ROLE }
+            find { it.id == currentFolderFlow.value?.id }
+                ?: find { it.role == DEFAULT_FOLDER_ROLE }
                 ?: firstOrNull()
                 ?: return null
         }
