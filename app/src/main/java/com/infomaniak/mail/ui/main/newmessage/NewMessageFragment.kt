@@ -92,15 +92,18 @@ class NewMessageFragment : Fragment() {
         updateSingleChipText()
     }
 
+    private fun FragmentNewMessageBinding.removeRecipient(contact: Contact) {
+        val index = viewModel.recipients.indexOfFirst { it.id == contact.id }
+        removeRecipient(index)
+    }
+
     private fun FragmentNewMessageBinding.updateSingleChipText() {
         viewModel.recipients.firstOrNull()?.let { singleChip.root.text = it.name }
     }
 
     private fun FragmentNewMessageBinding.refreshChips() {
         toItemsChipGroup.removeAllViews()
-        viewModel.recipients.forEachIndexed { index, contact ->
-            createChip(contact).setOnClickListener { _ -> removeRecipient(index) }
-        }
+        for (contact in viewModel.recipients) createChip(contact).setOnClickListener { _ -> removeRecipient(contact) }
     }
 
     private fun FragmentNewMessageBinding.createChip(contact: Contact): Chip {
