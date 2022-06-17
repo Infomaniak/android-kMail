@@ -47,7 +47,8 @@ class NewMessageFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         with(binding) {
             fromMailAddress.text = MailData.currentMailboxFlow.value?.email
-            fromMailAddress.setOnClickListener { it.chooseFromAddress() }
+            if (mails.count() > 1) fromMailAddress.setOnClickListener(::chooseFromAddress)
+            else fromMailAddress.isClickable = false
 
             displayChips()
 
@@ -58,12 +59,12 @@ class NewMessageFragment : Fragment() {
             return root
         }
 
-    private fun View.chooseFromAddress() {
-        val adapter = ArrayAdapter(context, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, mails)
-        ListPopupWindow(context).apply {
+    private fun chooseFromAddress(view: View) {
+        val adapter = ArrayAdapter(view.context, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, mails)
+        ListPopupWindow(view.context).apply {
             setAdapter(adapter)
-            anchorView = this@chooseFromAddress
-            width = this@chooseFromAddress.width
+            anchorView = view
+            width = view.width
             setOnItemClickListener { _, _, position, _ ->
                 binding.fromMailAddress.text = mails[position]
                 dismiss()
