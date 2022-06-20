@@ -20,11 +20,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor">
+    android:background="@color/backgroundColor"
+    android:scrollbars="none">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:orientation="vertical">
 
         <com.google.android.material.card.MaterialCardView
@@ -74,28 +76,38 @@
 
         <LinearLayout
             android:id="@+id/accountSwitcher"
-            style="@style/MenuDrawerItem">
+            style="@style/MenuDrawerItem"
+            tools:ignore="UseCompoundDrawables">
 
             <TextView
                 android:id="@+id/accountSwitcherText"
-                style="@style/Callout.Strong"
+                style="@style/Callout.Highlighted.Strong"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/primary"
                 tools:text="Myriam.rais@infomaniak.com" />
 
-            <com.google.android.material.button.MaterialButton
+            <ImageView
                 android:id="@+id/expandAccountButton"
-                style="@style/IconButton"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
                 android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"
-                android:rotation="-180"
-                app:icon="@drawable/ic_arrow_up"
-                app:iconSize="24dp" />
+                android:src="@drawable/ic_arrow_down" />
 
         </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            android:overScrollMode="never"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_setting_address"
+            tools:visibility="visible" />
 
         <com.google.android.material.divider.MaterialDivider
             style="@style/MenuDrawerDivider"
@@ -370,7 +382,8 @@
 
         <LinearLayout
             android:id="@+id/customFolders"
-            style="@style/MenuDrawerItem">
+            style="@style/MenuDrawerItem"
+            tools:ignore="UseCompoundDrawables">
 
             <TextView
                 android:layout_width="0dp"
@@ -378,15 +391,13 @@
                 android:layout_weight="1"
                 android:text="@string/buttonFolders" />
 
-            <com.google.android.material.button.MaterialButton
+            <ImageView
                 android:id="@+id/expandCustomFolderButton"
-                style="@style/IconButton"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
                 android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
-                android:rotation="-180"
-                app:icon="@drawable/ic_arrow_up"
-                app:iconSize="24dp" />
+                android:src="@drawable/ic_arrow_down" />
+
 
         </LinearLayout>
 
