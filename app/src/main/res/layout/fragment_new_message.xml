@@ -141,7 +141,6 @@
             android:layout_marginTop="@dimen/marginStandardVerySmall"
             android:backgroundTint="@android:color/transparent"
             android:imeOptions="actionDone"
-            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
             android:transitionName="toFieldTransition"
@@ -181,11 +180,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toAutocompleteInput" />
-
-
-        <!--    -->
-        <!--    -->
-        <!--    -->
 
 
         <TextView
@@ -230,7 +224,6 @@
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:backgroundTint="@android:color/transparent"
             android:imeOptions="actionDone"
-            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
             android:transitionName="ccFieldTransition"
@@ -238,6 +231,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ccPrefix"
             app:layout_constraintTop_toBottomOf="@id/ccItemsChipGroup" />
+
 
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider3"
@@ -248,11 +242,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ccAutocompleteInput" />
-
-
-        <!--    -->
-        <!--    -->
-        <!--    -->
 
 
         <TextView
@@ -297,7 +286,6 @@
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:backgroundTint="@android:color/transparent"
             android:imeOptions="actionDone"
-            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
             android:transitionName="bccFieldTransition"
@@ -323,11 +311,10 @@
             style="@style/Callout.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/marginStandardMedium"
             android:text="@string/subjectTitle"
-            app:layout_constraintBottom_toTopOf="@id/divider5"
+            app:layout_constraintBottom_toBottomOf="@id/subjectTextFieldGuide"
             app:layout_constraintStart_toStartOf="@id/fromPrefix"
-            app:layout_constraintTop_toBottomOf="@id/divider4" />
+            app:layout_constraintTop_toTopOf="@id/subjectTextFieldGuide" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/subjectTextField"
@@ -335,11 +322,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardVerySmall"
-            android:inputType="textEmailSubject"
-            app:layout_constraintBottom_toBottomOf="@id/subjectPrefix"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            android:inputType="textMultiLine|textEmailSubject"
+            android:maxLines="@null"
             app:layout_constraintEnd_toEndOf="@id/divider5"
             app:layout_constraintStart_toEndOf="@id/subjectPrefix"
-            app:layout_constraintTop_toTopOf="@id/subjectPrefix" />
+            app:layout_constraintTop_toBottomOf="@id/divider4" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/subjectTextFieldGuide"
+            style="@style/EmailAddressTextView"
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:lines="1"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/subjectTextField"
+            app:layout_constraintStart_toStartOf="parent" />
 
 
         <com.google.android.material.divider.MaterialDivider
@@ -347,10 +347,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subjectPrefix" />
+            app:layout_constraintTop_toBottomOf="@id/subjectTextField" />
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/bodyLayout"
@@ -360,7 +361,6 @@
             app:boxBackgroundColor="@android:color/transparent"
             app:boxBackgroundMode="none"
             app:boxStrokeWidth="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider5"
