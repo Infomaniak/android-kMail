@@ -15,55 +15,47 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/addressCardview"
-    style="@style/CardViewMail"
+    android:id="@+id/addressItemView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="0dp">
+    android:background="?selectableItemBackground"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:padding="@dimen/marginStandardSmall">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/envelopeIcon"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/marginStandardVerySmall"
-        android:padding="@dimen/marginStandardSmall">
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginEnd="@dimen/marginStandardSmall"
+        android:src="@drawable/ic_envelope"
+        app:tint="@color/primaryTextColor"
+        tools:ignore="ContentDescription" />
 
-        <ImageView
-            android:id="@+id/envelopeIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:src="@drawable/ic_envelope"
-            app:layout_constraintBottom_toBottomOf="@id/emailAddress"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/emailAddress"
-            app:tint="@color/primaryTextColor" />
+    <TextView
+        android:id="@+id/emailAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:lineSpacingMultiplier="1"
+        android:maxLines="1"
+        tools:text="myriam.rais@infomaniak.com" />
 
-        <TextView
-            android:id="@+id/emailAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/unreadCount"
-            app:layout_constraintStart_toEndOf="@id/envelopeIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="myriam.rais@infomaniak.com" />
+    <TextView
+        android:id="@+id/unreadCount"
+        style="@style/MenuDrawerBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:visibility="gone"
+        tools:text="99+"
+        tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/unreadCount"
-            style="@style/Callout.Highlighted"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/emailAddress"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/emailAddress"
-            tools:text="99+"
-            tools:visibility="visible" />
+</LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</com.google.android.material.card.MaterialCardView>
