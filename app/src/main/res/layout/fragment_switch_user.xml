@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context=".ui.main.menu.SwitchUserFragment">
+    tools:context=".ui.main.menu.user.SwitchUserFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -55,7 +55,7 @@
             android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
-            tools:listitem="@layout/item_setting_account" />
+            tools:listitem="@layout/item_switch_user_account" />
 
     </com.google.android.material.card.MaterialCardView>
 
