@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -79,6 +78,4 @@ class Mailbox : RealmObject {
 
         return this
     }
-
-    fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFoldersSync()
 }
