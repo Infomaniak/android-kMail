@@ -28,11 +28,21 @@ import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.data.models.user.UserResult
+import okhttp3.OkHttpClient
 
 object ApiRepository : ApiRepositoryCore() {
 
-    private inline fun <reified T> callKotlinxApi(url: String, method: ApiController.ApiMethod, body: Any? = null): T {
-        return ApiController.callApi(url, method, body, useKotlinxSerialization = true)
+    private inline fun <reified T> callKotlinxApi(
+        url: String,
+        method: ApiController.ApiMethod,
+        body: Any? = null,
+        okHttpClient: OkHttpClient? = null,
+    ): T {
+        return if (okHttpClient == null) {
+            ApiController.callApi(url, method, body, useKotlinxSerialization = true)
+        } else {
+            ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
+        }
     }
 
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callKotlinxApi(ApiRoutes.addressBooks(), GET)
@@ -47,7 +57,9 @@ object ApiRepository : ApiRepositoryCore() {
         return callKotlinxApi(ApiRoutes.signatures(mailboxHostingId, mailboxMailbox), GET)
     }
 
-    fun getMailboxes(): ApiResponse<List<Mailbox>> = callKotlinxApi("${ApiRoutes.mailbox()}?with=unseen", GET)
+    fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
+        return callKotlinxApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient)
+    }
 
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callKotlinxApi(ApiRoutes.folders(mailboxUuid), GET)
 

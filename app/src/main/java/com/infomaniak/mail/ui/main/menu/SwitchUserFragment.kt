@@ -27,6 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiAccount
@@ -50,7 +51,6 @@ class SwitchUserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        switchUserViewModel.setup()
         recyclerViewAccount.adapter = accountsAdapter
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
@@ -63,7 +63,7 @@ class SwitchUserFragment : Fragment() {
         }
 
         listenToMailboxes()
-        switchUserViewModel.loadMailboxes()
+        switchUserViewModel.loadMailboxes(viewLifecycleOwner)
     }
 
     override fun onPause() {
@@ -79,20 +79,25 @@ class SwitchUserFragment : Fragment() {
             if (mailboxesJob != null) mailboxesJob?.cancel()
 
             mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
-                uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                    // TODO: Handle multiple accounts
-                    // TODO: Sort accounts with selected one first
-                    // TODO: Get the unread count for all mailboxes and not only the current one
-                    val uiAccounts = listOf(UiAccount(AccountUtils.currentUser!!, mailboxes))
+                uiAccountsFlow.filterNotNull().collect { accounts ->
 
-                    accountsAdapter.setAccounts(sortUiAccounts(uiAccounts))
+                    val uiAccounts = accounts
+                        .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
+                        .sortAccounts()
+
+                    accountsAdapter.setAccounts(uiAccounts)
                     accountsAdapter.notifyDataSetChanged()
                 }
             }
         }
     }
 
-    private fun sortUiAccounts(uiAccounts: List<UiAccount>): List<UiAccount> = uiAccounts.map { account ->
-        account.apply { mailboxes = account.mailboxes.sortedByDescending { it.unseenMessages } }
+    private fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
+
+    private fun List<UiAccount>.sortAccounts(): List<UiAccount> {
+        return filter { it.user.id != AccountUtils.currentUserId }
+            .toMutableList()
+            .apply { this@sortAccounts.find { it.user.id == AccountUtils.currentUserId }?.let { add(0, it) } }
+            .toList()
     }
 }

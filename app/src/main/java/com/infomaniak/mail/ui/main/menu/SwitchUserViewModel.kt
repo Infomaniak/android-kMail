@@ -17,46 +17,72 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.infomaniak.mail.data.MailData
+import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.infomaniak.lib.core.BuildConfig
+import com.infomaniak.lib.core.auth.TokenAuthenticator
+import com.infomaniak.lib.core.auth.TokenInterceptor
+import com.infomaniak.lib.core.auth.TokenInterceptorListener
+import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
 class SwitchUserViewModel : ViewModel() {
 
-    private var listenToMailboxesJob: Job? = null
+    private val mutableUiAccountsFlow = MutableStateFlow<List<Pair<User, List<Mailbox>>>?>(null)
+    val uiAccountsFlow = mutableUiAccountsFlow.asStateFlow()
 
-    private val mutableUiMailboxesFlow = MutableStateFlow<List<Mailbox>?>(null)
-    val uiMailboxesFlow = mutableUiMailboxesFlow.asStateFlow()
+    fun loadMailboxes(lifecycleOwner: LifecycleOwner) {
 
-    fun setup() {
-        listenToMailboxes()
-    }
+        AccountUtils.getAllUsers().observeOnce(lifecycleOwner) { users ->
+            CoroutineScope(Dispatchers.IO).launch {
 
-    private fun listenToMailboxes() {
-        if (listenToMailboxesJob != null) listenToMailboxesJob?.cancel()
-
-        listenToMailboxesJob = CoroutineScope(Dispatchers.IO).launch {
-            MailData.mailboxesFlow.filterNotNull().collect { mailboxes ->
-                mutableUiMailboxesFlow.value = mailboxes
+                mutableUiAccountsFlow.value = users.mapNotNull { user ->
+                    ApiRepository.getMailboxes(createOkHttpClientForSpecificUser(user)).data?.let { user to it }
+                }
             }
         }
     }
 
-    fun loadMailboxes() {
-        MailData.loadMailboxes()
+    private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        observe(lifecycleOwner, object : Observer<T> {
+            override fun onChanged(t: T?) {
+                observer.onChanged(t)
+                removeObserver(this)
+            }
+        })
     }
 
-    override fun onCleared() {
-        listenToMailboxesJob?.cancel()
-        listenToMailboxesJob = null
+    private fun createOkHttpClientForSpecificUser(user: User): OkHttpClient {
 
-        super.onCleared()
+        val tokenInterceptorListener = object : TokenInterceptorListener {
+            override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
+                AccountUtils.setUserToken(user, apiToken)
+            }
+
+            override suspend fun onRefreshTokenError() {
+                // TODO?
+            }
+
+            override suspend fun getApiToken(): ApiToken = user.apiToken
+        }
+
+        return OkHttpClient.Builder()
+            .apply {
+                if (BuildConfig.DEBUG) addNetworkInterceptor(StethoInterceptor())
+                addInterceptor(TokenInterceptor(tokenInterceptorListener))
+                authenticator(TokenAuthenticator(tokenInterceptorListener))
+            }.build()
     }
 }
