@@ -41,11 +41,14 @@ class SwitchUserFragment : Fragment() {
 
     private var mailboxesJob: Job? = null
 
+    private val accountsAdapter = SettingAccountAdapter { findNavController().popBackStack() }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         switchUserViewModel.setup()
+        recyclerViewAccount.adapter = accountsAdapter
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
@@ -71,22 +74,18 @@ class SwitchUserFragment : Fragment() {
             mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
                 uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                     // TODO: Handle multiple accounts
-                    // TODO: Order accounts with selected one first
+                    // TODO: Sort accounts with selected one first
                     // TODO: Get the unread count for all mailboxes and not only the current one
-                    val uiAccount = UiAccount(AccountUtils.currentUser!!, mailboxes)
+                    val uiAccounts = listOf(UiAccount(AccountUtils.currentUser!!, mailboxes))
 
-                    val accounts = listOf(uiAccount)
-                    orderUiAccounts(accounts)
-
-                    binding.recyclerViewAccount.adapter = SettingAccountAdapter(accounts) { findNavController().popBackStack() }
+                    accountsAdapter.setAccounts(sortUiAccounts(uiAccounts))
+                    accountsAdapter.notifyDataSetChanged()
                 }
             }
         }
     }
 
-    private fun orderUiAccounts(uiAccounts: List<UiAccount>) {
-        uiAccounts.forEach { account ->
-            account.mailboxes = account.mailboxes.sortedByDescending { it.unseenMessages }
-        }
+    private fun sortUiAccounts(uiAccounts: List<UiAccount>): List<UiAccount> = uiAccounts.map { account ->
+        account.apply { mailboxes = account.mailboxes.sortedByDescending { it.unseenMessages } }
     }
 }

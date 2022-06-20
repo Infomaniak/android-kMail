@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
@@ -30,8 +31,9 @@ import com.infomaniak.mail.ui.main.menu.SettingAddressAdapter.SettingAddressView
 import com.infomaniak.lib.core.R as RCore
 
 class SettingAddressAdapter(
-    private val mailboxes: List<Mailbox> = emptyList(),
-    private val popBackStack: () -> Unit,
+    private var mailboxes: List<Mailbox> = emptyList(),
+    private val displayIcon: Boolean = true,
+    private val onItemClicked: () -> Unit,
 ) : RecyclerView.Adapter<SettingAddressViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingAddressViewHolder {
@@ -41,6 +43,7 @@ class SettingAddressAdapter(
     override fun onBindViewHolder(holder: SettingAddressViewHolder, position: Int): Unit = with(holder.binding) {
         val mailbox = mailboxes[position]
         emailAddress.text = mailbox.email
+        envelopeIcon.isVisible = displayIcon
 
         val unread = mailbox.unseenMessages
         var unreadText = unread.toString()
@@ -51,15 +54,15 @@ class SettingAddressAdapter(
         }
 
         setSelectedState(mailbox.objectId == MailData.currentMailboxFlow.value?.objectId)
-        addressCardview.setOnClickListener {
+        addressItemView.setOnClickListener {
             MailData.selectMailbox(mailbox)
-            popBackStack()
+            onItemClicked()
         }
     }
 
     private fun ItemSettingAddressBinding.setSelectedState(isSelected: Boolean) {
         val (color, style) = computeStyle(isSelected)
-        envelopeIcon.setColorFilter(color)
+        if (displayIcon) envelopeIcon.setColorFilter(color)
         emailAddress.apply {
             setTextColor(color)
             setTextAppearance(style)
@@ -68,10 +71,12 @@ class SettingAddressAdapter(
     }
 
     private fun ItemSettingAddressBinding.computeStyle(isSelected: Boolean) =
-        if (isSelected) ContextCompat.getColor(root.context, R.color.emphasizedTextColor) to R.style.Body_Highlighted
-        else ContextCompat.getColor(root.context, RCore.color.title) to R.style.Body
+        if (isSelected) ContextCompat.getColor(root.context, R.color.emphasizedTextColor) to R.style.Callout_Highlighted_Strong
+        else ContextCompat.getColor(root.context, RCore.color.title) to R.style.Callout
 
     override fun getItemCount(): Int = mailboxes.count()
+
+    fun setMailboxes(newMailboxes: List<Mailbox>) { mailboxes = newMailboxes }
 
     class SettingAddressViewHolder(val binding: ItemSettingAddressBinding) : RecyclerView.ViewHolder(binding.root)
 }
