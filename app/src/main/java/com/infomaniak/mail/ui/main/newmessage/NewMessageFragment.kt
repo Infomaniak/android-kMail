@@ -47,7 +47,6 @@ class NewMessageFragment : Fragment() {
     private var mailboxes = MailboxInfoController.getMailboxesSync()
     private var mails = mailboxes.map { it.email }
     private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
-    private var areAdvancedFieldsOpened = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         with(binding) {
@@ -140,11 +139,14 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun FragmentNewMessageBinding.updateChipVisibility() {
-        singleChipGroup.isVisible = !areAdvancedFieldsOpened && viewModel.recipients.isNotEmpty()
-        toItemsChipGroup.isVisible = areAdvancedFieldsOpened
-        toTransparentButton.isVisible = viewModel.recipients.isNotEmpty() && !areAdvancedFieldsOpened
-        doNotAnimate(constraintLayout) { plusOthers.isVisible = viewModel.recipients.count() > 1 && !areAdvancedFieldsOpened }
+        singleChipGroup.isVisible = !viewModel.areAdvancedFieldsOpened && viewModel.recipients.isNotEmpty()
+        toItemsChipGroup.isVisible = viewModel.areAdvancedFieldsOpened
+        toTransparentButton.isVisible = viewModel.recipients.isNotEmpty() && !viewModel.areAdvancedFieldsOpened
+        doNotAnimate(constraintLayout) {
+            plusOthers.isVisible = viewModel.recipients.count() > 1 && !viewModel.areAdvancedFieldsOpened
+        }
         plusOthers.text = "+${viewModel.recipients.count() - 1} others" // TODO : extract string
+        advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
     }
 
     private fun doNotAnimate(parent: View, body: () -> Unit) {
@@ -172,10 +174,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun FragmentNewMessageBinding.openAdvancedFields() {
-        areAdvancedFieldsOpened = !areAdvancedFieldsOpened
+        viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
 
-        advancedFields.isVisible = areAdvancedFieldsOpened
-        chevron.toggleChevron(!areAdvancedFieldsOpened)
+        advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
+        chevron.toggleChevron(!viewModel.areAdvancedFieldsOpened)
 
         refreshChips()
         updateChipVisibility()
