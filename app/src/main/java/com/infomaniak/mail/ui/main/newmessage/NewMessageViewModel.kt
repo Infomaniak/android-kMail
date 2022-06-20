@@ -20,6 +20,8 @@ package com.infomaniak.mail.ui.main.newmessage
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.models.Contact
 
-class NewMessageViewModel: ViewModel() {
-    val recipients = ArrayList<Contact>()
+class NewMessageViewModel : ViewModel() {
+    val recipients = mutableListOf<Contact>()
+    val cc = mutableListOf<Contact>()
+    val bcc = mutableListOf<Contact>()
 }

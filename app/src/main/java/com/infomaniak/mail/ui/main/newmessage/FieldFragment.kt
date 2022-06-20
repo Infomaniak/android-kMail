@@ -30,61 +30,72 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentFieldBinding
+import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 
-class FieldFragment : Fragment() {
+class FieldFragment(private val field: NewMessageFragment.FieldType) : Fragment() {
 
     private val binding: FragmentFieldBinding by lazy { FragmentFieldBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by activityViewModels()
+    private var contacts = mutableListOf<Contact>()
     private lateinit var contactAdapter: ContactAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
         super.onCreate(savedInstanceState)
+        contacts = when (field) {
+            TO -> viewModel.recipients
+            CC -> viewModel.cc
+            BCC -> viewModel.bcc
+        }
+
+        prefix.transitionName = field.prefixTransition
+        autocompleteInput.transitionName = field.fieldTransition
+        itemsChipGroup.transitionName = field.chipsTransition
+        prefix.setText(field.displayedName)
         sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = with(binding) {
-        autocompleteInput.requestFocus()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        with(binding) {
+            autocompleteInput.requestFocus()
 
-        displayChips()
+            displayChips()
 
-//        val cont1 = Contact().apply { name = "Gibran Chevalley"; emails = realmListOf("gibran.chevalley@infomaniak.com"); id = "22132021" }
+            //region Test contacts
+            //        val cont1 = Contact().apply { name = "Gibran Chevalley"; emails = realmListOf("gibran.chevalley@infomaniak.com"); id = "22132021" }
 //        val cont2 = Contact().apply { name = "Kevin Boulongne"; emails = realmListOf("kevin.boulongne@infomaniak.com"); id = "233871341" }
 //        val cont3 = Contact().apply { name = "Fabian Devel"; emails = realmListOf("fabian.devel@infomaniak.com"); id = "295232131" }
 //        val cont4 = Contact().apply { name = "Abdourahamane Boinaidi"; emails = realmListOf("abdourahamane.boinaidi@infomaniak.com"); id = "296232131" }
 //        vsl allContacts = listOf(cont1, cont2, cont3, cont4)
-        val allContacts = MailData.contactsFlow.value ?: emptyList()
-        val alreadyUsedContactIds = ArrayList(viewModel.recipients.map { it.id })
+            //endregion
+            val allContacts = MailData.contactsFlow.value ?: emptyList()
+            val alreadyUsedContactIds = ArrayList(viewModel.recipients.map { it.id })
 
-        contactAdapter = ContactAdapter(allContacts, alreadyUsedContactIds) {
-            binding.autocompleteInput.setText("")
-            binding.addRecipient(it)
-        }
-        autoCompleteRecyclerView.adapter = contactAdapter
-
-        autocompleteInput.apply {
-            doOnTextChanged { text, _, _, _ ->
-                if ((text?.trim()?.count() ?: 0) > 0) contactAdapter.filter.filter(text)
-                else contactAdapter.clear()
+            contactAdapter = ContactAdapter(allContacts, alreadyUsedContactIds) {
+                autocompleteInput.setText("")
+                addMail(it)
             }
+            autoCompleteRecyclerView.adapter = contactAdapter
 
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) contactAdapter.addFirstAvailableItem()
-                true // Keep keyboard open
+            autocompleteInput.apply {
+                doOnTextChanged { text, _, _, _ ->
+                    if ((text?.trim()?.count() ?: 0) > 0) contactAdapter.filter.filter(text)
+                    else contactAdapter.clear()
+                }
+
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) contactAdapter.addFirstAvailableItem()
+                    true // Keep keyboard open
+                }
             }
+            return root
         }
-        return root
-    }
 
     private fun FragmentFieldBinding.displayChips() {
-        for (recipient in viewModel.recipients) createChip(recipient)
+        for (recipient in contacts) createChip(recipient)
     }
 
-    private fun FragmentFieldBinding.addRecipient(contact: Contact) {
-        viewModel.recipients.add(contact)
+    private fun FragmentFieldBinding.addMail(contact: Contact) {
+        contacts.add(contact)
         createChip(contact)
     }
 

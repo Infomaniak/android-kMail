@@ -30,7 +30,6 @@
         android:layout_marginStart="@dimen/marginStandardMedium"
         android:layout_marginEnd="@dimen/marginStandardVerySmall"
         android:text="@string/toTitle"
-        android:transitionName="prefixTextView"
         app:layout_constraintBottom_toBottomOf="@id/autocompleteInput"
         app:layout_constraintEnd_toStartOf="@id/autocompleteInput"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +42,6 @@
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:paddingHorizontal="@dimen/marginStandardMedium"
-        android:transitionName="chipGroup"
         app:chipSpacingVertical="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +57,6 @@
         android:inputType="textEmailAddress"
         android:maxLines="1"
         android:textSize="16sp"
-        android:transitionName="fieldTransition"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefix"
         app:layout_constraintTop_toBottomOf="@id/itemsChipGroup" />
