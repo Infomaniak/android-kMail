@@ -33,7 +33,7 @@ object ApiRoutes {
         return "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
     }
 
-    fun mailbox() = "$MAIL_API/api/mailbox"
+    fun mailbox() = "$MAIL_API/api/mailbox?with=unseen"
 
     fun folders(uuid: String) = "$MAIL_API/api/mail/$uuid/folder"
 
@@ -51,7 +51,7 @@ object ApiRoutes {
         return "${folder(uuid, folderId)}/message?thread=on&offset=0&filter=$filter"
     }
 
-    fun quotas(mailbox: String, hostingId: Int) = "${mailbox()}/quotas?mailbox=$mailbox&product_id=$hostingId"
+    fun quotas(mailbox: String, hostingId: Int) = "$MAIL_API/api/mailbox/quotas?mailbox=$mailbox&product_id=$hostingId"
 
     fun moveMessage(uuid: String) = "$MAIL_API/api/mail/$uuid/message/move"
 
