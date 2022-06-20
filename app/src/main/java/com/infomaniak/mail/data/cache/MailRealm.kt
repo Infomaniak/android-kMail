@@ -86,10 +86,13 @@ object MailRealm {
     }
 
     /**
+     * Contacts
+     */
+    fun readContacts(): SharedFlow<ResultsChange<Contact>> = ContactsController.getContacts().toSharedFlow()
+
+    /**
      * Mailboxes
      */
-    fun readMailboxesFromRealm(): List<Mailbox> = MailboxInfoController.getMailboxesSync()
-
     fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
 
     fun readMailboxes(): SharedFlow<ResultsChange<Mailbox>> {
@@ -107,11 +110,6 @@ object MailRealm {
     fun readMessages(thread: Thread): List<Message> {
         return thread.messages
     }
-
-    /**
-     * Contacts
-     */
-    fun readContacts(): SharedFlow<ResultsChange<Contact>> = ContactsController.getContacts().toSharedFlow()
 
     /**
      * Utils

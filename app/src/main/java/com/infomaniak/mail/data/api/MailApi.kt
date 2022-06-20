@@ -35,8 +35,14 @@ import java.io.File
 
 object MailApi {
 
+    /**
+     * Contacts
+     */
     fun fetchContacts(): List<Contact> = ApiRepository.getContacts().data ?: emptyList()
 
+    /**
+     * Mailboxes
+     */
     fun fetchMailboxes(): List<Mailbox>? {
         return ApiRepository.getMailboxes().data?.map { it.initLocalValues() }
     }
@@ -94,7 +100,7 @@ object MailApi {
         return apiDraft
     }
 
-    suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
+    suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
 
         fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
             val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
