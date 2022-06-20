@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.menu.user
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -26,21 +26,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.databinding.ItemSettingAddressBinding
-import com.infomaniak.mail.ui.main.menu.SettingAddressAdapter.SettingAddressViewHolder
+import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
 import com.infomaniak.lib.core.R as RCore
 
-class SettingAddressAdapter(
+class SwitchUserMailboxesAdapter(
     private var mailboxes: List<Mailbox> = emptyList(),
     private val displayIcon: Boolean = true,
-    private val onItemClicked: () -> Unit,
-) : RecyclerView.Adapter<SettingAddressViewHolder>() {
+    private val popBackStack: () -> Unit,
+) : RecyclerView.Adapter<SwitchUserMailboxViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingAddressViewHolder {
-        return SettingAddressViewHolder(ItemSettingAddressBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserMailboxViewHolder {
+        return SwitchUserMailboxViewHolder(
+            ItemSwitchUserMailboxBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
     }
 
-    override fun onBindViewHolder(holder: SettingAddressViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: SwitchUserMailboxViewHolder, position: Int): Unit = with(holder.binding) {
         val mailbox = mailboxes[position]
         emailAddress.text = mailbox.email
         envelopeIcon.isVisible = displayIcon
@@ -60,7 +62,7 @@ class SettingAddressAdapter(
         }
     }
 
-    private fun ItemSettingAddressBinding.setSelectedState(isSelected: Boolean) {
+    private fun ItemSwitchUserMailboxBinding.setSelectedState(isSelected: Boolean) {
         val (color, style) = computeStyle(isSelected)
         if (displayIcon) envelopeIcon.setColorFilter(color)
         emailAddress.apply {
@@ -70,7 +72,7 @@ class SettingAddressAdapter(
         unreadCount.setTextAppearance(style)
     }
 
-    private fun ItemSettingAddressBinding.computeStyle(isSelected: Boolean) =
+    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean) =
         if (isSelected) ContextCompat.getColor(root.context, R.color.emphasizedTextColor) to R.style.Callout_Highlighted_Strong
         else ContextCompat.getColor(root.context, RCore.color.title) to R.style.Callout
 
@@ -80,5 +82,5 @@ class SettingAddressAdapter(
         mailboxes = newMailboxes
     }
 
-    class SettingAddressViewHolder(val binding: ItemSettingAddressBinding) : RecyclerView.ViewHolder(binding.root)
+    class SwitchUserMailboxViewHolder(val binding: ItemSwitchUserMailboxBinding) : RecyclerView.ViewHolder(binding.root)
 }

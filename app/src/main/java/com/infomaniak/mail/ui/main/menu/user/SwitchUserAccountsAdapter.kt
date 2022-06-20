@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.menu.user
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -24,37 +24,39 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.databinding.ItemSettingAccountBinding
-import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.SettingAccountViewHolder
+import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
 import com.infomaniak.mail.utils.toggleChevron
 
-class SettingAccountAdapter(
+class SwitchUserAccountsAdapter(
     private var accounts: List<UiAccount> = emptyList(),
-    private val onItemClicked: () -> Unit,
-) : RecyclerView.Adapter<SettingAccountViewHolder>() {
+    private val popBackStack: () -> Unit,
+) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingAccountViewHolder {
-        return SettingAccountViewHolder(ItemSettingAccountBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserAccountViewHolder {
+        return SwitchUserAccountViewHolder(
+            ItemSwitchUserAccountBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
     }
 
-    override fun onBindViewHolder(holder: SettingAccountViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int): Unit = with(holder.binding) {
         val account = accounts[position]
         expandFirstMailbox(account, position)
         userAvatarImage.loadAvatar(account.user)
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(account) }
-        addressesList.adapter = SettingAddressAdapter(mailboxes = account.mailboxes, onItemClicked = onItemClicked)
+        addressesList.adapter = SwitchUserMailboxesAdapter(mailboxes = account.mailboxes, popBackStack = popBackStack)
     }
 
-    private fun ItemSettingAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
+    private fun ItemSwitchUserAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
         if (position == 0) {
             chevron.rotation = 180.0f
             toggleMailboxes(account)
         }
     }
 
-    private fun ItemSettingAccountBinding.toggleMailboxes(account: UiAccount) {
+    private fun ItemSwitchUserAccountBinding.toggleMailboxes(account: UiAccount) {
         account.collapsed = !account.collapsed
         chevron.toggleChevron(account.collapsed)
         addressesList.isGone = account.collapsed
@@ -66,7 +68,7 @@ class SettingAccountAdapter(
         accounts = newAccounts
     }
 
-    class SettingAccountViewHolder(val binding: ItemSettingAccountBinding) : RecyclerView.ViewHolder(binding.root)
+    class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : RecyclerView.ViewHolder(binding.root)
 
     data class UiAccount(
         val user: User,
