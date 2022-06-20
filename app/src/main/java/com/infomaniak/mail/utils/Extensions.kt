@@ -70,8 +70,8 @@ fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month(
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
-    collapsedAngle: Float = -180.0f,
-    expandedAngle: Float = 0.0f,
+    collapsedAngle: Float = 0.0f,
+    expandedAngle: Float = 180.0f,
     duration: Long = 300L,
 ) {
     val angle = if (isCollapsed) collapsedAngle else expandedAngle

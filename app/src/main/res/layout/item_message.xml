@@ -117,11 +117,11 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@string/contentDescriptionButtonExpandHeader"
-                android:rotation="180"
-                app:icon="@drawable/ic_arrow_up"
-                app:iconSize="24dp"
+                app:icon="@drawable/ic_arrow_down"
+                app:iconSize="12dp"
+                app:layout_constraintBottom_toBottomOf="@+id/expeditorName"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@+id/expeditorName" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/deleteDraftButton"
