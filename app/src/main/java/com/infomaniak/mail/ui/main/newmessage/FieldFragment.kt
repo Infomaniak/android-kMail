@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentFieldBinding
-import io.realm.kotlin.ext.realmListOf
 
 class FieldFragment : Fragment() {
 
@@ -48,7 +47,7 @@ class FieldFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View = with(binding) {
-        ccAutocompleteInput.requestFocus()
+        autocompleteInput.requestFocus()
 
         displayChips()
 
@@ -61,12 +60,12 @@ class FieldFragment : Fragment() {
         val alreadyUsedContactIds = ArrayList(viewModel.recipients.map { it.id })
 
         contactAdapter = ContactAdapter(allContacts, alreadyUsedContactIds) {
-            binding.ccAutocompleteInput.setText("")
+            binding.autocompleteInput.setText("")
             binding.addRecipient(it)
         }
         autoCompleteRecyclerView.adapter = contactAdapter
 
-        ccAutocompleteInput.apply {
+        autocompleteInput.apply {
             doOnTextChanged { text, _, _, _ ->
                 if ((text?.trim()?.count() ?: 0) > 0) contactAdapter.filter.filter(text)
                 else contactAdapter.clear()
@@ -95,9 +94,9 @@ class FieldFragment : Fragment() {
             setOnClickListener {
                 viewModel.recipients.remove(contact)
                 contactAdapter.removeUsedContact(contact)
-                ccItemsChipGroup.removeView(it)
+                itemsChipGroup.removeView(it)
             }
-            ccItemsChipGroup.addView(this)
+            itemsChipGroup.addView(this)
         }
     }
 }

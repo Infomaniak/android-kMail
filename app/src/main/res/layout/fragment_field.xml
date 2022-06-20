@@ -31,55 +31,48 @@
         android:layout_marginEnd="@dimen/marginStandardVerySmall"
         android:text="@string/toTitle"
         android:transitionName="prefixTextView"
-        app:layout_constraintBottom_toBottomOf="@id/ccAutocompleteInput"
-        app:layout_constraintEnd_toStartOf="@id/ccAutocompleteInput"
-        app:layout_constraintTop_toTopOf="@id/ccAutocompleteInput"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/autocompleteInput"
+        app:layout_constraintEnd_toStartOf="@id/autocompleteInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/autocompleteInput" />
 
 
-        <com.google.android.material.chip.ChipGroup
-            android:transitionName="chipGroup"
-            android:paddingHorizontal="@dimen/marginStandardMedium"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/ccItemsChipGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            app:chipSpacingVertical="0dp" />
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/itemsChipGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:transitionName="chipGroup"
+        app:chipSpacingVertical="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <!--        <TextView-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
-        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
-
-
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:transitionName="fieldTransition"
-            app:layout_constraintTop_toBottomOf="@id/ccItemsChipGroup"
-            app:layout_constraintStart_toEndOf="@id/prefix"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/ccAutocompleteInput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-            android:backgroundTint="@android:color/transparent"
-            android:imeOptions="actionDone"
-            android:inputType="textEmailAddress"
-            android:maxLines="1"
-            android:textSize="16sp" />
+    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+        android:id="@+id/autocompleteInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+        android:backgroundTint="@android:color/transparent"
+        android:imeOptions="actionDone"
+        android:inputType="textEmailAddress"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:transitionName="fieldTransition"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefix"
+        app:layout_constraintTop_toBottomOf="@id/itemsChipGroup" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/autoCompleteRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ccAutocompleteInput"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/autocompleteInput"
         tools:itemCount="5"
         tools:listitem="@layout/item_contact" />
 </androidx.constraintlayout.widget.ConstraintLayout>
