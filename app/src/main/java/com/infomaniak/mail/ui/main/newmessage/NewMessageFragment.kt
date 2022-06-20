@@ -57,10 +57,10 @@ class NewMessageFragment : Fragment() {
 
             displayChips()
 
-            toAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(TO) }
             toTransparentButton.setOnClickListener { openAdvancedFields() }
             chevron.setOnClickListener { openAdvancedFields() }
 
+            toAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(TO) }
             ccAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(CC) }
             bccAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(BCC) }
 
@@ -81,7 +81,7 @@ class NewMessageFragment : Fragment() {
         }.show()
     }
 
-    //region Chips
+    //region Chips behavior
     private fun getContacts(field: FieldType): MutableList<Contact> =
         when (field) {
             TO -> viewModel.recipients
@@ -143,7 +143,7 @@ class NewMessageFragment : Fragment() {
         singleChipGroup.isVisible = !areAdvancedFieldsOpened && viewModel.recipients.isNotEmpty()
         toItemsChipGroup.isVisible = areAdvancedFieldsOpened
         toTransparentButton.isVisible = viewModel.recipients.isNotEmpty() && !areAdvancedFieldsOpened
-        doNotAnimate(root) { plusOthers.isVisible = viewModel.recipients.count() > 1 && !areAdvancedFieldsOpened }
+        doNotAnimate(constraintLayout) { plusOthers.isVisible = viewModel.recipients.count() > 1 && !areAdvancedFieldsOpened }
         plusOthers.text = "+${viewModel.recipients.count() - 1} others" // TODO : extract string
     }
 
@@ -180,7 +180,7 @@ class NewMessageFragment : Fragment() {
         refreshChips()
         updateChipVisibility()
     }
-//endregion
+    //endregion
 
     fun getFromMailbox(): Mailbox = mailboxes[selectedMailboxIndex]
 

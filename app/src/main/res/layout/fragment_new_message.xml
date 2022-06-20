@@ -15,369 +15,376 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     tools:context=".ui.main.newmessage.NewMessageFragment">
 
-    <TextView
-        android:id="@+id/fromPrefix"
-        style="@style/Callout.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardMedium"
-        android:text="@string/fromTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/fromMailAddress"
-        style="@style/TextButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/marginStandardMedium"
-        android:gravity="center_vertical"
-        app:layout_constraintBottom_toBottomOf="@id/fromPrefix"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/fromPrefix"
-        app:layout_constraintTop_toTopOf="@id/fromPrefix"
-        tools:text="myriam.rais@ik.me" />
-
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardMedium"
-        app:layout_constraintBottom_toTopOf="@id/toItemsChipGroup"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fromPrefix" />
-
-
-    <TextView
-        android:id="@+id/toPrefix"
-        style="@style/Callout.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/toTitle"
-        android:transitionName="toPrefixTextView"
-        app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
-        app:layout_constraintStart_toStartOf="@id/fromPrefix"
-        app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
-
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/toItemsChipGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
-        android:transitionName="toChipGroup"
-        app:chipSpacingVertical="0dp"
-        app:layout_constraintBottom_toTopOf="@id/toAutocompleteInput"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider1">
-
-        <!--        <TextView-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
-        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
-
-    </com.google.android.material.chip.ChipGroup>
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/singleChipGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:visibility="gone"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
-        app:layout_constraintEnd_toStartOf="@id/plusOthers"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/toPrefix"
-        app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
-        tools:visibility="visible">
-
-        <include
-            android:id="@+id/singleChip"
-            layout="@layout/chip_contact" />
-
-    </com.google.android.material.chip.ChipGroup>
-
-    <TextView
-        android:id="@+id/plusOthers"
-        style="@style/Callout.Highlighted"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
-        app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/singleChipGroup"
-        app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
-        tools:text="+2 autres" />
-
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/toAutocompleteInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-        android:layout_marginTop="@dimen/marginStandardVerySmall"
-        android:backgroundTint="@android:color/transparent"
-        android:imeOptions="actionDone"
-        android:inputType="textEmailAddress"
-        android:maxLines="1"
-        android:textSize="16sp"
-        android:transitionName="toFieldTransition"
-        app:layout_constraintBottom_toTopOf="@id/divider2"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
-        app:layout_constraintStart_toEndOf="@id/singleChipGroup"
-        app:layout_constraintTop_toBottomOf="@id/toItemsChipGroup" />
-
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/toTransparentButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@android:color/transparent"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
-        app:layout_constraintEnd_toStartOf="@id/chevron"
-        app:layout_constraintStart_toEndOf="@id/singleChipGroup"
-        app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/chevron"
-        style="@style/IconButton"
-        android:rotation="-180"
-        app:icon="@drawable/ic_chevron_up"
-        app:layout_constraintBottom_toTopOf="@id/toPrefix"
-        app:layout_constraintEnd_toEndOf="@id/divider1"
-        app:layout_constraintTop_toBottomOf="@id/toPrefix" />
-
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardVerySmall"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toAutocompleteInput" />
-
-
-    <!--    -->
-    <!--    -->
-    <!--    -->
-
-
-    <TextView
-        android:id="@+id/ccPrefix"
-        style="@style/Callout.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
-        android:text="@string/ccTitle"
-        android:transitionName="ccPrefixTextView"
-        app:layout_constraintBottom_toBottomOf="@id/ccAutocompleteInput"
-        app:layout_constraintStart_toStartOf="@id/fromPrefix"
-        app:layout_constraintTop_toTopOf="@id/ccAutocompleteInput" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/ccItemsChipGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
-        android:transitionName="ccChipGroup"
-        app:chipSpacingVertical="0dp"
-        app:layout_constraintBottom_toTopOf="@id/ccAutocompleteInput"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider2">
-
-        <!--        <TextView-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
-        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
-
-    </com.google.android.material.chip.ChipGroup>
-
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/ccAutocompleteInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:layout_marginTop="@dimen/marginStandardVerySmall"
-        android:layout_marginEnd="@dimen/marginStandardMedium"
-        android:backgroundTint="@android:color/transparent"
-        android:imeOptions="actionDone"
-        android:inputType="textEmailAddress"
-        android:maxLines="1"
-        android:textSize="16sp"
-        android:transitionName="ccFieldTransition"
-        app:layout_constraintBottom_toTopOf="@id/divider3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ccPrefix"
-        app:layout_constraintTop_toBottomOf="@id/ccItemsChipGroup" />
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardVerySmall"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ccAutocompleteInput" />
-
-
-    <!--    -->
-    <!--    -->
-    <!--    -->
-
-
-    <TextView
-        android:id="@+id/bccPrefix"
-        style="@style/Callout.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
-        android:text="@string/bccTitle"
-        android:transitionName="bccPrefixTextView"
-        app:layout_constraintBottom_toBottomOf="@id/bccAutocompleteInput"
-        app:layout_constraintStart_toStartOf="@id/fromPrefix"
-        app:layout_constraintTop_toTopOf="@id/bccAutocompleteInput" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/bccItemsChipGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:paddingHorizontal="@dimen/marginStandardMedium"
-        android:transitionName="bccChipGroup"
-        app:chipSpacingVertical="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bccAutocompleteInput"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider3">
-
-        <!--        <TextView-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
-        <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
-
-    </com.google.android.material.chip.ChipGroup>
-
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/bccAutocompleteInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:layout_marginTop="@dimen/marginStandardVerySmall"
-        android:layout_marginEnd="@dimen/marginStandardMedium"
-        android:backgroundTint="@android:color/transparent"
-        android:imeOptions="actionDone"
-        android:inputType="textEmailAddress"
-        android:maxLines="1"
-        android:textSize="16sp"
-        android:transitionName="bccFieldTransition"
-        app:layout_constraintBottom_toTopOf="@id/divider4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bccPrefix"
-        app:layout_constraintTop_toBottomOf="@id/bccItemsChipGroup" />
-
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider4"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardVerySmall"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bccAutocompleteInput" />
-
-
-    <TextView
-        android:id="@+id/subjectPrefix"
-        style="@style/Callout.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/marginStandardMedium"
-        android:text="@string/subjectTitle"
-        app:layout_constraintBottom_toTopOf="@id/divider5"
-        app:layout_constraintStart_toStartOf="@id/fromPrefix"
-        app:layout_constraintTop_toBottomOf="@id/divider4" />
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/subjectTextField"
-        style="@style/EmailAddressTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginStandardVerySmall"
-        android:inputType="textEmailSubject"
-        app:layout_constraintBottom_toBottomOf="@id/subjectPrefix"
-        app:layout_constraintEnd_toEndOf="@id/divider5"
-        app:layout_constraintStart_toEndOf="@id/subjectPrefix"
-        app:layout_constraintTop_toTopOf="@id/subjectPrefix" />
-
-
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider5"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginTop="@dimen/marginStandardMedium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subjectPrefix" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/bodyLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:hint=" "
-        app:boxBackgroundColor="@android:color/transparent"
-        app:boxBackgroundMode="none"
-        app:boxStrokeWidth="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider5"
-        app:placeholderText="@string/newMessagePlaceholderTitle"
-        app:placeholderTextColor="@color/secondaryText">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
+
+        <TextView
+            android:id="@+id/fromPrefix"
+            style="@style/Callout.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:text="@string/fromTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/fromMailAddress"
+            style="@style/TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="@id/fromPrefix"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/fromPrefix"
+            app:layout_constraintTop_toTopOf="@id/fromPrefix"
+            tools:text="myriam.rais@ik.me" />
+
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            app:layout_constraintBottom_toTopOf="@id/toItemsChipGroup"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fromPrefix" />
+
+
+        <TextView
+            android:id="@+id/toPrefix"
+            style="@style/Callout.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/toTitle"
+            android:transitionName="toPrefixTextView"
+            app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+            app:layout_constraintStart_toStartOf="@id/fromPrefix"
+            app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
+
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/toItemsChipGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:transitionName="toChipGroup"
+            app:chipSpacingVertical="0dp"
+            app:layout_constraintBottom_toTopOf="@id/toAutocompleteInput"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider1">
+
+            <!--        <TextView-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
+            <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/singleChipGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardVerySmall"
+            android:visibility="gone"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+            app:layout_constraintEnd_toStartOf="@id/plusOthers"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@id/toPrefix"
+            app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
+            tools:visibility="visible">
+
+            <include
+                android:id="@+id/singleChip"
+                layout="@layout/chip_contact" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            android:id="@+id/plusOthers"
+            style="@style/Callout.Highlighted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardVerySmall"
+            app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+            app:layout_constraintEnd_toStartOf="@id/chevron"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/singleChipGroup"
+            app:layout_constraintTop_toTopOf="@id/toAutocompleteInput"
+            tools:text="+2 autres" />
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/toAutocompleteInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            android:backgroundTint="@android:color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:textSize="16sp"
+            android:transitionName="toFieldTransition"
+            app:layout_constraintBottom_toTopOf="@id/divider2"
+            app:layout_constraintEnd_toStartOf="@id/chevron"
+            app:layout_constraintStart_toEndOf="@id/singleChipGroup"
+            app:layout_constraintTop_toBottomOf="@id/toItemsChipGroup" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toTransparentButton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
+            app:layout_constraintEnd_toStartOf="@id/chevron"
+            app:layout_constraintStart_toEndOf="@id/singleChipGroup"
+            app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/chevron"
+            style="@style/IconButton"
+            android:rotation="-180"
+            app:icon="@drawable/ic_chevron_up"
+            app:layout_constraintBottom_toTopOf="@id/toPrefix"
+            app:layout_constraintEnd_toEndOf="@id/divider1"
+            app:layout_constraintTop_toBottomOf="@id/toPrefix" />
+
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toAutocompleteInput" />
+
+
+        <!--    -->
+        <!--    -->
+        <!--    -->
+
+
+        <TextView
+            android:id="@+id/ccPrefix"
+            style="@style/Callout.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:text="@string/ccTitle"
+            android:transitionName="ccPrefixTextView"
+            app:layout_constraintBottom_toBottomOf="@id/ccAutocompleteInput"
+            app:layout_constraintStart_toStartOf="@id/fromPrefix"
+            app:layout_constraintTop_toTopOf="@id/ccAutocompleteInput" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/ccItemsChipGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:transitionName="ccChipGroup"
+            app:chipSpacingVertical="0dp"
+            app:layout_constraintBottom_toTopOf="@id/ccAutocompleteInput"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider2">
+
+            <!--        <TextView-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
+            <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/ccAutocompleteInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardVerySmall"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:backgroundTint="@android:color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:textSize="16sp"
+            android:transitionName="ccFieldTransition"
+            app:layout_constraintBottom_toTopOf="@id/divider3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ccPrefix"
+            app:layout_constraintTop_toBottomOf="@id/ccItemsChipGroup" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ccAutocompleteInput" />
+
+
+        <!--    -->
+        <!--    -->
+        <!--    -->
+
+
+        <TextView
+            android:id="@+id/bccPrefix"
+            style="@style/Callout.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:text="@string/bccTitle"
+            android:transitionName="bccPrefixTextView"
+            app:layout_constraintBottom_toBottomOf="@id/bccAutocompleteInput"
+            app:layout_constraintStart_toStartOf="@id/fromPrefix"
+            app:layout_constraintTop_toTopOf="@id/bccAutocompleteInput" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/bccItemsChipGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:transitionName="bccChipGroup"
+            app:chipSpacingVertical="0dp"
+            app:layout_constraintBottom_toTopOf="@id/bccAutocompleteInput"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider3">
+
+            <!--        <TextView-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"-->
+            <!--            android:text="dededmiewmdioewmoidmewoidoie\nkdoewopkdowpkdeopwkdoepwkk\njdieowjiodewnduewonn\njsiudewjdehwui" />-->
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/bccAutocompleteInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardVerySmall"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:backgroundTint="@android:color/transparent"
+            android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:textSize="16sp"
+            android:transitionName="bccFieldTransition"
+            app:layout_constraintBottom_toTopOf="@id/divider4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bccPrefix"
+            app:layout_constraintTop_toBottomOf="@id/bccItemsChipGroup" />
+
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bccAutocompleteInput" />
+
+
+        <TextView
+            android:id="@+id/subjectPrefix"
+            style="@style/Callout.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:text="@string/subjectTitle"
+            app:layout_constraintBottom_toTopOf="@id/divider5"
+            app:layout_constraintStart_toStartOf="@id/fromPrefix"
+            app:layout_constraintTop_toBottomOf="@id/divider4" />
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/bodyText"
+            android:id="@+id/subjectTextField"
+            style="@style/EmailAddressTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardVerySmall"
+            android:inputType="textEmailSubject"
+            app:layout_constraintBottom_toBottomOf="@id/subjectPrefix"
+            app:layout_constraintEnd_toEndOf="@id/divider5"
+            app:layout_constraintStart_toEndOf="@id/subjectPrefix"
+            app:layout_constraintTop_toTopOf="@id/subjectPrefix" />
+
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/divider5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subjectPrefix" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/bodyLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="top"
-            android:hint="@string/newMessagePlaceholderTitle"
-            android:textSize="16sp" />
+            android:layout_height="wrap_content"
+            android:hint=" "
+            app:boxBackgroundColor="@android:color/transparent"
+            app:boxBackgroundMode="none"
+            app:boxStrokeWidth="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider5"
+            app:placeholderText="@string/newMessagePlaceholderTitle"
+            app:placeholderTextColor="@color/secondaryText">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/bodyText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:hint="@string/newMessagePlaceholderTitle"
+                android:minHeight="300dp"
+                android:textSize="16sp" />
 
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/advancedFields"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="divider4,bccItemsChipGroup,bccAutocompleteInput,bccPrefix,divider3,ccItemsChipGroup,ccAutocompleteInput,ccPrefix"
-        tools:visibility="visible" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/advancedFields"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="divider4,bccItemsChipGroup,bccAutocompleteInput,bccPrefix,divider3,ccItemsChipGroup,ccAutocompleteInput,ccPrefix"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
