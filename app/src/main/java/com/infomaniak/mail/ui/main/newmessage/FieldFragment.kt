@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentFieldBinding
+import io.realm.kotlin.ext.realmListOf
 
 class FieldFragment : Fragment() {
 
@@ -51,16 +52,11 @@ class FieldFragment : Fragment() {
 
         displayChips()
 
-//        val cont1 = Contact().apply { name = "Gibran Chevalley"; emails = realmListOf("gibran.chevalley@infomaniak.com"); uuid = "22132021" }
-//        val cont2 = Contact().apply { name = "Kevin Boulongne"; emails = realmListOf("kevin.boulongne@infomaniak.com"); uuid = "233871341" }
-//        val cont3 = Contact().apply { name = "Fabian Devel"; emails = realmListOf("fabian.devel@infomaniak.com"); uuid = "295232131" }
-//        val cont4 = Contact().apply { name = "Abdourahamane Boinaidi"; emails = realmListOf("abdourahamane.boinaidi@infomaniak.com"); uuid = "296232131" }
-//        val contactAdapter = Contact2Adapter(arrayListOf(cont1, cont2, cont3, cont4)) {
-//        contactAdapter = ContactAdapter(MailData.contactsFlow.value ?: emptyList()) {
-//            ccAutocompleteInput.setText("")
-//            addRecipient(it)
-//        }
-
+//        val cont1 = Contact().apply { name = "Gibran Chevalley"; emails = realmListOf("gibran.chevalley@infomaniak.com"); id = "22132021" }
+//        val cont2 = Contact().apply { name = "Kevin Boulongne"; emails = realmListOf("kevin.boulongne@infomaniak.com"); id = "233871341" }
+//        val cont3 = Contact().apply { name = "Fabian Devel"; emails = realmListOf("fabian.devel@infomaniak.com"); id = "295232131" }
+//        val cont4 = Contact().apply { name = "Abdourahamane Boinaidi"; emails = realmListOf("abdourahamane.boinaidi@infomaniak.com"); id = "296232131" }
+//        vsl allContacts = listOf(cont1, cont2, cont3, cont4)
         val allContacts = MailData.contactsFlow.value ?: emptyList()
         val alreadyUsedContactIds = ArrayList(viewModel.recipients.map { it.id })
 
@@ -72,7 +68,7 @@ class FieldFragment : Fragment() {
 
         ccAutocompleteInput.apply {
             doOnTextChanged { text, _, _, _ ->
-                if ((text?.count() ?: 0) > 0) contactAdapter.filter.filter(text)
+                if ((text?.trim()?.count() ?: 0) > 0) contactAdapter.filter.filter(text)
                 else contactAdapter.clear()
             }
 
