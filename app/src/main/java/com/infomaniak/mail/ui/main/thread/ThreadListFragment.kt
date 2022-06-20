@@ -26,12 +26,12 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,10 +50,10 @@ import kotlinx.coroutines.launch
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by viewModels()
-    private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val threadListViewModel: ThreadListViewModel by activityViewModels()
 
     private val binding by lazy { FragmentThreadListBinding.inflate(layoutInflater) }
-    private lateinit var threadListAdapter: ThreadListAdapter
+    private var threadListAdapter = ThreadListAdapter()
 
     private var folderNameJob: Job? = null
     private var threadsJob: Job? = null
@@ -64,6 +65,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         setupOnRefresh()
         setupAdapter()
+        setupMenuDrawer()
         binding.setupListeners()
         setupUserAvatar()
 
@@ -78,8 +80,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListViewModel.refreshThreads()
     }
 
+    private fun setupMenuDrawer() {
+        activity?.supportFragmentManager?.beginTransaction()?.add(
+            R.id.menuDrawerFragment, MenuDrawerFragment { closeDrawer() }
+        )?.commit()
+    }
+
     private fun setupAdapter() {
-        binding.threadsList.adapter = ThreadListAdapter().also { threadListAdapter = it }
+        binding.threadsList.adapter = threadListAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO: Manage no Internet screen
@@ -108,7 +116,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         // TODO multiselection
         // openMultiselectButton.setOnClickListener {}
 
-        toolbar.setNavigationOnClickListener { drawerLayout.open() }
+        toolbar.setNavigationOnClickListener {
+            drawerLayout.open()
+        }
 
         searchViewCard.apply {
             // TODO filterButton doesn't propagate the event to root, must display it ?
@@ -219,5 +229,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
+    }
+
+    private fun closeDrawer() = with(binding) {
+        drawerLayout.closeDrawer(menuDrawerNavigation)
     }
 }

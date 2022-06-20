@@ -76,7 +76,9 @@ class SettingAddressAdapter(
 
     override fun getItemCount(): Int = mailboxes.count()
 
-    fun setMailboxes(newMailboxes: List<Mailbox>) { mailboxes = newMailboxes }
+    fun setMailboxes(newMailboxes: List<Mailbox>) {
+        mailboxes = newMailboxes
+    }
 
     class SettingAddressViewHolder(val binding: ItemSettingAddressBinding) : RecyclerView.ViewHolder(binding.root)
 }

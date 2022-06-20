@@ -100,7 +100,6 @@
             android:id="@+id/recyclerViewAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/marginStandardVerySmall"
             android:overScrollMode="never"
             android:paddingHorizontal="@dimen/marginStandardMedium"
             android:visibility="gone"
@@ -161,7 +160,7 @@
                 style="@style/MenuDrawerBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="15" />
+                tools:text="99+" />
 
         </LinearLayout>
 
@@ -249,8 +248,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/scheduledMessagesFolder"
-                app:drawableStartCompat="@drawable/ic_scheduled_messages"
-                app:drawableTint="@color/primary" />
+                app:drawableStartCompat="@drawable/ic_scheduled_messages" />
 
             <TextView
                 android:id="@+id/scheduledMessagesFolderBadge"
@@ -274,8 +272,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/pendingMessagesFolder"
-                app:drawableStartCompat="@drawable/ic_pending_messages"
-                app:drawableTint="@color/primary" />
+                app:drawableStartCompat="@drawable/ic_pending_messages" />
 
             <TextView
                 android:id="@+id/pendingMessagesFolderBadge"
@@ -405,7 +402,12 @@
             android:id="@+id/customFoldersList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:overScrollMode="never"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="2"
+            tools:listitem="@layout/item_custom_folder"
+            tools:visibility="visible" />
 
         <com.google.android.material.divider.MaterialDivider
             style="@style/MenuDrawerDivider"
