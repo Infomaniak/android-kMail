@@ -32,6 +32,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Contact
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.utils.toggleChevron
@@ -40,12 +41,14 @@ class NewMessageFragment : Fragment() {
 
     private val binding: FragmentNewMessageBinding by lazy { FragmentNewMessageBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by activityViewModels()
-    private var mails = MailboxInfoController.getMailboxesSync().map { it.email }
+    private var mailboxes = MailboxInfoController.getMailboxesSync()
+    private var mails = mailboxes.map { it.email }
+    private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
     private var areAdvancedFieldsOpened = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         with(binding) {
-            fromMailAddress.text = MailData.currentMailboxFlow.value?.email
+            fromMailAddress.text = mailboxes[selectedMailboxIndex].email
             if (mails.count() > 1) fromMailAddress.setOnClickListener(::chooseFromAddress)
             else fromMailAddress.isClickable = false
 
@@ -66,11 +69,13 @@ class NewMessageFragment : Fragment() {
             width = view.width
             setOnItemClickListener { _, _, position, _ ->
                 binding.fromMailAddress.text = mails[position]
+                selectedMailboxIndex = position
                 dismiss()
             }
         }.show()
     }
 
+    //region Chips
     private fun FragmentNewMessageBinding.displayChips() {
         refreshChips()
         updateSingleChipText()
@@ -146,4 +151,11 @@ class NewMessageFragment : Fragment() {
         refreshChips()
         updateChipVisibility()
     }
+    //endregion
+
+    fun getFromMailbox(): Mailbox = mailboxes[selectedMailboxIndex]
+
+    fun getSubject(): String = binding.subjectTextField.text.toString()
+
+    fun getBody(): String = binding.bodyText.text.toString()
 }

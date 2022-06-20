@@ -327,27 +327,27 @@
 
 
     <TextView
-        android:id="@+id/objectPrefix"
+        android:id="@+id/subjectPrefix"
         style="@style/Callout.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardMedium"
-        android:text="@string/objectTitle"
+        android:text="@string/subjectTitle"
         app:layout_constraintBottom_toTopOf="@id/divider5"
         app:layout_constraintStart_toStartOf="@id/fromPrefix"
         app:layout_constraintTop_toBottomOf="@id/divider4" />
 
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/objectAutocompleteInput"
+        android:id="@+id/subjectTextField"
         style="@style/EmailAddressTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         android:inputType="textEmailSubject"
-        app:layout_constraintBottom_toBottomOf="@id/objectPrefix"
+        app:layout_constraintBottom_toBottomOf="@id/subjectPrefix"
         app:layout_constraintEnd_toEndOf="@id/divider5"
-        app:layout_constraintStart_toEndOf="@id/objectPrefix"
-        app:layout_constraintTop_toTopOf="@id/objectPrefix" />
+        app:layout_constraintStart_toEndOf="@id/subjectPrefix"
+        app:layout_constraintTop_toTopOf="@id/subjectPrefix" />
 
 
     <com.google.android.material.divider.MaterialDivider
@@ -358,7 +358,7 @@
         android:layout_marginTop="@dimen/marginStandardMedium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/objectPrefix" />
+        app:layout_constraintTop_toBottomOf="@id/subjectPrefix" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/bodyLayout"
