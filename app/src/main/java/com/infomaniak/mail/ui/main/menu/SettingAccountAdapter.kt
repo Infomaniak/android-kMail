@@ -62,7 +62,9 @@ class SettingAccountAdapter(
 
     override fun getItemCount(): Int = accounts.count()
 
-    fun setAccounts(newAccounts: List<UiAccount>) { accounts = newAccounts }
+    fun setAccounts(newAccounts: List<UiAccount>) {
+        accounts = newAccounts
+    }
 
     class SettingAccountViewHolder(val binding: ItemSettingAccountBinding) : RecyclerView.ViewHolder(binding.root)
 

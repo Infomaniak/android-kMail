@@ -68,12 +68,12 @@ class Folder : RealmObject {
         return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name
     }
 
-    enum class FolderRole(@IdRes val folderNameRes: Int, val order: Int) {
-        INBOX(R.string.inboxFolder, 1),
-        DRAFT(R.string.draftFolder, 2),
-        SENT(R.string.sentFolder, 3),
-        SPAM(R.string.spamFolder, 4),
-        TRASH(R.string.trashFolder, 5),
-        ARCHIVE(R.string.archiveFolder, 6),
+    enum class FolderRole(@IdRes val folderNameRes: Int) {
+        INBOX(R.string.inboxFolder),
+        DRAFT(R.string.draftFolder),
+        SENT(R.string.sentFolder),
+        SPAM(R.string.spamFolder),
+        TRASH(R.string.trashFolder),
+        ARCHIVE(R.string.archiveFolder),
     }
 }

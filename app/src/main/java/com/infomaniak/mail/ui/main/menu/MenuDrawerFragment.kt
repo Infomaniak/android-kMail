@@ -21,25 +21,107 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
+import com.infomaniak.mail.ui.main.thread.ThreadListViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.toggleChevron
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
-class MenuDrawerFragment : Fragment() {
+class MenuDrawerFragment(private val closeDrawer: () -> Unit) : Fragment() {
+
+    private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
+    private val threadListViewModel: ThreadListViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
+
+    private var mailboxesJob: Job? = null
+
+    private val addressAdapter = SettingAddressAdapter(displayIcon = false) {
+        threadListViewModel.loadMailData()
+        closeDrawer.invoke()
+        onMailboxChange()
+    }
+
+    private val customFoldersAdapter = CustomFoldersAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        menuDrawerViewModel.setup()
+        binding.recyclerViewAddress.adapter = addressAdapter
+        binding.customFoldersList.adapter = customFoldersAdapter
+        setupListener()
         setupUi()
     }
 
     private fun setupUi() = with(binding) {
         accountSwitcherText.text = AccountUtils.currentUser?.email
+        setCommercialFolderVisibility()
+        listenToMailboxes()
+    }
 
-        // TODO continue setup
+    private fun setCommercialFolderVisibility() = with(binding) {
+        val mustDisplayFolders = MailData.currentMailboxFlow.value?.hasSocialAndCommercialFiltering ?: false
+        commercialFolder.isVisible = mustDisplayFolders
+        socialNetworksFolder.isVisible = mustDisplayFolders
+    }
+
+    override fun onResume() {
+        super.onResume()
+        listenToMailboxes()
+    }
+
+    override fun onPause() {
+        mailboxesJob?.cancel()
+        mailboxesJob = null
+
+        super.onPause()
+    }
+
+    private fun listenToMailboxes() {
+        with(menuDrawerViewModel) {
+
+            if (mailboxesJob != null) mailboxesJob?.cancel()
+
+            mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
+                uiMailboxesFlow.filterNotNull().collect { mailboxes ->
+                    addressAdapter.setMailboxes(mailboxes)
+                    addressAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+    }
+
+    private fun setupListener() = with(binding) {
+        accountSwitcher.setOnClickListener {
+            recyclerViewAddress.apply {
+                isVisible = !isVisible
+                expandAccountButton.toggleChevron(!isVisible)
+            }
+        }
+        customFolders.setOnClickListener {
+            customFoldersList.apply {
+                isVisible = !isVisible
+                expandCustomFolderButton.toggleChevron(!isVisible)
+            }
+        }
+    }
+
+    private fun onMailboxChange() {
+        setCommercialFolderVisibility()
+
+        // TODO: Change custom folders dataset
     }
 }

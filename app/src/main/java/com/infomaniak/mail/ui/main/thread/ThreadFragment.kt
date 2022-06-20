@@ -50,7 +50,7 @@ class ThreadFragment : Fragment() {
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadBinding
-    private lateinit var threadAdapter: ThreadAdapter
+    private var threadAdapter = ThreadAdapter()
 
     private var messagesJob: Job? = null
 
@@ -77,7 +77,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupAdapter() = with(binding) {
-        messagesList.adapter = ThreadAdapter().apply {
+        messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onContactClicked = { contact, isExpanded ->
                 if (isExpanded) {
@@ -100,7 +100,7 @@ class ThreadFragment : Fragment() {
                 }
                 threadAdapter.removeMessage(message)
             }
-        }.also { threadAdapter = it }
+        }
     }
 
     override fun onResume() {
