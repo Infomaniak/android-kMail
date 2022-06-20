@@ -61,16 +61,24 @@ class FieldFragment(private val field: NewMessageFragment.FieldType) : Fragment(
             displayChips()
 
             //region Test contacts
-            //        val cont1 = Contact().apply { name = "Gibran Chevalley"; emails = realmListOf("gibran.chevalley@infomaniak.com"); id = "22132021" }
+//        val cont1 = Contact().apply { name = "Gibran Chevalley"; emails = realmListOf("gibran.chevalley@infomaniak.com"); id = "22132021" }
 //        val cont2 = Contact().apply { name = "Kevin Boulongne"; emails = realmListOf("kevin.boulongne@infomaniak.com"); id = "233871341" }
 //        val cont3 = Contact().apply { name = "Fabian Devel"; emails = realmListOf("fabian.devel@infomaniak.com"); id = "295232131" }
 //        val cont4 = Contact().apply { name = "Abdourahamane Boinaidi"; emails = realmListOf("abdourahamane.boinaidi@infomaniak.com"); id = "296232131" }
 //        vsl allContacts = listOf(cont1, cont2, cont3, cont4)
             //endregion
             val allContacts = MailData.contactsFlow.value ?: emptyList()
-            val alreadyUsedContactIds = ArrayList(viewModel.recipients.map { it.id })
+            val toAlreadyUsedContactIds = (viewModel.recipients.map { it.id }).toMutableList()
+            val ccAlreadyUsedContactIds = (viewModel.cc.map { it.id }).toMutableList()
+            val bccAlreadyUsedContactIds = (viewModel.bcc.map { it.id }).toMutableList()
 
-            contactAdapter = ContactAdapter(allContacts, alreadyUsedContactIds) {
+            contactAdapter = ContactAdapter(
+                allContacts,
+                field,
+                toAlreadyUsedContactIds,
+                ccAlreadyUsedContactIds,
+                bccAlreadyUsedContactIds
+            ) {
                 autocompleteInput.setText("")
                 addMail(it)
             }

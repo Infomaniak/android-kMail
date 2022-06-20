@@ -27,13 +27,17 @@ import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ItemContactBinding
+import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 
 class ContactAdapter(
     private val allContacts: List<Contact> = emptyList(),
-    val alreadyUsedContactIds: ArrayList<String> = ArrayList(),
+    private val field: NewMessageFragment.FieldType,
+    private val toAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
+    private val ccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
+    private val bccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val onItemClick: (item: Contact) -> Unit,
 ) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>(), Filterable {
-    private var contacts = ArrayList<Contact>()
+    private var contacts = mutableListOf<Contact>()
 
     init {
         setHasStableIds(true)
@@ -72,13 +76,19 @@ class ContactAdapter(
 
     private fun orderItemList() = contacts.sortBy { it.name }
 
+    private fun getAlreadyUsedIds() = when (field) {
+        TO -> toAlreadyUsedContactIds
+        CC -> ccAlreadyUsedContactIds
+        BCC -> bccAlreadyUsedContactIds
+    }
+
     private fun selectContact(contact: Contact) {
         onItemClick(contact)
-        alreadyUsedContactIds.add(contact.id)
+        getAlreadyUsedIds().add(contact.id)
     }
 
     fun removeUsedContact(contact: Contact) {
-        alreadyUsedContactIds.remove(contact.id)
+        getAlreadyUsedIds().remove(contact.id)
     }
 
     override fun getFilter(): Filter {
@@ -87,7 +97,7 @@ class ContactAdapter(
                 val searchTerm = constraint?.standardize() ?: ""
                 val finalUserList = allContacts
                     .filter { it.name.standardize().contains(searchTerm) || it.emails[0].standardize().contains(searchTerm) }
-                    .filterNot { displayedItem -> alreadyUsedContactIds.any { it == displayedItem.id } }
+                    .filterNot { displayedItem -> getAlreadyUsedIds().any { it == displayedItem.id } }
                 return FilterResults().apply {
                     values = finalUserList
                     count = finalUserList.size
