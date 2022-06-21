@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.thread.Thread
-import io.realm.kotlin.ext.isValid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,7 +44,7 @@ class ThreadListViewModel : ViewModel() {
 
         listenToThreadsJob = CoroutineScope(Dispatchers.IO).launch {
             MailData.threadsFlow.filterNotNull().collect { threads ->
-                if (threads.find { !it.isValid() } == null) mutableUiThreadsFlow.value = threads
+                mutableUiThreadsFlow.value = threads
             }
         }
     }

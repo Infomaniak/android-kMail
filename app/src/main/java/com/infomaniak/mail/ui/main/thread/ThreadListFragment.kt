@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,7 +49,7 @@ import kotlinx.coroutines.launch
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by viewModels()
-    private val threadListViewModel: ThreadListViewModel by activityViewModels()
+    private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private val binding by lazy { FragmentThreadListBinding.inflate(layoutInflater) }
     private var threadListAdapter = ThreadListAdapter()
@@ -81,9 +80,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupMenuDrawer() {
-        activity?.supportFragmentManager?.beginTransaction()?.add(
-            R.id.menuDrawerFragment, MenuDrawerFragment { closeDrawer() }
-        )?.commit()
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.add(R.id.menuDrawerFragment, MenuDrawerFragment { closeDrawer() })
+            ?.commit()
     }
 
     private fun setupAdapter() {

@@ -143,6 +143,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
 
     override fun onResume() {
         super.onResume()
+
         listenToMailboxes()
     }
 
