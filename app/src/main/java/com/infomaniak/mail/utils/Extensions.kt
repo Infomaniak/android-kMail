@@ -18,18 +18,13 @@
 package com.infomaniak.mail.utils
 
 import android.app.Activity
-import android.content.Context
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import android.view.inputmethod.EditorInfo
 import androidx.viewbinding.ViewBinding
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Contact
-import com.infomaniak.mail.ui.main.newmessage.ContactAdapter
 import io.realm.kotlin.types.RealmInstant
 import java.util.*
 

@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import com.google.android.material.button.MaterialButton
@@ -54,6 +55,29 @@ class NewMessageActivity : AppCompatActivity() {
         linkEditor(editorCamera, CAMERA)
         linkEditor(editorLink, LINK)
         linkEditor(editorClock, CLOCK)
+
+        linkEditor(editorBold, BOLD)
+        linkEditor(editorItalic, ITALIC)
+        linkEditor(editorUnderlined, UNDERLINE)
+        linkEditor(editorStrikeThrough, STRIKE_THROUGH)
+        linkEditor(editorList, UNORDERED_LIST)
+
+        handleEditorToggle()
+    }
+
+    private fun ActivityNewMessageBinding.handleEditorToggle() {
+        editorTextOptions.setOnClickListener {
+            viewModel.isEditorExpanded = !viewModel.isEditorExpanded
+            updateEditorVisibility(viewModel.isEditorExpanded)
+        }
+    }
+
+    private fun ActivityNewMessageBinding.updateEditorVisibility(isEditorExpanded: Boolean) {
+        val color = if (isEditorExpanded) R.color.emphasizedTextColor else R.color.iconColor
+        editorTextOptions.setIconTintResource(color)
+
+        editorActions.isGone = isEditorExpanded
+        textEditing.isVisible = isEditorExpanded
     }
 
     private fun linkEditor(view: MaterialButton, action: EditorAction) {
@@ -75,12 +99,21 @@ class NewMessageActivity : AppCompatActivity() {
 
     fun toggleEditor(isVisible: Boolean) {
         binding.editor.isVisible = isVisible
+        if (!isVisible) {
+            viewModel.isEditorExpanded = false
+            binding.updateEditorVisibility(false)
+        }
     }
 
     enum class EditorAction {
         ATTACHMENT,
         CAMERA,
         LINK,
-        CLOCK
+        CLOCK,
+        BOLD,
+        ITALIC,
+        UNDERLINE,
+        STRIKE_THROUGH,
+        UNORDERED_LIST,
     }
 }

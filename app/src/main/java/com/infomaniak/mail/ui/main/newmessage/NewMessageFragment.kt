@@ -71,11 +71,20 @@ class NewMessageFragment : Fragment() {
             setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
 
             viewModel.editorAction.observe(requireActivity()) {
+                var selectedText = ""
+                bodyText.apply { selectedText = text?.substring(selectionStart, selectionEnd) ?: "" }
+
                 when (it) {
+                    // TODO: Replace logs with actual code
                     EditorAction.ATTACHMENT -> Log.e("gibran", "onCreateView: ATTACHMENT")
                     EditorAction.CAMERA -> Log.e("gibran", "onCreateView: CAMERA")
                     EditorAction.LINK -> Log.e("gibran", "onCreateView: LINK")
                     EditorAction.CLOCK -> Log.e("gibran", "onCreateView: CLOCK")
+                    EditorAction.BOLD -> Log.e("gibran", "onCreateView: BOLD")
+                    EditorAction.ITALIC -> Log.e("gibran", "onCreateView: ITALIC")
+                    EditorAction.UNDERLINE -> Log.e("gibran", "onCreateView: UNDERLINE")
+                    EditorAction.STRIKE_THROUGH -> Log.e("gibran", "onCreateView: STRIKE_THROUGH")
+                    EditorAction.UNORDERED_LIST -> Log.e("gibran", "onCreateView: UNORDERED_LIST")
                 }
             }
 

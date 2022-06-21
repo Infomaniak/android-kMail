@@ -122,6 +122,10 @@
     <style name="EditorIconButton" parent="IconButton">
         <item name="cornerRadius">0dp</item>
         <item name="iconSize">20dp</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textColor">@color/title</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0</item>
         <item name="rippleColor">@color/pink_mail_ripple</item>
     </style>
 

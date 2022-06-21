@@ -27,5 +27,6 @@ class NewMessageViewModel : ViewModel() {
     val cc = mutableListOf<Contact>()
     val bcc = mutableListOf<Contact>()
     var areAdvancedFieldsOpened = false
+    var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
 }
