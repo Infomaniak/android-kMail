@@ -21,14 +21,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
+import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.thread.ThreadListViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toggleChevron
@@ -37,22 +41,23 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
-class MenuDrawerFragment(private val closeDrawer: () -> Unit) : Fragment() {
+class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragment() {
 
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
     private val threadListViewModel: ThreadListViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
+    private var foldersJob: Job? = null
     private var mailboxesJob: Job? = null
 
     private val addressAdapter = SettingAddressAdapter(displayIcon = false) {
         threadListViewModel.loadMailData()
-        closeDrawer.invoke()
-        onMailboxChange()
+        threadListViewModel.setup()
+        closeDrawer()
     }
 
-    private val customFoldersAdapter = CustomFoldersAdapter()
+    private val customFoldersAdapter = CustomFoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -60,20 +65,82 @@ class MenuDrawerFragment(private val closeDrawer: () -> Unit) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         menuDrawerViewModel.setup()
-        binding.recyclerViewAddress.adapter = addressAdapter
-        binding.customFoldersList.adapter = customFoldersAdapter
+        setupAdapters()
         setupListener()
         setupUi()
     }
 
+    private fun setupAdapters() = with(binding) {
+        recyclerViewAddress.adapter = addressAdapter
+        customFoldersList.adapter = customFoldersAdapter
+    }
+
+    private fun setupListener() = with(binding) {
+        settingsButton.setOnClickListener {
+            safeNavigate(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment(),
+                currentClassName = MenuDrawerFragment::class.java.name,
+            )
+        }
+        accountSwitcher.setOnClickListener {
+            expandedAccountSwitcher.apply {
+                isVisible = !isVisible
+                expandAccountButton.toggleChevron(!isVisible)
+            }
+        }
+        manageAccount.setOnClickListener {
+            safeNavigate(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToManageMailAddressFragment(),
+                currentClassName = MenuDrawerFragment::class.java.name,
+            )
+        }
+        addAccount.setOnClickListener {
+            // TODO: go back to login activity directly ?
+        }
+        inboxFolder.setOnClickListener { openFolder(R.string.inboxFolder) }
+        sentFolder.setOnClickListener { openFolder(R.string.sentFolder) }
+        draftFolder.setOnClickListener { openFolder(R.string.draftFolder) }
+        spamFolder.setOnClickListener { openFolder(R.string.spamFolder) }
+        trashFolder.setOnClickListener { openFolder(R.string.trashFolder) }
+        archiveFolder.setOnClickListener { openFolder(R.string.archiveFolder) }
+        customFolders.setOnClickListener {
+            customFoldersList.apply {
+                isVisible = !isVisible
+                expandCustomFolderButton.toggleChevron(!isVisible)
+            }
+        }
+        feedbacks.setOnClickListener {
+            // TODO: go to feedbacks
+        }
+        help.setOnClickListener {
+            safeNavigate(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToHelpFragment(),
+                currentClassName = MenuDrawerFragment::class.java.name,
+            )
+        }
+        importMails.setOnClickListener {
+            // TODO: import mails
+        }
+        restoreMails.setOnClickListener {
+            // TODO: restore mails
+        }
+    }
+
     private fun setupUi() = with(binding) {
         accountSwitcherText.text = AccountUtils.currentUser?.email
-        setCommercialFolderVisibility()
         listenToMailboxes()
+        listenToFolders()
     }
 
     private fun setCommercialFolderVisibility() = with(binding) {
         val mustDisplayFolders = MailData.currentMailboxFlow.value?.hasSocialAndCommercialFiltering ?: false
+        if (mustDisplayFolders) {
+            commercialFolder.setOnClickListener { openFolder(R.string.commercialFolder) }
+            socialNetworksFolder.setOnClickListener { openFolder(R.string.socialNetworksFolder) }
+        } else {
+            commercialFolder.setOnClickListener(null)
+            socialNetworksFolder.setOnClickListener(null)
+        }
         commercialFolder.isVisible = mustDisplayFolders
         socialNetworksFolder.isVisible = mustDisplayFolders
     }
@@ -90,38 +157,43 @@ class MenuDrawerFragment(private val closeDrawer: () -> Unit) : Fragment() {
         super.onPause()
     }
 
-    private fun listenToMailboxes() {
-        with(menuDrawerViewModel) {
+    private fun listenToMailboxes() = with(menuDrawerViewModel) {
+        if (mailboxesJob != null) mailboxesJob?.cancel()
 
-            if (mailboxesJob != null) mailboxesJob?.cancel()
-
-            mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
-                uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                    addressAdapter.setMailboxes(mailboxes)
-                    addressAdapter.notifyDataSetChanged()
-                }
+        mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
+            uiMailboxesFlow.filterNotNull().collect { mailboxes ->
+                addressAdapter.setMailboxes(mailboxes)
+                addressAdapter.notifyDataSetChanged()
+                setCommercialFolderVisibility()
             }
         }
     }
 
-    private fun setupListener() = with(binding) {
-        accountSwitcher.setOnClickListener {
-            recyclerViewAddress.apply {
-                isVisible = !isVisible
-                expandAccountButton.toggleChevron(!isVisible)
-            }
-        }
-        customFolders.setOnClickListener {
-            customFoldersList.apply {
-                isVisible = !isVisible
-                expandCustomFolderButton.toggleChevron(!isVisible)
+    private fun listenToFolders() = with(menuDrawerViewModel) {
+        if (foldersJob != null) foldersJob?.cancel()
+
+        foldersJob = viewModelScope.launch(Dispatchers.Main) {
+            uiFoldersFlow.filterNotNull().collect { folders ->
+                // TODO : Manage embedded folders ?
+                val customFolders = folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
+                customFoldersAdapter.setCustomFolders(customFolders)
+                customFoldersAdapter.notifyDataSetChanged()
             }
         }
     }
 
-    private fun onMailboxChange() {
-        setCommercialFolderVisibility()
+    private fun closeDrawer() = with(binding) {
+        closeDrawer?.invoke()
+        customFoldersList.isGone = true
+        expandCustomFolderButton.rotation = 0.0f
+    }
 
-        // TODO: Change custom folders dataset
+    private fun openFolder(@StringRes folderNameId: Int) {
+        openFolder(getString(folderNameId))
+    }
+
+    private fun openFolder(folderName: String) = context?.let {
+        menuDrawerViewModel.openFolder(folderName, it)
+        closeDrawer()
     }
 }

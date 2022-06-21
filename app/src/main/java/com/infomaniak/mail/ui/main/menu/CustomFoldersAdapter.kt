@@ -20,19 +20,28 @@ package com.infomaniak.mail.ui.main.menu
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemCustomFolderBinding
 import com.infomaniak.mail.ui.main.menu.CustomFoldersAdapter.CustomFolderViewHolder
 
-class CustomFoldersAdapter(private var customFolders: List<Folder> = emptyList()) :
+class CustomFoldersAdapter(private var customFolders: List<Folder> = emptyList(), private val openFolder: (folderName: String) -> Unit) :
     RecyclerView.Adapter<CustomFolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomFolderViewHolder {
         return CustomFolderViewHolder(ItemCustomFolderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: CustomFolderViewHolder, position: Int) {
-        holder.binding.customFolderName.text = customFolders[position].name
+    override fun onBindViewHolder(holder: CustomFolderViewHolder, position: Int) = with(holder.binding) {
+        val folder = customFolders[position]
+        val folderIcon = root.context.getDrawable(if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder)
+
+        customFolderName.text = folder.name
+        customFolderName.setCompoundDrawablesWithIntrinsicBounds(folderIcon, null, null, null)
+
+        if (folder.unreadCount > 0) customFolderBadge.text = folder.unreadCount.toString()
+
+        root.setOnClickListener { openFolder.invoke(folder.name) }
     }
 
     override fun getItemCount() = customFolders.size

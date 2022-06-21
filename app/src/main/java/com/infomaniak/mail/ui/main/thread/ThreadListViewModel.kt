@@ -68,19 +68,4 @@ class ThreadListViewModel : ViewModel() {
 
         super.onCleared()
     }
-
-    fun openFolder(folderName: String, context: Context) {
-        var job: Job? = null
-        job = CoroutineScope(Dispatchers.IO).launch {
-            MailData.foldersFlow.filterNotNull().collect { folders ->
-                MailData.currentMailboxFlow.value?.let { mailbox ->
-                    folders.find { it.getLocalizedName(context) == folderName }?.let { folder ->
-                        MailData.selectFolder(folder)
-                        MailData.loadThreads(folder, mailbox)
-                    }
-                }
-                job?.cancel()
-            }
-        }
-    }
 }
