@@ -75,5 +75,7 @@ class Folder : RealmObject {
         SPAM(R.string.spamFolder),
         TRASH(R.string.trashFolder),
         ARCHIVE(R.string.archiveFolder),
+        COMMERCIAL(R.string.commercialFolder),
+        SOCIALNETWORKS(R.string.socialNetworksFolder),
     }
 }

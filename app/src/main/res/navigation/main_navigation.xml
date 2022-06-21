@@ -41,6 +41,18 @@
         <action
             android:id="@+id/action_threadListFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_menuDrawerFragment"
+            app:destination="@id/menuDrawerFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_manageMailAddressFragment"
+            app:destination="@id/manageMailAddressFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
 
     <dialog
@@ -118,17 +130,10 @@
         tools:layout="@layout/fragment_bottom_sheet_message_actions" />
 
     <fragment
-        android:id="@+id/menuDrawerFragment"
-        android:name="com.infomaniak.mail.ui.main.menu.MenuDrawerFragment"
-        android:label="MenuDrawerFragment"
-        tools:layout="@layout/fragment_menu_drawer">
-        <action
-            android:id="@+id/action_menuDrawerFragment_to_ManageMailAddressFragment"
-            app:destination="@id/manageMailAddressFragment" />
-        <action
-            android:id="@+id/action_menuDrawerFragment_to_SettingsFragment"
-            app:destination="@id/settingsFragment" />
-    </fragment>
+        android:id="@+id/helpFragment"
+        android:name="com.infomaniak.mail.ui.main.menu.HelpFragment"
+        android:label="HelpFragment"
+        tools:layout="@layout/fragment_help" />
 
     <fragment
         android:id="@+id/manageMailAddressFragment"

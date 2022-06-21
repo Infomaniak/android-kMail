@@ -20,6 +20,7 @@ package com.infomaniak.mail.data
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.MailApi
+import com.infomaniak.mail.data.api.MailApi.fetchThreads
 import com.infomaniak.mail.data.cache.ContactsController
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -128,8 +129,8 @@ object MailData {
     }
 
     fun loadThreads(folder: Folder, mailbox: Mailbox) {
-        readThreads(folder)
-        fetchThreads(folder, mailbox)
+        getThreadsFromRealm(folder)
+        getThreadsFromApi(folder, mailbox)
     }
 
     fun loadMessages(thread: Thread) {
@@ -200,8 +201,7 @@ object MailData {
 
     private fun computeFolderToSelect(folders: List<Folder>): Folder? {
         val folder = with(folders) {
-            find { it.id == currentFolderFlow.value?.id }
-                ?: find { it.role == DEFAULT_FOLDER_ROLE }
+            find { it.role == DEFAULT_FOLDER_ROLE }
                 ?: firstOrNull()
                 ?: return null
         }
