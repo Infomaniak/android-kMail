@@ -30,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
@@ -55,7 +54,7 @@ class MenuDrawerViewModel : ViewModel() {
         if (listenToMailboxesJob != null) listenToMailboxesJob?.cancel()
 
         listenToMailboxesJob = CoroutineScope(Dispatchers.IO).launch {
-            MailData.mailboxesFlow.filterNotNull().collect { mailboxes ->
+            MailData.mailboxesFlow.collect { mailboxes ->
                 mutableUiMailboxesFlow.value = mailboxes
             }
         }
@@ -65,25 +64,20 @@ class MenuDrawerViewModel : ViewModel() {
         if (listenToFoldersJob != null) listenToFoldersJob?.cancel()
 
         listenToFoldersJob = CoroutineScope(Dispatchers.IO).launch {
-            MailData.foldersFlow.filterNotNull().collect { folders ->
+            MailData.foldersFlow.collect { folders ->
                 mutableUiFoldersFlow.value = folders
             }
         }
     }
 
     fun openFolder(folderName: String, context: Context) {
-        var job: Job? = null
-        job = CoroutineScope(Dispatchers.IO).launch {
-            MailData.foldersFlow.filterNotNull().collect { folders ->
-                MailData.currentMailboxFlow.value?.let { mailbox ->
-                    folders.find { it.getLocalizedName(context) == folderName }?.let { folder ->
-                        MailData.selectFolder(folder)
-                        MailData.loadThreads(folder, mailbox)
-                    }
-                }
-                job?.cancel()
-            }
+        val folder = (MailData.foldersFlow.value?.find { it.getLocalizedName(context) == folderName } ?: return).also {
+            if (it.id == MailData.currentFolderFlow.value?.id) return
         }
+        val mailbox = MailData.currentMailboxFlow.value ?: return
+
+        MailData.selectFolder(folder)
+        MailData.loadThreads(folder, mailbox)
     }
 
     fun getMailBoxStorage(mailbox: Mailbox, activity: Activity) {
