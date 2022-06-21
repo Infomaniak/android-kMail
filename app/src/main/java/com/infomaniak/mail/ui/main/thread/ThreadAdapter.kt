@@ -107,7 +107,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         expeditorName.text = if (isDraft) {
             root.context.getString(R.string.messageIsDraftOption)
         } else {
-            from[0].displayedName(root.context)
+            from.first().displayedName(root.context)
         }
 
         expandHeaderButton.isVisible = isExpanded
@@ -117,7 +117,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         } else {
             Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
         }
-        expeditorEmail.text = if (isExpanded) from[0].email else ""
+        expeditorEmail.text = if (isExpanded) from.first().email else ""
 
         if (isExpanded) {
             messageHeader.addExpandHeaderListener(this@displayHeader, message)
@@ -168,7 +168,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
         recipient.text = formatRecipientsName(root.context, message)
         // TODO: Add listener to name and email of all recipient ?
-        userAvatar.setOnClickListener { onContactClicked?.invoke(from[0], isExpandedHeaderMode) }
+        userAvatar.setOnClickListener { onContactClicked?.invoke(from.first(), isExpandedHeaderMode) }
     }
 
     private fun TextView.changeSize(@DimenRes dimension: Int) {

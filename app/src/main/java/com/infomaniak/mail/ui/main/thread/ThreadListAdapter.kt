@@ -34,7 +34,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
-import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
+import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import java.util.*
@@ -92,16 +92,16 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton() {
-//        TODO Implement when we have intelligent mailbox
-//        val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
-//        seeAllText.text = "See all $threadsNumber"
+        // TODO Implement when we have intelligent mailbox
+        // val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
+        // seeAllText.text = "See all $threadsNumber"
     }
 
     private fun CardviewThreadItemBinding.displayThread(position: Int) {
         val thread = itemsList[position] as Thread
 
-        expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
-        mailSubject.text = thread.subject.displayedSubject(root.context)
+        expeditor.text = thread.from.first().name.ifEmpty { thread.from.first().email }
+        mailSubject.text = thread.subject.getFormattedThreadSubject(root.context)
 
         mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
 
