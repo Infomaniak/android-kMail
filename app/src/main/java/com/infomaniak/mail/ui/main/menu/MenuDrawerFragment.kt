@@ -159,7 +159,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
 
         mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                addressAdapter.setMailboxes(mailboxes)
+                addressAdapter.setMailboxes(mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId })
                 addressAdapter.notifyDataSetChanged()
                 manageStorageFooterVisibility()
             }
