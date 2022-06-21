@@ -15,20 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
+package com.infomaniak.mail.data.models
 
-import android.content.Context
-import android.text.Spanned
-import androidx.core.text.HtmlCompat
-import androidx.core.text.toSpanned
-import com.infomaniak.mail.R
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 
-object ModelsUtils {
+object MessagePriority {
 
-    fun String?.getFormattedThreadSubject(context: Context): Spanned {
-        return this?.toSpanned() ?: HtmlCompat.fromHtml(
-            "<i>${context.getString(R.string.messageNoSubject)}</i>",
-            HtmlCompat.FROM_HTML_MODE_COMPACT,
-        )
+    fun getPriority(priority: String?): Priority? = enumValueOfOrNull<Priority>(priority?.uppercase())
+
+    enum class Priority {
+        LOW,
+        NORMAL,
+        HIGH,
     }
 }
