@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.thread.Thread

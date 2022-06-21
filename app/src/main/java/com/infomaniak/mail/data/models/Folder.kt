@@ -68,14 +68,16 @@ class Folder : RealmObject {
         return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name
     }
 
-    enum class FolderRole(@IdRes val folderNameRes: Int) {
-        INBOX(R.string.inboxFolder),
-        DRAFT(R.string.draftFolder),
-        SENT(R.string.sentFolder),
-        SPAM(R.string.spamFolder),
-        TRASH(R.string.trashFolder),
-        ARCHIVE(R.string.archiveFolder),
-        COMMERCIAL(R.string.commercialFolder),
-        SOCIALNETWORKS(R.string.socialNetworksFolder),
+    fun getUnreadCountOrNull(): String? = if (unreadCount > 0) unreadCount.toString() else null
+
+    enum class FolderRole(@IdRes val folderNameRes: Int, val order: Int) {
+        INBOX(R.string.inboxFolder, 0),
+        DRAFT(R.string.draftFolder, 4),
+        SENT(R.string.sentFolder, 3),
+        SPAM(R.string.spamFolder, 5),
+        TRASH(R.string.trashFolder, 6),
+        ARCHIVE(R.string.archiveFolder, 7),
+        COMMERCIAL(R.string.commercialFolder, 1),
+        SOCIALNETWORKS(R.string.socialNetworksFolder, 2),
     }
 }

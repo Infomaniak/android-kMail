@@ -28,9 +28,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.thread.ThreadListViewModel
@@ -57,7 +59,8 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
         closeDrawer()
     }
 
-    private val customFoldersAdapter = CustomFoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
+    private val customFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
+    private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -71,8 +74,9 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
     }
 
     private fun setupAdapters() = with(binding) {
-        recyclerViewAddress.adapter = addressAdapter
+        addressesList.adapter = addressAdapter
         customFoldersList.adapter = customFoldersAdapter
+        defaultFoldersList.adapter = defaultFoldersAdapter
     }
 
     private fun setupListener() = with(binding) {
@@ -98,11 +102,6 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
             // TODO: go back to login activity directly ?
         }
         inboxFolder.setOnClickListener { openFolder(R.string.inboxFolder) }
-        sentFolder.setOnClickListener { openFolder(R.string.sentFolder) }
-        draftFolder.setOnClickListener { openFolder(R.string.draftFolder) }
-        spamFolder.setOnClickListener { openFolder(R.string.spamFolder) }
-        trashFolder.setOnClickListener { openFolder(R.string.trashFolder) }
-        archiveFolder.setOnClickListener { openFolder(R.string.archiveFolder) }
         customFolders.setOnClickListener {
             customFoldersList.apply {
                 isVisible = !isVisible
@@ -110,7 +109,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
             }
         }
         feedbacks.setOnClickListener {
-            // TODO: go to feedbacks
+            context?.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
         }
         help.setOnClickListener {
             safeNavigate(
@@ -132,19 +131,6 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
         listenToFolders()
     }
 
-    private fun setCommercialFolderVisibility() = with(binding) {
-        val mustDisplayFolders = MailData.currentMailboxFlow.value?.hasSocialAndCommercialFiltering ?: false
-        if (mustDisplayFolders) {
-            commercialFolder.setOnClickListener { openFolder(R.string.commercialFolder) }
-            socialNetworksFolder.setOnClickListener { openFolder(R.string.socialNetworksFolder) }
-        } else {
-            commercialFolder.setOnClickListener(null)
-            socialNetworksFolder.setOnClickListener(null)
-        }
-        commercialFolder.isVisible = mustDisplayFolders
-        socialNetworksFolder.isVisible = mustDisplayFolders
-    }
-
     override fun onResume() {
         super.onResume()
         listenToMailboxes()
@@ -164,7 +150,6 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                 addressAdapter.setMailboxes(mailboxes)
                 addressAdapter.notifyDataSetChanged()
-                setCommercialFolderVisibility()
             }
         }
     }
@@ -174,16 +159,16 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
 
         foldersJob = viewModelScope.launch(Dispatchers.Main) {
             uiFoldersFlow.filterNotNull().collect { folders ->
+                onFoldersChange(folders)
                 // TODO : Manage embedded folders ?
-                val customFolders = folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
-                customFoldersAdapter.setCustomFolders(customFolders)
-                customFoldersAdapter.notifyDataSetChanged()
             }
         }
     }
 
     private fun closeDrawer() = with(binding) {
         closeDrawer?.invoke()
+        expandedAccountSwitcher.isGone = true
+        expandAccountButton.rotation = 0.0f
         customFoldersList.isGone = true
         expandCustomFolderButton.rotation = 0.0f
     }
@@ -196,4 +181,22 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
         menuDrawerViewModel.openFolder(folderName, it)
         closeDrawer()
     }
+
+    private fun onFoldersChange(folders: List<Folder>) {
+        binding.inboxFolderBadge.text = getInboxFolder(folders)?.getUnreadCountOrNull()
+
+        defaultFoldersAdapter.setFolders(getDefaultFolders(folders))
+        defaultFoldersAdapter.notifyDataSetChanged()
+
+        customFoldersAdapter.setFolders(getCustomFolders(folders))
+        customFoldersAdapter.notifyDataSetChanged()
+    }
+
+    private fun getInboxFolder(folders: List<Folder>) = folders.find { it.role == Folder.FolderRole.INBOX }
+
+    private fun getDefaultFolders(folders: List<Folder>) = folders.filter {
+        it.role != null && it.role != Folder.FolderRole.INBOX
+    }.sortedBy { it.role?.order }
+
+    private fun getCustomFolders(folders: List<Folder>) = folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
 }

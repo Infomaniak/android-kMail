@@ -44,7 +44,7 @@ class SettingAccountAdapter(
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(account) }
-        recyclerViewAddress.adapter = SettingAddressAdapter(mailboxes = account.mailboxes, onItemClicked = onItemClicked)
+        addressesList.adapter = SettingAddressAdapter(mailboxes = account.mailboxes, onItemClicked = onItemClicked)
     }
 
     private fun ItemSettingAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
@@ -57,7 +57,7 @@ class SettingAccountAdapter(
     private fun ItemSettingAccountBinding.toggleMailboxes(account: UiAccount) {
         account.collapsed = !account.collapsed
         chevron.toggleChevron(account.collapsed)
-        recyclerViewAddress.isGone = account.collapsed
+        addressesList.isGone = account.collapsed
     }
 
     override fun getItemCount(): Int = accounts.count()

@@ -20,7 +20,7 @@
     style="@style/MenuDrawerItem">
 
     <TextView
-        android:id="@+id/customFolderName"
+        android:id="@+id/folderName"
         style="@style/MenuDrawerItemText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         tools:text="Dossier Perso" />
 
     <TextView
-        android:id="@+id/customFolderBadge"
+        android:id="@+id/folderBadge"
         style="@style/MenuDrawerBadge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
