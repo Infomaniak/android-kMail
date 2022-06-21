@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import android.animation.LayoutTransition
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +40,7 @@ import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.toggleChevron
 
@@ -67,6 +69,15 @@ class NewMessageFragment : Fragment() {
 
             bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
             setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
+
+            viewModel.editorAction.observe(requireActivity()) {
+                when (it) {
+                    EditorAction.ATTACHMENT -> Log.e("gibran", "onCreateView: ATTACHMENT")
+                    EditorAction.CAMERA -> Log.e("gibran", "onCreateView: CAMERA")
+                    EditorAction.LINK -> Log.e("gibran", "onCreateView: LINK")
+                    EditorAction.CLOCK -> Log.e("gibran", "onCreateView: CLOCK")
+                }
+            }
 
             return root
         }

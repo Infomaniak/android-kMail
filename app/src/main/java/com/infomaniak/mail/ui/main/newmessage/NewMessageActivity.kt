@@ -23,8 +23,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
+import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
+import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
 
 class NewMessageActivity : AppCompatActivity() {
 
@@ -47,6 +49,15 @@ class NewMessageActivity : AppCompatActivity() {
                 replace(R.id.fragmentContainer, newMessageFragment)
             }
         }
+
+        linkEditor(editorAttachment, ATTACHMENT)
+        linkEditor(editorCamera, CAMERA)
+        linkEditor(editorLink, LINK)
+        linkEditor(editorClock, CLOCK)
+    }
+
+    private fun linkEditor(view: MaterialButton, action: EditorAction) {
+        view.setOnClickListener { viewModel.editorAction.value = action }
     }
 
     private fun sendMail(): Boolean {
@@ -64,5 +75,12 @@ class NewMessageActivity : AppCompatActivity() {
 
     fun toggleEditor(isVisible: Boolean) {
         binding.editor.isVisible = isVisible
+    }
+
+    enum class EditorAction {
+        ATTACHMENT,
+        CAMERA,
+        LINK,
+        CLOCK
     }
 }

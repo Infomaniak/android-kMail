@@ -17,12 +17,15 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.models.Contact
+import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 
 class NewMessageViewModel : ViewModel() {
     val recipients = mutableListOf<Contact>()
     val cc = mutableListOf<Contact>()
     val bcc = mutableListOf<Contact>()
     var areAdvancedFieldsOpened = false
+    val editorAction = MutableLiveData<EditorAction>()
 }
