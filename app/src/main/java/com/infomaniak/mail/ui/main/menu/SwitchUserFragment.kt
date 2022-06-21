@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +26,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
+import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +57,10 @@ class SwitchUserFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            (menuItem.itemId == R.id.addAccount).also { if (it) startActivity(Intent(this.context, LoginActivity::class.java)) }
+        }
 
         listenToMailboxes()
         switchUserViewModel.loadMailboxes()
