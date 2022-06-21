@@ -49,7 +49,10 @@ class SwitchUserViewModel : ViewModel() {
             CoroutineScope(Dispatchers.IO).launch {
 
                 mutableUiAccountsFlow.value = users.mapNotNull { user ->
-                    ApiRepository.getMailboxes(createOkHttpClientForSpecificUser(user)).data?.let { user to it }
+                    val okHttpClient = createOkHttpClientForSpecificUser(user)
+                    ApiRepository.getMailboxes(okHttpClient).data
+                        ?.map { it.initLocalValues(user.id) }
+                        ?.let { user to it }
                 }
             }
         }

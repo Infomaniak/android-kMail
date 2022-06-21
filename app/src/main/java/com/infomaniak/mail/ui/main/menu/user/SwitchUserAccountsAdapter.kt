@@ -30,7 +30,7 @@ import com.infomaniak.mail.utils.toggleChevron
 
 class SwitchUserAccountsAdapter(
     private var accounts: List<UiAccount> = emptyList(),
-    private val popBackStack: () -> Unit,
+    private val onMailboxSelected: (Mailbox) -> Unit,
 ) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserAccountViewHolder {
@@ -46,7 +46,7 @@ class SwitchUserAccountsAdapter(
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(account) }
-        addressesList.adapter = SwitchUserMailboxesAdapter(mailboxes = account.mailboxes, popBackStack = popBackStack)
+        addressesList.adapter = SwitchUserMailboxesAdapter(mailboxes = account.mailboxes, onMailboxSelected = onMailboxSelected)
     }
 
     private fun ItemSwitchUserAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {

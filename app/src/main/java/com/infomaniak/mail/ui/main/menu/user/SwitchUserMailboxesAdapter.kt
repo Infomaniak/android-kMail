@@ -33,7 +33,7 @@ import com.infomaniak.lib.core.R as RCore
 class SwitchUserMailboxesAdapter(
     private var mailboxes: List<Mailbox> = emptyList(),
     private val displayIcon: Boolean = true,
-    private val popBackStack: () -> Unit,
+    private val onMailboxSelected: (Mailbox) -> Unit,
 ) : RecyclerView.Adapter<SwitchUserMailboxViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserMailboxViewHolder {
@@ -56,10 +56,7 @@ class SwitchUserMailboxesAdapter(
         }
 
         setSelectedState(mailbox.objectId == MailData.currentMailboxFlow.value?.objectId)
-        addressItemView.setOnClickListener {
-            MailData.selectMailbox(mailbox)
-            onItemClicked()
-        }
+        addressItemView.setOnClickListener { onMailboxSelected(mailbox) }
     }
 
     private fun ItemSwitchUserMailboxBinding.setSelectedState(isSelected: Boolean) {
