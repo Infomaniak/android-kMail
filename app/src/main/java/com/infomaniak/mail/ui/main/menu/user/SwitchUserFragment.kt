@@ -22,16 +22,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -45,7 +48,18 @@ class SwitchUserFragment : Fragment() {
 
     private var mailboxesJob: Job? = null
 
-    private val accountsAdapter = SettingAccountAdapter { findNavController().popBackStack() }
+    private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
+        if (selectedMailbox.userId == AccountUtils.currentUserId) {
+            MailData.selectMailbox(selectedMailbox)
+            findNavController().popBackStack()
+        } else {
+            CoroutineScope(Dispatchers.IO).launch {
+                AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
+                AccountUtils.currentMailboxId = selectedMailbox.mailboxId
+                AccountUtils.reloadApp?.invoke(bundleOf())
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
 

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -72,9 +71,9 @@ class Mailbox : RealmObject {
     var objectId: String = ""
     var userId: Int = -1
 
-    fun initLocalValues(): Mailbox {
-        objectId = "${AccountUtils.currentUserId}_${mailboxId}"
-        userId = AccountUtils.currentUserId
+    fun initLocalValues(mailboxUserId: Int): Mailbox {
+        objectId = "${mailboxUserId}_${mailboxId}"
+        userId = mailboxUserId
 
         return this
     }

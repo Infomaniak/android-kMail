@@ -44,7 +44,7 @@ object MailApi {
      * Mailboxes
      */
     fun fetchMailboxes(): List<Mailbox>? {
-        return ApiRepository.getMailboxes().data?.map { it.initLocalValues() }
+        return ApiRepository.getMailboxes().data?.map { it.initLocalValues(AccountUtils.currentUserId) }
     }
 
     fun fetchFolders(mailbox: Mailbox): List<Folder>? {
