@@ -54,8 +54,7 @@
                 android:id="@+id/settingsButton"
                 style="@style/IconButton"
                 android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
                 app:icon="@drawable/ic_cog"
                 app:iconSize="24dp"
@@ -69,13 +68,13 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:background="@color/backgroundColor"
         android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
             android:orientation="vertical">
 
             <LinearLayout
@@ -110,7 +109,7 @@
                 tools:visibility="visible">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewAddress"
+                    android:id="@+id/addressesList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:overScrollMode="never"
@@ -122,9 +121,9 @@
 
                 <com.google.android.material.divider.MaterialDivider
                     style="@style/MenuDrawerDivider"
-                    android:layout_marginBottom="0dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="0dp" />
 
                 <TextView
                     android:id="@+id/manageAccount"
@@ -152,9 +151,9 @@
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
-                android:layout_marginTop="0dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp" />
 
             <LinearLayout
                 android:id="@+id/inboxFolder"
@@ -183,237 +182,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <LinearLayout
-                android:id="@+id/commercialFolder"
-                style="@style/MenuDrawerItem"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView
-                    android:id="@+id/commercialFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/commercialFolder"
-                    app:drawableStartCompat="@drawable/ic_promotions" />
-
-                <TextView
-                    android:id="@+id/commercialFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="99+" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/socialNetworksFolder"
-                style="@style/MenuDrawerItem"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView
-                    android:id="@+id/socialNetworksFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/socialNetworksFolder"
-                    app:drawableStartCompat="@drawable/ic_social_media" />
-
-                <TextView
-                    android:id="@+id/socialNetworksFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/favoriteFolder"
-                style="@style/MenuDrawerItem"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView
-                    android:id="@+id/favoriteFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/favoritesFolder"
-                    app:drawableStartCompat="@drawable/ic_star"
-                    app:drawableTint="@color/primary" />
-
-                <TextView
-                    android:id="@+id/favoriteFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/sentFolder"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    android:id="@+id/sentFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/sentFolder"
-                    app:drawableStartCompat="@drawable/ic_sent_messages" />
-
-                <TextView
-                    android:id="@+id/sentFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/scheduledMessagesFolder"
-                style="@style/MenuDrawerItem"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView
-                    android:id="@+id/scheduledMessagesFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/scheduledMessagesFolder"
-                    app:drawableStartCompat="@drawable/ic_scheduled_messages" />
-
-                <TextView
-                    android:id="@+id/scheduledMessagesFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/pendingMessagesFolder"
-                style="@style/MenuDrawerItem"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView
-                    android:id="@+id/pendingMessagesFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/pendingMessagesFolder"
-                    app:drawableStartCompat="@drawable/ic_pending_messages" />
-
-                <TextView
-                    android:id="@+id/pendingMessagesFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/draftFolder"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    android:id="@+id/draftFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/draftFolder"
-                    app:drawableStartCompat="@drawable/ic_edit_draft" />
-
-                <TextView
-                    android:id="@+id/draftFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/spamFolder"
-                style="@style/MenuDrawerItem">
-
-
-                <TextView
-                    android:id="@+id/spamFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/spamFolder"
-                    app:drawableStartCompat="@drawable/ic_spam" />
-
-                <TextView
-                    android:id="@+id/spamFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/trashFolder"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    android:id="@+id/trashFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/trashFolder"
-                    app:drawableStartCompat="@drawable/ic_bin" />
-
-                <TextView
-                    android:id="@+id/trashFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="99+" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/archiveFolder"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    android:id="@+id/archiveFolderText"
-                    style="@style/MenuDrawerItemText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/archiveFolder"
-                    app:drawableStartCompat="@drawable/ic_archive_folder" />
-
-                <TextView
-                    android:id="@+id/archiveFolderBadge"
-                    style="@style/MenuDrawerBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="15" />
-
-            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/defaultFoldersList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_folder_menu_drawer" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
@@ -438,7 +214,6 @@
                     android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
                     android:src="@drawable/ic_arrow_down" />
 
-
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -449,7 +224,7 @@
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="2"
-                tools:listitem="@layout/item_custom_folder"
+                tools:listitem="@layout/item_folder_menu_drawer"
                 tools:visibility="visible" />
 
             <com.google.android.material.divider.MaterialDivider
@@ -525,6 +300,44 @@
                     app:drawableStartCompat="@drawable/ic_restore_arrow" />
 
             </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/storageIndicator"
+                    app:indicatorColor="@color/primary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/storageText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toTopOf="@id/getMoreStorageButton"
+                    app:layout_constraintStart_toStartOf="@id/storageIndicator"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="60.5 Ko / 20 Go utilisés" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/getMoreStorageButton"
+                    style="@style/TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/buttonMoreStorage"
+                    app:layout_constraintStart_toStartOf="@id/storageIndicator"
+                    app:layout_constraintTop_toBottomOf="@id/storageText" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 

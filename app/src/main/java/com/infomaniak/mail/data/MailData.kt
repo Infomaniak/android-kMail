@@ -20,7 +20,6 @@ package com.infomaniak.mail.data
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.MailApi
-import com.infomaniak.mail.data.api.MailApi.fetchThreads
 import com.infomaniak.mail.data.cache.ContactsController
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
