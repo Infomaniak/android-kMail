@@ -25,6 +25,8 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -63,8 +65,13 @@ class NewMessageFragment : Fragment() {
             ccAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(CC) }
             bccAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(BCC) }
 
+            bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
+            setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
+
             return root
         }
+
+    private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
 
     private fun chooseFromAddress(view: View) {
         val adapter = ArrayAdapter(view.context, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, mails)
@@ -78,6 +85,14 @@ class NewMessageFragment : Fragment() {
                 dismiss()
             }
         }.show()
+    }
+
+    private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
+        ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->
+            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            callback(isKeyboardVisible)
+            insets
+        }
     }
 
     //region Chips behavior

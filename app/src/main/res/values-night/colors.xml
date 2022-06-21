@@ -26,6 +26,7 @@
     <color name="backgroundNotificationColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/black</color>
     <color name="backgroundSnackbarColor">@color/black</color>
+    <color name="backgroundNewMailColor">@color/grey_title</color>
 
     <!-- Texts -->
     <color name="secondaryTextColor">@color/secondaryText</color>

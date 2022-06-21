@@ -119,6 +119,12 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
+    <style name="EditorIconButton" parent="IconButton">
+        <item name="cornerRadius">0dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="rippleColor">@color/pink_mail_ripple</item>
+    </style>
+
     <!-- Other -->
 
     <style name="EmailAddressTextView">

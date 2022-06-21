@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
@@ -59,5 +60,9 @@ class NewMessageActivity : AppCompatActivity() {
 
         if (viewModel.recipients.isEmpty() || newMessageFragment.getSubject().isBlank()) return false
         return true
+    }
+
+    fun toggleEditor(isVisible: Boolean) {
+        binding.editor.isVisible = isVisible
     }
 }

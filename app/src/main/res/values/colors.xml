@@ -19,6 +19,7 @@
 
     <!-- Primary colors -->
     <color name="pinkMail">#F2357A</color>
+    <color name="pinkMailRipple">#1EF2357A</color>
 
     <!-- Context / errors -->
     <color name="orangeWarning">#FF8500</color>
@@ -38,6 +39,7 @@
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundNotificationColor">@color/grey_text</color>
+    <color name="backgroundNewMailColor">@android:color/white</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
 
