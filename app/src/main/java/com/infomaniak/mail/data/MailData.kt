@@ -132,6 +132,10 @@ object MailData {
         getThreadsFromApi(folder, mailbox)
     }
 
+    fun refreshThreads(folder: Folder, mailbox: Mailbox) {
+        getThreadsFromApi(folder, mailbox)
+    }
+
     fun loadMessages(thread: Thread) {
         getMessagesFromRealm(thread)
         getMessagesFromApi(thread)
