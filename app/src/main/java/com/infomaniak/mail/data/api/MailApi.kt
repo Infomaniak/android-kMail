@@ -98,6 +98,10 @@ object MailApi {
         return apiDraft
     }
 
+    fun fetchMailBoxStorage(mailbox: Mailbox): Long? {
+        return ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.size?.toLong()
+    }
+
     suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
 
         fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {

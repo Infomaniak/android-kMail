@@ -81,6 +81,7 @@
     <string name="contentDescriptionIconCalendar"></string>
     <string name="contentDescriptionIconFavorite"></string>
     <string name="contentDescriptionIconNewMail"></string>
+    <string name="contentDescriptionIconStorage"></string>
     <string name="dateTitle"></string>
     <string name="draftFolder"></string>
     <string name="emailSentSnackbar"></string>
@@ -92,6 +93,7 @@
     <string name="loginViewDescription"></string>
     <string name="loginViewTitle"></string>
     <string name="menuDrawerAdvancedActions"></string>
+    <string name="menuDrawerMailboxStorage"></string>
     <string name="menuDrawerUsed"></string>
     <string name="messageForwardHeader"></string>
     <string name="messageIsDraftOption"></string>
