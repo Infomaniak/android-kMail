@@ -53,8 +53,9 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
-    private var foldersJob: Job? = null
+    private var currentMailboxJob: Job? = null
     private var mailboxesJob: Job? = null
+    private var foldersJob: Job? = null
 
     private val addressAdapter = SettingAddressAdapter(displayIcon = false) {
         threadListViewModel.loadMailData()
@@ -134,24 +135,36 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
         }
     }
 
-    private fun setupUi() = with(binding) {
-        accountSwitcherText.text = AccountUtils.currentUser?.email
+    override fun onResume() {
+        super.onResume()
+
+        listenToCurrentMailbox()
         listenToMailboxes()
         listenToFolders()
         listenToCurrentMailboxSize()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        listenToMailboxes()
-    }
-
     override fun onPause() {
+        currentMailboxJob?.cancel()
+        currentMailboxJob = null
+
         mailboxesJob?.cancel()
         mailboxesJob = null
 
+        foldersJob?.cancel()
+        foldersJob = null
+
         super.onPause()
+    }
+
+    private fun listenToCurrentMailbox() {
+        if (currentMailboxJob != null) currentMailboxJob?.cancel()
+
+        currentMailboxJob = menuDrawerViewModel.viewModelScope.launch(Dispatchers.Main) {
+            MailData.currentMailboxFlow.filterNotNull().collect { currentMailbox ->
+                binding.accountSwitcherText.text = currentMailbox.email
+            }
+        }
     }
 
     private fun listenToMailboxes() = with(menuDrawerViewModel) {
