@@ -28,10 +28,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData.currentMailboxFlow
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
@@ -42,6 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
 
 class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragment() {
 
@@ -68,9 +71,9 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         menuDrawerViewModel.setup()
+        setupUi()
         setupAdapters()
         setupListener()
-        setupUi()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -81,6 +84,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
 
     private fun setupListener() = with(binding) {
         settingsButton.setOnClickListener {
+            closeDrawer()
             safeNavigate(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment(),
                 currentClassName = MenuDrawerFragment::class.java.name,
@@ -93,6 +97,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
             }
         }
         manageAccount.setOnClickListener {
+            closeDrawer()
             safeNavigate(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToManageMailAddressFragment(),
                 currentClassName = MenuDrawerFragment::class.java.name,
@@ -109,18 +114,22 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
             }
         }
         feedbacks.setOnClickListener {
+            closeDrawer()
             context?.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
         }
         help.setOnClickListener {
+            closeDrawer()
             safeNavigate(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToHelpFragment(),
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
         importMails.setOnClickListener {
+            closeDrawer()
             // TODO: import mails
         }
         restoreMails.setOnClickListener {
+            closeDrawer()
             // TODO: restore mails
         }
     }
@@ -129,6 +138,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
         accountSwitcherText.text = AccountUtils.currentUser?.email
         listenToMailboxes()
         listenToFolders()
+        listenToCurrentMailboxSize()
     }
 
     override fun onResume() {
@@ -150,6 +160,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                 addressAdapter.setMailboxes(mailboxes)
                 addressAdapter.notifyDataSetChanged()
+                manageStorageFooterVisibility()
             }
         }
     }
@@ -162,6 +173,25 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
                 onFoldersChange(folders)
                 // TODO : Manage embedded folders ?
             }
+        }
+    }
+
+    private fun listenToCurrentMailboxSize() = with(binding) {
+        menuDrawerViewModel.mailboxSize.observe(viewLifecycleOwner) { sizeUsed ->
+            if (sizeUsed == null) return@observe
+
+            val formattedSize = FormatterFileSize.formatShortFileSize(root.context, sizeUsed)
+            val formattedTotalSize = FormatterFileSize.formatShortFileSize(root.context, LIMITED_MAILBOX_SIZE)
+
+            storageText.text = context?.resources?.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+            storageIndicator.progress = ceil(100.0 * sizeUsed / LIMITED_MAILBOX_SIZE).toInt()
+        }
+    }
+
+    private fun manageStorageFooterVisibility() {
+        currentMailboxFlow.value?.let { mailbox ->
+            binding.storageLayout.isVisible = mailbox.isLimited
+            if (mailbox.isLimited) activity?.let { menuDrawerViewModel.getMailBoxStorage(mailbox, it) }
         }
     }
 
@@ -199,4 +229,8 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
     }.sortedBy { it.role?.order }
 
     private fun getCustomFolders(folders: List<Folder>) = folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
+
+    companion object {
+        const val LIMITED_MAILBOX_SIZE: Long = 20L * 1 shl 30
+    }
 }

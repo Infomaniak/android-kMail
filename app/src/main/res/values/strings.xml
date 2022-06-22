@@ -89,6 +89,7 @@
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
     <string name="contentDescriptionIconFavorite">Is favorite</string>
     <string name="contentDescriptionIconNewMail">New</string>
+    <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="emailSentSnackbar">Email sent</string>
@@ -100,6 +101,7 @@
     <string name="loginViewDescription">Log in to your account and manage all your Infomaniak emails from the app.</string>
     <string name="loginViewTitle">Welcome to the Infomaniak Mail App</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
+    <string name="menuDrawerMailboxStorage">%s / %s used</string>
     <string name="menuDrawerUsed">used</string>
     <string name="messageForwardHeader">Forwarded message</string>
     <string name="messageIsDraftOption">Draft</string>

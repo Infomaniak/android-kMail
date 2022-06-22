@@ -17,9 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.app.Activity
 import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +43,8 @@ class MenuDrawerViewModel : ViewModel() {
 
     private val mutableUiFoldersFlow: MutableStateFlow<List<Folder>?> = MutableStateFlow(null)
     val uiFoldersFlow = mutableUiFoldersFlow.asStateFlow()
+
+    var mailboxSize: MutableLiveData<Long?> = MutableLiveData()
 
     fun setup() {
         listenToMailboxes()
@@ -78,6 +83,13 @@ class MenuDrawerViewModel : ViewModel() {
                 }
                 job?.cancel()
             }
+        }
+    }
+
+    fun getMailBoxStorage(mailbox: Mailbox, activity: Activity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val mailboxStorage = MailApi.fetchMailBoxStorage(mailbox)
+            activity.runOnUiThread { mailboxSize.value = mailboxStorage }
         }
     }
 
