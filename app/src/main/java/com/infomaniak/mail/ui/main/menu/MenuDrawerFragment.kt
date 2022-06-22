@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,6 +37,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
+import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.ui.main.thread.ThreadListViewModel
 import com.infomaniak.mail.utils.AccountUtils
@@ -103,9 +105,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
-        addAccount.setOnClickListener {
-            // TODO: go back to login activity directly ?
-        }
+        addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
         inboxFolder.setOnClickListener { openFolder(R.string.inboxFolder) }
         customFolders.setOnClickListener {
             customFoldersList.apply {
