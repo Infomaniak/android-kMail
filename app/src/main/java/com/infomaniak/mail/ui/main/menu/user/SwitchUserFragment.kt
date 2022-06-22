@@ -54,6 +54,7 @@ class SwitchUserFragment : Fragment() {
             findNavController().popBackStack()
         } else {
             CoroutineScope(Dispatchers.IO).launch {
+                MailData.close()
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
                 AccountUtils.reloadApp?.invoke(bundleOf())
@@ -73,7 +74,7 @@ class SwitchUserFragment : Fragment() {
         super.onResume()
 
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
-            (menuItem.itemId == R.id.addAccount).also { if (it) startActivity(Intent(this.context, LoginActivity::class.java)) }
+            (menuItem.itemId == R.id.addAccount).also { if (it) startActivity(Intent(context, LoginActivity::class.java)) }
         }
 
         listenToMailboxes()
