@@ -29,10 +29,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,8 +105,6 @@ class SwitchUserFragment : Fragment() {
             }
         }
     }
-
-    private fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
 
     private fun List<UiAccount>.sortAccounts(): List<UiAccount> {
         return filter { it.user.id != AccountUtils.currentUserId }
