@@ -22,10 +22,8 @@
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <style name="AppTheme.Login" parent="AppTheme" />
-
-    <style name="LoginAppBarTheme" parent="AppTheme.AppBarOverlayBase">
-        <item name="backgroundTint">@color/backgroundColor</item>
+    <style name="AppTheme.Login" parent="AppTheme.LoginBase">
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
 </resources>

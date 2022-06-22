@@ -35,7 +35,9 @@
     <color name="backgroundChipColor">@color/background</color>
     <color name="backgroundColor">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
+    <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundNotificationColor">@color/grey_text</color>
+    <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">#FAFAFA</color>
 
     <!-- Texts -->

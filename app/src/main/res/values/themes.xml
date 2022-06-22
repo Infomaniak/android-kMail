@@ -62,21 +62,25 @@
     <!-- Login -->
 
     <style name="AppTheme.LoginBase" parent="AppThemeBase">
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:windowBackground">@color/appBar</item>
+        <item name="android:navigationBarColor">@color/backgroundOnBoardingColor</item>
+        <item name="android:statusBarColor">@color/backgroundOnBoardingColor</item>
+        <item name="android:windowBackground">@color/backgroundOnBoardingColor</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="appBarLayoutStyle">@style/LoginAppBarTheme</item>
     </style>
 
     <style name="AppTheme.Login" parent="AppTheme.LoginBase" />
 
-    <style name="WebViewTheme" parent="AppTheme.Login">
+    <style name="WebViewThemeBase" parent="AppTheme.Login">
+        <item name="android:statusBarColor">@color/backgroundLoginWebviewColor</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorCloseIcon">@color/title</item>
         <item name="colorPrimary">@color/backgroundColor</item>
         <item name="colorPrimaryDark">@color/backgroundColor</item>
         <item name="themeLoginToolbar">@style/LoginToolbarTheme</item>
     </style>
+
+    <style name="WebViewTheme" parent="WebViewThemeBase" />
 
     <!-- AppBar -->
 
@@ -89,7 +93,7 @@
     </style>
 
     <style name="LoginAppBarTheme" parent="AppTheme.AppBarOverlayBase">
-        <item name="android:backgroundTint">@color/background</item>
+        <item name="android:backgroundTint">@color/backgroundLoginWebviewColor</item>
     </style>
 
     <style name="AppTheme.CollapsingToolbarLayoutTheme">

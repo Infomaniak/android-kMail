@@ -27,7 +27,6 @@
     </style>
 
     <style name="AppTheme.Login" parent="AppTheme.LoginBase">
-        <item name="android:navigationBarColor">@color/backgroundColor</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 

@@ -45,7 +45,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
+    private val binding: ActivityLoginBinding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
 
     private lateinit var infomaniakLogin: InfomaniakLogin
 
@@ -66,16 +66,15 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         infomaniakLogin = InfomaniakLogin(
             context = this,
             appUID = BuildConfig.APPLICATION_ID,
             clientID = BuildConfig.CLIENT_ID,
-        ).also {
-            it.startWebViewLogin(webViewLoginResultLauncher)
-        }
+        )
+        
+        binding.loginButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
     }
 
     private fun authenticateUser(authCode: String) {
