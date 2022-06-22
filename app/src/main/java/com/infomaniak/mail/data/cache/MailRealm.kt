@@ -96,7 +96,7 @@ object MailRealm {
     fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
 
     fun readMailboxes(): SharedFlow<ResultsChange<Mailbox>> {
-        return MailboxInfoController.getMailboxesAsync().toSharedFlow()
+        return MailboxInfoController.getMailboxesAsync(AccountUtils.currentUserId).toSharedFlow()
     }
 
     fun readFolders(): SharedFlow<ResultsChange<Folder>> {
