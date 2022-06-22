@@ -79,5 +79,9 @@ class SwitchUserMailboxesAdapter(
         mailboxes = newMailboxes
     }
 
+    companion object {
+        fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
+    }
+
     class SwitchUserMailboxViewHolder(val binding: ItemSwitchUserMailboxBinding) : RecyclerView.ViewHolder(binding.root)
 }

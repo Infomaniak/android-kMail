@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toggleChevron
@@ -185,8 +186,10 @@ class MenuDrawerFragment(
 
         mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                addressAdapter.setMailboxes(mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId })
-                addressAdapter.notifyDataSetChanged()
+                with(addressAdapter) {
+                    setMailboxes(mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes())
+                    notifyDataSetChanged()
+                }
                 manageStorageFooterVisibility()
             }
         }
