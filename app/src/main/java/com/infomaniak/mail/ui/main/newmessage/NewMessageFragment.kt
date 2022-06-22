@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.newmessage
 
 import android.animation.LayoutTransition
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -173,6 +174,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun FragmentNewMessageBinding.updateChipVisibility() {
         singleChipGroup.isVisible = !viewModel.areAdvancedFieldsOpened && viewModel.recipients.isNotEmpty()
         toItemsChipGroup.isVisible = viewModel.areAdvancedFieldsOpened
@@ -180,15 +182,16 @@ class NewMessageFragment : Fragment() {
         doNotAnimate(constraintLayout) {
             plusOthers.isVisible = viewModel.recipients.count() > 1 && !viewModel.areAdvancedFieldsOpened
         }
-        plusOthers.text = "+${viewModel.recipients.count() - 1} others" // TODO : extract string
+        plusOthersChip.root.text = "+${viewModel.recipients.count() - 1}"
         advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
     }
 
     private fun doNotAnimate(parent: View, body: () -> Unit) {
-        val lt: LayoutTransition = (parent as ViewGroup).layoutTransition
-        lt.disableTransitionType(LayoutTransition.DISAPPEARING)
-        body()
-        lt.enableTransitionType(LayoutTransition.DISAPPEARING)
+        (parent as ViewGroup).layoutTransition.apply {
+            disableTransitionType(LayoutTransition.DISAPPEARING)
+            body()
+            enableTransitionType(LayoutTransition.DISAPPEARING)
+        }
     }
 
     private fun FragmentNewMessageBinding.openFieldFragment(fieldType: FieldType) {

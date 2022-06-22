@@ -74,7 +74,11 @@ class NewMessageActivity : AppCompatActivity() {
 
     private fun ActivityNewMessageBinding.updateEditorVisibility(isEditorExpanded: Boolean) {
         val color = if (isEditorExpanded) R.color.emphasizedTextColor else R.color.iconColor
-        editorTextOptions.setIconTintResource(color)
+        val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
+        editorTextOptions.apply {
+            setIconTintResource(color)
+            contentDescription = getString(resId)
+        }
 
         editorActions.isGone = isEditorExpanded
         textEditing.isVisible = isEditorExpanded
