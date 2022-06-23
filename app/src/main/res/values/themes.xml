@@ -45,7 +45,7 @@
         <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlNormal">@color/primary</item>
-        <item name="colorControlHighlight">@color/pinkMail</item>
+        <item name="colorControlHighlight">@color/pinkMailRipple</item>
         <item name="colorOnSecondary">@android:color/white</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>

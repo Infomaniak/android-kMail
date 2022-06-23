@@ -32,8 +32,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commit
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailboxInfoController
@@ -54,44 +56,72 @@ class NewMessageFragment : Fragment() {
     private var mails = mailboxes.map { it.email }
     private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        with(binding) {
-            fromMailAddress.text = mailboxes[selectedMailboxIndex].email
-            if (mails.count() > 1) fromMailAddress.setOnClickListener(::chooseFromAddress)
-            else fromMailAddress.isClickable = false
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View = with(binding) {
+        setupFromField()
+        displayChips()
 
-            displayChips()
+        toTransparentButton.setOnClickListener { openAdvancedFields() }
+        chevron.setOnClickListener { openAdvancedFields() }
 
-            toTransparentButton.setOnClickListener { openAdvancedFields() }
-            chevron.setOnClickListener { openAdvancedFields() }
+        enableAutocomplete(TO)
+        enableAutocomplete(CC)
+        enableAutocomplete(BCC)
 
-            toAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(TO) }
-            ccAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(CC) }
-            bccAutocompleteInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) openFieldFragment(BCC) }
+        bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
+        setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
 
-            bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
-            setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
+        viewModel.editorAction.observe(requireActivity()) {
+            var selectedText = ""
+            bodyText.apply { selectedText = text?.substring(selectionStart, selectionEnd) ?: "" }
 
-            viewModel.editorAction.observe(requireActivity()) {
-                var selectedText = ""
-                bodyText.apply { selectedText = text?.substring(selectionStart, selectionEnd) ?: "" }
+            when (it) {
+                // TODO: Replace logs with actual code
+                EditorAction.ATTACHMENT -> Log.e("gibran", "onCreateView: ATTACHMENT")
+                EditorAction.CAMERA -> Log.e("gibran", "onCreateView: CAMERA")
+                EditorAction.LINK -> Log.e("gibran", "onCreateView: LINK")
+                EditorAction.CLOCK -> Log.e("gibran", "onCreateView: CLOCK")
+                EditorAction.BOLD -> Log.e("gibran", "onCreateView: BOLD")
+                EditorAction.ITALIC -> Log.e("gibran", "onCreateView: ITALIC")
+                EditorAction.UNDERLINE -> Log.e("gibran", "onCreateView: UNDERLINE")
+                EditorAction.STRIKE_THROUGH -> Log.e("gibran", "onCreateView: STRIKE_THROUGH")
+                EditorAction.UNORDERED_LIST -> Log.e("gibran", "onCreateView: UNORDERED_LIST")
+            }
+        }
 
-                when (it) {
-                    // TODO: Replace logs with actual code
-                    EditorAction.ATTACHMENT -> Log.e("gibran", "onCreateView: ATTACHMENT")
-                    EditorAction.CAMERA -> Log.e("gibran", "onCreateView: CAMERA")
-                    EditorAction.LINK -> Log.e("gibran", "onCreateView: LINK")
-                    EditorAction.CLOCK -> Log.e("gibran", "onCreateView: CLOCK")
-                    EditorAction.BOLD -> Log.e("gibran", "onCreateView: BOLD")
-                    EditorAction.ITALIC -> Log.e("gibran", "onCreateView: ITALIC")
-                    EditorAction.UNDERLINE -> Log.e("gibran", "onCreateView: UNDERLINE")
-                    EditorAction.STRIKE_THROUGH -> Log.e("gibran", "onCreateView: STRIKE_THROUGH")
-                    EditorAction.UNORDERED_LIST -> Log.e("gibran", "onCreateView: UNORDERED_LIST")
+        return root
+    }
+
+    private fun FragmentNewMessageBinding.enableAutocomplete(field: FieldType) {
+        getInputView(field).let {
+//            it.doOnTextChanged { text, _, _, _ ->
+//                if (text?.isNotEmpty() == true) {
+//                    it.setText("")
+//                    openFieldFragment(field, text)
+//                }
+//            }
+            it.setOnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) {
+                    it.clearFocus()
+                    openFieldFragment(field, "")
                 }
             }
-
-            return root
         }
+    }
+
+    private fun FragmentNewMessageBinding.setupFromField() {
+        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
+        if (mails.count() > 1) fromMailAddress.setOnClickListener(::chooseFromAddress)
+        else {
+            fromMailAddress.apply {
+                isClickable = false
+                isFocusable = false
+            }
+        }
+    }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
 
@@ -130,6 +160,13 @@ class NewMessageFragment : Fragment() {
             TO -> binding.toItemsChipGroup
             CC -> binding.ccItemsChipGroup
             BCC -> binding.bccItemsChipGroup
+        }
+
+    private fun getInputView(field: FieldType): MaterialAutoCompleteTextView =
+        when (field) {
+            TO -> binding.toAutocompleteInput
+            CC -> binding.ccAutocompleteInput
+            BCC -> binding.bccAutocompleteInput
         }
 
     private fun FragmentNewMessageBinding.displayChips() {
@@ -195,21 +232,32 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun FragmentNewMessageBinding.openFieldFragment(fieldType: FieldType) {
+    private fun FragmentNewMessageBinding.openFieldFragment(fieldType: FieldType, text: CharSequence) {
         val (prefix, field, chips) = when (fieldType) {
             TO -> Triple(toPrefix, toAutocompleteInput, toItemsChipGroup)
             CC -> Triple(ccPrefix, ccAutocompleteInput, ccItemsChipGroup)
             BCC -> Triple(bccPrefix, bccAutocompleteInput, bccItemsChipGroup)
         }
 
-        parentFragmentManager.commit {
-            setReorderingAllowed(true)
-            addSharedElement(prefix, fieldType.prefixTransition)
-            addSharedElement(field, fieldType.fieldTransition)
-            addSharedElement(chips, fieldType.chipsTransition)
-            replace(R.id.fragmentContainer, FieldFragment(fieldType))
-            addToBackStack("mailWritingMain")
-        }
+        val extras = FragmentNavigatorExtras(
+            prefix to fieldType.prefixTransition,
+            field to fieldType.fieldTransition,
+            chips to fieldType.chipsTransition
+        )
+
+        safeNavigate(
+            resId = R.id.fieldFragment,
+            args = FieldFragmentArgs(field = fieldType, text = text.toString()).toBundle(),
+            navOptions = null,
+            navigatorExtras = extras
+        )
+
+//        safeNavigate(
+//            NewMessageFragmentDirections.actionNewMessageFragmentToFieldFragment(
+//                field = fieldType,
+//                text = text.toString()
+//            )
+//        )
     }
 
     private fun FragmentNewMessageBinding.openAdvancedFields() {

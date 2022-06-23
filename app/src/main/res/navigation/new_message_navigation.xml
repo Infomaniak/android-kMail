@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/new_message_navigation"
+    app:startDestination="@id/newMessageFragment">
+
+    <fragment
+        android:id="@+id/newMessageFragment"
+        android:name="com.infomaniak.mail.ui.main.newmessage.NewMessageFragment"
+        android:label="fragment_new_message"
+        tools:layout="@layout/fragment_new_message">
+        <action
+            android:id="@+id/action_newMessageFragment_to_fieldFragment"
+            app:destination="@id/fieldFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fieldFragment"
+        android:name="com.infomaniak.mail.ui.main.newmessage.FieldFragment"
+        android:label="fragment_field"
+        tools:layout="@layout/fragment_field">
+        <argument
+            android:name="field"
+            app:argType="com.infomaniak.mail.ui.main.newmessage.NewMessageFragment$FieldType" />
+        <argument
+            android:name="text"
+            android:defaultValue=''
+            app:argType="string" />
+    </fragment>
+</navigation>

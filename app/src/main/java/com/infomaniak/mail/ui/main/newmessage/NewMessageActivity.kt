@@ -23,7 +23,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.commit
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
@@ -35,34 +34,31 @@ class NewMessageActivity : AppCompatActivity() {
     private val viewModel: NewMessageViewModel by viewModels()
     private val newMessageFragment = NewMessageFragment()
 
-    override fun onCreate(savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(root)
 
-        toolbar.setNavigationOnClickListener { onBackPressed() }
-        toolbar.setOnMenuItemClickListener {
-            if (sendMail()) finish()
-            true
-        }
+        binding.apply {
+            setContentView(root)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                replace(R.id.fragmentContainer, newMessageFragment)
+            toolbar.setNavigationOnClickListener { onBackPressed() }
+            toolbar.setOnMenuItemClickListener {
+                if (sendMail()) finish()
+                true
             }
+
+            linkEditor(editorAttachment, ATTACHMENT)
+            linkEditor(editorCamera, CAMERA)
+            linkEditor(editorLink, LINK)
+            linkEditor(editorClock, CLOCK)
+
+            linkEditor(editorBold, BOLD)
+            linkEditor(editorItalic, ITALIC)
+            linkEditor(editorUnderlined, UNDERLINE)
+            linkEditor(editorStrikeThrough, STRIKE_THROUGH)
+            linkEditor(editorList, UNORDERED_LIST)
+
+            handleEditorToggle()
         }
-
-        linkEditor(editorAttachment, ATTACHMENT)
-        linkEditor(editorCamera, CAMERA)
-        linkEditor(editorLink, LINK)
-        linkEditor(editorClock, CLOCK)
-
-        linkEditor(editorBold, BOLD)
-        linkEditor(editorItalic, ITALIC)
-        linkEditor(editorUnderlined, UNDERLINE)
-        linkEditor(editorStrikeThrough, STRIKE_THROUGH)
-        linkEditor(editorList, UNORDERED_LIST)
-
-        handleEditorToggle()
     }
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {
