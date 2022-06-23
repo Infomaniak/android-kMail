@@ -159,12 +159,10 @@
             app:layout_constraintStart_toEndOf="@id/singleChipGroup"
             app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
 
-        <!-- TODO: Use the correct chevron according to design -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/chevron"
             style="@style/IconButton"
-            android:rotation="-180"
-            app:icon="@drawable/ic_chevron_up"
+            app:icon="@drawable/ic_chevron_down"
             app:layout_constraintBottom_toTopOf="@id/toPrefix"
             app:layout_constraintEnd_toEndOf="@id/divider1"
             app:layout_constraintTop_toBottomOf="@id/toPrefix" />

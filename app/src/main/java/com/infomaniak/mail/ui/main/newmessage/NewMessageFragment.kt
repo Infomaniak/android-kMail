@@ -43,13 +43,14 @@ import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toggleChevron
 
 class NewMessageFragment : Fragment() {
 
     private val binding: FragmentNewMessageBinding by lazy { FragmentNewMessageBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by activityViewModels()
-    private var mailboxes = MailboxInfoController.getMailboxesSync()
+    private var mailboxes = MailboxInfoController.getMailboxesSync(AccountUtils.currentUserId)
     private var mails = mailboxes.map { it.email }
     private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
 
