@@ -167,7 +167,6 @@ object MailboxContentController {
     /**
      * Drafts
      */
-
     private fun getDraft(uuid: String): Draft? {
         return MailRealm.mailboxContent.query<Draft>("${Draft::uuid.name} == '$uuid'").first().find()
     }
