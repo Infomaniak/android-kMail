@@ -186,10 +186,8 @@ class MenuDrawerFragment(
 
         mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                with(addressAdapter) {
-                    setMailboxes(mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes())
-                    notifyDataSetChanged()
-                }
+                val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
+                addressAdapter.setMailboxes(sortedMailboxes)
                 manageStorageFooterVisibility()
             }
         }

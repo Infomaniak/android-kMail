@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
@@ -77,10 +78,34 @@ class SwitchUserMailboxesAdapter(
 
     fun setMailboxes(newMailboxes: List<Mailbox>) {
         mailboxes = newMailboxes
+        notifyDataSetChanged()
+    }
+
+    fun notifyAdapter(newList: List<Mailbox>) {
+        DiffUtil.calculateDiff(MailboxesListDiffCallback(mailboxes, newList)).dispatchUpdatesTo(this)
+        mailboxes = newList
     }
 
     companion object {
         fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
+    }
+
+    private class MailboxesListDiffCallback(
+        private val oldList: List<Mailbox>,
+        private val newList: List<Mailbox>,
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldIndex: Int, newIndex: Int): Boolean {
+            return oldList[oldIndex].mailboxId == newList[newIndex].mailboxId
+        }
+
+        override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
+            return oldList[oldIndex].unseenMessages == newList[newIndex].unseenMessages
+        }
     }
 
     class SwitchUserMailboxViewHolder(val binding: ItemSwitchUserMailboxBinding) : RecyclerView.ViewHolder(binding.root)

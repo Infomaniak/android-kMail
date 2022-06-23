@@ -54,9 +54,11 @@ class SwitchUserFragment : Fragment() {
             findNavController().popBackStack()
         } else {
             CoroutineScope(Dispatchers.IO).launch {
-                MailData.close()
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
+
+                MailData.close()
+
                 AccountUtils.reloadApp?.invoke(bundleOf())
             }
         }
@@ -100,8 +102,7 @@ class SwitchUserFragment : Fragment() {
                         .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
                         .sortAccounts()
 
-                    accountsAdapter.setAccounts(uiAccounts)
-                    accountsAdapter.notifyDataSetChanged()
+                    accountsAdapter.notifyAdapter(uiAccounts)
                 }
             }
         }

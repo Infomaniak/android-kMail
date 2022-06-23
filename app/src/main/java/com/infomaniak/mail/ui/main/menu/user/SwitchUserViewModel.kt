@@ -29,6 +29,7 @@ import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.CoroutineScope
@@ -47,6 +48,10 @@ class SwitchUserViewModel : ViewModel() {
 
         AccountUtils.getAllUsers().observeOnce(lifecycleOwner) { users ->
             CoroutineScope(Dispatchers.IO).launch {
+
+                mutableUiAccountsFlow.value = users.map { user ->
+                    user to MailboxInfoController.getMailboxesSync(user.id)
+                }
 
                 mutableUiAccountsFlow.value = users.mapNotNull { user ->
                     val okHttpClient = createOkHttpClientForSpecificUser(user)
