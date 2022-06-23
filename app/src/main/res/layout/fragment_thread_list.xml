@@ -191,7 +191,7 @@
                         android:text="@string/buttonNewMessage"
                         android:textAllCaps="false"
                         app:backgroundTint="@color/pink_mail"
-                        app:icon="@drawable/ic_pencil_1"
+                        app:icon="@drawable/ic_pencil"
                         app:iconGravity="end"
                         app:iconSize="16dp"
                         app:layout_constraintBottom_toBottomOf="parent"
