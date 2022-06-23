@@ -47,8 +47,9 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toggleChevron
 
-class ThreadAdapter(private var messageList: MutableList<Message> = mutableListOf()) :
-    RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
+class ThreadAdapter(
+    private var messageList: MutableList<Message> = mutableListOf(),
+) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
 
     var onContactClicked: ((contact: Recipient, isExpanded: Boolean) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
