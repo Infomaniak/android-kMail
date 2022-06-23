@@ -132,6 +132,7 @@ object MailData {
     }
 
     fun refreshThreads(folder: Folder, mailbox: Mailbox) {
+        mutableThreadsFlow.value = null
         getThreadsFromApi(folder, mailbox)
     }
 
