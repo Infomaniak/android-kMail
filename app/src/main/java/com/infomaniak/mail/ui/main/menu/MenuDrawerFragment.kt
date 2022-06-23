@@ -33,7 +33,7 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData.currentMailboxFlow
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
@@ -72,7 +72,6 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         menuDrawerViewModel.setup()
-        setupUi()
         setupAdapters()
         setupListener()
     }
@@ -203,7 +202,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
     }
 
     private fun manageStorageFooterVisibility() {
-        currentMailboxFlow.value?.let { mailbox ->
+        MailData.currentMailboxFlow.value?.let { mailbox ->
             binding.storageLayout.isVisible = mailbox.isLimited
             if (mailbox.isLimited) activity?.let { menuDrawerViewModel.getMailBoxStorage(mailbox, it) }
         }
