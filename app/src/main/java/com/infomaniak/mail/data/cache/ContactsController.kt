@@ -26,9 +26,6 @@ import kotlinx.coroutines.flow.Flow
 
 object ContactsController {
 
-    /**
-     * Contacts
-     */
     private fun getContact(id: String): Contact? {
         return MailRealm.contacts.query<Contact>("${Contact::id.name} == '$id'").first().find()
     }

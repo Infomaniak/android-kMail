@@ -97,7 +97,6 @@ object MailData {
     /**
      * Load Data
      */
-
     fun loadContacts() {
         CoroutineScope(Dispatchers.IO).launch {
             MailRealm.readContacts().collectOnce { realmContacts ->
@@ -213,7 +212,6 @@ object MailData {
     /**
      * Read Realm
      */
-
     private fun getMailboxesFromRealm(completion: (List<Mailbox>) -> Unit) {
         MailRealm.readMailboxes().collectOnce { realmMailboxes ->
 
@@ -252,7 +250,6 @@ object MailData {
     /**
      * Fetch API
      */
-
     private fun getInboxContentFromApi() {
         val mergedMailboxes = getMailboxesFromApi()
         val selectedMailbox = computeMailboxToSelect(mergedMailboxes) ?: return
@@ -305,7 +302,6 @@ object MailData {
     /**
      * Merge Realm & API data
      */
-
     private fun mergeContacts(realmContacts: List<Contact>, apiContacts: List<Contact>): List<Contact> {
 
         // Get outdated data
@@ -474,7 +470,6 @@ object MailData {
     /**
      * Utils
      */
-
     private fun <T : BaseRealmObject> SharedFlow<ResultsChange<T>>.collectOnce(completion: (List<T>) -> Unit) {
         var job: Job? = null
         job = CoroutineScope(Dispatchers.IO).launch {
