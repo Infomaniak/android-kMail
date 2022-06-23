@@ -141,10 +141,6 @@ object MailData {
         getMessagesFromApi(thread)
     }
 
-    fun refreshThreads(folder: Folder, mailbox: Mailbox) {
-        getThreadsFromApi(folder, mailbox)
-    }
-
     fun deleteDraft(message: Message) {
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MailboxContentController.deleteMessage(message.uid)
     }
