@@ -109,9 +109,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupMenuDrawer() {
         binding.drawerLayout.addDrawerListener(drawerListener)
 
+        val fragment = MenuDrawerFragment(
+            closeDrawer = { closeDrawer() },
+            isDrawerOpen = { binding.drawerLayout.isOpen },
+        ).also { menuDrawerFragment = it }
+
         activity?.supportFragmentManager
             ?.beginTransaction()
-            ?.add(R.id.menuDrawerFragment, MenuDrawerFragment { closeDrawer() }.also { menuDrawerFragment = it })
+            ?.add(R.id.menuDrawerFragment, fragment)
             ?.commit()
     }
 

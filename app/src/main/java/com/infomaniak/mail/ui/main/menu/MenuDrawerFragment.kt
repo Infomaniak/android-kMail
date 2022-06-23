@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -48,7 +49,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
-class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragment() {
+class MenuDrawerFragment(
+    private val closeDrawer: (() -> Unit)? = null,
+    private val isDrawerOpen: (() -> Boolean)? = null,
+) : Fragment() {
 
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
     private val threadListViewModel: ThreadListViewModel by activityViewModels()
@@ -76,6 +80,7 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
         menuDrawerViewModel.setup()
         setupAdapters()
         setupListener()
+        handleOnBackPressed()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -131,6 +136,17 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
         restoreMails.setOnClickListener {
             closeDrawer()
             // TODO: restore mails
+        }
+    }
+
+    private fun handleOnBackPressed() {
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner) {
+            if (isDrawerOpen?.invoke() == true) {
+                closeDrawer()
+            } else {
+                isEnabled = false
+                activity?.onBackPressed()
+            }
         }
     }
 
