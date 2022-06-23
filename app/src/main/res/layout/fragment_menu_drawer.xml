@@ -96,7 +96,7 @@
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"
-                    android:src="@drawable/ic_arrow_down" />
+                    android:src="@drawable/ic_chevron_down" />
 
             </LinearLayout>
 
@@ -212,7 +212,7 @@
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
-                    android:src="@drawable/ic_arrow_down" />
+                    android:src="@drawable/ic_chevron_down" />
 
             </LinearLayout>
 
