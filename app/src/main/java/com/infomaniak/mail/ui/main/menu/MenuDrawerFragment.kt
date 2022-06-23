@@ -210,6 +210,10 @@ class MenuDrawerFragment(private val closeDrawer: (() -> Unit)? = null) : Fragme
 
     private fun closeDrawer() = with(binding) {
         closeDrawer?.invoke()
+        closeDropdowns()
+    }
+
+    fun closeDropdowns() = with(binding) {
         expandedAccountSwitcher.isGone = true
         expandAccountButton.rotation = 0.0f
         customFoldersList.isGone = true

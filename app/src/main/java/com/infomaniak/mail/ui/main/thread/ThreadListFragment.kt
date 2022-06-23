@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -57,6 +58,26 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var folderNameJob: Job? = null
     private var threadsJob: Job? = null
 
+    private var menuDrawerFragment: MenuDrawerFragment? = null
+
+    private val drawerListener = object : DrawerLayout.DrawerListener {
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            // No-op
+        }
+
+        override fun onDrawerOpened(drawerView: View) {
+            // No-op
+        }
+
+        override fun onDrawerClosed(drawerView: View) {
+            menuDrawerFragment?.closeDropdowns()
+        }
+
+        override fun onDrawerStateChanged(newState: Int) {
+            // No-op
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,6 +92,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListViewModel.setup()
     }
 
+    override fun onDestroyView() {
+        binding.drawerLayout.removeDrawerListener(drawerListener)
+
+        super.onDestroyView()
+    }
+
     private fun setupOnRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
@@ -80,9 +107,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupMenuDrawer() {
+        binding.drawerLayout.addDrawerListener(drawerListener)
+
         activity?.supportFragmentManager
             ?.beginTransaction()
-            ?.add(R.id.menuDrawerFragment, MenuDrawerFragment { closeDrawer() })
+            ?.add(R.id.menuDrawerFragment, MenuDrawerFragment { closeDrawer() }.also { menuDrawerFragment = it })
             ?.commit()
     }
 
