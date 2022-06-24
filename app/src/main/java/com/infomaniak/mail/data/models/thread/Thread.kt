@@ -78,8 +78,8 @@ class Thread : RealmObject {
         return this
     }
 
-    fun updateAndSelect(isInternetAvailable: Boolean) {
-        MailApi.fetchMessagesFromApi(this, isInternetAvailable)
+    fun updateAndSelect() {
+        MailApi.fetchMessagesFromApi(this)
         select()
     }
 
