@@ -45,8 +45,8 @@ object MailApi {
         return ApiRepository.getFolders(mailbox.uuid).data
     }
 
-    fun fetchThreads(folder: Folder, mailboxUuid: String): List<Thread>? {
-        return ApiRepository.getThreads(mailboxUuid, folder.id).data?.threads?.map { it.initLocalValues() }
+    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int): List<Thread>? {
+        return ApiRepository.getThreads(mailboxUuid, folder.id, offset).data?.threads?.map { it.initLocalValues() }
     }
 
     fun fetchMessages(thread: Thread): List<Pair<Message, Boolean>> {

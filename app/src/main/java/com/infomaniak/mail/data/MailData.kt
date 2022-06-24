@@ -19,6 +19,7 @@ package com.infomaniak.mail.data
 
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.ContactsController
 import com.infomaniak.mail.data.cache.MailRealm
@@ -36,6 +37,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.types.BaseRealmObject
@@ -126,14 +128,13 @@ object MailData {
         }
     }
 
-    fun loadThreads(folder: Folder, mailbox: Mailbox) {
-        getThreadsFromRealm(folder)
-        getThreadsFromApi(folder, mailbox)
+    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int = OFFSET_FIRST_PAGE) {
+        val realmThreads = getThreadsFromRealm(folder, offset)
+        getThreadsFromApi(folder, mailbox, realmThreads, offset)
     }
 
     fun refreshThreads(folder: Folder, mailbox: Mailbox) {
-        mutableThreadsFlow.value = null
-        getThreadsFromApi(folder, mailbox)
+        getThreadsFromApi(folder, mailbox, forceRefresh = true)
     }
 
     fun loadMessages(thread: Thread) {
@@ -238,9 +239,10 @@ object MailData {
         }
     }
 
-    private fun getThreadsFromRealm(folder: Folder) {
+    private fun getThreadsFromRealm(folder: Folder, offset: Int = OFFSET_FIRST_PAGE): List<Thread> {
         val realmThreads = MailRealm.readThreads(folder)
-        mutableThreadsFlow.value = realmThreads
+        if (offset == OFFSET_FIRST_PAGE) mutableThreadsFlow.value = realmThreads
+        return realmThreads
     }
 
     private fun getMessagesFromRealm(thread: Thread) {
@@ -278,14 +280,20 @@ object MailData {
         getThreadsFromApi(selectedFolder, mailbox)
     }
 
-    private fun getThreadsFromApi(folder: Folder, mailbox: Mailbox) {
+    private fun getThreadsFromApi(
+        folder: Folder,
+        mailbox: Mailbox,
+        realmThreads: List<Thread>? = null,
+        offset: Int = OFFSET_FIRST_PAGE,
+        forceRefresh: Boolean = false,
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmThreads = mutableThreadsFlow.value
-            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid)
-            val mergedThreads = mergeThreads(realmThreads, apiThreads, folder)
+            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
+            val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
             // TODO: All StateFlows won't trigger when we refresh an empty folder, because "any instance
             // TODO: of StateFlow already behaves as if distinctUntilChanged operator is applied to it".
+            if (forceRefresh) mutableThreadsFlow.value = null
             mutableThreadsFlow.value = mergedThreads
         }
     }
@@ -309,7 +317,7 @@ object MailData {
         Log.d("API", "Contacts: Get outdated data")
         // val deletableContacts = ContactsController.getDeletableContact(apiContacts)
         val deletableContacts = realmContacts.filter { realmContact ->
-            !apiContacts.any { it.id == realmContact.id }
+            apiContacts.none { it.id == realmContact.id }
         }
 
         // Save new data
@@ -330,7 +338,7 @@ object MailData {
         Log.d("API", "Mailboxes: Get outdated data")
         // val deletableMailboxes = MailboxInfoController.getDeletableMailboxes(apiMailboxes)
         val deletableMailboxes = realmMailboxes?.filter { realmMailbox ->
-            !apiMailboxes.any { apiMailbox -> apiMailbox.mailboxId == realmMailbox.mailboxId }
+            apiMailboxes.none { apiMailbox -> apiMailbox.mailboxId == realmMailbox.mailboxId }
         } ?: emptyList()
 
         // Save new data
@@ -362,7 +370,7 @@ object MailData {
         Log.d("API", "Folders: Get outdated data")
         // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
         val deletableFolders = realmFolders?.filter { realmFolder ->
-            !apiFolders.any { apiFolder -> apiFolder.id == realmFolder.id }
+            apiFolders.none { apiFolder -> apiFolder.id == realmFolder.id }
         } ?: emptyList()
         val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
         val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
@@ -392,48 +400,71 @@ object MailData {
         return apiFolders
     }
 
-    private fun mergeThreads(realmThreads: List<Thread>?, apiThreads: List<Thread>?, folder: Folder): List<Thread> {
-        if (apiThreads == null) return realmThreads ?: emptyList()
+    private fun mergeThreads(
+        realmThreads: List<Thread>?,
+        apiThreadsSinceOffset: List<Thread>?,
+        folder: Folder,
+        offset: Int,
+    ): List<Thread> {
+        if (apiThreadsSinceOffset == null) return realmThreads ?: emptyList()
+
+        val apiThreads = if (offset == OFFSET_FIRST_PAGE) {
+            apiThreadsSinceOffset
+        } else {
+            MailRealm.mailboxContent.writeBlocking {
+                (realmThreads ?: emptyList())
+                    .plus(apiThreadsSinceOffset)
+                    .distinctBy { it.uid }
+                    .map { if (it.isManaged()) findLatest(it) ?: it else it }
+            }
+        }
 
         // Get outdated data
         Log.d("API", "Threads: Get outdated data")
         // val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
-        val deletableThreads = realmThreads?.filter { fromRealm ->
-            !apiThreads.any { fromApi -> fromApi.uid == fromRealm.uid }
-        } ?: emptyList()
+        val deletableThreads = if (offset == OFFSET_FIRST_PAGE) {
+            realmThreads?.filter { realmThread ->
+                apiThreads.none { apiThread -> apiThread.uid == realmThread.uid }
+            } ?: emptyList()
+        } else {
+            emptyList()
+        }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
 
         // Save new data
         Log.d("API", "Threads: Save new data")
-        MailRealm.mailboxContent.writeBlocking {
-            apiThreads.forEach { apiThread ->
-                val realmThread = realmThreads?.find { it.uid == apiThread.uid }
-                val mergedThread = if (realmThread == null) {
-                    apiThread
-                } else {
-                    apiThread.apply {
-                        messages.forEach { apiMessage ->
-                            realmThread.messages.find { it.uid == apiMessage.uid }
-                                ?.let { getLatestMessage(it.uid) }
-                                ?.let { realmMessage ->
-                                    apiMessage.apply {
-                                        fullyDownloaded = realmMessage.fullyDownloaded
-                                        body = realmMessage.body
-                                        attachmentsResource = realmMessage.attachmentsResource
-                                        attachments.setRealmListValues(realmMessage.attachments)
+        val takeLast = apiThreads.size - offset
+        if (takeLast > 0) {
+            MailRealm.mailboxContent.writeBlocking {
+                apiThreads.takeLast(takeLast).forEach { apiThread ->
+                    val realmThread = realmThreads?.find { it.uid == apiThread.uid }
+                    val mergedThread = if (realmThread == null) {
+                        apiThread
+                    } else {
+                        apiThread.apply {
+                            messages.forEach { apiMessage ->
+                                realmThread.messages.find { it.uid == apiMessage.uid }
+                                    ?.let { getLatestMessage(it.uid) }
+                                    ?.let { realmMessage ->
+                                        apiMessage.apply {
+                                            fullyDownloaded = realmMessage.fullyDownloaded
+                                            body = realmMessage.body
+                                            attachmentsResource = realmMessage.attachmentsResource
+                                            attachments.setRealmListValues(realmMessage.attachments)
+                                        }
+                                        copyToRealm(apiMessage, UpdatePolicy.ALL)
                                     }
-                                    copyToRealm(apiMessage, UpdatePolicy.ALL)
-                                }
+                            }
                         }
                     }
+
+                    copyToRealm(mergedThread, UpdatePolicy.ALL)
                 }
 
-                copyToRealm(mergedThread, UpdatePolicy.ALL)
+                val liveFolder = getLatestFolder(folder.id) ?: folder
+                liveFolder.threads = apiThreads.toRealmList()
+                copyToRealm(liveFolder, UpdatePolicy.ALL)
             }
-
-            val liveFolder = getLatestFolder(folder.id) ?: folder
-            liveFolder.threads = apiThreads.toRealmList()
-            copyToRealm(liveFolder, UpdatePolicy.ALL)
         }
 
         // Delete outdated data
@@ -441,7 +472,7 @@ object MailData {
         MailboxContentController.deleteMessages(deletableMessages)
         MailboxContentController.deleteThreads(deletableThreads)
 
-        return apiThreads
+        return MailboxContentController.getFolderThreads(folder.id)
     }
 
     private fun mergeMessages(realmMessages: List<Message>?, apiMessages: List<Pair<Message, Boolean>>): List<Message> {
@@ -450,7 +481,7 @@ object MailData {
         Log.d("API", "Messages: Get outdated data")
         // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
         val deletableMessages = realmMessages?.filter { realmMessage ->
-            !apiMessages.any { (apiMessage, _) -> apiMessage.uid == realmMessage.uid }
+            apiMessages.none { (apiMessage, _) -> apiMessage.uid == realmMessage.uid }
         } ?: emptyList()
 
         // Save new data
