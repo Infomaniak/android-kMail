@@ -142,9 +142,11 @@ class ThreadListFragment : Fragment() {
 
         jobFolderName = with(threadListViewModel) {
             viewModelScope.launch(Dispatchers.Main) {
-                MailRealm.currentFolderIdFlow.filterNotNull().collect {
-                    MailboxContentController.getFolder(it)?.let { folder ->
-                        binding.mailboxName.text = folder.getLocalizedName(requireContext())
+                MailRealm.currentFolderIdFlow.filterNotNull().collect { folderId ->
+                    context?.let {
+                        MailboxContentController.getFolder(folderId)?.let { folder ->
+                            binding.mailboxName.text = folder.getLocalizedName(it)
+                        }
                     }
                 }
             }
@@ -171,9 +173,11 @@ class ThreadListFragment : Fragment() {
             displayThreadList()
         }
 
-        with(threadListAdapter) {
-            val newList = formatList(threads, requireContext())
-            notifyAdapter(newList)
+        context?.let {
+            with(threadListAdapter) {
+                val newList = formatList(threads, it)
+                notifyAdapter(newList)
+            }
         }
     }
 

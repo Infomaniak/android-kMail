@@ -45,8 +45,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:context=".ui.main.thread.ThreadFragment">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/expeditor"
@@ -55,9 +54,10 @@
                 android:ellipsize="end"
                 android:maxWidth="235dp"
                 android:maxLines="1"
-                android:text="expeditor name looooooooooooooooooooooooooooooong"
+                android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Expeditor name" />
 
             <ImageView
                 android:id="@+id/iconCalendar"
@@ -90,7 +90,6 @@
                 android:gravity="end"
                 android:maxWidth="50dp"
                 android:maxLines="1"
-                android:text=""
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="31 jan 2000" />
@@ -103,9 +102,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text=""
-            tools:text="default subject" />
-
+            android:textSize="16sp"
+            tools:text="Subject" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -117,7 +115,8 @@
                 android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="TODO short body when api returns it"
+                android:text="Display the short body when the API returns it"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconFavorite"
                 app:layout_constraintStart_toStartOf="parent" />
