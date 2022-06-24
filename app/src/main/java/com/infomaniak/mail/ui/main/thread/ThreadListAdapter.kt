@@ -218,7 +218,8 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 else -> { // Both are Threads
                     if ((oldItem as Thread).uid == (newItem as Thread).uid) { // Same items
                         oldItem.subject == newItem.subject &&
-                                oldItem.messagesCount == newItem.messagesCount
+                                oldItem.messagesCount == newItem.messagesCount &&
+                                oldItem.unseenMessagesCount == newItem.unseenMessagesCount
                         // TODO: Add other fields checks
                     } else { // Not same items
                         false

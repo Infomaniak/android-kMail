@@ -57,9 +57,6 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUi()
-
-        displayMessagesFromRealm()
-        displayMessagesFromApi()
     }
 
     private fun setupUi() {
@@ -72,6 +69,18 @@ class ThreadFragment : Fragment() {
                 messagesList.addItemDecoration(DividerItemDecorator(it))
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        displayMessagesFromRealm()
+        displayMessagesFromApi()
+    }
+
+    override fun onPause() {
+        jobMessagesFromApi?.cancel()
+        super.onPause()
     }
 
     private fun displayMessagesFromRealm() {
