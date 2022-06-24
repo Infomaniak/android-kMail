@@ -79,11 +79,11 @@ object ApiRepository : ApiRepositoryCore() {
     fun getQuotas(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<Quotas> =
         callApi(ApiRoutes.quotas(mailboxMailbox, mailboxHostingId), GET)
 
-    // fun markAsSeen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
-    //     callApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
+     fun markMessagesAsSeen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
+         callApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
 
-    // fun markAsUnseen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
-    //     callApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
+     fun markMessagesAsUnseen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
+         callApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
 
     // fun markAsSafe(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> =
     //     callApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))

@@ -95,6 +95,9 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
     }
 
+    fun getLatestMessage(uid: String): Message? =
+        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid) }
+
     private fun MutableRealm.getLatestMessage(uid: String): Message? =
         getMessage(uid)?.let(::findLatest)
 
