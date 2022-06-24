@@ -17,15 +17,11 @@
  */
 package com.infomaniak.mail.data.models
 
-import android.util.Log
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.utils.AccountUtils
-import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
-import io.realm.toRealmList
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -91,48 +87,4 @@ class Mailbox : RealmObject {
     }
 
     fun readFoldersFromRealm(): List<Folder> = MailboxContentController.getFolders()
-
-    fun fetchFoldersFromApi(isInternetAvailable: Boolean): List<Folder> {
-
-        // Get current data
-        Log.d("API", "Folders: Get current data")
-        val foldersFromRealm = MailboxContentController.getFolders()
-        val foldersFromApi = ApiRepository.getFolders(uuid).data ?: emptyList()
-
-        // Get outdated data
-        Log.d("API", "Folders: Get outdated data")
-        val deletableFolders = if (isInternetAvailable) {
-            foldersFromRealm.filter { fromRealm ->
-                !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
-            }
-        } else {
-            emptyList()
-        }
-        val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
-        val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
-            deletableFolders.any { folder -> folder.id == message.folderId }
-        }
-        val deletableThreads = possiblyDeletableThreads.filter { thread ->
-            thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
-        }
-
-        // Save new data
-        Log.i("API", "Folders: Save new data")
-        MailRealm.mailboxContent.writeBlocking {
-            foldersFromApi.forEach { folderFromApi ->
-                val folder = copyToRealm(folderFromApi, UpdatePolicy.ALL)
-                foldersFromRealm.find { it.id == folderFromApi.id }?.threads
-                    ?.mapNotNull(::findLatest)
-                    ?.let { folder.threads = it.toRealmList() }
-            }
-        }
-
-        // Delete outdated data
-        Log.e("API", "Folders: Delete outdated data")
-        deletableMessages.forEach { MailboxContentController.deleteMessage(it.uid) }
-        deletableThreads.forEach { MailboxContentController.deleteThread(it.uid) }
-        deletableFolders.forEach { MailboxContentController.deleteFolder(it.id) }
-
-        return foldersFromApi
-    }
 }

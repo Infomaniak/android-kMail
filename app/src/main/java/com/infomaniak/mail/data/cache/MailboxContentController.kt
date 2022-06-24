@@ -30,14 +30,11 @@ object MailboxContentController {
     /**
      * Folders
      */
-    fun getFolders(): RealmResults<Folder> =
-        MailRealm.mailboxContent.query<Folder>().find()
+    fun getFolders(): RealmResults<Folder> = MailRealm.mailboxContent.query<Folder>().find()
 
-    fun getFolder(id: String): Folder? =
-        MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
+    fun getFolder(id: String): Folder? = MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
 
-    fun upsertFolder(folder: Folder): Folder =
-        MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
+    fun upsertFolder(folder: Folder): Folder = MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
 
     // fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
     //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
@@ -47,20 +44,18 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
     }
 
-    private fun MutableRealm.getLatestFolder(id: String): Folder? =
-        getFolder(id)?.let(::findLatest)
+    private fun MutableRealm.getLatestFolder(id: String): Folder? = getFolder(id)?.let(::findLatest)
 
     /**
      * Threads
      */
-    fun getFolderThreads(folderId: String): List<Thread> =
-        MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
+    fun getFolderThreads(folderId: String): List<Thread> {
+        return MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
+    }
 
-    fun getThread(uid: String): Thread? =
-        MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
+    fun getThread(uid: String): Thread? = MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
 
-    fun getLatestThread(uid: String): Thread? =
-        MailRealm.mailboxContent.writeBlocking { getLatestThread(uid) }
+    fun getLatestThread(uid: String): Thread? = MailRealm.mailboxContent.writeBlocking { getLatestThread(uid) }
 
     fun upsertThread(thread: Thread) {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
@@ -78,14 +73,14 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(::delete) }
     }
 
-    private fun MutableRealm.getLatestThread(uid: String): Thread? =
-        getThread(uid)?.let(::findLatest)
+    private fun MutableRealm.getLatestThread(uid: String): Thread? = getThread(uid)?.let(::findLatest)
 
     /**
      * Messages
      */
-    fun upsertMessage(message: Message): Message =
-        MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
+    fun upsertMessage(message: Message): Message {
+        return MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
+    }
 
     // fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
     //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
@@ -95,29 +90,24 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
     }
 
-    fun getLatestMessage(uid: String): Message? =
-        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid) }
+    fun getLatestMessage(uid: String): Message? = MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid) }
 
-    private fun MutableRealm.getLatestMessage(uid: String): Message? =
-        getMessage(uid)?.let(::findLatest)
+    private fun MutableRealm.getLatestMessage(uid: String): Message? = getMessage(uid)?.let(::findLatest)
 
-    private fun getMessage(uid: String): Message? =
-        MailRealm.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first().find()
+    private fun getMessage(uid: String): Message? {
+        return MailRealm.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first().find()
+    }
 
     /**
      * Recipients
      */
-//    private fun getRecipients(): RealmResults<Recipient> =
-//        MailRealm.mailboxContent.query<Recipient>().find()
+//    private fun getRecipients(): RealmResults<Recipient> = MailRealm.mailboxContent.query<Recipient>().find()
 
-//    private fun getRecipientsByEmail(email: String): RealmResults<Recipient> =
-//        MailRealm.mailboxContent.query<Recipient>("${Recipient::email.name} == '$email'").find()
+//    private fun getRecipientsByEmail(email: String): RealmResults<Recipient> = MailRealm.mailboxContent.query<Recipient>("${Recipient::email.name} == '$email'").find()
 
-//    private fun getRecipientByEmail(email: String): Recipient? =
-//        getRecipientsByEmail(email).firstOrNull()
+//    private fun getRecipientByEmail(email: String): Recipient? = getRecipientsByEmail(email).firstOrNull()
 
-//    private fun MutableRealm.getLatestRecipientByEmail(email: String): Recipient? =
-//        getRecipientByEmail(email)?.let(::findLatest)
+//    private fun MutableRealm.getLatestRecipientByEmail(email: String): Recipient? = getRecipientByEmail(email)?.let(::findLatest)
 
 //    fun upsertRecipient(recipient: Recipient) {
 //        MailRealm.mailboxContent.writeBlocking {

@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
+import io.sentry.protocol.User as SentryUser
 
 object AccountUtils : CredentialManager {
 
@@ -53,14 +54,14 @@ object AccountUtils : CredentialManager {
     fun init(context: Context) {
         userDatabase = UserDatabase.getDatabase(context)
 
-        Sentry.setUser(io.sentry.protocol.User().apply { id = currentUserId.toString() })
+        Sentry.setUser(SentryUser().apply { id = currentUserId.toString() })
     }
 
     var currentUser: User? = null
         set(user) {
             field = user
             currentUserId = user?.id ?: DEFAULT_ID
-            Sentry.setUser(io.sentry.protocol.User().apply {
+            Sentry.setUser(SentryUser().apply {
                 id = currentUserId.toString()
                 email = user?.email
             })

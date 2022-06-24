@@ -33,10 +33,6 @@ import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
-    private companion object {
-        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
-    }
-
     val threadsFromApi = MutableStateFlow<List<Thread>?>(null)
 
     fun getDataFromRealmThenFetchFromApi(isInternetAvailable: Boolean): List<Thread> {
@@ -70,14 +66,14 @@ class ThreadListViewModel : ViewModel() {
             val mailboxes = MailApi.fetchMailboxesFromApi(isInternetAvailable)
             return with(mailboxes) {
                 find { it.mailboxId == AccountUtils.currentMailboxId }
-                // ?: find { it.email == "kevin.boulongne@ik.me" }
-                    ?: find { it.email == "kevin.boulongne@infomaniak.com" }
+                // ?: find { it.email == "kevin.boulongne@ik.me" } // TODO: Remove this, it's for dev only
+                    ?: find { it.email == "kevin.boulongne@infomaniak.com" } // TODO: Remove this, it's for dev only
                     ?: firstOrNull()
             }
         }
 
         fun fetchFolder(mailbox: Mailbox, folderRole: FolderRole): Folder? =
-            mailbox.fetchFoldersFromApi(isInternetAvailable).find { it.getRole() == folderRole }
+            MailApi.fetchFoldersFromApi(mailbox.uuid, isInternetAvailable).find { it.getRole() == folderRole }
 
         viewModelScope.launch(Dispatchers.IO) {
             Log.e("API", "Start fetching data")
@@ -88,5 +84,9 @@ class ThreadListViewModel : ViewModel() {
             Log.e("API", "End of fetching data")
             threadsFromApi.value = folder.threads
         }
+    }
+
+    private companion object {
+        val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
     }
 }
