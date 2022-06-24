@@ -319,7 +319,7 @@
             android:focusable="false"
             android:lines="1"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="@id/subjectTextField"
+            app:layout_constraintTop_toTopOf="@id/subjectTextField"
             app:layout_constraintStart_toStartOf="parent" />
 
 

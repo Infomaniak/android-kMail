@@ -24,9 +24,5 @@
     android:textColor="@color/title"
     app:chipBackgroundColor="@color/backgroundChipColor"
     app:chipCornerRadius="100dp"
-    app:closeIcon="@drawable/ic_round_cancel"
-    app:closeIconEndPadding="@dimen/marginStandardVerySmall"
-    app:closeIconTint="@color/primaryText"
-    app:closeIconVisible="true"
     app:iconStartPadding="@dimen/marginStandardVerySmall"
     tools:text="@tools:sample/full_names" />
