@@ -130,11 +130,11 @@ class MenuDrawerFragment(
         }
         importMails.setOnClickListener {
             closeDrawer()
-            // TODO: import mails
+            // TODO: Import mails
         }
         restoreMails.setOnClickListener {
             closeDrawer()
-            // TODO: restore mails
+            // TODO: Restore mails
         }
     }
 

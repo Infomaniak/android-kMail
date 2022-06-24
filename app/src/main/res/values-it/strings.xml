@@ -82,6 +82,7 @@
     <string name="contentDescriptionIconFavorite"></string>
     <string name="contentDescriptionIconNewMail"></string>
     <string name="contentDescriptionIconStorage"></string>
+    <string name="contentDescriptionUserAvatar"></string>
     <string name="dateTitle"></string>
     <string name="draftFolder"></string>
     <string name="emailSentSnackbar"></string>

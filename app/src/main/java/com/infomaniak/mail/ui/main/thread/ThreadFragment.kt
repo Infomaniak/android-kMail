@@ -90,7 +90,6 @@ class ThreadFragment : Fragment() {
                     message.setDraftId(draft?.uuid)
                     // TODO: Open the draft in draft editor
                 }
-
             }
             onDeleteDraftClicked = { message ->
                 // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
@@ -131,12 +130,12 @@ class ThreadFragment : Fragment() {
     private fun displayMessages(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
 
-        messages.forEach {
-            with(it.body?.value) {
-                this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
-            }
-            Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")
-        }
+        // messages.forEach {
+        //     val displayedBody = with(it.body?.value) {
+        //         this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
+        //     }
+        //     Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")// | $displayedBody")
+        // }
 
         threadAdapter.notifyAdapter(messages.toMutableList())
         binding.messagesList.scrollToPosition(threadAdapter.itemCount - 1)

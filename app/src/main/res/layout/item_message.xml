@@ -68,7 +68,7 @@
                 android:maxLines="1"
                 app:layout_constraintStart_toEndOf="@id/userAvatar"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Steph Guyazfazfagaegaegagazgaegaegaeg" />
+                tools:text="@tools:sample/full_names" />
 
             <TextView
                 android:id="@+id/expeditorEmail"
@@ -184,7 +184,7 @@
         app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton"
         tools:visibility="visible" />
 
-    <!-- TODO see with UI/UX if we really handle attachments preview -->
+    <!-- TODO: See with UI/UX if we really handle attachments preview -->
     <HorizontalScrollView
         android:id="@+id/attachmentsScrollView"
         android:layout_width="match_parent"

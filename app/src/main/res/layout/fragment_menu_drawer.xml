@@ -89,7 +89,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    tools:text="Myriam.rais@infomaniak.com" />
+                    tools:text="myriam.rais@infomaniak.com" />
 
                 <ImageView
                     android:id="@+id/expandAccountButton"

@@ -62,9 +62,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupNavController() {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment)
             .navController
-            .addOnDestinationChangedListener { _, destination, _ ->
-                onDestinationChanged(destination)
-            }
+            .addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
     }
 
     private fun onDestinationChanged(destination: NavDestination) {
@@ -74,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             level = SentryLevel.INFO
         })
 
-        // TODO Matomo
+        // TODO: Matomo
         // with(destination) {
         //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
         // }
