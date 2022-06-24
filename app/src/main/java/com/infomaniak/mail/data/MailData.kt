@@ -189,8 +189,6 @@ object MailData {
     private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox? {
         val mailbox = with(mailboxes) {
             find { it.mailboxId == AccountUtils.currentMailboxId }
-            // ?: find { it.email == "kevin.boulongne@ik.me" } // TODO: Remove this, it's for dev only
-                ?: find { it.email == "kevin.boulongne@infomaniak.com" } // TODO: Remove this, it's for dev only
                 ?: firstOrNull()
                 ?: return null
         }
@@ -291,8 +289,6 @@ object MailData {
             val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
-            // TODO: All StateFlows won't trigger when we refresh an empty folder, because "any instance
-            // TODO: of StateFlow already behaves as if distinctUntilChanged operator is applied to it".
             if (forceRefresh) mutableThreadsFlow.value = null
             mutableThreadsFlow.value = mergedThreads
         }

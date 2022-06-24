@@ -82,6 +82,7 @@
     <string name="contentDescriptionIconFavorite">Est favori</string>
     <string name="contentDescriptionIconNewMail">Nouveau</string>
     <string name="contentDescriptionIconStorage">État du stockage</string>
+    <string name="contentDescriptionUserAvatar">Avatar de l’utilisateur</string>
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="emailSentSnackbar">Email envoyé</string>

@@ -195,7 +195,7 @@ class ThreadAdapter(
             }
 
             attachmentsDownloadAllButton.setOnClickListener {
-                // TODO attachmentList Fragment
+                // TODO: AttachmentsList Fragment
             }
         }
     }
@@ -226,7 +226,7 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.displayBody(body: Body?) {
-        // TODO make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
+        // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
 

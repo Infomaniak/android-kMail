@@ -64,7 +64,7 @@ object MailApi {
                         @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
                         attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
                     }
-                    // TODO: uncomment this when managing draft folder
+                    // TODO: Uncomment this when managing Drafts folder
                     // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
                     //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
                     //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
