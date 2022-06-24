@@ -1,0 +1,55 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="151dp"
+    android:height="155dp"
+    android:viewportWidth="151"
+    android:viewportHeight="155">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M11.17,66C-24,107.5 47.83,155.5 76,118C96.25,91.04 63.21,77.92 39.5,95.5C11.17,116.5 33.5,183 85,139"
+        android:strokeWidth="2"
+        android:strokeColor="#0098FF" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M28.67,40L22.67,62L14.54,54.76L22.34,46.53L11.88,53.75L4.67,52L28.67,40ZM13.67,56.67V64L16.93,59.57L13.67,56.67Z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M84,10.07L97.59,23.53L100.46,14.86L91.33,12.15L101.96,13.02L106.47,8.72L84,10.07ZM101.89,15.88L104.96,21.21L100.74,19.36L101.89,15.88Z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M95.67,66L107.67,110L123.93,95.52L108.32,79.05L129.24,93.51L143.67,90L95.67,66ZM125.67,99.34V114L119.15,105.14L125.67,99.34Z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M74.67,44h1v7h-1z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M78.67,47l-0,1l-7,0l-0,-1z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M96.67,126h1v7h-1z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M100.67,129l-0,1l-7,0l-0,-1z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M146.67,57h1v7h-1z" />
+    <path
+        android:fillColor="#0098FF"
+        android:pathData="M150.67,60l-0,1l-7,0l-0,-1z" />
+</vector>
