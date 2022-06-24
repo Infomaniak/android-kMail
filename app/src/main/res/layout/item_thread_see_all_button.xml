@@ -17,17 +17,14 @@
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <com.infomaniak.lib.core.views.LoaderTextView
         android:id="@+id/seeAllText"
+        style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
-        android:layout_marginStart="@dimen/marginStandard"
-        android:minWidth="120dp"
-        app:loader_corner="12dp"
-        tools:text="@string/See_all" />
+        android:text="@string/buttonSeeAll"
+        app:loader_corner="12dp" />
 </LinearLayout>

@@ -17,7 +17,7 @@
   -->
 <resources>
 
-    <!-- Background -->
+    <!-- Backgrounds -->
     <color name="backgroundCardSelectedColor">#333333</color>
     <color name="backgroundChipColor">@color/primaryTextColor</color>
     <color name="backgroundColor">#1A1A1A</color>
@@ -25,16 +25,16 @@
     <color name="backgroundNotificationColor">@color/black</color>
     <color name="backgroundSnackbarColor">@color/black</color>
 
-    <!-- Text -->
+    <!-- Texts -->
     <color name="secondaryTextColor">@color/secondaryText</color>
     <color name="snackbarTextColor">#F5F5F5</color>
     <color name="sectionHeaderTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/grey_text</color>
 
-    <!-- Drawable -->
+    <!-- Drawables -->
     <color name="separatorColor">#333333</color>
 
-    <!-- Icon -->
+    <!-- Icons -->
     <color name="chevronColor">#FAFAFA</color>
     <color name="iconColor">#FAFAFA</color>
     <color name="iconToolbarButton">#FAFAFA</color>
