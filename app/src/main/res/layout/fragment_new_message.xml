@@ -45,6 +45,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/marginStandardMedium"
+            android:clickable="false"
+            android:focusable="false"
             android:gravity="center_vertical"
             app:layout_constraintBottom_toBottomOf="@id/fromPrefix"
             app:layout_constraintEnd_toEndOf="parent"
@@ -89,7 +91,7 @@
             app:layout_constraintBottom_toTopOf="@id/toAutocompleteInput"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider1"/>
+            app:layout_constraintTop_toBottomOf="@id/divider1" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/singleChipGroup"
@@ -202,7 +204,7 @@
             app:layout_constraintBottom_toTopOf="@id/ccAutocompleteInput"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider2"/>
+            app:layout_constraintTop_toBottomOf="@id/divider2" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/ccAutocompleteInput"
@@ -256,7 +258,7 @@
             app:layout_constraintBottom_toTopOf="@id/bccAutocompleteInput"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider3"/>
+            app:layout_constraintTop_toBottomOf="@id/divider3" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/bccAutocompleteInput"
@@ -319,8 +321,8 @@
             android:focusable="false"
             android:lines="1"
             android:visibility="invisible"
-            app:layout_constraintTop_toTopOf="@id/subjectTextField"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/subjectTextField" />
 
 
         <com.google.android.material.divider.MaterialDivider

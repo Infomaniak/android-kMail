@@ -21,9 +21,7 @@ import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import androidx.annotation.StringRes
@@ -95,32 +93,49 @@ class NewMessageFragment : Fragment() {
         return root
     }
 
+    private fun FragmentNewMessageBinding.setupFromField() {
+        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
+        if (mails.count() > 1) {
+            fromMailAddress.setOnClickListener(::chooseFromAddress)
+            fromMailAddress.apply {
+                isClickable = true
+                isFocusable = true
+            }
+        }
+    }
+
     private fun FragmentNewMessageBinding.enableAutocomplete(field: FieldType) {
         getInputView(field).let {
-//            it.doOnTextChanged { text, _, _, _ ->
-//                if (text?.isNotEmpty() == true) {
-//                    it.setText("")
-//                    openFieldFragment(field, text)
-//                }
-//            }
+            it.disableCopyPaste()
+
             it.setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
-                    it.clearFocus()
+                    runCatching { it.clearFocus() }
                     openFieldFragment(field, "")
                 }
             }
         }
     }
 
-    private fun FragmentNewMessageBinding.setupFromField() {
-        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
-        if (mails.count() > 1) fromMailAddress.setOnClickListener(::chooseFromAddress)
-        else {
-            fromMailAddress.apply {
-                isClickable = false
-                isFocusable = false
+    private fun MaterialAutoCompleteTextView.disableCopyPaste() {
+        customSelectionActionModeCallback = object : ActionMode.Callback {
+            override fun onCreateActionMode(actionMode: ActionMode?, menu: Menu?): Boolean {
+                return false
             }
+
+            override fun onPrepareActionMode(actionMode: ActionMode?, menu: Menu?): Boolean {
+                return false
+            }
+
+            override fun onActionItemClicked(actionMode: ActionMode?, item: MenuItem?): Boolean {
+                return false
+            }
+
+            override fun onDestroyActionMode(actionMode: ActionMode?) {}
         }
+
+        isLongClickable = false
+        setTextIsSelectable(false)
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
@@ -251,13 +266,6 @@ class NewMessageFragment : Fragment() {
             navOptions = null,
             navigatorExtras = extras
         )
-
-//        safeNavigate(
-//            NewMessageFragmentDirections.actionNewMessageFragmentToFieldFragment(
-//                field = fieldType,
-//                text = text.toString()
-//            )
-//        )
     }
 
     private fun FragmentNewMessageBinding.openAdvancedFields() {
