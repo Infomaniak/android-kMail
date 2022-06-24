@@ -19,6 +19,8 @@ package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +52,10 @@ class ThreadListViewModel : ViewModel() {
 
     fun loadMailData() {
         MailData.loadInboxContent()
+    }
+
+    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
+        MailData.loadThreads(folder, mailbox, offset)
     }
 
     fun refreshThreads() {

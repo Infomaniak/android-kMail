@@ -32,6 +32,9 @@ import okhttp3.OkHttpClient
 
 object ApiRepository : ApiRepositoryCore() {
 
+    const val PER_PAGE = 50
+    const val OFFSET_FIRST_PAGE = 0
+
     private inline fun <reified T> callKotlinxApi(
         url: String,
         method: ApiController.ApiMethod,
@@ -75,8 +78,8 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> {
-        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, filter?.name), GET)
+    fun getThreads(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> {
+        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name), GET)
     }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {
@@ -146,6 +149,4 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
-
-    private fun pagination(page: Int, perPage: Int = PER_PAGE) = "page=$page&per_page=$perPage"
 }

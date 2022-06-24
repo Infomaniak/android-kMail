@@ -63,8 +63,7 @@ class MenuDrawerFragment(
     private var foldersJob: Job? = null
 
     private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
-        MailData.selectMailbox(selectedMailbox)
-        MailData.loadInboxContent()
+        menuDrawerViewModel.switchToMailbox(selectedMailbox)
         closeDrawer()
     }
 
