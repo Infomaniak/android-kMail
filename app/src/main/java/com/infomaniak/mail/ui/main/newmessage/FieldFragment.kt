@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.newmessage
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,8 +25,8 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.transition.TransitionInflater
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ChipContactBinding
@@ -49,14 +48,6 @@ class FieldFragment : Fragment() {
             CC -> viewModel.cc
             BCC -> viewModel.bcc
         }
-
-        prefix.transitionName = navigationArgs.field.prefixTransition
-        autocompleteInput.transitionName = navigationArgs.field.fieldTransition
-        itemsChipGroup.transitionName = navigationArgs.field.chipsTransition
-
-        sharedElementEnterTransition = TransitionInflater
-            .from(requireContext())
-            .inflateTransition(android.R.transition.move)
     }
 
     override fun onCreateView(
@@ -70,7 +61,8 @@ class FieldFragment : Fragment() {
             requestFocus()
 
             doOnTextChanged { text, _, _, _ ->
-                if ((text?.trim()?.count() ?: 0) > 0) contactAdapter.filter.filter(text)
+                if (text?.isEmpty() == true) findNavController().popBackStack()
+                else if ((text?.trim()?.count() ?: 0) > 0) contactAdapter.filter.filter(text)
                 else contactAdapter.clear()
             }
 
@@ -104,6 +96,7 @@ class FieldFragment : Fragment() {
             autocompleteInput.setText("")
             addMail(it)
         }
+        contactAdapter.filter.filter(navigationArgs.text)
         autoCompleteRecyclerView.adapter = contactAdapter
 
         return root

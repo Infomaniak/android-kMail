@@ -36,12 +36,14 @@
         app:layout_constraintTop_toTopOf="@id/autocompleteInput" />
 
 
+    <!--    TODO : Remove this view-->
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/itemsChipGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:paddingHorizontal="@dimen/marginStandardMedium"
+        android:visibility="gone"
         app:chipSpacingVertical="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

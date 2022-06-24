@@ -24,17 +24,15 @@ import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
-import androidx.annotation.StringRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Contact
@@ -60,6 +58,7 @@ class NewMessageFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = with(binding) {
         setupFromField()
+        focusCurrentField()
         displayChips()
 
         toTransparentButton.setOnClickListener { openAdvancedFields() }
@@ -93,25 +92,30 @@ class NewMessageFragment : Fragment() {
         return root
     }
 
+    private fun focusCurrentField() {
+        val field = viewModel.selectedField
+        if (field != null) getInputView(field).requestFocus()
+    }
+
     private fun FragmentNewMessageBinding.setupFromField() {
         fromMailAddress.text = mailboxes[selectedMailboxIndex].email
         if (mails.count() > 1) {
-            fromMailAddress.setOnClickListener(::chooseFromAddress)
             fromMailAddress.apply {
+                setOnClickListener(::chooseFromAddress)
                 isClickable = true
                 isFocusable = true
             }
         }
     }
 
-    private fun FragmentNewMessageBinding.enableAutocomplete(field: FieldType) {
+    private fun enableAutocomplete(field: FieldType) {
         getInputView(field).let {
             it.disableCopyPaste()
 
-            it.setOnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    runCatching { it.clearFocus() }
-                    openFieldFragment(field, "")
+            it.doOnTextChanged { text, _, _, _ ->
+                if (text?.isNotEmpty() == true) {
+                    it.setText("")
+                    openFieldFragment(field, text)
                 }
             }
         }
@@ -247,24 +251,15 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun FragmentNewMessageBinding.openFieldFragment(fieldType: FieldType, text: CharSequence) {
-        val (prefix, field, chips) = when (fieldType) {
-            TO -> Triple(toPrefix, toAutocompleteInput, toItemsChipGroup)
-            CC -> Triple(ccPrefix, ccAutocompleteInput, ccItemsChipGroup)
-            BCC -> Triple(bccPrefix, bccAutocompleteInput, bccItemsChipGroup)
-        }
-
-        val extras = FragmentNavigatorExtras(
-            prefix to fieldType.prefixTransition,
-            field to fieldType.fieldTransition,
-            chips to fieldType.chipsTransition
-        )
+    private fun openFieldFragment(fieldType: FieldType, text: CharSequence) {
+        viewModel.areAdvancedFieldsOpened = true
+        viewModel.selectedField = fieldType
 
         safeNavigate(
-            resId = R.id.fieldFragment,
-            args = FieldFragmentArgs(field = fieldType, text = text.toString()).toBundle(),
-            navOptions = null,
-            navigatorExtras = extras
+            NewMessageFragmentDirections.actionNewMessageFragmentToFieldFragment(
+                field = fieldType,
+                text = text.toString()
+            )
         )
     }
 
@@ -285,14 +280,9 @@ class NewMessageFragment : Fragment() {
 
     fun getBody(): String = binding.bodyText.text.toString()
 
-    enum class FieldType(
-        @StringRes val displayedName: Int,
-        val prefixTransition: String,
-        val fieldTransition: String,
-        val chipsTransition: String
-    ) {
-        TO(R.string.toTitle, "toPrefixTextView", "toFieldTransition", "toChipGroup"),
-        CC(R.string.ccTitle, "ccPrefixTextView", "ccFieldTransition", "ccChipGroup"),
-        BCC(R.string.bccTitle, "bccPrefixTextView", "bccFieldTransition", "bccChipGroup");
+    enum class FieldType {
+        TO,
+        CC,
+        BCC
     }
 }
