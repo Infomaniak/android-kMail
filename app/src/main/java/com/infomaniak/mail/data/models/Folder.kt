@@ -81,11 +81,11 @@ class Folder : RealmObject {
     }
 
     enum class FolderRole(@IdRes val folderNameRes: Int, val order: Int) {
-        INBOX(R.string.InboxFolder, 1),
-        DRAFT(R.string.DraftFolder, 2),
-        SENT(R.string.SentFolder, 3),
-        SPAM(R.string.SpamFolder, 4),
-        TRASH(R.string.TrashFolder, 5),
-        ARCHIVE(R.string.ArchiveFolder, 6),
+        INBOX(R.string.inboxFolder, 1),
+        DRAFT(R.string.draftFolder, 2),
+        SENT(R.string.sentFolder, 3),
+        SPAM(R.string.spamFolder, 4),
+        TRASH(R.string.trashFolder, 5),
+        ARCHIVE(R.string.archiveFolder, 6),
     }
 }
