@@ -22,6 +22,7 @@
 
     <application
         android:name=".ApplicationMain"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/appName"
         android:roundIcon="@mipmap/ic_launcher_round"

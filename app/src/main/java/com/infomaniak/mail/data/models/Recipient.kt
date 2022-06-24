@@ -40,12 +40,7 @@ class Recipient : RealmObject {
         return this
     }
 
-    override fun equals(other: Any?): Boolean =
-        when {
-            other !is Recipient -> false
-            objectId != other.objectId -> false
-            else -> true
-        }
+    override fun equals(other: Any?): Boolean = other is Recipient && other.objectId == objectId
 
     override fun hashCode(): Int = javaClass.hashCode()
 }

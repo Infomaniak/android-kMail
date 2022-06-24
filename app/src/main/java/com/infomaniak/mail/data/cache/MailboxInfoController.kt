@@ -25,36 +25,56 @@ import io.realm.query
 
 object MailboxInfoController {
 
-    fun getMailboxes(): RealmResults<Mailbox> = MailRealm.mailboxInfo.query<Mailbox>().find()
-
-    fun upsertMailbox(mailbox: Mailbox) {
-        MailRealm.mailboxInfo.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
-    }
-
-    fun deleteMailbox(objectId: String) {
-        MailRealm.mailboxInfo.writeBlocking { getLatestMailbox(objectId)?.let(::delete) }
-    }
-
-    private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? = getMailbox(objectId)?.let(::findLatest)
-
     fun getMailbox(objectId: String): Mailbox? {
         return MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
     }
 
-//    fun selectMailboxByEmail(email: String) {
-//        currentMailbox = MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
-//        currentMailbox?.let { AccountUtils.currentMailboxId = it.mailboxId } ?: throw MailboxNotFoundException(email)
-//    }
+    private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? = getMailbox(objectId)?.let(::findLatest)
 
-//    fun getMailboxInfoByEmail(email: String): Mailbox? = MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+    fun getMailboxes(): RealmResults<Mailbox> = MailRealm.mailboxInfo.query<Mailbox>().find()
 
-//    private fun updateMailboxInfo(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-//        MailRealm.mailboxInfo.writeBlocking { getLatestMailboxInfoByObjectId(objectId)?.let(onUpdate) }
-//    }
+    // TODO: RealmKotlin doesn't fully support `IN` for now.
+    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
+    fun getDeletableMailboxes(mailboxesToKeep: List<Mailbox>): RealmResults<Mailbox> {
+        val objectIds = mailboxesToKeep.map { it.objectId }
+        val query = objectIds.joinToString(
+            prefix = "NOT (${Mailbox::objectId.name} == '",
+            separator = "' OR ${Mailbox::objectId.name} == '",
+            postfix = "')"
+        )
+        return MailRealm.mailboxInfo.query<Mailbox>(query).find()
+    }
 
-//    private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {
-//        getMailboxInfoByObjectId(mailbox.objectId)?.let { findLatest(it)?.let(::delete) }
-//    }
+    // fun upsertMailbox(mailbox: Mailbox) {
+    //     mailboxInfo.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
+    // }
 
-//    class MailboxNotFoundException(email: String) : Exception("Mailbox [$email] not found")
+    fun upsertMailboxes(mailboxes: List<Mailbox>) {
+        MailRealm.mailboxInfo.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+    }
+
+    // fun deleteMailbox(id: String) {
+    //     mailboxInfo.writeBlocking { getLatestMailbox(id)?.let(::delete) }
+    // }
+
+    fun deleteMailboxes(mailboxes: List<Mailbox>) {
+        MailRealm.mailboxInfo.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
+    }
+
+    // fun selectMailboxByEmail(email: String) {
+    //     currentMailbox = mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+    //     currentMailbox?.let { AccountUtils.currentMailboxId = it.mailboxId } ?: throw MailboxNotFoundException(email)
+    // }
+
+    // fun getMailboxInfoByEmail(email: String): Mailbox? = mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+
+    // private fun updateMailboxInfo(id: String, onUpdate: (mailbox: Mailbox) -> Unit) {
+    //     mailboxInfo.writeBlocking { getLatestMailboxInfoById(id)?.let(onUpdate) }
+    // }
+
+    // private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {
+    //     getMailboxInfoByObjectId(mailbox.mailboxId)?.let { findLatest(it)?.let(::delete) }
+    // }
+
+    // class MailboxNotFoundException(email: String) : Exception("Mailbox [$email] not found")
 }
