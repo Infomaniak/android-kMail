@@ -20,6 +20,7 @@
 
 package com.infomaniak.mail.data.models.message
 
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
@@ -126,12 +127,7 @@ class Message : RealmObject {
         return apiDraft
     }
 
-    fun getDkimStatus(): MessageDKIM? = when (dkimStatus) {
-        MessageDKIM.VALID.value -> MessageDKIM.VALID
-        MessageDKIM.NOT_VALID.value -> MessageDKIM.NOT_VALID
-        MessageDKIM.NOT_SIGNED.value -> MessageDKIM.NOT_SIGNED
-        else -> null
-    }
+    fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)
 
     enum class MessageDKIM(val value: String?) {
         VALID(null),

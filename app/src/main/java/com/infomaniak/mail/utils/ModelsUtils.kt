@@ -21,6 +21,7 @@ import android.content.Context
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpanned
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 
 object ModelsUtils {
@@ -32,12 +33,7 @@ object ModelsUtils {
         )
     }
 
-    fun getPriority(priority: String?): MessagePriority? = when (priority?.uppercase()) {
-        MessagePriority.LOW.name -> MessagePriority.LOW
-        MessagePriority.NORMAL.name -> MessagePriority.NORMAL
-        MessagePriority.HIGH.name -> MessagePriority.HIGH
-        else -> null
-    }
+    fun getPriority(priority: String?): MessagePriority? = enumValueOfOrNull<MessagePriority>(priority?.uppercase())
 
     enum class MessagePriority {
         LOW,
