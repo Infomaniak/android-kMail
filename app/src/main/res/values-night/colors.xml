@@ -19,20 +19,24 @@
 
     <!-- Background -->
     <color name="backgroundCardSelectedColor">#333333</color>
+    <color name="backgroundChipColor">@color/primaryTextColor</color>
     <color name="backgroundColor">#1A1A1A</color>
-    <color name="backgroundHeaderColor">#1A1A1A</color>
-    <color name="backgroundNotificationColor">#000000</color>
-    <color name="backgroundSnackBarColor">#000000</color>
+    <color name="backgroundHeaderColor">@color/backgroundColor</color>
+    <color name="backgroundNotificationColor">@color/black</color>
+    <color name="backgroundSnackbarColor">@color/black</color>
 
     <!-- Text -->
-    <color name="unreadColor">#FAFAFA</color>
-    <color name="snackBarTextColor">#F5F5F5</color>
-    <color name="hintTextColor">#666666</color>
+    <color name="secondaryTextColor">@color/secondaryText</color>
+    <color name="snackbarTextColor">#F5F5F5</color>
+    <color name="sectionHeaderTextColor">@color/grey_text</color>
+    <color name="hintTextColor">@color/grey_text</color>
 
     <!-- Drawable -->
     <color name="separatorColor">#333333</color>
 
     <!-- Icon -->
+    <color name="chevronColor">#FAFAFA</color>
     <color name="iconColor">#FAFAFA</color>
+    <color name="iconToolbarButton">#FAFAFA</color>
 
 </resources>

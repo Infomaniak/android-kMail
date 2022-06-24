@@ -19,17 +19,18 @@
 
     <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="android:adjustViewBounds">true</item>
-        <item name="android:colorBackground">@color/background</item>
+        <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="android:fontFamily">@font/suisseintl_regular</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:lineSpacingMultiplier">1.25</item>
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:textColor">@color/primaryText</item>
-        <item name="android:textColorHint">@color/secondaryText</item>
+        <item name="android:statusBarColor">@color/backgroundColor</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textColorHint">@color/hintTextColor</item>
         <item name="android:textColorPrimary">@color/title</item>
-        <item name="android:textColorSecondary">@color/secondaryText</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:textColorSecondary">@color/secondaryTextColor</item>
+        <item name="android:textSize">@dimen/textRegularSize</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlNormal">@color/primary</item>
@@ -37,6 +38,9 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorSecondary">@color/primary</item>
+        <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
+        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
+        <item name="snackbarTextViewStyle">@style/Widget.App.SnackbarTextView</item>
         <item name="windowActionBar">false</item><!-- TODO: Is it the right way to fix the LoginActivity crash? -->
         <item name="windowNoTitle">true</item><!-- TODO: Is it the right way to fix the LoginActivity crash? -->
     </style>
@@ -44,40 +48,24 @@
     <style name="AppTheme" parent="AppThemeBase" />
 
     <style name="AppTheme.LauncherBase">
-        <item name="android:navigationBarColor">@color/background</item>
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:navigationBarColor">@color/backgroundColor</item>
+        <item name="android:statusBarColor">@color/backgroundColor</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
 
-    <!-- Buttons -->
-    <style name="TextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/buttonBlue</item>
-        <item name="android:letterSpacing">0</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textAllCaps">false</item>
-    </style>
+    <!--AppBar-->
 
-    <style name="IconButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:insetBottom">0dp</item>
-        <item name="android:insetLeft">0dp</item>
-        <item name="android:insetRight">0dp</item>
-        <item name="android:insetTop">0dp</item>
-        <item name="android:layout_height">32dp</item>
-        <item name="android:layout_width">32dp</item>
-        <item name="cornerRadius">40dp</item>
-        <item name="iconGravity">textStart</item>
-        <item name="iconPadding">0dp</item>
-        <item name="iconSize">16dp</item>
-        <item name="iconTint">@color/iconColor</item>
-    </style>
-
-    <!-- Other -->
-    <style name="CircleImageView">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
+    <style name="AppTheme.CollapsingToolbarLayoutTheme">
+        <item name="collapsedTitleGravity">center</item>
+        <item name="collapsedTitleTextAppearance">@style/H1</item>
+        <item name="expandedTitleGravity">bottom</item>
+        <item name="expandedTitleMarginBottom">@dimen/marginStandardSmall</item>
+        <item name="expandedTitleMarginStart">@dimen/marginStandard</item>
+        <item name="expandedTitleTextAppearance">@style/H1</item>
+        <item name="maxLines">2</item>
     </style>
 
 </resources>

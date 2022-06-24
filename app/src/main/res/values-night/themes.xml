@@ -17,6 +17,8 @@
   -->
 <resources>
 
-    <style name="AppTheme" parent="AppThemeBase" />
+    <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 
 </resources>

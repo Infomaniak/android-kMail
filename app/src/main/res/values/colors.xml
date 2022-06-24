@@ -17,31 +17,45 @@
   -->
 <resources>
 
-    <color name="buttonBlue">#4295F7</color>
+    <!-- Primary colors -->
+    <color name="pink_mail">#F2357A</color>
 
-    <color name="primaryLight">#4CB7FF</color>
-    <color name="mailPinkColor">#F2357A</color>
-    <color name="warningColor">#FF8500</color>
-    <color name="destructiveActionColor">#F44336</color>
+    <!-- Context / errors -->
+    <color name="orange_warning">#FF8500</color>
+    <color name="red_destructive_action">#F44336</color>
+
+    <!-- Black/Grey/White Tones -->
+    <color name="grey_text_light">#888888</color>
+
+    <!-- Color Tones -->
+    <color name="blue_text_light">#4CB7FF</color>
 
     <!-- Background -->
     <color name="backgroundCardSelectedColor">#F5F5F5</color>
-    <color name="backgroundColor">#FFFFFF</color>
-    <color name="backgroundHeaderColor">#F4F6FD</color>
-    <color name="backgroundNotificationColor">#666666</color>
-    <color name="backgroundSnackBarColor">#FAFAFA</color>
-    <color name="previewBackground">#111C28</color>
+    <color name="backgroundChipColor">@color/background</color>
+    <color name="backgroundColor">@color/white</color>
+    <color name="backgroundHeaderColor">@color/background</color>
+    <color name="backgroundNotificationColor">@color/grey_text</color>
+    <color name="backgroundSnackbarColor">#FAFAFA</color>
 
     <!-- Text -->
     <color name="unreadColor">#333333</color>
-    <color name="snackBarTextColor">#666666</color>
-    <color name="hintTextColor">#888888</color>
+    <color name="primaryTextColor">@color/title</color>
+    <color name="secondaryTextColor">@color/grey_text</color>
+    <color name="snackbarTextColor">@color/grey_text</color>
+    <color name="hintTextColor">@color/grey_text_light</color>
+    <color name="sectionHeaderTextColor">@color/grey_text_light</color>
     <color name="notificationTextColor">#F5F5F5</color>
 
     <!-- Drawable -->
     <color name="separatorColor">#ECECEC</color>
 
     <!-- Icon -->
-    <color name="iconColor">#666666</color>
+    <color name="chevronColor">@color/grey_text</color>
+    <color name="iconColor">@color/grey_text</color>
+    <color name="iconToolbarButton">@color/primaryTextColor</color>
+
+    <!-- Button -->
+    <color name="textButtonBlueLight">@color/blue_text_light</color>
 
 </resources>

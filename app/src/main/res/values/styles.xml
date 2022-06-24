@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<resources>
+
+    <!--Text-->
+    <style name="H1">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textSize">@dimen/h1</item>
+    </style>
+
+    <style name="H2">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textSize">@dimen/h2</item>
+    </style>
+
+    <style name="H2.Secondary">
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+    </style>
+
+    <style name="H3">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+    </style>
+
+    <style name="Body" />
+
+    <style name="Body.Highlighted">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textColor">@color/infomaniak</item>
+    </style>
+
+    <style name="Body.Secondary">
+        <item name="android:textColor">@color/secondaryTextColor</item>
+    </style>
+
+    <style name="ButtonPill">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Callout">
+        <item name="android:textSize">@dimen/textHintSize</item>
+    </style>
+
+    <style name="Callout.Strong">
+        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+    </style>
+
+    <style name="Callout.Secondary">
+        <item name="android:textColor">@color/secondaryTextColor</item>
+    </style>
+
+    <style name="Callout.Tertiary">
+        <item name="android:textColor">@color/hintTextColor</item>
+    </style>
+
+    <style name="Callout.Highlighted">
+        <item name="android:textColor">@color/infomaniak</item>
+    </style>
+
+    <!--Snackbar-->
+
+    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="actionTextColorAlpha">0.8</item>
+        <item name="android:backgroundTint">@color/backgroundSnackbarColor</item>
+        <item name="android:layout_margin">@dimen/marginStandard</item>
+    </style>
+
+    <style name="Widget.App.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/textButtonBlueLight</item>
+        <item name="android:textSize">@dimen/textHintSize</item>
+    </style>
+
+    <style name="Widget.App.SnackbarTextView" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/snackbarTextColor</item>
+        <item name="android:textSize">@dimen/textHintSize</item>
+    </style>
+
+    <!--Buttons-->
+
+    <style name="TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/infomaniak</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">@dimen/textHintSize</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="IconButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_width">32dp</item>
+        <item name="cornerRadius">40dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">16dp</item>
+        <item name="iconTint">@color/iconColor</item>
+    </style>
+
+    <!--Other-->
+    <style name="CircleImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+</resources>

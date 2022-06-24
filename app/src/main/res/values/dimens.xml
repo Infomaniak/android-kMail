@@ -15,10 +15,15 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="@color/pink_mail" />
-    <size
-        android:width="8dp"
-        android:height="8dp" />
-</shape>
+<resources>
+
+    <dimen name="h1">22sp</dimen>
+    <dimen name="h2">18sp</dimen>
+    <dimen name="textRegularSize">16sp</dimen>
+    <dimen name="textHintSize">14sp</dimen>
+    <dimen name="textSmallSize">12sp</dimen>
+
+    <dimen name="itemThreadTextViewSize">235dp</dimen>
+    <dimen name="attachmentChipMaxSize">160dp</dimen>
+
+</resources>
