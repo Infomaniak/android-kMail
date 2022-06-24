@@ -17,10 +17,12 @@
  */
 package com.infomaniak.mail.data.models.addressBook
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class AddressBooksResult(
-    @SerializedName("addressbooks")
+    @SerialName("addressbooks")
     val addressBooks: ArrayList<AddressBook>,
     val default: AddressBook?,
 )

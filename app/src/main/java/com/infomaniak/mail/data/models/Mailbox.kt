@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.models
 
 import android.util.Log
-import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -27,74 +26,59 @@ import io.realm.MutableRealm.UpdatePolicy
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.toRealmList
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Mailbox : RealmObject {
     var uuid: String = ""
     var email: String = ""
-
-    @SerializedName("email_idn")
+    @SerialName("email_idn")
     var emailIdn: String = ""
     var mailbox: String = ""
-
-    @SerializedName("real_mailbox")
+    @SerialName("real_mailbox")
     var realMailbox: String = ""
-
-    @SerializedName("link_id")
+    @SerialName("link_id")
     var linkId: Int = 0
-
-    @SerializedName("mailbox_id")
+    @SerialName("mailbox_id")
     var mailboxId: Int = -1
-
-    @SerializedName("hosting_id")
+    @SerialName("hosting_id")
     var hostingId: Int = 0
-
-    @SerializedName("is_primary")
+    @SerialName("is_primary")
     var isPrimary: Boolean = false
-
-    @SerializedName("password_status")
+    @SerialName("password_status")
     var passwordStatus: String = ""
-
-    @SerializedName("is_password_valid")
+    @SerialName("is_password_valid")
     var isPasswordValid: Boolean = false
-
-    @SerializedName("is_valid")
+    @SerialName("is_valid")
     var isMailboxValid: Boolean = false
-
-    @SerializedName("is_locked")
+    @SerialName("is_locked")
     var isLocked: Boolean = false
-
-    @SerializedName("has_social_and_commercial_filtering")
+    @SerialName("has_social_and_commercial_filtering")
     var hasSocialAndCommercialFiltering: Boolean = false
-
-    @SerializedName("show_config_modal")
+    @SerialName("show_config_modal")
     var showConfigModal: Boolean = false
-
-    @SerializedName("force_reset_password")
+    @SerialName("force_reset_password")
     var forceResetPassword: Boolean = false
-
-    @SerializedName("mda_version")
+    @SerialName("mda_version")
     var mdaVersion: String = ""
-
-    @SerializedName("is_limited")
+    @SerialName("is_limited")
     var isLimited: Boolean = false
-
-    @SerializedName("is_free")
+    @SerialName("is_free")
     var isFree: Boolean = false
-
-    @SerializedName("daily_limit")
+    @SerialName("daily_limit")
     var dailyLimit: Int = 0
 
     /**
      * Local
      */
-    var userId: Int = -1
-
     @PrimaryKey
     var objectId: String = ""
+    var userId: Int = -1
 
     fun initLocalValues(): Mailbox {
+        objectId = "${AccountUtils.currentUserId}_${mailboxId}"
         userId = AccountUtils.currentUserId
-        objectId = "${mailboxId}_${AccountUtils.currentUserId}"
 
         return this
     }

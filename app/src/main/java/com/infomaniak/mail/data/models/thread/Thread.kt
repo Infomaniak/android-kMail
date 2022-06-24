@@ -15,11 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+
 package com.infomaniak.mail.data.models.thread
 
 import android.util.Log
-import com.google.gson.annotations.SerializedName
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.cache.MailboxInfoController
@@ -27,23 +31,22 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.*
 import io.realm.annotations.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
+@Serializable
 class Thread : RealmObject {
     @PrimaryKey
     var uid: String = ""
-
-    @SerializedName("messages_count")
+    @SerialName("messages_count")
     var messagesCount: Int = 0
-
-    @SerializedName("unique_messages_count")
+    @SerialName("unique_messages_count")
     var uniqueMessagesCount: Int = 0
-
-    @SerializedName("deleted_messages_count")
+    @SerialName("deleted_messages_count")
     var deletedMessagesCount: Int = 0
-
     var messages: RealmList<Message> = realmListOf()
-
-    @SerializedName("unseen_messages")
+    @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
@@ -51,14 +54,11 @@ class Thread : RealmObject {
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     var date: RealmInstant? = null
-
-    @SerializedName("has_attachments")
+    @SerialName("has_attachments")
     var hasAttachments: Boolean = false
-
-    @SerializedName("has_st_attachments")
+    @SerialName("has_st_attachments")
     var hasStAttachments: Boolean = false
-
-    @SerializedName("has_drafts")
+    @SerialName("has_drafts")
     var hasDrafts: Boolean = false
     var flagged: Boolean = false
     var answered: Boolean = false

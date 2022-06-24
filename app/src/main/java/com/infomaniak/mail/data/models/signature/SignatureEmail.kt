@@ -17,22 +17,20 @@
  */
 package com.infomaniak.mail.data.models.signature
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class SignatureEmail : RealmObject {
     var id: Int = 0
     var email: String = ""
-
-    @SerializedName("email_idn")
+    @SerialName("email_idn")
     var emailIdn: String = ""
-
-    @SerializedName("is_account")
+    @SerialName("is_account")
     var isAccount: Boolean = false
-
-    @SerializedName("is_verified")
+    @SerialName("is_verified")
     var isVerified: Boolean = false
-
-    @SerializedName("is_removable")
+    @SerialName("is_removable")
     var isRemovable: Boolean = false
 }

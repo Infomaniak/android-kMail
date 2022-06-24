@@ -17,14 +17,15 @@
  */
 package com.infomaniak.mail.data.models.user
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class UserPreferences : RealmObject {
-    @SerializedName("thread_mode")
+    @SerialName("thread_mode")
     private var threadMode: String? = null
-
-    @SerializedName("read_pos")
+    @SerialName("read_pos")
     var readPosition: String = ""
     var density: String = ""
     // TODO: Add other preferences.

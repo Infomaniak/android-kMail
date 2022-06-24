@@ -17,11 +17,12 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MoveResult(
     val moved: Int,
-
-    @SerializedName("undo_resource")
+    @SerialName("undo_resource")
     val undoResource: String,
 )

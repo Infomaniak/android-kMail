@@ -19,8 +19,10 @@ package com.infomaniak.mail.data.models
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import kotlinx.serialization.Serializable
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
+@Serializable
 class Recipient : RealmObject {
     var email: String = ""
     var name: String = ""

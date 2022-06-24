@@ -17,48 +17,38 @@
  */
 package com.infomaniak.mail.data.models
 
-import com.google.gson.annotations.SerializedName
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.realmListOf
 import io.realm.toRealmList
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Draft : RealmObject {
-
-    companion object {
-        const val OFFLINE_DRAFT_UUID_PREFIX = "offline"
-    }
-
     @PrimaryKey
     var uuid: String = ""
-
-    @SerializedName("identity_id")
+    @SerialName("identity_id")
     var identityId: String = ""
-
-    @SerializedName("in_reply_to_uid")
+    @SerialName("in_reply_to_uid")
     var inReplyToUid: String? = null
-
-    @SerializedName("forwarded_uid")
+    @SerialName("forwarded_uid")
     var forwardedUid: String? = null
     var references: String? = null
-
-    @SerializedName("in_reply_to")
+    @SerialName("in_reply_to")
     var inReplyTo: String? = null
-
-    @SerializedName("mime_type")
+    @SerialName("mime_type")
     var mimeType: String = "any/any"
     var body: String = ""
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String = ""
-
-    @SerializedName("ack_request")
+    @SerialName("ack_request")
     var ackRequest: Boolean = false
     var priority: String? = null
-
-    @SerializedName("st_uuid")
+    @SerialName("st_uuid")
     var stUuid: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
 
@@ -76,5 +66,9 @@ class Draft : RealmObject {
         to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         return this
+    }
+
+    companion object {
+        const val OFFLINE_DRAFT_UUID_PREFIX = "offline"
     }
 }

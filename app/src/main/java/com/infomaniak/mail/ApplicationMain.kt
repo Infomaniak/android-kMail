@@ -28,19 +28,14 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.cache.SettingsPreferences
-import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.LaunchActivity
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.KMailHttpClient
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
-import io.realm.RealmInstant
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -57,7 +52,6 @@ class ApplicationMain : Application() {
         if (BuildConfig.DEBUG) configureDebugMode() else configureReleaseMode()
         configureSentry()
         configureSettingsPreferences()
-        configureApiController()
         configureAccountUtils()
         configureAppReloading()
         configureInfomaniakCore()
@@ -96,19 +90,6 @@ class ApplicationMain : Application() {
 
     private fun configureSettingsPreferences() {
         SettingsPreferences.initInstance(this)
-    }
-
-    private fun configureApiController() {
-        ApiController.init(
-            arrayListOf(
-                RealmInstant::class.java to RealmInstantConverter(),
-                typeAdapterOfRealmListOf<Folder>(FolderRealmListConverter()),
-                typeAdapterOfRealmListOf<Recipient>(RecipientRealmListConverter()),
-                typeAdapterOfRealmListOf<Message>(MessageRealmListConverter()),
-                typeAdapterOfRealmListOf<Attachment>(AttachmentRealmListConverter()),
-                typeAdapterOfRealmListOf<String>(StringRealmListConverter()),
-            )
-        )
     }
 
     private fun configureAccountUtils() {
