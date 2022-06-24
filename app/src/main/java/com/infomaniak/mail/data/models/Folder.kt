@@ -62,8 +62,8 @@ class Folder : RealmObject {
     var threads: RealmList<Thread> = realmListOf()
     var parentLink: Folder? = null // TODO
 
-    fun updateAndSelect(mailboxUuid: String) {
-        fetchThreadsFromApi(mailboxUuid)
+    fun updateAndSelect(isInternetAvailable: Boolean, mailboxUuid: String) {
+        fetchThreadsFromApi(isInternetAvailable, mailboxUuid)
         select()
     }
 
@@ -71,11 +71,10 @@ class Folder : RealmObject {
         MailRealm.mutableCurrentFolderIdFlow.value = id
     }
 
-    private fun fetchThreadsFromApi(mailboxUuid: String) {
+    private fun fetchThreadsFromApi(isInternetAvailable: Boolean, mailboxUuid: String) {
         // Get current data
         Log.d("API", "Threads: Get current data")
         val threadsFromRealm = threads
-        // TODO: Handle connectivity issues. If there is no Internet, this list will be empty, so all Realm Threads will be deleted. We don't want that.
         val threadsFromApi = ApiRepository.getThreads(mailboxUuid, id).data?.threads
             ?.map { threadFromApi ->
                 threadFromApi.initLocalValues()
@@ -97,8 +96,12 @@ class Folder : RealmObject {
 
         // Get outdated data
         Log.d("API", "Threads: Get outdated data")
-        val deletableThreads = threadsFromRealm.filter { fromRealm ->
-            !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+        val deletableThreads = if (isInternetAvailable) {
+            threadsFromRealm.filter { fromRealm ->
+                !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+            }
+        } else {
+            emptyList()
         }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == id } }
 

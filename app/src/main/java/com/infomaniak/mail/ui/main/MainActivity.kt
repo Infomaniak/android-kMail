@@ -18,10 +18,13 @@
 package com.infomaniak.mail.ui.main
 
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
@@ -29,13 +32,32 @@ import io.sentry.SentryLevel
 
 class MainActivity : AppCompatActivity() {
 
+    private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        listenToNetworkStatus()
+
         val navController = setupNavController()
         navController.addOnDestinationChangedListener { _, dest, args ->
             onDestinationChanged(dest, args)
+        }
+    }
+
+    private fun listenToNetworkStatus() {
+        LiveDataNetworkStatus(this).observe(this) { isAvailable ->
+            Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
+            Sentry.addBreadcrumb(Breadcrumb().apply {
+                category = "Network"
+                message = "Internet access is available : $isAvailable"
+                level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
+            })
+            mainViewModel.isInternetAvailable.value = isAvailable
+            if (isAvailable) {
+                // lifecycleScope.launch { AccountUtils.updateCurrentUserAndDrives(this@MainActivity) } // TODO?
+            }
         }
     }
 
