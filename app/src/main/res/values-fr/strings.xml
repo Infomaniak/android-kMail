@@ -68,8 +68,8 @@
     <string name="View_logs">Consulter les logs</string>
     <string name="Write_an_email">Ecrire un email</string>
     <plurals name="attachmentQuantity">
-        <item quantity="one">%d pièce jointe (%s)</item>
-        <item quantity="other">%d pièces jointes (%s)</item>
+        <item quantity="one">%d pièce jointe</item>
+        <item quantity="other">%d pièces jointes</item>
     </plurals>
     <string name="bccTitle">Cci :</string>
     <string name="buttonAddAccount">Ajouter un compte</string>
@@ -81,6 +81,7 @@
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonRestoreEmails">Restaurer des mails</string>
     <string name="ccTitle">Cc :</string>
+    <string name="contactMe">Moi</string>
     <string name="fromTitle">De :</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerUsed">utilisés</string>
@@ -88,6 +89,7 @@
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="noEmailDescription">Composez un nouvel email en cliquant sur \"Nouveau message\" en bas à droite</string>
     <string name="noEmailTitle">Vous n‘avez pas d‘emails</string>
+    <string name="noSubject">Pas de sujet</string>
     <string name="objectTitle">Objet :</string>
     <string name="searchViewHint">Rechercher un message</string>
     <string name="threadListSectionLastWeek">La semaine dernière</string>
