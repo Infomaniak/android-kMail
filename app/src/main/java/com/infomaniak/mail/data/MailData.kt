@@ -363,8 +363,10 @@ object MailData {
         }
     }
 
-    private fun mergeFolders(realmFolders: List<Folder>?, apiFolders: List<Folder>?): List<Folder> {
-        if (apiFolders == null) return realmFolders ?: emptyList()
+    private fun mergeFolders(realmFolders: List<Folder>?, apiFoldersWithoutChildren: List<Folder>?): List<Folder> {
+        if (apiFoldersWithoutChildren == null) return realmFolders ?: emptyList()
+
+        val apiFolders = apiFoldersWithoutChildren.formatFoldersListWithAllChildren()
 
         // Get outdated data
         Log.d("API", "Folders: Get outdated data")
@@ -510,6 +512,21 @@ object MailData {
                 job?.cancel()
             }
         }
+    }
+
+    private fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
+
+        fun formatFolderWithAllChildren(parent: Folder): List<Folder> {
+            return mutableListOf<Folder>().apply {
+                add(parent)
+                parent.children.forEach { child ->
+                    child.parentLink = parent
+                    addAll(formatFolderWithAllChildren(child))
+                }
+            }
+        }
+
+        return map(::formatFolderWithAllChildren).flatten()
     }
 
     private fun <T> RealmList<T>.setRealmListValues(values: RealmList<T>) {
