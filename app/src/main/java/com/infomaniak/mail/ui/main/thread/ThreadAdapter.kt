@@ -109,11 +109,8 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
     }
 
     private fun formatAttachmentFileSize(attachments: List<Attachment>, context: Context): String {
-        val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
-            attachment.size.toLong()
-        }.reduce { acc: Long, size: Long -> acc + size }
-
-        return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
+        val totalAttachmentsFileSizeInBytes = attachments.map { it.size }.reduce { acc, size -> acc + size }
+        return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes.toLong())
     }
 
     private fun displayBody(binding: ItemMessageBinding, body: Body?) = with(binding) {

@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.models
 import com.google.gson.annotations.SerializedName
 import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 import io.realm.realmListOf
 
 class Contact : RealmObject {
@@ -35,7 +34,6 @@ class Contact : RealmObject {
     var color: String = ""
     var other: Boolean = false
 
-    @Ignore // TODO: Why is this field ignored?
     @SerializedName("contacted_times")
     private var contactedTimes: Map<String?, Int?> = mapOf()
     var emails: RealmList<String> = realmListOf()
