@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -54,11 +55,13 @@ object MailData {
 
     private val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
 
+    private val mutableAddressBooksFlow = MutableStateFlow<List<AddressBook>?>(null)
     private val mutableContactsFlow = MutableStateFlow<List<Contact>?>(null)
     private val mutableMailboxesFlow = MutableStateFlow<List<Mailbox>?>(null)
     private val mutableFoldersFlow = MutableStateFlow<List<Folder>?>(null)
     private val mutableThreadsFlow = MutableStateFlow<List<Thread>?>(null)
     private val mutableMessagesFlow = MutableStateFlow<List<Message>?>(null)
+    val addressBooksFlow = mutableAddressBooksFlow.asStateFlow()
     val contactsFlow = mutableContactsFlow.asStateFlow()
     val mailboxesFlow = mutableMailboxesFlow.asStateFlow()
     val foldersFlow = mutableFoldersFlow.asStateFlow()
@@ -87,6 +90,7 @@ object MailData {
         mutableFoldersFlow.value = null
         mutableMailboxesFlow.value = null
         mutableContactsFlow.value = null
+        mutableAddressBooksFlow.value = null
     }
 
     private fun closeCurrentFlows() {
@@ -99,9 +103,31 @@ object MailData {
     /**
      * Load Data
      */
-    fun loadContacts() {
+    fun loadAddressBooksAndContacts() {
+        loadAddressBooks() {
+            loadContacts()
+        }
+    }
+
+    private fun loadAddressBooks(completion: () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            MailRealm.readAddressBooks().collectOnce { realmAddressBooks ->
+                mutableAddressBooksFlow.value = realmAddressBooks
+
+                val apiAddressBooks = MailApi.fetchAddressBooks()
+                val mergedAddressBooks = mergeAddressBooks(realmAddressBooks, apiAddressBooks)
+
+                mutableAddressBooksFlow.value = mergedAddressBooks
+
+                completion()
+            }
+        }
+    }
+
+    private fun loadContacts() {
         CoroutineScope(Dispatchers.IO).launch {
             MailRealm.readContacts().collectOnce { realmContacts ->
+                mutableContactsFlow.value = realmContacts
 
                 val apiContacts = MailApi.fetchContacts()
                 val mergedContacts = mergeContacts(realmContacts, apiContacts)
@@ -307,11 +333,31 @@ object MailData {
     /**
      * Merge Realm & API data
      */
+    private fun mergeAddressBooks(realmAddressBooks: List<AddressBook>, apiAddressBooks: List<AddressBook>): List<AddressBook> {
+
+        // Get outdated data
+        Log.d("API", "AddressBooks: Get outdated data")
+        // val deletableAddressBooks = ContactsController.getDeletableAddressBooks(apiAddressBooks)
+        val deletableAddressBooks = realmAddressBooks.filter { realmContact ->
+            apiAddressBooks.none { it.id == realmContact.id }
+        }
+
+        // Save new data
+        Log.d("API", "AddressBooks: Save new data")
+        ContactsController.upsertAddressBooks(apiAddressBooks)
+
+        // Delete outdated data
+        Log.d("API", "AddressBooks: Delete outdated data")
+        ContactsController.deleteAddressBooks(deletableAddressBooks)
+
+        return apiAddressBooks
+    }
+
     private fun mergeContacts(realmContacts: List<Contact>, apiContacts: List<Contact>): List<Contact> {
 
         // Get outdated data
         Log.d("API", "Contacts: Get outdated data")
-        // val deletableContacts = ContactsController.getDeletableContact(apiContacts)
+        // val deletableContacts = ContactsController.getDeletableContacts(apiContacts)
         val deletableContacts = realmContacts.filter { realmContact ->
             apiContacts.none { it.id == realmContact.id }
         }

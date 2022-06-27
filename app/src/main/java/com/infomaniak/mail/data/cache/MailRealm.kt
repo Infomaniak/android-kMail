@@ -85,6 +85,8 @@ object MailRealm {
         _contacts = null
     }
 
+    fun readAddressBooks(): SharedFlow<ResultsChange<AddressBook>> = ContactsController.getAddressBooks().toSharedFlow()
+
     fun readContacts(): SharedFlow<ResultsChange<Contact>> = ContactsController.getContacts().toSharedFlow()
 
     fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
