@@ -22,7 +22,12 @@
     </style>
 
     <style name="AppTheme" parent="AppThemeBase">
-        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/backgroundColor</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="AppTheme.Login" parent="AppTheme.LoginBase">
+        <item name="android:navigationBarColor">@color/backgroundColor</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 

@@ -17,7 +17,18 @@
   -->
 <resources>
 
-    <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <!-- AppTheme -->
+
+    <style name="AppTheme.LauncherBase">
+        <item name="android:navigationBarColor">@color/backgroundColor</item>
+        <item name="android:statusBarColor">@color/backgroundColor</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
+
+    <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:adjustViewBounds">true</item>
         <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="android:fontFamily">@font/suisseintl_regular</item>
@@ -30,8 +41,9 @@
         <item name="android:textColorSecondary">@color/secondaryTextColor</item>
         <item name="android:textSize">@dimen/textRegularSize</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
-        <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="appBarLayoutStyle">@style/AppTheme.AppBarOverlay</item>
+        <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlNormal">@color/primary</item>
         <item name="colorOnSecondary">@android:color/white</item>
@@ -41,22 +53,43 @@
         <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
         <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
         <item name="snackbarTextViewStyle">@style/Widget.App.SnackbarTextView</item>
-        <item name="windowActionBar">false</item><!-- TODO: Is it the right way to fix the LoginActivity crash? -->
-        <item name="windowNoTitle">true</item><!-- TODO: Is it the right way to fix the LoginActivity crash? -->
+        <item name="toolbarStyle">@style/AppTheme.ToolbarTheme</item>
     </style>
 
     <style name="AppTheme" parent="AppThemeBase" />
 
-    <style name="AppTheme.LauncherBase">
-        <item name="android:navigationBarColor">@color/backgroundColor</item>
-        <item name="android:statusBarColor">@color/backgroundColor</item>
-        <item name="android:windowBackground">@color/backgroundColor</item>
+    <!-- Login -->
+
+    <style name="AppTheme.LoginBase" parent="AppThemeBase">
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowBackground">@color/appBar</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="appBarLayoutStyle">@style/LoginAppBarTheme</item>
     </style>
 
-    <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
+    <style name="AppTheme.Login" parent="AppTheme.LoginBase" />
 
-    <!--AppBar-->
+    <style name="WebViewTheme" parent="AppTheme.Login">
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorCloseIcon">@color/title</item>
+        <item name="colorPrimary">@color/backgroundColor</item>
+        <item name="colorPrimaryDark">@color/backgroundColor</item>
+        <item name="themeLoginToolbar">@style/LoginToolbarTheme</item>
+    </style>
+
+    <!-- AppBar -->
+
+    <style name="AppTheme.AppBarOverlayBase" parent="Widget.Design.AppBarLayout">
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="AppTheme.AppBarOverlayBase">
+        <item name="android:backgroundTint">@color/backgroundColor</item>
+    </style>
+
+    <style name="LoginAppBarTheme" parent="AppTheme.AppBarOverlayBase">
+        <item name="android:backgroundTint">@color/background</item>
+    </style>
 
     <style name="AppTheme.CollapsingToolbarLayoutTheme">
         <item name="collapsedTitleGravity">center</item>
@@ -66,6 +99,21 @@
         <item name="expandedTitleMarginStart">@dimen/marginStandard</item>
         <item name="expandedTitleTextAppearance">@style/H1</item>
         <item name="maxLines">2</item>
+    </style>
+
+    <style name="AppTheme.ToolbarTheme" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:backgroundTint">@color/backgroundColor</item>
+        <item name="contentInsetEnd">54dp</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="iconTint">@color/iconToolbarButton</item>
+        <item name="navigationContentDescription">"Back"</item>00
+        <item name="navigationIcon">@drawable/ic_chevron_left</item>
+        <item name="titleMarginTop">8dp</item>
+    </style>
+
+    <style name="LoginToolbarTheme" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/title</item>
+        <item name="android:textColorSecondary">@color/title</item>
     </style>
 
 </resources>
