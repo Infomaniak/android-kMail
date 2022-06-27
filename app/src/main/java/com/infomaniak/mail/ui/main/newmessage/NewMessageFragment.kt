@@ -24,6 +24,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
+import androidx.annotation.StringRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -33,6 +34,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Contact
@@ -280,9 +282,11 @@ class NewMessageFragment : Fragment() {
 
     fun getBody(): String = binding.bodyText.text.toString()
 
-    enum class FieldType {
-        TO,
-        CC,
-        BCC
+    enum class FieldType(
+        @StringRes val displayedName: Int,
+    ) {
+        TO(R.string.toTitle),
+        CC(R.string.ccTitle),
+        BCC(R.string.bccTitle);
     }
 }
