@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         listenToNetworkStatus()
         setupNavController()
 
-        MailData.loadContacts()
+        MailData.loadAddressBooksAndContacts()
     }
 
     private fun listenToNetworkStatus() {

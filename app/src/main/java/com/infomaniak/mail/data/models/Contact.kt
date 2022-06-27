@@ -42,6 +42,8 @@ class Contact : RealmObject {
     @SerialName("contacted_times")
     private var contactedTimes: Map<String?, Int?> = emptyMap()
     var emails: RealmList<String> = realmListOf()
+    @SerialName("addressbook_id")
+    var addressBookId: Int = 0
 
     fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
