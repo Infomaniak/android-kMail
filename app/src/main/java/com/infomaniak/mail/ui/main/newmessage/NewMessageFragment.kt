@@ -37,7 +37,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.MailboxInfoController
-import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -112,7 +111,7 @@ class NewMessageFragment : Fragment() {
 
     private fun enableAutocomplete(field: FieldType) {
         getInputView(field).let {
-            it.disableCopyPaste()
+//            it.disableCopyPaste()
 
             it.doOnTextChanged { text, _, _, _ ->
                 if (text?.isNotEmpty() == true) {
@@ -123,26 +122,26 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun MaterialAutoCompleteTextView.disableCopyPaste() {
-        customSelectionActionModeCallback = object : ActionMode.Callback {
-            override fun onCreateActionMode(actionMode: ActionMode?, menu: Menu?): Boolean {
-                return false
-            }
-
-            override fun onPrepareActionMode(actionMode: ActionMode?, menu: Menu?): Boolean {
-                return false
-            }
-
-            override fun onActionItemClicked(actionMode: ActionMode?, item: MenuItem?): Boolean {
-                return false
-            }
-
-            override fun onDestroyActionMode(actionMode: ActionMode?) {}
-        }
-
-        isLongClickable = false
-        setTextIsSelectable(false)
-    }
+//    private fun MaterialAutoCompleteTextView.disableCopyPaste() {
+//        customSelectionActionModeCallback = object : ActionMode.Callback {
+//            override fun onCreateActionMode(actionMode: ActionMode?, menu: Menu?): Boolean {
+//                return false
+//            }
+//
+//            override fun onPrepareActionMode(actionMode: ActionMode?, menu: Menu?): Boolean {
+//                return false
+//            }
+//
+//            override fun onActionItemClicked(actionMode: ActionMode?, item: MenuItem?): Boolean {
+//                return false
+//            }
+//
+//            override fun onDestroyActionMode(actionMode: ActionMode?) {}
+//        }
+//
+//        isLongClickable = false
+//        setTextIsSelectable(false)
+//    }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
 
@@ -169,7 +168,7 @@ class NewMessageFragment : Fragment() {
     }
 
     //region Chips behavior
-    private fun getContacts(field: FieldType): MutableList<Contact> =
+    private fun getContacts(field: FieldType): MutableList<UiContact> =
         when (field) {
             TO -> viewModel.recipients
             CC -> viewModel.cc
@@ -207,8 +206,8 @@ class NewMessageFragment : Fragment() {
         if (field == TO) updateSingleChipText()
     }
 
-    private fun FragmentNewMessageBinding.removeMail(field: FieldType, contact: Contact) {
-        val index = getContacts(field).indexOfFirst { it.id == contact.id }
+    private fun FragmentNewMessageBinding.removeMail(field: FieldType, contact: UiContact) {
+        val index = getContacts(field).indexOfFirst { it.email == contact.email }
         removeMail(field, index)
     }
 
@@ -225,9 +224,10 @@ class NewMessageFragment : Fragment() {
         for (contact in viewModel.bcc) createChip(BCC, contact)
     }
 
-    private fun FragmentNewMessageBinding.createChip(field: FieldType, contact: Contact) {
+    private fun FragmentNewMessageBinding.createChip(field: FieldType, contact: UiContact) {
         ChipContactBinding.inflate(layoutInflater).root.apply {
-            text = contact.name
+            val name = if (contact.name?.isBlank() == true) null else contact.name
+            text = name ?: contact.email
             setOnClickListener { removeMail(field, contact) }
             getChipView(field).addView(this)
         }

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
-import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -25,19 +24,20 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.loadAvatar
-import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.utils.isEmail
 
 class ContactAdapter(
-    private val allContacts: List<Contact> = emptyList(),
+    private val allContacts: List<UiContact> = emptyList(),
     private val field: NewMessageFragment.FieldType,
     private val toAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val ccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val bccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
-    private val onItemClick: (item: Contact) -> Unit,
+    private val onItemClick: (item: UiContact) -> Unit,
+    private val addUnrecognizedContact: () -> Boolean,
 ) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>(), Filterable {
-    private var contacts = mutableListOf<Contact>()
+    private var contacts = mutableListOf<UiContact>()
 
     init {
         setHasStableIds(true)
@@ -50,19 +50,19 @@ class ContactAdapter(
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int): Unit = with(holder.binding) {
         val contact = contacts[position]
         userName.text = contact.name
-        userEmail.text = contact.emails[0] // TODO adapt to all emails?
-        userAvatar.loadAvatar(contact.id.hashCode(), null, contact.name.firstOrEmpty().toString())
+        userEmail.text = contact.email
+        userAvatar.loadAvatar(contact.email.hashCode(), null, contact.name?.firstOrEmpty().toString())
         root.setOnClickListener { selectContact(contact) }
     }
 
     override fun getItemCount(): Int = contacts.count()
 
-    override fun getItemId(position: Int): Long = contacts[position].id.hashCode().toLong()
+    override fun getItemId(position: Int): Long = contacts[position].email.hashCode().toLong()
 
     fun addFirstAvailableItem(): Boolean {
         val contact = contacts.firstOrNull()
         return if (contact == null) {
-            false
+            addUnrecognizedContact()
         } else {
             selectContact(contact)
             true
@@ -76,19 +76,19 @@ class ContactAdapter(
 
     private fun orderItemList() = contacts.sortBy { it.name }
 
-    private fun getAlreadyUsedIds() = when (field) {
+    private fun getAlreadyUsedEmails() = when (field) {
         TO -> toAlreadyUsedContactIds
         CC -> ccAlreadyUsedContactIds
         BCC -> bccAlreadyUsedContactIds
     }
 
-    private fun selectContact(contact: Contact) {
+    private fun selectContact(contact: UiContact) {
         onItemClick(contact)
-        getAlreadyUsedIds().add(contact.id)
+        getAlreadyUsedEmails().add(contact.email)
     }
 
-    fun removeUsedContact(contact: Contact) {
-        getAlreadyUsedIds().remove(contact.id)
+    fun removeUsedContact(contact: UiContact) {
+        getAlreadyUsedEmails().remove(contact.email)
     }
 
     override fun getFilter(): Filter {
@@ -96,8 +96,10 @@ class ContactAdapter(
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val searchTerm = constraint?.standardize() ?: ""
                 val finalUserList = allContacts
-                    .filter { it.name.standardize().contains(searchTerm) || it.emails[0].standardize().contains(searchTerm) }
-                    .filterNot { displayedItem -> getAlreadyUsedIds().any { it == displayedItem.id } }
+                    .filter {
+                        it.name?.standardize()?.contains(searchTerm) == true || it.email.standardize().contains(searchTerm)
+                    }
+                    .filterNot { displayedItem -> getAlreadyUsedEmails().any { it == displayedItem.email } }
                 return FilterResults().apply {
                     values = finalUserList
                     count = finalUserList.size
@@ -107,9 +109,9 @@ class ContactAdapter(
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                 val searchTerm = constraint?.standardize()
                 contacts = if (searchTerm?.isEmail() == true && !searchTerm.existsInAvailableItems()) {
-                    arrayListOf()
+                    mutableListOf()
                 } else {
-                    results.values as ArrayList<Contact> // Normal warning
+                    results.values as MutableList<UiContact> // Normal warning
                 }
                 orderItemList()
                 notifyDataSetChanged()
@@ -119,10 +121,8 @@ class ContactAdapter(
 
     private fun CharSequence.standardize(): String = this.toString().trim().lowercase()
 
-    private fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
-
     private fun String.existsInAvailableItems(): Boolean =
-        allContacts.any { availableItem -> availableItem.emails[0].standardize() == this }
+        allContacts.any { availableItem -> availableItem.email.standardize() == this }
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 }

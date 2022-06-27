@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.app.Activity
+import android.util.Patterns
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.viewbinding.ViewBinding
@@ -84,4 +85,7 @@ fun View.toggleChevron(
     animate().rotation(angle).setDuration(duration).start()
 }
 
+fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
 inline val ViewBinding.context: Context get() = root.context
+

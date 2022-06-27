@@ -28,17 +28,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.models.Contact
-import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentFieldBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.utils.isEmail
 
 class FieldFragment : Fragment() {
 
     private val binding: FragmentFieldBinding by lazy { FragmentFieldBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by activityViewModels()
     private val navigationArgs: FieldFragmentArgs by navArgs()
-    private var contacts = mutableListOf<Contact>()
+    private var contacts = mutableListOf<UiContact>()
     private lateinit var contactAdapter: ContactAdapter
 
     override fun onCreate(savedInstanceState: Bundle?): Unit = with(binding) {
@@ -72,7 +71,7 @@ class FieldFragment : Fragment() {
             }
         }
 
-        displayChips()
+//        displayChips()
 
         //region Test contacts
 //        val cont1 = Contact().apply { name = "Gibran Chevalley"; emails = realmListOf("gibran.chevalley@infomaniak.com"); id = "22132021" }
@@ -81,45 +80,58 @@ class FieldFragment : Fragment() {
 //        val cont4 = Contact().apply { name = "Abdourahamane Boinaidi"; emails = realmListOf("abdourahamane.boinaidi@infomaniak.com"); id = "296232131" }
 //        vsl allContacts = listOf(cont1, cont2, cont3, cont4)
         //endregion
-        val allContacts = MailData.contactsFlow.value ?: emptyList()
-        val toAlreadyUsedContactIds = (viewModel.recipients.map { it.id }).toMutableList()
-        val ccAlreadyUsedContactIds = (viewModel.cc.map { it.id }).toMutableList()
-        val bccAlreadyUsedContactIds = (viewModel.bcc.map { it.id }).toMutableList()
+        val allContacts = MailData.contactsFlow.value?.map { UiContact(it.emails[0], it.name) } ?: emptyList()
+        val toAlreadyUsedContactMails = (viewModel.recipients.map { it.email }).toMutableList()
+        val ccAlreadyUsedContactMails = (viewModel.cc.map { it.email }).toMutableList()
+        val bccAlreadyUsedContactMails = (viewModel.bcc.map { it.email }).toMutableList()
 
         contactAdapter = ContactAdapter(
             allContacts,
             navigationArgs.field,
-            toAlreadyUsedContactIds,
-            ccAlreadyUsedContactIds,
-            bccAlreadyUsedContactIds
-        ) {
-            autocompleteInput.setText("")
-            addMail(it)
-        }
+            toAlreadyUsedContactMails,
+            ccAlreadyUsedContactMails,
+            bccAlreadyUsedContactMails,
+            {
+                autocompleteInput.setText("")
+                addMail(it)
+            },
+            {
+                val isEmail = addUnrecognizedMail()
+                if (isEmail) autocompleteInput.setText("")
+                isEmail
+            }
+        )
         contactAdapter.filter.filter(navigationArgs.text)
         autoCompleteRecyclerView.adapter = contactAdapter
 
         return root
     }
 
-    private fun FragmentFieldBinding.displayChips() {
-        for (recipient in contacts) createChip(recipient)
+    private fun addUnrecognizedMail(): Boolean = with(binding) {
+        val input = autocompleteInput.text.toString()
+        val isEmail = input.isEmail()
+        if (isEmail) contacts.add(UiContact(input))
+        return isEmail
     }
 
-    private fun FragmentFieldBinding.addMail(contact: Contact) {
+//    private fun FragmentFieldBinding.displayChips() {
+//        for (recipient in contacts) createChip(recipient)
+//    }
+
+    private fun addMail(contact: UiContact) {
         contacts.add(contact)
-        createChip(contact)
+//        createChip(contact)
     }
 
-    private fun FragmentFieldBinding.createChip(contact: Contact) {
-        ChipContactBinding.inflate(layoutInflater).root.apply {
-            text = contact.name
-            setOnClickListener {
-                viewModel.recipients.remove(contact)
-                contactAdapter.removeUsedContact(contact)
-                itemsChipGroup.removeView(it)
-            }
-            itemsChipGroup.addView(this)
-        }
-    }
+//    private fun FragmentFieldBinding.createChip(contact: Contact) {
+//        ChipContactBinding.inflate(layoutInflater).root.apply {
+//            text = contact.name
+//            setOnClickListener {
+//                viewModel.recipients.remove(contact)
+//                contactAdapter.removeUsedContact(contact)
+//                itemsChipGroup.removeView(it)
+//            }
+//            itemsChipGroup.addView(this)
+//        }
+//    }
 }

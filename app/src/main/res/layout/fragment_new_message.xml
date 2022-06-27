@@ -139,6 +139,7 @@
             android:layout_marginTop="@dimen/marginStandardVerySmall"
             android:backgroundTint="@android:color/transparent"
             android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/divider2"
@@ -212,6 +213,7 @@
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:backgroundTint="@android:color/transparent"
             android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
             android:transitionName="ccFieldTransition"
@@ -266,6 +268,7 @@
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:backgroundTint="@android:color/transparent"
             android:imeOptions="actionDone"
+            android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
             android:transitionName="bccFieldTransition"
@@ -353,7 +356,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:hint="@string/newMessagePlaceholderTitle"
-                android:minHeight="300dp"
+                android:minHeight="200dp"
                 android:textSize="16sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
