@@ -21,6 +21,7 @@ import android.app.Activity
 import android.util.Patterns
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month

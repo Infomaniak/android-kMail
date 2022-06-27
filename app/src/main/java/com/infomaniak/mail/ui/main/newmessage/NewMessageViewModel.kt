@@ -28,5 +28,4 @@ class NewMessageViewModel : ViewModel() {
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
-    var selectedField: NewMessageFragment.FieldType? = null
 }

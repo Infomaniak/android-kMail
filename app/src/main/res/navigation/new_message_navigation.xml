@@ -25,23 +25,5 @@
         android:id="@+id/newMessageFragment"
         android:name="com.infomaniak.mail.ui.main.newmessage.NewMessageFragment"
         android:label="fragment_new_message"
-        tools:layout="@layout/fragment_new_message">
-        <action
-            android:id="@+id/action_newMessageFragment_to_fieldFragment"
-            app:destination="@id/fieldFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/fieldFragment"
-        android:name="com.infomaniak.mail.ui.main.newmessage.FieldFragment"
-        android:label="fragment_field"
-        tools:layout="@layout/fragment_field">
-        <argument
-            android:name="field"
-            app:argType="com.infomaniak.mail.ui.main.newmessage.NewMessageFragment$FieldType" />
-        <argument
-            android:name="text"
-            android:defaultValue=''
-            app:argType="string" />
-    </fragment>
+        tools:layout="@layout/fragment_new_message" />
 </navigation>

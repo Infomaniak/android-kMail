@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -25,23 +26,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.databinding.ItemContactBinding
+import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.isEmail
 
 class ContactAdapter(
     private val allContacts: List<UiContact> = emptyList(),
-    private val field: NewMessageFragment.FieldType,
     private val toAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val ccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val bccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
-    private val onItemClick: (item: UiContact) -> Unit,
-    private val addUnrecognizedContact: () -> Boolean,
+    private val onItemClick: (item: UiContact, field: FieldType) -> Unit,
+    private val addUnrecognizedContact: (field: FieldType) -> Boolean,
 ) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>(), Filterable {
     private var contacts = mutableListOf<UiContact>()
-
-    init {
-        setHasStableIds(true)
-    }
+    private var currentField: FieldType = TO
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder(ItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -57,12 +55,11 @@ class ContactAdapter(
 
     override fun getItemCount(): Int = contacts.count()
 
-    override fun getItemId(position: Int): Long = contacts[position].email.hashCode().toLong()
-
     fun addFirstAvailableItem(): Boolean {
         val contact = contacts.firstOrNull()
         return if (contact == null) {
-            addUnrecognizedContact()
+            Log.e("gibran", "addFirstAvailableItem: unrecognized email !!!", );
+            addUnrecognizedContact(currentField)
         } else {
             selectContact(contact)
             true
@@ -76,19 +73,19 @@ class ContactAdapter(
 
     private fun orderItemList() = contacts.sortBy { it.name }
 
-    private fun getAlreadyUsedEmails() = when (field) {
+    private fun getAlreadyUsedEmails(field: FieldType) = when (field) {
         TO -> toAlreadyUsedContactIds
         CC -> ccAlreadyUsedContactIds
         BCC -> bccAlreadyUsedContactIds
     }
 
     private fun selectContact(contact: UiContact) {
-        onItemClick(contact)
-        getAlreadyUsedEmails().add(contact.email)
+        onItemClick(contact, currentField)
+        getAlreadyUsedEmails(currentField).add(contact.email)
     }
 
     fun removeUsedContact(contact: UiContact) {
-        getAlreadyUsedEmails().remove(contact.email)
+        getAlreadyUsedEmails(currentField).remove(contact.email)
     }
 
     override fun getFilter(): Filter {
@@ -99,7 +96,7 @@ class ContactAdapter(
                     .filter {
                         it.name?.standardize()?.contains(searchTerm) == true || it.email.standardize().contains(searchTerm)
                     }
-                    .filterNot { displayedItem -> getAlreadyUsedEmails().any { it == displayedItem.email } }
+                    .filterNot { displayedItem -> getAlreadyUsedEmails(currentField).any { it == displayedItem.email } }
                 return FilterResults().apply {
                     values = finalUserList
                     count = finalUserList.size
@@ -117,6 +114,15 @@ class ContactAdapter(
                 notifyDataSetChanged()
             }
         }
+    }
+
+    fun filterField(selectedField: FieldType, text: CharSequence) {
+        currentField = selectedField
+        filter.filter(text)
+    }
+
+    fun removeEmail(field: FieldType, email: String) {
+        getAlreadyUsedEmails(field).remove(email)
     }
 
     private fun CharSequence.standardize(): String = this.toString().trim().lowercase()

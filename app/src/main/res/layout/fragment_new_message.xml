@@ -73,9 +73,10 @@
             style="@style/Callout.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardMedium"
             android:text="@string/toTitle"
             app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
-            app:layout_constraintStart_toStartOf="@id/fromPrefix"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
 
 
@@ -162,9 +163,10 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/chevron"
             style="@style/IconButton"
+            android:layout_marginEnd="@dimen/marginStandardMedium"
             app:icon="@drawable/ic_chevron_down"
             app:layout_constraintBottom_toTopOf="@id/toPrefix"
-            app:layout_constraintEnd_toEndOf="@id/divider1"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toPrefix" />
 
 
@@ -185,10 +187,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:layout_marginStart="@dimen/marginStandardMedium"
             android:text="@string/ccTitle"
-            android:transitionName="ccPrefixTextView"
             app:layout_constraintBottom_toBottomOf="@id/ccAutocompleteInput"
-            app:layout_constraintStart_toStartOf="@id/fromPrefix"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/ccAutocompleteInput" />
 
         <com.google.android.material.chip.ChipGroup
@@ -197,7 +199,6 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:transitionName="ccChipGroup"
             app:chipSpacingVertical="0dp"
             app:layout_constraintBottom_toTopOf="@id/ccAutocompleteInput"
             app:layout_constraintEnd_toEndOf="parent"
@@ -216,7 +217,6 @@
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
-            android:transitionName="ccFieldTransition"
             app:layout_constraintBottom_toTopOf="@id/divider3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ccPrefix"
@@ -240,10 +240,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/marginStandardMedium"
+            android:layout_marginStart="@dimen/marginStandardMedium"
             android:text="@string/bccTitle"
-            android:transitionName="bccPrefixTextView"
             app:layout_constraintBottom_toBottomOf="@id/bccAutocompleteInput"
-            app:layout_constraintStart_toStartOf="@id/fromPrefix"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/bccAutocompleteInput" />
 
         <com.google.android.material.chip.ChipGroup
@@ -252,7 +252,6 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:paddingHorizontal="@dimen/marginStandardMedium"
-            android:transitionName="bccChipGroup"
             app:chipSpacingVertical="0dp"
             app:layout_constraintBottom_toTopOf="@id/bccAutocompleteInput"
             app:layout_constraintEnd_toEndOf="parent"
@@ -271,7 +270,6 @@
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textSize="16sp"
-            android:transitionName="bccFieldTransition"
             app:layout_constraintBottom_toTopOf="@id/divider4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/bccPrefix"
@@ -361,13 +359,64 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/autoCompleteRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bodyLayout"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_contact" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/subjectGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="subjectPrefix,subjectTextField,divider5" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/fromGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="fromPrefix,fromMailAddress,divider1" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/bccGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="bccPrefix,bccItemsChipGroup,bccAutocompleteInput,divider4" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/ccGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="ccPrefix,ccItemsChipGroup,ccAutocompleteInput,divider3" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/toGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="toItemsChipGroup,toPrefix,divider2,toAutocompleteInput" />
+
+
         <androidx.constraintlayout.widget.Group
             android:id="@+id/advancedFields"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="divider4,bccItemsChipGroup,bccAutocompleteInput,bccPrefix,divider3,ccItemsChipGroup,ccAutocompleteInput,ccPrefix"
+            app:constraint_referenced_ids="ccGroup,bccGroup"
             tools:visibility="visible" />
+
+        <!--        <androidx.constraintlayout.widget.Group-->
+        <!--            android:id="@+id/everythingButCc"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            app:constraint_referenced_ids="fromPrefix,fromMailAddress,divider1,toPrefix,toItemsChipGroup,singleChipGroup,plusOthers,toAutocompleteInput,toTransparentButton,chevron,divider2,divider3,bccPrefix,bccItemsChipGroup,bccAutocompleteInput,bodyLayout,divider5,subjectTextFieldGuide,subjectTextField,subjectPrefix,divider4" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
