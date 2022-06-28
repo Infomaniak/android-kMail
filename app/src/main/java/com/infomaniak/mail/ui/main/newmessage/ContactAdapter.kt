@@ -73,7 +73,7 @@ class ContactAdapter(
 
     private fun orderItemList() = contacts.sortBy { it.name }
 
-    private fun getAlreadyUsedEmails(field: FieldType) = when (field) {
+    fun getAlreadyUsedEmails(field: FieldType) = when (field) {
         TO -> toAlreadyUsedContactIds
         CC -> ccAlreadyUsedContactIds
         BCC -> bccAlreadyUsedContactIds

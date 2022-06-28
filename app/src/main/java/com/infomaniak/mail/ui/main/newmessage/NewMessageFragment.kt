@@ -125,7 +125,6 @@ class NewMessageFragment : Fragment() {
                 createChip(field, contact)
             },
             addUnrecognizedContact = { field ->
-                // TODO : Update AlreadyUsedContactIds in Adapter with the unrecognized email
                 val isEmail = addUnrecognizedMail(field)
                 if (isEmail) getInputView(field).setText("")
             },
@@ -147,9 +146,13 @@ class NewMessageFragment : Fragment() {
         val input = getInputView(fieldType).text.toString()
         val isEmail = input.isEmail()
         if (isEmail) {
-            val contact = UiContact(input)
-            getContacts(fieldType).add(contact)
-            createChip(fieldType, contact)
+            val alreadyUsedEmails = contactAdapter.getAlreadyUsedEmails(fieldType)
+            if (alreadyUsedEmails.none { it == input }) {
+                alreadyUsedEmails.add(input)
+                val contact = UiContact(input)
+                getContacts(fieldType).add(contact)
+                createChip(fieldType, contact)
+            }
         }
         return isEmail
     }
