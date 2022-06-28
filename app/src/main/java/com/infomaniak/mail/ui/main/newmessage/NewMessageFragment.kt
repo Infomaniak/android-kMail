@@ -109,7 +109,7 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        val allContacts = getAllContacts()
+        val allContacts = viewModel.getAllContacts()
         val toAlreadyUsedContactMails = (viewModel.recipients.map { it.email }).toMutableList()
         val ccAlreadyUsedContactMails = (viewModel.cc.map { it.email }).toMutableList()
         val bccAlreadyUsedContactMails = (viewModel.bcc.map { it.email }).toMutableList()
@@ -132,14 +132,6 @@ class NewMessageFragment : Fragment() {
         autoCompleteRecyclerView.adapter = contactAdapter
 
         return root
-    }
-
-    private fun getAllContacts(): List<UiContact> {
-        val contacts = mutableListOf<UiContact>()
-        MailData.contactsFlow.value?.forEach { contact ->
-            contact.emails.forEach { email -> contacts.add(UiContact(email, contact.name)) }
-        }
-        return contacts
     }
 
     private fun addUnrecognizedMail(fieldType: FieldType): Boolean {

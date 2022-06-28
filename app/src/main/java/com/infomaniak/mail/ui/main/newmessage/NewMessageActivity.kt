@@ -99,6 +99,9 @@ class NewMessageActivity : AppCompatActivity() {
         Log.d("sendingMail", "BODY: ${newMessageFragment.getBody()}")
 
         if (viewModel.recipients.isEmpty()) return false // Do not send mail if required fields are not filled
+
+        viewModel.sendMail()
+
         return true
     }
 

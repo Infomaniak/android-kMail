@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 
 class NewMessageViewModel : ViewModel() {
@@ -28,4 +29,16 @@ class NewMessageViewModel : ViewModel() {
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
+
+    fun getAllContacts(): List<UiContact> {
+        val contacts = mutableListOf<UiContact>()
+        MailData.contactsFlow.value?.forEach { contact ->
+            contact.emails.forEach { email -> contacts.add(UiContact(email, contact.name)) }
+        }
+        return contacts
+    }
+
+    fun sendMail() {
+
+    }
 }
