@@ -19,9 +19,6 @@
 
     <!-- Text sizes -->
 
-    <dimen name="h1">22sp</dimen>
-    <dimen name="h2">18sp</dimen>
-    <dimen name="textRegularSize">16sp</dimen>
     <dimen name="textHintSize">14sp</dimen>
     <dimen name="textSmallSize">12sp</dimen>
 
@@ -33,6 +30,7 @@
     <dimen name="noMailTextViewSize">300dp</dimen>
 
     <!-- Cardview -->
+
     <dimen name="materialCardviewRadius">33dp</dimen>
 
     <!-- Menu Drawer -->

@@ -133,7 +133,7 @@
                 android:visibility="gone"
                 app:icon="@drawable/ic_bin"
                 app:iconSize="18dp"
-                app:iconTint="@color/red_destructive_action"
+                app:iconTint="@color/redDestructiveAction"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:visibility="visible" />
@@ -190,7 +190,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbarSize="1dp"
-        android:scrollbarThumbHorizontal="@color/infomaniak"
+        android:scrollbarThumbHorizontal="@color/accent"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/webViewFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"

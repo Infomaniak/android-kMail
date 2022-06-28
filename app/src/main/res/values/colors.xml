@@ -18,37 +18,38 @@
 <resources>
 
     <!-- Primary colors -->
-    <color name="pink_mail">#F2357A</color>
+    <color name="pinkMail">#F2357A</color>
 
     <!-- Context / errors -->
-    <color name="orange_warning">#FF8500</color>
-    <color name="red_destructive_action">#F44336</color>
+    <color name="orangeWarning">#FF8500</color>
+    <color name="redDestructiveAction">#F44336</color>
 
     <!-- Black/Grey/White Tones -->
-    <color name="grey_text_light">#888888</color>
+    <color name="greyTextLight">#888888</color>
+    <color name="lightenedGrey">#FAFAFA</color>
 
     <!-- Color Tones -->
-    <color name="blue_text_light">#4CB7FF</color>
+    <color name="blueTextLight">#4CB7FF</color>
 
     <!-- Backgrounds -->
-    <color name="backgroundCardSelectedColor">#F5F5F5</color>
+    <color name="backgroundCardSelectedColor">@color/hover</color>
     <color name="backgroundChipColor">@color/background</color>
     <color name="backgroundColor">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundNotificationColor">@color/grey_text</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
-    <color name="backgroundSnackbarColor">#FAFAFA</color>
+    <color name="backgroundSnackbarColor">>@color/lightenedGrey</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/title</color>
     <color name="secondaryTextColor">@color/grey_text</color>
     <color name="snackbarTextColor">@color/grey_text</color>
-    <color name="hintTextColor">@color/grey_text_light</color>
-    <color name="sectionHeaderTextColor">@color/grey_text_light</color>
-    <color name="notificationTextColor">#F5F5F5</color>
-    <color name="draftTextColor">@color/red_destructive_action</color>
-    <color name="emphasizedTextColor">@color/infomaniak</color>
+    <color name="hintTextColor">@color/greyTextLight</color>
+    <color name="sectionHeaderTextColor">@color/greyTextLight</color>
+    <color name="notificationTextColor">@color/hover</color>
+    <color name="draftTextColor">@color/redDestructiveAction</color>
+    <color name="emphasizedTextColor">@color/accent</color>
 
     <!-- Drawables -->
     <color name="separatorColor">#ECECEC</color>
@@ -59,7 +60,7 @@
     <color name="iconToolbarButton">@color/primaryTextColor</color>
 
     <!-- Buttons -->
-    <color name="textButtonBlueLight">@color/blue_text_light</color>
+    <color name="textButtonBlueLight">@color/blueTextLight</color>
 
     <!-- Cardview -->
     <color name="cardviewStrokeColor">@android:color/transparent</color>

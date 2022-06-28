@@ -21,12 +21,12 @@
 
     <style name="H1">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">@dimen/h1</item>
+        <item name="android:textSize">22sp</item>
     </style>
 
     <style name="H2">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">@dimen/h2</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="H2.Secondary">

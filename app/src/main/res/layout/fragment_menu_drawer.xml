@@ -116,7 +116,7 @@
                     android:paddingHorizontal="@dimen/marginStandardMedium"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
-                    tools:listitem="@layout/item_setting_address"
+                    tools:listitem="@layout/item_switch_user_mailbox"
                     tools:visibility="visible" />
 
                 <com.google.android.material.divider.MaterialDivider
@@ -323,7 +323,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/marginStandardMedium"
                     android:layout_marginStart="@dimen/marginStandard"
-                    app:indicatorColor="@color/pink_mail"
+                    app:indicatorColor="@color/pinkMail"
                     app:indicatorDirectionCircular="counterclockwise"
                     app:indicatorSize="48dp"
                     app:layout_constraintBottom_toBottomOf="parent"
