@@ -90,9 +90,9 @@ class NewMessageActivity : AppCompatActivity() {
 
         // TODO : Replace logs with actual API call
         Log.d("sendingMail", "FROM: ${newMessageFragment.getFromMailbox().email}")
-        Log.d("sendingMail", "TO: ${viewModel.recipients.map { it.name }}")
-        Log.d("sendingMail", "CC: ${viewModel.cc.map { it.name }}")
-        Log.d("sendingMail", "BCC: ${viewModel.bcc.map { it.name }}")
+        Log.d("sendingMail", "TO: ${viewModel.recipients.map { "${it.name} (${it.email})" }}")
+        Log.d("sendingMail", "CC: ${viewModel.cc.map { "${it.name} (${it.email})" }}")
+        Log.d("sendingMail", "BCC: ${viewModel.bcc.map { "${it.name} (${it.email})" }}")
         Log.d("sendingMail", "SUBJECT: ${newMessageFragment.getSubject()}")
         Log.d("sendingMail", "BODY: ${newMessageFragment.getBody()}")
 
