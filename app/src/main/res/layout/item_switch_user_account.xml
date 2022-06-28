@@ -66,7 +66,7 @@
                 app:layout_constraintEnd_toStartOf="@id/chevron"
                 app:layout_constraintStart_toEndOf="@id/userAvatar"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Myriam Rais" />
+                tools:text="@tools:sample/full_names" />
 
             <TextView
                 android:id="@+id/userMailAddress"

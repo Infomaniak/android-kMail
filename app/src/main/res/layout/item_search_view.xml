@@ -21,7 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="40dp"
     app:cardBackgroundColor="@color/backgroundCardSelectedColor"
-    app:cardCornerRadius="20dp">
+    app:cardCornerRadius="20dp"
+    tools:showIn="@layout/fragment_thread_list">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
