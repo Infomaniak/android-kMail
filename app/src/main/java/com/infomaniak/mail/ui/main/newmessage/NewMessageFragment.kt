@@ -246,7 +246,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateSingleChipText() {
-        viewModel.recipients.firstOrNull()?.let { binding.singleChip.root.text = it.name }
+        viewModel.recipients.firstOrNull()?.let { binding.singleChip.root.text = it.name ?: it.email }
     }
 
     private fun refreshChips() = with(binding) {
