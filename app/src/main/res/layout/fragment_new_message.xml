@@ -55,7 +55,6 @@
             app:layout_constraintTop_toTopOf="@id/fromPrefix"
             tools:text="myriam.rais@ik.me" />
 
-
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider1"
             android:layout_width="0dp"
@@ -67,7 +66,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fromPrefix" />
 
-
         <TextView
             android:id="@+id/toPrefix"
             style="@style/Callout.Secondary"
@@ -78,7 +76,6 @@
             app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
-
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/toItemsChipGroup"
@@ -148,7 +145,6 @@
             app:layout_constraintStart_toEndOf="@id/singleChipGroup"
             app:layout_constraintTop_toBottomOf="@id/toItemsChipGroup" />
 
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/toTransparentButton"
             android:layout_width="0dp"
@@ -169,7 +165,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toPrefix" />
 
-
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider2"
             android:layout_width="0dp"
@@ -179,7 +174,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toAutocompleteInput" />
-
 
         <TextView
             android:id="@+id/ccPrefix"
@@ -222,7 +216,6 @@
             app:layout_constraintStart_toEndOf="@id/ccPrefix"
             app:layout_constraintTop_toBottomOf="@id/ccItemsChipGroup" />
 
-
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider3"
             android:layout_width="0dp"
@@ -232,7 +225,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ccAutocompleteInput" />
-
 
         <TextView
             android:id="@+id/bccPrefix"
@@ -275,7 +267,6 @@
             app:layout_constraintStart_toEndOf="@id/bccPrefix"
             app:layout_constraintTop_toBottomOf="@id/bccItemsChipGroup" />
 
-
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider4"
             android:layout_width="0dp"
@@ -285,7 +276,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bccAutocompleteInput" />
-
 
         <TextView
             android:id="@+id/subjectPrefix"
@@ -322,7 +312,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/subjectTextField" />
 
-
         <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider5"
             android:layout_width="0dp"
@@ -332,7 +321,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/subjectTextField" />
-
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/bodyLayout"
@@ -360,7 +348,6 @@
                 android:textSize="16sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/autoCompleteRecyclerView"
@@ -405,7 +392,6 @@
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="toItemsChipGroup,toPrefix,divider2,toAutocompleteInput" />
 
-
         <androidx.constraintlayout.widget.Group
             android:id="@+id/advancedFields"
             android:layout_width="wrap_content"
@@ -413,12 +399,6 @@
             android:visibility="gone"
             app:constraint_referenced_ids="ccGroup,bccGroup"
             tools:visibility="visible" />
-
-        <!--        <androidx.constraintlayout.widget.Group-->
-        <!--            android:id="@+id/everythingButCc"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            app:constraint_referenced_ids="fromPrefix,fromMailAddress,divider1,toPrefix,toItemsChipGroup,singleChipGroup,plusOthers,toAutocompleteInput,toTransparentButton,chevron,divider2,divider3,bccPrefix,bccItemsChipGroup,bccAutocompleteInput,bodyLayout,divider5,subjectTextFieldGuide,subjectTextField,subjectPrefix,divider4" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

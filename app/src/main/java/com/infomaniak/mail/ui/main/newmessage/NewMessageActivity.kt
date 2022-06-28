@@ -30,8 +30,9 @@ import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
 
 class NewMessageActivity : AppCompatActivity() {
 
-    private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by viewModels()
+
+    private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +71,7 @@ class NewMessageActivity : AppCompatActivity() {
     private fun ActivityNewMessageBinding.updateEditorVisibility(isEditorExpanded: Boolean) {
         val color = if (isEditorExpanded) R.color.pink_mail else R.color.iconColor
         val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
+
         editorTextOptions.apply {
             setIconTintResource(color)
             contentDescription = getString(resId)

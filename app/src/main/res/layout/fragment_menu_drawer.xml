@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         app:cardElevation="6dp">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -301,7 +300,6 @@
                     app:drawableStartCompat="@drawable/ic_restore_arrow" />
 
             </LinearLayout>
-
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/storageLayout"

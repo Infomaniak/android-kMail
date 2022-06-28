@@ -33,7 +33,6 @@
         app:menu="@menu/new_message_menu"
         app:navigationIcon="@drawable/ic_close" />
 
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -44,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:navGraph="@navigation/new_message_navigation"/>
+        app:navGraph="@navigation/new_message_navigation" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/editor"

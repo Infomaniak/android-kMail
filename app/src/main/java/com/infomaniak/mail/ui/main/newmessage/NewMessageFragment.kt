@@ -48,22 +48,27 @@ import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import com.google.android.material.R as RMaterial
 
 class NewMessageFragment : Fragment() {
 
-    private val binding: FragmentNewMessageBinding by lazy { FragmentNewMessageBinding.inflate(layoutInflater) }
     private val viewModel: NewMessageViewModel by activityViewModels()
+
+    private val binding: FragmentNewMessageBinding by lazy { FragmentNewMessageBinding.inflate(layoutInflater) }
+
+    private lateinit var contactAdapter: ContactAdapter
+
     private var mailboxes = MailboxInfoController.getMailboxesSync(AccountUtils.currentUserId)
     private var mails = mailboxes.map { it.email }
     private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
     private var isAutocompletionOpened = false
-    private lateinit var contactAdapter: ContactAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View = with(binding) {
+
         setupFromField()
         displayChips()
 
@@ -81,11 +86,13 @@ class NewMessageFragment : Fragment() {
         enableAutocomplete(BCC)
 
         bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
+
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
 
         viewModel.editorAction.observe(requireActivity()) {
-            var selectedText = ""
-            bodyText.apply { selectedText = text?.substring(selectionStart, selectionEnd) ?: "" }
+
+            val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) ?: "" }
+            Log.e("gibran", "selectedText: $selectedText")
 
             when (it) {
                 // TODO: Replace logs with actual code
@@ -108,23 +115,20 @@ class NewMessageFragment : Fragment() {
         val bccAlreadyUsedContactMails = (viewModel.bcc.map { it.email }).toMutableList()
 
         contactAdapter = ContactAdapter(
-            allContacts,
-            toAlreadyUsedContactMails,
-            ccAlreadyUsedContactMails,
-            bccAlreadyUsedContactMails,
-            { contact, field ->
+            allContacts = allContacts,
+            toAlreadyUsedContactIds = toAlreadyUsedContactMails,
+            ccAlreadyUsedContactIds = ccAlreadyUsedContactMails,
+            bccAlreadyUsedContactIds = bccAlreadyUsedContactMails,
+            onItemClick = { contact, field ->
                 getInputView(field).setText("")
                 getContacts(field).add(contact)
                 createChip(field, contact)
             },
-            { field ->
+            addUnrecognizedContact = { field ->
                 // TODO : Update AlreadyUsedContactIds in Adapter with the unrecognized email
                 val isEmail = addUnrecognizedMail(field)
-                if (isEmail) {
-                    getInputView(field).setText("")
-                }
-                isEmail
-            }
+                if (isEmail) getInputView(field).setText("")
+            },
         )
         autoCompleteRecyclerView.adapter = contactAdapter
 
@@ -134,9 +138,7 @@ class NewMessageFragment : Fragment() {
     private fun getAllContacts(): List<UiContact> {
         val contacts = mutableListOf<UiContact>()
         MailData.contactsFlow.value?.forEach { contact ->
-            contact.emails.forEach { email ->
-                contacts.add(UiContact(email, contact.name))
-            }
+            contact.emails.forEach { email -> contacts.add(UiContact(email, contact.name)) }
         }
         return contacts
     }
@@ -168,11 +170,10 @@ class NewMessageFragment : Fragment() {
 
             doOnTextChanged { text, _, _, _ ->
                 if (text?.isNotEmpty() == true) {
-                    if ((text.trim().count()) > 0) contactAdapter.filterField(field, text)
-                    else contactAdapter.clear()
-                    if (!isAutocompletionOpened) openAutocompletionView(field, text)
+                    if ((text.trim().count()) > 0) contactAdapter.filterField(field, text) else contactAdapter.clear()
+                    if (!isAutocompletionOpened) openAutocompletionView(field)
                 } else if (isAutocompletionOpened) {
-                    closeAutocompletionView(field)
+                    closeAutocompletionView()
                 }
             }
 
@@ -186,7 +187,7 @@ class NewMessageFragment : Fragment() {
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
 
     private fun chooseFromAddress(view: View) {
-        val adapter = ArrayAdapter(view.context, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, mails)
+        val adapter = ArrayAdapter(view.context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
         ListPopupWindow(view.context).apply {
             setAdapter(adapter)
             anchorView = view
@@ -208,39 +209,41 @@ class NewMessageFragment : Fragment() {
     }
 
     //region Chips behavior
-    private fun getContacts(field: FieldType): MutableList<UiContact> =
-        when (field) {
-            TO -> viewModel.recipients
-            CC -> viewModel.cc
-            BCC -> viewModel.bcc
-        }
+    private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
+        TO -> viewModel.recipients
+        CC -> viewModel.cc
+        BCC -> viewModel.bcc
+    }
 
-    private fun getChipGroup(field: FieldType): ChipGroup =
-        when (field) {
-            TO -> binding.toItemsChipGroup
-            CC -> binding.ccItemsChipGroup
-            BCC -> binding.bccItemsChipGroup
-        }
+    private fun getChipGroup(field: FieldType): ChipGroup = when (field) {
+        TO -> binding.toItemsChipGroup
+        CC -> binding.ccItemsChipGroup
+        BCC -> binding.bccItemsChipGroup
+    }
 
-    private fun getInputView(field: FieldType): MaterialAutoCompleteTextView =
-        when (field) {
-            TO -> binding.toAutocompleteInput
-            CC -> binding.ccAutocompleteInput
-            BCC -> binding.bccAutocompleteInput
-        }
+    private fun getInputView(field: FieldType): MaterialAutoCompleteTextView = when (field) {
+        TO -> binding.toAutocompleteInput
+        CC -> binding.ccAutocompleteInput
+        BCC -> binding.bccAutocompleteInput
+    }
 
-    private fun displayChips() = with(binding) {
+    private fun displayChips() {
         refreshChips()
         updateSingleChipText()
         updateChipVisibility()
 
-        singleChip.root.setOnClickListener {
-            removeMail(TO, 0)
+        binding.singleChip.root.setOnClickListener {
+            removeEmail(TO, 0)
             updateChipVisibility()
         }
     }
 
-    private fun removeMail(field: FieldType, index: Int) {
+    private fun removeEmail(field: FieldType, contact: UiContact) {
+        val index = getContacts(field).indexOfFirst { it.email == contact.email }
+        removeEmail(field, index)
+    }
+
+    private fun removeEmail(field: FieldType, index: Int) {
         val email = getContacts(field)[index].email
         contactAdapter.removeEmail(field, email)
         getContacts(field).removeAt(index)
@@ -248,29 +251,24 @@ class NewMessageFragment : Fragment() {
         if (field == TO) updateSingleChipText()
     }
 
-    private fun removeMail(field: FieldType, contact: UiContact) {
-        val index = getContacts(field).indexOfFirst { it.email == contact.email }
-        removeMail(field, index)
-    }
-
-    private fun updateSingleChipText() = with(binding) {
-        viewModel.recipients.firstOrNull()?.let { singleChip.root.text = it.name }
+    private fun updateSingleChipText() {
+        viewModel.recipients.firstOrNull()?.let { binding.singleChip.root.text = it.name }
     }
 
     private fun refreshChips() = with(binding) {
         toItemsChipGroup.removeAllViews()
         ccItemsChipGroup.removeAllViews()
         bccItemsChipGroup.removeAllViews()
-        for (contact in viewModel.recipients) createChip(TO, contact)
-        for (contact in viewModel.cc) createChip(CC, contact)
-        for (contact in viewModel.bcc) createChip(BCC, contact)
+        viewModel.recipients.forEach { createChip(TO, it) }
+        viewModel.cc.forEach { createChip(CC, it) }
+        viewModel.bcc.forEach { createChip(BCC, it) }
     }
 
     private fun createChip(field: FieldType, contact: UiContact) {
         ChipContactBinding.inflate(layoutInflater).root.apply {
             val name = if (contact.name?.isBlank() == true) null else contact.name
             text = name ?: contact.email
-            setOnClickListener { removeMail(field, contact) }
+            setOnClickListener { removeEmail(field, contact) }
             getChipGroup(field).addView(this)
         }
     }
@@ -305,7 +303,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun openAutocompletionView(fieldType: FieldType, text: CharSequence) = with(binding) {
+    private fun openAutocompletionView(fieldType: FieldType) {
         viewModel.areAdvancedFieldsOpened = true
         openAdvancedFields()
         isAutocompletionOpened = true
@@ -316,7 +314,7 @@ class NewMessageFragment : Fragment() {
         getInputView(fieldType).requestFocus()
     }
 
-    private fun closeAutocompletionView(fieldType: FieldType) = with(binding) {
+    private fun closeAutocompletionView() {
         isAutocompletionOpened = false
         toggleAutocompletion()
     }
@@ -350,11 +348,9 @@ class NewMessageFragment : Fragment() {
 
     fun getBody(): String = binding.bodyText.text.toString()
 
-    enum class FieldType(
-        @StringRes val displayedName: Int,
-    ) {
+    enum class FieldType(@StringRes val displayedName: Int) {
         TO(R.string.toTitle),
         CC(R.string.ccTitle),
-        BCC(R.string.bccTitle);
+        BCC(R.string.bccTitle),
     }
 }

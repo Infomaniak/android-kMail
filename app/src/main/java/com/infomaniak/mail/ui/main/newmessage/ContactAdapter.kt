@@ -36,8 +36,9 @@ class ContactAdapter(
     private val ccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val bccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val onItemClick: (item: UiContact, field: FieldType) -> Unit,
-    private val addUnrecognizedContact: (field: FieldType) -> Boolean,
+    private val addUnrecognizedContact: (field: FieldType) -> Unit,
 ) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>(), Filterable {
+
     private var contacts = mutableListOf<UiContact>()
     private var currentField: FieldType = TO
 
@@ -55,14 +56,13 @@ class ContactAdapter(
 
     override fun getItemCount(): Int = contacts.count()
 
-    fun addFirstAvailableItem(): Boolean {
+    fun addFirstAvailableItem() {
         val contact = contacts.firstOrNull()
-        return if (contact == null) {
-            Log.e("gibran", "addFirstAvailableItem: unrecognized email !!!", );
+        if (contact == null) {
+            Log.e("gibran", "addFirstAvailableItem: unrecognized email !!!")
             addUnrecognizedContact(currentField)
         } else {
             selectContact(contact)
-            true
         }
     }
 
@@ -82,10 +82,6 @@ class ContactAdapter(
     private fun selectContact(contact: UiContact) {
         onItemClick(contact, currentField)
         getAlreadyUsedEmails(currentField).add(contact.email)
-    }
-
-    fun removeUsedContact(contact: UiContact) {
-        getAlreadyUsedEmails(currentField).remove(contact.email)
     }
 
     override fun getFilter(): Filter {
@@ -127,8 +123,9 @@ class ContactAdapter(
 
     private fun CharSequence.standardize(): String = this.toString().trim().lowercase()
 
-    private fun String.existsInAvailableItems(): Boolean =
-        allContacts.any { availableItem -> availableItem.email.standardize() == this }
+    private fun String.existsInAvailableItems(): Boolean {
+        return allContacts.any { availableItem -> availableItem.email.standardize() == this }
+    }
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 }
