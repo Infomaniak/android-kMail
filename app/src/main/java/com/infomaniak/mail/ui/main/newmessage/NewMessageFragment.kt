@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
-import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
@@ -280,33 +279,21 @@ class NewMessageFragment : Fragment() {
                 && viewModel.recipients.isNotEmpty()
                 && !viewModel.areAdvancedFieldsOpened
 
-        doNotAnimate(constraintLayout) {
-            plusOthers.isVisible = !isAutocompletionOpened
-                    && viewModel.recipients.count() > 1
-                    && !viewModel.areAdvancedFieldsOpened
-        }
+        plusOthers.isVisible = !isAutocompletionOpened
+                && viewModel.recipients.count() > 1
+                && !viewModel.areAdvancedFieldsOpened
+
         plusOthersChip.root.text = "+${viewModel.recipients.count() - 1}"
 
         advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
     }
 
-    private fun doNotAnimate(parent: View, body: () -> Unit) {
-        (parent as ViewGroup).layoutTransition.apply {
-            disableTransitionType(LayoutTransition.DISAPPEARING)
-            body()
-            enableTransitionType(LayoutTransition.DISAPPEARING)
-        }
-    }
-
     private fun openAutocompletionView(fieldType: FieldType) {
         viewModel.areAdvancedFieldsOpened = true
         openAdvancedFields()
-        isAutocompletionOpened = true
 
         isAutocompletionOpened = true
         toggleAutocompletion(fieldType)
-
-        getInputView(fieldType).requestFocus()
     }
 
     private fun closeAutocompletionView() {
