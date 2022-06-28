@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        listenToNetworkStatus()
+        // TODO: This is removed for now because it makes the NewMessageActivity crash when there is too much recipients.
+        // listenToNetworkStatus()
         setupNavController()
 
         MailData.loadAddressBooksAndContacts()
