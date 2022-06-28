@@ -46,8 +46,8 @@
             android:layout_width="@dimen/textHintSize"
             android:layout_height="@dimen/textHintSize"
             android:layout_marginEnd="@dimen/marginStandardSmall"
-            android:contentDescription="Attachment icon"
-            android:src="@drawable/ic_attachment_inclined" />
+            android:src="@drawable/ic_attachment_inclined"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/attachmentsSizeText"
