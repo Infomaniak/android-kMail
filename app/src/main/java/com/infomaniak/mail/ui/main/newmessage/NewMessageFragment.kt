@@ -134,7 +134,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun addUnrecognizedMail(fieldType: FieldType): Boolean {
-        val input = getInputView(fieldType).text.toString()
+        val input = getInputView(fieldType).text.toString().trim()
         val isEmail = input.isEmail()
         if (isEmail) {
             val alreadyUsedEmails = contactAdapter.getAlreadyUsedEmails(fieldType)
