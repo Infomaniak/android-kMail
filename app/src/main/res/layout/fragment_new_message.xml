@@ -242,32 +242,45 @@
             style="@style/Callout.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/marginStandardMedium"
             android:layout_marginStart="@dimen/marginStandardMedium"
             android:text="@string/bccTitle"
-            app:layout_constraintBottom_toBottomOf="@id/bccAutocompleteInput"
+            app:layout_constraintBottom_toBottomOf="@id/bccSingleChipGroup"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/bccAutocompleteInput" />
+            app:layout_constraintTop_toTopOf="@id/bccSingleChipGroup" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/bccSingleChipGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/marginStandardVerySmall"
+            android:visibility="invisible"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/bccPrefix"
+            app:layout_constraintTop_toBottomOf="@id/divider3">
+
+            <include
+                android:id="@+id/bccSingleChip"
+                layout="@layout/chip_contact" />
+        </com.google.android.material.chip.ChipGroup>
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/bccItemsChipGroup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
-            android:paddingHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
             app:chipSpacingVertical="0dp"
-            app:layout_constraintBottom_toTopOf="@id/bccAutocompleteInput"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider3" />
+            app:layout_constraintStart_toEndOf="@id/bccPrefix"
+            app:layout_constraintTop_toTopOf="@id/bccSingleChipGroup" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/bccAutocompleteInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardVerySmall"
+            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
             android:layout_marginTop="@dimen/marginStandardVerySmall"
-            android:layout_marginEnd="@dimen/marginStandardMedium"
             android:backgroundTint="@android:color/transparent"
             android:imeOptions="actionDone"
             android:inputType="textEmailAddress"
