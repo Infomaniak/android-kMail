@@ -23,6 +23,8 @@ object MessagePriority {
 
     fun getPriority(priority: String?): Priority? = enumValueOfOrNull<Priority>(priority?.uppercase())
 
+    fun Priority.getPriority() = name.lowercase()
+
     enum class Priority {
         LOW,
         NORMAL,

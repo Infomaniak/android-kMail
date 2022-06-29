@@ -28,6 +28,8 @@ import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.data.models.user.UserResult
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 
 object ApiRepository : ApiRepositoryCore() {
@@ -100,18 +102,22 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun markAsSafe(mailboxUuid: String, messagesUids: List<String>): ApiResponse<List<Seen>> = callKotlinxApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messagesUids))
 
-    // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
+    // fun trustSender(messageResource: String): ApiRe sponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<Draft> {
-        fun postDraft(): ApiResponse<Draft> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, draft)
-        fun putDraft(): ApiResponse<Draft> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, draft)
-        return if (draft.uuid.isEmpty()) postDraft() else putDraft()
+        val body = Json.encodeToString(draft)
+        fun postDraft(): ApiResponse<Draft> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
+        fun putDraft(): ApiResponse<Draft> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
+
+        return if (draft.hasLocalUuid()) postDraft() else putDraft()
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
-        fun postDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, draft)
-        fun putDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, draft)
-        return if (draft.uuid.isEmpty()) postDraft() else putDraft()
+        val body = Json.encodeToString(draft)
+        fun postDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
+        fun putDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
+
+        return if (draft.hasLocalUuid()) postDraft() else putDraft()
     }
 
     fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> {

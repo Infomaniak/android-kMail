@@ -19,13 +19,22 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
     val recipients = mutableListOf<UiContact>()
-    val cc = mutableListOf<UiContact>()
-    val bcc = mutableListOf<UiContact>()
+    val newMessageCc = mutableListOf<UiContact>()
+    val newMessageBcc = mutableListOf<UiContact>()
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
@@ -38,7 +47,39 @@ class NewMessageViewModel : ViewModel() {
         return contacts
     }
 
-    fun sendMail() {
+    fun sendMail(draft: Draft, action: Draft.DraftAction) {
+        val mailbox = MailData.currentMailboxFlow.value ?: return
+        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
+        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
 
+        viewModelScope.launch(Dispatchers.IO) {
+            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
+            draft.identityId = signature.data?.defaultSignatureId
+            if (action == Draft.DraftAction.SEND) sendDraft() else saveDraft()
+        }
+    }
+
+    private fun Draft.fillForApi(draftAction: String) = apply {
+        action = draftAction
+        to = recipients.toRealmRecipients() ?: realmListOf()
+        cc = newMessageCc.toRealmRecipients()
+        bcc = newMessageBcc.toRealmRecipients()
+
+//        // TODO: manage advanced functionalities
+//        quote = ""
+//        references = ""
+//        delay = 0
+//        inReplyTo = ""
+//        inReplyToUid = ""
+//        replyTo = realmListOf()
+    }
+
+    private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient>? {
+        return if (isEmpty()) null else map {
+            Recipient().apply {
+                email = it.email
+                name = it.name
+            }
+        }.toRealmList()
     }
 }
