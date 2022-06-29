@@ -1,9 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="25dp"
     android:height="25dp"
     android:viewportWidth="25"
     android:viewportHeight="25">
-  <path
-      android:pathData="M2.816,11.154C1.847,11.154 1,12.015 1,13C1,13.985 1.847,14.846 2.816,14.846C3.784,14.846 4.632,13.985 4.632,13C4.632,12.015 3.784,11.154 2.816,11.154ZM2.816,5C1.847,5 1,5.862 1,6.846C1,7.831 1.847,8.692 2.816,8.692C3.784,8.692 4.632,7.831 4.632,6.846C4.632,5.862 3.784,5 2.816,5ZM2.816,17.308C1.847,17.308 1,18.169 1,19.154C1,20.139 1.847,21 2.816,21C3.784,21 4.632,20.139 4.632,19.154C4.632,18.169 3.784,17.308 2.816,17.308ZM7.053,5.615V8.077H24V5.615H7.053ZM7.053,20.385H24V17.923H7.053V20.385ZM7.053,14.231H24V11.769H7.053V14.231Z"
-      android:fillColor="#666666"/>
+    <path
+        android:fillColor="#666666"
+        android:pathData="M2.816,11.154C1.847,11.154 1,12.015 1,13C1,13.985 1.847,14.846 2.816,14.846C3.784,14.846 4.632,13.985 4.632,13C4.632,12.015 3.784,11.154 2.816,11.154ZM2.816,5C1.847,5 1,5.862 1,6.846C1,7.831 1.847,8.692 2.816,8.692C3.784,8.692 4.632,7.831 4.632,6.846C4.632,5.862 3.784,5 2.816,5ZM2.816,17.308C1.847,17.308 1,18.169 1,19.154C1,20.139 1.847,21 2.816,21C3.784,21 4.632,20.139 4.632,19.154C4.632,18.169 3.784,17.308 2.816,17.308ZM7.053,5.615V8.077H24V5.615H7.053ZM7.053,20.385H24V17.923H7.053V20.385ZM7.053,14.231H24V11.769H7.053V14.231Z" />
 </vector>

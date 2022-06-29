@@ -69,7 +69,7 @@ class NewMessageActivity : AppCompatActivity() {
     }
 
     private fun ActivityNewMessageBinding.updateEditorVisibility(isEditorExpanded: Boolean) {
-        val color = if (isEditorExpanded) R.color.pink_mail else R.color.iconColor
+        val color = if (isEditorExpanded) R.color.pinkMail else R.color.iconColor
         val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
 
         editorTextOptions.apply {

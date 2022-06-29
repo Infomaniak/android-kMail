@@ -48,16 +48,16 @@
 
         <TextView
             android:id="@+id/userName"
-            android:textColor="@color/title"
-            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"
+            android:textColor="@color/title"
+            android:textSize="16sp"
             tools:text="@tools:sample/full_names" />
 
         <TextView
-            style="@style/Body.Secondary"
             android:id="@+id/userEmail"
+            style="@style/Body.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"

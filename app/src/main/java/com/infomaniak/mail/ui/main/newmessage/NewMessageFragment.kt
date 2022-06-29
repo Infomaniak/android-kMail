@@ -43,10 +43,7 @@ import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.setMargins
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.*
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -182,14 +179,14 @@ class NewMessageFragment : Fragment() {
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
 
-    private fun chooseFromAddress(view: View) {
-        val adapter = ArrayAdapter(view.context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
-        ListPopupWindow(view.context).apply {
+    private fun chooseFromAddress(view: View) = with(binding) {
+        val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
+        ListPopupWindow(context).apply {
             setAdapter(adapter)
             anchorView = view
             width = view.width
             setOnItemClickListener { _, _, position, _ ->
-                binding.fromMailAddress.text = mails[position]
+                fromMailAddress.text = mails[position]
                 selectedMailboxIndex = position
                 dismiss()
             }

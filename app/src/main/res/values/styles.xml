@@ -126,7 +126,7 @@
         <item name="android:textColor">@color/title</item>
         <item name="android:textSize">10sp</item>
         <item name="android:letterSpacing">0</item>
-        <item name="rippleColor">@color/pink_mail_ripple</item>
+        <item name="rippleColor">@color/pinkMailRipple</item>
     </style>
 
     <!-- Other -->

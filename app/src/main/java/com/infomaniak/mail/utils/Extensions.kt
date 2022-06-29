@@ -18,10 +18,11 @@
 package com.infomaniak.mail.utils
 
 import android.app.Activity
+import android.content.Context
 import android.util.Patterns
 import android.view.View
-import androidx.core.content.res.ResourcesCompat
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
@@ -96,4 +97,3 @@ fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 inline val ViewBinding.context: Context get() = root.context
-
