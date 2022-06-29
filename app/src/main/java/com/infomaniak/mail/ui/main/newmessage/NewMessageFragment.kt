@@ -27,10 +27,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.*
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -46,8 +44,10 @@ import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.setMargins
 import com.infomaniak.mail.utils.toggleChevron
 import com.google.android.material.R as RMaterial
+import com.infomaniak.lib.core.R as RCore
 
 class NewMessageFragment : Fragment() {
 
@@ -243,7 +243,10 @@ class NewMessageFragment : Fragment() {
         contactAdapter.removeEmail(field, email)
         getContacts(field).removeAt(index)
         getChipGroup(field).removeViewAt(index)
-        if (field == TO) updateSingleChipText()
+        if (field == TO) {
+            updateSingleChipText()
+            updateToAutocompleteInputLayout()
+        }
     }
 
     private fun updateSingleChipText() {
@@ -270,20 +273,20 @@ class NewMessageFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateChipVisibility() = with(binding) {
-        singleChipGroup.isVisible = !isAutocompletionOpened
+        singleChipGroup.isInvisible = !(!isAutocompletionOpened
                 && !viewModel.areAdvancedFieldsOpened
-                && viewModel.recipients.isNotEmpty()
+                && viewModel.recipients.isNotEmpty())
 
-        toItemsChipGroup.isVisible = viewModel.areAdvancedFieldsOpened
+        toItemsChipGroup.isInvisible = !viewModel.areAdvancedFieldsOpened
 
         // TODO: Do we want this button?
         // toTransparentButton.isVisible = !isAutocompletionOpened
         //         && viewModel.recipients.isNotEmpty()
         //         && !viewModel.areAdvancedFieldsOpened
 
-        plusOthers.isVisible = !isAutocompletionOpened
+        plusOthers.isInvisible = !(!isAutocompletionOpened
                 && viewModel.recipients.count() > 1
-                && !viewModel.areAdvancedFieldsOpened
+                && !viewModel.areAdvancedFieldsOpened)
 
         plusOthersChip.root.text = "+${viewModel.recipients.count() - 1}"
 
@@ -317,12 +320,39 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun openAdvancedFields() = with(binding) {
+
+        updateToAutocompleteInputLayout()
+
         advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
         chevron.toggleChevron(!viewModel.areAdvancedFieldsOpened)
 
         refreshChips()
         updateSingleChipText()
         updateChipVisibility()
+    }
+
+    private fun updateToAutocompleteInputLayout() = with(binding) {
+
+        fun updateToAutocompleteInputConstraints() {
+            ConstraintSet().apply {
+                clone(constraintLayout)
+                val topView = when {
+                    viewModel.areAdvancedFieldsOpened -> R.id.toItemsChipGroup
+                    viewModel.recipients.isEmpty() -> R.id.divider1
+                    else -> R.id.singleChipGroup
+                }
+                connect(R.id.toAutocompleteInput, ConstraintSet.TOP, topView, ConstraintSet.BOTTOM, 0)
+                applyTo(constraintLayout)
+            }
+        }
+
+        fun updateToAutocompleteInputMargins() {
+            val margin = resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt()
+            toAutocompleteInput.setMargins(top = margin, left = margin, right = margin)
+        }
+
+        updateToAutocompleteInputConstraints()
+        updateToAutocompleteInputMargins()
     }
     //endregion
 

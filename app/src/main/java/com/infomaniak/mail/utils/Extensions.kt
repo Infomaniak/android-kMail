@@ -21,7 +21,7 @@ import android.app.Activity
 import android.util.Patterns
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
+import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
@@ -84,6 +84,13 @@ fun View.toggleChevron(
         expandedAngle ?: ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
     }
     animate().rotation(angle).setDuration(duration).start()
+}
+
+fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) {
+    if (layoutParams is ViewGroup.MarginLayoutParams) {
+        (layoutParams as ViewGroup.MarginLayoutParams).setMargins(left, top, right, bottom)
+        requestLayout()
+    }
 }
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()

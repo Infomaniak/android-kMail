@@ -18,9 +18,7 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -31,6 +29,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.setMargins
 import com.infomaniak.lib.core.R as RCore
 
 class FoldersAdapter(
@@ -84,7 +83,7 @@ class FoldersAdapter(
         folderName.apply {
             text = name
             setCompoundDrawablesWithIntrinsicBounds(AppCompatResources.getDrawable(context, iconId), null, null, null)
-            if (indent != null) setMargins(context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent)
+            if (indent != null) setMargins(left = resources.getDimension(RCore.dimen.marginStandard).toInt() * indent)
         }
 
         if (badgeText != null) folderBadge.text = badgeText
@@ -94,13 +93,6 @@ class FoldersAdapter(
 
     fun setFolders(newFolders: List<Folder>) {
         folders = newFolders
-    }
-
-    private fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) {
-        if (layoutParams is MarginLayoutParams) {
-            (layoutParams as MarginLayoutParams).setMargins(left, top, right, bottom)
-            requestLayout()
-        }
     }
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
