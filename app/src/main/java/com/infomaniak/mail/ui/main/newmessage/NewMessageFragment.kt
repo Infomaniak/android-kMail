@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
+import androidx.activity.addCallback
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.*
@@ -68,6 +69,7 @@ class NewMessageFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = with(binding) {
 
+        handleOnBackPressed()
         setupFromField()
         displayChips()
 
@@ -134,19 +136,18 @@ class NewMessageFragment : Fragment() {
         return root
     }
 
-    private fun addUnrecognizedMail(fieldType: FieldType): Boolean {
-        val input = getInputView(fieldType).text.toString().trim()
-        val isEmail = input.isEmail()
-        if (isEmail) {
-            val alreadyUsedEmails = contactAdapter.getAlreadyUsedEmails(fieldType)
-            if (alreadyUsedEmails.none { it == input }) {
-                alreadyUsedEmails.add(input)
-                val contact = UiContact(input)
-                getContacts(fieldType).add(contact)
-                createChip(fieldType, contact)
+    private fun handleOnBackPressed() {
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner) {
+            if (isAutocompletionOpened) {
+                fun FieldType.clearField() = getInputView(this).setText("")
+                TO.clearField()
+                CC.clearField()
+                BCC.clearField()
+            } else {
+                isEnabled = false
+                activity?.onBackPressed()
             }
         }
-        return isEmail
     }
 
     private fun setupFromField() = with(binding) {
@@ -201,6 +202,21 @@ class NewMessageFragment : Fragment() {
             callback(isKeyboardVisible)
             insets
         }
+    }
+
+    private fun addUnrecognizedMail(fieldType: FieldType): Boolean {
+        val input = getInputView(fieldType).text.toString().trim()
+        val isEmail = input.isEmail()
+        if (isEmail) {
+            val alreadyUsedEmails = contactAdapter.getAlreadyUsedEmails(fieldType)
+            if (alreadyUsedEmails.none { it == input }) {
+                alreadyUsedEmails.add(input)
+                val contact = UiContact(input)
+                getContacts(fieldType).add(contact)
+                createChip(fieldType, contact)
+            }
+        }
+        return isEmail
     }
 
     //region Chips behavior
