@@ -71,10 +71,11 @@ class NewMessageFragment : Fragment() {
         setupFromField()
         displayChips()
 
-        toTransparentButton.setOnClickListener {
-            viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
-            openAdvancedFields()
-        }
+        // TODO: Do we want this button?
+        // toTransparentButton.setOnClickListener {
+        //     viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
+        //     openAdvancedFields()
+        // }
         chevron.setOnClickListener {
             viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
             openAdvancedFields()
@@ -275,9 +276,10 @@ class NewMessageFragment : Fragment() {
 
         toItemsChipGroup.isVisible = viewModel.areAdvancedFieldsOpened
 
-        toTransparentButton.isVisible = !isAutocompletionOpened
-                && viewModel.recipients.isNotEmpty()
-                && !viewModel.areAdvancedFieldsOpened
+        // TODO: Do we want this button?
+        // toTransparentButton.isVisible = !isAutocompletionOpened
+        //         && viewModel.recipients.isNotEmpty()
+        //         && !viewModel.areAdvancedFieldsOpened
 
         plusOthers.isVisible = !isAutocompletionOpened
                 && viewModel.recipients.count() > 1

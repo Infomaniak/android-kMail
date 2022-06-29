@@ -144,16 +144,17 @@
             app:layout_constraintStart_toEndOf="@id/singleChipGroup"
             app:layout_constraintTop_toBottomOf="@id/toItemsChipGroup" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/toTransparentButton"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@android:color/transparent"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"
-            app:layout_constraintEnd_toStartOf="@id/chevron"
-            app:layout_constraintStart_toEndOf="@id/singleChipGroup"
-            app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />
+        <!--TODO: Do we want this button?-->
+        <!--<com.google.android.material.button.MaterialButton-->
+        <!--    android:id="@+id/toTransparentButton"-->
+        <!--    android:layout_width="0dp"-->
+        <!--    android:layout_height="0dp"-->
+        <!--    android:background="@android:color/transparent"-->
+        <!--    android:visibility="gone"-->
+        <!--    app:layout_constraintBottom_toBottomOf="@id/toAutocompleteInput"-->
+        <!--    app:layout_constraintEnd_toStartOf="@id/chevron"-->
+        <!--    app:layout_constraintStart_toEndOf="@id/singleChipGroup"-->
+        <!--    app:layout_constraintTop_toTopOf="@id/toAutocompleteInput" />-->
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/chevron"
