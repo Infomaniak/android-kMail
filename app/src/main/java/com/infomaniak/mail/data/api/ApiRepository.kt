@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
+import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.data.models.user.UserResult
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -80,8 +81,14 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getThreads(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> {
-        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name), GET)
+    fun getThreads(
+        mailboxUuid: String,
+        folderId: String,
+        threadmode: UserPreferences.ThreadMode,
+        offset: Int,
+        filter: ThreadFilter? = null
+    ): ApiResponse<ThreadsResult> {
+        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, threadmode, offset, filter?.name), GET)
     }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {

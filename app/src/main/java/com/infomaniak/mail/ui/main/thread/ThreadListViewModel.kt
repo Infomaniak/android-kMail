@@ -58,7 +58,7 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
-        MailData.loadThreads(folder, mailbox, offset)
+        MailData.loadThreads(folder, mailbox, offset = offset)
     }
 
     fun refreshThreads() {

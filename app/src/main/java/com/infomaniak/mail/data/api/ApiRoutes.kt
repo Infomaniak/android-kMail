@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 
 object ApiRoutes {
 
@@ -47,8 +48,10 @@ object ApiRoutes {
 
     // fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
 
-    fun threads(uuid: String, folderId: String, offset: Int, filter: String?): String {
-        return "${folder(uuid, folderId)}/message?thread=on&offset=$offset&filter=$filter"
+    fun threads(uuid: String, folderId: String, threadMode: ThreadMode, offset: Int, filter: String?): String {
+        val thread = if (threadMode == ThreadMode.THREADS) "on" else "off"
+
+        return "${folder(uuid, folderId)}/message?thread=$thread&offset=$offset&filter=$filter"
     }
 
     fun quotas(mailbox: String, hostingId: Int) = "$MAIL_API/api/mailbox/quotas?mailbox=$mailbox&product_id=$hostingId"

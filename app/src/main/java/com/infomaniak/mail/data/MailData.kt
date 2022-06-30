@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
@@ -157,9 +158,14 @@ object MailData {
         }
     }
 
-    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
+    fun loadThreads(
+        folder: Folder,
+        mailbox: Mailbox,
+        threadMode: ThreadMode = ThreadMode.THREADS,
+        offset: Int = OFFSET_FIRST_PAGE
+    ) {
         val realmThreads = getThreadsFromRealm(folder, offset)
-        getThreadsFromApi(folder, mailbox, offset, realmThreads)
+        getThreadsFromApi(folder, mailbox, realmThreads, threadMode, offset)
     }
 
     fun refreshThreads(folder: Folder, mailbox: Mailbox) {
@@ -311,10 +317,12 @@ object MailData {
         mailbox: Mailbox,
         offset: Int,
         realmThreads: List<Thread>? = null,
+        threadMode: ThreadMode = ThreadMode.THREADS,
+        offset: Int = OFFSET_FIRST_PAGE,
         forceRefresh: Boolean = false,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
+            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, threadMode, offset)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
