@@ -23,6 +23,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -101,7 +103,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
     }
 
     private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
-        expeditor.text = from.first().run { if (name.isNullOrEmpty()) email else name }
+        expeditor.text = formatExpeditorField(context, this)
         mailSubject.text = subject.getFormattedThreadSubject(context)
 
         mailDate.text = displayedDate
@@ -113,6 +115,17 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
         root.setOnClickListener { onThreadClicked?.invoke(this) }
+    }
+
+    private fun formatExpeditorField(context: Context, thread: Thread) = with(thread) {
+        buildSpannedString {
+            if (hasDrafts) {
+                color(context.getColor(R.color.draftTextColor)) {
+                    append("(${context.getString(R.string.messageIsDraftOption)}) ")
+                }
+            }
+            from.forEach { append("${if (it.name.isNullOrEmpty()) it.email else it.name}, ") }
+        }.dropLast(2)
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {

@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.Html
 import android.text.SpannedString
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -81,10 +80,14 @@ class ThreadAdapter(
         displayMessage(message)
     }
 
-    fun removeMessage(message: Message) {
+    fun removeMessage(message: Message): Int {
         val position = messageList.indexOf(message)
-        messageList.removeAt(position)
-        notifyItemRemoved(position)
+        if (position != -1) {
+            messageList.removeAt(position)
+            notifyItemRemoved(position)
+        }
+
+        return position
     }
 
     fun notifyAdapter(newList: MutableList<Message>) {
@@ -122,7 +125,7 @@ class ThreadAdapter(
 
         expandHeaderButton.isVisible = isExpanded
         webViewFrameLayout.isVisible = isExpanded
-        recipient.text = if (isExpanded) formatRecipientsName(message) else Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
+        recipient.text = if (isExpanded) formatRecipientsName(context, message) else subject
         expeditorEmail.text = if (isExpanded) from.first().email else ""
 
         if (isExpanded) {
