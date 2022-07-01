@@ -24,13 +24,9 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.data.models.MessagePriority
-import com.infomaniak.mail.data.models.MessagePriority.getPriority
-import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
-import io.realm.kotlin.ext.realmListOf
 
 class NewMessageActivity : ThemedActivity() {
 
@@ -98,22 +94,11 @@ class NewMessageActivity : ThemedActivity() {
         view.setOnClickListener { viewModel.editorAction.value = action }
     }
 
-    private fun createDraft() = with(newMessageFragment) {
-        Draft().apply {
-            initLocalValues("")
-            // TODO: should userInformation (here 'from') be stored in mainViewModel ? see ApiRepository.getUser()
-            from = realmListOf(Recipient().apply { email = getFromMailbox().email })
-            subject = getSubject()
-            body = getBody()
-            priority = MessagePriority.Priority.NORMAL.getPriority()
-        }
-    }
-
-    private fun sendMail(action: Draft.DraftAction): Boolean {
-        if (viewModel.recipients.isEmpty()) return false
-        viewModel.sendMail(createDraft(), action)
-
-        return true
+    private fun sendMail(action: Draft.DraftAction): Boolean = with(viewModel) {
+        if (action == Draft.DraftAction.SEND && recipients.isEmpty()) return false
+        with(newMessageFragment) { currentDraft?.fill(action, getFromMailbox().email, getSubject(), getBody()) }
+        currentDraft?.let(::sendMail)
+        true
     }
 
     fun toggleEditor(isVisible: Boolean) {

@@ -52,7 +52,7 @@ class Draft : RealmObject {
     var cc: RealmList<Recipient>? = null
     var bcc: RealmList<Recipient>? = null
     var from: RealmList<Recipient> = realmListOf()
-    var to: RealmList<Recipient> = realmListOf()
+    var to: RealmList<Recipient>? = null
     var subject: String = ""
     @SerialName("ack_request")
     var ackRequest: Boolean = false
@@ -74,7 +74,7 @@ class Draft : RealmObject {
 
         cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         bcc = bcc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        to = to?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
     }
 
     fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)

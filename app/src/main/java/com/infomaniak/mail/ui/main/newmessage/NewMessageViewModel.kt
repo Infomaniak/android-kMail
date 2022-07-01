@@ -23,12 +23,15 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.MessagePriority
+import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
@@ -38,6 +41,13 @@ class NewMessageViewModel : ViewModel() {
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
+    var hasStartedEditing = MutableLiveData(false)
+    var autoSaveJob: Job? = null
+    var currentDraft: Draft? = null
+
+    fun setUp(draft: Draft? = null) {
+        currentDraft = draft ?: Draft().apply { initLocalValues("") }
+    }
 
     fun getAllContacts(): List<UiContact> {
         val contacts = mutableListOf<UiContact>()
@@ -47,21 +57,33 @@ class NewMessageViewModel : ViewModel() {
         return contacts
     }
 
-    fun sendMail(draft: Draft, action: Draft.DraftAction) {
+    fun sendMail(draft: Draft) {
+        if (hasStartedEditing.value == false) return
+
         val mailbox = MailData.currentMailboxFlow.value ?: return
-        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
-        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
+        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft)
+        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft)
 
         viewModelScope.launch(Dispatchers.IO) {
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
             draft.identityId = signature.data?.defaultSignatureId
-            if (action == Draft.DraftAction.SEND) sendDraft() else saveDraft()
+            // TODO: better handling of api response
+            if (draft.action == Draft.DraftAction.SEND.name.lowercase()) sendDraft() else currentDraft = saveDraft().data
         }
     }
 
-    private fun Draft.fillForApi(draftAction: String) = apply {
-        action = draftAction
-        to = recipients.toRealmRecipients() ?: realmListOf()
+    fun clearJobs() {
+        autoSaveJob?.cancel()
+    }
+
+    fun Draft.fill(draftAction: Draft.DraftAction, messageEmail: String, messageSubject: String, messageBody: String) = apply {
+        // TODO: should userInformation (here 'from') be stored in mainViewModel ? see ApiRepository.getUser()
+        from = realmListOf(Recipient().apply { email = messageEmail })
+        subject = messageSubject
+        body = messageBody
+        priority = MessagePriority.Priority.NORMAL.getPriority()
+        action = draftAction.name.lowercase()
+        to = recipients.toRealmRecipients()
         cc = newMessageCc.toRealmRecipients()
         bcc = newMessageBcc.toRealmRecipients()
 

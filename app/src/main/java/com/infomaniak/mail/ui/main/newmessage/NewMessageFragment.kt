@@ -21,12 +21,15 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ListPopupWindow
 import androidx.activity.addCallback
 import androidx.annotation.StringRes
@@ -35,6 +38,7 @@ import androidx.core.view.*
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
@@ -72,7 +76,9 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         handleOnBackPressed()
+        viewModel.setUp()
         setupFromField()
+        setUpAutoSave()
         displayChips()
 
         // TODO: Do we want this button?
@@ -94,7 +100,6 @@ class NewMessageFragment : Fragment() {
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
 
         viewModel.editorAction.observe(requireActivity()) {
-
             val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) ?: "" }
             // TODO: Do stuff here with this `selectedText`?
 
@@ -111,6 +116,8 @@ class NewMessageFragment : Fragment() {
                 EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
                 null -> Unit
             }
+
+            startAutoSave()
         }
 
         val allContacts = viewModel.getAllContacts()
@@ -127,6 +134,7 @@ class NewMessageFragment : Fragment() {
                 getInputView(field).setText("")
                 getContacts(field).add(contact)
                 createChip(field, contact)
+                startAutoSave()
             },
             addUnrecognizedContact = { field ->
                 val isEmail = addUnrecognizedMail(field)
@@ -141,6 +149,11 @@ class NewMessageFragment : Fragment() {
                 return null
             }
         })
+    }
+
+    override fun onPause() {
+        viewModel.clearJobs()
+        super.onPause()
     }
 
     private fun handleOnBackPressed() {
@@ -211,6 +224,40 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun setUpAutoSave() = with(binding) {
+        subjectTextField.setUpAutoSave()
+        bodyText.setUpAutoSave()
+    }
+
+    private fun EditText.setUpAutoSave() {
+        addTextChangedListener(object : TextWatcher {
+
+            override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {
+                // No Op
+            }
+
+            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.clearJobs()
+                viewModel.hasStartedEditing.value = true
+            }
+
+            override fun afterTextChanged(editable: Editable?) {
+                startAutoSave()
+            }
+        })
+    }
+
+    fun startAutoSave() = with(viewModel) {
+        hasStartedEditing.value = true
+        clearJobs()
+        autoSaveJob = lifecycleScope.launch(Dispatchers.IO) {
+            delay(3000)
+            if (currentDraft == null) currentDraft = Draft().apply { initLocalValues("") }
+            currentDraft?.fill(Draft.DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
+            currentDraft?.let(::sendMail)
+        }
+    }
+
     private fun addUnrecognizedMail(fieldType: FieldType): Boolean {
         val input = getInputView(fieldType).text.toString().trim()
         val isEmail = input.isEmail()
@@ -221,6 +268,7 @@ class NewMessageFragment : Fragment() {
                 val contact = UiContact(input)
                 getContacts(fieldType).add(contact)
                 createChip(fieldType, contact)
+                startAutoSave()
             }
         }
         return isEmail
@@ -259,6 +307,7 @@ class NewMessageFragment : Fragment() {
     private fun removeEmail(field: FieldType, contact: UiContact) {
         val index = getContacts(field).indexOfFirst { it.email == contact.email }
         removeEmail(field, index)
+        startAutoSave()
     }
 
     private fun removeEmail(field: FieldType, index: Int) {
