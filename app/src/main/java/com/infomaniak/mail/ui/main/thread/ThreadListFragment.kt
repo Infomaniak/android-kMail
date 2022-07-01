@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -49,6 +48,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -233,17 +233,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             if (folderNameJob != null) folderNameJob?.cancel()
 
             folderNameJob = viewModelScope.launch(Dispatchers.Main) {
-                MailData.currentFolderFlow.filterNotNull().collect { folder ->
-                    context?.let { displayFolderName(it, folder) }
-                }
+                MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
             }
         }
     }
 
-    private fun displayFolderName(context: Context, folder: Folder) {
+    private fun displayFolderName(folder: Folder) = with(binding) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
-        binding.mailboxName.text = folderName
+        mailboxName.text = folderName
     }
 
     private fun listenToThreads() {
@@ -257,17 +255,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayThreads(threads: List<Thread>) {
+    private fun displayThreads(threads: List<Thread>) = with(binding) {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
-        binding.swipeRefreshLayout.isRefreshing = false
+        swipeRefreshLayout.isRefreshing = false
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
-        context?.let {
-            with(threadListAdapter) {
-                notifyAdapter(formatList(threads, it))
-            }
+        with(threadListAdapter) {
+            notifyAdapter(formatList(threads, context))
         }
     }
 

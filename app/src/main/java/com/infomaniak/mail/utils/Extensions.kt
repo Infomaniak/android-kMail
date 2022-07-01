@@ -18,7 +18,9 @@
 package com.infomaniak.mail.utils
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
+import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
@@ -77,3 +79,5 @@ fun View.toggleChevron(
     val angle = if (isCollapsed) collapsedAngle else expandedAngle
     animate().rotation(angle).setDuration(duration).start()
 }
+
+inline val ViewBinding.context: Context get() = root.context

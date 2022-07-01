@@ -104,7 +104,7 @@ object MailData {
      * Load Data
      */
     fun loadAddressBooksAndContacts() {
-        loadAddressBooks() {
+        loadAddressBooks {
             loadContacts()
         }
     }

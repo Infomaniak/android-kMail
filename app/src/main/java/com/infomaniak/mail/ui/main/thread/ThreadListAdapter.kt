@@ -35,6 +35,7 @@ import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import java.util.*
@@ -88,7 +89,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         sectionTitle.apply {
             text = itemsList[position] as String
             setTextAppearance(R.style.Callout)
-            setTextColor(root.context.getColor(R.color.sectionHeaderTextColor))
+            setTextColor(context.getColor(R.color.sectionHeaderTextColor))
         }
     }
 
@@ -102,7 +103,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         val thread = itemsList[position] as Thread
 
         expeditor.text = thread.from.first().name.ifEmpty { thread.from.first().email }
-        mailSubject.text = thread.subject.getFormattedThreadSubject(root.context)
+        mailSubject.text = thread.subject.getFormattedThreadSubject(context)
 
         mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
 
@@ -120,8 +121,8 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         expeditor.setTextAppearance(R.style.H2_Secondary)
         mailSubject.setTextAppearance(R.style.Body_Secondary)
         mailDate.setTextAppearance(R.style.Callout_Secondary)
-        iconAttachment.setDrawableColor(root.context, R.color.secondaryTextColor)
-        iconCalendar.setDrawableColor(root.context, R.color.secondaryTextColor)
+        iconAttachment.setDrawableColor(context, R.color.secondaryTextColor)
+        iconCalendar.setDrawableColor(context, R.color.secondaryTextColor)
     }
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
@@ -129,8 +130,8 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         expeditor.setTextAppearance(R.style.H2)
         mailSubject.setTextAppearance(R.style.H3)
         mailDate.setTextAppearance(R.style.Callout_Strong)
-        iconAttachment.setDrawableColor(root.context, R.color.primaryTextColor)
-        iconCalendar.setDrawableColor(root.context, R.color.primaryTextColor)
+        iconAttachment.setDrawableColor(context, R.color.primaryTextColor)
+        iconCalendar.setDrawableColor(context, R.color.primaryTextColor)
     }
 
     private fun formatDate(date: Date): String = with(date) {

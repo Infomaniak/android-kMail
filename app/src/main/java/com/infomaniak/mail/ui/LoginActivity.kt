@@ -73,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
             appUID = BuildConfig.APPLICATION_ID,
             clientID = BuildConfig.CLIENT_ID,
         )
-        
+
         binding.loginButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
     }
 

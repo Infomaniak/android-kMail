@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -71,7 +72,7 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
-        AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
+        AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(it))
         }
     }

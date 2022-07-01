@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toggleChevron
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -119,7 +120,7 @@ class MenuDrawerFragment(
         }
         feedbacks.setOnClickListener {
             closeDrawer()
-            context?.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
+            context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
         }
         help.setOnClickListener {
             closeDrawer()
@@ -205,10 +206,10 @@ class MenuDrawerFragment(
         menuDrawerViewModel.mailboxSize.observe(viewLifecycleOwner) { sizeUsed ->
             if (sizeUsed == null) return@observe
 
-            val formattedSize = FormatterFileSize.formatShortFileSize(root.context, sizeUsed)
-            val formattedTotalSize = FormatterFileSize.formatShortFileSize(root.context, LIMITED_MAILBOX_SIZE)
+            val formattedSize = FormatterFileSize.formatShortFileSize(context, sizeUsed)
+            val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, LIMITED_MAILBOX_SIZE)
 
-            storageText.text = context?.resources?.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+            storageText.text = context.resources?.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
             storageIndicator.progress = ceil(100.0 * sizeUsed / LIMITED_MAILBOX_SIZE).toInt()
         }
     }
@@ -236,8 +237,8 @@ class MenuDrawerFragment(
         openFolder(getString(folderNameId))
     }
 
-    private fun openFolder(folderName: String) = context?.let {
-        menuDrawerViewModel.openFolder(folderName, it)
+    private fun openFolder(folderName: String) = with(binding) {
+        menuDrawerViewModel.openFolder(folderName, context)
         closeDrawer()
     }
 
