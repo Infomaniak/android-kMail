@@ -169,7 +169,7 @@ object MailData {
     }
 
     fun refreshThreads(folder: Folder, mailbox: Mailbox) {
-        getThreadsFromApi(folder, mailbox, OFFSET_FIRST_PAGE, forceRefresh = true)
+        getThreadsFromApi(folder, mailbox, offset = OFFSET_FIRST_PAGE, forceRefresh = true)
     }
 
     fun loadMessages(thread: Thread) {
@@ -309,13 +309,12 @@ object MailData {
         mutableFoldersFlow.value = mergedFolders
 
         val selectedFolder = computeFolderToSelect(mergedFolders)
-        getThreadsFromApi(selectedFolder, mailbox, OFFSET_FIRST_PAGE)
+        getThreadsFromApi(selectedFolder, mailbox, offset = OFFSET_FIRST_PAGE)
     }
 
     private fun getThreadsFromApi(
         folder: Folder,
         mailbox: Mailbox,
-        offset: Int,
         realmThreads: List<Thread>? = null,
         threadMode: ThreadMode = ThreadMode.THREADS,
         offset: Int = OFFSET_FIRST_PAGE,

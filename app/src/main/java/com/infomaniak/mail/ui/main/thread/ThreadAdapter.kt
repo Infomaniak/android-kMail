@@ -125,7 +125,7 @@ class ThreadAdapter(
 
         expandHeaderButton.isVisible = isExpanded
         webViewFrameLayout.isVisible = isExpanded
-        recipient.text = if (isExpanded) formatRecipientsName(context, message) else subject
+        recipient.text = if (isExpanded) formatRecipientsName(message) else subject
         expeditorEmail.text = if (isExpanded) from.first().email else ""
 
         if (isExpanded) {

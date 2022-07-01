@@ -64,7 +64,7 @@ class MenuDrawerViewModel : ViewModel() {
         val mailbox = MailData.currentMailboxFlow.value ?: return
 
         MailData.selectFolder(folder)
-        MailData.loadThreads(folder, mailbox, OFFSET_FIRST_PAGE)
+        MailData.loadThreads(folder, mailbox, offset = OFFSET_FIRST_PAGE)
     }
 
     fun switchToMailbox(mailbox: Mailbox) {
