@@ -88,7 +88,10 @@ object MailApi {
 
         // Get outdated data
         Log.d("API", "Folders: Get outdated data")
-        val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
+        // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
+        val deletableFolders = foldersFromRealm.filter { fromRealm ->
+            !foldersFromApi.any { fromApi -> fromApi.id == fromRealm.id }
+        }
         val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
         val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
             deletableFolders.any { folder -> folder.id == message.folderId }
@@ -145,7 +148,10 @@ object MailApi {
 
         // Get outdated data
         Log.d("API", "Threads: Get outdated data")
-        val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
+        // val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
+        val deletableThreads = threadsFromRealm.filter { fromRealm ->
+            !threadsFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+        }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
 
         // Save new data
@@ -179,7 +185,10 @@ object MailApi {
 
         // Get outdated data
         Log.d("API", "Messages: Get outdated data")
-        val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
+        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
+        val deletableMessages = messagesFromRealm.filter { fromRealm ->
+            !messagesFromApi.any { fromApi -> fromApi.uid == fromRealm.uid }
+        }
 
         // Save new data
         Log.i("API", "Messages: Save new data")

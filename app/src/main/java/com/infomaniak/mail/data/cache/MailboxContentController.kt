@@ -77,7 +77,7 @@ object MailboxContentController {
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    fun getDeletableThreads(threadsToKeep: List<Thread>): RealmResults<Thread> {
+    fun getDeletableThreads(folder: Folder, threadsToKeep: List<Thread>): RealmResults<Thread> {
         val threadsIds = threadsToKeep.map { it.uid }
         val query = threadsIds.joinToString(
             prefix = "NOT (${Thread::uid.name} == '",
@@ -104,7 +104,7 @@ object MailboxContentController {
     // }
 
     fun deleteThreads(threads: List<Thread>) {
-        MailRealm.mailboxContent.writeBlocking { threads.forEach { getLatestFolder(it.uid)?.let(::delete) } }
+        MailRealm.mailboxContent.writeBlocking { threads.forEach { getLatestThread(it.uid)?.let(::delete) } }
     }
 
     /**
@@ -118,13 +118,11 @@ object MailboxContentController {
         return MailRealm.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first().find()
     }
 
-    fun getLatestMessage(uid: String): Message? = MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid) }
-
-    private fun MutableRealm.getLatestMessage(uid: String): Message? = getMessage(uid)?.let(::findLatest)
+    fun MutableRealm.getLatestMessage(uid: String): Message? = getMessage(uid)?.let(::findLatest)
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    fun getDeletableMessages(messagesToKeep: List<Message>): RealmResults<Message> {
+    fun getDeletableMessages(thread: Thread, messagesToKeep: List<Message>): RealmResults<Message> {
         val messagesIds = messagesToKeep.map { it.uid }
         val query = messagesIds.joinToString(
             prefix = "NOT (${Message::uid.name} == '",
@@ -142,12 +140,12 @@ object MailboxContentController {
     //     mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
     // }
 
-    // fun deleteMessage(uid: String) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
-    // }
+    fun deleteMessage(uid: String) {
+        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
+    }
 
     fun deleteMessages(messages: List<Message>) {
-        MailRealm.mailboxContent.writeBlocking { messages.forEach { getLatestFolder(it.uid)?.let(::delete) } }
+        MailRealm.mailboxContent.writeBlocking { messages.forEach { getLatestMessage(it.uid)?.let(::delete) } }
     }
 
     /**
