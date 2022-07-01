@@ -39,7 +39,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
@@ -72,7 +71,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    private var currentOffset = ApiRepository.OFFSET_FIRST_PAGE // TODO: Reset it somewhere?
+    private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
@@ -91,6 +90,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         override fun onDrawerStateChanged(newState: Int) {
             // No-op
         }
+    }
+
+    private companion object {
+        const val OFFSET_TRIGGER = 1
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
@@ -188,7 +191,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
         }
 
-        threadsList.setPagination(whenLoadMoreIsPossible = { if (!isDownloadingChanges) downloadThreads() }, triggerOffset = 10)
+        threadsList.setPagination(
+            whenLoadMoreIsPossible = { if (!isDownloadingChanges) downloadThreads() },
+            triggerOffset = OFFSET_TRIGGER,
+        )
 
         threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

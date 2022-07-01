@@ -474,10 +474,10 @@ object MailData {
 
         // Save new data
         Log.d("API", "Threads: Save new data")
-        val takeLast = apiThreads.size - offset
-        if (takeLast > 0) {
+        val newPageSize = apiThreads.size - offset
+        if (newPageSize > 0) {
             MailRealm.mailboxContent.writeBlocking {
-                apiThreads.takeLast(takeLast).forEach { apiThread ->
+                apiThreads.takeLast(newPageSize).forEach { apiThread ->
                     val realmThread = realmThreads?.find { it.uid == apiThread.uid }
                     val mergedThread = if (realmThread == null) {
                         apiThread
