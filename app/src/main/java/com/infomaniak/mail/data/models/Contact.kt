@@ -15,13 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(RealmListSerializer::class)
+
 package com.infomaniak.mail.data.models
 
+import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.realmListOf
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
 @Serializable
 class Contact : RealmObject {
