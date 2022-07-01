@@ -219,19 +219,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onPause() {
         folderNameJob?.cancel()
-        folderNameJob = null
-
         threadsJob?.cancel()
-        threadsJob = null
-
         super.onPause()
     }
 
     private fun listenToFolderName() {
         with(threadListViewModel) {
-
-            if (folderNameJob != null) folderNameJob?.cancel()
-
+            folderNameJob?.cancel()
             folderNameJob = viewModelScope.launch(Dispatchers.Main) {
                 MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
             }
@@ -246,9 +240,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun listenToThreads() {
         with(threadListViewModel) {
-
-            if (threadsJob != null) threadsJob?.cancel()
-
+            threadsJob?.cancel()
             threadsJob = viewModelScope.launch(Dispatchers.Main) {
                 uiThreadsFlow.filterNotNull().collect(::displayThreads)
             }

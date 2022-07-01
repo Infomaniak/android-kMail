@@ -52,8 +52,7 @@ class MenuDrawerViewModel : ViewModel() {
     }
 
     private fun listenToMailboxes() {
-        if (listenToMailboxesJob != null) listenToMailboxesJob?.cancel()
-
+        listenToMailboxesJob?.cancel()
         listenToMailboxesJob = CoroutineScope(Dispatchers.IO).launch {
             MailData.mailboxesFlow.collect { mailboxes ->
                 mutableUiMailboxesFlow.value = mailboxes
@@ -62,8 +61,7 @@ class MenuDrawerViewModel : ViewModel() {
     }
 
     private fun listenToFolders() {
-        if (listenToFoldersJob != null) listenToFoldersJob?.cancel()
-
+        listenToFoldersJob?.cancel()
         listenToFoldersJob = CoroutineScope(Dispatchers.IO).launch {
             MailData.foldersFlow.collect { folders ->
                 mutableUiFoldersFlow.value = folders
@@ -96,10 +94,6 @@ class MenuDrawerViewModel : ViewModel() {
     override fun onCleared() {
         listenToMailboxesJob?.cancel()
         listenToFoldersJob?.cancel()
-
-        listenToMailboxesJob = null
-        listenToFoldersJob = null
-
         super.onCleared()
     }
 }

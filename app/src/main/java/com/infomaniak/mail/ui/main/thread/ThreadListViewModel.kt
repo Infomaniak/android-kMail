@@ -41,8 +41,7 @@ class ThreadListViewModel : ViewModel() {
     }
 
     private fun listenToThreads() {
-        if (listenToThreadsJob != null) listenToThreadsJob?.cancel()
-
+        listenToThreadsJob?.cancel()
         listenToThreadsJob = CoroutineScope(Dispatchers.IO).launch {
             MailData.threadsFlow.collect { threads ->
                 mutableUiThreadsFlow.value = threads
@@ -67,8 +66,6 @@ class ThreadListViewModel : ViewModel() {
 
     override fun onCleared() {
         listenToThreadsJob?.cancel()
-        listenToThreadsJob = null
-
         super.onCleared()
     }
 }

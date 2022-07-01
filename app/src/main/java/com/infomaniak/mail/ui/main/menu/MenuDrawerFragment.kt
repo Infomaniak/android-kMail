@@ -161,20 +161,13 @@ class MenuDrawerFragment(
 
     override fun onPause() {
         currentMailboxJob?.cancel()
-        currentMailboxJob = null
-
         mailboxesJob?.cancel()
-        mailboxesJob = null
-
         foldersJob?.cancel()
-        foldersJob = null
-
         super.onPause()
     }
 
     private fun listenToCurrentMailbox() {
-        if (currentMailboxJob != null) currentMailboxJob?.cancel()
-
+        currentMailboxJob?.cancel()
         currentMailboxJob = menuDrawerViewModel.viewModelScope.launch(Dispatchers.Main) {
             MailData.currentMailboxFlow.filterNotNull().collect { currentMailbox ->
                 binding.accountSwitcherText.text = currentMailbox.email
@@ -183,8 +176,7 @@ class MenuDrawerFragment(
     }
 
     private fun listenToMailboxes() = with(menuDrawerViewModel) {
-        if (mailboxesJob != null) mailboxesJob?.cancel()
-
+        mailboxesJob?.cancel()
         mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                 val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
@@ -195,8 +187,7 @@ class MenuDrawerFragment(
     }
 
     private fun listenToFolders() = with(menuDrawerViewModel) {
-        if (foldersJob != null) foldersJob?.cancel()
-
+        foldersJob?.cancel()
         foldersJob = viewModelScope.launch(Dispatchers.Main) {
             uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
         }

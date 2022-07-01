@@ -85,16 +85,12 @@ class SwitchUserFragment : Fragment() {
 
     override fun onPause() {
         mailboxesJob?.cancel()
-        mailboxesJob = null
-
         super.onPause()
     }
 
     private fun listenToMailboxes() {
         with(switchUserViewModel) {
-
-            if (mailboxesJob != null) mailboxesJob?.cancel()
-
+            mailboxesJob?.cancel()
             mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
                 uiAccountsFlow.filterNotNull().collect { accounts ->
 

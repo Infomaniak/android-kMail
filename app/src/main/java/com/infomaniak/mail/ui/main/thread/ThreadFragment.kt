@@ -112,16 +112,12 @@ class ThreadFragment : Fragment() {
 
     override fun onPause() {
         messagesJob?.cancel()
-        messagesJob = null
-
         super.onPause()
     }
 
     private fun listenToMessages() {
         with(threadViewModel) {
-
-            if (messagesJob != null) messagesJob?.cancel()
-
+            messagesJob?.cancel()
             messagesJob = viewModelScope.launch(Dispatchers.Main) {
                 uiMessagesFlow.filterNotNull().collect(::displayMessages)
             }
