@@ -101,14 +101,20 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.displayHeader(message: Message) = with(message) {
-        deleteDraftButton.isVisible = isDraft
-        deleteDraftButton.setOnClickListener { onDeleteDraftClicked?.invoke(message) }
+        deleteDraftButton.apply {
+            isVisible = isDraft
+            setOnClickListener { onDeleteDraftClicked?.invoke(message) }
+        }
+
         messageDate.text = if (isDraft) "" else date?.toDate()?.format("d MMM YYYY à HH:mm")
-        expeditorName.setTextColor(context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
-        expeditorName.text = if (isDraft) {
-            context.getString(R.string.messageIsDraftOption)
-        } else {
-            from.first().displayedName(context)
+
+        expeditorName.apply {
+            setTextColor(context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
+            text = if (isDraft) {
+                context.getString(R.string.messageIsDraftOption)
+            } else {
+                from.first().displayedName(context)
+            }
         }
 
         expandHeaderButton.isVisible = isExpanded
@@ -256,7 +262,7 @@ class ThreadAdapter(
         }
     }
 
-    companion object {
+    private companion object {
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
     }
 }

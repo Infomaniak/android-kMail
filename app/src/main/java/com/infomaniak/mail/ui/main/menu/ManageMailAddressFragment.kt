@@ -26,6 +26,7 @@ import com.infomaniak.mail.R
 
 class ManageMailAddressFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_manager_mail_address, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.fragment_manager_mail_address, container, false)
+    }
 }

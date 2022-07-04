@@ -229,7 +229,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         }
     }
 
-    companion object {
+    private companion object {
         const val NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER = 3
         const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
     }

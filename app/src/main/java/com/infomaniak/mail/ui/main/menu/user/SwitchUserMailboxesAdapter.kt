@@ -71,9 +71,13 @@ class SwitchUserMailboxesAdapter(
         unreadCount.setTextAppearance(style)
     }
 
-    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean) =
-        if (isSelected) ContextCompat.getColor(context, R.color.emphasizedTextColor) to R.style.Callout_Highlighted_Strong
-        else ContextCompat.getColor(context, RCore.color.title) to R.style.Callout
+    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Pair<Int, Int> {
+        return if (isSelected) {
+            ContextCompat.getColor(context, R.color.emphasizedTextColor) to R.style.Callout_Highlighted_Strong
+        } else {
+            ContextCompat.getColor(context, RCore.color.title) to R.style.Callout
+        }
+    }
 
     override fun getItemCount(): Int = mailboxes.count()
 

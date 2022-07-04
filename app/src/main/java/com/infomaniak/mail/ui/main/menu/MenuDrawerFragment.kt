@@ -72,8 +72,9 @@ class MenuDrawerFragment(
     private val customFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
     private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -200,8 +201,8 @@ class MenuDrawerFragment(
             val formattedSize = FormatterFileSize.formatShortFileSize(context, sizeUsed)
             val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, LIMITED_MAILBOX_SIZE)
 
-            storageText.text = context.resources?.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
-            storageIndicator.progress = ceil(100.0 * sizeUsed / LIMITED_MAILBOX_SIZE).toInt()
+            storageText.text = context.resources.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+            storageIndicator.progress = ceil(100.0f * sizeUsed.toFloat() / LIMITED_MAILBOX_SIZE.toFloat()).toInt()
         }
     }
 
@@ -255,7 +256,7 @@ class MenuDrawerFragment(
         return folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
     }
 
-    companion object {
+    private companion object {
         const val LIMITED_MAILBOX_SIZE: Long = 20L * 1 shl 30
     }
 }

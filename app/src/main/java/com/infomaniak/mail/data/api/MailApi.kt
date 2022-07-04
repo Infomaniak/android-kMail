@@ -81,18 +81,12 @@ object MailApi {
     }
 
     fun fetchDraft(draftResource: String, parentUid: String): Draft? {
-        val apiDraft = ApiRepository.getDraft(draftResource).data
-
-        apiDraft?.let { draft ->
-            draft.apply {
-                initLocalValues(parentUid)
-                // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
-            }
-            MailboxContentController.upsertDraft(draft)
+        return ApiRepository.getDraft(draftResource).data?.apply {
+            initLocalValues(parentUid)
+            // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+            attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
+            MailboxContentController.upsertDraft(this)
         }
-
-        return apiDraft
     }
 
     fun fetchMailBoxStorage(mailbox: Mailbox): Long? {

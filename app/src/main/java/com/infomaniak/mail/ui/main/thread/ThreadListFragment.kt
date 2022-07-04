@@ -169,9 +169,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         // TODO: Multiselect
         // openMultiselectButton.setOnClickListener {}
 
-        toolbar.setNavigationOnClickListener {
-            drawerLayout.open()
-        }
+        toolbar.setNavigationOnClickListener { drawerLayout.open() }
 
         searchViewCard.apply {
             // TODO: FilterButton doesn't propagate the event to root, must display it?

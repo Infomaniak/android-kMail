@@ -33,8 +33,10 @@ import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
 import com.infomaniak.lib.core.R as RCore
 
-class FoldersAdapter(private var folders: List<Folder> = emptyList(), private val openFolder: (folderName: String) -> Unit) :
-    RecyclerView.Adapter<FolderViewHolder>() {
+class FoldersAdapter(
+    private var folders: List<Folder> = emptyList(),
+    private val openFolder: (folderName: String) -> Unit,
+) : RecyclerView.Adapter<FolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         return FolderViewHolder(ItemFolderMenuDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
