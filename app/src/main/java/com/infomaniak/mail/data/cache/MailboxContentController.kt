@@ -17,13 +17,15 @@
  */
 package com.infomaniak.mail.data.cache
 
-import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
@@ -179,6 +181,37 @@ object MailboxContentController {
 
     fun upsertDraft(draft: Draft) {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
+    }
+
+    fun manageDraftAutoSave(draft: Draft, oldUuid: String, isOffline: Boolean) {
+        val draftsFolder = MailData.foldersFlow.value?.find { it.role == Folder.FolderRole.DRAFT }
+        val draftMessage = draft.toMessage()
+        val thread = Thread.from(draftMessage)
+        draft.apply {
+            bcc = bcc ?: realmListOf()
+            cc = cc ?: realmListOf()
+            to = to ?: realmListOf()
+        }
+
+        MailRealm.mailboxContent.writeBlocking {
+            val folderThreads = getLatestFolder(draftsFolder?.id ?: "")?.threads
+
+            if (isOffline) {
+                copyToRealm(draft, UpdatePolicy.ALL)
+                copyToRealm(draftMessage, UpdatePolicy.ALL)
+                copyToRealm(thread, UpdatePolicy.ALL)
+
+                folderThreads?.removeIf { it.uid == thread.uid }
+                folderThreads?.add(thread)
+
+            }
+
+            if (oldUuid.isNotEmpty()) {
+                folderThreads?.removeIf { it.uid == oldUuid }
+                getLatestThread(oldUuid)?.let(::delete)
+                deleteLatestMessage(oldUuid)
+            }
+        }
     }
 
     /**

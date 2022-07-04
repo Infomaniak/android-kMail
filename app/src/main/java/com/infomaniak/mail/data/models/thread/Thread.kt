@@ -107,4 +107,23 @@ class Thread : RealmObject {
         STARRED("Starred"),
         UNSTARRED("Unstarred"),
     }
+
+    companion object {
+
+        fun from(message: Message) = Thread().apply {
+            uid = message.uid
+            from = message.from
+            to = message.to
+            bcc = message.bcc
+            cc = message.cc
+            hasDrafts = true
+            hasAttachments = message.hasAttachments
+            messages = realmListOf(message)
+            subject = message.subject
+            date = message.date
+            messagesCount = 1
+            size = message.attachments.size
+            flagged = message.flagged
+        }
+    }
 }

@@ -125,7 +125,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
                 }
             }
             from.forEach { append("${if (it.name.isNullOrEmpty()) it.email else it.name}, ") }
-        }.dropLast(2)
+        }.removeSuffix(", ")
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {

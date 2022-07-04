@@ -22,10 +22,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -62,13 +62,20 @@ class NewMessageViewModel : ViewModel() {
 
         val mailbox = MailData.currentMailboxFlow.value ?: return
         fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft)
-        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft)
+        fun saveDraft() = MailData.saveDraft(draft)
 
         viewModelScope.launch(Dispatchers.IO) {
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
             draft.identityId = signature.data?.defaultSignatureId
             // TODO: better handling of api response
-            if (draft.action == Draft.DraftAction.SEND.name.lowercase()) sendDraft() else currentDraft = saveDraft().data
+            if (draft.action == Draft.DraftAction.SEND.name.lowercase()) {
+                sendDraft()
+            } else {
+                saveDraft()?.data?.let {
+                    currentDraft?.uuid = it.uuid
+                    currentDraft?.parentMessageUid = it.uid
+                }
+            }
         }
     }
 

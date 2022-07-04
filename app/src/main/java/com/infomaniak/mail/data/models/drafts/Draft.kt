@@ -17,9 +17,13 @@
  */
 @file:UseSerializers(RealmListSerializer::class)
 
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.drafts
 
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
@@ -28,6 +32,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import java.util.*
 
 @Serializable
 class Draft : RealmObject {
@@ -69,7 +74,7 @@ class Draft : RealmObject {
     var parentMessageUid: String = ""
 
     fun initLocalValues(messageUid: String) {
-        if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
+        if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid.ifEmpty { UUID.randomUUID() }}"
         parentMessageUid = messageUid
 
         cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
@@ -78,6 +83,22 @@ class Draft : RealmObject {
     }
 
     fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
+
+    fun toMessage() = Message().apply {
+        val draft = this@Draft
+        uid = draft.uuid
+        draftUuid = draft.uuid
+        subject = draft.subject
+        from = draft.from
+        to = draft.to ?: realmListOf()
+        cc = draft.cc ?: realmListOf()
+        bcc = draft.bcc ?: realmListOf()
+        replyTo = draft.replyTo
+        isDraft = true
+        attachments = draft.attachments
+        hasAttachments = draft.attachments.isNotEmpty()
+        date = Date().toRealmInstant()
+    }
 
     enum class DraftAction {
         SEND, SAVE

@@ -21,8 +21,12 @@ import android.util.Log
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Contact
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.user.UserPreferences

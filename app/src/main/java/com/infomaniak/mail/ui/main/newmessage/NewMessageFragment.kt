@@ -38,12 +38,13 @@ import androidx.core.view.*
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
@@ -250,7 +251,7 @@ class NewMessageFragment : Fragment() {
     fun startAutoSave() = with(viewModel) {
         hasStartedEditing.value = true
         clearJobs()
-        autoSaveJob = lifecycleScope.launch(Dispatchers.IO) {
+        autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(3000)
             if (currentDraft == null) currentDraft = Draft().apply { initLocalValues("") }
             currentDraft?.fill(Draft.DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())

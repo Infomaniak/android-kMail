@@ -23,7 +23,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*

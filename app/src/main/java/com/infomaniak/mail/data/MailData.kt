@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data
 
 import android.util.Log
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
@@ -29,6 +30,7 @@ import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestMessa
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestThread
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
+import com.infomaniak.mail.data.cache.MailboxContentController.manageDraftAutoSave
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Contact
@@ -36,6 +38,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.addressBook.AddressBook
+import com.infomaniak.mail.data.models.drafts.Draft
+import com.infomaniak.mail.data.models.drafts.DraftSaveResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
@@ -175,6 +179,20 @@ object MailData {
     fun loadMessages(thread: Thread) {
         getMessagesFromRealm(thread)
         getMessagesFromApi(thread)
+    }
+
+    fun saveDraft(draft: Draft): ApiResponse<DraftSaveResult>? {
+        val mailbox = currentMailboxFlow.value ?: return null
+        val response = ApiRepository.saveDraft(mailbox.uuid, draft)
+        var oldUuid = ""
+        response.data?.let {
+            oldUuid = draft.uuid
+            draft.uuid = it.uuid
+        }
+
+        manageDraftAutoSave(draft, oldUuid, response.translatedError == com.infomaniak.lib.core.R.string.connectionError)
+
+        return response
     }
 
     fun deleteDraft(message: Message) {
