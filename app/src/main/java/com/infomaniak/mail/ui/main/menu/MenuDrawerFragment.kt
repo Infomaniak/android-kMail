@@ -235,26 +235,34 @@ class MenuDrawerFragment(
     }
 
     private fun onFoldersChange(folders: List<Folder>) {
-        binding.inboxFolderBadge.text = getInboxFolder(folders)?.getUnreadCountOrNull()
 
-        defaultFoldersAdapter.setFolders(getDefaultFolders(folders))
+        val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
+
+        binding.inboxFolderBadge.text = inbox?.getUnreadCountOrNull()
+
+        defaultFoldersAdapter.setFolders(defaultFolders)
         defaultFoldersAdapter.notifyDataSetChanged()
 
-        customFoldersAdapter.setFolders(getCustomFolders(folders))
+        customFoldersAdapter.setFolders(customFolders)
         customFoldersAdapter.notifyDataSetChanged()
     }
 
-    private fun getInboxFolder(folders: List<Folder>): Folder? {
-        return folders.find { it.role == FolderRole.INBOX }
+    private fun getMenuFolders(folders: List<Folder>): Folders {
+        return folders.toMutableList().let { list ->
+
+            val inbox = list.find { it.role == FolderRole.INBOX }?.also(list::remove)
+            val defaultFolders = list.filter { it.role != null }.sortedBy { it.role?.order }.also(list::removeAll)
+            val customFolders = list.sortedByDescending { it.isFavorite }
+
+            Folders(inbox, defaultFolders, customFolders)
+        }
     }
 
-    private fun getDefaultFolders(folders: List<Folder>): List<Folder> {
-        return folders.filter { it.role != null && it.role != FolderRole.INBOX }.sortedBy { it.role?.order }
-    }
-
-    private fun getCustomFolders(folders: List<Folder>): List<Folder> {
-        return folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
-    }
+    private data class Folders(
+        val inbox: Folder?,
+        val defaultFolders: List<Folder>,
+        val customFolders: List<Folder>,
+    )
 
     private companion object {
         const val LIMITED_MAILBOX_SIZE: Long = 20L * 1 shl 30
