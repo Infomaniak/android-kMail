@@ -199,7 +199,7 @@ class MenuDrawerFragment : Fragment() {
         expandCustomFolderButton.rotation = angle
     }
 
-    private fun closeDrawer() = with(binding) {
+    private fun closeDrawer() {
         closeDrawer?.invoke()
         closeDropdowns()
     }
@@ -218,8 +218,8 @@ class MenuDrawerFragment : Fragment() {
         openFolder(getString(folderNameId))
     }
 
-    private fun openFolder(folderName: String) = with(binding) {
-        viewModel.openFolder(folderName, context)
+    private fun openFolder(folderName: String) {
+        viewModel.openFolder(folderName, binding.context)
         closeDrawer()
     }
 
