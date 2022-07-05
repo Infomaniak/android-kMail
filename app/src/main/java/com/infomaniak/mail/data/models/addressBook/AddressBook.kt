@@ -20,7 +20,7 @@
 package com.infomaniak.mail.data.models.addressBook
 
 import com.infomaniak.mail.data.api.RealmListSerializer
-import io.realm.RealmObject
+import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers

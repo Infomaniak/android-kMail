@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.data.api
 
-import io.realm.RealmList
-import io.realm.toRealmList
+import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmList
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
