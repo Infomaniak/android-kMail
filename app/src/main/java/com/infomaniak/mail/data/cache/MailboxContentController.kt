@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
+import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -146,6 +147,28 @@ object MailboxContentController {
 
     fun deleteMessages(messages: List<Message>) {
         MailRealm.mailboxContent.writeBlocking { messages.forEach { getLatestMessage(it.uid)?.let(::delete) } }
+    }
+
+    /**
+     * Drafts
+     */
+
+    private fun getDraft(uuid: String): Draft? {
+        return MailRealm.mailboxContent.query<Draft>("${Draft::uuid.name} == '$uuid'").first().find()
+    }
+
+    private fun MutableRealm.getLatestDraft(uuid: String): Draft? = getDraft(uuid)?.let(::findLatest)
+
+    fun deleteDraft(uuid: String) {
+        MailRealm.mailboxContent.writeBlocking { getLatestDraft(uuid)?.let(::delete) }
+    }
+
+    fun deleteDrafts(drafts: List<Draft>) {
+        MailRealm.mailboxContent.writeBlocking { drafts.forEach { getLatestDraft(it.uuid)?.let(::delete) } }
+    }
+
+    fun upsertDraft(draft: Draft) {
+        MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
     }
 
     /**
