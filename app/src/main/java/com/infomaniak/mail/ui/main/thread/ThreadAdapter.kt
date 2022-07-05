@@ -106,7 +106,7 @@ class ThreadAdapter(
             setOnClickListener { onDeleteDraftClicked?.invoke(message) }
         }
 
-        messageDate.text = if (isDraft) "" else date?.toDate()?.format("d MMM YYYY à HH:mm")
+        messageDate.text = if (isDraft) "" else date?.toDate()?.format(FORMAT_EMAIL_DATE)
 
         expeditorName.apply {
             setTextColor(context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
@@ -263,6 +263,7 @@ class ThreadAdapter(
     }
 
     private companion object {
+        const val FORMAT_EMAIL_DATE = "d MMM yyyy, HH:mm"
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
     }
 }
