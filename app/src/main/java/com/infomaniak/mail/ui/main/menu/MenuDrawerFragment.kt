@@ -71,7 +71,7 @@ class MenuDrawerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupAdapters()
-        setupListener()
+        setupListeners()
         handleOnBackPressed()
         listenToCurrentMailbox()
         listenToMailboxes()
@@ -84,7 +84,7 @@ class MenuDrawerFragment : Fragment() {
         customFoldersList.adapter = customFoldersAdapter
     }
 
-    private fun setupListener() = with(binding) {
+    private fun setupListeners() = with(binding) {
         settingsButton.setOnClickListener {
             closeDrawer()
             safeNavigate(
