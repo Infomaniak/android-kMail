@@ -88,7 +88,7 @@ class MenuDrawerFragment : Fragment() {
         customFoldersList.adapter = customFolderAdapter
     }
 
-    private fun setupListener() = with(binding) {
+    private fun setupListeners() = with(binding) {
         settingsButton.setOnClickListener {
             closeDrawer()
             safeNavigate(
