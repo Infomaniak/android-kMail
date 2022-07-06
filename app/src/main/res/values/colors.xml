@@ -72,4 +72,8 @@
     <!-- Cardview -->
     <color name="cardviewStrokeColor">@android:color/transparent</color>
 
+    <!-- ButtonToggle -->
+    <color name="buttonToggleStroke">#BC0055</color>
+    <color name="buttonToggleBackground">#F7E8EF</color>
+
 </resources>

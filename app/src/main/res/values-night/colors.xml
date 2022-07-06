@@ -53,4 +53,8 @@
     <!-- Cardview -->
     <color name="cardviewStrokeColor">#242424</color>
 
+    <!-- ButtonToggle -->
+    <color name="buttonToggleStroke">#9D1A51</color>
+    <color name="buttonToggleBackground">#2A0F1B</color>
+
 </resources>

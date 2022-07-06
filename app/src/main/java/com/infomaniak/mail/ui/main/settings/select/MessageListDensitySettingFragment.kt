@@ -17,4 +17,57 @@
  */
 package com.infomaniak.mail.ui.main.settings.select
 
-class MessageListDensitySettingFragment : SelectSettingsFragment()
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.FragmentMessageListDensitySettingBinding
+
+class MessageListDensitySettingFragment : Fragment() {
+
+    private lateinit var binding: FragmentMessageListDensitySettingBinding
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentMessageListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupBack()
+    }
+
+    private fun setupBack() {
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        addListeners()
+    }
+
+    private fun addListeners() = with(binding) {
+        listDensityButtonsGroup.addOnButtonCheckedListener { _, buttonId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+
+            val resId = when (buttonId) {
+                R.id.listDensityButtonCompact -> R.drawable.list_density_compact_wip
+                R.id.listDensityButtonNormal -> R.drawable.list_density_normal_wip
+                else -> R.drawable.list_density_large_wip
+            }
+
+            listDensityImage.setImageResource(resId)
+        }
+    }
+
+    override fun onPause() {
+        removeListeners()
+        super.onPause()
+    }
+
+    private fun removeListeners() {
+        binding.listDensityButtonsGroup.clearOnButtonCheckedListeners()
+    }
+}

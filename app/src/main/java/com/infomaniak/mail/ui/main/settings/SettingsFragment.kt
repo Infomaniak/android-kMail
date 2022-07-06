@@ -58,7 +58,9 @@ class SettingsFragment : Fragment() {
     private fun setupListeners() = with(binding) {
         settingsSend.setOnClickListener { } // TODO
         settingsCodeLock.setOnClickListener { } // TODO
-        settingsThreadListDensity.setOnClickListener { } // TODO
+        settingsThreadListDensity.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToMessageListDensitySettingFragment())
+        }
         settingsTheme.setOnClickListener { } // TODO
         settingsSwipeActions.setOnClickListener { } // TODO
         settingsMessageDisplay.setOnClickListener { } // TODO
