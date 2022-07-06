@@ -96,7 +96,6 @@
         <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
-
     <!-- Buttons -->
 
     <style name="TextButton" parent="Widget.Material3.Button.TextButton">
@@ -154,7 +153,6 @@
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
     </style>
 
-
     <!-- Cardview -->
 
     <style name="CardViewMail" parent="Widget.Material3.CardView.Filled">
@@ -179,7 +177,6 @@
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
-
 
     <!-- MenuDrawer -->
 
@@ -252,7 +249,6 @@
         <item name="closeIconTint">?attr/colorOnPrimary</item>
     </style>
 
-
     <!-- Bottom sheet -->
 
     <style name="BottomSheetDialogTheme.Base" parent="ThemeOverlay.Material3.BottomSheetDialog">
@@ -275,6 +271,58 @@
         <item name="cornerSizeTopRight">10dp</item>
     </style>
 
+    <!-- Settings -->
+
+    <style name="SettingSeparator" parent="MenuDrawerDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="SettingHeader" parent="Callout.Tertiary">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/menuDrawerItemViewHeight</item>
+        <item name="android:gravity">center|start</item>
+        <item name="android:paddingStart">@dimen/marginStandard</item>
+        <item name="android:paddingEnd">@dimen/marginStandard</item>
+        <item name="android:paddingTop">@dimen/marginStandardSmall</item>
+        <item name="android:paddingBottom">@dimen/marginStandardSmall</item>
+    </style>
+
+    <style name="SettingText" parent="MenuDrawerItem">
+        <item name="android:gravity">center|start</item>
+    </style>
+
+    <style name="SettingTextWithButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="Setting2TextsWithButton" parent="SettingTextWithButton">
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="SettingText1Of2WithButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="SettingText2Of2WithButton" parent="Callout.Secondary">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="SettingButtonChevron">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:rotation">180.0</item>
+        <item name="android:src">@drawable/ic_chevron_left</item>
+    </style>
+
+    <style name="SettingButtonSwitch">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 
     <!-- Other -->
 
