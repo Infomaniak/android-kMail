@@ -35,7 +35,7 @@
     <color name="backgroundNewMailColor">@color/grey_title</color>
 
     <!-- Texts -->
-    <color name="secondaryTextColor">@color/secondaryText</color>
+    <color name="secondaryTextColor">@color/grey_text_secondary</color>
     <color name="snackbarTextColor">@color/hover</color>
     <color name="sectionHeaderTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/grey_text</color>

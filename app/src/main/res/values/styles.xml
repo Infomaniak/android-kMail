@@ -183,7 +183,6 @@
         <item name="drawableStartCompat">@drawable/ic_folder</item>
     </style>
 
-
     <!-- Chips -->
 
     <style name="EmailAddressChip" parent="Widget.Material3.Chip.Input">
@@ -197,6 +196,58 @@
         <item name="checkedIcon">@null</item>
     </style>
 
+    <!-- Settings -->
+
+    <style name="SettingSeparator" parent="MenuDrawerDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="SettingHeader" parent="Callout.Tertiary">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/menuDrawerItemViewHeight</item>
+        <item name="android:gravity">center|start</item>
+        <item name="android:paddingStart">@dimen/marginStandard</item>
+        <item name="android:paddingEnd">@dimen/marginStandard</item>
+        <item name="android:paddingTop">@dimen/marginStandardSmall</item>
+        <item name="android:paddingBottom">@dimen/marginStandardSmall</item>
+    </style>
+
+    <style name="SettingText" parent="MenuDrawerItem">
+        <item name="android:gravity">center|start</item>
+    </style>
+
+    <style name="SettingTextWithButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="Setting2TextsWithButton" parent="SettingTextWithButton">
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="SettingText1Of2WithButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="SettingText2Of2WithButton" parent="Callout.Secondary">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="SettingButtonChevron">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:rotation">180.0</item>
+        <item name="android:src">@drawable/ic_chevron_left</item>
+    </style>
+
+    <style name="SettingButtonSwitch">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 
     <!-- Other -->
 
