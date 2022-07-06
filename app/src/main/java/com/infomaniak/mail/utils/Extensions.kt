@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Recipient
 import io.realm.kotlin.types.RealmInstant
 import java.util.*
 
@@ -72,6 +73,12 @@ inline val ViewBinding.context: Context get() = root.context
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
 }
+
+fun Recipient.displayedName(context: Context): String {
+    return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
+}
+
+fun Recipient.getNameOrEmail() = name?.ifBlank { email } ?: email
 
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")

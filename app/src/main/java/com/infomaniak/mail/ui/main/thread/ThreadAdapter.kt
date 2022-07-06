@@ -42,8 +42,8 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
-import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.displayedName
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toggleChevron
 import com.infomaniak.lib.core.R as RCore
@@ -234,12 +234,6 @@ class ThreadAdapter(
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
-
-    private fun Recipient.displayedName(context: Context): String {
-        return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
-    }
-
-    private fun Recipient.getNameOrEmail() = name?.ifBlank { email } ?: email
 
     private class MessageListDiffCallback(
         private val oldList: List<Message>,

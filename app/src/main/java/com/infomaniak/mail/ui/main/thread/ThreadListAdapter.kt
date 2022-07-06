@@ -124,7 +124,8 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
                     append("(${context.getString(R.string.messageIsDraftOption)}) ")
                 }
             }
-            from.forEach { append("${if (it.name.isNullOrEmpty()) it.email else it.name}, ") }
+            val recipients = if (hasDrafts) to else from
+            recipients.forEach { append("${it.displayedName(context)}, ") }
         }.removeSuffix(", ")
     }
 
