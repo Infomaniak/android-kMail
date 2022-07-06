@@ -332,7 +332,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             isDownloadingChanges = true
             currentOffset += PER_PAGE
             showLoadingTimer.start()
-            viewModel.loadThreads(folder, mailbox, currentOffset)
+            viewModel.loadThreads(folder, mailbox, mainViewModel.threadDisplayMode, currentOffset)
         }
     }
 }

@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.concurrent.thread
 
 class ThreadListViewModel : ViewModel() {
 
@@ -57,8 +58,8 @@ class ThreadListViewModel : ViewModel() {
         MailData.loadInboxContent()
     }
 
-    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
-        MailData.loadThreads(folder, mailbox, offset = offset)
+    fun loadThreads(folder: Folder, mailbox: Mailbox, threadMode: UserPreferences.ThreadMode, offset: Int) {
+        MailData.loadThreads(folder, mailbox, threadMode, offset)
     }
 
     fun refreshThreads() {
