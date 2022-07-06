@@ -217,6 +217,12 @@
         <item name="android:gravity">center|start</item>
     </style>
 
+    <style name="SettingImageAtStart">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginEnd">@dimen/marginStandard</item>
+    </style>
+
     <style name="SettingTextWithButton">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -242,6 +248,14 @@
         <item name="android:layout_height">12dp</item>
         <item name="android:rotation">180.0</item>
         <item name="android:src">@drawable/ic_chevron_left</item>
+    </style>
+
+    <style name="SettingButtonCheck">
+        <item name="android:layout_width">15dp</item>
+        <item name="android:layout_height">15dp</item>
+        <item name="android:src">@drawable/ic_check</item>
+        <item name="android:tint">@color/buttonToggleStroke</item>
+        <item name="android:visibility">invisible</item>
     </style>
 
     <style name="SettingButtonSwitch">
