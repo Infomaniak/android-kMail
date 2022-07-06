@@ -61,7 +61,9 @@ class SettingsFragment : Fragment() {
         settingsThreadListDensity.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToMessageListDensitySettingFragment())
         }
-        settingsTheme.setOnClickListener { } // TODO
+        settingsTheme.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToThemeSettingFragment())
+        }
         settingsSwipeActions.setOnClickListener { } // TODO
         settingsMessageDisplay.setOnClickListener { } // TODO
         settingsExternalContent.setOnClickListener { } // TODO
