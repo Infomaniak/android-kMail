@@ -64,4 +64,8 @@
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_text</color>
 
+    <!-- ButtonToggle -->
+    <color name="buttonToggleStroke">#9D1A51</color>
+    <color name="buttonToggleBackground">#2A0F1B</color>
+
 </resources>
