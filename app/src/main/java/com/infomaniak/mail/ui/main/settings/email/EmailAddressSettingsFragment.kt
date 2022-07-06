@@ -22,11 +22,50 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.databinding.FragmentEmailAddressSettingsBinding
 
 class EmailAddressSettingsFragment : Fragment() {
 
+    private val navigationArgs: EmailAddressSettingsFragmentArgs by navArgs()
+    private lateinit var binding: FragmentEmailAddressSettingsBinding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_email_address_settings, container, false)
+        return FragmentEmailAddressSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val mailbox = MailData.mailboxesFlow.value?.find { it.objectId == navigationArgs.mailboxObjectId } ?: return
+        setupBack()
+        setupUi(mailbox)
+        setupListeners()
+    }
+
+    private fun setupBack() {
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    }
+
+    private fun setupUi(mailbox: Mailbox) {
+        binding.toolbarText.text = mailbox.email
+    }
+
+    private fun setupListeners() = with(binding) {
+        settingsMailboxGeneralSignature.setOnClickListener { } // TODO
+        settingsMailboxGeneralAutoreply.setOnClickListener { } // TODO
+        settingsMailboxGeneralFolders.setOnClickListener { } // TODO
+        settingsMailboxGeneralNotifications.setOnClickListener { settingsMailboxGeneralNotificationsSwitch.toggle() } // TODO
+        settingsInboxType.setOnClickListener { } // TODO
+        settingsInboxRules.setOnClickListener { } // TODO
+        settingsInboxRedirect.setOnClickListener { } // TODO
+        settingsInboxAlias.setOnClickListener { } // TODO
+        settingsSecurityAdsFilter.setOnClickListener { settingsSecurityAdsFilterSwitch.toggle() } // TODO
+        settingsSecuritySpamFilter.setOnClickListener { settingsSecuritySpamFilterSwitch.toggle() } // TODO
+        settingsSecurityBlockedRecipients.setOnClickListener { } // TODO
+        settingsPrivacyDeleteSearchHistory.setOnClickListener { } // TODO
+        settingsPrivacyViewLogs.setOnClickListener { } // TODO
     }
 }

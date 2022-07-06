@@ -172,6 +172,9 @@
         android:name="com.infomaniak.mail.ui.main.settings.email.EmailAddressSettingsFragment"
         android:label="EmailAddressSettingsFragment"
         tools:layout="@layout/fragment_email_address_settings">
+        <argument
+            android:name="mailboxObjectId"
+            app:argType="string" />
         <action
             android:id="@+id/action_emailAddressSettingsFragment_to_spamSettingFragment"
             app:destination="@id/spamSettingFragment" />
