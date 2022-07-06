@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 
@@ -31,7 +32,7 @@ class SettingsFragment : Fragment() {
     private lateinit var binding: FragmentSettingsBinding
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        // TODO
+        safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToEmailAddressSettingsFragment(selectedMailbox.objectId))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
