@@ -22,6 +22,8 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
 import android.text.Editable
+import android.text.Html
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
@@ -44,6 +46,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
@@ -77,7 +80,6 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         handleOnBackPressed()
-        viewModel.setUp()
         setupFromField()
         setUpAutoSave()
         displayChips()
@@ -173,6 +175,7 @@ class NewMessageFragment : Fragment() {
 
     private fun setupFromField() = with(binding) {
         fromMailAddress.text = mailboxes[selectedMailboxIndex].email
+
         if (mails.count() > 1) {
             fromMailAddress.apply {
                 setOnClickListener(::chooseFromAddress)
@@ -180,6 +183,34 @@ class NewMessageFragment : Fragment() {
                 isFocusable = true
             }
         }
+
+        with(viewModel) {
+            currentDraft.observe(viewLifecycleOwner) { draft ->
+                if (draft == null) return@observe
+
+                newMessageTo = draft.to.toUiContact()
+                newMessageCc = draft.cc.toUiContact()
+                newMessageBcc = draft.bcc.toUiContact()
+                refreshChips()
+
+                fromMailAddress.text = if (draft.from.isEmpty()) {
+                    mailboxes[selectedMailboxIndex].email
+                } else {
+                    draft.from.first().email
+                }
+
+                subjectTextField.text = SpannableStringBuilder(draft.subject)
+                bodyText.text = Html.fromHtml(draft.body, Html.FROM_HTML_MODE_COMPACT) as Editable
+
+                clearJobs()
+                hasStartedEditing.value = false
+                currentDraft.removeObservers(viewLifecycleOwner)
+            }
+        }
+    }
+
+    private fun List<Recipient>?.toUiContact(): MutableList<UiContact> {
+        return (this?.map { UiContact(it.email, it.name) } ?: mutableListOf()) as MutableList<UiContact>
     }
 
     private fun enableAutocomplete(field: FieldType) {
@@ -253,9 +284,9 @@ class NewMessageFragment : Fragment() {
         clearJobs()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(3000)
-            if (currentDraft == null) currentDraft = Draft().apply { initLocalValues("") }
-            currentDraft?.fill(Draft.DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
-            currentDraft?.let(::sendMail)
+            if (currentDraft.value == null) currentDraft.value = Draft().apply { initLocalValues("") }
+            currentDraft.value?.fill(Draft.DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
+            currentDraft.value?.let(::sendMail)
         }
     }
 
@@ -277,7 +308,7 @@ class NewMessageFragment : Fragment() {
 
     //region Chips behavior
     private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
-        TO -> viewModel.recipients
+        TO -> viewModel.newMessageTo
         CC -> viewModel.newMessageCc
         BCC -> viewModel.newMessageBcc
     }
@@ -323,14 +354,14 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateSingleChipText() {
-        viewModel.recipients.firstOrNull()?.let { binding.singleChip.root.text = it.name ?: it.email }
+        viewModel.newMessageTo.firstOrNull()?.let { binding.singleChip.root.text = it.name ?: it.email }
     }
 
     private fun refreshChips() = with(binding) {
         toItemsChipGroup.removeAllViews()
         ccItemsChipGroup.removeAllViews()
         bccItemsChipGroup.removeAllViews()
-        viewModel.recipients.forEach { createChip(TO, it) }
+        viewModel.newMessageTo.forEach { createChip(TO, it) }
         viewModel.newMessageCc.forEach { createChip(CC, it) }
         viewModel.newMessageBcc.forEach { createChip(BCC, it) }
     }
@@ -348,7 +379,7 @@ class NewMessageFragment : Fragment() {
     private fun updateChipVisibility() = with(binding) {
         singleChipGroup.isInvisible = !(!isAutocompletionOpened
                 && !viewModel.areAdvancedFieldsOpened
-                && viewModel.recipients.isNotEmpty())
+                && viewModel.newMessageTo.isNotEmpty())
 
         toItemsChipGroup.isInvisible = !viewModel.areAdvancedFieldsOpened
 
@@ -358,10 +389,10 @@ class NewMessageFragment : Fragment() {
         //         && !viewModel.areAdvancedFieldsOpened
 
         plusOthers.isInvisible = !(!isAutocompletionOpened
-                && viewModel.recipients.count() > 1
+                && viewModel.newMessageTo.count() > 1
                 && !viewModel.areAdvancedFieldsOpened)
 
-        plusOthersChip.root.text = "+${viewModel.recipients.count() - 1}"
+        plusOthersChip.root.text = "+${viewModel.newMessageTo.count() - 1}"
 
         advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
     }
@@ -411,7 +442,7 @@ class NewMessageFragment : Fragment() {
                 clone(constraintLayout)
                 val topView = when {
                     viewModel.areAdvancedFieldsOpened -> R.id.toItemsChipGroup
-                    viewModel.recipients.isEmpty() -> R.id.divider1
+                    viewModel.newMessageTo.isEmpty() -> R.id.divider1
                     else -> R.id.singleChipGroup
                 }
                 connect(R.id.toAutocompleteInput, ConstraintSet.TOP, topView, ConstraintSet.BOTTOM, 0)

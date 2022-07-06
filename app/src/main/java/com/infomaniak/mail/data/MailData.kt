@@ -58,6 +58,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
 object MailData {
 
@@ -181,16 +182,22 @@ object MailData {
         getMessagesFromApi(thread)
     }
 
-    fun saveDraft(draft: Draft): ApiResponse<DraftSaveResult>? {
-        val mailbox = currentMailboxFlow.value ?: return null
-        val response = ApiRepository.saveDraft(mailbox.uuid, draft)
+    fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
+        val response = ApiRepository.sendDraft(mailboxUuid, draft)
+        if (response.data == true) MailboxContentController.removeDraft(draft.uuid)
+
+        return response
+    }
+
+    fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
+        val response = ApiRepository.saveDraft(mailboxUuid, draft)
         var oldUuid = ""
         response.data?.let {
             oldUuid = draft.uuid
             draft.uuid = it.uuid
         }
 
-        manageDraftAutoSave(draft, oldUuid, response.translatedError == com.infomaniak.lib.core.R.string.connectionError)
+        manageDraftAutoSave(draft, oldUuid, response.translatedError == RCore.string.connectionError)
 
         return response
     }

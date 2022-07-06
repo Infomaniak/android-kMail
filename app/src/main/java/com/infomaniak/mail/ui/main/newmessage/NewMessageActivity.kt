@@ -21,6 +21,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.drafts.Draft
@@ -30,6 +31,7 @@ import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
 
 class NewMessageActivity : ThemedActivity() {
 
+    private val navigationArgs: NewMessageActivityArgs by navArgs()
     private val viewModel: NewMessageViewModel by viewModels()
 
     private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
@@ -68,6 +70,8 @@ class NewMessageActivity : ThemedActivity() {
 
             handleEditorToggle()
         }
+
+        with(navigationArgs) { viewModel.setUp(this@NewMessageActivity, draftResource, draftUuid, messageUid) }
     }
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {
@@ -95,9 +99,12 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun sendMail(action: Draft.DraftAction): Boolean = with(viewModel) {
-        if (action == Draft.DraftAction.SEND && recipients.isEmpty()) return false
-        with(newMessageFragment) { currentDraft?.fill(action, getFromMailbox().email, getSubject(), getBody()) }
-        currentDraft?.let(::sendMail)
+        if (hasStartedEditing.value == false || action == Draft.DraftAction.SEND && newMessageTo.isEmpty()) return false
+
+        with(newMessageFragment) {
+            currentDraft.value?.fill(action, getFromMailbox().email, getSubject(), getBody())
+        }
+        currentDraft.value?.let(::sendMail)
         true
     }
 

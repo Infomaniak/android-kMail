@@ -114,7 +114,7 @@ object ApiRepository : ApiRepositoryCore() {
     // fun trustSender(messageResource: String): ApiRe sponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<DraftSaveResult> {
-        val body = Json.encodeToString(draft)
+        val body = Json.encodeToString(draft).replace("[]", "null")
         fun postDraft(): ApiResponse<DraftSaveResult> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<DraftSaveResult> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 

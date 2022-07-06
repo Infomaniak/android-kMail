@@ -24,6 +24,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
@@ -80,5 +81,10 @@ class Folder : RealmObject {
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2),
+    }
+
+    companion object {
+        fun isDraftsFolder() = MailData.currentFolderFlow.value?.role == FolderRole.DRAFT
+        fun getDraftsFolder() = MailData.foldersFlow.value?.find { it.role == Folder.FolderRole.DRAFT }
     }
 }
