@@ -22,11 +22,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment() {
 
+    private lateinit var binding: FragmentSettingsBinding
+
+    private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
+        // TODO
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        return FragmentSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupBack()
+        setupAdapter()
+        setupListeners()
+    }
+
+    private fun setupBack() {
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    }
+
+    private fun setupAdapter() {
+        binding.mailboxesList.adapter = mailboxesAdapter
+        MailData.mailboxesFlow.value?.let(mailboxesAdapter::setMailboxes)
+    }
+
+    private fun setupListeners() = with(binding) {
+        settingsSend.setOnClickListener { } // TODO
+        settingsCodeLock.setOnClickListener { } // TODO
+        settingsThreadListDensity.setOnClickListener { } // TODO
+        settingsTheme.setOnClickListener { } // TODO
+        settingsSwipeActions.setOnClickListener { } // TODO
+        settingsMessageDisplay.setOnClickListener { } // TODO
+        settingsExternalContent.setOnClickListener { } // TODO
     }
 }
