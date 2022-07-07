@@ -82,7 +82,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsExternalContent.setOnClickListener {
-            // TODO
+            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToExternalContentSettingFragment())
         }
     }
 }
