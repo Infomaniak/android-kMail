@@ -74,7 +74,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsSwipeActions.setOnClickListener {
-            // TODO
+            safeNavigate(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
         }
 
         settingsMessageDisplay.setOnClickListener {
