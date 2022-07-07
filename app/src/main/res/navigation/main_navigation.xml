@@ -310,6 +310,9 @@
         <action
             android:id="@+id/action_sendSettings_to_cancelDelaySetting"
             app:destination="@id/cancelDelaySettingFragment" />
+        <action
+            android:id="@+id/action_sendSettings_to_fordwardMailsSetting"
+            app:destination="@id/forwardMailsSettingFragment" />
     </fragment>
 
     <fragment
@@ -317,6 +320,12 @@
         android:name="com.infomaniak.mail.ui.main.settings.send.CancelDelaySettingFragment"
         android:label="CancelDelaySettingFragment"
         tools:layout="@layout/fragment_cancel_delay_setting" />
+
+    <fragment
+        android:id="@+id/forwardMailsSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.send.ForwardMailsSettingFragment"
+        android:label="ForwardMailsSettingFragment"
+        tools:layout="@layout/fragment_forward_mails_setting" />
 
     <activity
         android:id="@+id/mainActivity"

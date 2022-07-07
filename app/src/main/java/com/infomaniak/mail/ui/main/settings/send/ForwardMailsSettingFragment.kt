@@ -21,17 +21,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
+import com.infomaniak.mail.databinding.FragmentForwardMailsSettingBinding
 
-class SendSettingsFragment : Fragment() {
+class ForwardMailsSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentSendSettingsBinding
+    private lateinit var binding: FragmentForwardMailsSettingBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentSendSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentForwardMailsSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,17 +47,15 @@ class SendSettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
+        settingsTransferInBody.setOnClickListener { settingsTransferInBodyCheck.selectOption() }
+        settingsTransferAsAttachment.setOnClickListener { settingsTransferAsAttachmentCheck.selectOption() }
+    }
 
-        settingsCancellationPeriod.setOnClickListener {
-            safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToCancelDelaySetting())
-        }
+    private fun ImageView.selectOption() = with(binding) {
 
-        settingsTransferEmails.setOnClickListener {
-            safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToFordwardMailsSetting())
-        }
+        settingsTransferInBodyCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsTransferAsAttachmentCheck.let { if (it != this@selectOption) it.isInvisible = true }
 
-        settingsSendIncludeOriginalMessage.setOnClickListener { settingsSendIncludeOriginalMessageSwitch.toggle() } // TODO
-
-        settingsSendAcknowledgement.setOnClickListener { settingsSendAcknowledgementSwitch.toggle() } // TODO
+        this@selectOption.isVisible = true
     }
 }
