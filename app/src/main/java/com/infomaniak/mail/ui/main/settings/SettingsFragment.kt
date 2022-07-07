@@ -58,7 +58,7 @@ class SettingsFragment : Fragment() {
     private fun setupListeners() = with(binding) {
 
         settingsSend.setOnClickListener {
-            // TODO
+            safeNavigate(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
         settingsCodeLock.setOnClickListener {
