@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
 
@@ -53,6 +54,6 @@ class SwipeActionsSettingsFragment : Fragment() {
     }
 
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {
-        // safeNavigate(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting()) // TODO
+        safeNavigate(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
     }
 }

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.settings.swipe.SwipeActionsSelectionSettingFragment"
+    tools:ignore="ContentDescription,UseCompoundDrawables">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/toolbarText"
+            style="@style/H2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            tools:text="@string/settingsSwipeShortRight" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:animateLayoutChanges="true"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/actionDelete"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/actionDelete" />
+
+                <ImageView
+                    android:id="@+id/actionDeleteCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionArchive"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/actionArchive" />
+
+                <ImageView
+                    android:id="@+id/actionArchiveCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionReadUnread"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/settingsSwipeActionReadUnread" />
+
+                <ImageView
+                    android:id="@+id/actionReadUnreadCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionMove"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/actionMove" />
+
+                <ImageView
+                    android:id="@+id/actionMoveCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionFavorite"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/favoritesFolder" />
+
+                <ImageView
+                    android:id="@+id/actionFavoriteCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionPostpone"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/actionPostpone" />
+
+                <ImageView
+                    android:id="@+id/actionPostponeCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionSpam"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/actionSpam" />
+
+                <ImageView
+                    android:id="@+id/actionSpamCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionReadAndArchive"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/settingsSwipeActionReadAndArchive" />
+
+                <ImageView
+                    android:id="@+id/actionReadAndArchiveCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionQuickActionsMenu"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/settingsSwipeActionQuickActionsMenu" />
+
+                <ImageView
+                    android:id="@+id/actionQuickActionsMenuCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/actionNone"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/settingsSwipeActionNone" />
+
+                <ImageView
+                    android:id="@+id/actionNoneCheck"
+                    style="@style/SettingButtonCheck"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -261,16 +261,20 @@
         android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment"
         android:label="SwipeActionsSettingsFragment"
         tools:layout="@layout/fragment_swipe_actions_settings">
-        <!-- <action-->
-        <!--     android:id="@+id/action_swipe_actions_settings_to_SwipeActionSelectionSetting"-->
-        <!--     app:destination="@id/swipeActionSelectionSettingFragment" />-->
+        <action
+            android:id="@+id/action_swipe_actions_settings_to_SwipeActionSelectionSetting"
+            app:destination="@id/swipeActionSelectionSettingFragment" />
     </fragment>
 
-    <!-- <fragment-->
-    <!--     android:id="@+id/swipeActionSelectionSettingFragment"-->
-    <!--     android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionSelectionSettingFragment"-->
-    <!--     android:label="SwipeActionSelectionSettingFragment"-->
-    <!--     tools:layout="@layout/fragment_swipe_action_selection_setting" />-->
+    <fragment
+        android:id="@+id/swipeActionSelectionSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSelectionSettingFragment"
+        android:label="SwipeActionSelectionSettingFragment"
+        tools:layout="@layout/fragment_swipe_actions_selection_setting">
+        <argument
+            android:name="titleResId"
+            app:argType="integer" />
+    </fragment>
 
     <activity
         android:id="@+id/mainActivity"
