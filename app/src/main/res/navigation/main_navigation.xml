@@ -160,6 +160,9 @@
             android:id="@+id/action_settings_to_themeSetting"
             app:destination="@id/themeSettingFragment" />
         <action
+            android:id="@+id/action_settings_to_swipeActionsSetting"
+            app:destination="@id/swipeActionsSettingsFragment" />
+        <action
             android:id="@+id/action_settings_to_displayModeSetting"
             app:destination="@id/displayModeSettingFragment" />
         <action
@@ -252,6 +255,22 @@
         android:name="com.infomaniak.mail.ui.main.settings.send.ForwardMailsSettingFragment"
         android:label="ForwardMailsSettingFragment"
         tools:layout="@layout/fragment_forward_mails_setting" />
+
+    <fragment
+        android:id="@+id/swipeActionsSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionsSettingsFragment"
+        android:label="SwipeActionsSettingsFragment"
+        tools:layout="@layout/fragment_swipe_actions_settings">
+        <!-- <action-->
+        <!--     android:id="@+id/action_swipe_actions_settings_to_SwipeActionSelectionSetting"-->
+        <!--     app:destination="@id/swipeActionSelectionSettingFragment" />-->
+    </fragment>
+
+    <!-- <fragment-->
+    <!--     android:id="@+id/swipeActionSelectionSettingFragment"-->
+    <!--     android:name="com.infomaniak.mail.ui.main.settings.swipe.SwipeActionSelectionSettingFragment"-->
+    <!--     android:label="SwipeActionSelectionSettingFragment"-->
+    <!--     tools:layout="@layout/fragment_swipe_action_selection_setting" />-->
 
     <activity
         android:id="@+id/mainActivity"
