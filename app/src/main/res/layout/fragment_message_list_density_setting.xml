@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="@dimen/marginStandard"
                 android:paddingVertical="@dimen/marginStandardSmall"
-                android:src="@drawable/list_density_normal_wip" />
+                android:src="@drawable/bg_list_density_default" />
 
         </LinearLayout>
 
