@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
-import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.data.models.user.UserResult
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -86,11 +85,10 @@ object ApiRepository : ApiRepositoryCore() {
     fun getThreads(
         mailboxUuid: String,
         folderId: String,
-        threadmode: UserPreferences.ThreadMode,
         offset: Int,
         filter: ThreadFilter? = null
     ): ApiResponse<ThreadsResult> {
-        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, threadmode, offset, filter?.name), GET)
+        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name), GET)
     }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {
@@ -118,7 +116,7 @@ object ApiRepository : ApiRepositoryCore() {
         fun postDraft(): ApiResponse<DraftSaveResult> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<DraftSaveResult> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
-        return if (draft.hasLocalUuid()) postDraft() else putDraft()
+        return if (draft.isOffline) postDraft() else putDraft()
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
@@ -126,7 +124,7 @@ object ApiRepository : ApiRepositoryCore() {
         fun postDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
-        return if (draft.hasLocalUuid()) postDraft() else putDraft()
+        return if (draft.isOffline) postDraft() else putDraft()
     }
 
     fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> {

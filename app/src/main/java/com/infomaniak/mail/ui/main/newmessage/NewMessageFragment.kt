@@ -47,7 +47,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.drafts.Draft
+import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
@@ -284,8 +284,7 @@ class NewMessageFragment : Fragment() {
         clearJobs()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(3000)
-            if (currentDraft.value == null) currentDraft.value = Draft().apply { initLocalValues("") }
-            currentDraft.value?.fill(Draft.DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
+            currentDraft.value?.fill(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
             currentDraft.value?.let(::sendMail)
         }
     }

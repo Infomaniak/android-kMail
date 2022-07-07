@@ -100,6 +100,7 @@ class Message : RealmObject {
     var isExpandedHeaderMode = false
 
     fun initLocalValues(): Message {
+        draftUuid = draftResource.substringAfter("/draft/")
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects

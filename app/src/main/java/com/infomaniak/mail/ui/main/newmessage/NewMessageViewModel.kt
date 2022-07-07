@@ -46,16 +46,15 @@ class NewMessageViewModel : ViewModel() {
     val editorAction = MutableLiveData<EditorAction>()
     var hasStartedEditing = MutableLiveData(false)
     var autoSaveJob: Job? = null
-    var currentDraft: MutableLiveData<Draft?> = MutableLiveData()
+    var currentDraft: MutableLiveData<Draft> = MutableLiveData()
 
-    fun setUp(activity: Activity, draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
+    fun setup(activity: Activity, draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            val draft = if (draftResources.isNullOrEmpty() || messageUid.isNullOrEmpty()) {
-                draftUuid?.let { MailboxContentController.getDraft(draftUuid) }
-            } else {
-                MailApi.fetchDraft(draftResources, messageUid)
-            }
-            activity.runOnUiThread { currentDraft.value = draft ?: Draft().apply { initLocalValues("") } }
+            val draft = draftResources?.let { MailApi.fetchDraft(it, messageUid ?: "") }
+                ?: draftUuid?.let { MailboxContentController.getDraft(it) }
+                ?: Draft().apply { initLocalValues() }
+
+            activity.runOnUiThread { currentDraft.value = draft }
         }
     }
 

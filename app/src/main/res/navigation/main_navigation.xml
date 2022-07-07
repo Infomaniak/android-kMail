@@ -68,17 +68,17 @@
         tools:layout="@layout/activity_new_message">
         <argument
             android:name="draftUuid"
-            android:defaultValue="null"
+            android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
             android:name="draftResource"
-            android:defaultValue="null"
+            android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
             android:name="messageUid"
-            android:defaultValue="null"
+            android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
     </activity>

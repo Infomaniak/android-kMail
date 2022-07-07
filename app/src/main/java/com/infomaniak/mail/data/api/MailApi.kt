@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
@@ -56,8 +55,8 @@ object MailApi {
         return ApiRepository.getFolders(mailbox.uuid).data
     }
 
-    fun fetchThreads(folder: Folder, mailboxUuid: String, threadMode: UserPreferences.ThreadMode, offset: Int): List<Thread>? {
-        return ApiRepository.getThreads(mailboxUuid, folder.id, threadMode, offset).data?.threads?.map { it.initLocalValues() }
+    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int): List<Thread>? {
+        return ApiRepository.getThreads(mailboxUuid, folder.id, offset).data?.threads?.map { it.initLocalValues() }
     }
 
     fun fetchMessages(thread: Thread): List<Message> {
@@ -74,13 +73,9 @@ object MailApi {
                         // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
                         @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
                         attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
+
+                        if (isDraft && Folder.isDraftsFolder()) fetchDraft(draftResource, uid)
                     }
-                    // TODO: Uncomment this when managing Drafts folder
-                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
-                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
-                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
-                    //     completedMessage.draftUuid = draft?.uuid
-                    // }
                 }.let { apiMessage ->
                     apiMessage ?: realmMessage
                 }

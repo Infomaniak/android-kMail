@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
+import com.infomaniak.mail.data.MailData.threadsFlow
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.drafts.Draft
@@ -156,7 +157,7 @@ object MailboxContentController {
 
     fun MutableRealm.deleteLatestMessage(uid: String) {
         getLatestMessage(uid)?.apply {
-            draftUuid?.let { getLatestDraft(it) }?.let(::delete)
+            draftUuid?.let { getLatestDraft(it)?.let(::delete) }
         }?.let(::delete)
     }
 
@@ -183,10 +184,11 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
     }
 
-    fun updateDraft(draft: Draft, onUpdate: (draft: Draft) -> Unit) {
-        MailRealm.mailboxContent.writeBlocking {
+    fun updateDraft(draft: Draft, onUpdate: (draft: Draft) -> Unit): Draft {
+        return MailRealm.mailboxContent.writeBlocking {
             val hotDraft = if (draft.isManaged()) getLatestDraft(draft.uuid) else draft
             hotDraft?.let(onUpdate)
+            hotDraft ?: draft
         }
     }
 
@@ -194,32 +196,33 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking {
             if (isOffline) {
                 val folderThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
-                val hotDraft = if (draft.isManaged()) getLatestDraft(draft.uuid) else draft
+                val hotDraft = (if (draft.isManaged()) getLatestDraft(draft.uuid) else draft) ?: return@writeBlocking
 
-                hotDraft?.let {
-                    copyToRealm(it, UpdatePolicy.ALL)
+                copyToRealm(hotDraft, UpdatePolicy.ALL)
 
-                    val draftMessage = it.toMessage()
-                    copyToRealm(draftMessage, UpdatePolicy.ALL)
+                val draftMessage = hotDraft.toMessage()
+                copyToRealm(draftMessage, UpdatePolicy.ALL)
 
-                    val thread = Thread.from(draftMessage)
-                    copyToRealm(thread, UpdatePolicy.ALL)
-                    folderThreads?.removeIf { draft -> draft.uid == thread.uid }
-                    folderThreads?.add(thread)
-                }
+                val threadUid = threadsFlow.value?.find { thread ->
+                    thread.messages.any { message -> message.uid == draft.parentMessageUid }
+                }?.uid
+                val thread = Thread.from(draftMessage, threadUid)
+                copyToRealm(thread, UpdatePolicy.ALL)
+
+                if (folderThreads?.none { folderThread -> folderThread.uid == thread.uid } == true) folderThreads.add(thread)
             }
 
-            if (oldUuid.isNotEmpty()) removeDraft(oldUuid)
+            // if (oldUuid.isNotEmpty()) removeDraft(oldUuid, draft.parentMessageUid)
         }
     }
 
-    fun removeDraft(uuid: String) {
-        MailRealm.mailboxContent.writeBlocking { removeDraft(uuid) }
+    fun removeDraft(uuid: String, parentUid: String) {
+        MailRealm.mailboxContent.writeBlocking { removeDraft(uuid, parentUid) }
     }
 
-    private fun MutableRealm.removeDraft(uuid: String) {
-        getLatestFolder(getDraftsFolder()?.id ?: "")?.threads?.removeIf {
-            it.uid == uuid
+    private fun MutableRealm.removeDraft(uuid: String, parentUid: String) {
+        getLatestFolder(getDraftsFolder()?.id ?: "")?.threads?.removeIf { thread ->
+            thread.uid == uuid || thread.messages.any { it.uid == parentUid }
         }
         getLatestThread(uuid)?.let(::delete)
         deleteLatestMessage(uuid)

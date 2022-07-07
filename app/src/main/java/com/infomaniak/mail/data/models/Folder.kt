@@ -85,6 +85,8 @@ class Folder : RealmObject {
 
     companion object {
         fun isDraftsFolder() = MailData.currentFolderFlow.value?.role == FolderRole.DRAFT
-        fun getDraftsFolder() = MailData.foldersFlow.value?.find { it.role == Folder.FolderRole.DRAFT }
+        fun getDraftsFolder() = MailData.foldersFlow.value?.find { it.role == FolderRole.DRAFT }
+
+        const val API_DRAFT_FOLDER_NAME = "Drafts"
     }
 }

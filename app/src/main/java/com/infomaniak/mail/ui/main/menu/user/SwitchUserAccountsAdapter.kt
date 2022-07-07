@@ -130,10 +130,15 @@ class SwitchUserAccountsAdapter(
             val newItem = newList[newIndex]
             return if (oldItem.mailboxes.size == newItem.mailboxes.size) {
                 var areContentsTheSame = true
-                oldItem.mailboxes.forEachIndexed { index, oldMailbox ->
-                    if (oldMailbox.unseenMessages != newItem.mailboxes[index].unseenMessages) {
-                        areContentsTheSame = false
-                        return@forEachIndexed
+                run breaking@{
+                    oldItem.mailboxes.forEachIndexed { index, oldMailbox ->
+                        val newMailbox = newItem.mailboxes[index]
+                        if (oldMailbox.objectId != newMailbox.objectId ||
+                            oldMailbox.unseenMessages != newMailbox.unseenMessages
+                        ) {
+                            areContentsTheSame = false
+                            return@breaking
+                        }
                     }
                 }
                 areContentsTheSame

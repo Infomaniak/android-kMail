@@ -21,6 +21,8 @@ package com.infomaniak.mail.data.models.drafts
 
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder.Companion.API_DRAFT_FOLDER_NAME
+import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.toRealmInstant
@@ -31,6 +33,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 import java.util.*
 
@@ -72,9 +75,16 @@ class Draft : RealmObject {
      * Local
      */
     var parentMessageUid: String = ""
+    @Transient
+    var isOffline: Boolean = false
 
-    fun initLocalValues(messageUid: String) {
-        if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid.ifEmpty { UUID.randomUUID() }}"
+    fun initLocalValues(messageUid: String = "") {
+
+        if (uuid.isEmpty()) {
+            uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${UUID.randomUUID()}"
+            isOffline = true
+        }
+
         parentMessageUid = messageUid
 
         cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
@@ -82,13 +92,13 @@ class Draft : RealmObject {
         to = to?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
     }
 
-    fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
-
     fun toMessage() = Message().apply {
         val draft = this@Draft
-        uid = draft.uuid
+        uid = draft.parentMessageUid.ifEmpty { draft.uuid }
         draftUuid = draft.uuid
         subject = draft.subject
+        folder = API_DRAFT_FOLDER_NAME
+        folderId = getDraftsFolder()?.id.toString()
         from = draft.from
         to = draft.to ?: realmListOf()
         cc = draft.cc ?: realmListOf()

@@ -42,7 +42,6 @@ import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.DraftSaveResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
@@ -163,18 +162,49 @@ object MailData {
         }
     }
 
-    fun loadThreads(
+    fun loadThreadsWhileHandlingDrafts_THIS_IS_A_TEMPORARY_NAME(
         folder: Folder,
         mailbox: Mailbox,
-        threadMode: ThreadMode = ThreadMode.THREADS,
-        offset: Int = OFFSET_FIRST_PAGE
+        offset: Int,
+        forceRefresh: Boolean = false,
     ) {
-        val realmThreads = getThreadsFromRealm(folder, offset)
-        getThreadsFromApi(folder, mailbox, realmThreads, threadMode, offset)
+        val isInternetAvailable = true
+
+        if (Folder.isDraftsFolder() && isInternetAvailable) {
+
+            val realmOfflineDrafts = getThreadsFromRealm(folder, offset)
+                .flatMap { it.messages }
+                .filter { it.isDraft }
+                .mapNotNull { it.draftUuid?.let(MailboxContentController::getDraft) }
+                .filter { it.isOffline }
+
+            CoroutineScope(Dispatchers.IO).launch {
+                for (draft in realmOfflineDrafts) {
+                    val draftMailbox = mailboxesFlow.value?.find { it.email == draft.from.first().email } ?: continue
+                    val signature = ApiRepository.getSignatures(draftMailbox.hostingId, draftMailbox.mailbox)
+
+                    val updatedDraft = MailboxContentController.updateDraft(draft) {
+                        it.identityId = signature.data?.defaultSignatureId
+                    }
+
+                    saveDraft(updatedDraft, draftMailbox.uuid)
+                }
+                loadThreads(folder, mailbox, offset, forceRefresh)
+            }
+
+        } else {
+            loadThreads(folder, mailbox, offset, forceRefresh)
+        }
     }
 
-    fun refreshThreads(folder: Folder, mailbox: Mailbox) {
-        getThreadsFromApi(folder, mailbox, offset = OFFSET_FIRST_PAGE, forceRefresh = true)
+    private fun loadThreads(
+        folder: Folder,
+        mailbox: Mailbox,
+        offset: Int = OFFSET_FIRST_PAGE,
+        forceRefresh: Boolean = false,
+    ) {
+        val realmThreads = getThreadsFromRealm(folder, offset)
+        getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
     }
 
     fun loadMessages(thread: Thread) {
@@ -184,7 +214,7 @@ object MailData {
 
     fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
         val response = ApiRepository.sendDraft(mailboxUuid, draft)
-        if (response.data == true) MailboxContentController.removeDraft(draft.uuid)
+        if (response.data == true) MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
 
         return response
     }
@@ -192,14 +222,28 @@ object MailData {
     fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
         val response = ApiRepository.saveDraft(mailboxUuid, draft)
         var oldUuid = ""
-        response.data?.let {
-            oldUuid = draft.uuid
-            draft.uuid = it.uuid
+        response.data?.let { apiData ->
+            draft.apply {
+                oldUuid = uuid
+                uuid = apiData.uuid
+                isOffline = false
+                parentMessageUid = apiData.uid
+                // attachments = apiData.attachments // TODO? Not sure.
+            }
         }
 
         manageDraftAutoSave(draft, oldUuid, response.translatedError == RCore.string.connectionError)
 
         return response
+    }
+
+    fun setDraftSignature(draft: Draft) {
+        val mailbox = mailboxesFlow.value?.find { it.email == draft.from.first().email } ?: return
+        val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
+
+        MailboxContentController.updateDraft(draft) {
+            it.identityId = signature.data?.defaultSignatureId
+        }
     }
 
     fun deleteDraft(message: Message) {
@@ -341,16 +385,17 @@ object MailData {
         folder: Folder,
         mailbox: Mailbox,
         realmThreads: List<Thread>? = null,
-        threadMode: ThreadMode = ThreadMode.THREADS,
         offset: Int = OFFSET_FIRST_PAGE,
         forceRefresh: Boolean = false,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, threadMode, offset)
+            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
             mutableThreadsFlow.value = mergedThreads
+
+            if (Folder.isDraftsFolder()) apiThreads?.forEach { getMessagesFromApi(it) }
         }
     }
 
@@ -496,7 +541,6 @@ object MailData {
 
         // Get outdated data
         Log.d("API", "Threads: Get outdated data")
-        // val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
         val deletableThreads = if (offset == OFFSET_FIRST_PAGE) {
             realmThreads?.filter { realmThread ->
                 apiThreads.none { apiThread -> apiThread.uid == realmThread.uid }
