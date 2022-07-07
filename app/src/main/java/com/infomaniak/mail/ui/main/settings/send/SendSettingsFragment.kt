@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
 
 class SendSettingsFragment : Fragment() {
@@ -44,9 +45,17 @@ class SendSettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsCancellationPeriod.setOnClickListener { } // TODO
-        settingsTransferEmails.setOnClickListener { } // TODO
+
+        settingsCancellationPeriod.setOnClickListener {
+            safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToCancelDelaySetting())
+        }
+
+        settingsTransferEmails.setOnClickListener {
+            // TODO
+        }
+
         settingsSendIncludeOriginalMessage.setOnClickListener { settingsSendIncludeOriginalMessageSwitch.toggle() } // TODO
+
         settingsSendAcknowledgement.setOnClickListener { settingsSendAcknowledgementSwitch.toggle() } // TODO
     }
 }

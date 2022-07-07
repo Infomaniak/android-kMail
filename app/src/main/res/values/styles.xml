@@ -205,7 +205,7 @@
 
     <style name="SettingHeader" parent="Callout.Tertiary">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/menuDrawerItemViewHeight</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center|start</item>
         <item name="android:paddingStart">@dimen/marginStandard</item>
         <item name="android:paddingEnd">@dimen/marginStandard</item>

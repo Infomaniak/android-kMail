@@ -16,5 +16,153 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    tools:context=".ui.main.settings.send.CancelDelaySettingFragment"
+    tools:ignore="ContentDescription,UseCompoundDrawables">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            style="@style/H2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:text="@string/settingsCancellationPeriodTitle" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:animateLayoutChanges="true"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/settingsCancellationPeriodDescription" />
+
+            <LinearLayout
+                android:id="@+id/settingsDisabled"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/settingsDisabled" />
+
+                <ImageView
+                    android:id="@+id/settingsDisabledCheck"
+                    style="@style/SettingButtonCheck"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/settingCancel10"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    android:id="@+id/settingCancel10Text"
+                    style="@style/SettingTextWithButton"
+                    tools:text="10 seconds" />
+
+                <ImageView
+                    android:id="@+id/settingCancel10Check"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/settingCancel15"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    android:id="@+id/settingCancel15Text"
+                    style="@style/SettingTextWithButton"
+                    tools:text="15 seconds" />
+
+                <ImageView
+                    android:id="@+id/settingCancel15Check"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/settingCancel20"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    android:id="@+id/settingCancel20Text"
+                    style="@style/SettingTextWithButton"
+                    tools:text="20 seconds" />
+
+                <ImageView
+                    android:id="@+id/settingCancel20Check"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/settingCancel25"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    android:id="@+id/settingCancel25Text"
+                    style="@style/SettingTextWithButton"
+                    tools:text="25 seconds" />
+
+                <ImageView
+                    android:id="@+id/settingCancel25Check"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/settingCancel30"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    android:id="@+id/settingCancel30Text"
+                    style="@style/SettingTextWithButton"
+                    tools:text="30 seconds" />
+
+                <ImageView
+                    android:id="@+id/settingCancel30Check"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
