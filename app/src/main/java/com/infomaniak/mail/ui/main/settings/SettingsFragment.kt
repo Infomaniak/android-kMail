@@ -56,16 +56,33 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsSend.setOnClickListener { } // TODO
-        settingsCodeLock.setOnClickListener { } // TODO
+
+        settingsSend.setOnClickListener {
+            // TODO
+        }
+
+        settingsCodeLock.setOnClickListener {
+            // TODO
+        }
+
         settingsThreadListDensity.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToMessageListDensitySettingFragment())
         }
+
         settingsTheme.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToThemeSettingFragment())
         }
-        settingsSwipeActions.setOnClickListener { } // TODO
-        settingsMessageDisplay.setOnClickListener { } // TODO
-        settingsExternalContent.setOnClickListener { } // TODO
+
+        settingsSwipeActions.setOnClickListener {
+            // TODO
+        }
+
+        settingsMessageDisplay.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToMessageDisplayModeSettingFragment())
+        }
+
+        settingsExternalContent.setOnClickListener {
+            // TODO
+        }
     }
 }
