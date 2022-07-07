@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.select
+package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,14 +24,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.FragmentMessageListDensitySettingBinding
+import com.infomaniak.mail.databinding.FragmentListDensitySettingBinding
 
-class MessageListDensitySettingFragment : Fragment() {
+class ListDensitySettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentMessageListDensitySettingBinding
+    private lateinit var binding: FragmentListDensitySettingBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMessageListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.email
+package com.infomaniak.mail.ui.main.settings.mailbox
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,9 +24,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
 
-class AutoReplaySettingFragment : Fragment() {
+class AutoReplySettingFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_auto_replay_settings, container, false)
+        return inflater.inflate(R.layout.fragment_auto_reply_settings, container, false)
     }
 }
