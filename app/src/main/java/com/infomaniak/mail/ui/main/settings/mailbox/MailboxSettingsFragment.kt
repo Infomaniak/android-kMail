@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.email
+package com.infomaniak.mail.ui.main.settings.mailbox
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,15 +26,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.databinding.FragmentEmailAddressSettingsBinding
+import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 
-class EmailAddressSettingsFragment : Fragment() {
+class MailboxSettingsFragment : Fragment() {
 
-    private val navigationArgs: EmailAddressSettingsFragmentArgs by navArgs()
-    private lateinit var binding: FragmentEmailAddressSettingsBinding
+    private val navigationArgs: MailboxSettingsFragmentArgs by navArgs()
+    private lateinit var binding: FragmentMailboxSettingsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentEmailAddressSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentMailboxSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

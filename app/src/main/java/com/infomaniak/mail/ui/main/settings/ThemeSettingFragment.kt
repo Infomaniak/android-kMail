@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.select
+package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,14 +26,14 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
+import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
 
-class ExternalContentSettingFragment : Fragment() {
+class ThemeSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentExternalContentSettingBinding
+    private lateinit var binding: FragmentThemeSettingBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentExternalContentSettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentThemeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,14 +47,16 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsOptionAlways.setOnClickListener { settingsOptionAlwaysCheck.selectOption() }
-        settingsOptionAskMe.setOnClickListener { settingsOptionAskMeCheck.selectOption() }
+        settingsOptionDefaultTheme.setOnClickListener { settingsOptionDefaultThemeCheck.selectOption() }
+        settingsOptionLightTheme.setOnClickListener { settingsOptionLightThemeCheck.selectOption() }
+        settingsOptionDarkTheme.setOnClickListener { settingsOptionDarkThemeCheck.selectOption() }
     }
 
     private fun ImageView.selectOption() = with(binding) {
 
-        settingsOptionAlwaysCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionAskMeCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsOptionDefaultThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsOptionLightThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsOptionDarkThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
 
         this@selectOption.isVisible = true
     }

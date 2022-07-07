@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.settings.select.ThemeSettingFragment"
+    tools:context=".ui.main.settings.ThemeSettingFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.MaterialToolbar

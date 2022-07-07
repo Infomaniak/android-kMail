@@ -32,7 +32,7 @@ class SettingsFragment : Fragment() {
     private lateinit var binding: FragmentSettingsBinding
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToEmailAddressSettingsFragment(selectedMailbox.objectId))
+        safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -66,11 +66,11 @@ class SettingsFragment : Fragment() {
         }
 
         settingsThreadListDensity.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToMessageListDensitySettingFragment())
+            safeNavigate(SettingsFragmentDirections.actionSettingsToListDensitySetting())
         }
 
         settingsTheme.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToThemeSettingFragment())
+            safeNavigate(SettingsFragmentDirections.actionSettingsToThemeSetting())
         }
 
         settingsSwipeActions.setOnClickListener {
@@ -78,11 +78,11 @@ class SettingsFragment : Fragment() {
         }
 
         settingsMessageDisplay.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToMessageDisplayModeSettingFragment())
+            safeNavigate(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
         }
 
         settingsExternalContent.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsFragmentToExternalContentSettingFragment())
+            safeNavigate(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
         }
     }
 }

@@ -15,49 +15,59 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.select
+package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
+import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.FragmentListDensitySettingBinding
 
-class ThemeSettingFragment : Fragment() {
+class ListDensitySettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentThemeSettingBinding
+    private lateinit var binding: FragmentListDensitySettingBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThemeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
-        setupListeners()
     }
 
     private fun setupBack() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    private fun setupListeners() = with(binding) {
-        settingsOptionDefaultTheme.setOnClickListener { settingsOptionDefaultThemeCheck.selectOption() }
-        settingsOptionLightTheme.setOnClickListener { settingsOptionLightThemeCheck.selectOption() }
-        settingsOptionDarkTheme.setOnClickListener { settingsOptionDarkThemeCheck.selectOption() }
+    override fun onResume() {
+        super.onResume()
+        addListeners()
     }
 
-    private fun ImageView.selectOption() = with(binding) {
+    private fun addListeners() = with(binding) {
+        listDensityButtonsGroup.addOnButtonCheckedListener { _, buttonId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
 
-        settingsOptionDefaultThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionLightThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionDarkThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
+            val resId = when (buttonId) {
+                R.id.listDensityButtonCompact -> R.drawable.bg_list_density_compact
+                R.id.listDensityButtonNormal -> R.drawable.bg_list_density_default
+                else -> R.drawable.bg_list_density_large
+            }
 
-        this@selectOption.isVisible = true
+            listDensityImage.setImageResource(resId)
+        }
+    }
+
+    override fun onPause() {
+        removeListeners()
+        super.onPause()
+    }
+
+    private fun removeListeners() {
+        binding.listDensityButtonsGroup.clearOnButtonCheckedListeners()
     }
 }

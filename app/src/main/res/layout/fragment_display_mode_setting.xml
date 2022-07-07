@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.settings.select.MessageListDensitySettingFragment"
+    tools:context=".ui.main.settings.DisplayModeSettingFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -39,7 +39,7 @@
             android:ellipsize="end"
             android:gravity="center_horizontal"
             android:maxLines="1"
-            android:text="@string/settingsThreadListDensityTitle" />
+            android:text="@string/settingsMessageDisplayTitle" />
 
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -62,39 +62,43 @@
                 style="@style/SettingHeader"
                 android:text="@string/settingsSelectDisplayModeDescription" />
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/listDensityButtonsGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/marginStandard"
-                android:paddingVertical="@dimen/marginStandardSmall"
-                app:checkedButton="@id/listDensityButtonNormal"
-                app:selectionRequired="true"
-                app:singleSelection="true">
+            <LinearLayout
+                android:id="@+id/settingsOptionDiscussions"
+                style="@style/MenuDrawerItem">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/listDensityButtonCompact"
-                    style="@style/SettingButtonToggle"
-                    android:text="@string/settingsDensityOptionCompact" />
+                <ImageView
+                    style="@style/SettingImageAtStart"
+                    android:src="@drawable/ic_display_mode_thread" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/listDensityButtonNormal"
-                    style="@style/SettingButtonToggle"
-                    android:text="@string/settingsDefault" />
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/settingsOptionDiscussions" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/listDensityButtonLarge"
-                    style="@style/SettingButtonToggle"
-                    android:text="@string/settingsDensityOptionLarge" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+                <ImageView
+                    android:id="@+id/settingsOptionDiscussionsCheck"
+                    style="@style/SettingButtonCheck"
+                    android:visibility="visible" />
+            </LinearLayout>
 
-            <ImageView
-                android:id="@+id/listDensityImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/marginStandard"
-                android:paddingVertical="@dimen/marginStandardSmall"
-                android:src="@drawable/bg_list_density_default" />
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/settingsOptionMessages"
+                style="@style/MenuDrawerItem">
+
+                <ImageView
+                    style="@style/SettingImageAtStart"
+                    android:src="@drawable/ic_display_mode_message" />
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/settingsOptionMessages" />
+
+                <ImageView
+                    android:id="@+id/settingsOptionMessagesCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+            </LinearLayout>
 
         </LinearLayout>
 

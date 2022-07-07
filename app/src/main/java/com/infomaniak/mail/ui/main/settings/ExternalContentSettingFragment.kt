@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.select
+package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,14 +26,14 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.databinding.FragmentMessageDisplayModeSettingBinding
+import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
 
-class MessageDisplayModeSettingFragment : Fragment() {
+class ExternalContentSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentMessageDisplayModeSettingBinding
+    private lateinit var binding: FragmentExternalContentSettingBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMessageDisplayModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentExternalContentSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,14 +47,14 @@ class MessageDisplayModeSettingFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsOptionDiscussions.setOnClickListener { settingsOptionDiscussionsCheck.selectOption() }
-        settingsOptionMessages.setOnClickListener { settingsOptionMessagesCheck.selectOption() }
+        settingsOptionAlways.setOnClickListener { settingsOptionAlwaysCheck.selectOption() }
+        settingsOptionAskMe.setOnClickListener { settingsOptionAskMeCheck.selectOption() }
     }
 
     private fun ImageView.selectOption() = with(binding) {
 
-        settingsOptionDiscussionsCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionMessagesCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsOptionAlwaysCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsOptionAskMeCheck.let { if (it != this@selectOption) it.isInvisible = true }
 
         this@selectOption.isVisible = true
     }

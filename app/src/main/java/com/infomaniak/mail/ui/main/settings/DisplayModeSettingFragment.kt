@@ -15,59 +15,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.settings.select
+package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.FragmentMessageListDensitySettingBinding
+import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
 
-class MessageListDensitySettingFragment : Fragment() {
+class DisplayModeSettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentMessageListDensitySettingBinding
+    private lateinit var binding: FragmentDisplayModeSettingBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentMessageListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentDisplayModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
+        setupListeners()
     }
 
     private fun setupBack() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    override fun onResume() {
-        super.onResume()
-        addListeners()
+    private fun setupListeners() = with(binding) {
+        settingsOptionDiscussions.setOnClickListener { settingsOptionDiscussionsCheck.selectOption() }
+        settingsOptionMessages.setOnClickListener { settingsOptionMessagesCheck.selectOption() }
     }
 
-    private fun addListeners() = with(binding) {
-        listDensityButtonsGroup.addOnButtonCheckedListener { _, buttonId, isChecked ->
-            if (!isChecked) return@addOnButtonCheckedListener
+    private fun ImageView.selectOption() = with(binding) {
 
-            val resId = when (buttonId) {
-                R.id.listDensityButtonCompact -> R.drawable.bg_list_density_compact
-                R.id.listDensityButtonNormal -> R.drawable.bg_list_density_default
-                else -> R.drawable.bg_list_density_large
-            }
+        settingsOptionDiscussionsCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsOptionMessagesCheck.let { if (it != this@selectOption) it.isInvisible = true }
 
-            listDensityImage.setImageResource(resId)
-        }
-    }
-
-    override fun onPause() {
-        removeListeners()
-        super.onPause()
-    }
-
-    private fun removeListeners() {
-        binding.listDensityButtonsGroup.clearOnButtonCheckedListeners()
+        this@selectOption.isVisible = true
     }
 }

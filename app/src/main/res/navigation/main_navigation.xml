@@ -148,121 +148,101 @@
         android:label="SettingsFragment"
         tools:layout="@layout/fragment_settings">
         <action
-            android:id="@+id/action_settingsFragment_to_emailAddressSettingsFragment"
-            app:destination="@id/emailAddressSettingsFragment" />
+            android:id="@+id/action_settings_to_mailboxSettings"
+            app:destination="@id/mailboxSettingsFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_cancelDelaySettingFragment"
-            app:destination="@id/cancelDelaySettingFragment" />
+            android:id="@+id/action_settings_to_sendSettings"
+            app:destination="@id/sendSettingsFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_messageListDensitySettingFragment"
-            app:destination="@id/messageListDensitySettingFragment" />
+            android:id="@+id/action_settings_to_listDensitySetting"
+            app:destination="@id/listDensitySettingFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_messageDisplayModeSettingFragment"
-            app:destination="@id/messageDisplayModeSettingFragment" />
-        <action
-            android:id="@+id/action_settingsFragment_to_externalContentSettingFragment"
-            app:destination="@id/externalContentSettingFragment" />
-        <action
-            android:id="@+id/action_settingsFragment_to_themeSettingFragment"
+            android:id="@+id/action_settings_to_themeSetting"
             app:destination="@id/themeSettingFragment" />
+        <action
+            android:id="@+id/action_settings_to_displayModeSetting"
+            app:destination="@id/displayModeSettingFragment" />
+        <action
+            android:id="@+id/action_settings_to_externalContentSetting"
+            app:destination="@id/externalContentSettingFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/emailAddressSettingsFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.email.EmailAddressSettingsFragment"
-        android:label="EmailAddressSettingsFragment"
-        tools:layout="@layout/fragment_email_address_settings">
+        android:id="@+id/listDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ListDensitySettingFragment"
+        android:label="ListDensitySettingFragment"
+        tools:layout="@layout/fragment_list_density_setting" />
+
+    <fragment
+        android:id="@+id/themeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ThemeSettingFragment"
+        android:label="ThemeSettingFragment"
+        tools:layout="@layout/fragment_theme_setting" />
+
+    <fragment
+        android:id="@+id/displayModeSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.DisplayModeSettingFragment"
+        android:label="DisplayModeSettingFragment"
+        tools:layout="@layout/fragment_display_mode_setting" />
+
+    <fragment
+        android:id="@+id/externalContentSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ExternalContentSettingFragment"
+        android:label="ExternalContentSettingFragment"
+        tools:layout="@layout/fragment_external_content_setting" />
+
+    <fragment
+        android:id="@+id/mailboxSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.mailbox.MailboxSettingsFragment"
+        android:label="MailboxSettingsFragment"
+        tools:layout="@layout/fragment_mailbox_settings">
         <argument
             android:name="mailboxObjectId"
             app:argType="string" />
         <action
-            android:id="@+id/action_emailAddressSettingsFragment_to_spamSettingFragment"
-            app:destination="@id/spamSettingFragment" />
-        <action
-            android:id="@+id/action_emailAddressSettingsFragment_to_autoReplaySettingFragment"
-            app:destination="@id/autoReplaySettingFragment" />
-        <action
-            android:id="@+id/action_emailAddressSettingsFragment_to_signatureSettingFragment"
+            android:id="@+id/action_mailboxSettings_to_signatureSetting"
             app:destination="@id/signatureSettingFragment" />
+        <action
+            android:id="@+id/action_mailboxSettings_to_autoReplySetting"
+            app:destination="@id/autoReplySettingFragment" />
+        <action
+            android:id="@+id/action_mailboxSettings_to_spamSetting"
+            app:destination="@id/spamSettingFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/cancelDelaySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.CancelDelaySettingFragment"
-        android:label="CancelDelaySettingFragment"
-        tools:layout="@layout/fragment_cancel_delay_setting">
-        <action
-            android:id="@+id/action_cancelDelaySettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
+        android:id="@+id/signatureSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.mailbox.SignatureSettingFragment"
+        android:label="SignatureFragmentSetting"
+        tools:layout="@layout/fragment_signature_setting" />
 
     <fragment
-        android:id="@+id/messageListDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.MessageListDensitySettingFragment"
-        android:label="MessageListDensitySettingFragment"
-        tools:layout="@layout/fragment_message_list_density_setting">
-        <action
-            android:id="@+id/action_messageListDensitySettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/messageDisplayModeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.MessageDisplayModeSettingFragment"
-        android:label="messageDisplayModeSettingFragment"
-        tools:layout="@layout/fragment_message_display_mode_setting">
-        <action
-            android:id="@+id/action_messageDisplayModeSettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/externalContentSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.ExternalContentSettingFragment"
-        android:label="externalContentSettingFragment"
-        tools:layout="@layout/fragment_external_content_setting">
-        <action
-            android:id="@+id/action_externalContentSettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/themeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.ThemeSettingFragment"
-        android:label="themeSettingFragment"
-        tools:layout="@layout/fragment_theme_setting">
-        <action
-            android:id="@+id/action_themeSettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
+        android:id="@+id/autoReplySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.mailbox.AutoReplySettingFragment"
+        android:label="AutoReplySettingFragment"
+        tools:layout="@layout/fragment_auto_reply_settings" />
 
     <fragment
         android:id="@+id/spamSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.email.SpamSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.mailbox.SpamSettingFragment"
         android:label="SpamSettingFragment"
         tools:layout="@layout/fragment_spam_settings" />
 
     <fragment
-        android:id="@+id/autoReplaySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.email.AutoReplaySettingFragment"
-        android:label="AutoReplySettingFragment"
-        tools:layout="@layout/fragment_auto_replay_settings" />
-
-    <fragment
-        android:id="@+id/signatureSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.email.SignatureSettingFragment"
-        android:label="SignatureFragmentSetting"
-        tools:layout="@layout/fragment_signature_setting">
+        android:id="@+id/sendSettingsFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.send.SendSettingsFragment"
+        android:label="SendSettingFragment"
+        tools:layout="@layout/fragment_send_settings">
         <action
-            android:id="@+id/action_signatureSettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
+            android:id="@+id/action_sendSettings_to_cancelDelaySetting"
+            app:destination="@id/cancelDelaySettingFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/selectSettingsFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.SelectSettingsFragment"
-        android:label="SelectSettingsFragment"
-        tools:layout="@layout/fragment_select_settings" />
+        android:id="@+id/cancelDelaySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.send.CancelDelaySettingFragment"
+        android:label="CancelDelaySettingFragment"
+        tools:layout="@layout/fragment_cancel_delay_setting" />
 
     <activity
         android:id="@+id/mainActivity"
