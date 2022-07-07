@@ -53,9 +53,9 @@ class MessageListDensitySettingFragment : Fragment() {
             if (!isChecked) return@addOnButtonCheckedListener
 
             val resId = when (buttonId) {
-                R.id.listDensityButtonCompact -> R.drawable.list_density_compact_wip
-                R.id.listDensityButtonNormal -> R.drawable.list_density_normal_wip
-                else -> R.drawable.list_density_large_wip
+                R.id.listDensityButtonCompact -> R.drawable.bg_list_density_compact
+                R.id.listDensityButtonNormal -> R.drawable.bg_list_density_default
+                else -> R.drawable.bg_list_density_large
             }
 
             listDensityImage.setImageResource(resId)
