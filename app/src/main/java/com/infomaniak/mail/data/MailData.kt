@@ -168,7 +168,7 @@ object MailData {
         offset: Int,
         forceRefresh: Boolean = false,
     ) {
-        val isInternetAvailable = true
+        val isInternetAvailable = true // TODO: Manage this for real
 
         if (Folder.isDraftsFolder() && isInternetAvailable) {
 
@@ -181,12 +181,7 @@ object MailData {
             CoroutineScope(Dispatchers.IO).launch {
                 for (draft in realmOfflineDrafts) {
                     val draftMailbox = mailboxesFlow.value?.find { it.email == draft.from.first().email } ?: continue
-                    val signature = ApiRepository.getSignatures(draftMailbox.hostingId, draftMailbox.mailbox)
-
-                    val updatedDraft = MailboxContentController.updateDraft(draft) {
-                        it.identityId = signature.data?.defaultSignatureId
-                    }
-
+                    val updatedDraft = setDraftSignature(draft)
                     saveDraft(updatedDraft, draftMailbox.uuid)
                 }
                 loadThreads(folder, mailbox, offset, forceRefresh)
@@ -237,11 +232,11 @@ object MailData {
         return response
     }
 
-    fun setDraftSignature(draft: Draft) {
-        val mailbox = mailboxesFlow.value?.find { it.email == draft.from.first().email } ?: return
+    fun setDraftSignature(draft: Draft): Draft {
+        val mailbox = currentMailboxFlow.value ?: return draft
         val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
 
-        MailboxContentController.updateDraft(draft) {
+        return MailboxContentController.updateDraft(draft) {
             it.identityId = signature.data?.defaultSignatureId
         }
     }

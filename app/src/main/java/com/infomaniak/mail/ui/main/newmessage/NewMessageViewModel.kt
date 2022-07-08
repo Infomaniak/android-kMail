@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.MailData.setDraftSignature
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -72,10 +73,7 @@ class NewMessageViewModel : ViewModel() {
         fun saveDraft() = MailData.saveDraft(draft, mailbox.uuid)
 
         viewModelScope.launch(Dispatchers.IO) {
-            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
-            MailboxContentController.updateDraft(draft) {
-                it.identityId = signature.data?.defaultSignatureId
-            }
+            setDraftSignature(draft)
             // TODO: better handling of api response
             if (draft.action == Draft.DraftAction.SEND.name.lowercase()) {
                 sendDraft()
