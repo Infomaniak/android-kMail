@@ -46,7 +46,7 @@ class MainActivity : ThemedActivity() {
         // listenToNetworkStatus()
         setupNavController()
 
-        MailData.loadAddressBooksAndContacts()
+        MailData.loadUserInfos()
     }
 
     private fun listenToNetworkStatus() {

@@ -38,25 +38,25 @@ import kotlinx.coroutines.flow.*
 object MailRealm {
 
     private var _appSettings: Realm? = null
-    private var _mailboxInfo: Realm? = null
+    private var _mailboxInfos: Realm? = null
     private var _mailboxContent: Realm? = null
-    private var _contacts: Realm? = null
+    private var _userInfos: Realm? = null
 
     val appSettings: Realm
         get() = _appSettings
             ?: Realm.open(RealmConfigurations.appSettings).also { _appSettings = it }
 
-    val mailboxInfo
-        get() = _mailboxInfo
-            ?: Realm.open(RealmConfigurations.mailboxInfo).also { _mailboxInfo = it }
+    val userInfos
+        get() = _userInfos
+            ?: Realm.open(RealmConfigurations.userInfos).also { _userInfos = it }
+
+    val mailboxInfos
+        get() = _mailboxInfos
+            ?: Realm.open(RealmConfigurations.mailboxInfos).also { _mailboxInfos = it }
 
     val mailboxContent
         get() = _mailboxContent
             ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
-
-    val contacts
-        get() = _contacts
-            ?: Realm.open(RealmConfigurations.contacts).also { _contacts = it }
 
     fun close() {
         closeContacts()
@@ -71,8 +71,8 @@ object MailRealm {
     }
 
     private fun closeMailboxInfo() {
-        _mailboxInfo?.close()
-        _mailboxInfo = null
+        _mailboxInfos?.close()
+        _mailboxInfos = null
     }
 
     fun closeMailboxContent() {
@@ -81,18 +81,20 @@ object MailRealm {
     }
 
     fun closeContacts() {
-        _contacts?.close()
-        _contacts = null
+        _userInfos?.close()
+        _userInfos = null
     }
 
-    fun readAddressBooks(): SharedFlow<ResultsChange<AddressBook>> = ContactsController.getAddressBooks().toSharedFlow()
+    fun readUserPreferences(): UserPreferences = UserInfosController.getUserPreferences()
 
-    fun readContacts(): SharedFlow<ResultsChange<Contact>> = ContactsController.getContacts().toSharedFlow()
+    fun readAddressBooks(): SharedFlow<ResultsChange<AddressBook>> = UserInfosController.getAddressBooks().toSharedFlow()
+
+    fun readContacts(): SharedFlow<ResultsChange<Contact>> = UserInfosController.getContacts().toSharedFlow()
 
     fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
 
     fun readMailboxes(): SharedFlow<ResultsChange<Mailbox>> {
-        return MailboxInfoController.getMailboxesAsync(AccountUtils.currentUserId).toSharedFlow()
+        return MailboxInfosController.getMailboxesAsync(AccountUtils.currentUserId).toSharedFlow()
     }
 
     fun readFolders(): SharedFlow<ResultsChange<Folder>> = MailboxContentController.getFoldersAsync().toSharedFlow()
@@ -119,9 +121,9 @@ object MailRealm {
     private object RealmConfigurations {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
-        private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
+        private val USER_INFOS_DB_NAME get() = "${AccountUtils.currentUserId}.realm"
+        private const val MAILBOX_INFOS_DB_NAME = "MailboxInfos.realm"
         private fun MAILBOX_CONTENT_DB_NAME(mailboxId: Int) = "${AccountUtils.currentUserId}-${mailboxId}.realm"
-        private val CONTACTS_DB_NAME get() = "${AccountUtils.currentUserId}.realm"
 
         val appSettings =
             RealmConfiguration
@@ -130,10 +132,17 @@ object MailRealm {
                 .deleteRealmIfMigrationNeeded()
                 .build()
 
-        val mailboxInfo =
+        val userInfos
+            get() = RealmConfiguration
+                .Builder(RealmSets.userInfos)
+                .name(USER_INFOS_DB_NAME)
+                .deleteRealmIfMigrationNeeded()
+                .build()
+
+        val mailboxInfos =
             RealmConfiguration
-                .Builder(RealmSets.mailboxInfo)
-                .name(MAILBOX_INFO_DB_NAME)
+                .Builder(RealmSets.mailboxInfos)
+                .name(MAILBOX_INFOS_DB_NAME)
                 .deleteRealmIfMigrationNeeded()
                 .build()
 
@@ -144,20 +153,19 @@ object MailRealm {
                 .deleteRealmIfMigrationNeeded()
                 .build()
 
-        val contacts
-            get() = RealmConfiguration
-                .Builder(RealmSets.contacts)
-                .name(CONTACTS_DB_NAME)
-                .deleteRealmIfMigrationNeeded()
-                .build()
-
         private object RealmSets {
 
             val appSettings = setOf(
                 AppSettings::class,
             )
 
-            val mailboxInfo = setOf(
+            val userInfos = setOf(
+                UserPreferences::class,
+                AddressBook::class,
+                Contact::class,
+            )
+
+            val mailboxInfos = setOf(
                 Mailbox::class,
                 Quotas::class,
             )
@@ -170,11 +178,6 @@ object MailRealm {
                 Recipient::class,
                 Body::class,
                 Attachment::class,
-            )
-
-            val contacts = setOf(
-                AddressBook::class,
-                Contact::class,
             )
 
             val miscellaneous = setOf(

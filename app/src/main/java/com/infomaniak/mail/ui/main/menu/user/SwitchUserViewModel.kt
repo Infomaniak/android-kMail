@@ -26,7 +26,7 @@ import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.data.cache.MailboxInfosController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers

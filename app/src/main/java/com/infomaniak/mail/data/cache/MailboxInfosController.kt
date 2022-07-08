@@ -26,16 +26,16 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.flow.Flow
 
-object MailboxInfoController {
+object MailboxInfosController {
 
     private fun getMailbox(objectId: String): Mailbox? {
-        return MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
+        return MailRealm.mailboxInfos.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
     }
 
     private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? = getMailbox(objectId)?.let(::findLatest)
 
     private fun getMailboxes(userId: Int): RealmQuery<Mailbox> {
-        return MailRealm.mailboxInfo.query("${Mailbox::userId.name} == '$userId'")
+        return MailRealm.mailboxInfos.query("${Mailbox::userId.name} == '$userId'")
     }
 
     fun getMailboxesSync(userId: Int): RealmResults<Mailbox> = getMailboxes(userId).find()
@@ -51,34 +51,34 @@ object MailboxInfoController {
             separator = "' OR ${Mailbox::objectId.name} == '",
             postfix = "')"
         )
-        return MailRealm.mailboxInfo.query<Mailbox>(query).find()
+        return MailRealm.mailboxInfos.query<Mailbox>(query).find()
     }
 
     // fun upsertMailbox(mailbox: Mailbox) {
-    //     mailboxInfo.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
+    //     mailboxInfos.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
     // }
 
     fun upsertMailboxes(mailboxes: List<Mailbox>) {
-        MailRealm.mailboxInfo.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+        MailRealm.mailboxInfos.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     // fun deleteMailbox(id: String) {
-    //     mailboxInfo.writeBlocking { getLatestMailbox(id)?.let(::delete) }
+    //     mailboxInfos.writeBlocking { getLatestMailbox(id)?.let(::delete) }
     // }
 
     fun deleteMailboxes(mailboxes: List<Mailbox>) {
-        MailRealm.mailboxInfo.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
+        MailRealm.mailboxInfos.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
     }
 
     // fun selectMailboxByEmail(email: String) {
-    //     currentMailbox = mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+    //     currentMailbox = mailboxInfos.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
     //     currentMailbox?.let { AccountUtils.currentMailboxId = it.mailboxId } ?: throw MailboxNotFoundException(email)
     // }
 
-    // fun getMailboxInfoByEmail(email: String): Mailbox? = mailboxInfo.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+    // fun getMailboxInfoByEmail(email: String): Mailbox? = mailboxInfos.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
 
     // private fun updateMailboxInfo(id: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-    //     mailboxInfo.writeBlocking { getLatestMailboxInfoById(id)?.let(onUpdate) }
+    //     mailboxInfos.writeBlocking { getLatestMailboxInfoById(id)?.let(onUpdate) }
     // }
 
     // private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {

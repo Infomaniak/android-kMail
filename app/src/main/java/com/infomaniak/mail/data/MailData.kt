@@ -21,7 +21,6 @@ import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
-import com.infomaniak.mail.data.cache.ContactsController
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestFolder
@@ -29,7 +28,8 @@ import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestMessa
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestThread
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
-import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.data.cache.MailboxInfosController
+import com.infomaniak.mail.data.cache.UserInfosController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Folder
@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
@@ -58,12 +59,14 @@ object MailData {
 
     private val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
 
+    private val mutableUserPreferencesFlow = MutableStateFlow<UserPreferences?>(null)
     private val mutableAddressBooksFlow = MutableStateFlow<List<AddressBook>?>(null)
     private val mutableContactsFlow = MutableStateFlow<List<Contact>?>(null)
     private val mutableMailboxesFlow = MutableStateFlow<List<Mailbox>?>(null)
     private val mutableFoldersFlow = MutableStateFlow<List<Folder>?>(null)
     private val mutableThreadsFlow = MutableStateFlow<List<Thread>?>(null)
     private val mutableMessagesFlow = MutableStateFlow<List<Message>?>(null)
+    val userPreferencesFlow = mutableUserPreferencesFlow.asStateFlow()
     val addressBooksFlow = mutableAddressBooksFlow.asStateFlow()
     val contactsFlow = mutableContactsFlow.asStateFlow()
     val mailboxesFlow = mutableMailboxesFlow.asStateFlow()
@@ -94,6 +97,7 @@ object MailData {
         mutableMailboxesFlow.value = null
         mutableContactsFlow.value = null
         mutableAddressBooksFlow.value = null
+        mutableUserPreferencesFlow.value = null
     }
 
     private fun closeCurrentFlows() {
@@ -106,9 +110,26 @@ object MailData {
     /**
      * Load Data
      */
-    fun loadAddressBooksAndContacts() {
-        loadAddressBooks {
-            loadContacts()
+    fun loadUserInfos() {
+        loadUserPreferences {
+            loadAddressBooks {
+                loadContacts()
+            }
+        }
+    }
+
+    private fun loadUserPreferences(completion: () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            mutableUserPreferencesFlow.value = UserInfosController.getUserPreferences()
+            MailApi.fetchUserPreferences()?.let { api ->
+                UserInfosController.updateUserPreferences { realm ->
+                    realm.threadListDensity = api.threadListDensity
+                    realm.theme = api.theme
+                    realm.threadMode = api.threadMode
+                }
+                mutableUserPreferencesFlow.value = api
+            }
+            completion()
         }
     }
 
@@ -346,11 +367,11 @@ object MailData {
 
         // Save new data
         Log.d("API", "AddressBooks: Save new data")
-        ContactsController.upsertAddressBooks(apiAddressBooks)
+        UserInfosController.upsertAddressBooks(apiAddressBooks)
 
         // Delete outdated data
         Log.d("API", "AddressBooks: Delete outdated data")
-        ContactsController.deleteAddressBooks(deletableAddressBooks)
+        UserInfosController.deleteAddressBooks(deletableAddressBooks)
 
         return apiAddressBooks
     }
@@ -366,11 +387,11 @@ object MailData {
 
         // Save new data
         Log.d("API", "Contacts: Save new data")
-        ContactsController.upsertContacts(apiContacts)
+        UserInfosController.upsertContacts(apiContacts)
 
         // Delete outdated data
         Log.d("API", "Contacts: Delete outdated data")
-        ContactsController.deleteContacts(deletableContacts)
+        UserInfosController.deleteContacts(deletableContacts)
 
         return apiContacts
     }
@@ -387,7 +408,7 @@ object MailData {
 
         // Save new data
         Log.d("API", "Mailboxes: Save new data")
-        MailboxInfoController.upsertMailboxes(apiMailboxes)
+        MailboxInfosController.upsertMailboxes(apiMailboxes)
 
         // Delete outdated data
         Log.d("API", "Mailboxes: Delete outdated data")
@@ -396,7 +417,7 @@ object MailData {
             MailRealm.closeMailboxContent()
             AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
         }
-        MailboxInfoController.deleteMailboxes(deletableMailboxes)
+        MailboxInfosController.deleteMailboxes(deletableMailboxes)
         deletableMailboxes.forEach { Realm.deleteRealm(MailRealm.getMailboxConfiguration(it.mailboxId)) }
 
         return if (isCurrentMailboxDeleted) {

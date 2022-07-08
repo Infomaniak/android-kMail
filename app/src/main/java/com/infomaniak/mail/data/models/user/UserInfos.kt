@@ -18,34 +18,37 @@
 package com.infomaniak.mail.data.models.user
 
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 class UserInfos : RealmObject {
-    var name: String = ""
-    @SerialName("firstname")
-    var firstName: String = ""
-    var login: String = ""
+    @PrimaryKey
     var email: String = ""
-    @SerialName("hosting_url")
-    var hostingUrl: String = ""
-    @SerialName("manager_url")
-    var managerUrl: String = ""
-    @SerialName("workspace_url")
-    var workspaceUrl: String = ""
-    @SerialName("drive_url")
-    var driveUrl: String = ""
-    @SerialName("workspace_only")
-    var workspaceOnly: Boolean = false
+    var country: String = ""
     @SerialName("double_auth")
     var doubleAuth: Boolean = false
-    @SerialName("old_user")
-    var oldUser: Boolean = false
-    var locale: String = ""
-    var country: String = ""
-    @SerialName("is_restricted")
-    var isRestricted: Boolean = false
+    @SerialName("drive_url")
+    var driveUrl: String = "" // TODO: Do we really need a DriveURL in kMail?
+    @SerialName("firstname")
+    var firstName: String = ""
+    var name: String = ""
     @SerialName("from_webmail1")
     var fromWebmail1: Boolean = false
+    @SerialName("hosting_url")
+    var hostingUrl: String = ""
+    @SerialName("is_restricted")
+    var isRestricted: Boolean = false
+    var locale: String = ""
+    var login: String = ""
+    @SerialName("manager_url")
+    var managerUrl: String = ""
+    @SerialName("old_user")
+    var oldUser: Boolean = false
+    var timezone: String = ""
+    @SerialName("workspace_only")
+    var workspaceOnly: Boolean = false
+    @SerialName("workspace_url")
+    var workspaceUrl: String = ""
 }
