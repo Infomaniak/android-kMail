@@ -243,6 +243,7 @@ class NewMessageFragment : Fragment() {
             setOnItemClickListener { _, _, position, _ ->
                 fromMailAddress.text = mails[position]
                 selectedMailboxIndex = position
+                startAutoSave()
                 dismiss()
             }
         }.show()

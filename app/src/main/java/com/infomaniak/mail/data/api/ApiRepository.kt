@@ -120,7 +120,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
-        val body = Json.encodeToString(draft)
+        val body = Json.encodeToString(draft).replace("[]", "null")
         fun postDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
