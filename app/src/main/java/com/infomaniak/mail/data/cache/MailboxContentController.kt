@@ -192,40 +192,42 @@ object MailboxContentController {
         }
     }
 
-    fun manageDraftAutoSave(draft: Draft, oldUuid: String, isOffline: Boolean) {
+    fun manageDraftAutoSave(draft: Draft) {
         MailRealm.mailboxContent.writeBlocking {
-            if (isOffline) {
-                val folderThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
-                val hotDraft = (if (draft.isManaged()) getLatestDraft(draft.uuid) else draft) ?: return@writeBlocking
+            val hotDraft = (if (draft.isManaged()) getLatestDraft(draft.uuid) else draft) ?: return@writeBlocking
+            copyToRealm(hotDraft, UpdatePolicy.ALL)
 
-                copyToRealm(hotDraft, UpdatePolicy.ALL)
+            val draftMessage = hotDraft.toMessage()
+            copyToRealm(draftMessage, UpdatePolicy.ALL)
 
-                val draftMessage = hotDraft.toMessage()
-                copyToRealm(draftMessage, UpdatePolicy.ALL)
+            val threadUid = threadsFlow.value?.find { thread ->
+                thread.messages.any { message -> message.uid == draft.parentMessageUid }
+            }?.uid
+            val thread = Thread.from(draftMessage, threadUid)
+            copyToRealm(thread, UpdatePolicy.ALL)
 
-                val threadUid = threadsFlow.value?.find { thread ->
-                    thread.messages.any { message -> message.uid == draft.parentMessageUid }
-                }?.uid
-                val thread = Thread.from(draftMessage, threadUid)
-                copyToRealm(thread, UpdatePolicy.ALL)
-
-                if (folderThreads?.none { folderThread -> folderThread.uid == thread.uid } == true) folderThreads.add(thread)
+            val folderThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
+            if (folderThreads?.none { folderThread -> folderThread.uid == thread.uid } == true) {
+                folderThreads.add(thread)
             }
-
-            // if (oldUuid.isNotEmpty()) removeDraft(oldUuid, draft.parentMessageUid)
         }
     }
+
 
     fun removeDraft(uuid: String, parentUid: String) {
         MailRealm.mailboxContent.writeBlocking { removeDraft(uuid, parentUid) }
     }
 
     private fun MutableRealm.removeDraft(uuid: String, parentUid: String) {
-        getLatestFolder(getDraftsFolder()?.id ?: "")?.threads?.removeIf { thread ->
+        val hotThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
+        val threadToDelete = hotThreads?.find { thread ->
             thread.uid == uuid || thread.messages.any { it.uid == parentUid }
         }
-        getLatestThread(uuid)?.let(::delete)
-        deleteLatestMessage(uuid)
+        threadToDelete?.let { toDelete ->
+            hotThreads.removeIf { it.uid == toDelete.uid }
+            getLatestThread(toDelete.uid)?.let(::delete)
+        }
+        deleteLatestMessage(parentUid.ifEmpty { uuid })
     }
 
     /**

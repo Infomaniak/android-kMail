@@ -43,7 +43,6 @@ class Draft : RealmObject {
     var uuid: String = ""
     @SerialName("identity_id")
     var identityId: Int? = null
-    var resource: String? = null
     @SerialName("in_reply_to_uid")
     var inReplyToUid: String? = null
     @SerialName("forwarded_uid")

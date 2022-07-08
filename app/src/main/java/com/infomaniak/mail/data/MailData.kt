@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestMessa
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestThread
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
-import com.infomaniak.mail.data.cache.MailboxContentController.manageDraftAutoSave
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Contact
@@ -57,7 +56,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import com.infomaniak.lib.core.R as RCore
 
 object MailData {
 
@@ -216,18 +214,16 @@ object MailData {
 
     fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
         val response = ApiRepository.saveDraft(mailboxUuid, draft)
-        var oldUuid = ""
         response.data?.let { apiData ->
-            draft.apply {
-                oldUuid = uuid
-                uuid = apiData.uuid
+            MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
+            val newDraft = ApiRepository.getDraft(mailboxUuid, apiData.uuid).data
+            newDraft?.apply {
                 isOffline = false
                 parentMessageUid = apiData.uid
                 // attachments = apiData.attachments // TODO? Not sure.
+                MailboxContentController.manageDraftAutoSave(newDraft)
             }
-        }
-
-        manageDraftAutoSave(draft, oldUuid, response.translatedError == RCore.string.connectionError)
+        } ?: MailboxContentController.manageDraftAutoSave(draft)
 
         return response
     }

@@ -23,7 +23,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.MailData.setDraftSignature
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.MessagePriority

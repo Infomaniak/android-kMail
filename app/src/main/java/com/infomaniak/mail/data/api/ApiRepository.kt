@@ -157,6 +157,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callKotlinxApi(ApiRoutes.resource(messageDraftResource), GET)
 
+    fun getDraft(mailboxUuid: String, draftUuid: String): ApiResponse<Draft> {
+        return callKotlinxApi(ApiRoutes.draft(mailboxUuid, draftUuid), GET)
+    }
+
     fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> {
         return callKotlinxApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
     }
