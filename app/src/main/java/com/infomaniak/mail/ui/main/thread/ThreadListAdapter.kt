@@ -31,7 +31,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.databinding.ItemThreadBinding
+import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
@@ -65,7 +65,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
-            else -> ItemThreadBinding.inflate(layoutInflater, parent, false)
+            else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
         return BindingViewHolder(binding)
     }
@@ -80,7 +80,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
                 (viewHolder.binding as ItemThreadSeeAllButtonBinding).displaySeeAllButton()
             }
             DisplayType.THREAD.layout -> {
-                (viewHolder.binding as ItemThreadBinding).displayThread(position)
+                (viewHolder.binding as CardviewThreadItemBinding).displayThread(position)
             }
         }
     }
@@ -92,10 +92,12 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton() {
-        seeAllText.append(" (${itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER})")
+//        TODO Implement when we have intelligent mailbox
+//        val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
+//        seeAllText.text = "See all $threadsNumber"
     }
 
-    private fun ItemThreadBinding.displayThread(position: Int) {
+    private fun CardviewThreadItemBinding.displayThread(position: Int) {
         val thread = itemsList[position] as Thread
 
         expeditor.text = thread.from[0].name.ifEmpty { thread.from[0].email }
@@ -112,7 +114,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         root.setOnClickListener { onThreadClicked?.invoke(thread) }
     }
 
-    private fun ItemThreadBinding.setThreadUiRead() {
+    private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isGone = true
         expeditor.setTextAppearance(R.style.H2_Secondary)
         mailSubject.setTextAppearance(R.style.Body_Secondary)
@@ -121,7 +123,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
         iconCalendar.setDrawableColor(root.context, R.color.secondaryTextColor)
     }
 
-    private fun ItemThreadBinding.setThreadUiUnread() {
+    private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
         expeditor.setTextAppearance(R.style.H2)
         mailSubject.setTextAppearance(R.style.H3)
@@ -174,7 +176,7 @@ class ThreadListAdapter : RecyclerView.Adapter<ViewHolder>() { // TODO: Use Load
     }
 
     private enum class DisplayType(val layout: Int) {
-        THREAD(R.layout.item_thread),
+        THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }

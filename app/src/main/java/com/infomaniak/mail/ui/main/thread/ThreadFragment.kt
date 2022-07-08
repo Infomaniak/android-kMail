@@ -58,17 +58,15 @@ class ThreadFragment : Fragment() {
         setupUi()
     }
 
-    private fun setupUi() {
-        with(binding) {
-            messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
-            toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-            collapse.title = navigationArgs.threadSubject.displayedSubject(requireContext())
-            // TODO see if favorite icon must be visible or not
-            // iconFavorite.isVisible = navigationArgs.threadIsFavorite
+    private fun setupUi() = with(binding) {
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-            AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
-                messagesList.addItemDecoration(DividerItemDecorator(it))
-            }
+        threadSubject.text = navigationArgs.threadSubject.displayedSubject(requireContext())
+        iconFavorite.isVisible = navigationArgs.threadIsFavorite
+        messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
+
+        AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
+            messagesList.addItemDecoration(DividerItemDecorator(it))
         }
     }
 
@@ -84,11 +82,9 @@ class ThreadFragment : Fragment() {
         super.onPause()
     }
 
-    private fun displayMessagesFromRealm() {
-        val messages = with(threadViewModel) {
-            messagesFromApi.value = null
-            getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
-        }
+    private fun displayMessagesFromRealm() = with(threadViewModel) {
+        messagesFromApi.value = null
+        val messages = getMessagesFromRealmThenFetchFromApi(navigationArgs.threadUid)
         displayMessages(messages)
     }
 
