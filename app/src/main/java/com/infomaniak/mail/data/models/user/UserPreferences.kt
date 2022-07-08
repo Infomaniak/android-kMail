@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models.user
 
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -27,30 +26,102 @@ import kotlinx.serialization.Transient
 class UserPreferences : RealmObject {
 
     //region API data
+    var theme: String = ThemeMode.DEFAULT.mode
+    @SerialName("density")
+    var threadListDensity: String = ListDensityMode.DEFAULT.mode
     @SerialName("thread_mode")
-    private var threadMode: String? = null
-    @SerialName("read_pos")
-    var readPosition: String = ""
-    var density: String = ""
-    // TODO: Add other preferences.
+    var threadMode: Int = ThreadMode.THREADS.getValue
+    // @SerialName("auto_trust_emails")
+    // var autoTrustEmails: Int = 0
+    // @SerialName("reabirthday_calendar_colord_pos")
+    // var birthdayCalendarColor: String = ""
+    // @SerialName("calendar_default_event_duration")
+    // var calendarDefaultEventDuration: Int = 0
+    // @SerialName("calendar_start_page")
+    // var calendarStartPage: String = ""
+    // @SerialName("calendar_time_format")
+    // var calendarTimeFormat: String? = null
+    // @SerialName("cancel_send_delay")
+    // var cancelSendDelay: Int = 0
+    // @SerialName("composer_open_fullsize")
+    // var composerOpenFullsize: Int = 0
+    // @SerialName("contact_display")
+    // var contactDisplay: String = ""
+    // @SerialName("default_charset")
+    // var defaultCharset: String = ""
+    // @SerialName("delivery_acknowledgement")
+    // var deliveryAcknowledgement: Int = 0
+    // @SerialName("display_birthday_calendar")
+    // var displayBirthdayCalendar: Int = 0
+    // @SerialName("display_only_working_hours")
+    // var displayOnlyWorkingHours: Int = 0
+    // @SerialName("display_weekend")
+    // var displayWeekend: Int = 0
+    // @SerialName("display_working_hours_start")
+    // var displayWorkingHoursStart: Int = 0
+    // @SerialName("display_working_hours_end")
+    // var displayWorkingHoursEnd: Int = 0
+    // @SerialName("disposition_notification")
+    // var dispositionNotification: String = ""
+    // @SerialName("favorites_first")
+    // var favoritesFirst: Int = 0
+    // @SerialName("first_day")
+    // var firstDay: Int = 0
+    // @SerialName("format_message")
+    // var formatMessage: String = ""
+    // @SerialName("forward_mode")
+    // var forwardMode: String = ""
+    // @SerialName("include_mess_in_reply")
+    // var includeMessageInReply: Int = 0
+    // @SerialName("phone_code")
+    // var phoneCode: String = ""
+    // @SerialName("read_pos")
+    // var readPosition: String = ""
+    // var shortcuts: Int = 0
     //endregion
 
     //region Local data (Transient)
-    @Transient
-    private var intelligentMode: String = IntelligentMode.DISABLED.name
+    // private var intelligentMode: String = IntelligentMode.DISABLED.name
     //endregion
 
-    fun getThreadMode(): ThreadMode? = enumValueOfOrNull<ThreadMode>(threadMode)
-
-    fun getIntelligentMode(): IntelligentMode? = enumValueOfOrNull<IntelligentMode>(intelligentMode)
-
-    enum class ThreadMode {
-        MESSAGES,
-        THREADS,
+    fun getThemeMode(): ThemeMode = when (theme) {
+        ThemeMode.LIGHT.mode -> ThemeMode.LIGHT
+        ThemeMode.DARK.mode -> ThemeMode.DARK
+        else -> ThemeMode.DEFAULT
     }
 
-    enum class IntelligentMode {
-        ENABLED,
-        DISABLED,
+    fun getListDensityMode(): ListDensityMode = when (threadListDensity) {
+        ListDensityMode.COMPACT.mode -> ListDensityMode.COMPACT
+        ListDensityMode.LARGE.mode -> ListDensityMode.LARGE
+        else -> ListDensityMode.DEFAULT
     }
+
+    fun getThreadMode(): ThreadMode = when (threadMode) {
+        ThreadMode.MESSAGES.getValue -> ThreadMode.MESSAGES
+        else -> ThreadMode.THREADS
+    }
+
+    // fun getIntelligentMode(): IntelligentMode? = enumValueOfOrNull<IntelligentMode>(intelligentMode)
+
+    enum class ThemeMode(val mode: String) {
+        DEFAULT("medium"),
+        LIGHT("light"),
+        DARK("dark"),
+    }
+
+    enum class ListDensityMode(val mode: String) {
+        COMPACT("high"),
+        DEFAULT("normal"),
+        LARGE("low"),
+    }
+
+    enum class ThreadMode(val getValue: Int, val setValue: String) {
+        THREADS(1, "on"),
+        MESSAGES(0, "off"),
+    }
+
+    // enum class IntelligentMode {
+    //     ENABLED,
+    //     DISABLED,
+    // }
 }
