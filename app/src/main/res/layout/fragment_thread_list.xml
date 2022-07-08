@@ -30,8 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".ui.main.thread.ThreadListFragment"
-        tools:openDrawer="start">
+        tools:context=".ui.main.thread.ThreadListFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -62,16 +61,16 @@
                             android:id="@+id/searchViewCard"
                             layout="@layout/item_search_view"
                             android:layout_width="0dp"
-                            android:layout_height="40dp"
+                            android:layout_height="@dimen/searchViewHeight"
                             android:layout_weight="1" />
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/userAvatar"
                             android:layout_width="wrap_content"
-                            android:layout_height="32dp"
+                            android:layout_height="@dimen/iconButtonSize"
                             android:layout_gravity="center"
                             android:layout_marginHorizontal="@dimen/marginStandard"
-                            app:cardCornerRadius="100dp">
+                            app:cardCornerRadius="@dimen/roundCornerRadius">
 
                             <ImageView
                                 android:id="@+id/userAvatarImage"

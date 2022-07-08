@@ -93,8 +93,8 @@
 
                 <ImageView
                     android:id="@+id/expandAccountButton"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:layout_width="@dimen/chevronSize"
+                    android:layout_height="@dimen/chevronSize"
                     android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"
                     android:src="@drawable/ic_chevron_down" />
 
@@ -209,8 +209,8 @@
 
                 <ImageView
                     android:id="@+id/expandCustomFolderButton"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:layout_width="@dimen/chevronSize"
+                    android:layout_height="@dimen/chevronSize"
                     android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
                     android:src="@drawable/ic_chevron_down" />
 

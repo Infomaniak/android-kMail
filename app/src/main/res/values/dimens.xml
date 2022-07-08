@@ -25,15 +25,25 @@
     <!-- View sizes -->
 
     <dimen name="attachmentChipMaxSize">160dp</dimen>
+    <dimen name="chevronSize">12dp</dimen>
+    <dimen name="iconButtonSize">32dp</dimen>
+    <dimen name="iconImageSize">20dp</dimen>
     <dimen name="itemThreadTextViewSize">235dp</dimen>
     <dimen name="noMailIlluViewSize">180dp</dimen>
     <dimen name="noMailTextViewSize">300dp</dimen>
+    <dimen name="searchViewHeight">40dp</dimen>
+    <dimen name="userAvatarSizeLarge">50dp</dimen>
 
     <!-- Cardview -->
 
     <dimen name="materialCardviewRadius">33dp</dimen>
 
     <!-- Menu Drawer -->
+
     <dimen name="menuDrawerItemViewHeight">48dp</dimen>
+
+    <!-- Other -->
+
+    <dimen name="roundCornerRadius">100dp</dimen>
 
 </resources>

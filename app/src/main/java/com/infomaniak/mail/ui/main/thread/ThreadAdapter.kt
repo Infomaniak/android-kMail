@@ -35,6 +35,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
+import com.infomaniak.lib.core.R as RCore
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
@@ -65,7 +66,7 @@ class ThreadAdapter(
     override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
         root.setOnClickListener(null)
-        if ((position == messageList.size - 1 || !message.seen) && !message.isDraft) message.isExpanded = true
+        if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
         if (!message.isExpanded) {
             root.setOnClickListener {
                 if (message.isDraft) {
@@ -90,6 +91,8 @@ class ThreadAdapter(
         DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
         messageList = newList
     }
+
+    fun lastIndex() = messageList.lastIndex
 
     private fun ItemMessageBinding.displayMessage(message: Message) = with(message) {
         displayHeader(message)
@@ -141,17 +144,13 @@ class ThreadAdapter(
 
     private fun Message.recipientsToSpannedString(context: Context, recipientsList: List<Recipient>) = buildSpannedString {
         recipientsList.forEach {
-            append(
-                if (isExpandedHeaderMode) {
-                    buildSpannedString {
-                        color(context.getColor(R.color.primaryTextColor)) { append(it.displayedName(context)) }
-                        if (it.name.isBlank()) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append(" (${it.email})") }
-                        append(",\n")
-                    }
-                } else {
-                    "${it.displayedName(context)}, "
-                }
-            )
+            if (isExpandedHeaderMode) {
+                color(context.getColor(RCore.color.accent)) { append(it.displayedName(context)) }
+                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name.isNotBlank()) append(" (${it.email})") }
+                    .append(",\n")
+            } else {
+                append("${it.displayedName(context)}, ")
+            }
         }
     }
 

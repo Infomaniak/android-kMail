@@ -136,6 +136,6 @@ class ThreadFragment : Fragment() {
         // }
 
         threadAdapter.notifyAdapter(messages.toMutableList())
-        binding.messagesList.scrollToPosition(threadAdapter.itemCount - 1)
+        binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
     }
 }

@@ -110,9 +110,9 @@
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
         <item name="android:insetTop">0dp</item>
-        <item name="android:layout_height">32dp</item>
-        <item name="android:layout_width">32dp</item>
-        <item name="cornerRadius">40dp</item>
+        <item name="android:layout_height">@dimen/iconButtonSize</item>
+        <item name="android:layout_width">@dimen/iconButtonSize</item>
+        <item name="cornerRadius">@dimen/roundCornerRadius</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">0dp</item>
         <item name="iconSize">16dp</item>

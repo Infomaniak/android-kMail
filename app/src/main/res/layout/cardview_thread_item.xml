@@ -119,8 +119,8 @@
 
                 <ImageView
                     android:id="@+id/iconFavorite"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/iconImageSize"
+                    android:layout_height="@dimen/iconImageSize"
                     android:contentDescription="@string/contentDescriptionIconFavorite"
                     android:src="@drawable/ic_star"
                     android:visibility="gone"

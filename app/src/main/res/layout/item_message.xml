@@ -41,10 +41,10 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/userAvatar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="@dimen/userAvatarSizeLarge"
+                android:layout_height="@dimen/userAvatarSizeLarge"
                 android:src="@drawable/placeholder"
-                app:cardCornerRadius="100dp"
+                app:cardCornerRadius="@dimen/roundCornerRadius"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -95,8 +95,7 @@
                 app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
                 app:layout_constraintStart_toEndOf="@id/userAvatar"
                 app:layout_constraintTop_toBottomOf="@id/expeditorEmail"
-                tools:text="Myriam Rais, George Li"
-                tools:textSize="12sp" />
+                tools:text="Myriam Rais, George Li" />
 
             <TextView
                 android:id="@+id/messageDate"
@@ -104,7 +103,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardMedium"
-                android:textSize="12sp"
+                android:textSize="@dimen/textSmallSize"
                 app:layout_constraintBottom_toBottomOf="@id/expeditorName"
                 app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
                 app:layout_constraintStart_toEndOf="@id/expeditorName"
@@ -118,7 +117,7 @@
                 android:layout_height="24dp"
                 android:contentDescription="@string/contentDescriptionButtonExpandHeader"
                 app:icon="@drawable/ic_chevron_down"
-                app:iconSize="12dp"
+                app:iconSize="@dimen/chevronSize"
                 app:layout_constraintBottom_toBottomOf="@+id/expeditorName"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/expeditorName" />
