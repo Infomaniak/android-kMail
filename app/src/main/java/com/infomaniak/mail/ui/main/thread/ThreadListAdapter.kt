@@ -31,7 +31,9 @@ import com.infomaniak.lib.core.utils.startOfTheDay
 import com.infomaniak.lib.core.utils.startOfTheWeek
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.user.UserPreferences.ListDensityMode
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
@@ -100,9 +102,19 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
+    private fun CardviewThreadItemBinding.displayThread(position: Int) {
+        val thread = itemsList[position] as Thread
+        when (MailData.userPreferencesFlow.value?.getListDensityMode() ?: ListDensityMode.DEFAULT) {
+            ListDensityMode.COMPACT -> displayCompactThread(thread)
+            ListDensityMode.DEFAULT -> displayDefaultThread(thread)
+            ListDensityMode.LARGE -> displayLargeThread(thread)
+        }
+
+    }
+
+    private fun CardviewThreadItemBinding.displayCompactThread(thread: Thread) = with(thread) {
         expeditor.text = from.first().run { if (name.isNullOrEmpty()) email else name }
-        mailSubject.text = subject.getFormattedThreadSubject(context)
+        mailSubject.text = "COMPACT - " + subject.getFormattedThreadSubject(context) // TODO
 
         mailDate.text = displayedDate
 
@@ -113,6 +125,39 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
         root.setOnClickListener { onThreadClicked?.invoke(this) }
+
+    }
+
+    private fun CardviewThreadItemBinding.displayDefaultThread(thread: Thread) = with(thread) {
+        expeditor.text = if (from.first().name.isNullOrEmpty()) from.first().email else from.first().email
+        mailSubject.text = "DEFAULT - " + subject.getFormattedThreadSubject(context) // TODO
+
+        mailDate.text = formatDate(date?.toDate() ?: Date(0))
+
+        iconAttachment.isVisible = hasAttachments
+        iconCalendar.isGone = true // TODO: See with API when we should display this icon
+        iconFavorite.isVisible = flagged
+
+        if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+
+        root.setOnClickListener { onThreadClicked?.invoke(this) }
+
+    }
+
+    private fun CardviewThreadItemBinding.displayLargeThread(thread: Thread) = with(thread) {
+        expeditor.text = if (from.first().name.isNullOrEmpty()) from.first().email else from.first().email
+        mailSubject.text = "LARGE - " + subject.getFormattedThreadSubject(context) // TODO
+
+        mailDate.text = formatDate(date?.toDate() ?: Date(0))
+
+        iconAttachment.isVisible = hasAttachments
+        iconCalendar.isGone = true // TODO: See with API when we should display this icon
+        iconFavorite.isVisible = flagged
+
+        if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+
+        root.setOnClickListener { onThreadClicked?.invoke(this) }
+
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
