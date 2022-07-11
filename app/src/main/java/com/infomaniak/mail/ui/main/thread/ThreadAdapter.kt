@@ -35,7 +35,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
-import com.infomaniak.lib.core.R as RCore
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
@@ -48,6 +47,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),

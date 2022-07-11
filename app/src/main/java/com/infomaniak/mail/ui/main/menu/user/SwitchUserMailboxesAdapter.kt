@@ -53,7 +53,7 @@ class SwitchUserMailboxesAdapter(
         var unreadText = unread.toString()
         if (unread >= 100) unreadText = "99+"
         unreadCount.apply {
-            isGone = unread <= 0
+            isGone = unread == 0
             text = unreadText
         }
 
