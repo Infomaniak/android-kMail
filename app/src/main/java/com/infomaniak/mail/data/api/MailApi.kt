@@ -52,10 +52,10 @@ object MailApi {
         return ApiRepository.getThreads(mailboxUuid, folder.id, offset).data?.threads?.map { it.initLocalValues() }
     }
 
-    fun fetchMessages(thread: Thread): List<Pair<Message, Boolean>> {
+    fun fetchMessages(thread: Thread): List<Message> {
         return thread.messages.map { realmMessage ->
             if (realmMessage.fullyDownloaded) {
-                realmMessage to true
+                realmMessage
             } else {
                 // TODO: Handle if this API call fails
                 ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
@@ -74,7 +74,7 @@ object MailApi {
                     //     completedMessage.draftUuid = draft?.uuid
                     // }
                 }.let { apiMessage ->
-                    if (apiMessage == null) realmMessage to true else apiMessage to false
+                    apiMessage ?: realmMessage
                 }
             }
         }

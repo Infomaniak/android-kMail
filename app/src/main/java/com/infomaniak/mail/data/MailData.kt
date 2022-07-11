@@ -516,20 +516,20 @@ object MailData {
         return apiThreads
     }
 
-    private fun mergeMessages(realmMessages: List<Message>?, apiMessages: List<Pair<Message, Boolean>>): List<Message> {
+    private fun mergeMessages(realmMessages: List<Message>?, apiMessages: List<Message>): List<Message> {
 
         // Get outdated data
         Log.d("API", "Messages: Get outdated data")
         // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
         val deletableMessages = realmMessages?.filter { realmMessage ->
-            apiMessages.none { (apiMessage, _) -> apiMessage.uid == realmMessage.uid }
+            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
         } ?: emptyList()
 
         // Save new data
         Log.d("API", "Messages: Save new data")
         MailRealm.mailboxContent.writeBlocking {
-            apiMessages.forEach { (apiMessage, isFromRealm) ->
-                if (!isFromRealm) copyToRealm(apiMessage, UpdatePolicy.ALL)
+            apiMessages.forEach { apiMessage ->
+                if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
             }
         }
 
@@ -537,7 +537,7 @@ object MailData {
         Log.d("API", "Messages: Delete outdated data")
         MailboxContentController.deleteMessages(deletableMessages)
 
-        return apiMessages.map { (apiMessage, _) -> apiMessage }
+        return apiMessages
     }
 
     /**
