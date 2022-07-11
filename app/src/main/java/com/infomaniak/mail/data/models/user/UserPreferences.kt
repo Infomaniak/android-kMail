@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.data.models.user
 
+import androidx.annotation.IdRes
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -81,6 +84,22 @@ class UserPreferences : RealmObject {
      */
     // private var intelligentMode: String = IntelligentMode.DISABLED.name
 
+    var _shortRightSwipe: String = SwipeAction.NONE.name
+    val shortRightSwipe: SwipeAction?
+        get() = enumValueOfOrNull<SwipeAction>(_shortRightSwipe)
+
+    var _longRightSwipe: String = SwipeAction.NONE.name
+    val longRightSwipe: SwipeAction?
+        get() = enumValueOfOrNull<SwipeAction>(_longRightSwipe)
+
+    var _shortLeftSwipe: String = SwipeAction.NONE.name
+    val shortLeftSwipe: SwipeAction?
+        get() = enumValueOfOrNull<SwipeAction>(_shortLeftSwipe)
+
+    var _longLeftSwipe: String = SwipeAction.NONE.name
+    val longLeftSwipe: SwipeAction?
+        get() = enumValueOfOrNull<SwipeAction>(_longLeftSwipe)
+
     fun getThemeMode(): ThemeMode = when (theme) {
         ThemeMode.LIGHT.mode -> ThemeMode.LIGHT
         ThemeMode.DARK.mode -> ThemeMode.DARK
@@ -121,4 +140,24 @@ class UserPreferences : RealmObject {
     //     ENABLED,
     //     DISABLED,
     // }
+
+    data class SwipeActions(
+        var shortRightSwipe: SwipeAction = SwipeAction.NONE,
+        var longRightSwipe: SwipeAction = SwipeAction.NONE,
+        var shortLeftSwipe: SwipeAction = SwipeAction.NONE,
+        var longLeftSwipe: SwipeAction = SwipeAction.NONE,
+    )
+
+    enum class SwipeAction(@IdRes val nameRes: Int) {
+        NONE(R.string.settingsSwipeActionNone),
+        ARCHIVE(R.string.actionArchive),
+        DELETE(R.string.actionDelete),
+        FAVORITE(R.string.favoritesFolder),
+        MOVE(R.string.actionMove),
+        POSTPONE(R.string.actionPostpone),
+        QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu),
+        READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive),
+        READ_UNREAD(R.string.settingsSwipeActionReadUnread),
+        SPAM(R.string.actionSpam),
+    }
 }

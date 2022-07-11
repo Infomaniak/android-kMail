@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data
 
 import android.util.Log
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
@@ -39,6 +40,7 @@ import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.user.UserPreferences
+import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
@@ -120,16 +122,28 @@ object MailData {
 
     private fun loadUserPreferences(completion: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            mutableUserPreferencesFlow.value = UserInfosController.getUserPreferences()
-            MailApi.fetchUserPreferences()?.let { api ->
-                UserInfosController.updateUserPreferences { realm ->
-                    realm.threadListDensity = api.threadListDensity
-                    realm.theme = api.theme
-                    realm.threadMode = api.threadMode
-                }
-                mutableUserPreferencesFlow.value = api
-            }
+            mutableUserPreferencesFlow.value = MailRealm.readUserPreferences()
+            // TODO: Do we want to get the UserPreferences from the API? Or do we want to keep these Settings App-only?
+            // MailApi.fetchUserPreferences()?.let { api ->
+            //     UserInfosController.updateUserPreferences { realm ->
+            //         realm.threadListDensity = api.threadListDensity
+            //         realm.theme = api.theme
+            //         realm.threadMode = api.threadMode
+            //     }
+            //     mutableUserPreferencesFlow.value = api
+            // }
             completion()
+        }
+    }
+
+    fun updateSwipeAction(titleResId: Int, swipeAction: SwipeAction) {
+        mutableUserPreferencesFlow.value = UserInfosController.updateUserPreferences {
+            when (titleResId) {
+                R.string.settingsSwipeShortRight -> it._shortRightSwipe = swipeAction.name
+                R.string.settingsSwipeLongRight -> it._longRightSwipe = swipeAction.name
+                R.string.settingsSwipeShortLeft -> it._shortLeftSwipe = swipeAction.name
+                R.string.settingsSwipeLongLeft -> it._longLeftSwipe = swipeAction.name
+            }
         }
     }
 

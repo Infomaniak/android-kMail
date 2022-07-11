@@ -184,7 +184,6 @@ object MailRealm {
                 Signature::class,
                 SignatureEmail::class,
                 UserInfos::class,
-                UserPreferences::class,
             )
         }
     }

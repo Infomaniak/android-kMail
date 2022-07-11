@@ -35,8 +35,8 @@ object UserInfosController {
         query<UserPreferences>().first().find() ?: writeBlocking { copyToRealm(UserPreferences()) }
     }
 
-    fun updateUserPreferences(onUpdate: (appSettings: UserPreferences) -> Unit) {
-        MailRealm.userInfos.writeBlocking { findLatest(getUserPreferences())?.let(onUpdate) }
+    fun updateUserPreferences(onUpdate: (userPreferences: UserPreferences) -> Unit): UserPreferences? {
+        return MailRealm.userInfos.writeBlocking { findLatest(getUserPreferences())?.also(onUpdate) }
     }
 
     fun removeUserPreferences() {

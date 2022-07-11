@@ -78,8 +78,9 @@
                         android:text="@string/settingsSwipeShortRight" />
 
                     <TextView
+                        android:id="@+id/settingsSwipeShortRightText"
                         style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsSwipeActionNone" />
+                        tools:text="@string/settingsSwipeActionNone" />
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
@@ -101,8 +102,9 @@
                         android:text="@string/settingsSwipeLongRight" />
 
                     <TextView
+                        android:id="@+id/settingsSwipeLongRightText"
                         style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsSwipeActionNone" />
+                        tools:text="@string/settingsSwipeActionNone" />
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
@@ -126,8 +128,9 @@
                         android:text="@string/settingsSwipeShortLeft" />
 
                     <TextView
+                        android:id="@+id/settingsSwipeShortLeftText"
                         style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsSwipeActionNone" />
+                        tools:text="@string/settingsSwipeActionNone" />
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
@@ -149,8 +152,9 @@
                         android:text="@string/settingsSwipeLongLeft" />
 
                     <TextView
+                        android:id="@+id/settingsSwipeLongLeftText"
                         style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsSwipeActionNone" />
+                        tools:text="@string/settingsSwipeActionNone" />
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />

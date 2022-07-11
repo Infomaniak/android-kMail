@@ -132,7 +132,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         expeditor.text = if (from.first().name.isNullOrEmpty()) from.first().email else from.first().email
         mailSubject.text = "DEFAULT - " + subject.getFormattedThreadSubject(context) // TODO
 
-        mailDate.text = formatDate(date?.toDate() ?: Date(0))
+        mailDate.text = displayedDate
 
         iconAttachment.isVisible = hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
@@ -148,7 +148,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         expeditor.text = if (from.first().name.isNullOrEmpty()) from.first().email else from.first().email
         mailSubject.text = "LARGE - " + subject.getFormattedThreadSubject(context) // TODO
 
-        mailDate.text = formatDate(date?.toDate() ?: Date(0))
+        mailDate.text = displayedDate
 
         iconAttachment.isVisible = hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon

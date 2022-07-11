@@ -43,7 +43,7 @@ class SwitchUserViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
 
                 users
-                    .map { user -> user to MailboxInfoController.getMailboxesSync(user.id) }
+                    .map { user -> user to MailboxInfosController.getMailboxesSync(user.id) }
                     .also(accounts::postValue)
 
                 users
