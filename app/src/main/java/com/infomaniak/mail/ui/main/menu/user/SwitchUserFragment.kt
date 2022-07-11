@@ -43,7 +43,7 @@ class SwitchUserFragment : Fragment() {
 
     private val switchUserViewModel: SwitchUserViewModel by viewModels()
 
-    private val binding: FragmentSwitchUserBinding by lazy { FragmentSwitchUserBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentSwitchUserBinding
 
     private var mailboxesJob: Job? = null
 
@@ -63,7 +63,9 @@ class SwitchUserFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentSwitchUserBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
