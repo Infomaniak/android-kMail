@@ -39,7 +39,7 @@ class UserInfos : RealmObject, Correspondent {
     var firstName: String = ""
     var name: String = ""
     @SerialName("from_webmail1")
-    var fromWebmail1: Boolean = false
+    var fromWebmail: Boolean = false
     @SerialName("hosting_url")
     var hostingUrl: String = ""
     @SerialName("is_restricted")

@@ -321,7 +321,7 @@
     <style name="SettingButtonChevron">
         <item name="android:layout_width">12dp</item>
         <item name="android:layout_height">12dp</item>
-        <item name="android:rotation">180.0</item>
+        <item name="android:rotation">@dimen/angleViewRotated</item>
         <item name="android:src">@drawable/ic_chevron_left</item>
     </style>
 

@@ -27,6 +27,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 
 class SwipeActionsSelectionSettingFragment : Fragment() {
@@ -54,16 +56,46 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        actionDelete.setOnClickListener { actionDeleteCheck.selectOption() }
-        actionArchive.setOnClickListener { actionArchiveCheck.selectOption() }
-        actionReadUnread.setOnClickListener { actionReadUnreadCheck.selectOption() }
-        actionMove.setOnClickListener { actionMoveCheck.selectOption() }
-        actionFavorite.setOnClickListener { actionFavoriteCheck.selectOption() }
-        actionPostpone.setOnClickListener { actionPostponeCheck.selectOption() }
-        actionSpam.setOnClickListener { actionSpamCheck.selectOption() }
-        actionReadAndArchive.setOnClickListener { actionReadAndArchiveCheck.selectOption() }
-        actionQuickActionsMenu.setOnClickListener { actionQuickActionsMenuCheck.selectOption() }
-        actionNone.setOnClickListener { actionNoneCheck.selectOption() }
+        actionDelete.setOnClickListener {
+            actionDeleteCheck.selectOption()
+            saveAction(SwipeAction.DELETE)
+        }
+        actionArchive.setOnClickListener {
+            actionArchiveCheck.selectOption()
+            saveAction(SwipeAction.ARCHIVE)
+        }
+        actionReadUnread.setOnClickListener {
+            actionReadUnreadCheck.selectOption()
+            saveAction(SwipeAction.READ_UNREAD)
+        }
+        actionMove.setOnClickListener {
+            actionMoveCheck.selectOption()
+            saveAction(SwipeAction.MOVE)
+        }
+        actionFavorite.setOnClickListener {
+            actionFavoriteCheck.selectOption()
+            saveAction(SwipeAction.FAVORITE)
+        }
+        actionPostpone.setOnClickListener {
+            actionPostponeCheck.selectOption()
+            saveAction(SwipeAction.POSTPONE)
+        }
+        actionSpam.setOnClickListener {
+            actionSpamCheck.selectOption()
+            saveAction(SwipeAction.SPAM)
+        }
+        actionReadAndArchive.setOnClickListener {
+            actionReadAndArchiveCheck.selectOption()
+            saveAction(SwipeAction.READ_AND_ARCHIVE)
+        }
+        actionQuickActionsMenu.setOnClickListener {
+            actionQuickActionsMenuCheck.selectOption()
+            saveAction(SwipeAction.QUICKACTIONS_MENU)
+        }
+        actionNone.setOnClickListener {
+            actionNoneCheck.selectOption()
+            saveAction(SwipeAction.NONE)
+        }
     }
 
     private fun ImageView.selectOption() = with(binding) {
@@ -80,5 +112,9 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         actionNoneCheck.let { if (it != this@selectOption) it.isInvisible = true }
 
         this@selectOption.isVisible = true
+    }
+
+    private fun saveAction(swipeAction: SwipeAction) {
+        MailData.updateSwipeAction(navigationArgs.titleResId, swipeAction)
     }
 }
