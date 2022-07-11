@@ -18,12 +18,11 @@
 package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,7 +41,7 @@ class ThreadListViewModel : ViewModel() {
 
     private fun listenToThreads() {
         listenToThreadsJob?.cancel()
-        listenToThreadsJob = CoroutineScope(Dispatchers.IO).launch {
+        listenToThreadsJob = viewModelScope.launch {
             MailData.threadsFlow.collect { threads ->
                 mutableUiThreadsFlow.value = threads
             }
@@ -62,10 +61,5 @@ class ThreadListViewModel : ViewModel() {
             folder = MailData.currentFolderFlow.value ?: return,
             mailbox = MailData.currentMailboxFlow.value ?: return,
         )
-    }
-
-    override fun onCleared() {
-        listenToThreadsJob?.cancel()
-        super.onCleared()
     }
 }

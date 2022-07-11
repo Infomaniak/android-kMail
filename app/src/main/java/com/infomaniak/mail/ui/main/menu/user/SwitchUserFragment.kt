@@ -34,7 +34,6 @@ import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -53,7 +52,7 @@ class SwitchUserFragment : Fragment() {
             MailData.selectMailbox(selectedMailbox)
             findNavController().popBackStack()
         } else {
-            CoroutineScope(Dispatchers.IO).launch {
+            switchUserViewModel.viewModelScope.launch {
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 
