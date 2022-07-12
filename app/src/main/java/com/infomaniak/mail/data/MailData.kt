@@ -47,13 +47,10 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 object MailData {
 
@@ -319,7 +316,7 @@ object MailData {
             val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
-            if (forceRefresh) mutableThreadsFlow.value = null
+            if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
             mutableThreadsFlow.value = mergedThreads
         }
     }
@@ -573,6 +570,11 @@ object MailData {
                 job?.cancel()
             }
         }
+    }
+
+    private suspend fun <T> MutableStateFlow<T?>.forceRefresh() {
+        value = null
+        delay(1L)
     }
 
     private fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
