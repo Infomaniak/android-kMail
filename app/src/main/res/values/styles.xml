@@ -80,32 +80,32 @@
 
     <!-- Snackbar -->
 
-    <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+    <style name="Widget.App.Snackbar" parent="Widget.Material3.Snackbar">
         <item name="actionTextColorAlpha">0.8</item>
         <item name="android:backgroundTint">@color/backgroundSnackbarColor</item>
         <item name="android:layout_margin">@dimen/marginStandard</item>
     </style>
 
-    <style name="Widget.App.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+    <style name="Widget.App.SnackbarButton" parent="Widget.Material3.Button.TextButton.Snackbar">
         <item name="android:textColor">@color/textButtonBlueLight</item>
         <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
-    <style name="Widget.App.SnackbarTextView" parent="Widget.MaterialComponents.Snackbar.TextView">
+    <style name="Widget.App.SnackbarTextView" parent="Widget.Material3.Snackbar.TextView">
         <item name="android:textColor">@color/snackbarTextColor</item>
         <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
     <!-- Buttons -->
 
-    <style name="TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="TextButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@color/emphasizedTextColor</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">@dimen/textHintSize</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="IconButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="IconButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
@@ -131,6 +131,19 @@
 
     <!-- Other -->
 
+    <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
+    </style>
+
+    <style name="Widget.App.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
+    </style>
+
+    <style name="ThemeOverlay.App.FloatingActionButton" parent="">
+        <item name="colorContainer">?android:attr/colorPrimary</item>
+        <item name="colorOnContainer">?attr/colorOnPrimary</item>
+    </style>
+
     <style name="EmailAddressTextView">
         <item name="android:backgroundTint">@android:color/transparent</item>
         <item name="android:imeOptions">actionDone</item>
@@ -140,13 +153,13 @@
 
     <!-- Cardview -->
 
-    <style name="CardViewMail" parent="Widget.MaterialComponents.CardView">
+    <style name="CardViewMail" parent="Widget.Material3.CardView.Filled">
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="cardCornerRadius">0dp</item>
         <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
     </style>
 
-    <style name="CardviewTopRounded" parent="Widget.MaterialComponents.CardView">
+    <style name="CardviewTopRounded" parent="Widget.Material3.CardView.Filled">
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="shapeAppearanceOverlay">@style/CardviewTopRounded.ShapeAppearance</item>
         <item name="cardElevation">10dp</item>
@@ -165,7 +178,7 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <style name="MenuDrawerDivider" parent="Widget.MaterialComponents.MaterialDivider">
+    <style name="MenuDrawerDivider" parent="Widget.Material3.MaterialDivider">
         <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
         <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
         <item name="dividerColor">@color/separatorColor</item>
