@@ -185,13 +185,14 @@ class NewMessageFragment : Fragment() {
         }
 
         with(viewModel) {
-            currentDraft.observe(viewLifecycleOwner) { draft ->
-                if (draft == null) return@observe
+            currentDraft.observeOnce(viewLifecycleOwner) { draft ->
+                if (draft == null) return@observeOnce
 
                 newMessageTo = draft.to.toUiContact()
                 newMessageCc = draft.cc.toUiContact()
                 newMessageBcc = draft.bcc.toUiContact()
-                refreshChips()
+                displayChips()
+                updateToAutocompleteInputLayout()
 
                 fromMailAddress.text = if (draft.from.isEmpty()) {
                     mailboxes[selectedMailboxIndex].email
@@ -204,7 +205,6 @@ class NewMessageFragment : Fragment() {
 
                 clearJobs()
                 hasStartedEditing.value = false
-                currentDraft.removeObservers(viewLifecycleOwner)
             }
         }
     }
@@ -351,6 +351,7 @@ class NewMessageFragment : Fragment() {
             updateSingleChipText()
             updateToAutocompleteInputLayout()
         }
+        updateChipVisibility()
     }
 
     private fun updateSingleChipText() {
