@@ -21,6 +21,9 @@ import android.content.Context
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -79,6 +82,15 @@ fun Recipient.displayedName(context: Context): String {
 }
 
 fun Recipient.getNameOrEmail() = name?.ifBlank { email } ?: email
+
+fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+    observe(lifecycleOwner, object : Observer<T> {
+        override fun onChanged(t: T?) {
+            observer.onChanged(t)
+            removeObserver(this)
+        }
+    })
+}
 
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")

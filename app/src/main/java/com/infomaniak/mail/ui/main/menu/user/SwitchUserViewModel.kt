@@ -17,7 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.menu.user
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.BuildConfig
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -59,15 +60,6 @@ class SwitchUserViewModel : ViewModel() {
                     .also(accounts::postValue)
             }
         }
-    }
-
-    private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
-        observe(lifecycleOwner, object : Observer<T> {
-            override fun onChanged(t: T?) {
-                observer.onChanged(t)
-                removeObserver(this)
-            }
-        })
     }
 
     private fun createOkHttpClientForSpecificUser(user: User): OkHttpClient {
