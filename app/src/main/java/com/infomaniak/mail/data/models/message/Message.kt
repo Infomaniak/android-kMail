@@ -111,10 +111,6 @@ class Message : RealmObject {
         ApiRepository.markMessagesAsSeen(mailboxUuid, arrayListOf(this))
     }
 
-    fun select() {
-        MailRealm.mutableCurrentMessageUidFlow.value = uid
-    }
-
     fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)
 
     enum class MessageDKIM(val value: String?) {

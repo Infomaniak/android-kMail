@@ -24,7 +24,10 @@ import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
+import kotlinx.coroutines.flow.Flow
 
 object MailboxContentController {
 
@@ -35,24 +38,26 @@ object MailboxContentController {
 
     private fun MutableRealm.getLatestFolder(id: String): Folder? = getFolder(id)?.let(::findLatest)
 
-    fun getFolders(): RealmResults<Folder> = MailRealm.mailboxContent.query<Folder>().find()
+    private fun getFolders(): RealmQuery<Folder> = MailRealm.mailboxContent.query()
+    fun getFoldersSync(): RealmResults<Folder> = getFolders().find()
+    fun getFoldersAsync(): Flow<ResultsChange<Folder>> = getFolders().asFlow()
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    fun getDeletableFolders(foldersToKeep: List<Folder>): RealmResults<Folder> {
-        val foldersIds = foldersToKeep.map { it.id }
-        val query = foldersIds.joinToString(
-            prefix = "NOT (${Folder::id.name} == '",
-            separator = "' OR ${Folder::id.name} == '",
-            postfix = "')"
-        )
-        return MailRealm.mailboxContent.query<Folder>(query).find()
-    }
+    // fun getDeletableFolders(foldersToKeep: List<Folder>): RealmResults<Folder> {
+    //     val foldersIds = foldersToKeep.map { it.id }
+    //     val query = foldersIds.joinToString(
+    //         prefix = "NOT (${Folder::id.name} == '",
+    //         separator = "' OR ${Folder::id.name} == '",
+    //         postfix = "')"
+    //     )
+    //     return MailRealm.mailboxContent.query<Folder>(query).find()
+    // }
 
     fun upsertFolder(folder: Folder): Folder = MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
 
     // fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-    //     mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
+    //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
     // }
 
     // fun deleteFolder(id: String) {
@@ -78,15 +83,15 @@ object MailboxContentController {
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    fun getDeletableThreads(folder: Folder, threadsToKeep: List<Thread>): RealmResults<Thread> {
-        val threadsIds = threadsToKeep.map { it.uid }
-        val query = threadsIds.joinToString(
-            prefix = "NOT (${Thread::uid.name} == '",
-            separator = "' OR ${Thread::uid.name} == '",
-            postfix = "')"
-        )
-        return MailRealm.mailboxContent.query<Thread>(query).find()
-    }
+    // fun getDeletableThreads(folder: Folder, threadsToKeep: List<Thread>): RealmResults<Thread> {
+    //     val threadsIds = threadsToKeep.map { it.uid }
+    //     val query = threadsIds.joinToString(
+    //         prefix = "NOT (${Thread::uid.name} == '",
+    //         separator = "' OR ${Thread::uid.name} == '",
+    //         postfix = "')"
+    //     )
+    //     return MailRealm.mailboxContent.query<Thread>(query).find()
+    // }
 
     // fun upsertThread(thread: Thread) {
     //     mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
@@ -123,15 +128,15 @@ object MailboxContentController {
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    fun getDeletableMessages(thread: Thread, messagesToKeep: List<Message>): RealmResults<Message> {
-        val messagesIds = messagesToKeep.map { it.uid }
-        val query = messagesIds.joinToString(
-            prefix = "NOT (${Message::uid.name} == '",
-            separator = "' OR ${Message::uid.name} == '",
-            postfix = "')"
-        )
-        return MailRealm.mailboxContent.query<Message>(query).find()
-    }
+    // fun getDeletableMessages(thread: Thread, messagesToKeep: List<Message>): RealmResults<Message> {
+    //     val messagesIds = messagesToKeep.map { it.uid }
+    //     val query = messagesIds.joinToString(
+    //         prefix = "NOT (${Message::uid.name} == '",
+    //         separator = "' OR ${Message::uid.name} == '",
+    //         postfix = "')"
+    //     )
+    //     return MailRealm.mailboxContent.query<Message>(query).find()
+    // }
 
     fun upsertMessages(messages: List<Message>) {
         MailRealm.mailboxContent.writeBlocking { messages.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
@@ -141,9 +146,9 @@ object MailboxContentController {
     //     mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
     // }
 
-    fun deleteMessage(uid: String) {
-        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
-    }
+    // fun deleteMessage(uid: String) {
+    //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(::delete) }
+    // }
 
     fun deleteMessages(messages: List<Message>) {
         MailRealm.mailboxContent.writeBlocking { messages.forEach { getLatestMessage(it.uid)?.let(::delete) } }
@@ -159,13 +164,13 @@ object MailboxContentController {
 
     private fun MutableRealm.getLatestDraft(uuid: String): Draft? = getDraft(uuid)?.let(::findLatest)
 
-    fun deleteDraft(uuid: String) {
-        MailRealm.mailboxContent.writeBlocking { getLatestDraft(uuid)?.let(::delete) }
-    }
+    // fun deleteDraft(uuid: String) {
+    //     MailRealm.mailboxContent.writeBlocking { getLatestDraft(uuid)?.let(::delete) }
+    // }
 
-    fun deleteDrafts(drafts: List<Draft>) {
-        MailRealm.mailboxContent.writeBlocking { drafts.forEach { getLatestDraft(it.uuid)?.let(::delete) } }
-    }
+    // fun deleteDrafts(drafts: List<Draft>) {
+    //     MailRealm.mailboxContent.writeBlocking { drafts.forEach { getLatestDraft(it.uuid)?.let(::delete) } }
+    // }
 
     fun upsertDraft(draft: Draft) {
         MailRealm.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
