@@ -24,7 +24,7 @@ import androidx.core.view.isVisible
 import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.drafts.Draft
+import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
@@ -48,12 +48,10 @@ class NewMessageActivity : ThemedActivity() {
         binding.apply {
             setContentView(root)
 
-            toolbar.setNavigationOnClickListener {
-                sendMail(Draft.DraftAction.SAVE)
-                onBackPressed()
-            }
+            toolbar.setNavigationOnClickListener { closeDraft() }
+
             toolbar.setOnMenuItemClickListener {
-                if (sendMail(Draft.DraftAction.SEND)) finish()
+                if (sendMail(DraftAction.SEND)) finish()
                 true
             }
 
@@ -98,15 +96,26 @@ class NewMessageActivity : ThemedActivity() {
         view.setOnClickListener { viewModel.editorAction.value = action }
     }
 
-    private fun sendMail(action: Draft.DraftAction): Boolean = with(viewModel) {
-        if (action == Draft.DraftAction.SAVE && hasStartedEditing.value == false ||
-            action == Draft.DraftAction.SEND && newMessageTo.isEmpty()
+    fun closeDraft() {
+        sendMail(DraftAction.SAVE)
+        finish()
+    }
+
+    fun sendMail(action: DraftAction): Boolean = with(viewModel) {
+        if (action == DraftAction.SAVE && hasStartedEditing.value == false ||
+            action == DraftAction.SEND && newMessageTo.isEmpty()
         ) return false
 
-        with(newMessageFragment) {
-            currentDraft.value?.fill(action, getFromMailbox().email, getSubject(), getBody())
+        currentDraft.value?.let { draft ->
+            draft.fill(
+                draftAction = action,
+                messageEmail = newMessageFragment.getFromMailbox().email,
+                messageSubject = newMessageFragment.getSubject(),
+                messageBody = newMessageFragment.getBody(),
+            )
+            sendMail(draft)
         }
-        currentDraft.value?.let(::sendMail)
+
         true
     }
 

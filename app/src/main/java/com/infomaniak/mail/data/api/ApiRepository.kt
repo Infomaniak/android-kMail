@@ -86,7 +86,7 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         folderId: String,
         offset: Int,
-        filter: ThreadFilter? = null
+        filter: ThreadFilter? = null,
     ): ApiResponse<ThreadsResult> {
         return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name), GET)
     }

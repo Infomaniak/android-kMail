@@ -160,17 +160,18 @@ object MailData {
         }
     }
 
-    fun loadThreadsWhileHandlingDrafts_THIS_IS_A_TEMPORARY_NAME(
+    fun loadThreads(
         folder: Folder,
         mailbox: Mailbox,
         offset: Int,
         forceRefresh: Boolean = false,
     ) {
         val isInternetAvailable = true // TODO: Manage this for real
+        val realmThreads = getThreadsFromRealm(folder, offset)
 
         if (Folder.isDraftsFolder() && isInternetAvailable) {
 
-            val realmOfflineDrafts = getThreadsFromRealm(folder, offset)
+            val realmOfflineDrafts = realmThreads
                 .flatMap { it.messages }
                 .filter { it.isDraft }
                 .mapNotNull { it.draftUuid?.let(MailboxContentController::getDraft) }
@@ -182,22 +183,12 @@ object MailData {
                     val updatedDraft = setDraftSignature(draft)
                     saveDraft(updatedDraft, draftMailbox.uuid)
                 }
-                loadThreads(folder, mailbox, offset, forceRefresh)
+                getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
             }
 
         } else {
-            loadThreads(folder, mailbox, offset, forceRefresh)
+            getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
         }
-    }
-
-    private fun loadThreads(
-        folder: Folder,
-        mailbox: Mailbox,
-        offset: Int = OFFSET_FIRST_PAGE,
-        forceRefresh: Boolean = false,
-    ) {
-        val realmThreads = getThreadsFromRealm(folder, offset)
-        getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
     }
 
     fun loadMessages(thread: Thread) {
@@ -386,7 +377,7 @@ object MailData {
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
             mutableThreadsFlow.value = mergedThreads
 
-            if (Folder.isDraftsFolder()) apiThreads?.forEach { getMessagesFromApi(it) }
+            // if (Folder.isDraftsFolder()) apiThreads?.forEach(::getMessagesFromApi) // TODO: Do we really want this? Here?
         }
     }
 

@@ -25,5 +25,5 @@ import kotlinx.serialization.Serializable
 data class DraftSaveResult(
     val uuid: String,
     val uid: String,
-    val attachments: List<Attachment>
+    val attachments: List<Attachment>,
 )

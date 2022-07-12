@@ -19,12 +19,7 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.InputFilter
-import android.text.Spanned
-import android.text.Editable
-import android.text.Html
-import android.text.SpannableStringBuilder
-import android.text.TextWatcher
+import android.text.*
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -52,10 +47,10 @@ import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.setMargins
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -124,7 +119,7 @@ class NewMessageFragment : Fragment() {
         }
 
         val allContacts = viewModel.getAllContacts()
-        val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
+        val toAlreadyUsedContactMails = viewModel.newMessageTo.map { it.email }.toMutableList()
         val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
         val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
 
@@ -168,7 +163,7 @@ class NewMessageFragment : Fragment() {
                 BCC.clearField()
             } else {
                 isEnabled = false
-                activity?.onBackPressed()
+                (activity as NewMessageActivity).closeDraft()
             }
         }
     }
@@ -284,9 +279,8 @@ class NewMessageFragment : Fragment() {
         hasStartedEditing.value = true
         clearJobs()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
-            delay(3000)
-            currentDraft.value?.fill(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
-            currentDraft.value?.let(::sendMail)
+            delay(3_000L)
+            (activity as NewMessageActivity).sendMail(DraftAction.SAVE)
         }
     }
 

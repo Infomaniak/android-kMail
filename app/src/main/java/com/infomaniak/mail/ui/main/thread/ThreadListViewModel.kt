@@ -59,11 +59,11 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun loadThreadsAfterPagination(folder: Folder, mailbox: Mailbox, offset: Int) {
-        MailData.loadThreadsWhileHandlingDrafts_THIS_IS_A_TEMPORARY_NAME(folder, mailbox, offset)
+        MailData.loadThreads(folder, mailbox, offset)
     }
 
     fun loadThreadsAfterRefresh() {
-        MailData.loadThreadsWhileHandlingDrafts_THIS_IS_A_TEMPORARY_NAME(
+        MailData.loadThreads(
             folder = MailData.currentFolderFlow.value ?: return,
             mailbox = MailData.currentMailboxFlow.value ?: return,
             offset = ApiRepository.OFFSET_FIRST_PAGE,

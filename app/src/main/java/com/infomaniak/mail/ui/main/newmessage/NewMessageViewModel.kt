@@ -22,13 +22,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.MailData.setDraftSignature
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
+import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -68,19 +68,14 @@ class NewMessageViewModel : ViewModel() {
 
     fun sendMail(draft: Draft) {
         val mailbox = MailData.currentMailboxFlow.value ?: return
-        fun sendDraft() = MailData.sendDraft(draft, mailbox.uuid)
-        fun saveDraft() = MailData.saveDraft(draft, mailbox.uuid)
-
-        viewModelScope.launch(Dispatchers.IO) {
-            setDraftSignature(draft)
-            // TODO: better handling of api response
-            if (draft.action == Draft.DraftAction.SEND.name.lowercase()) {
-                sendDraft()
-            } else {
-                saveDraft().data?.let {
-                    currentDraft.value?.uuid = it.uuid
-                    currentDraft.value?.parentMessageUid = it.uid
-                }
+        val updatedDraft = if (draft.identityId == null) MailData.setDraftSignature(draft) else draft
+        // TODO: better handling of api response
+        if (updatedDraft.action == DraftAction.SEND.name.lowercase()) {
+            MailData.sendDraft(updatedDraft, mailbox.uuid)
+        } else {
+            MailData.saveDraft(updatedDraft, mailbox.uuid).data?.let {
+                currentDraft.value?.uuid = it.uuid
+                currentDraft.value?.parentMessageUid = it.uid
             }
         }
     }
@@ -89,8 +84,8 @@ class NewMessageViewModel : ViewModel() {
         autoSaveJob?.cancel()
     }
 
-    fun Draft.fill(draftAction: Draft.DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
-        // TODO: should userInformation (here 'from') be stored in mainViewModel ? see ApiRepository.getUser()
+    fun Draft.fill(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
+        // TODO: Should userInformation (here 'from') be stored in mainViewModel? See ApiRepository.getUser()
         MailboxContentController.updateDraft(this) {
             it.from = realmListOf(Recipient().apply { email = messageEmail })
             it.subject = messageSubject
@@ -101,13 +96,13 @@ class NewMessageViewModel : ViewModel() {
             it.cc = newMessageCc.toRealmRecipients()
             it.bcc = newMessageBcc.toRealmRecipients()
 
-//        // TODO: manage advanced functionalities
-//        it.quote = ""
-//        it.references = ""
-//        it.delay = 0
-//        it.inReplyTo = ""
-//        it.inReplyToUid = ""
-//        it.replyTo = realmListOf()
+            // TODO: Manage advanced functionalities
+            // it.quote = ""
+            // it.references = ""
+            // it.delay = 0
+            // it.inReplyTo = ""
+            // it.inReplyToUid = ""
+            // it.replyTo = realmListOf()
         }
     }
 

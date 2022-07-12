@@ -89,7 +89,7 @@ class ThreadFragment : Fragment() {
                 }
             }
             onDeleteDraftClicked = { message ->
-                // TODO: when catching api error, use the position returned by remove message to add back the item to the list
+                // TODO: When catching API error, use the position returned by removeMessage to add back the item to the list.
                 threadAdapter.removeMessage(message)
                 lifecycleScope.launch(Dispatchers.IO) {
                     MailData.deleteDraft(message)

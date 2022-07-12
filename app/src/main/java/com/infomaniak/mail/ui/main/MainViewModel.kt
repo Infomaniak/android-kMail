@@ -19,10 +19,10 @@ package com.infomaniak.mail.ui.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.infomaniak.mail.data.models.user.UserPreferences
+import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 
 class MainViewModel : ViewModel() {
 
     val isInternetAvailable = MutableLiveData(false)
-    var threadDisplayMode = UserPreferences.ThreadMode.THREADS
+    var threadDisplayMode = ThreadMode.THREADS
 }

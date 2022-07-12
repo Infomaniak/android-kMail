@@ -109,7 +109,6 @@ class Thread : RealmObject {
     }
 
     companion object {
-
         fun from(message: Message, threadUid: String?) = Thread().apply {
             uid = threadUid ?: message.uid
             from = message.from

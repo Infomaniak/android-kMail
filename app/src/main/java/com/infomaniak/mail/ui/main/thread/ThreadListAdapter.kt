@@ -39,6 +39,7 @@ import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.displayedName
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.isValid
 import java.util.*

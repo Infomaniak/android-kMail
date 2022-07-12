@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache
 
-import com.infomaniak.mail.data.MailData.threadsFlow
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.drafts.Draft
@@ -187,8 +187,7 @@ object MailboxContentController {
     fun updateDraft(draft: Draft, onUpdate: (draft: Draft) -> Unit): Draft {
         return MailRealm.mailboxContent.writeBlocking {
             val hotDraft = if (draft.isManaged()) getLatestDraft(draft.uuid) else draft
-            hotDraft?.let(onUpdate)
-            hotDraft ?: draft
+            hotDraft?.also(onUpdate) ?: draft
         }
     }
 
@@ -200,7 +199,7 @@ object MailboxContentController {
             val draftMessage = hotDraft.toMessage()
             copyToRealm(draftMessage, UpdatePolicy.ALL)
 
-            val threadUid = threadsFlow.value?.find { thread ->
+            val threadUid = MailData.threadsFlow.value?.find { thread ->
                 thread.messages.any { message -> message.uid == draft.parentMessageUid }
             }?.uid
             val thread = Thread.from(draftMessage, threadUid)
@@ -219,15 +218,14 @@ object MailboxContentController {
     }
 
     private fun MutableRealm.removeDraft(uuid: String, parentUid: String) {
-        val hotThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
-        val threadToDelete = hotThreads?.find { thread ->
-            thread.uid == uuid || thread.messages.any { it.uid == parentUid }
-        }
-        threadToDelete?.let { toDelete ->
-            hotThreads.removeIf { it.uid == toDelete.uid }
-            getLatestThread(toDelete.uid)?.let(::delete)
-        }
+        val thread = getDraftsFolder()?.id
+            ?.let { getLatestFolder(it) }
+            ?.threads
+            ?.find { thread ->
+                thread.uid == uuid || thread.uid == parentUid || thread.messages.any { it.uid == uuid || it.uid == parentUid }
+            }
         deleteLatestMessage(parentUid.ifEmpty { uuid })
+        thread?.let { getLatestThread(it.uid)?.let(::delete) }
     }
 
     /**
