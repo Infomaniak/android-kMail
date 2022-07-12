@@ -58,8 +58,11 @@
         <item name="colorPrimary">@color/pinkMail</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
-        <item name="colorAccent">#00FF00</item>
-        <item name="colorSecondary">#00FF00</item>
+        <item name="colorPrimaryContainer">@color/pinkMailSecondary</item>
+        <item name="colorOnPrimaryContainer">@color/pinkMail</item>
+
+        <item name="colorAccent">@color/pinkMail</item>
+        <item name="colorSecondary">@color/pinkMail</item>
 
         <item name="colorControlNormal">@color/pinkMail</item>
         <item name="colorControlHighlight">@color/pinkMailRipple</item>
@@ -70,8 +73,11 @@
         <item name="colorPrimary">@color/blueMail</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
-        <item name="colorAccent">#00FF00</item>
-        <item name="colorSecondary">#00FF00</item>
+        <item name="colorPrimaryContainer">@color/blueMailSecondary</item>
+        <item name="colorOnPrimaryContainer">@color/blueMail</item>
+
+        <item name="colorAccent">@color/blueMail</item>
+        <item name="colorSecondary">@color/blueMail</item>
 
         <item name="colorControlNormal">@color/blueMail</item>
         <item name="colorControlHighlight">@color/blueMailRipple</item>

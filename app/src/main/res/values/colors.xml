@@ -19,8 +19,10 @@
 
     <!-- Primary colors -->
     <color name="pinkMail">#BC0055</color>
+    <color name="pinkMailSecondary">#F7E8EF</color>
     <color name="pinkMailRipple">#1EBC0055</color>
     <color name="blueMail">@color/primary</color>
+    <color name="blueMailSecondary">#F4F6FD</color>
     <color name="blueMailRipple">#1E0098FF</color>
 
     <!-- Context / errors -->
@@ -54,6 +56,7 @@
     <color name="notificationTextColor">@color/hover</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="emphasizedTextColor">@color/accent</color>
+    <color name="emailChipTextColor">@color/grey_title</color>
 
     <!-- Drawables -->
     <color name="separatorColor">#ECECEC</color>

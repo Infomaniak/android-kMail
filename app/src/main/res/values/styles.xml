@@ -129,28 +129,6 @@
         <item name="rippleColor">@color/pinkMailRipple</item>
     </style>
 
-    <!-- Other -->
-
-    <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
-    </style>
-
-    <style name="Widget.App.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
-    </style>
-
-    <style name="ThemeOverlay.App.FloatingActionButton" parent="">
-        <item name="colorContainer">?android:attr/colorPrimary</item>
-        <item name="colorOnContainer">?attr/colorOnPrimary</item>
-    </style>
-
-    <style name="EmailAddressTextView">
-        <item name="android:backgroundTint">@android:color/transparent</item>
-        <item name="android:imeOptions">actionDone</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
     <!-- Cardview -->
 
     <style name="CardViewMail" parent="Widget.Material3.CardView.Filled">
@@ -205,7 +183,42 @@
         <item name="drawableStartCompat">@drawable/ic_folder</item>
     </style>
 
+
+    <!-- Chips -->
+
+    <style name="EmailAddressChip" parent="Widget.Material3.Chip.Input">
+        <item name="android:textColor">@color/emailChipTextColor</item>
+        <item name="chipBackgroundColor">?attr/colorPrimaryContainer</item>
+        <item name="chipCornerRadius">100dp</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="closeIcon">@null</item>
+        <item name="closeIconEnabled">false</item>
+        <item name="checkedIconEnabled">false</item>
+        <item name="checkedIcon">@null</item>
+    </style>
+
+
     <!-- Other -->
+
+    <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
+    </style>
+
+    <style name="Widget.App.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
+    </style>
+
+    <style name="ThemeOverlay.App.FloatingActionButton" parent="">
+        <item name="colorContainer">?android:attr/colorPrimary</item>
+        <item name="colorOnContainer">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="EmailAddressTextView">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 
     <style name="CircleImageView">
         <item name="cornerFamily">rounded</item>
