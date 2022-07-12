@@ -38,6 +38,7 @@ import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
+import io.realm.kotlin.ext.isValid
 import java.util.*
 
 // TODO: Use LoaderAdapter from Core instead?
@@ -203,9 +204,10 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
             val oldItem = oldList[oldIndex]
             val newItem = newList[newIndex]
             return when {
-                oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
                 oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
-                else -> (oldItem as Thread).uid == (newItem as Thread).uid // Both are Threads
+                oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
+                oldItem.isValid() && newItem.isValid() -> oldItem.uid == newItem.uid // Both are valid
+                else -> false
             }
         }
 
