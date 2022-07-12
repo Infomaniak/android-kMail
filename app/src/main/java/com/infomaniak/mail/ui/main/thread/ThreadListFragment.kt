@@ -216,6 +216,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onResume() {
         super.onResume()
 
+        binding.newMessageFab.shrink()
+
         listenToFolderName()
         listenToThreads()
 
