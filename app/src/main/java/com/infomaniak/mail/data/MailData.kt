@@ -38,7 +38,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 object MailData {
@@ -46,21 +45,22 @@ object MailData {
     private val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
 
     private val mutableMailboxesFlow: MutableStateFlow<List<Mailbox>?> = MutableStateFlow(null)
-    val mailboxesFlow = mutableMailboxesFlow.asStateFlow().filterNotNull()
-
     private val mutableFoldersFlow: MutableStateFlow<List<Folder>?> = MutableStateFlow(null)
-    val foldersFlow = mutableFoldersFlow.asStateFlow().filterNotNull()
-
     private val mutableThreadsFlow: MutableStateFlow<List<Thread>?> = MutableStateFlow(null)
-    val threadsFlow = mutableThreadsFlow.asStateFlow().filterNotNull()
-
     private val mutableMessagesFlow: MutableStateFlow<List<Message>?> = MutableStateFlow(null)
-    val messagesFlow = mutableMessagesFlow.asStateFlow().filterNotNull()
+    val mailboxesFlow = mutableMailboxesFlow.asStateFlow()
+    val foldersFlow = mutableFoldersFlow.asStateFlow()
+    val threadsFlow = mutableThreadsFlow.asStateFlow()
+    val messagesFlow = mutableMessagesFlow.asStateFlow()
 
-    var currentMailbox: Mailbox? = null
-    var currentFolder: Folder? = null
-    var currentThread: Thread? = null
-    var currentMessage: Message? = null
+    private val mutableCurrentMailboxFlow: MutableStateFlow<Mailbox?> = MutableStateFlow(null)
+    private val mutableCurrentFolderFlow: MutableStateFlow<Folder?> = MutableStateFlow(null)
+    private val mutableCurrentThreadFlow: MutableStateFlow<Thread?> = MutableStateFlow(null)
+    private val mutableCurrentMessageFlow: MutableStateFlow<Message?> = MutableStateFlow(null)
+    val currentMailboxFlow = mutableCurrentMailboxFlow.asStateFlow()
+    val currentFolderFlow = mutableCurrentFolderFlow.asStateFlow()
+    val currentThreadFlow = mutableCurrentThreadFlow.asStateFlow()
+    val currentMessageFlow = mutableCurrentMessageFlow.asStateFlow()
 
     ///////////////
     // LOAD MAIL //
@@ -69,15 +69,8 @@ object MailData {
     fun close() {
         MailRealm.close()
 
-        closeCurrentData()
         closeFlows()
-    }
-
-    private fun closeCurrentData() {
-        currentMessage = null
-        currentThread = null
-        currentFolder = null
-        currentMailbox = null
+        closeCurrentFlows()
     }
 
     private fun closeFlows() {
@@ -85,6 +78,13 @@ object MailData {
         mutableThreadsFlow.value = null
         mutableFoldersFlow.value = null
         mutableMailboxesFlow.value = null
+    }
+
+    private fun closeCurrentFlows() {
+        mutableCurrentMessageFlow.value = null
+        mutableCurrentThreadFlow.value = null
+        mutableCurrentFolderFlow.value = null
+        mutableCurrentMailboxFlow.value = null
     }
 
     fun loadMailData() {
@@ -102,26 +102,37 @@ object MailData {
     }
 
     fun selectMailbox(mailbox: Mailbox) {
-        if (MailRealm.currentMailboxObjectIdFlow.value != mailbox.objectId) {
+        if (currentMailboxFlow.value?.objectId != mailbox.objectId) {
             AccountUtils.currentMailboxId = mailbox.mailboxId
-            MailRealm.mutableCurrentMailboxObjectIdFlow.value = mailbox.objectId
-            currentMailbox = mailbox
+            mutableCurrentMailboxFlow.value = mailbox
+
+            mutableCurrentMessageFlow.value = null
+            mutableCurrentThreadFlow.value = null
+            mutableCurrentFolderFlow.value = null
+            mutableMessagesFlow.value = null
+            mutableThreadsFlow.value = null
+            mutableFoldersFlow.value = null
         }
     }
 
-    private fun selectFolder(folder: Folder) {
-        MailRealm.mutableCurrentFolderIdFlow.value = folder.id
-        currentFolder = folder
+    fun selectFolder(folder: Folder) {
+        mutableCurrentFolderFlow.value = folder
+
+        mutableCurrentMessageFlow.value = null
+        mutableCurrentThreadFlow.value = null
+        mutableMessagesFlow.value = null
+        mutableThreadsFlow.value = null
     }
 
     fun selectThread(thread: Thread) {
-        MailRealm.mutableCurrentThreadUidFlow.value = thread.uid
-        currentThread = thread
+        mutableCurrentThreadFlow.value = thread
+
+        mutableCurrentMessageFlow.value = null
+        mutableMessagesFlow.value = null
     }
 
     fun selectMessage(message: Message) {
-        MailRealm.mutableCurrentMessageUidFlow.value = message.uid
-        currentMessage = message
+        mutableCurrentMessageFlow.value = message
     }
 
     private fun handleMailboxes(mailboxes: List<Mailbox>, completion: (mailbox: Mailbox) -> Unit) {

@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
@@ -42,7 +43,7 @@ class ThreadListViewModel : ViewModel() {
         if (listenToThreadsJob != null) listenToThreadsJob?.cancel()
 
         listenToThreadsJob = CoroutineScope(Dispatchers.IO).launch {
-            MailData.threadsFlow.collect { threads ->
+            MailData.threadsFlow.filterNotNull().collect { threads ->
                 mutableUiThreadsFlow.value = threads
             }
         }
@@ -53,8 +54,8 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun refreshThreads() {
-        val folder = MailData.currentFolder ?: return
-        val mailbox = MailData.currentMailbox ?: return
+        val folder = MailData.currentFolderFlow.value ?: return
+        val mailbox = MailData.currentMailboxFlow.value ?: return
         MailData.fetchThreads(folder, mailbox)
     }
 

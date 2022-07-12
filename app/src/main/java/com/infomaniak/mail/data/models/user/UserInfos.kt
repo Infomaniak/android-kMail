@@ -29,7 +29,7 @@ class UserInfos : RealmObject {
     var login: String = ""
     var email: String = ""
     @SerialName("avatar_url")
-    var avatarUrl: String = ""
+    var avatarUrl: String = "" // TODO: We already have an Avatar from the logged in User. Isn't this a duplicate?
     @SerialName("hosting_url")
     var hostingUrl: String = ""
     @SerialName("manager_url")

@@ -50,7 +50,7 @@ class SettingAddressAdapter(
             text = unreadText
         }
 
-        setSelectedState(mailbox.objectId == MailData.currentMailbox?.objectId)
+        setSelectedState(mailbox.objectId == MailData.currentMailboxFlow.value?.objectId)
         addressCardview.setOnClickListener {
             MailData.selectMailbox(mailbox)
             popBackStack()

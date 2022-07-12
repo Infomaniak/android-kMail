@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class SwitchUserViewModel : ViewModel() {
@@ -42,7 +43,7 @@ class SwitchUserViewModel : ViewModel() {
         if (listenToMailboxesJob != null) listenToMailboxesJob?.cancel()
 
         listenToMailboxesJob = CoroutineScope(Dispatchers.IO).launch {
-            MailData.mailboxesFlow.collect { mailboxes ->
+            MailData.mailboxesFlow.filterNotNull().collect { mailboxes ->
                 mutableUiMailboxesFlow.value = mailboxes
             }
         }
