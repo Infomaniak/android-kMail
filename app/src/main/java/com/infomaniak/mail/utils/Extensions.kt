@@ -67,3 +67,13 @@ fun Date.toRealmInstant(): RealmInstant {
 }
 
 fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }
+
+fun View.toggleChevron(
+    isCollapsed: Boolean,
+    collapsedAngle: Float = -180.0f,
+    expandedAngle: Float = 0.0f,
+    duration: Long = 300L,
+) {
+    val angle = if (isCollapsed) collapsedAngle else expandedAngle
+    animate().rotation(angle).setDuration(duration).start()
+}

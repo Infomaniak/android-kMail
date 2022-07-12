@@ -109,6 +109,7 @@
         <item name="navigationContentDescription">@string/contentDescriptionButtonBack</item>
         <item name="navigationIcon">@drawable/ic_chevron_left</item>
         <item name="titleMarginTop">8dp</item>
+        <item name="titleTextAppearance">@style/H1</item>
     </style>
 
     <style name="LoginToolbarTheme" parent="Theme.AppCompat">

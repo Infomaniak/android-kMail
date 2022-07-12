@@ -47,7 +47,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callKotlinxApi(ApiRoutes.signatures(mailboxHostingId, mailboxMailbox), GET)
     }
 
-    fun getMailboxes(): ApiResponse<ArrayList<Mailbox>> = callKotlinxApi(ApiRoutes.mailbox(), GET)
+    fun getMailboxes(): ApiResponse<ArrayList<Mailbox>> = callKotlinxApi("${ApiRoutes.mailbox()}?with=unseen", GET)
 
     fun getFolders(mailboxUuid: String): ApiResponse<ArrayList<Folder>> = callKotlinxApi(ApiRoutes.folders(mailboxUuid), GET)
 

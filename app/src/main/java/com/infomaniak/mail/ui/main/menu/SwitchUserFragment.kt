@@ -22,10 +22,71 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
+import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiAccount
+import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
 class SwitchUserFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_switch_user, container, false)
+    private val switchUserViewModel: SwitchUserViewModel by viewModels()
+
+    private val binding: FragmentSwitchUserBinding by lazy { FragmentSwitchUserBinding.inflate(layoutInflater) }
+
+    private var mailboxesJob: Job? = null
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+        switchUserViewModel.setup()
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        listenToMailboxes()
+        switchUserViewModel.loadMailboxes()
+    }
+
+    override fun onPause() {
+        mailboxesJob?.cancel()
+        mailboxesJob = null
+
+        super.onPause()
+    }
+
+    private fun listenToMailboxes() {
+        with(switchUserViewModel) {
+
+            if (mailboxesJob != null) mailboxesJob?.cancel()
+
+            mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
+                uiMailboxesFlow.filterNotNull().collect { mailboxes ->
+                    // TODO: Handle multiple accounts
+                    // TODO: Order accounts with selected one first
+                    // TODO: Get the unread count for all mailboxes and not only the current one
+                    val uiAccount = UiAccount(AccountUtils.currentUser!!, mailboxes)
+
+                    val accounts = listOf(uiAccount)
+                    orderUiAccounts(accounts)
+
+                    binding.recyclerViewAccount.adapter = SettingAccountAdapter(accounts) { findNavController().popBackStack() }
+                }
+            }
+        }
+    }
+
+    private fun orderUiAccounts(uiAccounts: List<UiAccount>) {
+        uiAccounts.forEach { account ->
+            account.mailboxes = account.mailboxes.sortedByDescending { it.unseenMessages }
+        }
+    }
 }
