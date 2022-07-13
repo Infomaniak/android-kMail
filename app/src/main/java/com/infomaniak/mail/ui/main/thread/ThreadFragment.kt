@@ -26,11 +26,16 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
@@ -60,15 +65,40 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
+        setupAdapter()
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         threadSubject.text = navigationArgs.threadSubject.displayedSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
-        messagesList.adapter = ThreadAdapter().also { threadAdapter = it }
 
         AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(it))
         }
+    }
+
+    private fun setupAdapter() = with(binding) {
+        messagesList.adapter = ThreadAdapter().apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            onContactClicked = { contact ->
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
+            }
+            onDraftClicked = { message ->
+                threadViewModel.viewModelScope.launch(Dispatchers.IO) {
+                    val draft = MailApi.fetchDraft(message.draftResource, message.uid)
+                    message.setDraftId(draft?.uuid)
+                    // TODO: Open the draft in draft editor
+                }
+
+            }
+            onDeleteDraftClicked = { message ->
+                // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
+                lifecycleScope.launch(Dispatchers.IO) {
+                    MailData.deleteDraft(message)
+                    // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
+                }
+                threadAdapter.removeMessage(message)
+            }
+        }.also { threadAdapter = it }
     }
 
     override fun onResume() {
@@ -100,12 +130,13 @@ class ThreadFragment : Fragment() {
         Log.i("UI", "Received messages (${messages.size})")
 
         messages.forEach {
-            val displayedBody = with(it.body?.value) {
+            with(it.body?.value) {
                 this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
             }
-            Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")// | $displayedBody")
+            Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")
         }
 
         threadAdapter.notifyAdapter(ArrayList(messages))
+        binding.messagesList.scrollToPosition(threadAdapter.itemCount - 1)
     }
 }

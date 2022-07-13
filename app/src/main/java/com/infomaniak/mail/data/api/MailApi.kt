@@ -67,12 +67,18 @@ object MailApi {
                             attachment.initLocalValues(index, uid)
                         }
                     }
-                } ?: realmMessage
-            }
+                    // TODO: uncomment this when managing draft folder
+//                    if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
+//                        Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
+//                        val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+//                        completedMessage.draftUuid = draft?.uuid
+//                    }
+                }
+            } ?: realmMessage
         }
     }
 
-    private fun fetchDraft(draftResource: String, parentUid: String): Draft? {
+    fun fetchDraft(draftResource: String, parentUid: String): Draft? {
         val apiDraft = ApiRepository.getDraft(draftResource).data
 
         apiDraft?.let { draft ->
@@ -87,7 +93,7 @@ object MailApi {
         return apiDraft
     }
 
-    suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
+    suspend fun fetchAttachmentsFromApi(attachment: Attachment, cacheDir: File) {
 
         fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
             val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()

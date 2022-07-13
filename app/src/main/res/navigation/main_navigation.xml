@@ -87,6 +87,9 @@
         <action
             android:id="@+id/action_threadFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
+        <action
+            android:id="@+id/action_threadFragment_to_contactFragment"
+            app:destination="@id/contactFragment" />
     </fragment>
 
     <fragment
@@ -99,7 +102,14 @@
         android:id="@+id/contactFragment"
         android:name="com.infomaniak.mail.ui.main.ContactFragment"
         android:label="ContactFragment"
-        tools:layout="@layout/fragment_contact" />
+        tools:layout="@layout/fragment_contact">
+        <argument
+            android:name="contactName"
+            app:argType="string" />
+        <argument
+            android:name="contactEmail"
+            app:argType="string" />
+    </fragment>
 
     <dialog
         android:id="@+id/messageActionBottomSheetDialog"

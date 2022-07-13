@@ -75,15 +75,15 @@ object ApiRepository : ApiRepositoryCore() {
         return callKotlinxApi(ApiRoutes.quotas(mailboxMailbox, mailboxHostingId), GET)
     }
 
-    fun markMessagesAsSeen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<Seen> {
-        return callKotlinxApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
+    fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
+        return callKotlinxApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
-    fun markMessagesAsUnseen(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<Seen> {
-        return callKotlinxApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
+    fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
+        return callKotlinxApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
-    // fun markAsSafe(mailboxUuid: String, messages: ArrayList<Message>): ApiResponse<ArrayList<Seen>> = callKotlinxApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messages.map { it.uid }))
+    // fun markAsSafe(mailboxUuid: String, messagesUids: List<String>): ApiResponse<ArrayList<Seen>> = callKotlinxApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messagesUids))
 
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
@@ -99,19 +99,19 @@ object ApiRepository : ApiRepositoryCore() {
         return if (draft.uuid.isEmpty()) postDraft() else putDraft()
     }
 
-    fun getDraft(mailboxUuid: String, draftUuid: String): ApiResponse<Draft> {
-        return callKotlinxApi(ApiRoutes.draft(mailboxUuid, draftUuid), GET)
+    fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> {
+        return callKotlinxApi(ApiRoutes.resource(draftResource), DELETE)
     }
 
-    fun deleteDraft(mailboxUuid: String, draftUuid: String): ApiResponse<EmptyResponse?> {
-        return callKotlinxApi(ApiRoutes.draft(mailboxUuid, draftUuid), DELETE)
+    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<EmptyResponse?> {
+        return callKotlinxApi(ApiRoutes.deleteMessage(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
-    fun moveMessage(mailboxUuid: String, messages: ArrayList<Message>, destinationId: String): ApiResponse<MoveResult> {
+    fun moveMessage(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
         return callKotlinxApi(
             url = ApiRoutes.moveMessage(mailboxUuid),
             method = POST,
-            body = mapOf("uids" to messages.map { it.uid }, "to" to destinationId),
+            body = mapOf("uids" to messagesUids, "to" to destinationId),
         )
     }
 

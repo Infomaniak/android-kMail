@@ -62,7 +62,7 @@ class Draft : RealmObject {
     var parentMessageUid: String = ""
 
     fun initLocalValues(messageUid: String) {
-        uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
+        if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
         parentMessageUid = messageUid
 
         cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects

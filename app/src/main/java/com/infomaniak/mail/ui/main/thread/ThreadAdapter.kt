@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
+import android.text.Html
 import android.text.SpannedString
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -40,12 +41,17 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toggleChevron
 
 class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
 
     private var messageList: ArrayList<Message> = arrayListOf()
+
+    var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
+    var onDraftClicked: ((message: Message) -> Unit)? = null
+    var onContactClicked: ((contact: Recipient) -> Unit)? = null
 
     override fun getItemCount() = messageList.size
 
@@ -55,9 +61,26 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
-        displayHeader(message)
-        displayAttachments(message.attachments)
-        displayBody(message.body)
+        root.setOnClickListener(null)
+        if ((position == messageList.size - 1 || !message.seen) && !message.isDraft) message.isExpanded = true
+        if (!message.isExpanded) {
+            root.setOnClickListener {
+                if (message.isDraft) {
+                    onDraftClicked?.invoke(message)
+                } else {
+                    message.isExpanded = true
+                    displayMessage(message)
+                }
+            }
+        }
+
+        displayMessage(message)
+    }
+
+    fun removeMessage(message: Message) {
+        val position = messageList.indexOf(message)
+        messageList.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     fun notifyAdapter(newList: ArrayList<Message>) {
@@ -65,15 +88,40 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         messageList = newList
     }
 
-    private fun ItemMessageBinding.displayHeader(message: Message) {
-        expeditorName.text = message.from[0].name.ifBlank { message.from[0].email }
-        expeditorEmail.text = message.from[0].email
-        messageDate.text = message.date?.toDate()?.format("d MMM YYYY à HH:mm")
-        recipient.text = formatRecipientsName(root.context, message)
-        expandHeaderButton.setOnClickListener {
-            val isExpanded = !message.isExpandedHeaderMode
-            message.isExpandedHeaderMode = isExpanded
-            expandHeader(message)
+    private fun ItemMessageBinding.displayMessage(message: Message) = with(message) {
+        displayHeader(message)
+        hideAttachments()
+        if (isExpanded) {
+            displayAttachments(attachments)
+            displayBody(body)
+        }
+    }
+
+    private fun ItemMessageBinding.displayHeader(message: Message) = with(message) {
+        deleteDraftButton.isVisible = isDraft
+        deleteDraftButton.setOnClickListener { onDeleteDraftClicked?.invoke(message) }
+        messageDate.text = if (isDraft) "" else date?.toDate()?.format("d MMM YYYY à HH:mm")
+        expeditorName.setTextColor(root.context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
+        expeditorName.text = if (isDraft) {
+            root.context.getString(R.string.messageIsDraftOption)
+        } else {
+            from[0].displayedName(root.context)
+        }
+
+        expandHeaderButton.isVisible = isExpanded
+        webViewFrameLayout.isVisible = isExpanded
+        recipient.text = if (isExpanded) {
+            formatRecipientsName(root.context, message)
+        } else {
+            Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
+        }
+        expeditorEmail.text = if (isExpanded) from[0].email else ""
+
+        if (isExpanded) {
+            expandHeaderButton.setOnClickListener {
+                isExpandedHeaderMode = !isExpandedHeaderMode
+                expandHeader(message)
+            }
         }
     }
 
@@ -82,7 +130,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         val cc = recipientsToSpannedString(context, cc)
 
         return buildSpannedString {
-            if (isExpandedHeaderMode) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append("À : ") }
+            if (isExpandedHeaderMode) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append("${context.getString(R.string.toTitle)} ") }
             append(to)
             if (cc.isNotBlank()) append(cc)
         }.dropLast(2) as SpannedString
@@ -93,16 +141,12 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
             append(
                 if (isExpandedHeaderMode) {
                     buildSpannedString {
-                        if (it.name.isNotBlank()) {
-                            color(context.getColor(R.color.primaryTextColor)) { append(it.name) }
-                            scale(RECIPIENT_TEXT_SCALE_FACTOR) { append(" (${it.email})") }
-                        } else {
-                            color(context.getColor(R.color.primaryTextColor)) { append(it.email) }
-                        }
+                        color(context.getColor(R.color.primaryTextColor)) { append(it.displayedName(context)) }
+                        if (it.name.isBlank()) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append(" (${it.email})") }
                         append(",\n")
                     }
                 } else {
-                    "${it.name.ifBlank { it.email }}, "
+                    "${it.displayedName(context)}, "
                 }
             )
         }
@@ -115,6 +159,8 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         recipient.changeSize(if (message.isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
 
         recipient.text = formatRecipientsName(root.context, message)
+        // TODO: Add listener to name and email of all recipient ?
+        userAvatar.setOnClickListener { onContactClicked?.invoke(message.from[0]) }
     }
 
     private fun TextView.changeSize(@DimenRes dimension: Int) {
@@ -175,6 +221,12 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         // TODO make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
+
+    private fun Recipient.displayedName(context: Context): String {
+        return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
+    }
+
+    private fun Recipient.getNameOrEmail() = name.ifBlank { email }
 
     private class MessageListDiffCallback(
         private val oldList: List<Message>,

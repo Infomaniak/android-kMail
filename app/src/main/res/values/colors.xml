@@ -45,6 +45,7 @@
     <color name="hintTextColor">@color/grey_text_light</color>
     <color name="sectionHeaderTextColor">@color/grey_text_light</color>
     <color name="notificationTextColor">#F5F5F5</color>
+    <color name="draftTextColor">@color/red_destructive_action</color>
     <color name="emphasizedTextColor">@color/infomaniak</color>
 
     <!-- Drawables -->

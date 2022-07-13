@@ -60,11 +60,10 @@
         style="@style/Callout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardVerySmall"
         android:layout_marginStart="@dimen/marginStandardSmall"
         android:ellipsize="end"
+        android:paddingBottom="@dimen/marginStandardVerySmall"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/recipient"
         app:layout_constraintEnd_toStartOf="@id/expandHeaderButton"
         app:layout_constraintStart_toEndOf="@id/userAvatar"
         app:layout_constraintTop_toBottomOf="@id/expeditorName"
@@ -109,12 +108,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/deleteDraftButton"
+        style="@style/IconButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
+        android:paddingTop="0dp"
+        android:visibility="gone"
+        app:icon="@drawable/ic_bin"
+        app:iconSize="18dp"
+        app:iconTint="@color/red_destructive_action"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/messageHeaderBarrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="userAvatar, recipient, expandHeaderButton" />
+        app:constraint_referenced_ids="userAvatar,recipient,expandHeaderButton,deleteDraftButton" />
 
     <ImageView
         android:id="@+id/attachmentsIcon"
@@ -188,7 +202,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsScrollView">
+        app:layout_constraintTop_toBottomOf="@id/attachmentsScrollView"
+        tools:visibility="visible">
 
         <WebView
             android:id="@+id/messageBody"
