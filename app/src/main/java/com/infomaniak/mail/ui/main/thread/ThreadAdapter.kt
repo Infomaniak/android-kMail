@@ -22,6 +22,7 @@ import android.text.Html
 import android.text.SpannedString
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.DimenRes
@@ -49,9 +50,9 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
 
     private var messageList: ArrayList<Message> = arrayListOf()
 
+    var onContactClicked: ((contact: Recipient, isExpanded: Boolean) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null
-    var onContactClicked: ((contact: Recipient) -> Unit)? = null
 
     override fun getItemCount() = messageList.size
 
@@ -118,10 +119,8 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         expeditorEmail.text = if (isExpanded) from[0].email else ""
 
         if (isExpanded) {
-            expandHeaderButton.setOnClickListener {
-                isExpandedHeaderMode = !isExpandedHeaderMode
-                expandHeader(message)
-            }
+            messageHeader.addExpandHeaderListener(this@displayHeader, message)
+            expandHeaderButton.addExpandHeaderListener(this@displayHeader, message)
         }
     }
 
@@ -152,15 +151,23 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         }
     }
 
-    private fun ItemMessageBinding.expandHeader(message: Message) {
-        expeditorEmail.isVisible = message.isExpandedHeaderMode
+    private fun View.addExpandHeaderListener(binding: ItemMessageBinding, message: Message) = with(message) {
+        setOnClickListener {
+            isExpandedHeaderMode = !isExpandedHeaderMode
+            binding.expandHeader(message)
+        }
+    }
+
+    private fun ItemMessageBinding.expandHeader(message: Message) = with(message) {
+
+        expeditorEmail.isVisible = isExpandedHeaderMode
         expandHeaderButton.toggleChevron(!message.isExpandedHeaderMode)
-        recipient.maxLines = if (message.isExpandedHeaderMode) Int.MAX_VALUE else 1
-        recipient.changeSize(if (message.isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
+        recipient.maxLines = if (isExpandedHeaderMode) Int.MAX_VALUE else 1
+        recipient.changeSize(if (isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
 
         recipient.text = formatRecipientsName(root.context, message)
         // TODO: Add listener to name and email of all recipient ?
-        userAvatar.setOnClickListener { onContactClicked?.invoke(message.from[0]) }
+        userAvatar.setOnClickListener { onContactClicked?.invoke(from[0], isExpandedHeaderMode) }
     }
 
     private fun TextView.changeSize(@DimenRes dimension: Int) {

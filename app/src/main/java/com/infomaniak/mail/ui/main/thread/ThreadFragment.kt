@@ -79,8 +79,10 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = ThreadAdapter().apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            onContactClicked = { contact ->
-                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
+            onContactClicked = { contact, isExpanded ->
+                if (isExpanded) {
+                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
+                }
             }
             onDraftClicked = { message ->
                 threadViewModel.viewModelScope.launch(Dispatchers.IO) {
