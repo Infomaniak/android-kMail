@@ -502,9 +502,9 @@ object MailData {
                     copyToRealm(mergedThread, UpdatePolicy.ALL)
                 }
 
-                val liveFolder = getLatestFolder(folder.id) ?: folder
-                liveFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
-                copyToRealm(liveFolder, UpdatePolicy.ALL)
+                val latestFolder = getLatestFolder(folder.id) ?: folder
+                latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
+                copyToRealm(latestFolder, UpdatePolicy.ALL)
             }
         }
 
