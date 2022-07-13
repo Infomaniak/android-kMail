@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
@@ -30,7 +29,7 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ThemedActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 

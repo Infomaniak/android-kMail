@@ -16,6 +16,10 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <color name="pinkMail">#E07FA3</color>
+    <color name="pinkMailRipple">#1EE07FA3</color>
+    <color name="blueMail">@color/blueTextLight</color>
+    <color name="blueMailRipple">#1E4CB7FF</color>
 
     <!-- Backgrounds -->
     <color name="backgroundCardSelectedColor">@color/grey_title</color>

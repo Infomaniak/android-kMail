@@ -115,7 +115,9 @@
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:listitem="@layout/cardview_thread_item"
+                tools:visibility="visible" />
 
             <ImageView
                 android:id="@+id/illuNoMail"
@@ -127,6 +129,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
+                app:tint="?android:attr/colorPrimary"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -162,7 +165,8 @@
                 android:id="@+id/noMailLayoutGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="illuNoMail,noMailTitle,noMailDescription" />
+                app:constraint_referenced_ids="illuNoMail,noMailTitle,noMailDescription"
+                tools:visibility="gone" />
 
             <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                 android:id="@+id/newMessageFab"
@@ -174,7 +178,6 @@
                 android:paddingHorizontal="18dp"
                 android:text="@string/buttonNewMessage"
                 android:textAllCaps="false"
-                app:backgroundTint="@color/pinkMail"
                 app:icon="@drawable/ic_pencil"
                 app:iconGravity="end"
                 app:iconSize="16dp"

@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/marginStandardMedium"
-    app:rippleColor="@color/pinkMailRipple">
+    app:rippleColor="?android:attr/colorControlHighlight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -18,8 +18,10 @@
 <resources>
 
     <!-- Primary colors -->
-    <color name="pinkMail">#F2357A</color>
-    <color name="pinkMailRipple">#1EF2357A</color>
+    <color name="pinkMail">#BC0055</color>
+    <color name="pinkMailRipple">#1EBC0055</color>
+    <color name="blueMail">@color/primary</color>
+    <color name="blueMailRipple">#1E0098FF</color>
 
     <!-- Context / errors -->
     <color name="orangeWarning">#FF8500</color>
