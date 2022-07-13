@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
@@ -45,7 +46,7 @@ class ThreadViewModel : ViewModel() {
     private fun listenToMessages() {
         listenToMessagesJob?.cancel()
         listenToMessagesJob = viewModelScope.launch {
-            MailData.messagesFlow.collect { messages ->
+            MailData.messagesFlow.filterNotNull().collect { messages ->
                 mutableUiMessagesFlow.value = messages
             }
         }
