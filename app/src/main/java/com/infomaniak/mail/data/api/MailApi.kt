@@ -50,10 +50,10 @@ object MailApi {
         return ApiRepository.getThreads(mailboxUuid, folder.id).data?.threads?.map { it.initLocalValues() }
     }
 
-    fun fetchMessages(thread: Thread): List<Message> {
+    fun fetchMessages(thread: Thread): List<Pair<Message, Boolean>> {
         return thread.messages.map { realmMessage ->
             if (realmMessage.fullyDownloaded) {
-                realmMessage
+                realmMessage to true
             } else {
                 // TODO: Handle if this API call fails
                 ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
@@ -68,13 +68,15 @@ object MailApi {
                         }
                     }
                     // TODO: uncomment this when managing draft folder
-//                    if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
-//                        Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
-//                        val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
-//                        completedMessage.draftUuid = draft?.uuid
-//                    }
+                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
+                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
+                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+                    //     completedMessage.draftUuid = draft?.uuid
+                    // }
+                }.let { apiMessage ->
+                    if (apiMessage == null) realmMessage to true else apiMessage to false
                 }
-            } ?: realmMessage
+            }
         }
     }
 

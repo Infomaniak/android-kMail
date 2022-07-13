@@ -36,7 +36,7 @@ object MailboxContentController {
      */
     fun getFolder(id: String): Folder? = MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
 
-    private fun MutableRealm.getLatestFolder(id: String): Folder? = getFolder(id)?.let(::findLatest)
+    fun MutableRealm.getLatestFolder(id: String): Folder? = getFolder(id)?.let(::findLatest)
 
     private fun getFolders(): RealmQuery<Folder> = MailRealm.mailboxContent.query()
     fun getFoldersSync(): RealmResults<Folder> = getFolders().find()
@@ -72,7 +72,7 @@ object MailboxContentController {
      * Threads
      */
     // fun getFolderThreads(folderId: String): List<Thread> {
-    //     return mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
+    //     return MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
     // }
 
     fun getThread(uid: String): Thread? = MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()
@@ -94,15 +94,15 @@ object MailboxContentController {
     // }
 
     // fun upsertThread(thread: Thread) {
-    //     mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
+    //     MailRealm.mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
     // }
 
     // fun upsertLatestThread(uid: String) {
-    //     mailboxContent.writeBlocking { getLatestThread(uid)?.let { copyToRealm(it, UpdatePolicy.ALL) } }
+    //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let { copyToRealm(it, UpdatePolicy.ALL) } }
     // }
 
     // fun updateThread(uid: String, onUpdate: (thread: Thread) -> Unit) {
-    //     mailboxContent.writeBlocking { getLatestThread(uid)?.let(onUpdate) }
+    //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(onUpdate) }
     // }
 
     // fun deleteThread(uid: String) {
@@ -117,7 +117,7 @@ object MailboxContentController {
      * Messages
      */
     // fun upsertMessage(message: Message) {
-    //     mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
+    //     MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
     // }
 
     private fun getMessage(uid: String): Message? {
@@ -143,7 +143,7 @@ object MailboxContentController {
     }
 
     // fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
-    //     mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
+    //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
     // }
 
     fun deleteMessage(uid: String) {
@@ -181,27 +181,27 @@ object MailboxContentController {
     /**
      * Recipients
      */
-    // private fun getRecipients(): RealmResults<Recipient> = mailboxContent.query<Recipient>().find()
+    // private fun getRecipients(): RealmResults<Recipient> = MailRealm.mailboxContent.query<Recipient>().find()
 
-    // private fun getRecipientsByEmail(email: String): RealmResults<Recipient> = mailboxContent.query<Recipient>("${Recipient::email.name} == '$email'").find()
+    // private fun getRecipientsByEmail(email: String): RealmResults<Recipient> = MailRealm.mailboxContent.query<Recipient>("${Recipient::email.name} == '$email'").find()
 
     // private fun getRecipientByEmail(email: String): Recipient? = getRecipientsByEmail(email).firstOrNull()
 
     // private fun MutableRealm.getLatestRecipientByEmail(email: String): Recipient? = getRecipientByEmail(email)?.let(::findLatest)
 
     // fun upsertRecipient(recipient: Recipient) {
-    //     mailboxContent.writeBlocking {
+    //     MailRealm.mailboxContent.writeBlocking {
     //         removeRecipientIfAlreadyExisting(recipient) // TODO: remove this when the UPSERT is working
     //         copyToRealm(recipient)
     //     }
     // }
 
     // fun updateRecipient(email: String, onUpdate: (recipient: Recipient) -> Unit) {
-    //     mailboxContent.writeBlocking { getLatestRecipientByEmail(email)?.let(onUpdate) }
+    //     MailRealm.mailboxContent.writeBlocking { getLatestRecipientByEmail(email)?.let(onUpdate) }
     // }
 
     // fun removeRecipient(email: String) {
-    //     mailboxContent.writeBlocking { getLatestRecipientByEmail(email)?.let(::delete) }
+    //     MailRealm.mailboxContent.writeBlocking { getLatestRecipientByEmail(email)?.let(::delete) }
     // }
 
     // private fun MutableRealm.removeRecipientIfAlreadyExisting(recipient: Recipient) {
@@ -209,7 +209,7 @@ object MailboxContentController {
     // }
 
     // fun cleanRecipients() {
-    //     mailboxContent.writeBlocking {
+    //     MailRealm.mailboxContent.writeBlocking {
     //         getRecipients().map { it.email }.distinct().forEach { email ->
     //             getRecipientsByEmail(email).forEachIndexed { index, recipient ->
     //                 if (index > 0) findLatest(recipient)?.let(::delete)
