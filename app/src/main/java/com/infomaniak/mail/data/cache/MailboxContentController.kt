@@ -34,7 +34,9 @@ object MailboxContentController {
     /**
      * Folders
      */
-    fun getFolder(id: String): Folder? = MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
+    private fun getFolder(id: String): Folder? {
+        return MailRealm.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first().find()
+    }
 
     fun MutableRealm.getLatestFolder(id: String): Folder? = getFolder(id)?.let(::findLatest)
 
@@ -64,8 +66,12 @@ object MailboxContentController {
     //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
     // }
 
-    fun deleteFolders(folders: List<Folder>) {
-        MailRealm.mailboxContent.writeBlocking { folders.forEach { getLatestFolder(it.id)?.let(::delete) } }
+    // fun deleteFolders(folders: List<Folder>) {
+    //     MailRealm.mailboxContent.writeBlocking { folders.forEach { getLatestFolder(it.id)?.let(::delete) } }
+    // }
+
+    fun MutableRealm.deleteLatestFolder(id: String) {
+        getLatestFolder(id)?.let(::delete)
     }
 
     /**
@@ -105,13 +111,13 @@ object MailboxContentController {
     //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(onUpdate) }
     // }
 
-    // fun deleteThread(uid: String) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(::delete) }
-    // }
-
-    fun deleteThreads(threads: List<Thread>) {
-        MailRealm.mailboxContent.writeBlocking { threads.forEach { getLatestThread(it.uid)?.let(::delete) } }
+    fun MutableRealm.deleteLatestThread(uid: String) {
+        getLatestThread(uid)?.let(::delete)
     }
+
+    // fun deleteThreads(threads: List<Thread>) {
+    //     MailRealm.mailboxContent.writeBlocking { threads.forEach { getLatestThread(it.uid)?.let(::delete) } }
+    // }
 
     /**
      * Messages
@@ -146,7 +152,7 @@ object MailboxContentController {
     //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
     // }
 
-    private fun MutableRealm.deleteLatestMessage(uid: String) {
+    fun MutableRealm.deleteLatestMessage(uid: String) {
         getLatestMessage(uid)?.apply {
             draftUuid?.let { getLatestDraft(it) }?.let(::delete)
         }?.let(::delete)
@@ -156,11 +162,11 @@ object MailboxContentController {
         MailRealm.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
     }
 
-    fun deleteMessages(messages: List<Message>) {
-        MailRealm.mailboxContent.writeBlocking {
-            messages.forEach { message -> deleteLatestMessage(message.uid) }
-        }
-    }
+    // fun deleteMessages(messages: List<Message>) {
+    //     MailRealm.mailboxContent.writeBlocking {
+    //         messages.forEach { message -> deleteLatestMessage(message.uid) }
+    //     }
+    // }
 
     /**
      * Drafts
