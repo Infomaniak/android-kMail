@@ -19,8 +19,12 @@ package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.MailboxContentController.getLatestThread
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -51,10 +55,32 @@ class ThreadViewModel : ViewModel() {
     }
 
     fun loadMessages(threadUid: String) {
-        val thread = MailboxContentController.getThread(threadUid) ?: return
-        MailData.selectThread(thread)
-        thread.markAsSeen()
-        MailData.loadMessages(thread)
+        MailboxContentController.getThread(threadUid)?.let { thread ->
+            MailData.selectThread(thread)
+            markAsSeen(thread)
+            MailData.loadMessages(thread)
+        }
+    }
+
+    private fun markAsSeen(thread: Thread) {
+        if (thread.unseenMessagesCount != 0) {
+
+            val mailboxUuid = MailData.currentMailboxFlow.value?.uuid ?: return
+
+            MailRealm.mailboxContent.writeBlocking {
+                getLatestThread(thread.uid)?.let { latestThread ->
+
+                    val apiResponse = ApiRepository.markMessagesAsSeen(mailboxUuid, latestThread.messages.map { it.uid })
+
+                    if (apiResponse.isSuccess()) {
+                        latestThread.apply {
+                            messages.forEach { it.seen = true }
+                            unseenMessagesCount = 0
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onCleared() {

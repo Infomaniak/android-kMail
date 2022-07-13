@@ -19,12 +19,8 @@
 
 package com.infomaniak.mail.data.models.thread
 
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.ext.realmListOf
@@ -78,22 +74,6 @@ class Thread : RealmObject {
         messages = messages.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         return this
-    }
-
-    fun markAsSeen() {
-        MailData.currentMailboxFlow.value?.let { mailbox ->
-            MailboxContentController.getThread(uid)?.let { coldThread ->
-                MailRealm.mailboxContent.writeBlocking {
-                    findLatest(coldThread)?.let { hotThread ->
-                        hotThread.apply {
-                            messages.forEach { it.seen = true }
-                            unseenMessagesCount = 0
-                        }
-                        ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid })
-                    }
-                }
-            }
-        }
     }
 
     // enum class ThreadFilter(@IdRes val filterNameRes: Int) {
