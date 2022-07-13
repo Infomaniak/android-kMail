@@ -68,7 +68,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var menuDrawerFragment: MenuDrawerFragment? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
+        Utils.createRefreshTimer { binding.content.swipeRefreshLayout.isRefreshing = true }
     }
 
     private var currentOffset = OFFSET_FIRST_PAGE
@@ -106,7 +106,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupOnRefresh()
         setupAdapter()
         setupMenuDrawer()
-        binding.setupListeners()
+        setupListeners()
         setupUserAvatar()
 
         threadListViewModel.setup()
@@ -119,7 +119,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupOnRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener(this)
+        binding.content.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
     override fun onRefresh() {
@@ -142,7 +142,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupAdapter() {
-        binding.threadsList.adapter = threadListAdapter
+        binding.content.threadsList.adapter = threadListAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO: Manage no Internet screen
@@ -167,11 +167,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun FragmentThreadListBinding.setupListeners() {
+    private fun setupListeners() = with(binding.content) {
         // TODO: Multiselect
         // openMultiselectButton.setOnClickListener {}
 
-        toolbar.setNavigationOnClickListener { drawerLayout.open() }
+        toolbar.setNavigationOnClickListener { binding.drawerLayout.open() }
 
         searchViewCard.apply {
             // TODO: FilterButton doesn't propagate the event to root, must display it?
@@ -210,13 +210,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupUserAvatar() {
-        AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+        AccountUtils.currentUser?.let(binding.content.userAvatarImage::loadAvatar)
     }
 
     override fun onResume() {
         super.onResume()
 
-        binding.newMessageFab.shrink()
+        binding.content.newMessageFab.shrink()
 
         listenToFolderName()
         listenToThreads()
@@ -240,7 +240,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayFolderName(folder: Folder) = with(binding) {
+    private fun displayFolderName(folder: Folder) = with(binding.content) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
         mailboxName.text = folderName
@@ -255,7 +255,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayThreads(threads: List<Thread>) = with(binding) {
+    private fun displayThreads(threads: List<Thread>) = with(binding.content) {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
         swipeRefreshLayout.isRefreshing = false
@@ -267,12 +267,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayNoEmailView() = with(binding) {
+    private fun displayNoEmailView() = with(binding.content) {
         threadsList.isGone = true
         noMailLayoutGroup.isVisible = true
     }
 
-    private fun displayThreadList() = with(binding) {
+    private fun displayThreadList() = with(binding.content) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
     }
