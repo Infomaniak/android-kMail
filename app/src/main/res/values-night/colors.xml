@@ -26,8 +26,8 @@
     <!-- Backgrounds -->
     <color name="backgroundCardSelectedColor">@color/grey_title</color>
     <color name="backgroundChipColor">@color/grey_title</color>
-    <color name="backgroundColor">#1A1A1A</color>
-    <color name="backgroundHeaderColor">@color/backgroundColor</color>
+    <color name="backgroundColor">#101010</color>
+    <color name="backgroundHeaderColor">#1A1A1A</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundNotificationColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/black</color>

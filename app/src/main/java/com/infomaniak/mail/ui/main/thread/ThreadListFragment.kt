@@ -23,6 +23,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -98,6 +99,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.content.unreadCountChip.apply {
+            isCloseIconVisible = false
+            setOnCheckedChangeListener { _, isChecked ->
+                isCloseIconVisible = isChecked
+            }
+        }
+
         setupOnRefresh()
         setupAdapter()
         setupMenuDrawer()
@@ -115,6 +123,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onRefresh() {
         currentOffset = OFFSET_FIRST_PAGE
         viewModel.refreshThreads()
+    }
+
+    private fun updateUnreadCount() = with(binding.content.unreadCountChip) {
+        // TODO: Fetch folder again to update it.
+        val unreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
+        text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
+        isVisible = unreadCount > 0
     }
 
     private fun setupMenuDrawer() {
@@ -160,14 +175,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         toolbar.setNavigationOnClickListener { drawerLayout?.open() }
 
-        searchViewCard.apply {
-            // TODO: FilterButton doesn't propagate the event to root, must display it?
-            searchView.isGone = true
-            searchViewText.isVisible = true
-            filterButton.isEnabled = false
-            root.setOnClickListener {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
-            }
+        searchButton.setOnClickListener {
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
         }
 
         userAvatar.setOnClickListener {
@@ -235,7 +244,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun displayFolderName(folder: Folder) = with(binding) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
-        mailboxName.text = folderName
+        toolbar.title = folderName
     }
 
     private fun listenToThreads() {
@@ -247,6 +256,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
         swipeRefreshLayout.isRefreshing = false
+
+        updateUnreadCount()
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 

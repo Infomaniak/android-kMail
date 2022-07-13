@@ -21,13 +21,13 @@
     style="@style/CardViewMail"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/marginStandardMedium"
     app:rippleColor="?android:attr/colorControlHighlight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginVertical="@dimen/marginStandardSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/marginStandardMedium">
+        android:paddingHorizontal="@dimen/marginStandardSmall">
 
         <ImageView
             android:id="@+id/newMailBullet"
@@ -44,7 +44,8 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandard"
+            android:paddingEnd="@dimen/marginStandardVerySmall"
+            android:layout_marginStart="@dimen/marginStandardMedium"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -55,14 +56,15 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:id="@+id/expeditor"
                     style="@style/H2.Secondary"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:maxWidth="@dimen/itemThreadTextViewSize"
-                    android:maxLines="1"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:lines="1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/iconCalendar"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="@tools:sample/full_names" />
 
@@ -74,18 +76,20 @@
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionIconCalendar"
                     android:src="@drawable/ic_calendar"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
                     app:layout_constraintEnd_toStartOf="@id/iconAttachment" />
 
                 <ImageView
                     android:id="@+id/iconAttachment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardMedium"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionIconAttachments"
                     android:src="@drawable/ic_attachment"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
                     app:layout_constraintEnd_toStartOf="@id/mailDate" />
 
                 <TextView
@@ -96,24 +100,20 @@
                     android:gravity="end"
                     android:maxWidth="50dp"
                     android:maxLines="1"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
                     app:layout_constraintEnd_toEndOf="parent"
                     tools:text="@tools:sample/date/hhmm" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/mailSubject"
                     style="@style/Body.Secondary"
-                    android:layout_width="@dimen/itemThreadTextViewSize"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
-                    android:maxLines="1"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:lines="1"
+                    app:layout_constraintTop_toBottomOf="@id/expeditor"
+                    app:layout_constraintEnd_toStartOf="@id/mailDate"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:text="@tools:sample/lorem" />
 
@@ -122,11 +122,11 @@
                     android:layout_width="@dimen/iconImageSize"
                     android:layout_height="@dimen/iconImageSize"
                     android:contentDescription="@string/contentDescriptionIconFavorite"
-                    android:src="@drawable/ic_star"
+                    android:src="@drawable/ic_star_filled"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -134,10 +134,10 @@
             <TextView
                 android:id="@+id/mailBodyPreview"
                 style="@style/Body.Secondary"
-                android:layout_width="@dimen/itemThreadTextViewSize"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:ellipsize="end"
-                android:maxLines="1"
+                android:lines="1"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

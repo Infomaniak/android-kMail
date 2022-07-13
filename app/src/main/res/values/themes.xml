@@ -43,7 +43,8 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="appBarLayoutStyle">@style/AppTheme.AppBarOverlay</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOnSecondary">#00FF00</item>
         <item name="extendedFloatingActionButtonStyle">@style/Widget.App.ExtendedFloatingActionButton</item>
         <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
         <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
