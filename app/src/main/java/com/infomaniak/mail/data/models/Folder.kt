@@ -20,7 +20,8 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
-import androidx.annotation.IdRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmListSerializer
@@ -70,14 +71,14 @@ class Folder : RealmObject {
 
     fun getUnreadCountOrNull(): String? = if (unreadCount > 0) unreadCount.toString() else null
 
-    enum class FolderRole(@IdRes val folderNameRes: Int, val order: Int) {
-        INBOX(R.string.inboxFolder, 0),
-        DRAFT(R.string.draftFolder, 4),
-        SENT(R.string.sentFolder, 3),
-        SPAM(R.string.spamFolder, 5),
-        TRASH(R.string.trashFolder, 6),
-        ARCHIVE(R.string.archiveFolder, 7),
-        COMMERCIAL(R.string.commercialFolder, 1),
-        SOCIALNETWORKS(R.string.socialNetworksFolder, 2),
+    enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
+        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_mailbox, 0),
+        DRAFT(R.string.draftFolder, R.drawable.ic_edit_draft, 4),
+        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3),
+        SPAM(R.string.spamFolder, R.drawable.ic_spam, 5),
+        TRASH(R.string.trashFolder, R.drawable.ic_bin, 6),
+        ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7),
+        COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1),
+        SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2),
     }
 }
