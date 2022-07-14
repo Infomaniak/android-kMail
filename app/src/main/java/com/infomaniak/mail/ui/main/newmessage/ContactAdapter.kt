@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -57,13 +56,7 @@ class ContactAdapter(
     override fun getItemCount(): Int = contacts.count()
 
     fun addFirstAvailableItem() {
-        val contact = contacts.firstOrNull()
-        if (contact == null) {
-            Log.e("gibran", "addFirstAvailableItem: unrecognized email !!!")
-            addUnrecognizedContact(currentField)
-        } else {
-            selectContact(contact)
-        }
+        contacts.firstOrNull()?.let { ::selectContact } ?: addUnrecognizedContact(currentField)
     }
 
     fun clear() {

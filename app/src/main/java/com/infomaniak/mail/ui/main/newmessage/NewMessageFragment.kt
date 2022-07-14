@@ -91,19 +91,19 @@ class NewMessageFragment : Fragment() {
         viewModel.editorAction.observe(requireActivity()) {
 
             val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) ?: "" }
-            Log.e("gibran", "selectedText: $selectedText")
+            // TODO: Do stuff here with this `selectedText`?
 
             when (it) {
                 // TODO: Replace logs with actual code
-                EditorAction.ATTACHMENT -> Log.e("gibran", "ATTACHMENT")
-                EditorAction.CAMERA -> Log.e("gibran", "CAMERA")
-                EditorAction.LINK -> Log.e("gibran", "LINK")
-                EditorAction.CLOCK -> Log.e("gibran", "CLOCK")
-                EditorAction.BOLD -> Log.e("gibran", "BOLD")
-                EditorAction.ITALIC -> Log.e("gibran", "ITALIC")
-                EditorAction.UNDERLINE -> Log.e("gibran", "UNDERLINE")
-                EditorAction.STRIKE_THROUGH -> Log.e("gibran", "STRIKE_THROUGH")
-                EditorAction.UNORDERED_LIST -> Log.e("gibran", "UNORDERED_LIST")
+                EditorAction.ATTACHMENT -> Log.d("SelectedText", "ATTACHMENT")
+                EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
+                EditorAction.LINK -> Log.d("SelectedText", "LINK")
+                EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
+                EditorAction.BOLD -> Log.d("SelectedText", "BOLD")
+                EditorAction.ITALIC -> Log.d("SelectedText", "ITALIC")
+                EditorAction.UNDERLINE -> Log.d("SelectedText", "UNDERLINE")
+                EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH")
+                EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
                 null -> Unit
             }
         }
