@@ -53,7 +53,7 @@ class NewMessageFragment : Fragment() {
 
     private val viewModel: NewMessageViewModel by activityViewModels()
 
-    private val binding: FragmentNewMessageBinding by lazy { FragmentNewMessageBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentNewMessageBinding
 
     private lateinit var contactAdapter: ContactAdapter
 
@@ -62,11 +62,12 @@ class NewMessageFragment : Fragment() {
     private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
     private var isAutocompletionOpened = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View = with(binding) {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
 
         handleOnBackPressed()
         setupFromField()
@@ -138,8 +139,6 @@ class NewMessageFragment : Fragment() {
                 return null
             }
         })
-
-        return root
     }
 
     private fun handleOnBackPressed() {
