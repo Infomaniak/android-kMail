@@ -19,5 +19,5 @@ package com.infomaniak.mail.ui.main.newmessage
 
 data class UiContact(
     val email: String,
-    val name: String? = null
+    val name: String? = null,
 )
