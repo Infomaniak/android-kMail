@@ -27,7 +27,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
@@ -66,15 +65,9 @@ class SwitchUserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         recyclerViewAccount.adapter = accountsAdapter
-        setupToolbar()
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
         listenToAccounts()
-    }
-
-    private fun setupToolbar() = with(binding.toolbar) {
-        setNavigationOnClickListener { findNavController().popBackStack() }
-        setOnMenuItemClickListener { menuItem ->
-            (menuItem.itemId == R.id.addAccount).also { if (it) startActivity(Intent(context, LoginActivity::class.java)) }
-        }
     }
 
     private fun listenToAccounts() {

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu.user
 
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -73,7 +74,9 @@ class SwitchUserMailboxesAdapter(
 
     private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Pair<Int, Int> {
         return if (isSelected) {
-            ContextCompat.getColor(context, R.color.emphasizedTextColor) to R.style.Callout_Highlighted_Strong
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)
+            typedValue.data to R.style.Callout_Highlighted_Strong
         } else {
             ContextCompat.getColor(context, RCore.color.title) to R.style.Callout
         }

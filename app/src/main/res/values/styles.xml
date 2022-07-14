@@ -42,7 +42,7 @@
 
     <style name="Body.Highlighted">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textColor">@color/emphasizedTextColor</item>
+        <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
     <style name="Body.Secondary">
@@ -71,7 +71,7 @@
     </style>
 
     <style name="Callout.Highlighted">
-        <item name="android:textColor">@color/emphasizedTextColor</item>
+        <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
     <style name="Callout.Highlighted.Strong">
@@ -99,7 +99,7 @@
     <!-- Buttons -->
 
     <style name="TextButton" parent="Widget.Material3.Button.TextButton">
-        <item name="android:textColor">@color/emphasizedTextColor</item>
+        <item name="android:textColor">?android:attr/colorPrimary</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">@dimen/textHintSize</item>
         <item name="android:textAllCaps">false</item>
@@ -126,7 +126,7 @@
         <item name="android:textColor">@color/title</item>
         <item name="android:textSize">10sp</item>
         <item name="android:letterSpacing">0</item>
-        <item name="rippleColor">@color/pinkMailRipple</item>
+        <item name="rippleColor">?android:attr/colorControlHighlight</item>
     </style>
 
     <!-- Cardview -->
@@ -137,16 +137,18 @@
         <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
     </style>
 
-    <style name="CardviewTopRounded" parent="Widget.Material3.CardView.Filled">
+    <style name="BackgroundCardview" parent="Widget.Material3.CardView.Filled">
         <item name="cardBackgroundColor">@color/backgroundColor</item>
-        <item name="shapeAppearanceOverlay">@style/CardviewTopRounded.ShapeAppearance</item>
-        <item name="cardElevation">10dp</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">6dp</item>
+        <item name="shapeAppearanceOverlay">@style/BackgroundCardview.ShapeAppearance</item>
+        <item name="strokeWidth">0dp</item>
     </style>
 
-    <style name="CardviewTopRounded.ShapeAppearance" parent="">
+    <style name="BackgroundCardview.ShapeAppearance" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopRight">@dimen/materialCardviewRadius</item>
-        <item name="cornerSizeTopLeft">@dimen/materialCardviewRadius</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeTopLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
@@ -154,6 +156,7 @@
     <!-- MenuDrawer -->
     <style name="MenuDrawerBadge" parent="Callout.Highlighted">
         <item name="android:gravity">center</item>
+        <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
     <style name="MenuDrawerDivider" parent="Widget.Material3.MaterialDivider">

@@ -79,6 +79,13 @@ class MainActivity : ThemedActivity() {
 
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
+        window.statusBarColor = getColor(
+            when (destination.id) {
+                R.id.searchFragment, R.id.threadFragment -> R.color.backgroundColor
+                else -> R.color.backgroundHeaderColor
+            }
+        )
+
         // TODO: Matomo
         // with(destination) {
         //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())

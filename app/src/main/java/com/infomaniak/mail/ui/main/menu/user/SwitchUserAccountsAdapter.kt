@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.menu.user
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.DiffUtil
@@ -73,6 +74,10 @@ class SwitchUserAccountsAdapter(
         account.collapsed = !account.collapsed
         chevron.toggleChevron(account.collapsed)
         addressesList.isGone = account.collapsed
+
+        val backgroundColorResource = if (account.collapsed) R.color.backgroundColor else R.color.selectedAccountCardviewColor
+        val backgroundColor = ContextCompat.getColor(root.context, backgroundColorResource)
+        accountCardview.setCardBackgroundColor(backgroundColor)
     }
 
     override fun getItemCount(): Int = accounts.count()
