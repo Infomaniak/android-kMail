@@ -19,6 +19,8 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.Spanned
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -129,6 +131,13 @@ class NewMessageFragment : Fragment() {
             },
         )
         autoCompleteRecyclerView.adapter = contactAdapter
+
+        subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
+            override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
+                source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
+                return null
+            }
+        })
 
         return root
     }
