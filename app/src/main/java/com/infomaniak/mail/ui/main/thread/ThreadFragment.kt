@@ -27,7 +27,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
@@ -87,7 +86,7 @@ class ThreadFragment : Fragment() {
                 }
             }
             onDraftClicked = { message ->
-                threadViewModel.viewModelScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     val draft = MailApi.fetchDraft(message.draftResource, message.uid)
                     message.setDraftId(draft?.uuid)
                     // TODO: Open the draft in draft editor
@@ -119,7 +118,7 @@ class ThreadFragment : Fragment() {
     private fun listenToMessages() {
         with(threadViewModel) {
             messagesJob?.cancel()
-            messagesJob = viewModelScope.launch(Dispatchers.Main) {
+            messagesJob = lifecycleScope.launch {
                 uiMessagesFlow.filterNotNull().collect(::displayMessages)
             }
         }

@@ -29,7 +29,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -48,7 +48,6 @@ import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -234,7 +233,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun listenToFolderName() {
         with(threadListViewModel) {
             folderNameJob?.cancel()
-            folderNameJob = viewModelScope.launch(Dispatchers.Main) {
+            folderNameJob = lifecycleScope.launch {
                 MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
             }
         }
@@ -249,7 +248,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun listenToThreads() {
         with(threadListViewModel) {
             threadsJob?.cancel()
-            threadsJob = viewModelScope.launch(Dispatchers.Main) {
+            threadsJob = lifecycleScope.launch {
                 uiThreadsFlow.filterNotNull().collect(::displayThreads)
             }
         }

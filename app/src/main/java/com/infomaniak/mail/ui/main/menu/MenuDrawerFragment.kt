@@ -28,7 +28,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -45,7 +45,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toggleChevron
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -169,7 +168,8 @@ class MenuDrawerFragment(
 
     private fun listenToCurrentMailbox() {
         currentMailboxJob?.cancel()
-        currentMailboxJob = menuDrawerViewModel.viewModelScope.launch(Dispatchers.Main) {
+
+        currentMailboxJob = lifecycleScope.launch {
             MailData.currentMailboxFlow.filterNotNull().collect { currentMailbox ->
                 binding.accountSwitcherText.text = currentMailbox.email
             }
@@ -178,7 +178,7 @@ class MenuDrawerFragment(
 
     private fun listenToMailboxes() = with(menuDrawerViewModel) {
         mailboxesJob?.cancel()
-        mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
+        mailboxesJob = lifecycleScope.launch {
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                 val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
                 addressAdapter.setMailboxes(sortedMailboxes)
@@ -189,7 +189,7 @@ class MenuDrawerFragment(
 
     private fun listenToFolders() = with(menuDrawerViewModel) {
         foldersJob?.cancel()
-        foldersJob = viewModelScope.launch(Dispatchers.Main) {
+        foldersJob = lifecycleScope.launch {
             uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
         }
     }
