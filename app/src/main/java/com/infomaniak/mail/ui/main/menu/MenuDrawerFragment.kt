@@ -55,7 +55,7 @@ class MenuDrawerFragment(
     private val isDrawerOpen: (() -> Boolean)? = null,
 ) : Fragment() {
 
-    private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
+    private val viewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
@@ -64,7 +64,7 @@ class MenuDrawerFragment(
     private var foldersJob: Job? = null
 
     private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
-        menuDrawerViewModel.switchToMailbox(selectedMailbox)
+        viewModel.switchToMailbox(selectedMailbox)
         closeDrawer()
     }
 
@@ -77,7 +77,7 @@ class MenuDrawerFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        menuDrawerViewModel.setup()
+        viewModel.setup()
         setupAdapters()
         setupListener()
         handleOnBackPressed()
@@ -176,10 +176,10 @@ class MenuDrawerFragment(
         }
     }
 
-    private fun listenToMailboxes() = with(menuDrawerViewModel) {
+    private fun listenToMailboxes() {
         mailboxesJob?.cancel()
         mailboxesJob = lifecycleScope.launch {
-            uiMailboxesFlow.filterNotNull().collect { mailboxes ->
+            viewModel.uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                 val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
                 addressAdapter.setMailboxes(sortedMailboxes)
                 manageStorageFooterVisibility()
@@ -187,15 +187,15 @@ class MenuDrawerFragment(
         }
     }
 
-    private fun listenToFolders() = with(menuDrawerViewModel) {
+    private fun listenToFolders() {
         foldersJob?.cancel()
         foldersJob = lifecycleScope.launch {
-            uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
+            viewModel.uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
         }
     }
 
     private fun listenToCurrentMailboxSize() = with(binding) {
-        menuDrawerViewModel.mailboxSize.observe(viewLifecycleOwner) { sizeUsed ->
+        viewModel.mailboxSize.observe(viewLifecycleOwner) { sizeUsed ->
             if (sizeUsed == null) return@observe
 
             val formattedSize = FormatterFileSize.formatShortFileSize(context, sizeUsed)
@@ -209,7 +209,7 @@ class MenuDrawerFragment(
     private fun manageStorageFooterVisibility() {
         MailData.currentMailboxFlow.value?.let { mailbox ->
             binding.storageLayout.isVisible = mailbox.isLimited
-            if (mailbox.isLimited) activity?.let { menuDrawerViewModel.getMailBoxStorage(mailbox, it) }
+            if (mailbox.isLimited) activity?.let { viewModel.getMailBoxStorage(mailbox, it) }
         }
     }
 
@@ -230,7 +230,7 @@ class MenuDrawerFragment(
     }
 
     private fun openFolder(folderName: String) = with(binding) {
-        menuDrawerViewModel.openFolder(folderName, context)
+        viewModel.openFolder(folderName, context)
         closeDrawer()
     }
 

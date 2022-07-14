@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 
 class SwitchUserFragment : Fragment() {
 
-    private val switchUserViewModel: SwitchUserViewModel by viewModels()
+    private val viewModel: SwitchUserViewModel by viewModels()
 
     private lateinit var binding: FragmentSwitchUserBinding
 
@@ -80,7 +80,7 @@ class SwitchUserFragment : Fragment() {
         }
 
         listenToMailboxes()
-        switchUserViewModel.loadMailboxes(viewLifecycleOwner)
+        viewModel.loadMailboxes(viewLifecycleOwner)
     }
 
     override fun onPause() {
@@ -89,7 +89,7 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun listenToMailboxes() {
-        with(switchUserViewModel) {
+        with(viewModel) {
             mailboxesJob?.cancel()
             mailboxesJob = lifecycleScope.launch {
                 uiAccountsFlow.filterNotNull().collect { accounts ->
