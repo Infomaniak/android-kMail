@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -50,6 +51,9 @@ import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.filterNotNull
+import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -66,6 +70,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
+    private var lastUpdatedAt = Date() // TODO : Remove
 
     private var menuDrawerFragment: MenuDrawerFragment? = null
     private var menuDrawerNavigation: NavigationView? = null
@@ -106,6 +111,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
 
+        lastUpdatedAt = Date(Calendar.getInstance().timeInMillis - DateUtils.MINUTE_IN_MILLIS * 60 * 24 * 31 * 3 * 0)
+        startPeriodicRefreshJob()
+
         setupOnRefresh()
         setupAdapter()
         setupMenuDrawer()
@@ -123,6 +131,28 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onRefresh() {
         currentOffset = OFFSET_FIRST_PAGE
         viewModel.refreshThreads()
+    }
+
+    private fun startPeriodicRefreshJob() {
+        updatedAtRefreshJob?.cancel()
+        updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
+            while (true) {
+                withContext(Dispatchers.Main) { updateUpdatedAt() }
+                delay(DateUtils.MINUTE_IN_MILLIS)
+            }
+        }
+    }
+
+    private fun updateUpdatedAt() = with(binding.content) {
+        // TODO : Replace lastUpdatedAt.time with currentFolder.lastUpdatedAt ?
+        var ago: String
+        if (Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS) {
+            ago = getString(R.string.threadListHeaderLastUpdateNow)
+        } else {
+            ago = DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString()
+            ago = ago.replaceFirstChar { it.lowercaseChar() }
+        }
+        updatedAt.text = getString(R.string.threadListHeaderLastUpdate, ago)
     }
 
     private fun updateUnreadCount() = with(binding.content.unreadCountChip) {
@@ -264,6 +294,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         with(threadListAdapter) {
             notifyAdapter(formatList(threads, context))
         }
+        startPeriodicRefreshJob()
     }
 
     private fun displayNoEmailView() = with(binding) {

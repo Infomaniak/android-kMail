@@ -240,6 +240,7 @@
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Subject:</string>
     <string name="threadListHeaderLastUpdate">Updated %s</string>
+    <string name="threadListHeaderLastUpdateNow">now</string>
     <plurals name="threadListHeaderUnreadCount">
         <item quantity="one">%d unread</item>
         <item quantity="other">%d unread</item>
