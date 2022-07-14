@@ -241,10 +241,7 @@ class MenuDrawerFragment(
         binding.inboxFolderBadge.text = inbox?.getUnreadCountOrNull()
 
         defaultFoldersAdapter.setFolders(defaultFolders)
-        defaultFoldersAdapter.notifyDataSetChanged()
-
         customFoldersAdapter.setFolders(customFolders)
-        customFoldersAdapter.notifyDataSetChanged()
     }
 
     private fun getMenuFolders(folders: List<Folder>): Folders {

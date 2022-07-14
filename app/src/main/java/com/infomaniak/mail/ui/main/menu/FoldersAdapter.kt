@@ -74,6 +74,7 @@ class FoldersAdapter(
 
     fun setFolders(newFolders: List<Folder>) {
         folders = newFolders
+        notifyDataSetChanged()
     }
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
