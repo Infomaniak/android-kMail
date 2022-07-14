@@ -159,6 +159,7 @@ object MailRealm {
 
             val mailboxInfo = setOf(
                 Mailbox::class,
+                Quotas::class,
             )
 
             val mailboxContent = setOf(
@@ -177,7 +178,6 @@ object MailRealm {
             )
 
             val miscellaneous = setOf(
-                Quotas::class,
                 Signature::class,
                 SignatureEmail::class,
                 UserInfos::class,

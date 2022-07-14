@@ -21,6 +21,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 class Mailbox : RealmObject {
@@ -70,10 +71,13 @@ class Mailbox : RealmObject {
     @PrimaryKey
     var objectId: String = ""
     var userId: Int = -1
+    @Transient
+    var quotas: Quotas? = null
 
-    fun initLocalValues(mailboxUserId: Int): Mailbox {
-        objectId = "${mailboxUserId}_${mailboxId}"
-        userId = mailboxUserId
+    fun initLocalValues(userId: Int, quotas: Quotas?): Mailbox {
+        this.objectId = "${userId}_${mailboxId}"
+        this.userId = userId
+        this.quotas = quotas?.apply { mailboxObjectId = this@Mailbox.objectId }
 
         return this
     }

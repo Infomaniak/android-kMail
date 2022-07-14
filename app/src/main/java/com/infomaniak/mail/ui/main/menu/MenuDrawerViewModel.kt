@@ -17,17 +17,13 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
-import android.app.Activity
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
-import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -39,8 +35,6 @@ class MenuDrawerViewModel : ViewModel() {
 
     private val mutableUiFoldersFlow: MutableStateFlow<List<Folder>?> = MutableStateFlow(null)
     val uiFoldersFlow = mutableUiFoldersFlow.asStateFlow()
-
-    var mailboxSize: MutableLiveData<Long?> = MutableLiveData()
 
     fun setup() {
         listenToMailboxes()
@@ -71,13 +65,6 @@ class MenuDrawerViewModel : ViewModel() {
 
         MailData.selectFolder(folder)
         MailData.loadThreads(folder, mailbox, OFFSET_FIRST_PAGE)
-    }
-
-    fun getMailBoxStorage(mailbox: Mailbox, activity: Activity) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val mailboxStorage = MailApi.fetchMailBoxStorage(mailbox)
-            activity.runOnUiThread { mailboxSize.value = mailboxStorage }
-        }
     }
 
     fun switchToMailbox(mailbox: Mailbox) {

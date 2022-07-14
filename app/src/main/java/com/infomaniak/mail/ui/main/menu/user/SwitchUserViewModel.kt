@@ -52,7 +52,10 @@ class SwitchUserViewModel : ViewModel() {
                 mutableUiAccountsFlow.value = users.mapNotNull { user ->
                     val okHttpClient = createOkHttpClientForSpecificUser(user)
                     ApiRepository.getMailboxes(okHttpClient).data
-                        ?.map { it.initLocalValues(user.id) }
+                        ?.map {
+                            val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
+                            it.initLocalValues(user.id, quotas)
+                        }
                         ?.let { user to it }
                 }
             }
