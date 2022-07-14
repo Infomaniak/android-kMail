@@ -231,11 +231,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToFolderName() {
-        with(viewModel) {
-            folderNameJob?.cancel()
-            folderNameJob = lifecycleScope.launch {
-                MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
-            }
+        folderNameJob?.cancel()
+        folderNameJob = lifecycleScope.launch {
+            MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
         }
     }
 
@@ -246,11 +244,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToThreads() {
-        with(viewModel) {
-            threadsJob?.cancel()
-            threadsJob = lifecycleScope.launch {
-                uiThreadsFlow.filterNotNull().collect(::displayThreads)
-            }
+        threadsJob?.cancel()
+        threadsJob = lifecycleScope.launch {
+            viewModel.uiThreadsFlow.filterNotNull().collect(::displayThreads)
         }
     }
 

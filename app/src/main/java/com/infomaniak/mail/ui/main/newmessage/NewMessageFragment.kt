@@ -112,9 +112,9 @@ class NewMessageFragment : Fragment() {
         }
 
         val allContacts = viewModel.getAllContacts()
-        val toAlreadyUsedContactMails = (viewModel.recipients.map { it.email }).toMutableList()
-        val ccAlreadyUsedContactMails = (viewModel.newMessageCc.map { it.email }).toMutableList()
-        val bccAlreadyUsedContactMails = (viewModel.newMessageBcc.map { it.email }).toMutableList()
+        val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
+        val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
+        val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
 
         contactAdapter = ContactAdapter(
             allContacts = allContacts,

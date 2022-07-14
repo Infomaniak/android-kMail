@@ -17,10 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu.user
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.BuildConfig
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -32,7 +29,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,7 +43,7 @@ class SwitchUserViewModel : ViewModel() {
     fun loadMailboxes(lifecycleOwner: LifecycleOwner) {
 
         AccountUtils.getAllUsers().observeOnce(lifecycleOwner) { users ->
-            CoroutineScope(Dispatchers.IO).launch {
+            viewModelScope.launch(Dispatchers.IO) {
 
                 mutableUiAccountsFlow.value = users.map { user ->
                     user to MailboxInfoController.getMailboxesSync(user.id)

@@ -97,7 +97,8 @@ class ContactAdapter(
                 contacts = if (searchTerm?.isEmail() == true && !searchTerm.existsInAvailableItems()) {
                     mutableListOf()
                 } else {
-                    results.values as MutableList<UiContact> // Normal warning
+                    @Suppress("UNCHECKED_CAST")
+                    results.values as MutableList<UiContact>
                 }
                 orderItemList()
                 notifyDataSetChanged()

@@ -65,6 +65,7 @@ class MenuDrawerFragment(
 
     private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
+        // TODO: This is not enough. It won't refresh the MenuDrawer data (ex: unread counts)
         closeDrawer()
     }
 
@@ -97,10 +98,10 @@ class MenuDrawerFragment(
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
-        accountSwitcher.setOnClickListener {
-            expandedAccountSwitcher.apply {
+        mailboxSwitcher.setOnClickListener {
+            mailboxExpandedSwitcher.apply {
                 isVisible = !isVisible
-                expandAccountButton.toggleChevron(!isVisible)
+                mailboxExpandButton.toggleChevron(!isVisible)
             }
         }
         manageAccount.setOnClickListener {
@@ -168,10 +169,9 @@ class MenuDrawerFragment(
 
     private fun listenToCurrentMailbox() {
         currentMailboxJob?.cancel()
-
         currentMailboxJob = lifecycleScope.launch {
             MailData.currentMailboxFlow.filterNotNull().collect { currentMailbox ->
-                binding.accountSwitcherText.text = currentMailbox.email
+                binding.mailboxSwitcherText.text = currentMailbox.email
             }
         }
     }
@@ -218,9 +218,10 @@ class MenuDrawerFragment(
         closeDropdowns()
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun closeDropdowns() = with(binding) {
-        expandedAccountSwitcher.isGone = true
-        expandAccountButton.rotation = 0.0f
+        mailboxExpandedSwitcher.isGone = true
+        mailboxExpandButton.rotation = 0.0f
         customFoldersList.isGone = true
         expandCustomFolderButton.rotation = 0.0f
     }
