@@ -15,24 +15,33 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addressItemView"
     style="@style/MenuDrawerItem">
 
-    <TextView
-        android:id="@+id/folderName"
-        style="@style/MenuDrawerItemText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:lines="1"
-        tools:text="Dossier Perso" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/marginStandardSmall"
+        android:layout_marginEnd="@dimen/marginStandard"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/folderBadge"
-        style="@style/MenuDrawerBadge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="99+" />
+        <TextView
+            android:id="@+id/folderName"
+            style="@style/MenuDrawerItemText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lines="1"
+            tools:text="Dossier Perso" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/folderBadge"
+            style="@style/MenuDrawerBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="99+" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
