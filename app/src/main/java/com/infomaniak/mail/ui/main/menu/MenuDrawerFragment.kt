@@ -52,10 +52,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
-class MenuDrawerFragment(
-    private val closeDrawer: (() -> Unit)? = null,
-    private val isDrawerOpen: (() -> Boolean)? = null,
-) : Fragment() {
+class MenuDrawerFragment : Fragment() {
+
+    var closeDrawer: (() -> Unit)? = null
+    var isDrawerOpen: (() -> Boolean)? = null
 
     private val viewModel: MenuDrawerViewModel by viewModels()
 

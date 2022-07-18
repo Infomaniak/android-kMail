@@ -20,11 +20,14 @@ package com.infomaniak.mail.ui.main
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.databinding.ActivityMainBinding
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -33,9 +36,11 @@ class MainActivity : ThemedActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
+    val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
         // TODO: This is removed for now because it makes the NewMessageActivity crash when there is too much recipients.
         // listenToNetworkStatus()
@@ -72,9 +77,15 @@ class MainActivity : ThemedActivity() {
             level = SentryLevel.INFO
         })
 
+        setDrawerLockMode(destination.id == R.id.threadListFragment)
+
         // TODO: Matomo
         // with(destination) {
         //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
         // }
+    }
+
+    private fun setDrawerLockMode(isUnlocked: Boolean) {
+        binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
     }
 }
