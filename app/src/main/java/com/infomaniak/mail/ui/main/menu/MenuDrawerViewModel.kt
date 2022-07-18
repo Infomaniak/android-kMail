@@ -57,11 +57,11 @@ class MenuDrawerViewModel : ViewModel() {
         }
     }
 
-    fun openFolder(folderName: String, context: Context) {
-        val folder = (MailData.foldersFlow.value?.find { it.getLocalizedName(context) == folderName } ?: return).also {
-            if (it.id == MailData.currentFolderFlow.value?.id) return
-        }
+    fun openFolder(folderId: String) {
         val mailbox = MailData.currentMailboxFlow.value ?: return
+        if (folderId == MailData.currentFolderFlow.value?.id) return
+
+        val folder = (MailData.foldersFlow.value?.find { it.id == folderId } ?: return)
 
         MailData.selectFolder(folder)
         MailData.loadThreads(folder, mailbox, OFFSET_FIRST_PAGE)
