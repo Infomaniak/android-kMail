@@ -19,19 +19,25 @@
 
 package com.infomaniak.mail.data.models.thread
 
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.isToday
+import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import java.util.*
 
 @Serializable
 class Thread : RealmObject {
@@ -63,6 +69,12 @@ class Thread : RealmObject {
     var forwarded: Boolean = false
     var size: Int = 0
 
+    /**
+     * Local
+     */
+    @Transient
+    var displayedDate: String = ""
+
     fun initLocalValues(): Thread {
         messages.removeIf { it.isDuplicate }
 
@@ -73,7 +85,19 @@ class Thread : RealmObject {
 
         messages = messages.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
+        // TODO: When do we want to update this value? This is a quick fix. The date will
+        // TODO: only update when we get data from the API. We probably don't want that.
+        displayedDate = formatDate(date?.toDate() ?: Date(0))
+
         return this
+    }
+
+    private fun formatDate(date: Date): String = with(date) {
+        when {
+            isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
+            year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
+            else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
+        }
     }
 
     // enum class ThreadFilter(@IdRes val filterNameRes: Int) {

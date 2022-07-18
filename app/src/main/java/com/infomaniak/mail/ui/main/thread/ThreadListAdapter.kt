@@ -104,7 +104,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         expeditor.text = from.first().run { if (name.isNullOrEmpty()) email else name }
         mailSubject.text = subject.getFormattedThreadSubject(context)
 
-        mailDate.text = formatDate(date?.toDate() ?: Date(0))
+        mailDate.text = displayedDate
 
         iconAttachment.isVisible = hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
@@ -133,14 +133,6 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         iconCalendar.setDrawableColor(context, R.color.primaryTextColor)
     }
 
-    private fun formatDate(date: Date): String = with(date) {
-        when {
-            isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-            year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
-            else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
-        }
-    }
-
     fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
         previousSectionName = -1
         val formattedList = mutableListOf<Any>()
@@ -162,9 +154,9 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
 
     private fun getDateCategories(dateTime: Long): DateFilter {
         return when {
-            dateTime >= DateFilter.TODAY.start -> DateFilter.TODAY
-            dateTime >= DateFilter.CURRENT_WEEK.start -> DateFilter.CURRENT_WEEK
-            dateTime >= DateFilter.LAST_WEEK.start -> DateFilter.LAST_WEEK
+            dateTime >= DateFilter.TODAY.start() -> DateFilter.TODAY
+            dateTime >= DateFilter.CURRENT_WEEK.start() -> DateFilter.CURRENT_WEEK
+            dateTime >= DateFilter.LAST_WEEK.start() -> DateFilter.LAST_WEEK
             else -> DateFilter.TWO_WEEKS
         }
     }
@@ -182,11 +174,11 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
-    private enum class DateFilter(val start: Long, @StringRes val value: Int) {
-        TODAY(Date().startOfTheDay().time, R.string.threadListSectionToday),
-        CURRENT_WEEK(Date().startOfTheWeek().time, R.string.threadListSectionThisWeek),
-        LAST_WEEK(Date().startOfTheWeek().time - DAY_LENGTH_MS * 7, R.string.threadListSectionLastWeek),
-        TWO_WEEKS(Date().startOfTheWeek().time - DAY_LENGTH_MS * 14, R.string.threadListSectionTwoWeeks),
+    private enum class DateFilter(val start: () -> Long, @StringRes val value: Int) {
+        TODAY({ Date().startOfTheDay().time }, R.string.threadListSectionToday),
+        CURRENT_WEEK({ Date().startOfTheWeek().time }, R.string.threadListSectionThisWeek),
+        LAST_WEEK({ Date().startOfTheWeek().time - DAY_LENGTH_MS * 7 }, R.string.threadListSectionLastWeek),
+        TWO_WEEKS({ Date().startOfTheWeek().time - DAY_LENGTH_MS * 14 }, R.string.threadListSectionTwoWeeks),
     }
 
     private class ThreadListDiffCallback(
@@ -219,7 +211,8 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
                     if ((oldItem as Thread).uid == (newItem as Thread).uid) { // Same items
                         oldItem.subject == newItem.subject &&
                                 oldItem.messagesCount == newItem.messagesCount &&
-                                oldItem.unseenMessagesCount == newItem.unseenMessagesCount
+                                oldItem.unseenMessagesCount == newItem.unseenMessagesCount &&
+                                oldItem.displayedDate == newItem.displayedDate
                         // TODO: Add other fields checks
                     } else { // Not same items
                         false
