@@ -39,9 +39,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadFragment : Fragment() {
@@ -52,21 +51,18 @@ class ThreadFragment : Fragment() {
     private lateinit var binding: FragmentThreadBinding
     private var threadAdapter = ThreadAdapter()
 
-    private var messagesJob: Job? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupUi()
-        viewModel.setup()
+        setupAdapter()
+        listenToMessages()
     }
 
     private fun setupUi() = with(binding) {
-        setupAdapter()
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
@@ -103,25 +99,9 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        listenToMessages()
-        viewModel.loadMessages(navigationArgs.threadUid)
-    }
-
-    override fun onPause() {
-        messagesJob?.cancel()
-        super.onPause()
-    }
-
     private fun listenToMessages() {
-        with(viewModel) {
-            messagesJob?.cancel()
-            messagesJob = lifecycleScope.launch {
-                uiMessagesFlow.filterNotNull().collect(::displayMessages)
-            }
-        }
+        viewModel.messages.observeNotNull(this, ::displayMessages)
+        viewModel.loadMessages(navigationArgs.threadUid)
     }
 
     private fun displayMessages(messages: List<Message>) {
