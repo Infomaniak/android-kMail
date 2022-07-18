@@ -19,8 +19,10 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.util.Patterns
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -71,6 +73,12 @@ inline val ViewBinding.context: Context get() = root.context
 
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
+}
+
+fun Context.getAttributeColor(@IdRes attribute: Int): Int {
+    val typedValue = TypedValue()
+    theme.resolveAttribute(attribute, typedValue, true)
+    return typedValue.data
 }
 
 fun Fragment.notYetImplemented() {

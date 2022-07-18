@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.menu.user
 
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -31,6 +30,8 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.getAttributeColor
+import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 class SwitchUserMailboxesAdapter(
@@ -74,11 +75,17 @@ class SwitchUserMailboxesAdapter(
 
     private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Triple<Int, Int, Int> {
         return if (isSelected) {
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)
-            Triple(typedValue.data, R.style.Callout_Highlighted_Strong, R.style.Callout_Highlighted_Strong)
+            Triple(
+                context.getAttributeColor(RMaterial.attr.colorPrimary),
+                R.style.Callout_Highlighted_Strong,
+                R.style.Callout_Highlighted_Strong
+            )
         } else {
-            Triple(ContextCompat.getColor(context, RCore.color.title), R.style.Callout, R.style.Callout_Highlighted)
+            Triple(
+                ContextCompat.getColor(context, RCore.color.title),
+                R.style.Callout,
+                R.style.Callout_Highlighted
+            )
         }
     }
 

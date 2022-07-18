@@ -26,17 +26,27 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
+import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment.Companion.selectDrawerItem
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.setMargins
 import com.infomaniak.lib.core.R as RCore
 
 class FoldersAdapter(
     private var folders: List<Folder> = emptyList(),
-    private val openFolder: (folderName: String) -> Unit,
+    private val openFolder: (folderId: String) -> Unit,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         return FolderViewHolder(ItemFolderMenuDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    }
+
+    override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.firstOrNull() == Unit) {
+            val folder = folders[position]
+            holder.binding.colorCardBackground(folder.id)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
@@ -44,8 +54,9 @@ class FoldersAdapter(
         val badgeText = folder.getUnreadCountOrNull()
 
         folder.role?.let {
-            setFolderUi(context.getString(it.folderNameRes), it.folderIconRes, badgeText)
+            setFolderUi(folder.id, context.getString(it.folderNameRes), it.folderIconRes, badgeText)
         } ?: setFolderUi(
+            id = folder.id,
             name = folder.name,
             iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
             badgeText = badgeText,
@@ -56,6 +67,7 @@ class FoldersAdapter(
     override fun getItemCount() = folders.size
 
     private fun ItemFolderMenuDrawerBinding.setFolderUi(
+        id: String,
         name: String,
         @DrawableRes iconId: Int,
         badgeText: String? = null,
@@ -69,7 +81,13 @@ class FoldersAdapter(
 
         folderBadge.text = badgeText
 
-        root.setOnClickListener { openFolder.invoke(name) }
+        colorCardBackground(id)
+
+        root.setOnClickListener { openFolder.invoke(id) }
+    }
+
+    private fun ItemFolderMenuDrawerBinding.colorCardBackground(id: String) {
+        selectDrawerItem(id)
     }
 
     fun setFolders(newFolders: List<Folder>) {

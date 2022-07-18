@@ -141,6 +141,7 @@
                 android:id="@+id/mailboxExpandedSwitcher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/marginStandardSmall"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
@@ -187,36 +188,13 @@
 
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/marginStandardSmall" />
+
+            <include
                 android:id="@+id/inboxFolder"
-                style="@style/MenuDrawerItem"
-                android:layout_marginTop="@dimen/marginStandardSmall">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/inboxFolderText"
-                        style="@style/MenuDrawerItemText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/inboxFolder"
-                        app:drawableStartCompat="@drawable/ic_drawer_mailbox" />
-
-                    <TextView
-                        android:id="@+id/inboxFolderBadge"
-                        style="@style/MenuDrawerBadge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="15" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                layout="@layout/item_folder_menu_drawer" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"

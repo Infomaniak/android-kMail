@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:lines="1"
-            tools:text="Dossier Perso" />
+            tools:text="Folder (Inbox/Default/Custom)" />
 
         <TextView
             android:id="@+id/folderBadge"

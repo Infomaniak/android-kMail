@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
@@ -39,13 +40,23 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
+import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.toggleChevron
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
+import com.google.android.material.R as RMaterial
 
 class MenuDrawerFragment : Fragment() {
 
@@ -56,14 +67,17 @@ class MenuDrawerFragment : Fragment() {
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
+    private val inboxFolderId: String? by lazy {
+        MailData.foldersFlow.value?.find { it.role == FolderRole.INBOX }?.id
+    }
     private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
         // TODO: This is not enough. It won't refresh the MenuDrawer data (ex: unread counts)
         closeDrawer()
     }
 
-    private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
-    private val customFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
+    private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val customFoldersAdapter = FoldersAdapter(openFolder = { folderId -> openFolder(folderId) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -78,6 +92,7 @@ class MenuDrawerFragment : Fragment() {
         listenToCurrentMailbox()
         listenToMailboxes()
         listenToFolders()
+        initInboxButton()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -108,7 +123,9 @@ class MenuDrawerFragment : Fragment() {
             )
         }
         addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
-        inboxFolder.setOnClickListener { openFolder(R.string.inboxFolder) }
+        inboxFolder.root.setOnClickListener {
+            inboxFolderId?.let { openFolder(it) }
+        }
         customFolders.setOnClickListener {
             customFoldersList.apply {
                 isVisible = !isVisible
@@ -157,6 +174,13 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
+    private fun initInboxButton() = with(binding) {
+        inboxFolder.folderName.text = getText(R.string.inboxFolder)
+        val inboxIcon = ContextCompat.getDrawable(context, R.drawable.ic_drawer_mailbox)
+        inboxFolder.folderName.setCompoundDrawablesWithIntrinsicBounds(inboxIcon, null, null, null)
+//        inboxFolder.selectDrawerItem(true)
+    }
+
     private fun listenToCurrentMailbox() {
         viewModel.currentMailbox.observeNotNull(this) { currentMailbox ->
             binding.mailboxSwitcherText.text = currentMailbox.email
@@ -201,6 +225,17 @@ class MenuDrawerFragment : Fragment() {
         expandCustomFolderButton.rotation = angle
     }
 
+    private fun listenToCurrentFolder() {
+        currentFoldersJob?.cancel()
+        currentFoldersJob = lifecycleScope.launch {
+            MailData.currentFolderFlow.filterNotNull().collect {
+                inboxFolderId?.let { binding.inboxFolder.selectDrawerItem(it) }
+                defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
+                customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
+            }
+        }
+    }
+
     private fun closeDrawer() = with(binding) {
         closeDrawer?.invoke()
         closeDropdowns()
@@ -216,12 +251,8 @@ class MenuDrawerFragment : Fragment() {
         setCustomFolderCollapsedState()
     }
 
-    private fun openFolder(@StringRes folderNameId: Int) {
-        openFolder(getString(folderNameId))
-    }
-
-    private fun openFolder(folderName: String) = with(binding) {
-        viewModel.openFolder(folderName, context)
+    private fun openFolder(folderId: String) {
+        viewModel.openFolder(folderId)
         closeDrawer()
     }
 
@@ -229,7 +260,7 @@ class MenuDrawerFragment : Fragment() {
 
         val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
 
-        binding.inboxFolderBadge.text = inbox?.getUnreadCountOrNull()
+        binding.inboxFolder.folderBadge.text = inbox?.getUnreadCountOrNull()
 
         defaultFoldersAdapter.setFolders(defaultFolders)
         customFoldersAdapter.setFolders(customFolders)
@@ -255,6 +286,30 @@ class MenuDrawerFragment : Fragment() {
                 .formatFoldersListWithAllChildren()
 
             Triple(inbox, defaultFolders, customFolders)
+        }
+    }
+
+    companion object {
+        fun ItemFolderMenuDrawerBinding.selectDrawerItem(id: String) {
+            val isSelected = MailData.currentFolderFlow.value?.id == id
+
+            val (color, textColor, textAppearance) = if (isSelected) {
+                Triple(
+                    context.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+                    context.getAttributeColor(RMaterial.attr.colorPrimary),
+                    R.style.Body_Highlighted
+                )
+            } else {
+                Triple(
+                    ContextCompat.getColor(context, R.color.backgroundColor),
+                    ContextCompat.getColor(context, R.color.primaryTextColor),
+                    R.style.Body
+                )
+            }
+
+            root.setCardBackgroundColor(color)
+            folderName.setTextColor(textColor)
+            folderName.setTextAppearance(textAppearance)
         }
     }
 }
