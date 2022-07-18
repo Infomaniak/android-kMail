@@ -49,6 +49,7 @@ import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -63,7 +64,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var threadListAdapter = ThreadListAdapter()
 
     private var folderNameJob: Job? = null
-    private var threadsJob: Job? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -110,7 +110,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupListeners()
         setupUserAvatar()
 
-        viewModel.setup()
+        listenToThreads()
     }
 
     private fun setupOnRefresh() {
@@ -218,7 +218,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupMenuDrawerCallbacks()
 
         listenToFolderName()
-        listenToThreads()
 
         currentOffset = OFFSET_FIRST_PAGE
         viewModel.loadMailData()
@@ -226,7 +225,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onPause() {
         folderNameJob?.cancel()
-        threadsJob?.cancel()
         super.onPause()
     }
 
@@ -255,10 +253,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToThreads() {
-        threadsJob?.cancel()
-        threadsJob = lifecycleScope.launch {
-            viewModel.uiThreadsFlow.filterNotNull().collect(::displayThreads)
-        }
+        viewModel.threads.observeNotNull(this, ::displayThreads)
+        viewModel.listenToThreads()
     }
 
     private fun displayThreads(threads: List<Thread>) = with(binding) {
