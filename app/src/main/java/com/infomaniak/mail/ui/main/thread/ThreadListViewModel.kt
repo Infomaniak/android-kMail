@@ -29,9 +29,20 @@ import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
+    private var listenToCurrentFolderJob: Job? = null
     private var listenToThreadsJob: Job? = null
 
+    val currentFolder = SingleLiveEvent<Folder?>()
     val threads = SingleLiveEvent<List<Thread>?>()
+
+    fun listenToCurrentFolder() {
+        listenToCurrentFolderJob?.cancel()
+        listenToCurrentFolderJob = viewModelScope.launch {
+            MailData.currentFolderFlow.collect {
+                currentFolder.value = it
+            }
+        }
+    }
 
     fun listenToThreads() {
         listenToThreadsJob?.cancel()

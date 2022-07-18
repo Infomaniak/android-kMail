@@ -29,7 +29,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -50,9 +49,6 @@ import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -62,8 +58,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
 
     private var threadListAdapter = ThreadListAdapter()
-
-    private var folderNameJob: Job? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -110,6 +104,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupListeners()
         setupUserAvatar()
 
+        listenToCurrentFolder()
         listenToThreads()
     }
 
@@ -217,15 +212,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         setupMenuDrawerCallbacks()
 
-        listenToFolderName()
-
         currentOffset = OFFSET_FIRST_PAGE
         viewModel.loadMailData()
-    }
-
-    override fun onPause() {
-        folderNameJob?.cancel()
-        super.onPause()
     }
 
     private fun setupMenuDrawerCallbacks() {
@@ -239,11 +227,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
     }
 
-    private fun listenToFolderName() {
-        folderNameJob?.cancel()
-        folderNameJob = lifecycleScope.launch {
-            MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
-        }
+    private fun listenToCurrentFolder() {
+        viewModel.currentFolder.observeNotNull(this, ::displayFolderName)
+        viewModel.listenToCurrentFolder()
     }
 
     private fun displayFolderName(folder: Folder) = with(binding) {
