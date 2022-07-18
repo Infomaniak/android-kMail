@@ -67,7 +67,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var menuDrawerFragment: MenuDrawerFragment? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer { binding.content.swipeRefreshLayout.isRefreshing = true }
+        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
     private var currentOffset = OFFSET_FIRST_PAGE
@@ -111,14 +111,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         viewModel.setup()
     }
 
-    override fun onDestroyView() {
-        binding.drawerLayout.removeDrawerListener(drawerListener)
-
-        super.onDestroyView()
-    }
-
     private fun setupOnRefresh() {
-        binding.content.swipeRefreshLayout.setOnRefreshListener(this)
+        binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
     override fun onRefresh() {
@@ -141,7 +135,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupAdapter() {
-        binding.content.threadsList.adapter = threadListAdapter
+        binding.threadsList.adapter = threadListAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO: Manage no Internet screen
@@ -166,7 +160,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupListeners() = with(binding.content) {
+    private fun setupListeners() = with(binding) {
         // TODO: Multiselect
         // openMultiselectButton.setOnClickListener {}
 
@@ -210,12 +204,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupUserAvatar() {
-        AccountUtils.currentUser?.let(binding.content.userAvatarImage::loadAvatar)
+        AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+    }
+
+    override fun onDestroyView() {
+        binding.drawerLayout.removeDrawerListener(drawerListener)
+
+        super.onDestroyView()
     }
 
     override fun onResume() {
         super.onResume()
-
         listenToFolderName()
         listenToThreads()
 
@@ -236,7 +235,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayFolderName(folder: Folder) = with(binding.content) {
+    private fun displayFolderName(folder: Folder) = with(binding) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
         mailboxName.text = folderName
@@ -249,7 +248,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayThreads(threads: List<Thread>) = with(binding.content) {
+    private fun displayThreads(threads: List<Thread>) = with(binding) {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
         swipeRefreshLayout.isRefreshing = false
@@ -261,12 +260,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayNoEmailView() = with(binding.content) {
+    private fun displayNoEmailView() = with(binding) {
         threadsList.isGone = true
         noMailLayoutGroup.isVisible = true
     }
 
-    private fun displayThreadList() = with(binding.content) {
+    private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
     }
