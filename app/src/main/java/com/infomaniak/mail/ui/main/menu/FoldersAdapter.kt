@@ -79,7 +79,7 @@ class FoldersAdapter(
             setMargins(left = resources.getDimension(RCore.dimen.marginStandard).toInt() * (indent ?: 0))
         }
 
-        folderBadge.text = badgeText
+        folderBadge.text = badgeText ?: ""
 
         colorCardBackground(id)
 

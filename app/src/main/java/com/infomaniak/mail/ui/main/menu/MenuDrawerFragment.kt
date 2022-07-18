@@ -178,7 +178,6 @@ class MenuDrawerFragment : Fragment() {
         inboxFolder.folderName.text = getText(R.string.inboxFolder)
         val inboxIcon = ContextCompat.getDrawable(context, R.drawable.ic_drawer_mailbox)
         inboxFolder.folderName.setCompoundDrawablesWithIntrinsicBounds(inboxIcon, null, null, null)
-//        inboxFolder.selectDrawerItem(true)
     }
 
     private fun listenToCurrentMailbox() {
@@ -216,24 +215,28 @@ class MenuDrawerFragment : Fragment() {
         viewModel.listenToFolders()
     }
 
-    private fun setCustomFolderCollapsedState() = with(binding) {
-        val isCollapsed = customFoldersAdapter.itemCount > 0
-        val angleResource = if (isCollapsed) R.dimen.angleViewNotRotated else R.dimen.angleViewRotated
-        val angle = ResourcesCompat.getFloat(resources, angleResource)
-        customFoldersList.isGone = isCollapsed
-        createNewFolderButton.isGone = isCollapsed
-        expandCustomFolderButton.rotation = angle
-    }
-
-    private fun listenToCurrentFolder() {
+    private fun listenToCurrentFolder() = with(binding) {
         currentFoldersJob?.cancel()
         currentFoldersJob = lifecycleScope.launch {
-            MailData.currentFolderFlow.filterNotNull().collect {
-                inboxFolderId?.let { binding.inboxFolder.selectDrawerItem(it) }
+            MailData.currentFolderFlow.filterNotNull().collect { currentFolder ->
+                inboxFolderId?.let {
+                    inboxFolder.selectDrawerItem(it)
+                    if (currentFolder.role == null) setCustomFolderCollapsed(false)
+                }
                 defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
                 customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
             }
         }
+    }
+
+    private fun setCustomFolderCollapsedState() = with(binding) {
+        val currentFolder = MailData.currentFolderFlow.value
+        val isExpanded = currentFolder != null && (currentFolder.role == null || customFoldersAdapter.itemCount == 0)
+        val angleResource = if (isExpanded) R.dimen.angleViewRotated else R.dimen.angleViewNotRotated
+        val angle = ResourcesCompat.getFloat(resources, angleResource)
+        customFoldersList.isVisible = isExpanded
+        createNewFolderButton.isVisible = isExpanded
+        expandCustomFolderButton.rotation = angle
     }
 
     private fun closeDrawer() = with(binding) {
