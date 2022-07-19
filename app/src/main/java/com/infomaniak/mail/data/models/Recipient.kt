@@ -20,16 +20,18 @@ package com.infomaniak.mail.data.models
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 @Serializable
 class Recipient : RealmObject {
     var email: String = ""
-    var name: String = ""
+    var name: String? = null
 
     /**
      * Local
      */
+    @Transient
     @PrimaryKey
     var objectId: String = "" // TODO: Remove this variable when we have EmbeddedObjects
 

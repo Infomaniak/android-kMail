@@ -117,7 +117,8 @@
         tools:layout="@layout/fragment_contact">
         <argument
             android:name="contactName"
-            app:argType="string" />
+            app:argType="string"
+            app:nullable="true" />
         <argument
             android:name="contactEmail"
             app:argType="string" />

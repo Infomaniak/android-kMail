@@ -110,8 +110,8 @@ class NewMessageFragment : Fragment() {
 
         val allContacts = viewModel.getAllContacts()
         val toAlreadyUsedContactMails = (viewModel.recipients.map { it.email }).toMutableList()
-        val ccAlreadyUsedContactMails = (viewModel.cc.map { it.email }).toMutableList()
-        val bccAlreadyUsedContactMails = (viewModel.bcc.map { it.email }).toMutableList()
+        val ccAlreadyUsedContactMails = (viewModel.newMessageCc.map { it.email }).toMutableList()
+        val bccAlreadyUsedContactMails = (viewModel.newMessageBcc.map { it.email }).toMutableList()
 
         contactAdapter = ContactAdapter(
             allContacts = allContacts,
@@ -219,8 +219,8 @@ class NewMessageFragment : Fragment() {
     //region Chips behavior
     private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
         TO -> viewModel.recipients
-        CC -> viewModel.cc
-        BCC -> viewModel.bcc
+        CC -> viewModel.newMessageCc
+        BCC -> viewModel.newMessageBcc
     }
 
     private fun getChipGroup(field: FieldType): ChipGroup = when (field) {
@@ -271,8 +271,8 @@ class NewMessageFragment : Fragment() {
         ccItemsChipGroup.removeAllViews()
         bccItemsChipGroup.removeAllViews()
         viewModel.recipients.forEach { createChip(TO, it) }
-        viewModel.cc.forEach { createChip(CC, it) }
-        viewModel.bcc.forEach { createChip(BCC, it) }
+        viewModel.newMessageCc.forEach { createChip(CC, it) }
+        viewModel.newMessageBcc.forEach { createChip(BCC, it) }
     }
 
     private fun createChip(field: FieldType, contact: UiContact) {

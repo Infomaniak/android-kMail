@@ -34,23 +34,30 @@ class Draft : RealmObject {
     @PrimaryKey
     var uuid: String = ""
     @SerialName("identity_id")
-    var identityId: String = ""
+    var identityId: Int? = null
+    var resource: String? = null
     @SerialName("in_reply_to_uid")
     var inReplyToUid: String? = null
     @SerialName("forwarded_uid")
     var forwardedUid: String? = null
+    var quote: String = ""
     var references: String? = null
+    @SerialName("reply_to")
+    var replyTo: RealmList<Recipient> = realmListOf()
     @SerialName("in_reply_to")
     var inReplyTo: String? = null
     @SerialName("mime_type")
     var mimeType: String = "any/any"
     var body: String = ""
-    var cc: RealmList<Recipient> = realmListOf()
-    var bcc: RealmList<Recipient> = realmListOf()
+    var cc: RealmList<Recipient>? = null
+    var bcc: RealmList<Recipient>? = null
+    var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String = ""
     @SerialName("ack_request")
     var ackRequest: Boolean = false
+    var action: String = ""
+    var delay: Int = 0
     var priority: String? = null
     @SerialName("st_uuid")
     var stUuid: String? = null
@@ -65,9 +72,15 @@ class Draft : RealmObject {
         if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
         parentMessageUid = messageUid
 
-        cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = bcc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+    }
+
+    fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
+
+    enum class DraftAction {
+        SEND, SAVE
     }
 
     companion object {

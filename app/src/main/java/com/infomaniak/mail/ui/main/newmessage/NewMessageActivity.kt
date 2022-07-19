@@ -18,15 +18,19 @@
 package com.infomaniak.mail.ui.main.newmessage
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.MessagePriority
+import com.infomaniak.mail.data.models.MessagePriority.getPriority
+import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
+import io.realm.kotlin.ext.realmListOf
 
 class NewMessageActivity : AppCompatActivity() {
 
@@ -34,15 +38,24 @@ class NewMessageActivity : AppCompatActivity() {
 
     private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
 
+    private val newMessageFragment: NewMessageFragment by lazy {
+        supportFragmentManager.findFragmentById(R.id.fragmentContainer)?.let {
+            it.childFragmentManager.primaryNavigationFragment as NewMessageFragment
+        }!!
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding.apply {
             setContentView(root)
 
-            toolbar.setNavigationOnClickListener { onBackPressed() }
+            toolbar.setNavigationOnClickListener {
+                sendMail(Draft.DraftAction.SAVE)
+                onBackPressed()
+            }
             toolbar.setOnMenuItemClickListener {
-                if (sendMail()) finish()
+                if (sendMail(Draft.DraftAction.SEND)) finish()
                 true
             }
 
@@ -85,22 +98,20 @@ class NewMessageActivity : AppCompatActivity() {
         view.setOnClickListener { viewModel.editorAction.value = action }
     }
 
-    private fun sendMail(): Boolean {
-        val newMessageFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)?.let {
-            it.childFragmentManager.primaryNavigationFragment as NewMessageFragment
-        }!!
+    private fun createDraft() = with(newMessageFragment) {
+        Draft().apply {
+            initLocalValues("")
+            // TODO: should userInformation (here 'from') be stored in mainViewModel ? see ApiRepository.getUser()
+            from = realmListOf(Recipient().apply { email = getFromMailbox().email })
+            subject = getSubject()
+            body = getBody()
+            priority = MessagePriority.Priority.NORMAL.getPriority()
+        }
+    }
 
-        // TODO : Replace logs with actual API call
-        Log.d("sendingMail", "FROM: ${newMessageFragment.getFromMailbox().email}")
-        Log.d("sendingMail", "TO: ${viewModel.recipients.map { "${it.name} (${it.email})" }}")
-        Log.d("sendingMail", "CC: ${viewModel.cc.map { "${it.name} (${it.email})" }}")
-        Log.d("sendingMail", "BCC: ${viewModel.bcc.map { "${it.name} (${it.email})" }}")
-        Log.d("sendingMail", "SUBJECT: ${newMessageFragment.getSubject()}")
-        Log.d("sendingMail", "BODY: ${newMessageFragment.getBody()}")
-
-        if (viewModel.recipients.isEmpty()) return false // Do not send mail if required fields are not filled
-
-        viewModel.sendMail()
+    private fun sendMail(action: Draft.DraftAction): Boolean {
+        if (viewModel.recipients.isEmpty()) return false
+        viewModel.sendMail(createDraft(), action)
 
         return true
     }

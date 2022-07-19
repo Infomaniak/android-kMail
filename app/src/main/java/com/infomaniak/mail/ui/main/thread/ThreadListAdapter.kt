@@ -100,21 +100,19 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    private fun CardviewThreadItemBinding.displayThread(position: Int) {
-        val thread = itemsList[position] as Thread
+    private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
+        expeditor.text = from.first().run { if (name.isNullOrEmpty()) email else name }
+        mailSubject.text = subject.getFormattedThreadSubject(context)
 
-        expeditor.text = thread.from.first().name.ifEmpty { thread.from.first().email }
-        mailSubject.text = thread.subject.getFormattedThreadSubject(context)
+        mailDate.text = formatDate(date?.toDate() ?: Date(0))
 
-        mailDate.text = formatDate(thread.date?.toDate() ?: Date(0))
-
-        iconAttachment.isVisible = thread.hasAttachments
+        iconAttachment.isVisible = hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
-        iconFavorite.isVisible = thread.flagged
+        iconFavorite.isVisible = flagged
 
-        if (thread.unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+        if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
-        root.setOnClickListener { onThreadClicked?.invoke(thread) }
+        root.setOnClickListener { onThreadClicked?.invoke(this) }
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
