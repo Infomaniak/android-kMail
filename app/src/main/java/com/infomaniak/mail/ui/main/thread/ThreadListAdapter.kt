@@ -39,8 +39,8 @@ import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import java.util.*
 
-class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf()) :
-    RecyclerView.Adapter<ViewHolder>() { // TODO: Use LoaderAdapter from Core instead?
+// TODO: Use LoaderAdapter from Core instead?
+class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf()) : RecyclerView.Adapter<ViewHolder>() {
 
     @StringRes
     var previousSectionName: Int = -1

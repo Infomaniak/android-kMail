@@ -22,6 +22,7 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
@@ -77,7 +78,7 @@ class MenuDrawerViewModel : ViewModel() {
         val mailbox = MailData.currentMailboxFlow.value ?: return
 
         MailData.selectFolder(folder)
-        MailData.loadThreads(folder, mailbox)
+        MailData.loadThreads(folder, mailbox, OFFSET_FIRST_PAGE)
     }
 
     fun getMailBoxStorage(mailbox: Mailbox, activity: Activity) {
@@ -85,6 +86,11 @@ class MenuDrawerViewModel : ViewModel() {
             val mailboxStorage = MailApi.fetchMailBoxStorage(mailbox)
             activity.runOnUiThread { mailboxSize.value = mailboxStorage }
         }
+    }
+
+    fun switchToMailbox(mailbox: Mailbox) {
+        MailData.selectMailbox(mailbox)
+        MailData.loadInboxContent()
     }
 
     override fun onCleared() {

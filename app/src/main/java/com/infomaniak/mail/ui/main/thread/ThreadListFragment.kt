@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -33,10 +34,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
+import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -54,12 +60,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private val binding by lazy { FragmentThreadListBinding.inflate(layoutInflater) }
+
     private var threadListAdapter = ThreadListAdapter()
 
     private var folderNameJob: Job? = null
     private var threadsJob: Job? = null
 
     private var menuDrawerFragment: MenuDrawerFragment? = null
+
+    private val showLoadingTimer: CountDownTimer by lazy {
+        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
+    }
+
+    private var currentOffset = ApiRepository.OFFSET_FIRST_PAGE // TODO: Reset it somewhere?
+    private var isDownloadingChanges = false
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -104,6 +118,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
+        currentOffset = OFFSET_FIRST_PAGE
         threadListViewModel.refreshThreads()
     }
 
@@ -173,6 +188,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
         }
 
+        threadsList.setPagination(whenLoadMoreIsPossible = { if (!isDownloadingChanges) downloadThreads() }, triggerOffset = 10)
+
         threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -196,6 +213,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         listenToFolderName()
         listenToThreads()
 
+        currentOffset = OFFSET_FIRST_PAGE
         threadListViewModel.loadMailData()
     }
 
@@ -241,13 +259,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayThreads(threads: List<Thread>) {
         Log.i("UI", "Received threads (${threads.size})")
+        isDownloadingChanges = false
         binding.swipeRefreshLayout.isRefreshing = false
 
-        if (threads.isEmpty()) {
-            displayNoEmailView()
-        } else {
-            displayThreadList()
-        }
+        if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
         context?.let {
             with(threadListAdapter) {
@@ -268,5 +283,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun closeDrawer() = with(binding) {
         drawerLayout.closeDrawer(menuDrawerNavigation)
+    }
+
+    private fun downloadThreads() {
+
+        val folder = MailData.currentFolderFlow.value ?: return
+        val mailbox = MailData.currentMailboxFlow.value ?: return
+
+        if (folder.totalCount > currentOffset + PER_PAGE) {
+            isDownloadingChanges = true
+            currentOffset += PER_PAGE
+            showLoadingTimer.start()
+            threadListViewModel.loadThreads(folder, mailbox, currentOffset)
+        }
     }
 }
