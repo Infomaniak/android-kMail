@@ -17,7 +17,7 @@
   -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
-    <solid android:color="@color/pink_mail" />
+    <solid android:color="@color/pinkMail" />
     <size
         android:width="8dp"
         android:height="8dp" />

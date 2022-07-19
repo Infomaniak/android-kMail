@@ -26,6 +26,7 @@ import com.infomaniak.mail.R
 
 class MessageActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        inflater.inflate(R.layout.fragment_bottom_sheet_message_actions, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.fragment_bottom_sheet_message_actions, container, false)
+    }
 }

@@ -34,7 +34,6 @@ import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -44,7 +43,7 @@ class SwitchUserFragment : Fragment() {
 
     private val switchUserViewModel: SwitchUserViewModel by viewModels()
 
-    private val binding: FragmentSwitchUserBinding by lazy { FragmentSwitchUserBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentSwitchUserBinding
 
     private var mailboxesJob: Job? = null
 
@@ -53,7 +52,7 @@ class SwitchUserFragment : Fragment() {
             MailData.selectMailbox(selectedMailbox)
             findNavController().popBackStack()
         } else {
-            CoroutineScope(Dispatchers.IO).launch {
+            switchUserViewModel.viewModelScope.launch {
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 
@@ -64,7 +63,9 @@ class SwitchUserFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentSwitchUserBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -85,16 +86,12 @@ class SwitchUserFragment : Fragment() {
 
     override fun onPause() {
         mailboxesJob?.cancel()
-        mailboxesJob = null
-
         super.onPause()
     }
 
     private fun listenToMailboxes() {
         with(switchUserViewModel) {
-
-            if (mailboxesJob != null) mailboxesJob?.cancel()
-
+            mailboxesJob?.cancel()
             mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
                 uiAccountsFlow.filterNotNull().collect { accounts ->
 

@@ -21,6 +21,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
@@ -28,15 +29,11 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
-
-    private var listenToMailboxesJob: Job? = null
-    private var listenToFoldersJob: Job? = null
 
     private val mutableUiMailboxesFlow: MutableStateFlow<List<Mailbox>?> = MutableStateFlow(null)
     val uiMailboxesFlow = mutableUiMailboxesFlow.asStateFlow()
@@ -52,9 +49,7 @@ class MenuDrawerViewModel : ViewModel() {
     }
 
     private fun listenToMailboxes() {
-        if (listenToMailboxesJob != null) listenToMailboxesJob?.cancel()
-
-        listenToMailboxesJob = CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch {
             MailData.mailboxesFlow.collect { mailboxes ->
                 mutableUiMailboxesFlow.value = mailboxes
             }
@@ -62,9 +57,7 @@ class MenuDrawerViewModel : ViewModel() {
     }
 
     private fun listenToFolders() {
-        if (listenToFoldersJob != null) listenToFoldersJob?.cancel()
-
-        listenToFoldersJob = CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch {
             MailData.foldersFlow.collect { folders ->
                 mutableUiFoldersFlow.value = folders
             }
@@ -91,15 +84,5 @@ class MenuDrawerViewModel : ViewModel() {
     fun switchToMailbox(mailbox: Mailbox) {
         MailData.selectMailbox(mailbox)
         MailData.loadInboxContent()
-    }
-
-    override fun onCleared() {
-        listenToMailboxesJob?.cancel()
-        listenToFoldersJob?.cancel()
-
-        listenToMailboxesJob = null
-        listenToFoldersJob = null
-
-        super.onCleared()
     }
 }

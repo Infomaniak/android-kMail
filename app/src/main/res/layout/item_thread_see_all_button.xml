@@ -16,10 +16,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/seeAllText"
     style="@style/TextButton"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="@string/buttonSeeAll"
-    app:loader_corner="12dp" />
+    android:text="@string/buttonSeeAll" />

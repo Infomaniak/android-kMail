@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
+import com.infomaniak.mail.utils.context
 import com.infomaniak.lib.core.R as RCore
 
 class SwitchUserMailboxesAdapter(
@@ -52,7 +53,7 @@ class SwitchUserMailboxesAdapter(
         var unreadText = unread.toString()
         if (unread >= 100) unreadText = "99+"
         unreadCount.apply {
-            isGone = unread <= 0
+            isGone = unread == 0
             text = unreadText
         }
 
@@ -70,9 +71,13 @@ class SwitchUserMailboxesAdapter(
         unreadCount.setTextAppearance(style)
     }
 
-    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean) =
-        if (isSelected) ContextCompat.getColor(root.context, R.color.emphasizedTextColor) to R.style.Callout_Highlighted_Strong
-        else ContextCompat.getColor(root.context, RCore.color.title) to R.style.Callout
+    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Pair<Int, Int> {
+        return if (isSelected) {
+            ContextCompat.getColor(context, R.color.emphasizedTextColor) to R.style.Callout_Highlighted_Strong
+        } else {
+            ContextCompat.getColor(context, RCore.color.title) to R.style.Callout
+        }
+    }
 
     override fun getItemCount(): Int = mailboxes.count()
 

@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -40,7 +39,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
@@ -49,6 +47,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -59,7 +58,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
-    private val binding by lazy { FragmentThreadListBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentThreadListBinding
 
     private var threadListAdapter = ThreadListAdapter()
 
@@ -69,10 +68,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var menuDrawerFragment: MenuDrawerFragment? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
+        Utils.createRefreshTimer { binding.content.swipeRefreshLayout.isRefreshing = true }
     }
 
-    private var currentOffset = ApiRepository.OFFSET_FIRST_PAGE // TODO: Reset it somewhere?
+    private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
@@ -93,7 +92,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
+    private companion object {
+        const val OFFSET_TRIGGER = 1
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -101,7 +106,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupOnRefresh()
         setupAdapter()
         setupMenuDrawer()
-        binding.setupListeners()
+        setupListeners()
         setupUserAvatar()
 
         threadListViewModel.setup()
@@ -114,7 +119,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupOnRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener(this)
+        binding.content.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
     override fun onRefresh() {
@@ -137,7 +142,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupAdapter() {
-        binding.threadsList.adapter = threadListAdapter
+        binding.content.threadsList.adapter = threadListAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO: Manage no Internet screen
@@ -162,13 +167,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun FragmentThreadListBinding.setupListeners() {
+    private fun setupListeners() = with(binding.content) {
         // TODO: Multiselect
         // openMultiselectButton.setOnClickListener {}
 
-        toolbar.setNavigationOnClickListener {
-            drawerLayout.open()
-        }
+        toolbar.setNavigationOnClickListener { binding.drawerLayout.open() }
 
         searchViewCard.apply {
             // TODO: FilterButton doesn't propagate the event to root, must display it?
@@ -188,7 +191,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
         }
 
-        threadsList.setPagination(whenLoadMoreIsPossible = { if (!isDownloadingChanges) downloadThreads() }, triggerOffset = 10)
+        threadsList.setPagination(
+            whenLoadMoreIsPossible = { if (!isDownloadingChanges) downloadThreads() },
+            triggerOffset = OFFSET_TRIGGER,
+        )
 
         threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -204,11 +210,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupUserAvatar() {
-        AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+        AccountUtils.currentUser?.let(binding.content.userAvatarImage::loadAvatar)
     }
 
     override fun onResume() {
         super.onResume()
+
+        binding.content.newMessageFab.shrink()
 
         listenToFolderName()
         listenToThreads()
@@ -219,64 +227,52 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onPause() {
         folderNameJob?.cancel()
-        folderNameJob = null
-
         threadsJob?.cancel()
-        threadsJob = null
-
         super.onPause()
     }
 
     private fun listenToFolderName() {
         with(threadListViewModel) {
-
-            if (folderNameJob != null) folderNameJob?.cancel()
-
+            folderNameJob?.cancel()
             folderNameJob = viewModelScope.launch(Dispatchers.Main) {
-                MailData.currentFolderFlow.filterNotNull().collect { folder ->
-                    context?.let { displayFolderName(it, folder) }
-                }
+                MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
             }
         }
     }
 
-    private fun displayFolderName(context: Context, folder: Folder) {
+    private fun displayFolderName(folder: Folder) = with(binding.content) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
-        binding.mailboxName.text = folderName
+        mailboxName.text = folderName
     }
 
     private fun listenToThreads() {
         with(threadListViewModel) {
-
-            if (threadsJob != null) threadsJob?.cancel()
-
+            threadsJob?.cancel()
             threadsJob = viewModelScope.launch(Dispatchers.Main) {
                 uiThreadsFlow.filterNotNull().collect(::displayThreads)
             }
         }
     }
 
-    private fun displayThreads(threads: List<Thread>) {
+    private fun displayThreads(threads: List<Thread>) = with(binding.content) {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
-        binding.swipeRefreshLayout.isRefreshing = false
+        swipeRefreshLayout.isRefreshing = false
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
-        context?.let {
-            with(threadListAdapter) {
-                notifyAdapter(formatList(threads, it))
-            }
+        with(threadListAdapter) {
+            notifyAdapter(formatList(threads, context))
         }
     }
 
-    private fun displayNoEmailView() = with(binding) {
+    private fun displayNoEmailView() = with(binding.content) {
         threadsList.isGone = true
         noMailLayoutGroup.isVisible = true
     }
 
-    private fun displayThreadList() = with(binding) {
+    private fun displayThreadList() = with(binding.content) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
     }

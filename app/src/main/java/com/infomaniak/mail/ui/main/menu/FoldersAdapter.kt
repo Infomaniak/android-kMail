@@ -30,10 +30,13 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
+import com.infomaniak.mail.utils.context
 import com.infomaniak.lib.core.R as RCore
 
-class FoldersAdapter(private var folders: List<Folder> = emptyList(), private val openFolder: (folderName: String) -> Unit) :
-    RecyclerView.Adapter<FolderViewHolder>() {
+class FoldersAdapter(
+    private var folders: List<Folder> = emptyList(),
+    private val openFolder: (folderName: String) -> Unit,
+) : RecyclerView.Adapter<FolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         return FolderViewHolder(ItemFolderMenuDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -69,7 +72,7 @@ class FoldersAdapter(private var folders: List<Folder> = emptyList(), private va
         badgeText: String? = null,
         indent: Int? = null,
     ) {
-        setFolderUi(root.context.getString(nameResource), iconId, badgeText, indent)
+        setFolderUi(context.getString(nameResource), iconId, badgeText, indent)
     }
 
     private fun ItemFolderMenuDrawerBinding.setFolderUi(
@@ -80,8 +83,8 @@ class FoldersAdapter(private var folders: List<Folder> = emptyList(), private va
     ) {
         folderName.apply {
             text = name
-            setCompoundDrawablesWithIntrinsicBounds(AppCompatResources.getDrawable(root.context, iconId), null, null, null)
-            if (indent != null) setMargins(root.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent)
+            setCompoundDrawablesWithIntrinsicBounds(AppCompatResources.getDrawable(context, iconId), null, null, null)
+            if (indent != null) setMargins(context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent)
         }
 
         if (badgeText != null) folderBadge.text = badgeText

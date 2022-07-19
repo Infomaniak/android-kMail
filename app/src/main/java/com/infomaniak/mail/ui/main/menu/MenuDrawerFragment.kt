@@ -43,6 +43,7 @@ import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toggleChevron
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -71,8 +72,9 @@ class MenuDrawerFragment(
     private val customFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
     private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -119,7 +121,7 @@ class MenuDrawerFragment(
         }
         feedbacks.setOnClickListener {
             closeDrawer()
-            context?.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
+            context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
         }
         help.setOnClickListener {
             closeDrawer()
@@ -160,20 +162,13 @@ class MenuDrawerFragment(
 
     override fun onPause() {
         currentMailboxJob?.cancel()
-        currentMailboxJob = null
-
         mailboxesJob?.cancel()
-        mailboxesJob = null
-
         foldersJob?.cancel()
-        foldersJob = null
-
         super.onPause()
     }
 
     private fun listenToCurrentMailbox() {
-        if (currentMailboxJob != null) currentMailboxJob?.cancel()
-
+        currentMailboxJob?.cancel()
         currentMailboxJob = menuDrawerViewModel.viewModelScope.launch(Dispatchers.Main) {
             MailData.currentMailboxFlow.filterNotNull().collect { currentMailbox ->
                 binding.accountSwitcherText.text = currentMailbox.email
@@ -182,8 +177,7 @@ class MenuDrawerFragment(
     }
 
     private fun listenToMailboxes() = with(menuDrawerViewModel) {
-        if (mailboxesJob != null) mailboxesJob?.cancel()
-
+        mailboxesJob?.cancel()
         mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                 val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
@@ -194,8 +188,7 @@ class MenuDrawerFragment(
     }
 
     private fun listenToFolders() = with(menuDrawerViewModel) {
-        if (foldersJob != null) foldersJob?.cancel()
-
+        foldersJob?.cancel()
         foldersJob = viewModelScope.launch(Dispatchers.Main) {
             uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
         }
@@ -205,11 +198,11 @@ class MenuDrawerFragment(
         menuDrawerViewModel.mailboxSize.observe(viewLifecycleOwner) { sizeUsed ->
             if (sizeUsed == null) return@observe
 
-            val formattedSize = FormatterFileSize.formatShortFileSize(root.context, sizeUsed)
-            val formattedTotalSize = FormatterFileSize.formatShortFileSize(root.context, LIMITED_MAILBOX_SIZE)
+            val formattedSize = FormatterFileSize.formatShortFileSize(context, sizeUsed)
+            val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, LIMITED_MAILBOX_SIZE)
 
-            storageText.text = context?.resources?.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
-            storageIndicator.progress = ceil(100.0 * sizeUsed / LIMITED_MAILBOX_SIZE).toInt()
+            storageText.text = context.resources.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+            storageIndicator.progress = ceil(100.0f * sizeUsed.toFloat() / LIMITED_MAILBOX_SIZE.toFloat()).toInt()
         }
     }
 
@@ -236,34 +229,42 @@ class MenuDrawerFragment(
         openFolder(getString(folderNameId))
     }
 
-    private fun openFolder(folderName: String) = context?.let {
-        menuDrawerViewModel.openFolder(folderName, it)
+    private fun openFolder(folderName: String) = with(binding) {
+        menuDrawerViewModel.openFolder(folderName, context)
         closeDrawer()
     }
 
     private fun onFoldersChange(folders: List<Folder>) {
-        binding.inboxFolderBadge.text = getInboxFolder(folders)?.getUnreadCountOrNull()
 
-        defaultFoldersAdapter.setFolders(getDefaultFolders(folders))
+        val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
+
+        binding.inboxFolderBadge.text = inbox?.getUnreadCountOrNull()
+
+        defaultFoldersAdapter.setFolders(defaultFolders)
         defaultFoldersAdapter.notifyDataSetChanged()
 
-        customFoldersAdapter.setFolders(getCustomFolders(folders))
+        customFoldersAdapter.setFolders(customFolders)
         customFoldersAdapter.notifyDataSetChanged()
     }
 
-    private fun getInboxFolder(folders: List<Folder>): Folder? {
-        return folders.find { it.role == FolderRole.INBOX }
+    private fun getMenuFolders(folders: List<Folder>): Folders {
+        return folders.toMutableList().let { list ->
+
+            val inbox = list.find { it.role == FolderRole.INBOX }?.also(list::remove)
+            val defaultFolders = list.filter { it.role != null }.sortedBy { it.role?.order }.also(list::removeAll)
+            val customFolders = list.sortedByDescending { it.isFavorite }
+
+            Folders(inbox, defaultFolders, customFolders)
+        }
     }
 
-    private fun getDefaultFolders(folders: List<Folder>): List<Folder> {
-        return folders.filter { it.role != null && it.role != FolderRole.INBOX }.sortedBy { it.role?.order }
-    }
+    private data class Folders(
+        val inbox: Folder?,
+        val defaultFolders: List<Folder>,
+        val customFolders: List<Folder>,
+    )
 
-    private fun getCustomFolders(folders: List<Folder>): List<Folder> {
-        return folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
-    }
-
-    companion object {
+    private companion object {
         const val LIMITED_MAILBOX_SIZE: Long = 20L * 1 shl 30
     }
 }

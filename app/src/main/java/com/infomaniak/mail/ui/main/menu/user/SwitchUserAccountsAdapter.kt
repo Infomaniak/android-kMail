@@ -19,14 +19,17 @@ package com.infomaniak.mail.ui.main.menu.user
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.loadAvatar
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toggleChevron
 
 class SwitchUserAccountsAdapter(
@@ -61,7 +64,7 @@ class SwitchUserAccountsAdapter(
 
     private fun ItemSwitchUserAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
         if (position == 0) {
-            chevron.rotation = 180.0f
+            chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
             toggleMailboxes(account)
         }
     }

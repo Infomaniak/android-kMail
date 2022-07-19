@@ -44,8 +44,10 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
@@ -64,7 +66,7 @@ class ThreadAdapter(
     override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
         root.setOnClickListener(null)
-        if ((position == messageList.size - 1 || !message.seen) && !message.isDraft) message.isExpanded = true
+        if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
         if (!message.isExpanded) {
             root.setOnClickListener {
                 if (message.isDraft) {
@@ -90,6 +92,8 @@ class ThreadAdapter(
         messageList = newList
     }
 
+    fun lastIndex() = messageList.lastIndex
+
     private fun ItemMessageBinding.displayMessage(message: Message) = with(message) {
         displayHeader(message)
         hideAttachments()
@@ -100,23 +104,25 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.displayHeader(message: Message) = with(message) {
-        deleteDraftButton.isVisible = isDraft
-        deleteDraftButton.setOnClickListener { onDeleteDraftClicked?.invoke(message) }
-        messageDate.text = if (isDraft) "" else date?.toDate()?.format("d MMM YYYY à HH:mm")
-        expeditorName.setTextColor(root.context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
-        expeditorName.text = if (isDraft) {
-            root.context.getString(R.string.messageIsDraftOption)
-        } else {
-            from.first().displayedName(root.context)
+        deleteDraftButton.apply {
+            isVisible = isDraft
+            setOnClickListener { onDeleteDraftClicked?.invoke(message) }
+        }
+
+        messageDate.text = if (isDraft) "" else date?.toDate()?.format(FORMAT_EMAIL_DATE)
+
+        expeditorName.apply {
+            setTextColor(context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
+            text = if (isDraft) {
+                context.getString(R.string.messageIsDraftOption)
+            } else {
+                from.first().displayedName(context)
+            }
         }
 
         expandHeaderButton.isVisible = isExpanded
         webViewFrameLayout.isVisible = isExpanded
-        recipient.text = if (isExpanded) {
-            formatRecipientsName(root.context, message)
-        } else {
-            Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
-        }
+        recipient.text = if (isExpanded) formatRecipientsName(message) else Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
         expeditorEmail.text = if (isExpanded) from.first().email else ""
 
         if (isExpanded) {
@@ -125,7 +131,7 @@ class ThreadAdapter(
         }
     }
 
-    private fun formatRecipientsName(context: Context, message: Message): SpannedString = with(message) {
+    private fun ItemMessageBinding.formatRecipientsName(message: Message): SpannedString = with(message) {
         val to = recipientsToSpannedString(context, to)
         val cc = recipientsToSpannedString(context, cc)
 
@@ -138,17 +144,13 @@ class ThreadAdapter(
 
     private fun Message.recipientsToSpannedString(context: Context, recipientsList: List<Recipient>) = buildSpannedString {
         recipientsList.forEach {
-            append(
-                if (isExpandedHeaderMode) {
-                    buildSpannedString {
-                        color(context.getColor(R.color.primaryTextColor)) { append(it.displayedName(context)) }
-                        if (it.name.isBlank()) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append(" (${it.email})") }
-                        append(",\n")
-                    }
-                } else {
-                    "${it.displayedName(context)}, "
-                }
-            )
+            if (isExpandedHeaderMode) {
+                color(context.getColor(RCore.color.accent)) { append(it.displayedName(context)) }
+                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name.isNotBlank()) append(" (${it.email})") }
+                    .append(",\n")
+            } else {
+                append("${it.displayedName(context)}, ")
+            }
         }
     }
 
@@ -166,7 +168,7 @@ class ThreadAdapter(
         recipient.maxLines = if (isExpandedHeaderMode) Int.MAX_VALUE else 1
         recipient.changeSize(if (isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
 
-        recipient.text = formatRecipientsName(root.context, message)
+        recipient.text = formatRecipientsName(message)
         // TODO: Add listener to name and email of all recipient ?
         userAvatar.setOnClickListener { onContactClicked?.invoke(from.first(), isExpandedHeaderMode) }
     }
@@ -182,8 +184,8 @@ class ThreadAdapter(
         } else {
             showAttachments()
 
-            val fileSize = formatAttachmentFileSize(root.context, attachments)
-            attachmentsSizeText.text = root.context.resources.getQuantityString(
+            val fileSize = formatAttachmentFileSize(attachments)
+            attachmentsSizeText.text = context.resources.getQuantityString(
                 R.plurals.attachmentQuantity,
                 attachments.size,
                 attachments.size,
@@ -210,7 +212,7 @@ class ThreadAdapter(
         attachmentsScrollView.isVisible = true
     }
 
-    private fun formatAttachmentFileSize(context: Context, attachments: List<Attachment>): String {
+    private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
         val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
             attachment.size.toLong()
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
@@ -219,7 +221,7 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.createChip(attachmentName: String): Chip {
-        val layoutInflater = LayoutInflater.from(root.context)
+        val layoutInflater = LayoutInflater.from(context)
         val chip = layoutInflater.inflate(R.layout.chip_attachment, attachmentsChipGroup, false) as Chip
 
         return chip.apply { text = attachmentName }
@@ -259,7 +261,8 @@ class ThreadAdapter(
         }
     }
 
-    companion object {
+    private companion object {
+        const val FORMAT_EMAIL_DATE = "d MMM yyyy, HH:mm"
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
     }
 }

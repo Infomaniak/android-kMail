@@ -73,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
             appUID = BuildConfig.APPLICATION_ID,
             clientID = BuildConfig.CLIENT_ID,
         )
-        
+
         binding.loginButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
     }
 
@@ -115,7 +115,7 @@ class LoginActivity : AppCompatActivity() {
         showSnackbar(error)
     }
 
-    companion object {
+    private companion object {
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {
@@ -144,7 +144,8 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        private fun getErrorResponse(@StringRes text: Int): ApiResponse<Any> =
-            ApiResponse(result = ApiResponse.Status.ERROR, translatedError = text)
+        private fun getErrorResponse(@StringRes text: Int): ApiResponse<Any> {
+            return ApiResponse(result = ApiResponse.Status.ERROR, translatedError = text)
+        }
     }
 }

@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -54,8 +55,9 @@ class ThreadFragment : Fragment() {
 
     private var messagesJob: Job? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -71,7 +73,7 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
-        AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {
+        AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(it))
         }
     }
@@ -111,16 +113,12 @@ class ThreadFragment : Fragment() {
 
     override fun onPause() {
         messagesJob?.cancel()
-        messagesJob = null
-
         super.onPause()
     }
 
     private fun listenToMessages() {
         with(threadViewModel) {
-
-            if (messagesJob != null) messagesJob?.cancel()
-
+            messagesJob?.cancel()
             messagesJob = viewModelScope.launch(Dispatchers.Main) {
                 uiMessagesFlow.filterNotNull().collect(::displayMessages)
             }
@@ -138,6 +136,6 @@ class ThreadFragment : Fragment() {
         // }
 
         threadAdapter.notifyAdapter(messages.toMutableList())
-        binding.messagesList.scrollToPosition(threadAdapter.itemCount - 1)
+        binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
     }
 }

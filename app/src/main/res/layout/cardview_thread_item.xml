@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/marginStandardMedium"
-    app:rippleColor="@color/pink_mail">
+    app:rippleColor="@color/pinkMail">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -98,7 +98,7 @@
                     android:maxLines="1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    tools:text="31 jan 2000" />
+                    tools:text="@tools:sample/date/hhmm" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -115,12 +115,12 @@
                     android:maxLines="1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    tools:text="@tools:sample/lorem/random" />
+                    tools:text="@tools:sample/lorem" />
 
                 <ImageView
                     android:id="@+id/iconFavorite"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="@dimen/iconImageSize"
+                    android:layout_height="@dimen/iconImageSize"
                     android:contentDescription="@string/contentDescriptionIconFavorite"
                     android:src="@drawable/ic_star"
                     android:visibility="gone"
@@ -138,9 +138,11 @@
                 android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:maxLines="1"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:text="Body preview" />
+                tools:text="@tools:sample/lorem/random"
+                tools:visibility="visible" />
 
         </LinearLayout>
 

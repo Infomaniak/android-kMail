@@ -18,7 +18,10 @@
 package com.infomaniak.mail.utils
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
+import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
@@ -70,10 +73,16 @@ fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month(
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
-    collapsedAngle: Float = 0.0f,
-    expandedAngle: Float = 180.0f,
+    collapsedAngle: Float? = null,
+    expandedAngle: Float? = null,
     duration: Long = 300L,
 ) {
-    val angle = if (isCollapsed) collapsedAngle else expandedAngle
+    val angle = if (isCollapsed) {
+        collapsedAngle ?: ResourcesCompat.getFloat(context.resources, R.dimen.angleViewNotRotated)
+    } else {
+        expandedAngle ?: ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
+    }
     animate().rotation(angle).setDuration(duration).start()
 }
+
+inline val ViewBinding.context: Context get() = root.context
