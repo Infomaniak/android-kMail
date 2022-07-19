@@ -37,6 +37,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
@@ -157,7 +158,6 @@ class MenuDrawerFragment(
         listenToCurrentMailbox()
         listenToMailboxes()
         listenToFolders()
-        listenToCurrentMailboxSize()
     }
 
     override fun onPause() {
@@ -172,7 +172,22 @@ class MenuDrawerFragment(
         currentMailboxJob = lifecycleScope.launch {
             MailData.currentMailboxFlow.filterNotNull().collect { currentMailbox ->
                 binding.mailboxSwitcherText.text = currentMailbox.email
+                displayMailboxQuotas(currentMailbox)
             }
+        }
+    }
+
+    private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {
+        storageLayout.isVisible = mailbox.isLimited
+
+        if (mailbox.isLimited) {
+            val usedSize = (mailbox.quotas?.size ?: 0).toLong()
+            val maxSize = mailbox.quotas?.maxSize ?: 0L
+            val formattedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
+            val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, maxSize)
+
+            storageText.text = context.resources.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+            storageIndicator.progress = ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
         }
     }
 
@@ -182,7 +197,6 @@ class MenuDrawerFragment(
             viewModel.uiMailboxesFlow.filterNotNull().collect { mailboxes ->
                 val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
                 addressAdapter.setMailboxes(sortedMailboxes)
-                manageStorageFooterVisibility()
             }
         }
     }
@@ -191,25 +205,6 @@ class MenuDrawerFragment(
         foldersJob?.cancel()
         foldersJob = lifecycleScope.launch {
             viewModel.uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
-        }
-    }
-
-    private fun listenToCurrentMailboxSize() = with(binding) {
-        viewModel.mailboxSize.observe(viewLifecycleOwner) { sizeUsed ->
-            if (sizeUsed == null) return@observe
-
-            val formattedSize = FormatterFileSize.formatShortFileSize(context, sizeUsed)
-            val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, LIMITED_MAILBOX_SIZE)
-
-            storageText.text = context.resources.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
-            storageIndicator.progress = ceil(100.0f * sizeUsed.toFloat() / LIMITED_MAILBOX_SIZE.toFloat()).toInt()
-        }
-    }
-
-    private fun manageStorageFooterVisibility() {
-        MailData.currentMailboxFlow.value?.let { mailbox ->
-            binding.storageLayout.isVisible = mailbox.isLimited
-            if (mailbox.isLimited) activity?.let { viewModel.getMailBoxStorage(mailbox, it) }
         }
     }
 
@@ -261,8 +256,4 @@ class MenuDrawerFragment(
         val defaultFolders: List<Folder>,
         val customFolders: List<Folder>,
     )
-
-    private companion object {
-        const val LIMITED_MAILBOX_SIZE: Long = 20L * 1 shl 30
-    }
 }

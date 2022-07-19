@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models
 
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -26,4 +27,11 @@ class Quotas : RealmObject {
     var size: Int = 0
     @SerialName("size_checked_at")
     var sizeCheckedAt: Long = 0L
+
+    /**
+     * Local
+     */
+    @PrimaryKey
+    var mailboxObjectId: String = ""
+    var maxSize: Long = 20L * 1 shl 30 // TODO: Get this value from API?
 }

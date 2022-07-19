@@ -41,7 +41,10 @@ object MailApi {
     fun fetchContacts(): List<Contact> = ApiRepository.getContacts().data ?: emptyList()
 
     fun fetchMailboxes(): List<Mailbox>? {
-        return ApiRepository.getMailboxes().data?.map { it.initLocalValues(AccountUtils.currentUserId) }
+        return ApiRepository.getMailboxes().data?.map {
+            val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
+            it.initLocalValues(AccountUtils.currentUserId, quotas)
+        }
     }
 
     fun fetchFolders(mailbox: Mailbox): List<Folder>? {
@@ -87,10 +90,6 @@ object MailApi {
             attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
             MailboxContentController.upsertDraft(this)
         }
-    }
-
-    fun fetchMailBoxStorage(mailbox: Mailbox): Long? {
-        return ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.size?.toLong()
     }
 
     suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
