@@ -32,6 +32,7 @@
     <dimen name="noMailTextViewSize">300dp</dimen>
     <dimen name="searchViewHeight">40dp</dimen>
     <dimen name="userAvatarSizeLarge">50dp</dimen>
+    <dimen name="primaryButtonHeight">56dp</dimen>
 
     <!-- Menu Drawer -->
 

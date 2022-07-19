@@ -42,6 +42,7 @@
         <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="appBarLayoutStyle">@style/AppTheme.AppBarOverlay</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="extendedFloatingActionButtonStyle">@style/Widget.App.ExtendedFloatingActionButton</item>

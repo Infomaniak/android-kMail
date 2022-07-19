@@ -160,6 +160,9 @@ class MenuDrawerFragment : Fragment() {
             closeDrawer()
             // TODO: Restore mails
             notYetImplemented()
+        }        
+        getMoreStorageCardview.setOnClickListener {
+            GetMoreStorageBottomSheetDialog().show(parentFragmentManager, "GetMoreStorageBottomSheetDialog")
         }
     }
 

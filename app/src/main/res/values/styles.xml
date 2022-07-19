@@ -96,13 +96,35 @@
         <item name="android:textSize">@dimen/textHintSize</item>
     </style>
 
+
     <!-- Buttons -->
 
     <style name="TextButton" parent="Widget.Material3.Button.TextButton">
-        <item name="android:textColor">?android:attr/colorPrimary</item>
         <item name="android:letterSpacing">0</item>
-        <item name="android:textSize">@dimen/textHintSize</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?android:attr/colorPrimary</item>
+        <item name="android:textSize">@dimen/textHintSize</item>
+    </style>
+
+    <style name="TextButtonPrimary" parent="Widget.Material3.Button">
+        <item name="android:layout_height">@dimen/primaryButtonHeight</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:minWidth">130dp</item>
+        <item name="android:paddingLeft">@dimen/marginStandard</item>
+        <item name="android:paddingRight">@dimen/marginStandard</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="backgroundTint">@color/primary_button_background_color</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="fontFamily">@font/suisseintl_medium</item>
+    </style>
+
+    <style name="TextButtonPrimary.Error">
+        <item name="android:textColor">@color/redDestructiveAction</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="fontFamily">@font/suisseintl_semibold</item>
+        <item name="rippleColor">@color/redDestructiveActionTransparent</item>
     </style>
 
     <style name="IconButton" parent="Widget.Material3.Button.TextButton">
@@ -129,6 +151,7 @@
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
     </style>
 
+
     <!-- Cardview -->
 
     <style name="CardViewMail" parent="Widget.Material3.CardView.Filled">
@@ -153,7 +176,9 @@
         <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
+
     <!-- MenuDrawer -->
+
     <style name="MenuDrawerBadge" parent="Callout.Highlighted">
         <item name="android:gravity">center</item>
         <item name="android:textColor">?android:attr/colorPrimary</item>
@@ -214,6 +239,40 @@
         <item name="closeIcon">@null</item>
         <item name="closeIconEnabled">false</item>
     </style>
+
+    <style name="UnreadChip" parent="Widget.Material3.Chip.Input">
+        <item name="android:textColor">@color/chip_unread_text_color</item>
+        <item name="checkedIcon">@null</item>
+        <item name="checkedIconEnabled">false</item>
+        <item name="chipBackgroundColor">@color/chip_unread_background</item>
+        <item name="chipCornerRadius">100dp</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="closeIconTint">?attr/colorOnPrimary</item>
+    </style>
+
+
+    <!-- Bottom sheet -->
+
+    <style name="BottomSheetDialogTheme.Base" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/BottomSheetDialogTheme.ModalStyle</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base" />
+
+    <style name="BottomSheetDialogTheme.ModalStyle" parent="Widget.Material3.BottomSheet">
+        <item name="backgroundTint">@color/backgroundColor</item>
+        <item name="shapeAppearanceOverlay">@style/BottomSheetDialogTheme.ShapeAppearanceOverlay</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme.ShapeAppearanceOverlay">
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeTopLeft">10dp</item>
+        <item name="cornerSizeTopRight">10dp</item>
+    </style>
+
 
     <!-- Other -->
 
