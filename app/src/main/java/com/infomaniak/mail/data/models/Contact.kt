@@ -23,12 +23,14 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 class Contact : RealmObject {
+    @PrimaryKey
     var id: String = ""
     var name: String = ""
     @SerialName("firstname")

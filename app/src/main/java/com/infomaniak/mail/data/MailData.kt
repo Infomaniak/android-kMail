@@ -20,12 +20,14 @@ package com.infomaniak.mail.data
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.MailApi
+import com.infomaniak.mail.data.cache.ContactsController
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -35,10 +37,13 @@ import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.types.BaseRealmObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -47,10 +52,12 @@ object MailData {
 
     private val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
 
+    private val mutableContactsFlow: MutableStateFlow<List<Contact>?> = MutableStateFlow(null)
     private val mutableMailboxesFlow: MutableStateFlow<List<Mailbox>?> = MutableStateFlow(null)
     private val mutableFoldersFlow: MutableStateFlow<List<Folder>?> = MutableStateFlow(null)
     private val mutableThreadsFlow: MutableStateFlow<List<Thread>?> = MutableStateFlow(null)
     private val mutableMessagesFlow: MutableStateFlow<List<Message>?> = MutableStateFlow(null)
+    val contactsFlow = mutableContactsFlow.asStateFlow()
     val mailboxesFlow = mutableMailboxesFlow.asStateFlow()
     val foldersFlow = mutableFoldersFlow.asStateFlow()
     val threadsFlow = mutableThreadsFlow.asStateFlow()
@@ -65,10 +72,6 @@ object MailData {
     val currentThreadFlow = mutableCurrentThreadFlow.asStateFlow()
     val currentMessageFlow = mutableCurrentMessageFlow.asStateFlow()
 
-    ///////////////
-    // LOAD MAIL //
-    ///////////////
-
     fun close() {
         MailRealm.close()
 
@@ -81,6 +84,7 @@ object MailData {
         mutableThreadsFlow.value = null
         mutableFoldersFlow.value = null
         mutableMailboxesFlow.value = null
+        mutableContactsFlow.value = null
     }
 
     private fun closeCurrentFlows() {
@@ -88,6 +92,22 @@ object MailData {
         mutableCurrentThreadFlow.value = null
         mutableCurrentFolderFlow.value = null
         mutableCurrentMailboxFlow.value = null
+    }
+
+    /**
+     * Load Data
+     */
+
+    fun loadContacts() {
+        CoroutineScope(Dispatchers.IO).launch {
+            MailRealm.readContacts().collectOnce { realmContacts ->
+
+                val apiContacts = MailApi.fetchContacts()
+                val mergedContacts = mergeContacts(realmContacts, apiContacts)
+
+                mutableContactsFlow.value = mergedContacts
+            }
+        }
     }
 
     fun loadMailData() {
@@ -102,6 +122,10 @@ object MailData {
 
     fun loadMessages(thread: Thread) {
         readMessages(thread)
+    }
+
+    fun deleteDraft(message: Message) {
+        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MailboxContentController.deleteMessage(message.uid)
     }
 
     fun selectMailbox(mailbox: Mailbox) {
@@ -168,9 +192,9 @@ object MailData {
         completion(folder)
     }
 
-    ////////////////
-    // READ REALM //
-    ////////////////
+    /**
+     * Read Realm
+     */
 
     private fun readRealmData() {
         readMailboxes { realmMailboxes ->
@@ -234,13 +258,9 @@ object MailData {
         fetchMessages(thread)
     }
 
-    fun deleteDraft(message: Message) {
-        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MailboxContentController.deleteMessage(message.uid)
-    }
-
-    ///////////////
-    // FETCH API //
-    ///////////////
+    /**
+     * Fetch API
+     */
 
     private fun fetchApiData() {
         fetchMailboxes { mergedMailboxes ->
@@ -290,6 +310,30 @@ object MailData {
 
             mutableMessagesFlow.value = mergedMessages
         }
+    }
+
+    /**
+     * Merge Realm & API data
+     */
+
+    private fun mergeContacts(realmContacts: List<Contact>, apiContacts: List<Contact>): List<Contact> {
+
+        // Get outdated data
+        Log.d("API", "Contacts: Get outdated data")
+        // val deletableContacts = ContactsController.getDeletableContact(apiContacts)
+        val deletableContacts = realmContacts.filter { realmContact ->
+            !apiContacts.any { it.id == realmContact.id }
+        }
+
+        // Save new data
+        Log.d("API", "Contacts: Save new data")
+        ContactsController.upsertContacts(apiContacts)
+
+        // Delete outdated data
+        Log.d("API", "Contacts: Delete outdated data")
+        ContactsController.deleteContacts(deletableContacts)
+
+        return apiContacts
     }
 
     private fun mergeMailboxes(realmMailboxes: List<Mailbox>?, apiMailboxes: List<Mailbox>?): List<Mailbox> {
@@ -428,5 +472,19 @@ object MailData {
         MailboxContentController.deleteMessages(deletableMessages)
 
         return apiMessages.map { (apiMessage, _) -> apiMessage }
+    }
+
+    /**
+     * Utils
+     */
+
+    private fun <T : BaseRealmObject> SharedFlow<ResultsChange<T>>.collectOnce(completion: (List<T>) -> Unit) {
+        var job: Job? = null
+        job = CoroutineScope(Dispatchers.IO).launch {
+            this@collectOnce.collect {
+                completion(it.list.toList())
+                job?.cancel()
+            }
+        }
     }
 }

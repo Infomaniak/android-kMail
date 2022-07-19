@@ -21,10 +21,7 @@ import android.util.Log
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -37,6 +34,8 @@ import java.io.BufferedInputStream
 import java.io.File
 
 object MailApi {
+
+    fun fetchContacts(): List<Contact> = ApiRepository.getContacts().data ?: emptyList()
 
     fun fetchMailboxes(): List<Mailbox>? {
         return ApiRepository.getMailboxes().data?.map { it.initLocalValues() }

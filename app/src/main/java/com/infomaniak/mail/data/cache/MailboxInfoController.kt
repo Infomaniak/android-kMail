@@ -28,7 +28,10 @@ import kotlinx.coroutines.flow.Flow
 
 object MailboxInfoController {
 
-    fun getMailbox(objectId: String): Mailbox? {
+    /**
+     * Mailboxes
+     */
+    private fun getMailbox(objectId: String): Mailbox? {
         return MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
     }
 
