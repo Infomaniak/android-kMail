@@ -85,7 +85,6 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-
                     android:layout_marginEnd="@dimen/marginStandard"
                     android:paddingVertical="@dimen/marginStandardVerySmall"
                     android:paddingStart="@dimen/marginStandardVerySmall">
@@ -159,33 +158,59 @@
                     tools:visibility="visible" />
 
                 <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/addressesListDivider"
                     style="@style/MenuDrawerDivider"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="0dp" />
 
-                <TextView
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/marginStandardSmall" />
+
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/manageAccount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                    android:background="?attr/selectableItemBackground"
-                    android:paddingHorizontal="@dimen/marginStandardMedium"
-                    android:paddingVertical="@dimen/marginStandardMedium"
-                    android:text="@string/buttonManageAccount"
-                    android:textSize="@dimen/textHintSize" />
+                    style="@style/MenuDrawerItem">
 
-                <TextView
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/marginStandardSmall"
+                        android:layout_marginEnd="@dimen/marginStandard"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            style="@style/MenuDrawerItemText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/buttonManageAccount"
+                            app:drawableStartCompat="@null" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/addAccount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                    android:background="?selectableItemBackground"
-                    android:paddingHorizontal="@dimen/marginStandardMedium"
-                    android:paddingVertical="@dimen/marginStandardMedium"
-                    android:text="@string/buttonAddAccount"
-                    android:textSize="@dimen/textHintSize" />
+                    style="@style/MenuDrawerItem">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/marginStandardSmall"
+                        android:layout_marginEnd="@dimen/marginStandard"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            style="@style/MenuDrawerItemText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/buttonAddAccount"
+                            app:drawableStartCompat="@null" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <View
