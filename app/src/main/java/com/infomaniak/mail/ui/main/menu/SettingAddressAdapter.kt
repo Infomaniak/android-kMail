@@ -30,7 +30,7 @@ import com.infomaniak.mail.ui.main.menu.SettingAddressAdapter.SettingAddressView
 import com.infomaniak.lib.core.R as RCore
 
 class SettingAddressAdapter(
-    private val mailboxes: List<Mailbox> = listOf(),
+    private val mailboxes: List<Mailbox> = emptyList(),
     private val popBackStack: () -> Unit,
 ) : RecyclerView.Adapter<SettingAddressViewHolder>() {
 

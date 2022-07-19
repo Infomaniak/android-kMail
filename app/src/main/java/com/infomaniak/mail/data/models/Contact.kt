@@ -40,7 +40,7 @@ class Contact : RealmObject {
     var color: String = ""
     var other: Boolean = false
     @SerialName("contacted_times")
-    private var contactedTimes: Map<String?, Int?> = mapOf()
+    private var contactedTimes: Map<String?, Int?> = emptyMap()
     var emails: RealmList<String> = realmListOf()
 
     fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }

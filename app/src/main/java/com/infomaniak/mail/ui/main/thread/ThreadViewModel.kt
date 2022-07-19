@@ -37,7 +37,7 @@ class ThreadViewModel : ViewModel() {
 
     private var listenToMessagesJob: Job? = null
 
-    private val mutableUiMessagesFlow: MutableStateFlow<List<Message>?> = MutableStateFlow(null)
+    private val mutableUiMessagesFlow = MutableStateFlow<List<Message>?>(null)
     val uiMessagesFlow = mutableUiMessagesFlow.asStateFlow()
 
     fun setup() {

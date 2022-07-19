@@ -23,6 +23,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AddressBooksResult(
     @SerialName("addressbooks")
-    val addressBooks: ArrayList<AddressBook>,
+    val addressBooks: List<AddressBook>,
     val default: AddressBook?,
 )

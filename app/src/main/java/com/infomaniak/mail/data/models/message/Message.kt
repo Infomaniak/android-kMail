@@ -20,7 +20,6 @@
 package com.infomaniak.mail.data.models.message
 
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
@@ -112,11 +111,6 @@ class Message : RealmObject {
 
     fun setDraftId(draftUuid: String?) {
         MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.draftUuid = draftUuid }
-    }
-
-    fun markAsSeen(mailboxUuid: String) {
-        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.seen = true }
-        ApiRepository.markMessagesAsSeen(mailboxUuid, arrayListOf(uid))
     }
 
     fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)
