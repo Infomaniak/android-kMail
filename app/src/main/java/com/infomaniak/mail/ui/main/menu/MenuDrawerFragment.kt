@@ -45,6 +45,7 @@ import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companio
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.toggleChevron
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -125,6 +126,7 @@ class MenuDrawerFragment(
             context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
         }
         help.setOnClickListener {
+            notYetImplemented()
             closeDrawer()
             safeNavigate(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToHelpFragment(),
@@ -134,10 +136,12 @@ class MenuDrawerFragment(
         importMails.setOnClickListener {
             closeDrawer()
             // TODO: Import mails
+            notYetImplemented()
         }
         restoreMails.setOnClickListener {
             closeDrawer()
             // TODO: Restore mails
+            notYetImplemented()
         }
     }
 
