@@ -28,13 +28,11 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -44,9 +42,6 @@ import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -57,8 +52,6 @@ class MenuDrawerFragment : Fragment() {
     private val viewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
-
-    private var currentMailboxJob: Job? = null
 
     private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
@@ -75,10 +68,10 @@ class MenuDrawerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.setup()
         setupAdapters()
         setupListener()
         handleOnBackPressed()
+        listenToCurrentMailbox()
         listenToMailboxes()
         listenToFolders()
     }
@@ -153,25 +146,12 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        listenToCurrentMailbox()
-    }
-
-    override fun onPause() {
-        currentMailboxJob?.cancel()
-        super.onPause()
-    }
-
     private fun listenToCurrentMailbox() {
-        currentMailboxJob?.cancel()
-        currentMailboxJob = lifecycleScope.launch {
-            MailData.currentMailboxFlow.filterNotNull().collect { currentMailbox ->
-                binding.mailboxSwitcherText.text = currentMailbox.email
-                displayMailboxQuotas(currentMailbox)
-            }
+        viewModel.currentMailbox.observeNotNull(this) { currentMailbox ->
+            binding.mailboxSwitcherText.text = currentMailbox.email
+            displayMailboxQuotas(currentMailbox)
         }
+        viewModel.listenToCurrentMailbox()
     }
 
     private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {

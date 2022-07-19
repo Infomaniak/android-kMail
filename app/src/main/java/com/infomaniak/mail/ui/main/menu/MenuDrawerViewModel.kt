@@ -25,18 +25,20 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
 
+    val currentMailbox = MutableLiveData<Mailbox?>()
     val mailboxes = MutableLiveData<List<Mailbox>?>()
     val folders = MutableLiveData<List<Folder>?>()
 
-    fun setup() {
-        listenToMailboxes()
-        listenToFolders()
+    fun listenToCurrentMailbox() {
+        viewModelScope.launch {
+            MailData.currentMailboxFlow.collect {
+                currentMailbox.value = it
+            }
+        }
     }
 
     fun listenToMailboxes() {
