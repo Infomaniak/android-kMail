@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.app.Activity
 import android.content.Context
 import android.util.Patterns
 import android.view.View
@@ -30,38 +29,6 @@ import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmInstant
 import java.util.*
-
-// TODO: Put these methods in Core
-
-fun Activity.showSnackbar(
-    title: Int,
-    anchorView: View? = null,
-    actionButtonTitle: Int = R.string.buttonCancel,
-    onActionClicked: (() -> Unit)? = null,
-) {
-    Utils.showSnackbar(
-        view = window.decorView.findViewById(android.R.id.content),
-        title = title,
-        anchorView = anchorView,
-        actionButtonTitle = actionButtonTitle,
-        onActionClicked = onActionClicked
-    )
-}
-
-fun Activity.showSnackbar(
-    title: String,
-    anchorView: View? = null,
-    actionButtonTitle: Int = R.string.buttonCancel,
-    onActionClicked: (() -> Unit)? = null,
-) {
-    Utils.showSnackbar(
-        view = window.decorView.findViewById(android.R.id.content),
-        title = title,
-        anchorView = anchorView,
-        actionButtonTitle = actionButtonTitle,
-        onActionClicked = onActionClicked
-    )
-}
 
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
 
