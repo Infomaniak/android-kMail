@@ -31,8 +31,7 @@ import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
 
-    private val mutableUiMailboxesFlow: MutableStateFlow<List<Mailbox>?> = MutableStateFlow(null)
-    val uiMailboxesFlow = mutableUiMailboxesFlow.asStateFlow()
+    val mailboxes = MutableLiveData<List<Mailbox>?>()
     val folders = MutableLiveData<List<Folder>?>()
 
     fun setup() {
@@ -40,10 +39,10 @@ class MenuDrawerViewModel : ViewModel() {
         listenToFolders()
     }
 
-    private fun listenToMailboxes() {
+    fun listenToMailboxes() {
         viewModelScope.launch {
-            MailData.mailboxesFlow.collect { mailboxes ->
-                mutableUiMailboxesFlow.value = mailboxes
+            MailData.mailboxesFlow.collect {
+                mailboxes.value = it
             }
         }
     }

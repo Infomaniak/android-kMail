@@ -59,7 +59,6 @@ class MenuDrawerFragment : Fragment() {
     private lateinit var binding: FragmentMenuDrawerBinding
 
     private var currentMailboxJob: Job? = null
-    private var mailboxesJob: Job? = null
 
     private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
@@ -80,6 +79,7 @@ class MenuDrawerFragment : Fragment() {
         setupAdapters()
         setupListener()
         handleOnBackPressed()
+        listenToMailboxes()
         listenToFolders()
     }
 
@@ -157,12 +157,10 @@ class MenuDrawerFragment : Fragment() {
         super.onResume()
 
         listenToCurrentMailbox()
-        listenToMailboxes()
     }
 
     override fun onPause() {
         currentMailboxJob?.cancel()
-        mailboxesJob?.cancel()
         super.onPause()
     }
 
@@ -191,13 +189,11 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun listenToMailboxes() {
-        mailboxesJob?.cancel()
-        mailboxesJob = lifecycleScope.launch {
-            viewModel.uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
-                addressAdapter.setMailboxes(sortedMailboxes)
-            }
+        viewModel.mailboxes.observeNotNull(this) { mailboxes ->
+            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
+            addressAdapter.setMailboxes(sortedMailboxes)
         }
+        viewModel.listenToMailboxes()
     }
 
     private fun listenToFolders() {
