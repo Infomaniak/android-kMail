@@ -48,12 +48,12 @@ class ApplicationMain : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG) configureDebugMode() else configureReleaseMode()
+        if (BuildConfig.DEBUG) configureDebugMode()
         configureSentry()
         configureAccountUtils()
         configureAppReloading()
         configureInfomaniakCore()
-        configureNotifications()
+        initNotificationChannel()
         configureHttpClient()
     }
 
@@ -70,10 +70,6 @@ class ApplicationMain : Application() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) detectCredentialProtectedWhileLocked()
             }.build()
         )
-    }
-
-    private fun configureReleaseMode() {
-        // No-op
     }
 
     private fun configureSentry() {
@@ -106,10 +102,6 @@ class ApplicationMain : Application() {
             credentialManager = null,
             isDebug = BuildConfig.DEBUG,
         )
-    }
-
-    private fun configureNotifications() {
-        initNotificationChannel()
     }
 
     private fun configureHttpClient() {
