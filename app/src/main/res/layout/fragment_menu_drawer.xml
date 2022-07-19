@@ -46,7 +46,7 @@
 
             <Space
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1" />
 
             <com.google.android.material.button.MaterialButton
@@ -77,13 +77,13 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/accountSwitcher"
+                android:id="@+id/mailboxSwitcher"
                 style="@style/MenuDrawerItem"
                 android:layout_marginVertical="@dimen/marginStandardSmall"
                 tools:ignore="UseCompoundDrawables">
 
                 <TextView
-                    android:id="@+id/accountSwitcherText"
+                    android:id="@+id/mailboxSwitcherText"
                     style="@style/Callout.Highlighted.Strong"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                     tools:text="myriam.rais@infomaniak.com" />
 
                 <ImageView
-                    android:id="@+id/expandAccountButton"
+                    android:id="@+id/mailboxExpandButton"
                     android:layout_width="@dimen/chevronSize"
                     android:layout_height="@dimen/chevronSize"
                     android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"
@@ -100,7 +100,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/expandedAccountSwitcher"
+                android:id="@+id/mailboxExpandedSwitcher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

@@ -27,7 +27,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
@@ -48,7 +47,7 @@ import kotlinx.coroutines.launch
 class ThreadFragment : Fragment() {
 
     private val navigationArgs: ThreadFragmentArgs by navArgs()
-    private val threadViewModel: ThreadViewModel by viewModels()
+    private val viewModel: ThreadViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadBinding
     private var threadAdapter = ThreadAdapter()
@@ -63,7 +62,7 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUi()
-        threadViewModel.setup()
+        viewModel.setup()
     }
 
     private fun setupUi() = with(binding) {
@@ -87,7 +86,7 @@ class ThreadFragment : Fragment() {
                 }
             }
             onDraftClicked = { message ->
-                threadViewModel.viewModelScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     val draft = MailApi.fetchDraft(message.draftResource, message.uid)
                     message.setDraftId(draft?.uuid)
                     // TODO: Open the draft in draft editor
@@ -108,7 +107,7 @@ class ThreadFragment : Fragment() {
         super.onResume()
 
         listenToMessages()
-        threadViewModel.loadMessages(navigationArgs.threadUid)
+        viewModel.loadMessages(navigationArgs.threadUid)
     }
 
     override fun onPause() {
@@ -117,9 +116,9 @@ class ThreadFragment : Fragment() {
     }
 
     private fun listenToMessages() {
-        with(threadViewModel) {
+        with(viewModel) {
             messagesJob?.cancel()
-            messagesJob = viewModelScope.launch(Dispatchers.Main) {
+            messagesJob = lifecycleScope.launch {
                 uiMessagesFlow.filterNotNull().collect(::displayMessages)
             }
         }

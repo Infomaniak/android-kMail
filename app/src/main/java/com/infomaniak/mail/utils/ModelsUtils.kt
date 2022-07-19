@@ -26,9 +26,7 @@ import com.infomaniak.mail.R
 object ModelsUtils {
 
     fun String?.getFormattedThreadSubject(context: Context): Spanned {
-        return this?.toSpanned() ?: HtmlCompat.fromHtml(
-            "<i>${context.getString(R.string.messageNoSubject)}</i>",
-            HtmlCompat.FROM_HTML_MODE_COMPACT,
-        )
+        return this?.replace("\n+".toRegex(), " ")?.toSpanned()
+            ?: HtmlCompat.fromHtml("<i>${context.getString(R.string.messageNoSubject)}</i>", HtmlCompat.FROM_HTML_MODE_COMPACT)
     }
 }

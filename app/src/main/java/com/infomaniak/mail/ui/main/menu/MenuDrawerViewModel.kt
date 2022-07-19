@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -75,7 +74,7 @@ class MenuDrawerViewModel : ViewModel() {
     }
 
     fun getMailBoxStorage(mailbox: Mailbox, activity: Activity) {
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val mailboxStorage = MailApi.fetchMailBoxStorage(mailbox)
             activity.runOnUiThread { mailboxSize.value = mailboxStorage }
         }

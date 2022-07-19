@@ -25,7 +25,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
@@ -34,14 +34,13 @@ import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class SwitchUserFragment : Fragment() {
 
-    private val switchUserViewModel: SwitchUserViewModel by viewModels()
+    private val viewModel: SwitchUserViewModel by viewModels()
 
     private lateinit var binding: FragmentSwitchUserBinding
 
@@ -52,7 +51,7 @@ class SwitchUserFragment : Fragment() {
             MailData.selectMailbox(selectedMailbox)
             findNavController().popBackStack()
         } else {
-            switchUserViewModel.viewModelScope.launch {
+            lifecycleScope.launch {
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 
@@ -81,7 +80,7 @@ class SwitchUserFragment : Fragment() {
         }
 
         listenToMailboxes()
-        switchUserViewModel.loadMailboxes(viewLifecycleOwner)
+        viewModel.loadMailboxes(viewLifecycleOwner)
     }
 
     override fun onPause() {
@@ -90,9 +89,9 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun listenToMailboxes() {
-        with(switchUserViewModel) {
+        with(viewModel) {
             mailboxesJob?.cancel()
-            mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
+            mailboxesJob = lifecycleScope.launch {
                 uiAccountsFlow.filterNotNull().collect { accounts ->
 
                     val uiAccounts = accounts

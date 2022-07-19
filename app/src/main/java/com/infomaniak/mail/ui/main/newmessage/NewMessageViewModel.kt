@@ -42,7 +42,7 @@ class NewMessageViewModel : ViewModel() {
     fun getAllContacts(): List<UiContact> {
         val contacts = mutableListOf<UiContact>()
         MailData.contactsFlow.value?.forEach { contact ->
-            contact.emails.forEach { email -> contacts.add(UiContact(email, contact.name)) }
+            contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
         }
         return contacts
     }

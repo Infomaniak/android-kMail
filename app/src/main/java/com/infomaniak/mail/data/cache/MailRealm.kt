@@ -95,17 +95,11 @@ object MailRealm {
         return MailboxInfoController.getMailboxesAsync(AccountUtils.currentUserId).toSharedFlow()
     }
 
-    fun readFolders(): SharedFlow<ResultsChange<Folder>> {
-        return MailboxContentController.getFoldersAsync().toSharedFlow()
-    }
+    fun readFolders(): SharedFlow<ResultsChange<Folder>> = MailboxContentController.getFoldersAsync().toSharedFlow()
 
-    fun readThreads(folder: Folder): List<Thread> {
-        return MailboxContentController.getFolderThreads(folder.id)
-    }
+    fun readThreads(folder: Folder): List<Thread> = MailboxContentController.getFolderThreads(folder.id)
 
-    fun readMessages(thread: Thread): List<Message> {
-        return thread.messages
-    }
+    fun readMessages(thread: Thread): List<Message> = thread.messages
 
     /**
      * Utils

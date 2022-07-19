@@ -19,6 +19,8 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.Spanned
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -51,7 +53,7 @@ class NewMessageFragment : Fragment() {
 
     private val viewModel: NewMessageViewModel by activityViewModels()
 
-    private val binding: FragmentNewMessageBinding by lazy { FragmentNewMessageBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentNewMessageBinding
 
     private lateinit var contactAdapter: ContactAdapter
 
@@ -60,11 +62,12 @@ class NewMessageFragment : Fragment() {
     private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
     private var isAutocompletionOpened = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View = with(binding) {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
 
         handleOnBackPressed()
         setupFromField()
@@ -91,27 +94,27 @@ class NewMessageFragment : Fragment() {
         viewModel.editorAction.observe(requireActivity()) {
 
             val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) ?: "" }
-            Log.e("gibran", "selectedText: $selectedText")
+            // TODO: Do stuff here with this `selectedText`?
 
             when (it) {
                 // TODO: Replace logs with actual code
-                EditorAction.ATTACHMENT -> Log.e("gibran", "ATTACHMENT")
-                EditorAction.CAMERA -> Log.e("gibran", "CAMERA")
-                EditorAction.LINK -> Log.e("gibran", "LINK")
-                EditorAction.CLOCK -> Log.e("gibran", "CLOCK")
-                EditorAction.BOLD -> Log.e("gibran", "BOLD")
-                EditorAction.ITALIC -> Log.e("gibran", "ITALIC")
-                EditorAction.UNDERLINE -> Log.e("gibran", "UNDERLINE")
-                EditorAction.STRIKE_THROUGH -> Log.e("gibran", "STRIKE_THROUGH")
-                EditorAction.UNORDERED_LIST -> Log.e("gibran", "UNORDERED_LIST")
+                EditorAction.ATTACHMENT -> Log.d("SelectedText", "ATTACHMENT")
+                EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
+                EditorAction.LINK -> Log.d("SelectedText", "LINK")
+                EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
+                EditorAction.BOLD -> Log.d("SelectedText", "BOLD")
+                EditorAction.ITALIC -> Log.d("SelectedText", "ITALIC")
+                EditorAction.UNDERLINE -> Log.d("SelectedText", "UNDERLINE")
+                EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH")
+                EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
                 null -> Unit
             }
         }
 
         val allContacts = viewModel.getAllContacts()
-        val toAlreadyUsedContactMails = (viewModel.recipients.map { it.email }).toMutableList()
-        val ccAlreadyUsedContactMails = (viewModel.newMessageCc.map { it.email }).toMutableList()
-        val bccAlreadyUsedContactMails = (viewModel.newMessageBcc.map { it.email }).toMutableList()
+        val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
+        val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
+        val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
 
         contactAdapter = ContactAdapter(
             allContacts = allContacts,
@@ -130,7 +133,12 @@ class NewMessageFragment : Fragment() {
         )
         autoCompleteRecyclerView.adapter = contactAdapter
 
-        return root
+        subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
+            override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
+                source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
+                return null
+            }
+        })
     }
 
     private fun handleOnBackPressed() {

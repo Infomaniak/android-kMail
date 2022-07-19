@@ -29,7 +29,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -48,7 +48,6 @@ import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -56,7 +55,7 @@ import kotlinx.coroutines.launch
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val viewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
 
@@ -109,7 +108,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupListeners()
         setupUserAvatar()
 
-        threadListViewModel.setup()
+        viewModel.setup()
     }
 
     override fun onDestroyView() {
@@ -124,7 +123,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         currentOffset = OFFSET_FIRST_PAGE
-        threadListViewModel.refreshThreads()
+        viewModel.refreshThreads()
     }
 
     private fun setupMenuDrawer() {
@@ -222,7 +221,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         listenToThreads()
 
         currentOffset = OFFSET_FIRST_PAGE
-        threadListViewModel.loadMailData()
+        viewModel.loadMailData()
     }
 
     override fun onPause() {
@@ -232,11 +231,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToFolderName() {
-        with(threadListViewModel) {
-            folderNameJob?.cancel()
-            folderNameJob = viewModelScope.launch(Dispatchers.Main) {
-                MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
-            }
+        folderNameJob?.cancel()
+        folderNameJob = lifecycleScope.launch {
+            MailData.currentFolderFlow.filterNotNull().collect(::displayFolderName)
         }
     }
 
@@ -247,11 +244,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToThreads() {
-        with(threadListViewModel) {
-            threadsJob?.cancel()
-            threadsJob = viewModelScope.launch(Dispatchers.Main) {
-                uiThreadsFlow.filterNotNull().collect(::displayThreads)
-            }
+        threadsJob?.cancel()
+        threadsJob = lifecycleScope.launch {
+            viewModel.uiThreadsFlow.filterNotNull().collect(::displayThreads)
         }
     }
 
@@ -290,7 +285,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             isDownloadingChanges = true
             currentOffset += PER_PAGE
             showLoadingTimer.start()
-            threadListViewModel.loadThreads(folder, mailbox, currentOffset)
+            viewModel.loadThreads(folder, mailbox, currentOffset)
         }
     }
 }
