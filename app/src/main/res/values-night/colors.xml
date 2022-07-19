@@ -23,6 +23,10 @@
     <color name="blueMailSecondary">#292E3D</color>
     <color name="blueMailRipple">#1E4CB7FF</color>
 
+    <!-- Context / errors -->
+    <color name="redDestructiveAction">#D71E04</color>
+    <color name="redDestructiveActionTransparent">#1ED71E04</color>
+
     <!-- Backgrounds -->
     <color name="backgroundCardSelectedColor">@color/grey_title</color>
     <color name="backgroundChipColor">@color/grey_title</color>
