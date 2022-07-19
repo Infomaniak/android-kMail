@@ -16,6 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <color name="pinkMail">#E07FA3</color>
+    <color name="pinkMailSecondary">#2A0F1B</color>
+    <color name="pinkMailRipple">#1EE07FA3</color>
+    <color name="blueMail">@color/blueTextLight</color>
+    <color name="blueMailSecondary">#292E3D</color>
+    <color name="blueMailRipple">#1E4CB7FF</color>
 
     <!-- Backgrounds -->
     <color name="backgroundCardSelectedColor">@color/grey_title</color>
@@ -34,6 +40,7 @@
     <color name="sectionHeaderTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/grey_text</color>
     <color name="emphasizedTextColor">@color/blueTextLight</color>
+    <color name="emailChipTextColor">@color/secondaryText</color>
 
     <!-- Drawables -->
     <color name="separatorColor">@color/grey_title</color>

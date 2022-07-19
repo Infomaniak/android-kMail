@@ -28,7 +28,7 @@
 
     <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase" />
 
-    <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="AppThemeBase" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:adjustViewBounds">true</item>
         <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="android:fontFamily">@font/suisseintl_regular</item>
@@ -43,13 +43,9 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="appBarLayoutStyle">@style/AppTheme.AppBarOverlay</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="colorControlNormal">@color/primary</item>
-        <item name="colorControlHighlight">@color/pinkMailRipple</item>
         <item name="colorOnSecondary">@android:color/white</item>
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primaryDark</item>
-        <item name="colorSecondary">@color/primary</item>
+        <item name="extendedFloatingActionButtonStyle">@style/Widget.App.ExtendedFloatingActionButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
         <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
         <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
         <item name="snackbarTextViewStyle">@style/Widget.App.SnackbarTextView</item>
@@ -57,6 +53,35 @@
     </style>
 
     <style name="AppTheme" parent="AppThemeBase" />
+
+    <style name="AppTheme.Pink" parent="AppTheme">
+        <item name="colorPrimary">@color/pinkMail</item>
+        <item name="colorPrimaryDark">#00FF00</item>
+
+        <item name="colorPrimaryContainer">@color/pinkMailSecondary</item>
+        <item name="colorOnPrimaryContainer">@color/pinkMail</item>
+
+        <item name="colorAccent">@color/pinkMail</item>
+        <item name="colorSecondary">@color/pinkMail</item>
+
+        <item name="colorControlNormal">@color/pinkMail</item>
+        <item name="colorControlHighlight">@color/pinkMailRipple</item>
+
+    </style>
+
+    <style name="AppTheme.Blue" parent="AppTheme">
+        <item name="colorPrimary">@color/blueMail</item>
+        <item name="colorPrimaryDark">#00FF00</item>
+
+        <item name="colorPrimaryContainer">@color/blueMailSecondary</item>
+        <item name="colorOnPrimaryContainer">@color/blueMail</item>
+
+        <item name="colorAccent">@color/blueMail</item>
+        <item name="colorSecondary">@color/blueMail</item>
+
+        <item name="colorControlNormal">@color/blueMail</item>
+        <item name="colorControlHighlight">@color/blueMailRipple</item>
+    </style>
 
     <!-- Login -->
 
@@ -105,7 +130,7 @@
         <item name="maxLines">1</item>
     </style>
 
-    <style name="AppTheme.ToolbarTheme" parent="Widget.MaterialComponents.Toolbar">
+    <style name="AppTheme.ToolbarTheme" parent="Widget.Material3.Toolbar">
         <item name="android:backgroundTint">@color/backgroundColor</item>
         <item name="contentInsetEnd">54dp</item>
         <item name="contentInsetStartWithNavigation">0dp</item>

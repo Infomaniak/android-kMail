@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.newmessage
 
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
@@ -29,10 +28,11 @@ import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
+import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
 import io.realm.kotlin.ext.realmListOf
 
-class NewMessageActivity : AppCompatActivity() {
+class NewMessageActivity : ThemedActivity() {
 
     private val viewModel: NewMessageViewModel by viewModels()
 

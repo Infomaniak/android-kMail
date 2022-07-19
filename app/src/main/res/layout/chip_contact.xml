@@ -16,13 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/EmailAddressChip"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:ellipsize="end"
-    android:textColor="@color/title"
-    app:chipBackgroundColor="@color/backgroundChipColor"
-    app:chipCornerRadius="100dp"
-    app:iconStartPadding="@dimen/marginStandardVerySmall"
     tools:text="@tools:sample/full_names" />
