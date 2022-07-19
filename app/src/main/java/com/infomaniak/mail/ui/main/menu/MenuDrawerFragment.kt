@@ -27,7 +27,6 @@ import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.FormatterFileSize
@@ -39,8 +38,9 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
-import com.infomaniak.mail.ui.main.thread.ThreadListViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toggleChevron
 import kotlinx.coroutines.Dispatchers
@@ -55,7 +55,6 @@ class MenuDrawerFragment(
 ) : Fragment() {
 
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
-    private val threadListViewModel: ThreadListViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
@@ -63,9 +62,9 @@ class MenuDrawerFragment(
     private var mailboxesJob: Job? = null
     private var foldersJob: Job? = null
 
-    private val addressAdapter = SettingAddressAdapter(displayIcon = false) {
-        threadListViewModel.loadMailData()
-        threadListViewModel.setup()
+    private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
+        MailData.selectMailbox(selectedMailbox)
+        MailData.loadInboxContent()
         closeDrawer()
     }
 
@@ -187,8 +186,8 @@ class MenuDrawerFragment(
 
         mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
             uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                addressAdapter.setMailboxes(mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId })
-                addressAdapter.notifyDataSetChanged()
+                val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
+                addressAdapter.setMailboxes(sortedMailboxes)
                 manageStorageFooterVisibility()
             }
         }

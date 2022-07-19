@@ -19,14 +19,8 @@ package com.infomaniak.mail.ui.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.infomaniak.mail.data.MailData
 
 class MainViewModel : ViewModel() {
 
     val isInternetAvailable = MutableLiveData(false)
-
-    override fun onCleared() {
-        MailData.close()
-        super.onCleared()
-    }
 }

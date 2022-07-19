@@ -35,16 +35,10 @@ import java.io.File
 
 object MailApi {
 
-    /**
-     * Contacts
-     */
     fun fetchContacts(): List<Contact> = ApiRepository.getContacts().data ?: emptyList()
 
-    /**
-     * Mailboxes
-     */
     fun fetchMailboxes(): List<Mailbox>? {
-        return ApiRepository.getMailboxes().data?.map { it.initLocalValues() }
+        return ApiRepository.getMailboxes().data?.map { it.initLocalValues(AccountUtils.currentUserId) }
     }
 
     fun fetchFolders(mailbox: Mailbox): List<Folder>? {

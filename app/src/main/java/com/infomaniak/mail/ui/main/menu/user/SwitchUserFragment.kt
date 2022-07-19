@@ -15,19 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.menu.user
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
-import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.UiAccount
+import com.infomaniak.mail.ui.LoginActivity
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
+import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -41,13 +48,26 @@ class SwitchUserFragment : Fragment() {
 
     private var mailboxesJob: Job? = null
 
-    private val accountsAdapter = SettingAccountAdapter { findNavController().popBackStack() }
+    private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
+        if (selectedMailbox.userId == AccountUtils.currentUserId) {
+            MailData.selectMailbox(selectedMailbox)
+            findNavController().popBackStack()
+        } else {
+            CoroutineScope(Dispatchers.IO).launch {
+                AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
+                AccountUtils.currentMailboxId = selectedMailbox.mailboxId
+
+                MailData.close()
+
+                AccountUtils.reloadApp?.invoke(bundleOf())
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        switchUserViewModel.setup()
         recyclerViewAccount.adapter = accountsAdapter
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
@@ -55,8 +75,12 @@ class SwitchUserFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            (menuItem.itemId == R.id.addAccount).also { if (it) startActivity(Intent(context, LoginActivity::class.java)) }
+        }
+
         listenToMailboxes()
-        switchUserViewModel.loadMailboxes()
+        switchUserViewModel.loadMailboxes(viewLifecycleOwner)
     }
 
     override fun onPause() {
@@ -72,20 +96,22 @@ class SwitchUserFragment : Fragment() {
             if (mailboxesJob != null) mailboxesJob?.cancel()
 
             mailboxesJob = viewModelScope.launch(Dispatchers.Main) {
-                uiMailboxesFlow.filterNotNull().collect { mailboxes ->
-                    // TODO: Handle multiple accounts
-                    // TODO: Sort accounts with selected one first
-                    // TODO: Get the unread count for all mailboxes and not only the current one
-                    val uiAccounts = listOf(UiAccount(AccountUtils.currentUser!!, mailboxes))
+                uiAccountsFlow.filterNotNull().collect { accounts ->
 
-                    accountsAdapter.setAccounts(sortUiAccounts(uiAccounts))
-                    accountsAdapter.notifyDataSetChanged()
+                    val uiAccounts = accounts
+                        .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
+                        .sortAccounts()
+
+                    accountsAdapter.notifyAdapter(uiAccounts)
                 }
             }
         }
     }
 
-    private fun sortUiAccounts(uiAccounts: List<UiAccount>): List<UiAccount> = uiAccounts.map { account ->
-        account.apply { mailboxes = account.mailboxes.sortedByDescending { it.unseenMessages } }
+    private fun List<UiAccount>.sortAccounts(): List<UiAccount> {
+        return filter { it.user.id != AccountUtils.currentUserId }
+            .toMutableList()
+            .apply { this@sortAccounts.find { it.user.id == AccountUtils.currentUserId }?.let { add(0, it) } }
+            .toList()
     }
 }

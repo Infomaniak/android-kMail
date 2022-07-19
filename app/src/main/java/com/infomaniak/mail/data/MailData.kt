@@ -97,7 +97,6 @@ object MailData {
     /**
      * Load Data
      */
-
     fun loadContacts() {
         CoroutineScope(Dispatchers.IO).launch {
             MailRealm.readContacts().collectOnce { realmContacts ->
@@ -200,7 +199,8 @@ object MailData {
 
     private fun computeFolderToSelect(folders: List<Folder>): Folder? {
         val folder = with(folders) {
-            find { it.role == DEFAULT_FOLDER_ROLE }
+            find { it.id == currentFolderFlow.value?.id }
+                ?: find { it.role == DEFAULT_FOLDER_ROLE }
                 ?: firstOrNull()
                 ?: return null
         }
@@ -212,7 +212,6 @@ object MailData {
     /**
      * Read Realm
      */
-
     private fun getMailboxesFromRealm(completion: (List<Mailbox>) -> Unit) {
         MailRealm.readMailboxes().collectOnce { realmMailboxes ->
 
@@ -251,7 +250,6 @@ object MailData {
     /**
      * Fetch API
      */
-
     private fun getInboxContentFromApi() {
         val mergedMailboxes = getMailboxesFromApi()
         val selectedMailbox = computeMailboxToSelect(mergedMailboxes) ?: return
@@ -285,6 +283,8 @@ object MailData {
             val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid)
             val mergedThreads = mergeThreads(realmThreads, apiThreads, folder)
 
+            // TODO: All StateFlows won't trigger when we refresh an empty folder, because "any instance
+            // TODO: of StateFlow already behaves as if distinctUntilChanged operator is applied to it".
             mutableThreadsFlow.value = mergedThreads
         }
     }
@@ -302,7 +302,6 @@ object MailData {
     /**
      * Merge Realm & API data
      */
-
     private fun mergeContacts(realmContacts: List<Contact>, apiContacts: List<Contact>): List<Contact> {
 
         // Get outdated data
@@ -471,7 +470,6 @@ object MailData {
     /**
      * Utils
      */
-
     private fun <T : BaseRealmObject> SharedFlow<ResultsChange<T>>.collectOnce(completion: (List<T>) -> Unit) {
         var job: Job? = null
         job = CoroutineScope(Dispatchers.IO).launch {

@@ -28,18 +28,19 @@ import kotlinx.coroutines.flow.Flow
 
 object MailboxInfoController {
 
-    /**
-     * Mailboxes
-     */
     private fun getMailbox(objectId: String): Mailbox? {
         return MailRealm.mailboxInfo.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first().find()
     }
 
     private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? = getMailbox(objectId)?.let(::findLatest)
 
-    private fun getMailboxes(): RealmQuery<Mailbox> = MailRealm.mailboxInfo.query()
-    fun getMailboxesSync(): RealmResults<Mailbox> = getMailboxes().find()
-    fun getMailboxesAsync(): Flow<ResultsChange<Mailbox>> = getMailboxes().asFlow()
+    private fun getMailboxes(userId: Int): RealmQuery<Mailbox> {
+        return MailRealm.mailboxInfo.query("${Mailbox::userId.name} == '$userId'")
+    }
+
+    fun getMailboxesSync(userId: Int): RealmResults<Mailbox> = getMailboxes(userId).find()
+
+    fun getMailboxesAsync(userId: Int): Flow<ResultsChange<Mailbox>> = getMailboxes(userId).asFlow()
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640

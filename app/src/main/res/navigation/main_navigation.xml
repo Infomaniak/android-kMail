@@ -106,7 +106,7 @@
 
     <fragment
         android:id="@+id/switchUserFragment"
-        android:name="com.infomaniak.mail.ui.main.menu.SwitchUserFragment"
+        android:name="com.infomaniak.mail.ui.main.menu.user.SwitchUserFragment"
         android:label="SwitchUSerFragment"
         tools:layout="@layout/fragment_switch_user" />
 
