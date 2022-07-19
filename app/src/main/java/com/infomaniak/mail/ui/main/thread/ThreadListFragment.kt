@@ -192,8 +192,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayThreads(threads: List<Thread>) {
         Log.i("UI", "Received threads (${threads.size})")
-        // threads.forEach { Log.v("UI", "Subject: ${it.subject}") }
-
         binding.swipeRefreshLayout.isRefreshing = false
 
         if (threads.isEmpty()) {
@@ -204,8 +202,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         context?.let {
             with(threadListAdapter) {
-                val newList = formatList(threads, it)
-                notifyAdapter(newList)
+                notifyAdapter(formatList(threads, it))
             }
         }
     }

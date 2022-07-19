@@ -38,7 +38,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
-import com.infomaniak.mail.utils.ModelsUtils.displayedSubject
+import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
@@ -68,7 +68,7 @@ class ThreadFragment : Fragment() {
         setupAdapter()
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        threadSubject.text = navigationArgs.threadSubject.displayedSubject(requireContext())
+        threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
         AppCompatResources.getDrawable(root.context, R.drawable.divider)?.let {

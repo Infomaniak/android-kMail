@@ -68,9 +68,7 @@ object MailApi {
                         body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
                         // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
                         @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
-                        attachments?.forEachIndexed { index, attachment ->
-                            attachment.initLocalValues(index, uid)
-                        }
+                        attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
                     }
                     // TODO: uncomment this when managing draft folder
                     // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
