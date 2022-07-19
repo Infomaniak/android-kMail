@@ -81,10 +81,9 @@
 
             <ImageView
                 android:id="@+id/chevron"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:rotation="-180"
-                android:src="@drawable/ic_chevron_up"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_arrow_down"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/userName"
@@ -95,11 +94,12 @@
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewAddress"
+        android:id="@+id/addressesList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardVerySmall"
         android:overScrollMode="never"
+        android:paddingHorizontal="@dimen/marginStandardSmall"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="3"

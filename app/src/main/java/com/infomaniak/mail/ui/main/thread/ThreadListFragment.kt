@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -33,11 +34,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -50,10 +53,30 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private val binding by lazy { FragmentThreadListBinding.inflate(layoutInflater) }
-    private lateinit var threadListAdapter: ThreadListAdapter
+    private var threadListAdapter = ThreadListAdapter()
 
     private var folderNameJob: Job? = null
     private var threadsJob: Job? = null
+
+    private var menuDrawerFragment: MenuDrawerFragment? = null
+
+    private val drawerListener = object : DrawerLayout.DrawerListener {
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            // No-op
+        }
+
+        override fun onDrawerOpened(drawerView: View) {
+            // No-op
+        }
+
+        override fun onDrawerClosed(drawerView: View) {
+            menuDrawerFragment?.closeDropdowns()
+        }
+
+        override fun onDrawerStateChanged(newState: Int) {
+            // No-op
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = binding.root
 
@@ -62,10 +85,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         setupOnRefresh()
         setupAdapter()
-        setupListeners()
+        setupMenuDrawer()
+        binding.setupListeners()
         setupUserAvatar()
 
         threadListViewModel.setup()
+    }
+
+    override fun onDestroyView() {
+        binding.drawerLayout.removeDrawerListener(drawerListener)
+
+        super.onDestroyView()
     }
 
     private fun setupOnRefresh() {
@@ -76,8 +106,22 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListViewModel.refreshThreads()
     }
 
+    private fun setupMenuDrawer() {
+        binding.drawerLayout.addDrawerListener(drawerListener)
+
+        val fragment = MenuDrawerFragment(
+            closeDrawer = { closeDrawer() },
+            isDrawerOpen = { binding.drawerLayout.isOpen },
+        ).also { menuDrawerFragment = it }
+
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.add(R.id.menuDrawerFragment, fragment)
+            ?.commit()
+    }
+
     private fun setupAdapter() {
-        binding.threadsList.adapter = ThreadListAdapter().also { threadListAdapter = it }
+        binding.threadsList.adapter = threadListAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO: Manage no Internet screen
@@ -102,9 +146,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupListeners() = with(binding) {
+    private fun FragmentThreadListBinding.setupListeners() {
         // TODO multiselection
         // openMultiselectButton.setOnClickListener {}
+
+        toolbar.setNavigationOnClickListener {
+            drawerLayout.open()
+        }
 
         searchViewCard.apply {
             // TODO filterButton doesn't propagate the event to root, must display it ?
@@ -215,5 +263,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
+    }
+
+    private fun closeDrawer() = with(binding) {
+        drawerLayout.closeDrawer(menuDrawerNavigation)
     }
 }

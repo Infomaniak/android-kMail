@@ -46,6 +46,7 @@
         <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlNormal">@color/primary</item>
+        <item name="colorControlHighlight">@color/pink_mail</item>
         <item name="colorOnSecondary">@android:color/white</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
@@ -107,7 +108,7 @@
         <item name="contentInsetStartWithNavigation">0dp</item>
         <item name="iconTint">@color/iconToolbarButton</item>
         <item name="navigationContentDescription">@string/contentDescriptionButtonBack</item>
-        <item name="navigationIcon">@drawable/ic_chevron_left</item>
+        <item name="navigationIcon">@drawable/ic_arrow_left</item>
         <item name="titleMarginTop">8dp</item>
         <item name="titleTextAppearance">@style/H1</item>
     </style>

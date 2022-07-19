@@ -15,20 +15,362 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.menu.MenuDrawerFragment">
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/drawerHeader"
+        style="@style/CardViewMail"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="MenuDrawerFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:cardElevation="6dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardSmall"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/appNameFull"
+                android:src="@drawable/ic_logo_infomaniak_mail"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/settingsButton"
+                style="@style/IconButton"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/contentDescriptionButtonSettings"
+                app:icon="@drawable/ic_cog"
+                app:iconSize="24dp"
+                app:iconTint="@color/infomaniak"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:background="@color/backgroundColor"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/accountSwitcher"
+                style="@style/MenuDrawerItem"
+                android:layout_marginVertical="@dimen/marginStandardSmall"
+                tools:ignore="UseCompoundDrawables">
+
+                <TextView
+                    android:id="@+id/accountSwitcherText"
+                    style="@style/Callout.Highlighted.Strong"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:text="Myriam.rais@infomaniak.com" />
+
+                <ImageView
+                    android:id="@+id/expandAccountButton"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"
+                    android:src="@drawable/ic_arrow_down" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/expandedAccountSwitcher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/addressesList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"
+                    android:paddingHorizontal="@dimen/marginStandardMedium"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_setting_address"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    style="@style/MenuDrawerDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="0dp" />
+
+                <TextView
+                    android:id="@+id/manageAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                    android:background="?attr/selectableItemBackground"
+                    android:paddingHorizontal="@dimen/marginStandardMedium"
+                    android:paddingVertical="@dimen/marginStandardSmall"
+                    android:text="@string/buttonManageAccount"
+                    android:textSize="@dimen/textHintSize" />
+
+                <TextView
+                    android:id="@+id/addAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                    android:background="?selectableItemBackground"
+                    android:paddingHorizontal="@dimen/marginStandardMedium"
+                    android:paddingVertical="@dimen/marginStandardSmall"
+                    android:text="@string/buttonAddAccount"
+                    android:textSize="@dimen/textHintSize" />
+
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp" />
+
+            <LinearLayout
+                android:id="@+id/inboxFolder"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    android:id="@+id/inboxFolderText"
+                    style="@style/MenuDrawerItemText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/inboxFolder"
+                    app:drawableStartCompat="@drawable/ic_drawer_mailbox" />
+
+                <TextView
+                    android:id="@+id/inboxFolderBadge"
+                    style="@style/MenuDrawerBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="15" />
+
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/defaultFoldersList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_folder_menu_drawer" />
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/customFolders"
+                style="@style/MenuDrawerItem"
+                tools:ignore="UseCompoundDrawables">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/buttonFolders" />
+
+                <ImageView
+                    android:id="@+id/expandCustomFolderButton"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
+                    android:src="@drawable/ic_arrow_down" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/customFoldersList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_folder_menu_drawer"
+                tools:visibility="visible" />
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/feedbacks"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/MenuDrawerItemText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/buttonFeedbacks"
+                    app:drawableStartCompat="@drawable/ic_feedbacks" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/help"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/MenuDrawerItemText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/buttonHelp"
+                    app:drawableStartCompat="@drawable/ic_help" />
+
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/Callout.Tertiary"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/menuDrawerItemViewHeight"
+                android:gravity="center|start"
+                android:paddingHorizontal="@dimen/marginStandard"
+                android:paddingVertical="@dimen/marginStandardSmall"
+                android:text="@string/menuDrawerAdvancedActions" />
+
+            <LinearLayout
+                android:id="@+id/importMails"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/MenuDrawerItemText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/buttonImportEmails"
+                    app:drawableStartCompat="@drawable/ic_drawer_download" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/restoreMails"
+                style="@style/MenuDrawerItem">
+
+                <TextView
+                    style="@style/MenuDrawerItemText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/buttonRestoreEmails"
+                    app:drawableStartCompat="@drawable/ic_restore_arrow" />
+
+            </LinearLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/storageLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/storageDivider"
+                    style="@style/MenuDrawerDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/storageIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/marginStandardMedium"
+                    android:layout_marginStart="@dimen/marginStandard"
+                    app:indicatorColor="@color/pink_mail"
+                    app:indicatorDirectionCircular="counterclockwise"
+                    app:indicatorSize="48dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/storageDivider"
+                    app:trackColor="@color/primary"
+                    app:trackThickness="2dp"
+                    tools:progress="5" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/contentDescriptionIconStorage"
+                    android:src="@drawable/ic_drawer_mailbox"
+                    app:layout_constraintBottom_toBottomOf="@id/storageIndicator"
+                    app:layout_constraintEnd_toEndOf="@id/storageIndicator"
+                    app:layout_constraintStart_toStartOf="@id/storageIndicator"
+                    app:layout_constraintTop_toTopOf="@id/storageIndicator" />
+
+                <TextView
+                    android:id="@+id/storageText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardMedium"
+                    app:layout_constraintBottom_toTopOf="@id/getMoreStorageButton"
+                    app:layout_constraintStart_toEndOf="@id/storageIndicator"
+                    app:layout_constraintTop_toTopOf="@+id/storageIndicator"
+                    tools:text="60.5 Ko / 20 Go utilisés" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/getMoreStorageButton"
+                    style="@style/TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="@dimen/marginStandardMedium"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:padding="0dp"
+                    android:text="@string/buttonMoreStorage"
+                    app:layout_constraintBottom_toBottomOf="@+id/storageIndicator"
+                    app:layout_constraintStart_toEndOf="@id/storageIndicator"
+                    app:layout_constraintTop_toBottomOf="@id/storageText" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

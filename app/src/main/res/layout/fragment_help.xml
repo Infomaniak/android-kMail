@@ -15,27 +15,14 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- Text sizes -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/buttonHelp" />
 
-    <dimen name="h1">22sp</dimen>
-    <dimen name="h2">18sp</dimen>
-    <dimen name="textRegularSize">16sp</dimen>
-    <dimen name="textHintSize">14sp</dimen>
-    <dimen name="textSmallSize">12sp</dimen>
-
-    <!-- View sizes -->
-
-    <dimen name="attachmentChipMaxSize">160dp</dimen>
-    <dimen name="itemThreadTextViewSize">235dp</dimen>
-    <dimen name="noMailIlluViewSize">180dp</dimen>
-    <dimen name="noMailTextViewSize">300dp</dimen>
-
-    <!-- Cardview -->
-    <dimen name="materialCardviewRadius">33dp</dimen>
-
-    <!-- Menu Drawer -->
-    <dimen name="menuDrawerItemViewHeight">48dp</dimen>
-
-</resources>
+</androidx.constraintlayout.widget.ConstraintLayout>

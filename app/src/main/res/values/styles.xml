@@ -74,6 +74,10 @@
         <item name="android:textColor">@color/emphasizedTextColor</item>
     </style>
 
+    <style name="Callout.Highlighted.Strong">
+        <item name="fontFamily">@font/suisseintl_semibold</item>
+    </style>
+
     <!-- Snackbar -->
 
     <style name="Widget.App.Snackbar" parent="Widget.MaterialComponents.Snackbar">
@@ -115,13 +119,6 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
-    <!-- Other -->
-
-    <style name="CircleImageView">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
-    </style>
-
     <!-- Cardview -->
 
     <style name="CardViewMail" parent="Widget.MaterialComponents.CardView">
@@ -142,6 +139,45 @@
         <item name="cornerSizeTopLeft">@dimen/materialCardviewRadius</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <!-- MenuDrawer -->
+    <style name="MenuDrawerBadge" parent="Callout.Highlighted">
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="MenuDrawerDivider" parent="Widget.MaterialComponents.MaterialDivider">
+        <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
+        <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
+        <item name="dividerColor">@color/separatorColor</item>
+        <item name="dividerInsetEnd">@dimen/marginStandard</item>
+        <item name="dividerInsetStart">@dimen/marginStandard</item>
+    </style>
+
+    <style name="MenuDrawerItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/menuDrawerItemViewHeight</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingEnd">@dimen/marginStandard</item>
+        <item name="android:paddingStart">@dimen/marginStandard</item>
+    </style>
+
+    <style name="MenuDrawerItemText">
+        <item name="android:drawablePadding">@dimen/marginStandard</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">start|center</item>
+        <item name="android:lineSpacingMultiplier">1</item>
+        <item name="android:maxLines">2</item>
+        <item name="drawableStartCompat">@drawable/ic_folder</item>
+    </style>
+
+    <!-- Other -->
+
+    <style name="CircleImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 
 </resources>

@@ -29,8 +29,8 @@ import com.infomaniak.mail.ui.main.menu.SettingAccountAdapter.SettingAccountView
 import com.infomaniak.mail.utils.toggleChevron
 
 class SettingAccountAdapter(
-    private val accounts: List<UiAccount> = emptyList(),
-    private val popBackStack: () -> Unit,
+    private var accounts: List<UiAccount> = emptyList(),
+    private val onItemClicked: () -> Unit,
 ) : RecyclerView.Adapter<SettingAccountViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingAccountViewHolder {
@@ -44,12 +44,12 @@ class SettingAccountAdapter(
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(account) }
-        recyclerViewAddress.adapter = SettingAddressAdapter(account.mailboxes, popBackStack)
+        addressesList.adapter = SettingAddressAdapter(mailboxes = account.mailboxes, onItemClicked = onItemClicked)
     }
 
     private fun ItemSettingAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
         if (position == 0) {
-            chevron.rotation = 0.0f
+            chevron.rotation = 180.0f
             toggleMailboxes(account)
         }
     }
@@ -57,10 +57,14 @@ class SettingAccountAdapter(
     private fun ItemSettingAccountBinding.toggleMailboxes(account: UiAccount) {
         account.collapsed = !account.collapsed
         chevron.toggleChevron(account.collapsed)
-        recyclerViewAddress.isGone = account.collapsed
+        addressesList.isGone = account.collapsed
     }
 
     override fun getItemCount(): Int = accounts.count()
+
+    fun setAccounts(newAccounts: List<UiAccount>) {
+        accounts = newAccounts
+    }
 
     class SettingAccountViewHolder(val binding: ItemSettingAccountBinding) : RecyclerView.ViewHolder(binding.root)
 

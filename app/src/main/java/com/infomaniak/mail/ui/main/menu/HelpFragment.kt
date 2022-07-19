@@ -15,26 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.thread
+package com.infomaniak.mail.ui.main.menu
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.infomaniak.mail.R
 
-@Serializable
-data class ThreadsResult(
-    val threads: List<Thread> = emptyList(),
-    @SerialName("total_messages_count")
-    val totalMessagesCount: Int = 0,
-    @SerialName("messages_count")
-    val messagesCount: Int = 0,
-    @SerialName("current_offset")
-    val currentOffset: Int = 0,
-    @SerialName("thread_mode")
-    val threadMode: String = "on",
-    @SerialName("folder_unseen_messages")
-    val folderUnseenMessage: Int = 0,
-    @SerialName("resource_previous")
-    val resourcePrevious: String? = null,
-    @SerialName("resource_next")
-    val resourceNext: String? = null,
-)
+class HelpFragment : Fragment() {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_help, container, false)
+}

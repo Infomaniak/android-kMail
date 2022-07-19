@@ -15,27 +15,23 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MenuDrawerItem">
 
-    <!-- Text sizes -->
+    <TextView
+        android:id="@+id/folderName"
+        style="@style/MenuDrawerItemText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        tools:text="Dossier Perso" />
 
-    <dimen name="h1">22sp</dimen>
-    <dimen name="h2">18sp</dimen>
-    <dimen name="textRegularSize">16sp</dimen>
-    <dimen name="textHintSize">14sp</dimen>
-    <dimen name="textSmallSize">12sp</dimen>
+    <TextView
+        android:id="@+id/folderBadge"
+        style="@style/MenuDrawerBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="99+" />
 
-    <!-- View sizes -->
-
-    <dimen name="attachmentChipMaxSize">160dp</dimen>
-    <dimen name="itemThreadTextViewSize">235dp</dimen>
-    <dimen name="noMailIlluViewSize">180dp</dimen>
-    <dimen name="noMailTextViewSize">300dp</dimen>
-
-    <!-- Cardview -->
-    <dimen name="materialCardviewRadius">33dp</dimen>
-
-    <!-- Menu Drawer -->
-    <dimen name="menuDrawerItemViewHeight">48dp</dimen>
-
-</resources>
+</LinearLayout>

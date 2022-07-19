@@ -17,13 +17,14 @@
   -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="appName" translatable="false">kMail</string>
+    <string name="appNameFull" translatable="false">Infomaniak Mail</string>
 
     <string name="notification_channel_id_general" translatable="false">general_channel_id</string>
 
-    <string name="buttonCancel">Cancel</string><!--TODO: Add translations-->
     <string name="refreshTokenError">You’ve been disconnected due to a problem. Please log in again</string><!--TODO: Add translations-->
     <string name="notificationGeneralChannelName">General notifications</string><!--TODO: Add translations-->
 
+    <string name="actionsMenuTitle">What would you like to do?</string>
     <string name="archiveFolder">Archived</string>
     <plurals name="attachmentQuantity">
         <item quantity="one">%d attachment</item>
@@ -35,8 +36,14 @@
     <string name="buttonAccountDisconnect">Disconnect account</string>
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
+    <string name="buttonArchive">Archive</string>
+    <string name="buttonBlockSender">Block sender</string>
+    <string name="buttonCancel">Cancel</string>
+    <string name="buttonCreateRule">Create a rule</string>
+    <string name="buttonDelete">Delete</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
+    <string name="buttonEditMenu">Edit menu</string>
     <string name="buttonFeedbacks">Feedbacks</string>
     <string name="buttonFolders">Folders</string>
     <string name="buttonForward">Forward</string>
@@ -44,37 +51,57 @@
     <string name="buttonImportEmails">Import emails</string>
     <string name="buttonLogin">Login</string>
     <string name="buttonManageAccount">Manage my account</string>
+    <string name="buttonMarkAsRead">Mark as read</string>
+    <string name="buttonMarkAsUnread">Mark as unread</string>
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
+    <string name="buttonMove">Move</string>
     <string name="buttonNewMessage">New message</string>
+    <string name="buttonOpenIn">Open in</string>
+    <string name="buttonPhishing">Phishing</string>
+    <string name="buttonPostpone">Postpone</string>
+    <string name="buttonPrint">Print</string>
     <string name="buttonReply">Reply</string>
+    <string name="buttonReplyAll">Reply all</string>
+    <string name="buttonReportDisplayProblem">Report a display problem</string>
     <string name="buttonRestoreEmails">Restore emails</string>
+    <string name="buttonSavePDF">Save as PDF</string>
     <string name="buttonSeeAll">See all</string>
     <string name="buttonSelectAll">Select all</string>
     <string name="buttonShare">Share</string>
+    <string name="buttonSpam">Spam</string>
+    <string name="canceledEmailSendingConfirmationSnackbar">Canceled email sending</string>
     <string name="ccTitle">Cc:</string>
+    <string name="commercialFolder">Promotions</string>
     <string name="contactActionAddToContacts">Add to contacts</string>
     <string name="contactActionCopyEmailAddress">Copy email address</string>
     <string name="contactActionWriteEmail">Write an email</string>
     <string name="contactMe">Me</string>
     <string name="contentDescriptionButtonBack">Back</string>
     <string name="contentDescriptionButtonDeleteDraft">Delete draft</string>
+    <string name="contentDescriptionButtonExpandAccountSelection">Expand account selection</string>
+    <string name="contentDescriptionButtonExpandCustomFolders">Expand custom folders</string>
     <string name="contentDescriptionButtonExpandHeader">Expand header</string>
     <string name="contentDescriptionButtonFilterSearch">Filter search</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
+    <string name="contentDescriptionButtonSettings">Settings</string>
     <string name="contentDescriptionIconAttachments">Has attachments</string>
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
     <string name="contentDescriptionIconFavorite">Is favorite</string>
     <string name="contentDescriptionIconNewMail">New</string>
+    <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
+    <string name="emailSentSnackbar">Email sent</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
+    <string name="favoritesFolder">Favorites</string>
     <string name="fromTitle">From:</string>
     <string name="inboxFolder">Inbox</string>
     <string name="loginViewDescription">Log in to your account and manage all your Infomaniak emails from the app.</string>
     <string name="loginViewTitle">Welcome to the Infomaniak Mail App</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
+    <string name="menuDrawerMailboxStorage">%s / %s used</string>
     <string name="menuDrawerUsed">used</string>
     <string name="messageForwardHeader">Forwarded message</string>
     <string name="messageIsDraftOption">Draft</string>
@@ -82,8 +109,12 @@
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
     <string name="newMessagePlaceholderTitle">Type your message</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
-    <string name="noEmailTitle">You don\'t have any emails</string>
+    <string name="noEmailTitle">You don’t have any emails</string>
+    <string name="noNetworkDescription">Your emails may not be up to date</string>
+    <string name="noNetworkTitle">No signal</string>
     <string name="objectTitle">Object:</string>
+    <string name="pendingMessagesFolder">Pending messages</string>
+    <string name="scheduledMessagesFolder">Scheduled messages</string>
     <string name="searchViewHint">Search for a message</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
@@ -123,6 +154,14 @@
     <string name="settingsSendAcknowledgement">Request an acknowledgement of receipt for every email sent</string>
     <string name="settingsSendIncludeOriginalMessage">Include the original message in the reply</string>
     <string name="settingsSendTitle">Send</string>
+    <string name="settingsSwipeActionArchive">Archive</string>
+    <string name="settingsSwipeActionDelete">Delete</string>
+    <string name="settingsSwipeActionMove">Move</string>
+    <string name="settingsSwipeActionNone">None</string>
+    <string name="settingsSwipeActionQuickActionsMenu">Quick actions menu</string>
+    <string name="settingsSwipeActionReadAndArchive">Read and archive</string>
+    <string name="settingsSwipeActionReadUnread">Read / unread</string>
+    <string name="settingsSwipeActionSpam">Spam</string>
     <string name="settingsSwipeActionsTitle">Swipe actions</string>
     <string name="settingsSwipeLongLeft">Long left swipe</string>
     <string name="settingsSwipeLongRight">Long right swipe</string>
@@ -135,6 +174,7 @@
     <string name="settingsTransferAsAttachment">As an attachment</string>
     <string name="settingsTransferEmailsTitle">Transfer emails</string>
     <string name="settingsTransferInBody">In the message body</string>
+    <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>
     <string name="threadListSectionLastWeek">Last week</string>
     <string name="threadListSectionThisWeek">This week</string>

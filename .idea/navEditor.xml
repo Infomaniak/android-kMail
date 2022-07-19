@@ -105,13 +105,25 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="helpFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-572" />
+                            <option name="y" value="2628" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="mainActivity">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-741" />
-                            <option name="y" value="149" />
+                            <option name="x" value="-2261" />
+                            <option name="y" value="1349" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -123,34 +135,8 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="-573" />
-                            <option name="y" value="2185" />
+                            <option name="y" value="2105" />
                           </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
-                  <entry key="menuDrawerFragment">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="-834" />
-                            <option name="y" value="2647" />
-                          </Point>
-                        </option>
-                        <option name="myPositions">
-                          <map>
-                            <entry key="action_menuDrawerFragment_to_ManageMailAddressFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_menuDrawerFragment_to_SettingsFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -161,7 +147,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="755" />
-                            <option name="y" value="955" />
+                            <option name="y" value="1065" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -354,15 +340,6 @@
                             <option name="y" value="710" />
                           </Point>
                         </option>
-                        <option name="myPositions">
-                          <map>
-                            <entry key="action_switchUserFragment_to_contactFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                          </map>
-                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -398,6 +375,11 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_threadFragment_to_contactFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_threadFragment_to_messageActionBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
@@ -418,13 +400,28 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-741" />
-                            <option name="y" value="561" />
+                            <option name="x" value="-2261" />
+                            <option name="y" value="1751" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
                             <entry key="action_homeFragment_to_newMessageActivity">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_threadListFragment_to_helpFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_threadListFragment_to_manageMailAddressFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_threadListFragment_to_menuDrawerFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -435,6 +432,11 @@
                               </value>
                             </entry>
                             <entry key="action_threadListFragment_to_searchFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_threadListFragment_to_settingsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>

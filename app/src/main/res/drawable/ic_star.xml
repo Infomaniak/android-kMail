@@ -1,28 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="22"
-    android:viewportHeight="22">
+    android:viewportWidth="24"
+    android:viewportHeight="24">
     <path
-        android:fillColor="#F1BE41"
-        android:pathData="M11,1.6996L12.9918,8.1702L13.1004,8.5231H13.4697H19.988L14.6917,12.5849L14.4158,12.7964L14.5181,13.1287L16.5269,19.6547L11.3043,15.6494L11,15.4161L10.6957,15.6494L5.4731,19.6547L7.4819,13.1287L7.5842,12.7964L7.3083,12.5849L2.012,8.5231H8.5303H8.8996L9.0082,8.1702L11,1.6996Z"
+        android:fillColor="#00000000"
+        android:pathData="M12,1.694L14.355,9.315L14.464,9.667H14.833H22.522L16.28,14.436L16.003,14.647L16.106,14.98L18.477,22.653L12.304,17.937L12,17.705L11.696,17.937L5.523,22.653L7.894,14.98L7.997,14.647L7.72,14.436L1.478,9.667H9.167H9.536L9.645,9.315L12,1.694Z"
         android:strokeWidth="1"
-        android:strokeColor="#F1BE41" />
+        android:strokeColor="#000000" />
 </vector>
