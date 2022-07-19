@@ -36,6 +36,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
@@ -196,10 +197,7 @@ class MenuDrawerFragment(
         if (foldersJob != null) foldersJob?.cancel()
 
         foldersJob = viewModelScope.launch(Dispatchers.Main) {
-            uiFoldersFlow.filterNotNull().collect { folders ->
-                onFoldersChange(folders)
-                // TODO : Manage embedded folders ?
-            }
+            uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
         }
     }
 
@@ -253,13 +251,17 @@ class MenuDrawerFragment(
         customFoldersAdapter.notifyDataSetChanged()
     }
 
-    private fun getInboxFolder(folders: List<Folder>) = folders.find { it.role == Folder.FolderRole.INBOX }
+    private fun getInboxFolder(folders: List<Folder>): Folder? {
+        return folders.find { it.role == FolderRole.INBOX }
+    }
 
-    private fun getDefaultFolders(folders: List<Folder>) = folders.filter {
-        it.role != null && it.role != Folder.FolderRole.INBOX
-    }.sortedBy { it.role?.order }
+    private fun getDefaultFolders(folders: List<Folder>): List<Folder> {
+        return folders.filter { it.role != null && it.role != FolderRole.INBOX }.sortedBy { it.role?.order }
+    }
 
-    private fun getCustomFolders(folders: List<Folder>) = folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
+    private fun getCustomFolders(folders: List<Folder>): List<Folder> {
+        return folders.filter { it.role == null }.sortedByDescending { it.isFavorite }
+    }
 
     companion object {
         const val LIMITED_MAILBOX_SIZE: Long = 20L * 1 shl 30

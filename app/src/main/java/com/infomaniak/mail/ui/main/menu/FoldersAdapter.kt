@@ -18,14 +18,19 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
+import com.infomaniak.lib.core.R as RCore
 
 class FoldersAdapter(private var folders: List<Folder> = emptyList(), private val openFolder: (folderName: String) -> Unit) :
     RecyclerView.Adapter<FolderViewHolder>() {
@@ -39,18 +44,20 @@ class FoldersAdapter(private var folders: List<Folder> = emptyList(), private va
         val badgeText = folder.getUnreadCountOrNull()
 
         when (folder.role) {
-            Folder.FolderRole.INBOX -> setFolderUi(R.string.inboxFolder, R.drawable.ic_drawer_mailbox, badgeText)
-            Folder.FolderRole.DRAFT -> setFolderUi(R.string.draftFolder, R.drawable.ic_edit_draft, badgeText)
-            Folder.FolderRole.SENT -> setFolderUi(R.string.sentFolder, R.drawable.ic_sent_messages, badgeText)
-            Folder.FolderRole.SPAM -> setFolderUi(R.string.spamFolder, R.drawable.ic_spam, badgeText)
-            Folder.FolderRole.TRASH -> setFolderUi(R.string.trashFolder, R.drawable.ic_bin, badgeText)
-            Folder.FolderRole.ARCHIVE -> setFolderUi(R.string.archiveFolder, R.drawable.ic_archive_folder, badgeText)
-            Folder.FolderRole.COMMERCIAL -> setFolderUi(R.string.commercialFolder, R.drawable.ic_promotions, badgeText)
-            Folder.FolderRole.SOCIALNETWORKS -> setFolderUi(R.string.socialNetworksFolder, R.drawable.ic_social_media, badgeText)
-            null -> {
-                val folderIcon = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder
-                setFolderUi(folder.name, folderIcon, badgeText)
-            }
+            FolderRole.INBOX -> setFolderUi(R.string.inboxFolder, R.drawable.ic_drawer_mailbox, badgeText)
+            FolderRole.DRAFT -> setFolderUi(R.string.draftFolder, R.drawable.ic_edit_draft, badgeText)
+            FolderRole.SENT -> setFolderUi(R.string.sentFolder, R.drawable.ic_sent_messages, badgeText)
+            FolderRole.SPAM -> setFolderUi(R.string.spamFolder, R.drawable.ic_spam, badgeText)
+            FolderRole.TRASH -> setFolderUi(R.string.trashFolder, R.drawable.ic_bin, badgeText)
+            FolderRole.ARCHIVE -> setFolderUi(R.string.archiveFolder, R.drawable.ic_archive_folder, badgeText)
+            FolderRole.COMMERCIAL -> setFolderUi(R.string.commercialFolder, R.drawable.ic_promotions, badgeText)
+            FolderRole.SOCIALNETWORKS -> setFolderUi(R.string.socialNetworksFolder, R.drawable.ic_social_media, badgeText)
+            null -> setFolderUi(
+                name = folder.name,
+                iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
+                badgeText = badgeText,
+                indent = folder.path.split(folder.separator).size - 1,
+            )
         }
     }
 
@@ -59,14 +66,23 @@ class FoldersAdapter(private var folders: List<Folder> = emptyList(), private va
     private fun ItemFolderMenuDrawerBinding.setFolderUi(
         @StringRes nameResource: Int,
         @DrawableRes iconId: Int,
-        badgeText: String? = null
+        badgeText: String? = null,
+        indent: Int? = null,
     ) {
-        setFolderUi(root.context.getString(nameResource), iconId, badgeText)
+        setFolderUi(root.context.getString(nameResource), iconId, badgeText, indent)
     }
 
-    private fun ItemFolderMenuDrawerBinding.setFolderUi(name: String, @DrawableRes iconId: Int, badgeText: String? = null) {
-        folderName.text = name
-        folderName.setCompoundDrawablesWithIntrinsicBounds(root.context.getDrawable(iconId), null, null, null)
+    private fun ItemFolderMenuDrawerBinding.setFolderUi(
+        name: String,
+        @DrawableRes iconId: Int,
+        badgeText: String? = null,
+        indent: Int? = null,
+    ) {
+        folderName.apply {
+            text = name
+            setCompoundDrawablesWithIntrinsicBounds(AppCompatResources.getDrawable(root.context, iconId), null, null, null)
+            if (indent != null) setMargins(root.context.resources.getDimension(RCore.dimen.marginStandard).toInt() * indent)
+        }
 
         if (badgeText != null) folderBadge.text = badgeText
 
@@ -75,6 +91,13 @@ class FoldersAdapter(private var folders: List<Folder> = emptyList(), private va
 
     fun setFolders(newFolders: List<Folder>) {
         folders = newFolders
+    }
+
+    private fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) {
+        if (layoutParams is MarginLayoutParams) {
+            (layoutParams as MarginLayoutParams).setMargins(left, top, right, bottom)
+            requestLayout()
+        }
     }
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)

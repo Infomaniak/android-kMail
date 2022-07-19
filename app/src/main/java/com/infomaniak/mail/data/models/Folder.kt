@@ -59,7 +59,7 @@ class Folder : RealmObject {
      * Local
      */
     var threads: RealmList<Thread> = realmListOf()
-    var parentLink: Folder? = null // TODO
+    var parentLink: Folder? = null
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
