@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
         android:gravity="center"
-        android:text="@string/loginViewTitle"
+        android:text="@string/onBoardingTitle4"
         app:layout_constraintBottom_toTopOf="@+id/onBoardingDescription"
         app:layout_constraintEnd_toStartOf="@+id/end"
         app:layout_constraintStart_toStartOf="@+id/start"
@@ -69,7 +69,7 @@
         android:layout_marginTop="12dp"
         android:gravity="center"
         android:lineSpacingMultiplier="1"
-        android:text="@string/loginViewDescription"
+        android:text="@string/onBoardingDescription4"
         app:layout_constraintEnd_toEndOf="@id/end"
         app:layout_constraintStart_toStartOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/onBoardingTitle" />
