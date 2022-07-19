@@ -189,7 +189,8 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {
-        storageLayout.isVisible = mailbox.isLimited
+        getMoreStorageCardview.isVisible = mailbox.isLimited
+        storageDivider.isVisible = mailbox.isLimited
 
         if (mailbox.isLimited) {
             val usedSize = (mailbox.quotas?.size ?: 0).toLong()

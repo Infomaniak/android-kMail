@@ -35,6 +35,7 @@
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardSmall"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
@@ -52,8 +53,6 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settingsButton"
                 style="@style/IconButton"
-                android:layout_width="30dp"
-                android:layout_height="match_parent"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
                 app:icon="@drawable/ic_cog"
                 app:iconSize="24dp"
@@ -74,7 +73,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
             android:animateLayoutChanges="true"
             android:orientation="vertical">
 
@@ -406,72 +405,72 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/storageLayout"
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/storageDivider"
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/getMoreStorageCardview"
+                style="@style/MenuDrawerItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:id="@+id/storageDivider"
-                    style="@style/MenuDrawerDivider"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/storageLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:padding="@dimen/marginStandardSmall">
 
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/storageIndicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/marginStandardMedium"
-                    android:layout_marginStart="@dimen/marginStandard"
-                    app:indicatorColor="@color/pinkMail"
-                    app:indicatorDirectionCircular="counterclockwise"
-                    app:indicatorSize="48dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/storageDivider"
-                    app:trackColor="?android:attr/colorPrimary"
-                    app:trackThickness="2dp"
-                    tools:progress="5" />
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/storageIndicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:indicatorColor="?android:attr/colorPrimary"
+                        app:indicatorSize="48dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:trackColor="@color/progressbarTrackColor"
+                        app:trackThickness="4dp"
+                        tools:progress="25" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/contentDescriptionIconStorage"
-                    android:src="@drawable/ic_drawer_mailbox"
-                    app:layout_constraintBottom_toBottomOf="@id/storageIndicator"
-                    app:layout_constraintEnd_toEndOf="@id/storageIndicator"
-                    app:layout_constraintStart_toStartOf="@id/storageIndicator"
-                    app:layout_constraintTop_toTopOf="@id/storageIndicator"
-                    app:tint="?android:attr/colorPrimary" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/contentDescriptionIconStorage"
+                        android:src="@drawable/ic_drawer_mailbox"
+                        app:layout_constraintBottom_toBottomOf="@id/storageIndicator"
+                        app:layout_constraintEnd_toEndOf="@id/storageIndicator"
+                        app:layout_constraintStart_toStartOf="@id/storageIndicator"
+                        app:layout_constraintTop_toTopOf="@id/storageIndicator"
+                        app:tint="?android:attr/colorPrimary" />
 
-                <TextView
-                    android:id="@+id/storageText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardMedium"
-                    app:layout_constraintBottom_toTopOf="@id/getMoreStorageButton"
-                    app:layout_constraintStart_toEndOf="@id/storageIndicator"
-                    app:layout_constraintTop_toTopOf="@+id/storageIndicator"
-                    tools:text="60.5 Ko / 20 Go utilisés" />
+                    <TextView
+                        android:id="@+id/storageText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/marginStandardMedium"
+                        app:layout_constraintBottom_toTopOf="@id/getMoreStorageButton"
+                        app:layout_constraintStart_toEndOf="@id/storageIndicator"
+                        app:layout_constraintTop_toTopOf="@+id/storageIndicator"
+                        tools:text="60.5 Ko / 20 Go utilisés" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/getMoreStorageButton"
-                    style="@style/TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="@dimen/marginStandardMedium"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    android:text="@string/buttonMoreStorage"
-                    app:layout_constraintBottom_toBottomOf="@+id/storageIndicator"
-                    app:layout_constraintStart_toEndOf="@id/storageIndicator"
-                    app:layout_constraintTop_toBottomOf="@id/storageText" />
+                    <TextView
+                        android:id="@+id/getMoreStorageButton"
+                        style="@style/Callout.Highlighted"
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_marginStart="@dimen/marginStandardMedium"
+                        android:padding="0dp"
+                        android:text="@string/buttonMoreStorage"
+                        app:layout_constraintBottom_toBottomOf="@+id/storageIndicator"
+                        app:layout_constraintStart_toEndOf="@id/storageIndicator"
+                        app:layout_constraintTop_toBottomOf="@id/storageText" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

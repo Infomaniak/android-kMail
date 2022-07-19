@@ -53,4 +53,7 @@
     <!-- Cardview -->
     <color name="cardviewStrokeColor">#242424</color>
 
+    <!-- Progressbar -->
+    <color name="progressbarTrackColor">@color/grey_text</color>
+
 </resources>
