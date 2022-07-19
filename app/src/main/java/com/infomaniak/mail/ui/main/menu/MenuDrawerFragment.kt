@@ -43,10 +43,7 @@ import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -63,7 +60,6 @@ class MenuDrawerFragment : Fragment() {
 
     private var currentMailboxJob: Job? = null
     private var mailboxesJob: Job? = null
-    private var foldersJob: Job? = null
 
     private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
@@ -84,6 +80,7 @@ class MenuDrawerFragment : Fragment() {
         setupAdapters()
         setupListener()
         handleOnBackPressed()
+        listenToFolders()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -161,13 +158,11 @@ class MenuDrawerFragment : Fragment() {
 
         listenToCurrentMailbox()
         listenToMailboxes()
-        listenToFolders()
     }
 
     override fun onPause() {
         currentMailboxJob?.cancel()
         mailboxesJob?.cancel()
-        foldersJob?.cancel()
         super.onPause()
     }
 
@@ -206,10 +201,8 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun listenToFolders() {
-        foldersJob?.cancel()
-        foldersJob = lifecycleScope.launch {
-            viewModel.uiFoldersFlow.filterNotNull().collect(::onFoldersChange)
-        }
+        viewModel.folders.observeNotNull(this, ::onFoldersChange)
+        viewModel.listenToFolders()
     }
 
     private fun closeDrawer() = with(binding) {

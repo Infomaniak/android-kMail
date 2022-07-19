@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
@@ -32,9 +33,7 @@ class MenuDrawerViewModel : ViewModel() {
 
     private val mutableUiMailboxesFlow: MutableStateFlow<List<Mailbox>?> = MutableStateFlow(null)
     val uiMailboxesFlow = mutableUiMailboxesFlow.asStateFlow()
-
-    private val mutableUiFoldersFlow: MutableStateFlow<List<Folder>?> = MutableStateFlow(null)
-    val uiFoldersFlow = mutableUiFoldersFlow.asStateFlow()
+    val folders = MutableLiveData<List<Folder>?>()
 
     fun setup() {
         listenToMailboxes()
@@ -49,10 +48,10 @@ class MenuDrawerViewModel : ViewModel() {
         }
     }
 
-    private fun listenToFolders() {
+    fun listenToFolders() {
         viewModelScope.launch {
-            MailData.foldersFlow.collect { folders ->
-                mutableUiFoldersFlow.value = folders
+            MailData.foldersFlow.collect {
+                folders.value = it
             }
         }
     }
