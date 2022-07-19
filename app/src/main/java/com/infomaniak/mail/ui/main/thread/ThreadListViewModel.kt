@@ -50,13 +50,14 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun loadMailData() {
-        MailData.loadMailData()
+        MailData.loadInboxContent()
     }
 
     fun refreshThreads() {
-        val folder = MailData.currentFolderFlow.value ?: return
-        val mailbox = MailData.currentMailboxFlow.value ?: return
-        MailData.fetchThreads(folder, mailbox)
+        MailData.refreshThreads(
+            folder = MailData.currentFolderFlow.value ?: return,
+            mailbox = MailData.currentMailboxFlow.value ?: return,
+        )
     }
 
     override fun onCleared() {
