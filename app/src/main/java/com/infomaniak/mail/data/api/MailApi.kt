@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -34,6 +35,8 @@ import java.io.BufferedInputStream
 import java.io.File
 
 object MailApi {
+
+    fun fetchAddressBooks(): List<AddressBook> = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
 
     fun fetchContacts(): List<Contact> = ApiRepository.getContacts().data ?: emptyList()
 

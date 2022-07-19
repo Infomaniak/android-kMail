@@ -21,28 +21,29 @@ package com.infomaniak.mail.data.models.addressBook
 
 import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 class AddressBook : RealmObject {
+    @PrimaryKey
     var id: Int = 0
     @SerialName("user_id")
     var userId: Int = 0
+    var name: String = ""
+    var rights: String = ""
     @SerialName("principal_uri")
     var principalUri: String = ""
-    var name: String = ""
-    var color: String = ""
-    var uuid: String = ""
     var description: String = ""
-    @SerialName("is_shared")
-    var isShared: Boolean = false
-    var rights: String = ""
+    var color: String = ""
     @SerialName("is_activated")
     var isActivated: Boolean = false
     @SerialName("is_hidden")
     var isHidden: Boolean = false
     @SerialName("is_pending")
     var isPending: Boolean = false
+    @SerialName("is_shared")
+    var isShared: Boolean = false
 }

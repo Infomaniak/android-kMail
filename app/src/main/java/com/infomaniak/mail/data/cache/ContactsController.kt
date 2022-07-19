@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.Contact
+import com.infomaniak.mail.data.models.addressBook.AddressBook
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -26,6 +27,30 @@ import kotlinx.coroutines.flow.Flow
 
 object ContactsController {
 
+    /**
+     * Address Books
+     */
+    private fun getAddressBook(id: Int): AddressBook? {
+        return MailRealm.contacts.query<AddressBook>("${AddressBook::id.name} == '$id'").first().find()
+    }
+
+    private fun MutableRealm.getLatestAddressBook(id: Int): AddressBook? = getAddressBook(id)?.let(::findLatest)
+
+    fun getAddressBooks(): Flow<ResultsChange<AddressBook>> = MailRealm.contacts.query<AddressBook>().asFlow()
+
+    fun upsertAddressBooks(addressBooks: List<AddressBook>) {
+        MailRealm.contacts.writeBlocking { addressBooks.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+    }
+
+    fun deleteAddressBooks(addressBooks: List<AddressBook>) {
+        MailRealm.contacts.writeBlocking { addressBooks.forEach { getLatestAddressBook(it.id)?.let(::delete) } }
+    }
+
+    fun Contact.getAddressBook(): AddressBook? = getAddressBook(addressBookId)
+
+    /**
+     * Contacts
+     */
     private fun getContact(id: String): Contact? {
         return MailRealm.contacts.query<Contact>("${Contact::id.name} == '$id'").first().find()
     }
@@ -40,5 +65,9 @@ object ContactsController {
 
     fun deleteContacts(contacts: List<Contact>) {
         MailRealm.contacts.writeBlocking { contacts.forEach { getLatestContact(it.id)?.let(::delete) } }
+    }
+
+    fun AddressBook.getContacts(): List<Contact> {
+        return MailRealm.contacts.query<Contact>("${Contact::addressBookId.name} == '$id'").find()
     }
 }
