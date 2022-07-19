@@ -119,6 +119,25 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
+    <style name="EditorIconButton" parent="IconButton">
+        <item name="cornerRadius">0dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textColor">@color/title</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="rippleColor">@color/pinkMailRipple</item>
+    </style>
+
+    <!-- Other -->
+
+    <style name="EmailAddressTextView">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <!-- Cardview -->
 
     <style name="CardViewMail" parent="Widget.MaterialComponents.CardView">

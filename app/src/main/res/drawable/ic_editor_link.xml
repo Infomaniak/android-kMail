@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="25dp"
+    android:height="25dp"
+    android:tint="@color/iconColor"
+    android:viewportWidth="25"
+    android:viewportHeight="25">
+    <path
+        android:fillColor="#666666"
+        android:pathData="M6.315,24.612C5.115,24.612 3.989,24.146 3.143,23.301L2.204,22.362C0.456,20.613 0.456,17.768 2.204,16.02L8.31,9.912C9.156,9.066 10.283,8.601 11.482,8.601C12.681,8.601 13.808,9.067 14.654,9.912L15.593,10.852C15.788,11.047 15.788,11.364 15.593,11.559C15.498,11.653 15.373,11.705 15.239,11.705C15.105,11.705 14.98,11.653 14.885,11.559L13.946,10.619C13.289,9.962 12.413,9.6 11.481,9.6C10.549,9.6 9.673,9.962 9.016,10.619L2.91,16.726C1.552,18.085 1.552,20.295 2.91,21.654L3.849,22.593C4.506,23.25 5.382,23.612 6.314,23.612C7.246,23.612 8.122,23.25 8.779,22.593L13.006,18.366C13.1,18.272 13.226,18.22 13.36,18.22C13.494,18.22 13.619,18.272 13.714,18.366C13.909,18.561 13.909,18.878 13.714,19.073L9.487,23.3C8.641,24.146 7.514,24.612 6.315,24.612Z" />
+    <path
+        android:fillColor="#666666"
+        android:pathData="M14.299,16.627C13.099,16.627 11.974,16.161 11.127,15.316C11.123,15.312 11.113,15.302 11.109,15.297L10.186,14.375C10.092,14.28 10.04,14.155 10.04,14.021C10.04,13.887 10.092,13.762 10.188,13.668C10.281,13.574 10.406,13.522 10.54,13.522C10.675,13.522 10.8,13.574 10.894,13.668L11.833,14.608C12.495,15.267 13.368,15.628 14.297,15.628C15.229,15.628 16.105,15.266 16.763,14.608L22.868,8.501C24.226,7.142 24.226,4.932 22.868,3.573L21.933,2.638C21.27,1.976 20.395,1.613 19.465,1.613C18.532,1.613 17.657,1.976 17,2.634L12.773,6.86C12.679,6.954 12.552,7.006 12.418,7.006C12.285,7.006 12.16,6.954 12.064,6.86C11.969,6.766 11.92,6.64 11.92,6.507C11.92,6.373 11.972,6.248 12.066,6.153L16.294,1.927C17.14,1.08 18.267,0.613 19.465,0.613C20.662,0.613 21.787,1.078 22.632,1.922L23.576,2.865C25.324,4.614 25.324,7.459 23.576,9.207L17.471,15.314C16.625,16.161 15.498,16.627 14.299,16.627Z" />
+</vector>

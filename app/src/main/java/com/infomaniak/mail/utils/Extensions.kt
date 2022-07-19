@@ -19,7 +19,9 @@ package com.infomaniak.mail.utils
 
 import android.app.Activity
 import android.content.Context
+import android.util.Patterns
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.day
@@ -84,5 +86,14 @@ fun View.toggleChevron(
     }
     animate().rotation(angle).setDuration(duration).start()
 }
+
+fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) {
+    if (layoutParams is ViewGroup.MarginLayoutParams) {
+        (layoutParams as ViewGroup.MarginLayoutParams).setMargins(left, top, right, bottom)
+        requestLayout()
+    }
+}
+
+fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 inline val ViewBinding.context: Context get() = root.context
