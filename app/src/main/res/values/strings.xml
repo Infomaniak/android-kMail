@@ -90,6 +90,7 @@
     <string name="contentDescriptionIconFavorite">Is favorite</string>
     <string name="contentDescriptionIconNewMail">New</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
+    <string name="contentDescriptionUserAvatar">User avatar</string>
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="emailSentSnackbar">Email sent</string>

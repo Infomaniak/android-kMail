@@ -26,7 +26,7 @@ import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmInstant
 import java.util.*
 
-// TODO Put these methods in Core
+// TODO: Put these methods in Core
 
 fun Activity.showSnackbar(
     title: Int,

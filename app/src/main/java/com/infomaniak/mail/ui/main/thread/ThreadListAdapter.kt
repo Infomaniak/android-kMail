@@ -44,7 +44,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
 
     @StringRes
     var previousSectionName: Int = -1
-    private var displaySeeAllButton = false // TODO manage this for intelligent mailbox
+    private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
 
     var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
@@ -85,13 +85,15 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
     }
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(position: Int) {
-        sectionTitle.text = itemsList[position] as String
-        sectionTitle.setTextAppearance(R.style.Callout)
-        sectionTitle.setTextColor(root.context.getColor(R.color.sectionHeaderTextColor))
+        sectionTitle.apply {
+            text = itemsList[position] as String
+            setTextAppearance(R.style.Callout)
+            setTextColor(root.context.getColor(R.color.sectionHeaderTextColor))
+        }
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton() {
-        // TODO Implement when we have intelligent mailbox
+        // TODO: Implement when we have intelligent mailbox
         // val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
         // seeAllText.text = "See all $threadsNumber"
     }

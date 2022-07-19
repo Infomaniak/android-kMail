@@ -45,5 +45,4 @@ class AddressBook : RealmObject {
     var isHidden: Boolean = false
     @SerialName("is_pending")
     var isPending: Boolean = false
-    // var categories: RealmList<Category> = realmListOf() // TODO: Add Category model
 }

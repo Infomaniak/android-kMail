@@ -64,7 +64,7 @@
                     android:maxLines="1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    tools:text="Expeditor name looooooooooooooooooooooooooooooong" />
+                    tools:text="@tools:sample/full_names" />
 
                 <ImageView
                     android:id="@+id/iconCalendar"
@@ -115,7 +115,7 @@
                     android:maxLines="1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    tools:text="default subject" />
+                    tools:text="@tools:sample/lorem/random" />
 
                 <ImageView
                     android:id="@+id/iconFavorite"
@@ -138,9 +138,9 @@
                 android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="TODO short body when api returns it"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="Body preview" />
 
         </LinearLayout>
 

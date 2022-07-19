@@ -163,7 +163,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun FragmentThreadListBinding.setupListeners() {
-        // TODO multiselection
+        // TODO: Multiselect
         // openMultiselectButton.setOnClickListener {}
 
         toolbar.setNavigationOnClickListener {
@@ -171,7 +171,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         searchViewCard.apply {
-            // TODO filterButton doesn't propagate the event to root, must display it ?
+            // TODO: FilterButton doesn't propagate the event to root, must display it?
             searchView.isGone = true
             searchViewText.isVisible = true
             filterButton.isEnabled = false
