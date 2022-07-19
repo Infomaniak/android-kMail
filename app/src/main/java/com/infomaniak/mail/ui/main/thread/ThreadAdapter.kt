@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Html
 import android.text.SpannedString
@@ -174,6 +175,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
         setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(dimension))
     }
 
+    @SuppressLint("SetTextI18n")
     private fun ItemMessageBinding.displayAttachments(attachments: List<Attachment>) {
         if (attachments.isEmpty()) {
             hideAttachments()
@@ -185,8 +187,7 @@ class ThreadAdapter : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>
                 R.plurals.attachmentQuantity,
                 attachments.size,
                 attachments.size,
-                fileSize
-            )
+            ) + " ($fileSize)"
 
             with(attachmentsChipGroup) {
                 removeAllViews()
