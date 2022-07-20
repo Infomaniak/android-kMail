@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.annotation.StringRes
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -42,6 +43,7 @@ import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -59,8 +61,8 @@ class MenuDrawerFragment : Fragment() {
         closeDrawer()
     }
 
-    private val customFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
     private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
+    private val customFoldersAdapter = FoldersAdapter(openFolder = { folderName -> openFolder(folderName) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -78,8 +80,8 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupAdapters() = with(binding) {
         addressesList.adapter = addressAdapter
-        customFoldersList.adapter = customFoldersAdapter
         defaultFoldersList.adapter = defaultFoldersAdapter
+        customFoldersList.adapter = customFoldersAdapter
     }
 
     private fun setupListener() = with(binding) {
@@ -110,6 +112,13 @@ class MenuDrawerFragment : Fragment() {
                 isVisible = !isVisible
                 expandCustomFolderButton.toggleChevron(!isVisible)
             }
+            createNewFolderButton.apply {
+                isVisible = !isVisible
+            }
+        }
+        createNewFolderButton.setOnClickListener {
+            // TODO
+            notYetImplemented()
         }
         feedbacks.setOnClickListener {
             closeDrawer()
@@ -181,17 +190,28 @@ class MenuDrawerFragment : Fragment() {
         viewModel.listenToFolders()
     }
 
+    private fun setCustomFolderCollapsedState() = with(binding) {
+        val isCollapsed = customFoldersAdapter.itemCount > 0
+        val angleResource = if (isCollapsed) R.dimen.angleViewNotRotated else R.dimen.angleViewRotated
+        val angle = ResourcesCompat.getFloat(resources, angleResource)
+        customFoldersList.isGone = isCollapsed
+        createNewFolderButton.isGone = isCollapsed
+        expandCustomFolderButton.rotation = angle
+    }
+
     private fun closeDrawer() = with(binding) {
         closeDrawer?.invoke()
         closeDropdowns()
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun closeDropdowns() = with(binding) {
+    fun closeDropdowns(): Unit = with(binding) {
         mailboxExpandedSwitcher.isGone = true
         mailboxExpandButton.rotation = 0.0f
         customFoldersList.isGone = true
+        createNewFolderButton.isGone = true
         expandCustomFolderButton.rotation = 0.0f
+        setCustomFolderCollapsedState()
     }
 
     private fun openFolder(@StringRes folderNameId: Int) {
@@ -211,14 +231,26 @@ class MenuDrawerFragment : Fragment() {
 
         defaultFoldersAdapter.setFolders(defaultFolders)
         customFoldersAdapter.setFolders(customFolders)
+
+        setCustomFolderCollapsedState()
     }
 
     private fun getMenuFolders(folders: List<Folder>): Folders {
         return folders.toMutableList().let { list ->
 
-            val inbox = list.find { it.role == FolderRole.INBOX }?.also(list::remove)
-            val defaultFolders = list.filter { it.role != null }.sortedBy { it.role?.order }.also(list::removeAll)
-            val customFolders = list.sortedByDescending { it.isFavorite }
+            val inbox = list
+                .find { it.role == FolderRole.INBOX }
+                ?.also(list::remove)
+
+            val defaultFolders = list
+                .filter { it.role != null }
+                .sortedBy { it.role?.order }
+                .also(list::removeAll)
+
+            val customFolders = list
+                .filter { it.parentLink == null }
+                .sortedByDescending { it.isFavorite }
+                .formatFoldersListWithAllChildren()
 
             Folders(inbox, defaultFolders, customFolders)
         }
