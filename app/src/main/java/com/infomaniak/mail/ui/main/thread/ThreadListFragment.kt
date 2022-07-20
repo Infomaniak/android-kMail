@@ -105,7 +105,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         setupOnRefresh()
         setupAdapter()
-        setupMenuDrawer()
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
@@ -173,16 +172,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupMenuDrawer() {
-        (activity as? MainActivity)?.binding?.let { activityBinding ->
-
-            drawerLayout = activityBinding.drawerLayout.also {
-                it.addDrawerListener(drawerListener)
-            }
-
-            menuDrawerNavigation = activityBinding.menuDrawerNavigation
-        }
-    }
+//    private fun setupMenuDrawer() {
+//        (activity as? MainActivity)?.binding?.let { activityBinding ->
+//
+//            drawerLayout = activityBinding.drawerLayout.also {
+//                it.addDrawerListener(drawerListener)
+//            }
+//
+//            menuDrawerNavigation = activityBinding.menuDrawerNavigation
+//        }
+//    }
 
     private fun setupAdapter() {
         binding.threadsList.adapter = threadListAdapter
@@ -212,7 +211,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupListeners() = with(binding) {
 
-        toolbar.setNavigationOnClickListener { drawerLayout?.open() }
+        toolbar.setNavigationOnClickListener { (activity as? MainActivity)?.binding?.drawerLayout?.open() }
 
         searchButton.setOnClickListener {
             safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
@@ -247,12 +246,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupUserAvatar() {
         AccountUtils.currentUser?.let { binding.userAvatarImage.loadAvatar(it, requireContext().imageLoader) }
-    }
-
-    override fun onDestroyView() {
-        drawerLayout?.removeDrawerListener(drawerListener)
-
-        super.onDestroyView()
     }
 
     override fun onResume() {

@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
@@ -30,6 +29,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.loadAvatar
@@ -43,7 +44,6 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapter
-import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
@@ -61,16 +61,15 @@ import com.google.android.material.R as RMaterial
 
 class MenuDrawerFragment : Fragment() {
 
-    var closeDrawer: (() -> Unit)? = null
+    var exitDrawer: (() -> Unit)? = null
     var isDrawerOpen: (() -> Boolean)? = null
 
     private val viewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
-    private val inboxFolderId: String? by lazy {
-        MailData.foldersFlow.value?.find { it.role == FolderRole.INBOX }?.id
-    }
+    private val inboxFolderId: String? by lazy { MailData.foldersFlow.value?.find { it.role == FolderRole.INBOX }?.id }
+    private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter() { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
@@ -164,17 +163,9 @@ class MenuDrawerFragment : Fragment() {
             notYetImplemented()
         }        
         getMoreStorageCardview.setOnClickListener {
-            GetMoreStorageBottomSheetDialog().show(parentFragmentManager, "GetMoreStorageBottomSheetDialog")
-        }
-    }
-
-    private fun handleOnBackPressed() {
-        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner) {
-            if (isDrawerOpen?.invoke() == true) {
-                closeDrawer()
-            } else {
-                isEnabled = false
-                activity?.onBackPressed()
+            if (canNavigate) {
+                canNavigate = false
+                findNavController().navigate(R.id.getMoreStorageBottomSheetDialog)
             }
         }
     }
@@ -183,6 +174,10 @@ class MenuDrawerFragment : Fragment() {
         inboxFolder.folderName.text = getText(R.string.inboxFolder)
         val inboxIcon = ContextCompat.getDrawable(context, R.drawable.ic_drawer_mailbox)
         inboxFolder.folderName.setCompoundDrawablesWithIntrinsicBounds(inboxIcon, null, null, null)
+    }
+
+    fun onDrawerOpened() {
+        canNavigate = true
     }
 
     private fun listenToCurrentMailbox() {
@@ -249,8 +244,8 @@ class MenuDrawerFragment : Fragment() {
         expandCustomFolderButton.rotation = angle
     }
 
-    private fun closeDrawer() = with(binding) {
-        closeDrawer?.invoke()
+    fun closeDrawer() = with(binding) {
+        exitDrawer?.invoke()
         closeDropdowns()
     }
 
