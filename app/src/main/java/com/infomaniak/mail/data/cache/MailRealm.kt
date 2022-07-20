@@ -121,9 +121,9 @@ object MailRealm {
     private object RealmConfigurations {
 
         private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
-        private val USER_INFOS_DB_NAME get() = "${AccountUtils.currentUserId}.realm"
+        private val USER_INFOS_DB_NAME get() = "User-${AccountUtils.currentUserId}.realm"
         private const val MAILBOX_INFOS_DB_NAME = "MailboxInfos.realm"
-        private fun MAILBOX_CONTENT_DB_NAME(mailboxId: Int) = "${AccountUtils.currentUserId}-${mailboxId}.realm"
+        private fun MAILBOX_CONTENT_DB_NAME(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
 
         val appSettings =
             RealmConfiguration
