@@ -62,12 +62,12 @@
         android:gravity="end">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/closeButton"
             style="@style/TextButtonPrimary.Error"
             android:text="@string/buttonClose"
             android:textColor="@color/red_error" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/availableSoon"
             style="@style/TextButtonPrimary"
             android:layout_marginStart="@dimen/marginStandardSmall"
             android:enabled="false"
