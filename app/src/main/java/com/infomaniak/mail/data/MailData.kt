@@ -213,23 +213,21 @@ object MailData {
         }
     }
 
-    private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox? {
+    private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox {
         val mailbox = with(mailboxes) {
             find { it.mailboxId == AccountUtils.currentMailboxId }
-                ?: firstOrNull()
-                ?: return null
+                ?: first()
         }
 
         selectMailbox(mailbox)
         return mailbox
     }
 
-    private fun computeFolderToSelect(folders: List<Folder>): Folder? {
+    private fun computeFolderToSelect(folders: List<Folder>): Folder {
         val folder = with(folders) {
             find { it.id == currentFolderFlow.value?.id }
                 ?: find { it.role == DEFAULT_FOLDER_ROLE }
-                ?: firstOrNull()
-                ?: return null
+                ?: first()
         }
 
         selectFolder(folder)
@@ -256,10 +254,9 @@ object MailData {
             if (realmFolders.isEmpty()) {
                 getInboxContentFromApi()
             } else {
-                computeFolderToSelect(realmFolders)?.let { selectedFolder ->
-                    getThreadsFromRealm(selectedFolder, OFFSET_FIRST_PAGE)
-                    getInboxContentFromApi()
-                }
+                val selectedFolder = computeFolderToSelect(realmFolders)
+                getThreadsFromRealm(selectedFolder, OFFSET_FIRST_PAGE)
+                getInboxContentFromApi()
             }
         }
     }
@@ -280,7 +277,7 @@ object MailData {
      */
     private fun getInboxContentFromApi() {
         val mergedMailboxes = getMailboxesFromApi()
-        val selectedMailbox = computeMailboxToSelect(mergedMailboxes) ?: return
+        val selectedMailbox = computeMailboxToSelect(mergedMailboxes)
         getFoldersFromApi(selectedMailbox)
     }
 
@@ -301,7 +298,7 @@ object MailData {
 
         mutableFoldersFlow.value = mergedFolders
 
-        val selectedFolder = computeFolderToSelect(mergedFolders) ?: return
+        val selectedFolder = computeFolderToSelect(mergedFolders)
         getThreadsFromApi(selectedFolder, mailbox, OFFSET_FIRST_PAGE)
     }
 
