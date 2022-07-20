@@ -48,6 +48,7 @@
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
     <color name="selectedAccountCardviewColor">@color/lightenedGrey</color>
+    <color name="backgroundDisabledPrimaryButton">@color/grey_text_secondary</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/title</color>

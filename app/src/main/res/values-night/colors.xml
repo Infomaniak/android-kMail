@@ -38,6 +38,7 @@
     <color name="backgroundSnackbarColor">@color/black</color>
     <color name="backgroundNewMailColor">@color/grey_title</color>
     <color name="selectedAccountCardviewColor">#1A1A1A</color>
+    <color name="backgroundDisabledPrimaryButton">@color/grey_title</color>
 
     <!-- Texts -->
     <color name="secondaryTextColor">@color/secondaryText</color>

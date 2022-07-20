@@ -42,12 +42,14 @@
         tools:ignore="ContentDescription" />
 
     <TextView
+        style="@style/Body.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardMedium"
         android:text="@string/moreStorageText1" />
 
     <TextView
+        style="@style/Body.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardMedium"
