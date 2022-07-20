@@ -85,17 +85,7 @@
         app:layout_constraintBottom_toTopOf="@id/swipeRefreshLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-        tools:text="Boite de Reception" />
-
-    <!-- TODO: Multiselect -->
-    <!--        <com.google.android.material.button.MaterialButton-->
-    <!--            android:id="@+id/openMultiselectButton"-->
-    <!--            style="@style/TextButton"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="Modifier"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@id/searchViewCard" />-->
+        tools:text="Inbox" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
