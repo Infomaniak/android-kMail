@@ -44,13 +44,14 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmList
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 object MailData {
 
@@ -112,29 +113,29 @@ object MailData {
 
     private fun loadAddressBooks(completion: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            MailRealm.readAddressBooks().collectOnce { realmAddressBooks ->
-                mutableAddressBooksFlow.value = realmAddressBooks
+            val realmAddressBooks = MailRealm.readAddressBooks().first().list.toList()
 
-                val apiAddressBooks = MailApi.fetchAddressBooks()
-                val mergedAddressBooks = mergeAddressBooks(realmAddressBooks, apiAddressBooks)
+            mutableAddressBooksFlow.value = realmAddressBooks
 
-                mutableAddressBooksFlow.value = mergedAddressBooks
+            val apiAddressBooks = MailApi.fetchAddressBooks()
+            val mergedAddressBooks = mergeAddressBooks(realmAddressBooks, apiAddressBooks)
 
-                completion()
-            }
+            mutableAddressBooksFlow.value = mergedAddressBooks
+
+            completion()
         }
     }
 
     private fun loadContacts() {
         CoroutineScope(Dispatchers.IO).launch {
-            MailRealm.readContacts().collectOnce { realmContacts ->
-                mutableContactsFlow.value = realmContacts
+            val realmContacts = MailRealm.readContacts().first().list.toList()
 
-                val apiContacts = MailApi.fetchContacts()
-                val mergedContacts = mergeContacts(realmContacts, apiContacts)
+            mutableContactsFlow.value = realmContacts
 
-                mutableContactsFlow.value = mergedContacts
-            }
+            val apiContacts = MailApi.fetchContacts()
+            val mergedContacts = mergeContacts(realmContacts, apiContacts)
+
+            mutableContactsFlow.value = mergedContacts
         }
     }
 
@@ -238,7 +239,8 @@ object MailData {
      * Read Realm
      */
     private fun getMailboxesFromRealm(completion: (List<Mailbox>) -> Unit) {
-        MailRealm.readMailboxes().collectOnce { realmMailboxes ->
+        CoroutineScope(Dispatchers.IO).launch {
+            val realmMailboxes = MailRealm.readMailboxes().first().list.toList()
 
             mutableMailboxesFlow.value = realmMailboxes
 
@@ -247,7 +249,8 @@ object MailData {
     }
 
     private fun getFoldersFromRealm() {
-        MailRealm.readFolders().collectOnce { realmFolders ->
+        CoroutineScope(Dispatchers.IO).launch {
+            val realmFolders = MailRealm.readFolders().first().list.toList()
 
             mutableFoldersFlow.value = realmFolders
 
@@ -559,16 +562,6 @@ object MailData {
     /**
      * Utils
      */
-    private fun <T : BaseRealmObject> SharedFlow<ResultsChange<T>>.collectOnce(completion: (List<T>) -> Unit) {
-        var job: Job? = null
-        job = CoroutineScope(Dispatchers.IO).launch {
-            this@collectOnce.collect {
-                completion(it.list.toList())
-                job?.cancel()
-            }
-        }
-    }
-
     private suspend fun <T> MutableStateFlow<T?>.forceRefresh() {
         value = null
         delay(1L)
