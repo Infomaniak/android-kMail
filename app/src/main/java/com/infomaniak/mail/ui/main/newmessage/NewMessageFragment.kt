@@ -39,13 +39,15 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.setMargins
+import com.infomaniak.mail.utils.toggleChevron
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -57,7 +59,7 @@ class NewMessageFragment : Fragment() {
 
     private lateinit var contactAdapter: ContactAdapter
 
-    private var mailboxes = MailboxInfoController.getMailboxesSync(AccountUtils.currentUserId)
+    private var mailboxes = MailData.mailboxesFlow.value ?: emptyList()
     private var mails = mailboxes.map { it.email }
     private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
     private var isAutocompletionOpened = false
