@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
+import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
@@ -70,7 +71,8 @@ class MenuDrawerFragment : Fragment() {
     private val inboxFolderId: String? by lazy {
         MailData.foldersFlow.value?.find { it.role == FolderRole.INBOX }?.id
     }
-    private val addressAdapter = SwitchUserMailboxesAdapter(displayIcon = false) { selectedMailbox ->
+
+    private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter() { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
         // TODO: This is not enough. It won't refresh the MenuDrawer data (ex: unread counts)
         closeDrawer()
