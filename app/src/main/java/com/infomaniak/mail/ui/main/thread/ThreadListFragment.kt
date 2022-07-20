@@ -197,13 +197,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 || dy < 0) {
+                if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 || dy <= 0) {
                     newMessageFab.extend()
                 } else {
                     newMessageFab.shrink()
                 }
+
+                super.onScrolled(recyclerView, dx, dy)
             }
         })
     }
@@ -214,8 +215,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onResume() {
         super.onResume()
-
-        binding.content.newMessageFab.shrink()
 
         listenToFolderName()
         listenToThreads()
