@@ -41,10 +41,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
-import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapter
-import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
@@ -57,7 +55,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
-import com.google.android.material.R as RMaterial
 
 class MenuDrawerFragment : Fragment() {
 
@@ -93,7 +90,6 @@ class MenuDrawerFragment : Fragment() {
         listenToCurrentMailbox()
         listenToMailboxes()
         listenToFolders()
-        initInboxButton()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -124,7 +120,7 @@ class MenuDrawerFragment : Fragment() {
             )
         }
         addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
-        inboxFolder.root.setOnClickListener {
+        inboxFolder.setOnClickListener {
             inboxFolderId?.let { openFolder(it) }
         }
         customFolders.setOnClickListener {
@@ -170,10 +166,6 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun initInboxButton() = with(binding) {
-        inboxFolder.folderName.text = getText(R.string.inboxFolder)
-        val inboxIcon = ContextCompat.getDrawable(context, R.drawable.ic_drawer_mailbox)
-        inboxFolder.folderName.setCompoundDrawablesWithIntrinsicBounds(inboxIcon, null, null, null)
     }
 
     fun onDrawerOpened() {
@@ -225,7 +217,7 @@ class MenuDrawerFragment : Fragment() {
         currentFoldersJob = lifecycleScope.launch {
             MailData.currentFolderFlow.filterNotNull().collect { currentFolder ->
                 inboxFolderId?.let {
-                    inboxFolder.selectDrawerItem(it)
+                    inboxFolder.setSelectedState(MailData.currentFolderFlow.value?.id == it)
                     if (currentFolder.role == null) setCustomFolderCollapsed(false)
                 }
                 defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
@@ -268,7 +260,7 @@ class MenuDrawerFragment : Fragment() {
 
         val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
 
-        binding.inboxFolder.folderBadge.text = inbox?.getUnreadCountOrNull()
+        binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
 
         defaultFoldersAdapter.setFolders(defaultFolders)
         customFoldersAdapter.setFolders(customFolders)
@@ -294,30 +286,6 @@ class MenuDrawerFragment : Fragment() {
                 .formatFoldersListWithAllChildren()
 
             Triple(inbox, defaultFolders, customFolders)
-        }
-    }
-
-    companion object {
-        fun ItemFolderMenuDrawerBinding.selectDrawerItem(id: String) {
-            val isSelected = MailData.currentFolderFlow.value?.id == id
-
-            val (color, textColor, textAppearance) = if (isSelected) {
-                Triple(
-                    context.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
-                    context.getAttributeColor(RMaterial.attr.colorPrimary),
-                    R.style.Body_Highlighted
-                )
-            } else {
-                Triple(
-                    ContextCompat.getColor(context, R.color.backgroundColor),
-                    ContextCompat.getColor(context, R.color.primaryTextColor),
-                    R.style.Body
-                )
-            }
-
-            root.setCardBackgroundColor(color)
-            folderName.setTextColor(textColor)
-            folderName.setTextAppearance(textAppearance)
         }
     }
 }

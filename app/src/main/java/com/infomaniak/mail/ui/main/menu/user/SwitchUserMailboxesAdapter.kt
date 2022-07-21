@@ -101,10 +101,6 @@ class SwitchUserMailboxesAdapter(
         mailboxes = newList
     }
 
-    companion object {
-        fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
-    }
-
     private class MailboxesListDiffCallback(
         private val oldList: List<Mailbox>,
         private val newList: List<Mailbox>,
