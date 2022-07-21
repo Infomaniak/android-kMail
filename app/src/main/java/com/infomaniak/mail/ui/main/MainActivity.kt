@@ -119,6 +119,13 @@ class MainActivity : ThemedActivity() {
             }
         )
 
+        window.navigationBarColor = getColor(
+            when (destination.id) {
+                R.id.threadFragment -> R.color.backgroundQuickActions
+                else -> R.color.backgroundColor
+            }
+        )
+
         // TODO: Matomo
         // with(destination) {
         //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
