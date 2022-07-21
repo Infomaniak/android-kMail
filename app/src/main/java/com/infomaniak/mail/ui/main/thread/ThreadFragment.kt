@@ -37,6 +37,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
@@ -67,6 +68,17 @@ class ThreadFragment : Fragment() {
 
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
+
+        quickActionBar.setOnItemClickListener {
+            val action = values()[it]
+            when (action) { // TODO : Replace with actual actions
+                ANSWER -> Log.e("gibran", "setupUi: ANSWER")
+                TRANSFER -> Log.e("gibran", "setupUi: TRANSFER")
+                ARCHIVE -> Log.e("gibran", "setupUi: ARCHIVE")
+                DELETE -> Log.e("gibran", "setupUi: DELETE")
+                PLUS -> Log.e("gibran", "setupUi: PLUS")
+            }
+        }
 
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(it))
@@ -116,5 +128,14 @@ class ThreadFragment : Fragment() {
 
         threadAdapter.notifyAdapter(messages.toMutableList())
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+    }
+
+    // Do not change the order of the enum, it's important
+    enum class QuickActionButton {
+        ANSWER,
+        TRANSFER,
+        ARCHIVE,
+        DELETE,
+        PLUS,
     }
 }
