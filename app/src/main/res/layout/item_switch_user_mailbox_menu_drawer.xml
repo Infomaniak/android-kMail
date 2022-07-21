@@ -15,43 +15,49 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+<com.infomaniak.mail.views.MenuDrawerItemView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/addressItemView"
-    style="@style/MenuDrawerItem">
+    android:id="@+id/emailAddress"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:indent="48dp"
+    app:textSize="@dimen/textHintSize"
+    tools:badge="99+"
+    tools:text="myriam.rais@infomaniak.com" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:layout_marginEnd="@dimen/marginStandard"
-        android:paddingVertical="@dimen/marginStandardVerySmall"
-        android:paddingStart="@dimen/marginStandardVerySmall">
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:layout_marginEnd="@dimen/marginStandard"-->
+<!--        android:paddingVertical="@dimen/marginStandardVerySmall"-->
+<!--        android:paddingStart="@dimen/marginStandardVerySmall">-->
 
-        <View
-            android:layout_width="36dp"
-            android:layout_height="36dp" />
+<!--        <View-->
+<!--            android:layout_width="36dp"-->
+<!--            android:layout_height="36dp" />-->
 
-        <TextView
-            style="@style/Callout"
-            android:id="@+id/emailAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:lineSpacingMultiplier="1"
-            android:maxLines="2"
-            app:drawableStartCompat="@null"
-            tools:text="myriam.rais@infomaniak.com" />
+<!--        <TextView-->
+<!--            style="@style/Callout"-->
+<!--            android:id="@+id/emailAddress"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginHorizontal="@dimen/marginStandardMedium"-->
+<!--            android:layout_weight="1"-->
+<!--            android:ellipsize="end"-->
+<!--            android:lineSpacingMultiplier="1"-->
+<!--            android:maxLines="2"-->
+<!--            app:drawableStartCompat="@null"-->
+<!--            tools:text="myriam.rais@infomaniak.com" />-->
 
-        <TextView
-            android:id="@+id/unreadCount"
-            style="@style/MenuDrawerBadge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="99+" />
+<!--        <TextView-->
+<!--            android:id="@+id/unreadCount"-->
+<!--            style="@style/MenuDrawerBadge"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            tools:text="99+" />-->
 
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+<!--    </LinearLayout>-->

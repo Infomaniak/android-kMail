@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.types.RealmInstant
 import java.util.*
 
@@ -84,3 +85,5 @@ fun Context.getAttributeColor(@IdRes attribute: Int): Int {
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
 }
+
+fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }

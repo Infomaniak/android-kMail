@@ -166,60 +166,32 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/marginStandardSmall" />
 
-                <com.google.android.material.card.MaterialCardView
+                <com.infomaniak.mail.views.MenuDrawerItemView
                     android:id="@+id/manageAccount"
-                    style="@style/MenuDrawerItem">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:indent="48dp"
+                    app:text="@string/buttonManageAccount" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="@dimen/marginStandardSmall"
-                        android:layout_marginEnd="@dimen/marginStandard"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_marginStart="48dp"
-                            style="@style/MenuDrawerItemText"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/buttonManageAccount"
-                            app:drawableStartCompat="@null" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
+                <com.infomaniak.mail.views.MenuDrawerItemView
                     android:id="@+id/addAccount"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="@dimen/marginStandardSmall"
-                        android:layout_marginEnd="@dimen/marginStandard"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_marginStart="48dp"
-                            style="@style/MenuDrawerItemText"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/buttonAddAccount"
-                            app:drawableStartCompat="@null" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:indent="48dp"
+                    app:text="@string/buttonAddAccount" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/marginStandardSmall" />
 
-            <include
+            <com.infomaniak.mail.views.MenuDrawerItemView
                 android:id="@+id/inboxFolder"
-                layout="@layout/item_folder_menu_drawer" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_drawer_mailbox"
+                app:text="@string/inboxFolder"
+                tools:badge="32" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
@@ -302,49 +274,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.google.android.material.card.MaterialCardView
+            <com.infomaniak.mail.views.MenuDrawerItemView
                 android:id="@+id/feedbacks"
-                style="@style/MenuDrawerItem">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_feedbacks"
+                app:text="@string/buttonFeedbacks" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        style="@style/MenuDrawerItemText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/buttonFeedbacks"
-                        app:drawableStartCompat="@drawable/ic_feedbacks" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
+            <com.infomaniak.mail.views.MenuDrawerItemView
                 android:id="@+id/help"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        style="@style/MenuDrawerItemText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/buttonHelp"
-                        app:drawableStartCompat="@drawable/ic_help" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_help"
+                app:text="@string/buttonHelp" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
@@ -360,51 +302,19 @@
                 android:paddingVertical="@dimen/marginStandardSmall"
                 android:text="@string/menuDrawerAdvancedActions" />
 
-
-            <com.google.android.material.card.MaterialCardView
+            <com.infomaniak.mail.views.MenuDrawerItemView
                 android:id="@+id/importMails"
-                style="@style/MenuDrawerItem">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_drawer_download"
+                app:text="@string/buttonImportEmails" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        style="@style/MenuDrawerItemText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/buttonImportEmails"
-                        app:drawableStartCompat="@drawable/ic_drawer_download" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <com.google.android.material.card.MaterialCardView
+            <com.infomaniak.mail.views.MenuDrawerItemView
                 android:id="@+id/restoreMails"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        style="@style/MenuDrawerItemText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/buttonRestoreEmails"
-                        app:drawableStartCompat="@drawable/ic_restore_arrow" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_restore_arrow"
+                app:text="@string/buttonRestoreEmails" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/storageDivider"
