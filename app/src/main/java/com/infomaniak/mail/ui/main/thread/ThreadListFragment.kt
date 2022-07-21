@@ -46,6 +46,7 @@ import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
@@ -122,14 +123,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         listenToThreads()
     }
 
-    private fun setupUnreadCountChip() {
-        binding.unreadCountChip.apply {
-            isCloseIconVisible = false
-            setOnCheckedChangeListener { _, isChecked ->
-                isCloseIconVisible = isChecked
+    private fun setupUnreadCountChip() = with(binding.content) {
+            unreadCountChip.apply {
+                isCloseIconVisible = false
+                setOnCheckedChangeListener { _, isChecked ->
+                    isCloseIconVisible = isChecked
+                    viewModel.filter = if (isChecked) ThreadFilter.UNSEEN else null
+                    swipeRefreshLayout.isRefreshing = true
+                    onRefresh()
+                }
             }
         }
-    }
 
     private fun setupOnRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
@@ -137,6 +141,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         currentOffset = OFFSET_FIRST_PAGE
+        isDownloadingChanges = true
         viewModel.refreshThreads()
     }
 
@@ -292,7 +297,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         isDownloadingChanges = false
         swipeRefreshLayout.isRefreshing = false
 
-        updateUnreadCount()
+        if (currentOffset == OFFSET_FIRST_PAGE) {
+            threadsList.layoutManager?.scrollToPosition(0)
+            lastUpdatedAt = Date()
+            updateUpdatedAt()
+            updateUnreadCount()
+        }
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 

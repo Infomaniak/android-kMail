@@ -49,11 +49,13 @@
         <item quantity="other">%d attachments</item>
     </plurals>
     <string name="bccTitle">Bcc:</string>
+    <string name="buttonAccept">Accept</string>
     <string name="buttonAccountAssociatedEmailAddresses">Email addresses associated with this account</string>
     <string name="buttonAccountDelete">Delete account</string>
     <string name="buttonAccountDisconnect">Disconnect account</string>
     <string name="buttonAccountSwitch">Change account</string>
     <string name="buttonAddAccount">Add an account</string>
+    <string name="buttonAddEmailAddress">Add an email address</string>
     <string name="buttonAttachment">Add an attachment</string>
     <string name="buttonAvailableSoon">Available soon</string>
     <string name="buttonBold">Bold</string>
@@ -64,7 +66,7 @@
     <string name="buttonConfirmRestoreEmails">Restore</string>
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
-    <string name="buttonCreateFolder">Create a new folder</string>
+    <string name="buttonCreateFolder">Add a folder</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
     <string name="buttonFeedbacks">Feedbacks</string>
@@ -73,11 +75,14 @@
     <string name="buttonHyperlink">Add a hyperlink</string>
     <string name="buttonImportEmails">Import emails</string>
     <string name="buttonItalic">Italic</string>
+    <string name="buttonLogInDifferentAccount">Log in with another account</string>
     <string name="buttonLogin">Login</string>
     <string name="buttonManageAccount">Manage my account</string>
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
+    <string name="buttonRefuse">Refuse</string>
+    <string name="buttonReport">Report</string>
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSeeAll">See all</string>
@@ -139,6 +144,8 @@
     <string name="newMessagePlaceholderTitle">Type your message</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
     <string name="noEmailTitle">You don’t have any emails</string>
+    <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
+    <string name="noMailboxTitle">No email address associated with this account</string>
     <string name="noNetworkDescription">Your emails may not be up to date</string>
     <string name="noNetworkTitle">No signal</string>
     <string name="noSubjectTitle">(no subject)</string>
@@ -152,22 +159,32 @@
     <string name="onBoardingTitle4">Log in and start using the kMail app now!</string>
     <string name="pendingMessagesFolder">Pending messages</string>
     <string name="refreshTokenError">Sei stato disconnesso a causa di un problema. Riconnettiti</string>
+    <string name="reportDisplayProblemDescription">Do you agree to share your data with our developers so that they can help you with your problem?</string>
+    <string name="reportDisplayProblemTitle">Report a display problem</string>
+    <string name="reportPhishingDescription">Is this message trying to steal sensitive information (password, bank details, etc.) and/or impersonate a recognised identity?\n\nBy reporting a phishing attempt, you speed up the detection of dangerous messages for all our users.\n\nThe report will be sent to our security team for analysis so that we can take the necessary measures manually. The email will also be automatically moved to your spam folder.\n\nI confirm that this email is a phishing attempt and I would like to forward it to Infomaniak for analysis.</string>
+    <string name="reportPhishingTitle">Report a phishing attempt</string>
     <string name="restoreEmailsBackupDate">Backup date</string>
     <string name="restoreEmailsText">All emails will come back to your inbox.</string>
     <string name="restoreEmailsTitle">Restore your emails</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
+    <string name="searchAllMessages">All messages</string>
+    <string name="searchFilterAttachment">Attachments</string>
+    <string name="searchFilterFolder">Folder</string>
+    <string name="searchFilterRead">Read</string>
+    <string name="searchFilterUnread">Unread</string>
     <string name="searchViewHint">Search for a message</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
     <string name="settingsAccentColorDescription">Choose the accent colour for the application</string>
+    <string name="settingsAppLock">App lock</string>
     <string name="settingsCancellationPeriodDescription">You have the possibility to cancel the sending of your email up to 30 seconds</string>
     <string name="settingsCancellationPeriodTitle">Send cancellation period</string>
-    <string name="settingsCodeLock">Code lock</string>
     <string name="settingsDefault">Default</string>
     <string name="settingsDelaySeconds">%d seconds</string>
     <string name="settingsDensityOptionCompact">Compact</string>
     <string name="settingsDensityOptionLarge">Large</string>
+    <string name="settingsDensityOptionNormal">Normal</string>
     <string name="settingsDisabled">Disabled</string>
     <string name="settingsEnabled">Enabled</string>
     <string name="settingsExternalContentTitle">Display external content</string>
@@ -186,6 +203,7 @@
     <string name="settingsOptionDiscussions">Discussions</string>
     <string name="settingsOptionLightTheme">Light</string>
     <string name="settingsOptionMessages">Messages</string>
+    <string name="settingsOptionSystemTheme">System</string>
     <string name="settingsPrivacyDeleteSearchHistory">Delete search history</string>
     <string name="settingsPrivacyViewLogs">View logs</string>
     <string name="settingsSectionAppearance">Appearance</string>
@@ -194,7 +212,10 @@
     <string name="settingsSectionPrivacy">Privacy</string>
     <string name="settingsSectionSecurity">Security</string>
     <string name="settingsSecurityAdsFilter">Ads and social networks filter</string>
+    <string name="settingsSecurityApprovedOption">Approved</string>
+    <string name="settingsSecurityBlockedOption">Blocked</string>
     <string name="settingsSecurityBlockedRecipients">Blocked / authorised recipients</string>
+    <string name="settingsSecurityBlockedRecipientsDescription">You can specify senders to approve or block for our Anti-Spam protection to process them for you.</string>
     <string name="settingsSecuritySpamFilter">Spam filter</string>
     <string name="settingsSelectDisplayModeDescription">Select a display mode</string>
     <string name="settingsSendAcknowledgement">Request an acknowledgement of receipt for every email sent</string>
@@ -222,6 +243,7 @@
     <string name="snackBarDraftDeleted">Draft deleted</string>
     <string name="snackBarDraftSaved">Draft saved</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>
+    <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarEmailCopiedToClipboard">Email address copied to the clipboard</string>
     <string name="snackbarInvalidUrl">Invalid URL</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
@@ -241,6 +263,7 @@
         <item quantity="other">%d unread</item>
     </plurals>
     <string name="threadListSectionLastWeek">Last week</string>
+    <string name="threadListSectionThisMonth">This month</string>
     <string name="threadListSectionThisWeek">This week</string>
     <string name="threadListSectionToday">Today</string>
     <string name="threadListSectionTwoWeeks">Two weeks ago</string>

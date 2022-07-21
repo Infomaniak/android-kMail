@@ -97,7 +97,9 @@ object MailRealm {
 
     fun readFolders(): SharedFlow<ResultsChange<Folder>> = MailboxContentController.getFoldersAsync().toSharedFlow()
 
-    fun readThreads(folder: Folder): List<Thread> = MailboxContentController.getFolderThreads(folder.id)
+    fun readThreads(folder: Folder, filter: Thread.ThreadFilter? = null): List<Thread> {
+        return MailboxContentController.getFolderThreads(folder.id, filter)
+    }
 
     fun readMessages(thread: Thread): List<Message> = thread.messages
 

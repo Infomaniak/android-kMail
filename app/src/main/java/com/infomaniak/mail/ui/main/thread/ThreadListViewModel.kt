@@ -35,6 +35,8 @@ class ThreadListViewModel : ViewModel() {
     val currentFolder = SingleLiveEvent<Folder?>()
     val threads = SingleLiveEvent<List<Thread>?>()
 
+    var filter: Thread.ThreadFilter? = null
+
     fun listenToCurrentFolder() {
         listenToCurrentFolderJob?.cancel()
         listenToCurrentFolderJob = viewModelScope.launch {
@@ -58,13 +60,14 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
-        MailData.loadThreads(folder, mailbox, offset)
+        MailData.loadThreads(folder, mailbox, offset, filter)
     }
 
     fun refreshThreads() {
         MailData.refreshThreads(
             folder = MailData.currentFolderFlow.value ?: return,
             mailbox = MailData.currentMailboxFlow.value ?: return,
+            filter = filter
         )
     }
 }

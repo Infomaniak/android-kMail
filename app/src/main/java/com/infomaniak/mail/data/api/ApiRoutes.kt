@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.data.models.thread.Thread
 
 object ApiRoutes {
 
@@ -47,8 +48,23 @@ object ApiRoutes {
 
     // fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
 
-    fun threads(uuid: String, folderId: String, offset: Int, filter: String?): String {
-        return "${folder(uuid, folderId)}/message?thread=on&offset=$offset&filter=$filter"
+    fun threads(
+        uuid: String,
+        folderId: String,
+        offset: Int,
+        filter: Thread.ThreadFilter? = null,
+        searchText: String? = null
+    ): String {
+        val urlSearch = searchText?.let { "&scontains=$it" } ?: ""
+        val urlAttachment = if (filter == Thread.ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
+        val urlFilter = when (filter) {
+            Thread.ThreadFilter.SEEN,
+            Thread.ThreadFilter.STARRED,
+            Thread.ThreadFilter.UNSEEN -> "&filters=${filter.name.lowercase()}"
+            else -> ""
+        }
+
+        return "${folder(uuid, folderId)}/message?thread=on&offset=$offset$urlSearch$urlAttachment$urlFilter"
     }
 
     fun quotas(mailbox: String, hostingId: Int) = "$MAIL_API/api/mailbox/quotas?mailbox=$mailbox&product_id=$hostingId"

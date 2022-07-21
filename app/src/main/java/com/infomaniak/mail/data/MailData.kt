@@ -157,13 +157,13 @@ object MailData {
         }
     }
 
-    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
-        val realmThreads = getThreadsFromRealm(folder, offset)
-        getThreadsFromApi(folder, mailbox, offset, realmThreads)
+    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int, filter: Thread.ThreadFilter? = null) {
+        val realmThreads = getThreadsFromRealm(folder, offset, filter)
+        getThreadsFromApi(folder, mailbox, offset, filter, realmThreads)
     }
 
-    fun refreshThreads(folder: Folder, mailbox: Mailbox) {
-        getThreadsFromApi(folder, mailbox, OFFSET_FIRST_PAGE, forceRefresh = true)
+    fun refreshThreads(folder: Folder, mailbox: Mailbox, filter: Thread.ThreadFilter?) {
+        getThreadsFromApi(folder, mailbox, OFFSET_FIRST_PAGE, filter, forceRefresh = true)
     }
 
     fun loadMessages(thread: Thread) {
@@ -216,10 +216,7 @@ object MailData {
     }
 
     private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox {
-        val mailbox = with(mailboxes) {
-            find { it.mailboxId == AccountUtils.currentMailboxId }
-                ?: first()
-        }
+        val mailbox = with(mailboxes) { find { it.mailboxId == AccountUtils.currentMailboxId } ?: first() }
 
         selectMailbox(mailbox)
         return mailbox
@@ -265,9 +262,10 @@ object MailData {
         }
     }
 
-    private fun getThreadsFromRealm(folder: Folder, offset: Int): List<Thread> {
-        val realmThreads = MailRealm.readThreads(folder)
+    private fun getThreadsFromRealm(folder: Folder, offset: Int, filter: Thread.ThreadFilter? = null): List<Thread> {
+        val realmThreads = MailRealm.readThreads(folder, filter)
         if (offset == OFFSET_FIRST_PAGE) mutableThreadsFlow.value = realmThreads
+
         return realmThreads
     }
 
@@ -310,11 +308,12 @@ object MailData {
         folder: Folder,
         mailbox: Mailbox,
         offset: Int,
+        filter: Thread.ThreadFilter? = null,
         realmThreads: List<Thread>? = null,
         forceRefresh: Boolean = false,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
+            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset, filter)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
@@ -516,6 +515,11 @@ object MailData {
             attachments.setRealmListValues(realmMessage.attachments)
         }
         copyToRealm(apiMessage, UpdatePolicy.ALL)
+    }
+
+    // TODO: Delete this when refactor with realm query will be done
+    fun updateFolderFlow(folder: Folder) {
+        mutableCurrentFolderFlow.value = folder
     }
 
     private fun MutableRealm.updateFolder(folder: Folder, apiThreads: List<Thread>) {

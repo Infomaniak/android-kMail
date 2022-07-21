@@ -19,7 +19,9 @@
 
 package com.infomaniak.mail.data.models.thread
 
+import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Recipient
@@ -100,12 +102,12 @@ class Thread : RealmObject {
         }
     }
 
-    // enum class ThreadFilter(@IdRes val filterNameRes: Int) {
-    enum class ThreadFilter(filterNameRes: String) { // TODO: Put these strings in strings.xml (like the `FolderRole` enum class)
-        ALL("All"),
-        SEEN("Seen"),
-        UNSEEN("Unseen"),
-        STARRED("Starred"),
-        UNSTARRED("Unstarred"),
+    enum class ThreadFilter(@IdRes val filterNameRes: Int) {
+        ALL(R.string.searchAllMessages),
+        SEEN(R.string.searchFilterRead),
+        UNSEEN(R.string.searchFilterUnread),
+        STARRED(R.string.favoritesFolder),
+        ATTACHMENTS(R.string.searchFilterAttachment),
+        FOLDER(R.string.searchFilterFolder)
     }
 }
