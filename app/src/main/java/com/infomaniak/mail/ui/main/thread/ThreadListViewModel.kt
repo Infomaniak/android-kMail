@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
@@ -39,6 +40,9 @@ class ThreadListViewModel : ViewModel() {
     var lastFolderRole: Folder.FolderRole? = null
     var lastUnreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
     var filter: Thread.ThreadFilter? = null
+
+    var currentOffset = OFFSET_FIRST_PAGE
+    var isDownloadingChanges = false
 
     fun listenToCurrentFolder() {
         listenToCurrentFolderJob?.cancel()
@@ -67,10 +71,12 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun refreshThreads() {
+        currentOffset = OFFSET_FIRST_PAGE
+        isDownloadingChanges = true
         MailData.refreshThreads(
-            folder = MailData.currentFolderFlow.value ?: return,
-            mailbox = MailData.currentMailboxFlow.value ?: return,
-            filter = filter
+            MailData.currentFolderFlow.value ?: return,
+            MailData.currentMailboxFlow.value ?: return,
+            filter
         )
     }
 }
