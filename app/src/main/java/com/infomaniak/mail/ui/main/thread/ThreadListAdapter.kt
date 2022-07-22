@@ -38,6 +38,7 @@ import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toDate
+import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.isValid
 import java.util.*
 
@@ -101,6 +102,8 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
     }
 
     private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
+        if (!isValid()) return
+
         expeditor.text = from.first().run { if (name.isNullOrEmpty()) email else name }
         mailSubject.text = subject.getFormattedThreadSubject(context)
 

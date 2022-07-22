@@ -58,8 +58,9 @@ object MailboxContentController {
 
     fun upsertFolder(folder: Folder): Folder = MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
 
-    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
+    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit): Folder? {
         MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
+        return getFolder(id)
     }
 
     // fun deleteFolder(id: String) {

@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
@@ -58,18 +57,8 @@ object MailApi {
         val apiResponse = ApiRepository.getThreads(mailboxUuid, folder.id, offset, filter)
 
         return apiResponse.data?.also { threadResult ->
-            currentFolderFlow.value?.let { folder -> updateCurrentFolderCounts(folder, threadResult) }
+            currentFolderFlow.value?.let { folder -> MailData.updateCurrentFolderCounts(folder, threadResult) }
         }?.threads?.map { it.initLocalValues() }
-    }
-
-    private fun updateCurrentFolderCounts(folder: Folder, threadResult: ThreadsResult) {
-        MailboxContentController.updateFolder(folder.id) {
-            it.unreadCount = threadResult.folderUnseenMessage
-            it.totalCount = threadResult.totalMessagesCount
-        }
-        // TODO: update mutableCurrentFolderFlow, waiting for realm query refactor
-        // Delete this after refactor
-        MailData.updateFolderFlow(folder)
     }
 
     fun fetchMessages(thread: Thread): List<Message> {

@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
@@ -140,13 +141,13 @@ object MailData {
         }
     }
 
-    fun loadInboxContent() {
+    fun loadMailboxContent(filter: Thread.ThreadFilter? = null) {
         getMailboxesFromRealm { realmMailboxes ->
             if (realmMailboxes.isEmpty()) {
-                getInboxContentFromApi()
+                getMailboxContentFromApi(filter)
             } else {
                 computeMailboxToSelect(realmMailboxes)
-                getFoldersFromRealm()
+                getFoldersFromRealm(filter)
             }
         }
     }
@@ -200,6 +201,13 @@ object MailData {
         }
     }
 
+    fun updateCurrentFolderCounts(folder: Folder, threadResult: ThreadsResult) {
+        mutableCurrentFolderFlow.value = MailboxContentController.updateFolder(folder.id) {
+            it.unreadCount = threadResult.folderUnseenMessage
+            it.totalCount = threadResult.totalMessagesCount
+        }
+    }
+
     fun selectThread(thread: Thread) {
         if (thread.uid != currentThreadFlow.value?.uid) {
             mutableCurrentThreadFlow.value = thread
@@ -217,8 +225,8 @@ object MailData {
 
     private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox {
         val mailbox = with(mailboxes) { find { it.mailboxId == AccountUtils.currentMailboxId } ?: first() }
-
         selectMailbox(mailbox)
+
         return mailbox
     }
 
@@ -246,18 +254,18 @@ object MailData {
         }
     }
 
-    private fun getFoldersFromRealm() {
+    private fun getFoldersFromRealm(filter: Thread.ThreadFilter?) {
         CoroutineScope(Dispatchers.IO).launch {
             val realmFolders = MailRealm.readFolders().first().list
 
             mutableFoldersFlow.value = realmFolders
 
             if (realmFolders.isEmpty()) {
-                getInboxContentFromApi()
+                getMailboxContentFromApi(filter)
             } else {
                 val selectedFolder = computeFolderToSelect(realmFolders)
                 getThreadsFromRealm(selectedFolder, OFFSET_FIRST_PAGE)
-                getInboxContentFromApi()
+                getMailboxContentFromApi(filter)
             }
         }
     }
@@ -277,10 +285,10 @@ object MailData {
     /**
      * Fetch API
      */
-    private fun getInboxContentFromApi() {
+    private fun getMailboxContentFromApi(filter: Thread.ThreadFilter?) {
         val mergedMailboxes = getMailboxesFromApi()
         val selectedMailbox = computeMailboxToSelect(mergedMailboxes)
-        getFoldersFromApi(selectedMailbox)
+        getFoldersFromApi(selectedMailbox, filter)
     }
 
     private fun getMailboxesFromApi(): List<Mailbox> {
@@ -293,7 +301,7 @@ object MailData {
         return mergedMailboxes
     }
 
-    private fun getFoldersFromApi(mailbox: Mailbox) {
+    private fun getFoldersFromApi(mailbox: Mailbox, filter: Thread.ThreadFilter?) {
         val realmFolders = mutableFoldersFlow.value
         val apiFolders = MailApi.fetchFolders(mailbox)
         val mergedFolders = mergeFolders(realmFolders, apiFolders)
@@ -301,7 +309,7 @@ object MailData {
         mutableFoldersFlow.value = mergedFolders
 
         val selectedFolder = computeFolderToSelect(mergedFolders)
-        getThreadsFromApi(selectedFolder, mailbox, OFFSET_FIRST_PAGE)
+        getThreadsFromApi(selectedFolder, mailbox, OFFSET_FIRST_PAGE, filter)
     }
 
     private fun getThreadsFromApi(
@@ -515,11 +523,6 @@ object MailData {
             attachments.setRealmListValues(realmMessage.attachments)
         }
         copyToRealm(apiMessage, UpdatePolicy.ALL)
-    }
-
-    // TODO: Delete this when refactor with realm query will be done
-    fun updateFolderFlow(folder: Folder) {
-        mutableCurrentFolderFlow.value = folder
     }
 
     private fun MutableRealm.updateFolder(folder: Folder, apiThreads: List<Thread>) {

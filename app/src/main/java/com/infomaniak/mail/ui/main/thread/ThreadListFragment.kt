@@ -143,6 +143,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges = true
         viewModel.refreshThreads()
+        scrollToTop()
     }
 
     private fun startPeriodicRefreshJob() {
@@ -165,11 +166,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         updatedAt.text = getString(R.string.threadListHeaderLastUpdate, ago)
     }
 
-    private fun updateUnreadCount() = with(binding.unreadCountChip) {
-        // TODO: Fetch folder again to update it.
-        val unreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
-        text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
-        isVisible = unreadCount > 0
+    private fun updateUnreadCount(unreadCount: Int) = with(binding) {
+        if (unreadCount == 0 && viewModel.lastUnreadCount > 0 && viewModel.filter != null) {
+            swipeRefreshLayout.isRefreshing = true
+            clearFilter()
+            onRefresh()
+        }
+        viewModel.lastUnreadCount = unreadCount
+        unreadCountChip.text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
+        unreadCountChip.isVisible = unreadCount > 0
     }
 
     private fun setupMenuDrawer() {
@@ -262,10 +267,22 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupMenuDrawerCallbacks()
 
         currentOffset = OFFSET_FIRST_PAGE
+        binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
         viewModel.loadMailData()
     }
 
-    private fun setupMenuDrawerCallbacks() {
+    private fun resetList() {
+        clearFilter()
+        scrollToTop()
+    }
+
+    private fun clearFilter() = with(binding.unreadCountChip) {
+        viewModel.filter = null
+        isChecked = false
+        isCloseIconVisible = false
+    }
+
+private fun setupMenuDrawerCallbacks() {
         val fragmentContainer = (activity as? MainActivity)?.binding?.menuDrawerFragment ?: return
         (fragmentContainer.getFragment() as? MenuDrawerFragment)
             ?.apply {
@@ -281,10 +298,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         viewModel.listenToCurrentFolder()
     }
 
-    private fun displayFolderName(folder: Folder) = with(binding) {
+    private fun updateFolderInfo(folder: Folder) = with(binding) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
         toolbar.title = folderName
+        updateUnreadCount(folder.unreadCount)
     }
 
     private fun listenToThreads() {
@@ -298,10 +316,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         swipeRefreshLayout.isRefreshing = false
 
         if (currentOffset == OFFSET_FIRST_PAGE) {
-            threadsList.layoutManager?.scrollToPosition(0)
             lastUpdatedAt = Date()
             updateUpdatedAt()
-            updateUnreadCount()
         }
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
@@ -324,6 +340,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun closeDrawer() {
         drawerLayout?.let { drawer -> menuDrawerNavigation?.let(drawer::closeDrawer) }
+    }
+
+
+    private fun scrollToTop() {
+        binding.content.threadsList.layoutManager?.scrollToPosition(0)
     }
 
     private fun downloadThreads() {

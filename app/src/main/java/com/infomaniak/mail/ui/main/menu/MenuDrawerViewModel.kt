@@ -69,6 +69,6 @@ class MenuDrawerViewModel : ViewModel() {
 
     fun switchToMailbox(mailbox: Mailbox) {
         MailData.selectMailbox(mailbox)
-        MailData.loadInboxContent()
+        MailData.loadMailboxContent()
     }
 }
