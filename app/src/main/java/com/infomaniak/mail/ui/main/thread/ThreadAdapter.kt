@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Html
 import android.text.SpannedString
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -36,17 +37,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.infomaniak.lib.core.utils.FormatterFileSize
+import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.toDate
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.*
+import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
@@ -65,20 +66,87 @@ class ThreadAdapter(
 
     override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
-        root.setOnClickListener(null)
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
-        if (!message.isExpanded) {
-            root.setOnClickListener {
-                if (message.isDraft) {
-                    onDraftClicked?.invoke(message)
+
+        loadBody(message.body)
+        handleHeaderClick(message)
+        displayMyHeader(message)
+        displayExpandedCollapsedMessage(message)
+    }
+
+    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
+        setHeaderState(message)
+        webViewFrameLayout.isVisible = message.isExpanded
+    }
+
+    private fun ItemMessageBinding.setHeaderState(message: Message) = with(message) {
+        deleteDraftButton.apply {
+            isVisible = isDraft
+            setOnClickListener { onDeleteDraftClicked?.invoke(this@with) }
+        }
+        replyButton.apply {
+            isVisible = isExpanded
+            setOnClickListener { /*TODO*/ }
+        }
+        menuButton.apply {
+            isVisible = isExpanded
+            setOnClickListener { /*TODO*/ }
+        }
+
+        recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject
+        recipientChevron.isVisible = isExpanded
+        recipientOverlayedButton.isVisible = isExpanded
+    }
+
+    private fun ItemMessageBinding.displayMyHeader(message: Message) {
+        if (message.isDraft) {
+            userAvatarImage.loadAvatar(AccountUtils.currentUser!!)
+            expeditorName.apply {
+                text = context.getString(R.string.messageIsDraftOption)
+                setTextColor(context.getColor(R.color.draftTextColor))
+            }
+            messageDate.text = ""
+        } else {
+            val firstSender = message.from.first()
+            userAvatarImage.loadAvatar(firstSender.email.hashCode(), null, firstSender.name?.firstOrEmpty().toString())
+            expeditorName.apply {
+                text = firstSender.displayedName(context)
+                setTextColor(context.getColor(R.color.primaryTextColor))
+            }
+            messageDate.text = message.date?.let { mailFormattedDate(it.toDate()) } ?: ""
+        }
+
+        recipientOverlayedButton.setOnClickListener {
+            recipientChevron.toggleChevron(false)
+            Log.e("gibran", "displayExpandedHeader: Displaying details")
+        }
+    }
+
+    private fun mailFormattedDate(date: Date): CharSequence = with(date) {
+        return format(
+            when {
+                isToday() -> FORMAT_EMAIL_DATE_TODAY
+                isYesterday() -> FORMAT_EMAIL_DATE_YESTERDAY
+                isThisYear() -> FORMAT_EMAIL_DATE_THIS_YEAR
+                else -> FORMAT_EMAIL_DATE_PAST_YEAR
+            }
+        )
+    }
+
+    private fun ItemMessageBinding.handleHeaderClick(message: Message) = with(message) {
+        messageHeader.setOnClickListener {
+            if (isExpanded) {
+                isExpanded = false
+                displayExpandedCollapsedMessage(this@with)
+            } else {
+                if (isDraft) {
+                    onDraftClicked?.invoke(this@with)
                 } else {
-                    message.isExpanded = true
-                    displayMessage(message)
+                    isExpanded = true
+                    displayExpandedCollapsedMessage(this@with)
                 }
             }
         }
-
-        displayMessage(message)
     }
 
     fun removeMessage(message: Message) {
@@ -94,12 +162,13 @@ class ThreadAdapter(
 
     fun lastIndex() = messageList.lastIndex
 
+
     private fun ItemMessageBinding.displayMessage(message: Message) = with(message) {
         displayHeader(message)
         hideAttachments()
         if (isExpanded) {
             displayAttachments(attachments)
-            displayBody(body)
+            loadBody(body)
         }
     }
 
@@ -109,7 +178,7 @@ class ThreadAdapter(
             setOnClickListener { onDeleteDraftClicked?.invoke(message) }
         }
 
-        messageDate.text = if (isDraft) "" else date?.toDate()?.format(FORMAT_EMAIL_DATE)
+        messageDate.text = if (isDraft) "" else date?.toDate()?.format(FORMAT_EMAIL_DATE_SIMPLIFIED)
 
         expeditorName.apply {
             setTextColor(context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
@@ -120,15 +189,10 @@ class ThreadAdapter(
             }
         }
 
-        expandHeaderButton.isVisible = isExpanded
         webViewFrameLayout.isVisible = isExpanded
         recipient.text = if (isExpanded) formatRecipientsName(message) else Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
-        expeditorEmail.text = if (isExpanded) from.first().email else ""
 
-        if (isExpanded) {
-            messageHeader.addExpandHeaderListener(this@displayHeader, message)
-            expandHeaderButton.addExpandHeaderListener(this@displayHeader, message)
-        }
+        if (isExpanded) messageHeader.addExpandHeaderListener(this@displayHeader, message)
     }
 
     private fun ItemMessageBinding.formatRecipientsName(message: Message): SpannedString = with(message) {
@@ -162,9 +226,6 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.expandHeader(message: Message) = with(message) {
-
-        expeditorEmail.isVisible = isExpandedHeaderMode
-        expandHeaderButton.toggleChevron(!message.isExpandedHeaderMode)
         recipient.maxLines = if (isExpandedHeaderMode) Int.MAX_VALUE else 1
         recipient.changeSize(if (isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
 
@@ -227,7 +288,7 @@ class ThreadAdapter(
         return chip.apply { text = attachmentName }
     }
 
-    private fun ItemMessageBinding.displayBody(body: Body?) {
+    private fun ItemMessageBinding.loadBody(body: Body?) {
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
@@ -263,7 +324,14 @@ class ThreadAdapter(
     }
 
     private companion object {
-        const val FORMAT_EMAIL_DATE = "d MMM yyyy, HH:mm"
+        const val FORMAT_EMAIL_DATE_DETAILED = "d MMM yyyy, HH:mm"
+        const val FORMAT_EMAIL_DATE_SIMPLIFIED = "d MMM HH:mm"
+
+        const val FORMAT_EMAIL_DATE_TODAY = "HH:mm"
+        const val FORMAT_EMAIL_DATE_YESTERDAY = "yesterday, $FORMAT_EMAIL_DATE_TODAY"
+        const val FORMAT_EMAIL_DATE_THIS_YEAR = "d MMM HH:mm"
+        const val FORMAT_EMAIL_DATE_PAST_YEAR = "d MMM yyyy, HH:mm"
+
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
     }
 }

@@ -157,6 +157,7 @@
     <style name="CardViewMail" parent="Widget.Material3.CardView.Filled">
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="cardCornerRadius">0dp</item>
+        <item name="rippleColor">?attr/colorControlHighlight</item>
         <item name="cardElevation">0dp</item> <!-- Shadow remove feature, awaiting approve -->
     </style>
 
