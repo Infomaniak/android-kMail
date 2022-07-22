@@ -35,6 +35,7 @@
         app:cornerRadius="10dp"
         app:iconGravity="textTop"
         app:iconSize="24dp"
+        app:iconTint="?android:attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/button2"
         app:layout_constraintStart_toStartOf="parent"
