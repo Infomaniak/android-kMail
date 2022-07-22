@@ -47,6 +47,13 @@ fun Date.toRealmInstant(): RealmInstant {
 
 fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }
 
+fun Date.isYesterday(): Boolean {
+    val yesterday = Calendar.getInstance().apply { add(Calendar.DATE, -1) }.time
+    return year() == yesterday.year() && month() == yesterday.month() && day() == yesterday.day()
+}
+
+fun Date.isThisYear(): Boolean = Date().let { now -> year() == now.year() }
+
 fun View.toggleChevron(
     isCollapsed: Boolean,
     collapsedAngle: Float? = null,
