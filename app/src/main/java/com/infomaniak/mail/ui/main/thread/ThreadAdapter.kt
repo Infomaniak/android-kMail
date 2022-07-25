@@ -35,7 +35,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.format
@@ -69,14 +68,31 @@ class ThreadAdapter(
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
         loadBody(message.body)
+        initHeader(message)
+        initAttachment(message.attachments)
+
         handleHeaderClick(message)
-        displayMyHeader(message)
+
         displayExpandedCollapsedMessage(message)
     }
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
         setHeaderState(message)
+        if (message.isExpanded) displayAttachments(message.attachments) else hideAttachments()
         webViewFrameLayout.isVisible = message.isExpanded
+    }
+
+    private fun ItemMessageBinding.initAttachment(attachments: List<Attachment>) {
+        val fileSize = formatAttachmentFileSize(attachments)
+        attachmentsSizeText.text = context.resources.getQuantityString(
+            R.plurals.attachmentQuantity,
+            attachments.size,
+            attachments.size,
+        ) + " ($fileSize)"
+        attachmentsRecyclerView.adapter = AttachmentAdapter(attachments)
+        attachmentsDownloadAllButton.setOnClickListener {
+            // TODO: AttachmentsList Fragment
+        }
     }
 
     private fun ItemMessageBinding.setHeaderState(message: Message) = with(message) {
@@ -98,7 +114,7 @@ class ThreadAdapter(
         recipientOverlayedButton.isVisible = isExpanded
     }
 
-    private fun ItemMessageBinding.displayMyHeader(message: Message) {
+    private fun ItemMessageBinding.initHeader(message: Message) {
         if (message.isDraft) {
             userAvatarImage.loadAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
@@ -108,7 +124,7 @@ class ThreadAdapter(
             messageDate.text = ""
         } else {
             val firstSender = message.from.first()
-            userAvatarImage.loadAvatar(firstSender.email.hashCode(), null, firstSender.name?.firstOrEmpty().toString())
+            userAvatarImage.loadAvatar(firstSender.email.hashCode(), null, firstSender.getNameOrEmail().firstOrEmpty().uppercase())
             expeditorName.apply {
                 text = firstSender.displayedName(context)
                 setTextColor(context.getColor(R.color.primaryTextColor))
@@ -240,40 +256,22 @@ class ThreadAdapter(
 
     @SuppressLint("SetTextI18n")
     private fun ItemMessageBinding.displayAttachments(attachments: List<Attachment>) {
-        if (attachments.isEmpty()) {
-            hideAttachments()
-        } else {
-            showAttachments()
-
-            val fileSize = formatAttachmentFileSize(attachments)
-            attachmentsSizeText.text = context.resources.getQuantityString(
-                R.plurals.attachmentQuantity,
-                attachments.size,
-                attachments.size,
-            ) + " ($fileSize)"
-
-            with(attachmentsChipGroup) {
-                removeAllViews()
-                attachments.forEach { addView(createChip(it.name)) }
-            }
-
-            attachmentsDownloadAllButton.setOnClickListener {
-                // TODO: AttachmentsList Fragment
-            }
-        }
+        if (attachments.isEmpty()) hideAttachments() else showAttachments()
     }
 
     private fun ItemMessageBinding.hideAttachments() {
         attachmentsGroup.isGone = true
-        attachmentsScrollView.isGone = true
+        attachmentsRecyclerView.isGone = true
     }
 
     private fun ItemMessageBinding.showAttachments() {
         attachmentsGroup.isVisible = true
-        attachmentsScrollView.isVisible = true
+        attachmentsRecyclerView.isVisible = true
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
+        if (attachments.isEmpty()) return ""
+
         val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
             attachment.size.toLong()
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
@@ -281,12 +279,12 @@ class ThreadAdapter(
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ItemMessageBinding.createChip(attachmentName: String): Chip {
-        val layoutInflater = LayoutInflater.from(context)
-        val chip = layoutInflater.inflate(R.layout.chip_attachment, attachmentsChipGroup, false) as Chip
-
-        return chip.apply { text = attachmentName }
-    }
+//    private fun ItemMessageBinding.createChip(attachmentName: String): Chip {
+//        val layoutInflater = LayoutInflater.from(context)
+//        val chip = layoutInflater.inflate(R.layout.chip_attachment, attachmentsChipGroup, false) as Chip
+//
+//        return chip.apply { text = attachmentName }
+//    }
 
     private fun ItemMessageBinding.loadBody(body: Body?) {
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
