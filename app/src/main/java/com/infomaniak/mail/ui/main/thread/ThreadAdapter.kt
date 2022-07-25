@@ -17,11 +17,11 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.animation.LayoutTransition
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Html
 import android.text.SpannedString
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -49,6 +49,7 @@ import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
+
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
@@ -67,20 +68,30 @@ class ThreadAdapter(
         val message = messageList[position]
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
+        (root as ViewGroup).layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+
         loadBody(message.body)
         initHeader(message)
         initAttachment(message.attachments)
-
-        handleHeaderClick(message)
 
         displayExpandedCollapsedMessage(message)
     }
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
+//        root.doNotAnimate {
+        collapseMessageDetails(message)
+//        }
         setHeaderState(message)
         if (message.isExpanded) displayAttachments(message.attachments) else hideAttachments()
         webViewFrameLayout.isVisible = message.isExpanded
     }
+
+//    private fun View.doNotAnimate(body: () -> Unit) {
+//        val lt = (this as ViewGroup).layoutTransition
+//        lt.disableTransitionType(LayoutTransition.CHANGING)
+//        body()
+//        lt.enableTransitionType(LayoutTransition.CHANGING)
+//    }
 
     private fun ItemMessageBinding.initAttachment(attachments: List<Attachment>) {
         val fileSize = formatAttachmentFileSize(attachments)
@@ -114,40 +125,85 @@ class ThreadAdapter(
         recipientOverlayedButton.isVisible = isExpanded
     }
 
+    private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
+        message.detailsAreExpanded = false
+        ccGroup.isGone = true
+        detailedFieldsGroup.isGone = true
+        recipientChevron.rotation = 0f
+    }
+
     private fun ItemMessageBinding.initHeader(message: Message) {
+        val messageDate = message.date?.toDate()
+
         if (message.isDraft) {
             userAvatarImage.loadAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
                 text = context.getString(R.string.messageIsDraftOption)
                 setTextColor(context.getColor(R.color.draftTextColor))
             }
-            messageDate.text = ""
+            shortMessageDate.text = ""
         } else {
             val firstSender = message.from.first()
-            userAvatarImage.loadAvatar(firstSender.email.hashCode(), null, firstSender.getNameOrEmail().firstOrEmpty().uppercase())
+            userAvatarImage.loadAvatar(
+                firstSender.email.hashCode(),
+                null,
+                firstSender.getNameOrEmail().firstOrEmpty().uppercase()
+            )
             expeditorName.apply {
                 text = firstSender.displayedName(context)
                 setTextColor(context.getColor(R.color.primaryTextColor))
             }
-            messageDate.text = message.date?.let { mailFormattedDate(it.toDate()) } ?: ""
+            shortMessageDate.text = messageDate?.let { context.mailFormattedDate(it) } ?: ""
         }
 
+        handleHeaderClick(message)
+        handleExpandDetailsClick(message)
+        bindRecipientDetails(message, messageDate)
+    }
+
+    private fun ItemMessageBinding.bindRecipientDetails(message: Message, messageDate: Date?) {
+        fromRecyclerView.adapter = DetailedRecipientAdapter(message.from.toList())
+        toRecyclerView.adapter = DetailedRecipientAdapter(message.to.toList())
+
+        val ccIsNotEmpty = !message.cc.isEmpty()
+        ccGroup.isVisible = ccIsNotEmpty
+        if (ccIsNotEmpty) ccRecyclerView.adapter = DetailedRecipientAdapter(message.cc.toList())
+
+        val dateNotNull = messageDate != null
+        detailedMessageDate.isVisible = dateNotNull
+        detailedMessagePrefix.isVisible = dateNotNull
+        if (dateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
+    }
+
+    private fun ItemMessageBinding.handleExpandDetailsClick(message: Message) {
         recipientOverlayedButton.setOnClickListener {
-            recipientChevron.toggleChevron(false)
-            Log.e("gibran", "displayExpandedHeader: Displaying details")
+            message.detailsAreExpanded = !message.detailsAreExpanded
+            val isExpanded = message.detailsAreExpanded
+            recipientChevron.toggleChevron(!isExpanded)
+            detailedFieldsGroup.isVisible = isExpanded
+            ccGroup.isVisible = isExpanded && !message.cc.isEmpty()
         }
     }
 
-    private fun mailFormattedDate(date: Date): CharSequence = with(date) {
-        return format(
-            when {
-                isToday() -> FORMAT_EMAIL_DATE_TODAY
-                isYesterday() -> FORMAT_EMAIL_DATE_YESTERDAY
-                isThisYear() -> FORMAT_EMAIL_DATE_THIS_YEAR
-                else -> FORMAT_EMAIL_DATE_PAST_YEAR
-            }
-        )
+    private fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
+        return when {
+            isToday() -> format(FORMAT_EMAIL_DATE_HOUR)
+            isYesterday() -> getString(
+                R.string.messageDetailsDateAt,
+                getString(R.string.messageDetailsYesterday),
+                format(FORMAT_EMAIL_DATE_HOUR)
+            )
+            isThisYear() -> getString(
+                R.string.messageDetailsDateAt,
+                format(FORMAT_EMAIL_DATE_SHORT_DATE),
+                format(FORMAT_EMAIL_DATE_HOUR)
+            )
+            else -> this@mailFormattedDate.mostDetailedDate(this@with)
+        }
     }
+
+    private fun Context.mostDetailedDate(date: Date) =
+        getString(R.string.messageDetailsDateAt, date.format(FORMAT_EMAIL_DATE_LONG_DATE), date.format(FORMAT_EMAIL_DATE_HOUR))
 
     private fun ItemMessageBinding.handleHeaderClick(message: Message) = with(message) {
         messageHeader.setOnClickListener {
@@ -194,7 +250,7 @@ class ThreadAdapter(
             setOnClickListener { onDeleteDraftClicked?.invoke(message) }
         }
 
-        messageDate.text = if (isDraft) "" else date?.toDate()?.format(FORMAT_EMAIL_DATE_SIMPLIFIED)
+//        shortMessageDate.text = if (isDraft) "" else date?.toDate()?.format(FORMAT_EMAIL_DATE_SIMPLIFIED)
 
         expeditorName.apply {
             setTextColor(context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
@@ -322,13 +378,9 @@ class ThreadAdapter(
     }
 
     private companion object {
-        const val FORMAT_EMAIL_DATE_DETAILED = "d MMM yyyy, HH:mm"
-        const val FORMAT_EMAIL_DATE_SIMPLIFIED = "d MMM HH:mm"
-
-        const val FORMAT_EMAIL_DATE_TODAY = "HH:mm"
-        const val FORMAT_EMAIL_DATE_YESTERDAY = "yesterday, $FORMAT_EMAIL_DATE_TODAY"
-        const val FORMAT_EMAIL_DATE_THIS_YEAR = "d MMM HH:mm"
-        const val FORMAT_EMAIL_DATE_PAST_YEAR = "d MMM yyyy, HH:mm"
+        const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
+        const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
+        const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
 
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
     }
