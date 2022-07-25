@@ -187,6 +187,32 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/headerDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        app:dividerColor="@color/separatorColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/messageHeader" />
+
+
+    <!-- TODO: See with UI/UX if we really handle attachments preview -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attachmentsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="@dimen/marginStandardMedium"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerDivider"
+        tools:listitem="@layout/item_attachment" />
+
 
     <ImageView
         android:id="@+id/attachmentsIcon"
@@ -205,12 +231,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-        android:layout_marginTop="@dimen/marginStandard"
-        android:layout_marginBottom="@dimen/marginStandardSmall"
-        app:layout_constraintBottom_toTopOf="@id/attachmentsScrollView"
         app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
         app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
-        app:layout_constraintTop_toBottomOf="@id/messageHeader"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
         tools:text="4 pièces jointes (3 MB)" />
 
     <com.google.android.material.button.MaterialButton
@@ -218,50 +241,41 @@
         style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="0dp"
         android:text="@string/buttonDownloadAll"
         app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
         app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
         app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/attachmentsDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        app:dividerColor="@color/separatorColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsSizeText" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/attachmentsGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton"
+        app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton,attachmentsDivider,headerDivider"
         tools:visibility="visible" />
-
-    <!-- TODO: See with UI/UX if we really handle attachments preview -->
-    <HorizontalScrollView
-        android:id="@+id/attachmentsScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbarSize="1dp"
-        android:scrollbarThumbHorizontal="@color/accent"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/webViewFrameLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsSizeText"
-        tools:visibility="visible">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/attachmentsChipGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:singleLine="true" />
-
-    </HorizontalScrollView>
 
     <FrameLayout
         android:id="@+id/webViewFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginVertical="@dimen/marginStandardMedium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/attachmentsScrollView"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsDivider"
         tools:visibility="visible">
 
         <WebView

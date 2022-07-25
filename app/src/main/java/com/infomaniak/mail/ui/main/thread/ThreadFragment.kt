@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -43,6 +44,7 @@ import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
@@ -81,7 +83,9 @@ class ThreadFragment : Fragment() {
         }
 
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(it))
+            val margin = resources.getDimensionPixelSize(RCore.dimen.marginStandardSmall)
+            val divider = InsetDrawable(it, margin, 0, margin, 0)
+            messagesList.addItemDecoration(DividerItemDecorator(divider))
         }
     }
 
