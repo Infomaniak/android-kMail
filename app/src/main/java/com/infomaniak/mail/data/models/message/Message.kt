@@ -99,6 +99,8 @@ class Message : RealmObject {
     var isExpanded = false
     @Ignore
     var isExpandedHeaderMode = false
+    @Ignore
+    var detailsAreExpanded = false
 
     fun initLocalValues(): Message {
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects

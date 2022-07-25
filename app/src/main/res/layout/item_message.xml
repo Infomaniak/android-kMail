@@ -69,7 +69,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 app:layout_constrainedWidth="true"
-                app:layout_constraintEnd_toStartOf="@id/messageDate"
+                app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toEndOf="@id/userAvatar"
@@ -138,7 +138,7 @@
                 app:layout_constraintTop_toTopOf="@id/recipientLayout" />
 
             <TextView
-                android:id="@+id/messageDate"
+                android:id="@+id/shortMessageDate"
                 style="@style/Callout.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -187,16 +187,116 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <TextView
+        android:id="@+id/fromPrefix"
+        style="@style/Callout.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:text="@string/fromTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/messageHeader" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fromRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/fromPrefix"
+        tools:itemCount="2"
+        tools:listitem="@layout/item_detailed_contact" />
+
+    <TextView
+        android:id="@+id/toPrefix"
+        style="@style/Callout.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:text="@string/toTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fromRecyclerView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/toRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/toPrefix"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_detailed_contact" />
+
+    <TextView
+        android:id="@+id/ccPrefix"
+        style="@style/Callout.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:text="@string/ccTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toRecyclerView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ccRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/ccPrefix"
+        tools:itemCount="2"
+        tools:listitem="@layout/item_detailed_contact" />
+
+    <ImageView
+        android:id="@+id/detailedMessagePrefix"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintBottom_toTopOf="@id/headerDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ccRecyclerView"
+        app:tint="@color/secondaryTextColor"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/detailedMessageDate"
+        style="@style/Callout.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
+        tools:text="10 juin 2022, 16:36" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/prefixBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="right"
+        app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,detailedMessagePrefix" />
+
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/headerDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
         app:dividerColor="@color/separatorColor"
+        app:layout_constraintBottom_toTopOf="@id/attachmentsRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/messageHeader" />
-
+        app:layout_constraintTop_toBottomOf="@id/detailedMessagePrefix" />
 
     <!-- TODO: See with UI/UX if we really handle attachments preview -->
     <androidx.recyclerview.widget.RecyclerView
@@ -212,7 +312,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/headerDivider"
         tools:listitem="@layout/item_attachment" />
-
 
     <ImageView
         android:id="@+id/attachmentsIcon"
@@ -253,25 +352,18 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
         android:layout_marginTop="@dimen/marginStandardSmall"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
         app:dividerColor="@color/separatorColor"
+        app:layout_constraintBottom_toTopOf="@id/webViewFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attachmentsSizeText" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/attachmentsGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton,attachmentsDivider,headerDivider"
-        tools:visibility="visible" />
 
     <FrameLayout
         android:id="@+id/webViewFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-        android:layout_marginVertical="@dimen/marginStandardMedium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -284,5 +376,29 @@
             android:layout_height="wrap_content" />
 
     </FrameLayout>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/attachmentsGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton,attachmentsDivider,headerDivider"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/ccGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="ccRecyclerView,ccPrefix"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/detailedFieldsGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="fromPrefix,fromRecyclerView,toPrefix,toRecyclerView,detailedMessagePrefix,detailedMessageDate"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
