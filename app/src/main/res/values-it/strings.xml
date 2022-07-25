@@ -128,6 +128,8 @@
     <string name="lockAppTitle">Application locked</string>
     <string name="menuDrawerAdvancedActions">Advanced actions</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s used</string>
+    <string name="messageDetailsDateAt">%1$s at %2$s</string>
+    <string name="messageDetailsYesterday">Yesterday</string>
     <string name="messageForwardHeader">Forwarded message</string>
     <string name="messageIsDraftOption">Draft</string>
     <string name="messageNoSubject">No subject</string>

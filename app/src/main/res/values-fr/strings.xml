@@ -128,6 +128,8 @@
     <string name="lockAppTitle">Application verrouillée</string>
     <string name="menuDrawerAdvancedActions">Actions avancées</string>
     <string name="menuDrawerMailboxStorage">%1$s / %2$s utilisés</string>
+    <string name="messageDetailsDateAt">%1$s à %2$s</string>
+    <string name="messageDetailsYesterday">Hier</string>
     <string name="messageForwardHeader">Message transféré</string>
     <string name="messageIsDraftOption">Brouillon</string>
     <string name="messageNoSubject">Pas de sujet</string>
