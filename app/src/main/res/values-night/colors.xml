@@ -57,7 +57,7 @@
     <color name="iconToolbarButton">@color/lightenedGrey</color>
 
     <!-- Cardview -->
-    <color name="cardviewStrokeColor">#242424</color>
+    <color name="attachmentStrokeColor">@color/grey_title</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_text</color>

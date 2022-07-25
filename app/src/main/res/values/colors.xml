@@ -73,7 +73,7 @@
     <color name="textButtonBlueLight">@color/blueTextLight</color>
 
     <!-- Cardview -->
-    <color name="cardviewStrokeColor">@android:color/transparent</color>
+    <color name="attachmentStrokeColor">@color/border</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_border</color>
