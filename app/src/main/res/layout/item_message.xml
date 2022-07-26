@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:animateLayoutChanges="true">
+    >
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/messageHeader"
@@ -37,7 +37,6 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginVertical="@dimen/marginStandardMedium"
-            android:animateLayoutChanges="true"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.card.MaterialCardView
@@ -104,7 +103,8 @@
                 app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toEndOf="@id/userAvatar"
-                app:layout_constraintTop_toBottomOf="@id/subjectTextView">
+                app:layout_constraintTop_toBottomOf="@id/subjectTextView"
+                tools:ignore="UseCompoundDrawables">
 
                 <TextView
                     android:id="@+id/recipient"
@@ -115,7 +115,8 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    tools:text="Myriam Rais, George Li, +3 Abcdef dkeowdewdewdewdew" />
+                    tools:text="Myriam Rais, George Li, +3"
+                    tools:ignore="InefficientWeight" />
 
                 <ImageView
                     android:id="@+id/recipientChevron"
@@ -297,7 +298,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/detailedMessagePrefix" />
 
-    <!-- TODO: See with UI/UX if we really handle attachments preview -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/attachmentsRecyclerView"
         android:layout_width="match_parent"

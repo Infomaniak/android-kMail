@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.animation.LayoutTransition
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log

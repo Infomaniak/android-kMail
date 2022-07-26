@@ -68,8 +68,6 @@ class ThreadAdapter(
         val message = messageList[position]
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
-        (root as ViewGroup).layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-
         loadBody(message.body)
         initHeader(message)
         initAttachment(message.attachments)
