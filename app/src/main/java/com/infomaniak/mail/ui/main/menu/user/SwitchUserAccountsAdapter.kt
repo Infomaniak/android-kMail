@@ -39,11 +39,21 @@ class SwitchUserAccountsAdapter(
 ) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
 
     private val mailboxesAdapter = mutableListOf<SwitchUserMailboxesAdapter>()
+    private lateinit var isCollapsed: MutableList<Boolean>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserAccountViewHolder {
         return SwitchUserAccountViewHolder(
             ItemSwitchUserAccountBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
+    }
+
+    override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.firstOrNull() is Unit) {
+            isCollapsed[position] = true
+            holder.binding.updateAccountCard(position)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int): Unit = with(holder.binding) {
@@ -52,7 +62,7 @@ class SwitchUserAccountsAdapter(
         userAvatarImage.loadAvatar(account.user)
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
-        accountCardview.setOnClickListener { toggleMailboxes(account) }
+        accountCardview.setOnClickListener { toggleMailboxes(position) }
 
         addressesList.adapter = if (position < mailboxesAdapter.size) {
             mailboxesAdapter[position]
@@ -66,16 +76,27 @@ class SwitchUserAccountsAdapter(
     private fun ItemSwitchUserAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
         if (position == 0) {
             chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
-            toggleMailboxes(account)
+            toggleMailboxes(position, true)
         }
     }
 
-    private fun ItemSwitchUserAccountBinding.toggleMailboxes(account: UiAccount) {
-        account.collapsed = !account.collapsed
-        chevron.toggleChevron(account.collapsed)
-        addressesList.isGone = account.collapsed
+    private fun ItemSwitchUserAccountBinding.toggleMailboxes(position: Int, isFirstRun: Boolean = false) {
+        if (!isFirstRun && isCollapsed[position]) closeAllBut(position)
+        isCollapsed[position] = !isCollapsed[position]
+        updateAccountCard(position)
+    }
 
-        val backgroundColorResource = if (account.collapsed) R.color.backgroundColor else R.color.selectedAccountCardviewColor
+    private fun closeAllBut(position: Int) {
+        accounts.forEachIndexed { index, _ ->
+            if (index != position) notifyItemChanged(index, Unit)
+        }
+    }
+
+    private fun ItemSwitchUserAccountBinding.updateAccountCard(position: Int) {
+        chevron.toggleChevron(isCollapsed[position])
+        addressesList.isGone = isCollapsed[position]
+
+        val backgroundColorResource = if (isCollapsed[position]) R.color.backgroundColor else R.color.selectedAccountCardviewColor
         val backgroundColor = ContextCompat.getColor(root.context, backgroundColorResource)
         accountCardview.setCardBackgroundColor(backgroundColor)
     }
@@ -85,6 +106,7 @@ class SwitchUserAccountsAdapter(
     fun notifyAdapter(newList: List<UiAccount>) {
         DiffUtil.calculateDiff(UiAccountsListDiffCallback(accounts, newList)).dispatchUpdatesTo(this)
         accounts = newList
+        isCollapsed = MutableList(accounts.count()) { true }
     }
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : RecyclerView.ViewHolder(binding.root)
@@ -123,6 +145,5 @@ class SwitchUserAccountsAdapter(
     data class UiAccount(
         val user: User,
         var mailboxes: List<Mailbox>,
-        var collapsed: Boolean = true,
     )
 }
