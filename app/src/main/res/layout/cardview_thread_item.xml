@@ -95,11 +95,9 @@
                 <TextView
                     android:id="@+id/mailDate"
                     style="@style/Callout.Secondary"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="end"
-                    android:maxWidth="50dp"
-                    android:maxLines="1"
                     app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
                     app:layout_constraintEnd_toEndOf="parent"
