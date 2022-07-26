@@ -266,7 +266,6 @@
         app:layout_constraintBottom_toTopOf="@id/headerDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ccRecyclerView"
-        app:tint="@color/secondaryTextColor"
         tools:ignore="ContentDescription" />
 
     <TextView
