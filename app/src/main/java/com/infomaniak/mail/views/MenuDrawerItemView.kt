@@ -83,7 +83,6 @@ class MenuDrawerItemView @JvmOverloads constructor(
             var indentValue: Int? = null
             kotlin.runCatching { indentValue = typedArray.getDimensionPixelSizeOrThrow(R.styleable.MenuDrawerItemView_indent) }
             var textSizeValue: Int? = null
-            Log.e("gibran", " - The value textSizeValue is: ${textSizeValue}")
             kotlin.runCatching {
                 textSizeValue = typedArray.getDimensionPixelSizeOrThrow(R.styleable.MenuDrawerItemView_textSize)
             }

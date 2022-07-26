@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:lines="1"
-            tools:text="Folder (Inbox/Default/Custom)" />
+            tools:text="Folder (Default/Custom)" />
 
         <TextView
             android:id="@+id/itemBadge"
