@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.thread.ThreadListFragment">
+    android:background="@color/backgroundHeaderColor">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -119,98 +119,105 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/background"
+        style="@style/BackgroundCardview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/threadsList"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/backgroundColor"
-                android:clipToPadding="false"
-                android:paddingBottom="@dimen/recyclerViewPaddingBottom"
-                android:visibility="gone"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/cardview_thread_item"
-                tools:visibility="visible" />
+                android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/illuNoMail"
-                android:layout_width="@dimen/noMailIlluViewSize"
-                android:layout_height="@dimen/noMailIlluViewSize"
-                android:src="@drawable/ic_zero_mail"
-                app:layout_constraintBottom_toTopOf="@id/noMailTitle"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                app:tint="?android:attr/colorPrimary"
-                tools:ignore="ContentDescription" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/threadsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/backgroundColor"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/recyclerViewPaddingBottom"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/cardview_thread_item"
+                    tools:visibility="visible" />
 
-            <TextView
-                android:id="@+id/noMailTitle"
-                style="@style/H2"
-                android:layout_width="@dimen/noMailTextViewSize"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/marginStandard"
-                android:gravity="center"
-                android:text="@string/noEmailTitle"
-                app:layout_constraintBottom_toTopOf="@id/noMailDescription"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/illuNoMail"
-                app:layout_constraintVertical_chainStyle="packed" />
+                <ImageView
+                    android:id="@+id/illuNoMail"
+                    android:layout_width="@dimen/noMailIlluViewSize"
+                    android:layout_height="@dimen/noMailIlluViewSize"
+                    android:src="@drawable/ic_zero_mail"
+                    app:layout_constraintBottom_toTopOf="@id/noMailTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    app:tint="?android:attr/colorPrimary"
+                    tools:ignore="ContentDescription" />
 
-            <TextView
-                android:id="@+id/noMailDescription"
-                style="@style/Body.Secondary"
-                android:layout_width="@dimen/noMailTextViewSize"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/marginStandardVerySmall"
-                android:gravity="center"
-                android:lineSpacingMultiplier="1"
-                android:text="@string/noEmailDescription"
-                app:layout_constraintBottom_toTopOf="@id/newMessageFab"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/noMailTitle"
-                app:layout_constraintVertical_chainStyle="packed" />
+                <TextView
+                    android:id="@+id/noMailTitle"
+                    style="@style/H2"
+                    android:layout_width="@dimen/noMailTextViewSize"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/marginStandard"
+                    android:gravity="center"
+                    android:text="@string/noEmailTitle"
+                    app:layout_constraintBottom_toTopOf="@id/noMailDescription"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/illuNoMail"
+                    app:layout_constraintVertical_chainStyle="packed" />
 
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/noMailLayoutGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:constraint_referenced_ids="illuNoMail,noMailTitle,noMailDescription"
-                tools:visibility="gone" />
+                <TextView
+                    android:id="@+id/noMailDescription"
+                    style="@style/Body.Secondary"
+                    android:layout_width="@dimen/noMailTextViewSize"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/marginStandardVerySmall"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1"
+                    android:text="@string/noEmailDescription"
+                    app:layout_constraintBottom_toTopOf="@id/newMessageFab"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/noMailTitle"
+                    app:layout_constraintVertical_chainStyle="packed" />
 
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/newMessageFab"
-                style="@style/H3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandard"
-                android:layout_marginBottom="@dimen/marginStandard"
-                android:text="@string/buttonNewMessage"
-                android:textAllCaps="false"
-                app:icon="@drawable/ic_pencil"
-                app:iconGravity="start"
-                app:iconSize="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/noMailLayoutGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="illuNoMail,noMailTitle,noMailDescription"
+                    tools:visibility="gone" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                    android:id="@+id/newMessageFab"
+                    style="@style/H3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandard"
+                    android:layout_marginBottom="@dimen/marginStandard"
+                    android:text="@string/buttonNewMessage"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_pencil"
+                    app:iconGravity="start"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
