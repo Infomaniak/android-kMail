@@ -123,6 +123,7 @@ class Thread : RealmObject {
             messagesCount = 1
             size = message.attachments.size
             flagged = message.flagged
+            displayedDate = formatDate(message.date?.toDate() ?: Date(0))
         }
     }
 }
