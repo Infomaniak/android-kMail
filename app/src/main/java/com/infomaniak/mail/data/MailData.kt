@@ -113,7 +113,7 @@ object MailData {
 
     private fun loadAddressBooks(completion: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmAddressBooks = MailRealm.readAddressBooks().first().list.toList()
+            val realmAddressBooks = MailRealm.readAddressBooks().first().list
 
             mutableAddressBooksFlow.value = realmAddressBooks
 
@@ -128,7 +128,7 @@ object MailData {
 
     private fun loadContacts() {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmContacts = MailRealm.readContacts().first().list.toList()
+            val realmContacts = MailRealm.readContacts().first().list
 
             mutableContactsFlow.value = realmContacts
 
@@ -240,7 +240,7 @@ object MailData {
      */
     private fun getMailboxesFromRealm(completion: (List<Mailbox>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmMailboxes = MailRealm.readMailboxes().first().list.toList()
+            val realmMailboxes = MailRealm.readMailboxes().first().list
 
             mutableMailboxesFlow.value = realmMailboxes
 
@@ -250,7 +250,7 @@ object MailData {
 
     private fun getFoldersFromRealm() {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmFolders = MailRealm.readFolders().first().list.toList()
+            val realmFolders = MailRealm.readFolders().first().list
 
             mutableFoldersFlow.value = realmFolders
 
