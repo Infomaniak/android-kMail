@@ -24,13 +24,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -39,6 +39,7 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
@@ -52,7 +53,6 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.filterNotNull
 import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -61,6 +61,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
+
+    private var updatedAtRefreshJob: Job? = null
 
     private var threadListAdapter = ThreadListAdapter()
 
@@ -104,7 +106,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.content.unreadCountChip.apply {
+        binding.unreadCountChip.apply {
             isCloseIconVisible = false
             setOnCheckedChangeListener { _, isChecked ->
                 isCloseIconVisible = isChecked
@@ -143,7 +145,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun updateUpdatedAt() = with(binding.content) {
+    private fun updateUpdatedAt() = with(binding) {
         // TODO : Replace lastUpdatedAt.time with currentFolder.lastUpdatedAt ?
         var ago: String
         if (Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS) {
@@ -155,7 +157,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         updatedAt.text = getString(R.string.threadListHeaderLastUpdate, ago)
     }
 
-    private fun updateUnreadCount() = with(binding.content.unreadCountChip) {
+    private fun updateUnreadCount() = with(binding.unreadCountChip) {
         // TODO: Fetch folder again to update it.
         val unreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
         text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)

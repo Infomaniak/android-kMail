@@ -20,12 +20,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundHeaderColor"
     tools:context=".ui.main.thread.ThreadListFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -36,27 +38,31 @@
             android:layout_height="wrap_content"
             app:contentInsetEnd="0dp"
             app:navigationContentDescription="@string/contentDescriptionButtonMenu"
-            app:navigationIcon="@drawable/ic_burger">
+            app:navigationIcon="@drawable/ic_burger"
+            app:navigationIconTint="?android:attr/colorPrimary"
+            tools:title="Boite de réception">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
                 android:orientation="horizontal">
 
-                <include
-                    android:id="@+id/searchViewCard"
-                    layout="@layout/item_search_view"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/searchViewHeight"
-                    android:layout_weight="1" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/searchButton"
+                    style="@style/IconButton"
+                    app:icon="@drawable/ic_search"
+                    app:iconSize="24dp"
+                    app:iconTint="?android:attr/colorPrimary" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/userAvatar"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/iconButtonSize"
                     android:layout_gravity="center"
-                    android:layout_marginHorizontal="@dimen/marginStandard"
-                    app:cardCornerRadius="@dimen/roundCornerRadius">
+                    android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                    app:cardCornerRadius="@dimen/roundCornerRadius"
+                    app:strokeWidth="0dp">
 
                     <ImageView
                         android:id="@+id/userAvatarImage"
@@ -75,25 +81,45 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
-        android:id="@+id/mailboxName"
-        style="@style/H1"
+        android:id="@+id/updatedAt"
+        style="@style/Body.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginLarge"
-        android:layout_marginTop="@dimen/marginStandard"
-        android:text="@string/inboxFolder"
-        app:layout_constraintBottom_toTopOf="@id/swipeRefreshLayout"
+        android:layout_marginStart="@dimen/marginStandardMedium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-        tools:text="Inbox" />
+        tools:text="Mis à jour à l'instant" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/unreadCountChip"
+        style="@style/UnreadChip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/marginStandardMedium"
+        app:layout_constraintBottom_toBottomOf="@id/updatedAt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/updatedAt"
+        tools:closeIcon="@null"
+        tools:text="2 non lus" />
+
+    <!-- TODO: Multiselect -->
+    <!--        <com.google.android.material.button.MaterialButton-->
+    <!--            android:id="@+id/openMultiselectButton"-->
+    <!--            style="@style/TextButton"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="Modifier"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintTop_toBottomOf="@id/searchViewCard" />-->
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="@dimen/marginStandardMedium"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mailboxName">
+        app:layout_constraintTop_toBottomOf="@id/updatedAt">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -103,6 +129,9 @@
                 android:id="@+id/threadsList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/backgroundColor"
+                android:clipToPadding="false"
+                android:paddingBottom="100dp"
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -166,11 +195,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandard"
                 android:layout_marginBottom="@dimen/marginStandard"
-                android:paddingHorizontal="18dp"
                 android:text="@string/buttonNewMessage"
                 android:textAllCaps="false"
                 app:icon="@drawable/ic_pencil"
-                app:iconGravity="end"
+                app:iconGravity="start"
                 app:iconSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
