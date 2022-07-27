@@ -24,9 +24,9 @@
     app:rippleColor="?android:attr/colorControlHighlight">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_marginVertical="@dimen/marginStandardSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/marginStandardSmall"
         android:paddingHorizontal="@dimen/marginStandardSmall">
 
         <ImageView
@@ -44,9 +44,9 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/marginStandardVerySmall"
             android:layout_marginStart="@dimen/marginStandardMedium"
             android:orientation="vertical"
+            android:paddingEnd="@dimen/marginStandardVerySmall"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -56,16 +56,16 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:id="@+id/expeditor"
                     style="@style/H2.Secondary"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/iconCalendar"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="@tools:sample/full_names" />
 
                 <ImageView
@@ -76,9 +76,9 @@
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionIconCalendar"
                     android:src="@drawable/ic_calendar"
-                    app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                    app:layout_constraintEnd_toStartOf="@id/iconAttachment" />
+                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintTop_toTopOf="@id/expeditor" />
 
                 <ImageView
                     android:id="@+id/iconAttachment"
@@ -88,9 +88,9 @@
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionIconAttachments"
                     android:src="@drawable/ic_attachment"
-                    app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                    app:layout_constraintEnd_toStartOf="@id/mailDate" />
+                    app:layout_constraintEnd_toStartOf="@id/mailDate"
+                    app:layout_constraintTop_toTopOf="@id/expeditor" />
 
                 <TextView
                     android:id="@+id/mailDate"
@@ -98,9 +98,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="end"
-                    app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
                     tools:text="@tools:sample/date/hhmm" />
 
                 <TextView
@@ -110,9 +110,9 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintTop_toBottomOf="@id/expeditor"
                     app:layout_constraintEnd_toStartOf="@id/mailDate"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/expeditor"
                     tools:text="@tools:sample/lorem" />
 
                 <ImageView
@@ -122,9 +122,9 @@
                     android:contentDescription="@string/contentDescriptionIconFavorite"
                     android:src="@drawable/ic_star_filled"
                     android:visibility="gone"
-                    app:layout_constraintTop_toTopOf="@id/mailSubject"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
                     tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

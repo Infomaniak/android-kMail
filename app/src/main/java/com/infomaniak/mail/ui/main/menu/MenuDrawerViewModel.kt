@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +31,7 @@ class MenuDrawerViewModel : ViewModel() {
     val currentMailbox = MutableLiveData<Mailbox?>()
     val mailboxes = MutableLiveData<List<Mailbox>?>()
     val folders = MutableLiveData<List<Folder>?>()
+    val currentFolder = MutableLiveData<Folder?>()
 
     fun listenToCurrentMailbox() {
         viewModelScope.launch {
@@ -53,6 +53,14 @@ class MenuDrawerViewModel : ViewModel() {
         viewModelScope.launch {
             MailData.foldersFlow.collect {
                 folders.value = it
+            }
+        }
+    }
+
+    fun listenToCurrentFolder() {
+        viewModelScope.launch {
+            MailData.currentFolderFlow.collect {
+                currentFolder.value = it
             }
         }
     }
