@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -565,21 +566,6 @@ object MailData {
     private suspend fun <T> MutableStateFlow<T?>.forceRefresh() {
         value = null
         delay(1L)
-    }
-
-    private fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
-
-        fun formatFolderWithAllChildren(parent: Folder): List<Folder> {
-            return mutableListOf<Folder>().apply {
-                add(parent)
-                parent.children.forEach { child ->
-                    child.parentLink = parent
-                    addAll(formatFolderWithAllChildren(child))
-                }
-            }
-        }
-
-        return map(::formatFolderWithAllChildren).flatten()
     }
 
     private fun <T> RealmList<T>.setRealmListValues(values: RealmList<T>) {

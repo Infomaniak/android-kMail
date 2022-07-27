@@ -27,7 +27,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.startOfTheDay
+import com.infomaniak.lib.core.utils.startOfTheWeek
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
@@ -36,7 +37,6 @@ import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.isValid
 import java.util.*

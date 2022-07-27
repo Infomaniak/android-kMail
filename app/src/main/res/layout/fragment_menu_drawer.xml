@@ -226,6 +226,24 @@
                 tools:listitem="@layout/item_folder_menu_drawer"
                 tools:visibility="visible" />
 
+            <LinearLayout
+                android:id="@+id/createNewFolderButton"
+                style="@style/MenuDrawerItem"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <!--TODO: Use the correct drawableStartCompat icon, this one is wrong.-->
+                <TextView
+                    style="@style/MenuDrawerItemText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:text="@string/buttonCreateFolder"
+                    app:drawableStartCompat="@drawable/ic_plus_rounded" />
+
+            </LinearLayout>
+
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
                 android:layout_width="match_parent"

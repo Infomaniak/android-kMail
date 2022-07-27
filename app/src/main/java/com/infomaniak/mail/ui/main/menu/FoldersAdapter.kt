@@ -64,10 +64,10 @@ class FoldersAdapter(
         folderName.apply {
             text = name
             setCompoundDrawablesWithIntrinsicBounds(AppCompatResources.getDrawable(context, iconId), null, null, null)
-            indent?.let { setMargins(left = resources.getDimension(RCore.dimen.marginStandard).toInt() * it) }
+            setMargins(left = resources.getDimension(RCore.dimen.marginStandard).toInt() * (indent ?: 0))
         }
 
-        badgeText?.let { folderBadge.text = it }
+        folderBadge.text = badgeText
 
         root.setOnClickListener { openFolder.invoke(name) }
     }

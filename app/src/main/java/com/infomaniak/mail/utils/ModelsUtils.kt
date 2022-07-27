@@ -22,11 +22,27 @@ import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpanned
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 
 object ModelsUtils {
 
     fun String?.getFormattedThreadSubject(context: Context): Spanned {
         return this?.replace("\n+".toRegex(), " ")?.toSpanned()
             ?: HtmlCompat.fromHtml("<i>${context.getString(R.string.messageNoSubject)}</i>", HtmlCompat.FROM_HTML_MODE_COMPACT)
+    }
+
+    fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
+
+        fun formatFolderWithAllChildren(parent: Folder): List<Folder> {
+            return mutableListOf<Folder>().apply {
+                add(parent)
+                parent.children.forEach { child ->
+                    child.parentLink = parent
+                    addAll(formatFolderWithAllChildren(child))
+                }
+            }
+        }
+
+        return map(::formatFolderWithAllChildren).flatten()
     }
 }
