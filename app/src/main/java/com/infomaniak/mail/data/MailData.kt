@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
+import com.infomaniak.mail.data.api.MailApi.fetchDraft
 import com.infomaniak.mail.data.cache.ContactsController
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -181,7 +182,9 @@ object MailData {
                 for (draft in realmOfflineDrafts) {
                     val draftMailbox = mailboxesFlow.value?.find { it.email == draft.from.first().email } ?: continue
                     val updatedDraft = setDraftSignature(draft)
-                    saveDraft(updatedDraft, draftMailbox.uuid)
+                    saveDraft(updatedDraft, draftMailbox.uuid).data?.let {
+                        fetchDraft("/api/mail/${draftMailbox.uuid}/draft/${it.uuid}", it.uid)
+                    }
                 }
                 getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
             }

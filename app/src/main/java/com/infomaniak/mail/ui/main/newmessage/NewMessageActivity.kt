@@ -21,6 +21,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
@@ -28,6 +29,8 @@ import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NewMessageActivity : ThemedActivity() {
 
@@ -113,7 +116,7 @@ class NewMessageActivity : ThemedActivity() {
                 messageSubject = newMessageFragment.getSubject(),
                 messageBody = newMessageFragment.getBody(),
             )
-            sendMail(draft)
+            lifecycleScope.launch(Dispatchers.IO) { sendMail(draft) }
         }
 
         true
