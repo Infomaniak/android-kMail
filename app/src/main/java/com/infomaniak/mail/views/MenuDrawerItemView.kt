@@ -79,7 +79,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
             val nameText = typedArray.getString(R.styleable.MenuDrawerItemView_text)
             val badgeText = typedArray.getString(R.styleable.MenuDrawerItemView_badge)
             val indentValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, 0)
-            val textSizeValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, 0)
+            val textSizeValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, binding.itemName.textSize.toInt())
 
             icon = iconDrawable
             text = nameText
