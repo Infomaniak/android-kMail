@@ -108,6 +108,5 @@ class SwitchUserFragment : Fragment() {
         return filter { it.user.id != AccountUtils.currentUserId }
             .toMutableList()
             .apply { this@sortAccounts.find { it.user.id == AccountUtils.currentUserId }?.let { add(0, it) } }
-            .toList()
     }
 }
