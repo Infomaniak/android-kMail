@@ -72,7 +72,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
-    private var lastUpdatedAt = Date() // TODO : Remove
+    private var lastUpdatedAt = Date() // TODO : Remove when implementing last updated at feature
 
     private var menuDrawerFragment: MenuDrawerFragment? = null
     private var menuDrawerNavigation: NavigationView? = null
@@ -113,7 +113,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
 
-        lastUpdatedAt = Date(Calendar.getInstance().timeInMillis - DateUtils.MINUTE_IN_MILLIS * 60 * 24 * 31 * 3 * 0)
+        lastUpdatedAt = Date()
         startPeriodicRefreshJob()
 
         setupOnRefresh()

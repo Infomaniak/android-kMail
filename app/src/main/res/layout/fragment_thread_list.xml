@@ -102,16 +102,6 @@
         tools:closeIcon="@null"
         tools:text="2 non lus" />
 
-    <!-- TODO: Multiselect -->
-    <!--        <com.google.android.material.button.MaterialButton-->
-    <!--            android:id="@+id/openMultiselectButton"-->
-    <!--            style="@style/TextButton"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:text="Modifier"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@id/searchViewCard" />-->
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
