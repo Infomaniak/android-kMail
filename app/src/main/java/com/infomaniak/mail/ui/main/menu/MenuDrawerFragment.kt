@@ -22,14 +22,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -37,6 +34,7 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -46,14 +44,6 @@ import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapte
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.toggleChevron
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -86,10 +76,10 @@ class MenuDrawerFragment : Fragment() {
         AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
         setupAdapters()
         setupListener()
-        handleOnBackPressed()
         listenToCurrentMailbox()
         listenToMailboxes()
         listenToFolders()
+        listenToCurrentFolder()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -157,15 +147,13 @@ class MenuDrawerFragment : Fragment() {
             closeDrawer()
             // TODO: Restore mails
             notYetImplemented()
-        }        
+        }
         getMoreStorageCardview.setOnClickListener {
             if (canNavigate) {
                 canNavigate = false
                 findNavController().navigate(R.id.getMoreStorageBottomSheetDialog)
             }
         }
-    }
-
     }
 
     fun onDrawerOpened() {
@@ -195,8 +183,8 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun listenToMailboxes() {
-        viewModel.mailboxes.observeNotNull(this) { mailboxes ->
+    private fun listenToMailboxes() = with(binding) {
+        viewModel.mailboxes.observeNotNull(this@MenuDrawerFragment) { mailboxes ->
             val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
             addressAdapter.setMailboxes(sortedMailboxes)
             if (sortedMailboxes.isEmpty()) {
@@ -213,17 +201,14 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun listenToCurrentFolder() = with(binding) {
-        currentFoldersJob?.cancel()
-        currentFoldersJob = lifecycleScope.launch {
-            MailData.currentFolderFlow.filterNotNull().collect { currentFolder ->
-                inboxFolderId?.let {
-                    inboxFolder.setSelectedState(MailData.currentFolderFlow.value?.id == it)
-                    if (currentFolder.role == null) setCustomFolderCollapsed(false)
-                }
-                defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
-                customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
-            }
-        }
+        viewModel.currentFolder.observeNotNull(this@MenuDrawerFragment, ::onCurrentFolderChange)
+        viewModel.listenToCurrentFolder()
+    }
+
+    private fun onCurrentFolderChange(currentFolder: Folder) = with(binding) {
+        inboxFolder.setSelectedState(currentFolder.id == inboxFolderId)
+        defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
+        customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
     }
 
     private fun setCustomFolderCollapsedState() = with(binding) {

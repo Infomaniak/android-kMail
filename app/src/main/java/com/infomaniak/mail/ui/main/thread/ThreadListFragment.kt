@@ -26,7 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -35,7 +34,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.imageLoader
-import com.google.android.material.navigation.NavigationView
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -50,7 +48,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
-import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
@@ -171,17 +168,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             isVisible = unreadCount > 0
         }
     }
-
-//    private fun setupMenuDrawer() {
-//        (activity as? MainActivity)?.binding?.let { activityBinding ->
-//
-//            drawerLayout = activityBinding.drawerLayout.also {
-//                it.addDrawerListener(drawerListener)
-//            }
-//
-//            menuDrawerNavigation = activityBinding.menuDrawerNavigation
-//        }
-//    }
 
     private fun setupAdapter() {
         binding.threadsList.adapter = threadListAdapter

@@ -20,12 +20,10 @@ package com.infomaniak.mail.views
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
@@ -80,17 +78,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
             val iconDrawable = typedArray.getDrawable(R.styleable.MenuDrawerItemView_icon)
             val nameText = typedArray.getString(R.styleable.MenuDrawerItemView_text)
             val badgeText = typedArray.getString(R.styleable.MenuDrawerItemView_badge)
-            var indentValue: Int? = null
-            kotlin.runCatching { indentValue = typedArray.getDimensionPixelSizeOrThrow(R.styleable.MenuDrawerItemView_indent) }
-            var textSizeValue: Int? = null
-            kotlin.runCatching {
-                textSizeValue = typedArray.getDimensionPixelSizeOrThrow(R.styleable.MenuDrawerItemView_textSize)
-            }
+            val indentValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, 0)
+            val textSizeValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, 0)
 
             icon = iconDrawable
             text = nameText
             badge = badgeText
-            indentValue?.let { indent = it }
+            indent = indentValue
             textSize = textSizeValue
 
             typedArray.recycle()
