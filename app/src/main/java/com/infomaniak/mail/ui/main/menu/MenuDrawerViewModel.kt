@@ -18,41 +18,41 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
 
-    private val mutableUiMailboxesFlow: MutableStateFlow<List<Mailbox>?> = MutableStateFlow(null)
-    val uiMailboxesFlow = mutableUiMailboxesFlow.asStateFlow()
+    val currentMailbox = MutableLiveData<Mailbox?>()
+    val mailboxes = MutableLiveData<List<Mailbox>?>()
+    val folders = MutableLiveData<List<Folder>?>()
 
-    private val mutableUiFoldersFlow: MutableStateFlow<List<Folder>?> = MutableStateFlow(null)
-    val uiFoldersFlow = mutableUiFoldersFlow.asStateFlow()
-
-    fun setup() {
-        listenToMailboxes()
-        listenToFolders()
-    }
-
-    private fun listenToMailboxes() {
+    fun listenToCurrentMailbox() {
         viewModelScope.launch {
-            MailData.mailboxesFlow.collect { mailboxes ->
-                mutableUiMailboxesFlow.value = mailboxes
+            MailData.currentMailboxFlow.collect {
+                currentMailbox.value = it
             }
         }
     }
 
-    private fun listenToFolders() {
+    fun listenToMailboxes() {
         viewModelScope.launch {
-            MailData.foldersFlow.collect { folders ->
-                mutableUiFoldersFlow.value = folders
+            MailData.mailboxesFlow.collect {
+                mailboxes.value = it
+            }
+        }
+    }
+
+    fun listenToFolders() {
+        viewModelScope.launch {
+            MailData.foldersFlow.collect {
+                folders.value = it
             }
         }
     }

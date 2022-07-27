@@ -34,8 +34,7 @@ import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
+import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.launch
 
 class SwitchUserFragment : Fragment() {
@@ -43,8 +42,6 @@ class SwitchUserFragment : Fragment() {
     private val viewModel: SwitchUserViewModel by viewModels()
 
     private lateinit var binding: FragmentSwitchUserBinding
-
-    private var mailboxesJob: Job? = null
 
     private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
         if (selectedMailbox.userId == AccountUtils.currentUserId) {
@@ -69,39 +66,28 @@ class SwitchUserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         recyclerViewAccount.adapter = accountsAdapter
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        setupToolbar()
+        listenToAccounts()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+    private fun setupToolbar() = with(binding.toolbar) {
+        setNavigationOnClickListener { findNavController().popBackStack() }
+        setOnMenuItemClickListener { menuItem ->
             (menuItem.itemId == R.id.addAccount).also { if (it) startActivity(Intent(context, LoginActivity::class.java)) }
         }
-
-        listenToMailboxes()
-        viewModel.loadMailboxes(viewLifecycleOwner)
     }
 
-    override fun onPause() {
-        mailboxesJob?.cancel()
-        super.onPause()
-    }
+    private fun listenToAccounts() {
+        viewModel.accounts.observeNotNull(this) { accounts ->
 
-    private fun listenToMailboxes() {
-        with(viewModel) {
-            mailboxesJob?.cancel()
-            mailboxesJob = lifecycleScope.launch {
-                uiAccountsFlow.filterNotNull().collect { accounts ->
+            val uiAccounts = accounts
+                .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
+                .sortAccounts()
 
-                    val uiAccounts = accounts
-                        .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
-                        .sortAccounts()
-
-                    accountsAdapter.notifyAdapter(uiAccounts)
-                }
-            }
+            accountsAdapter.notifyAdapter(uiAccounts)
         }
+
+        viewModel.loadAccounts(viewLifecycleOwner)
     }
 
     private fun List<UiAccount>.sortAccounts(): List<UiAccount> {

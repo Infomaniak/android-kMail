@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
@@ -27,8 +28,6 @@ import com.infomaniak.mail.data.cache.MailboxContentController.getLatestThread
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -36,27 +35,24 @@ class ThreadViewModel : ViewModel() {
 
     private var listenToMessagesJob: Job? = null
 
-    private val mutableUiMessagesFlow = MutableStateFlow<List<Message>?>(null)
-    val uiMessagesFlow = mutableUiMessagesFlow.asStateFlow()
+    val messages = MutableLiveData<List<Message>?>()
 
-    fun setup() {
+    fun loadMessages(threadUid: String) {
         listenToMessages()
+
+        MailboxContentController.getThread(threadUid)?.let { thread ->
+            MailData.selectThread(thread)
+            markAsSeen(thread)
+            MailData.loadMessages(thread)
+        }
     }
 
     private fun listenToMessages() {
         listenToMessagesJob?.cancel()
         listenToMessagesJob = viewModelScope.launch {
-            MailData.messagesFlow.filterNotNull().collect { messages ->
-                mutableUiMessagesFlow.value = messages
+            MailData.messagesFlow.filterNotNull().collect {
+                messages.value = it
             }
-        }
-    }
-
-    fun loadMessages(threadUid: String) {
-        MailboxContentController.getThread(threadUid)?.let { thread ->
-            MailData.selectThread(thread)
-            markAsSeen(thread)
-            MailData.loadMessages(thread)
         }
     }
 

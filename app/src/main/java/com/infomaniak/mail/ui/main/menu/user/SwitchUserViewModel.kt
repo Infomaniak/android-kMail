@@ -30,34 +30,33 @@ import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
 class SwitchUserViewModel : ViewModel() {
 
-    private val mutableUiAccountsFlow = MutableStateFlow<List<Pair<User, List<Mailbox>>>?>(null)
-    val uiAccountsFlow = mutableUiAccountsFlow.asStateFlow()
+    val accounts = MutableLiveData<List<Pair<User, List<Mailbox>>>?>(null)
 
-    fun loadMailboxes(lifecycleOwner: LifecycleOwner) {
+    fun loadAccounts(lifecycleOwner: LifecycleOwner) {
 
         AccountUtils.getAllUsers().observeOnce(lifecycleOwner) { users ->
             viewModelScope.launch(Dispatchers.IO) {
 
-                mutableUiAccountsFlow.value = users.map { user ->
-                    user to MailboxInfoController.getMailboxesSync(user.id)
-                }
+                users
+                    .map { user -> user to MailboxInfoController.getMailboxesSync(user.id) }
+                    .also(accounts::postValue)
 
-                mutableUiAccountsFlow.value = users.mapNotNull { user ->
-                    val okHttpClient = createOkHttpClientForSpecificUser(user)
-                    ApiRepository.getMailboxes(okHttpClient).data
-                        ?.map {
-                            val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
-                            it.initLocalValues(user.id, quotas)
-                        }
-                        ?.let { user to it }
-                }
+                users
+                    .mapNotNull { user ->
+                        val okHttpClient = createOkHttpClientForSpecificUser(user)
+                        ApiRepository.getMailboxes(okHttpClient).data
+                            ?.map {
+                                val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
+                                it.initLocalValues(user.id, quotas)
+                            }
+                            ?.let { user to it }
+                    }
+                    .also { accounts::postValue }
             }
         }
     }

@@ -19,31 +19,36 @@ package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
+    private var listenToCurrentFolderJob: Job? = null
     private var listenToThreadsJob: Job? = null
 
-    private val mutableUiThreadsFlow = MutableStateFlow<List<Thread>?>(null)
-    val uiThreadsFlow = mutableUiThreadsFlow.asStateFlow()
+    val currentFolder = SingleLiveEvent<Folder?>()
+    val threads = SingleLiveEvent<List<Thread>?>()
 
-    fun setup() {
-        listenToThreads()
+    fun listenToCurrentFolder() {
+        listenToCurrentFolderJob?.cancel()
+        listenToCurrentFolderJob = viewModelScope.launch {
+            MailData.currentFolderFlow.collect {
+                currentFolder.value = it
+            }
+        }
     }
 
-    private fun listenToThreads() {
+    fun listenToThreads() {
         listenToThreadsJob?.cancel()
         listenToThreadsJob = viewModelScope.launch {
-            MailData.threadsFlow.collect { threads ->
-                mutableUiThreadsFlow.value = threads
+            MailData.threadsFlow.collect {
+                threads.value = it
             }
         }
     }
