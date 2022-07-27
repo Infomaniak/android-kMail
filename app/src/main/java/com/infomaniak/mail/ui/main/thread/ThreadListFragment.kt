@@ -33,17 +33,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.navigation.NavigationView
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
+import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
@@ -64,15 +65,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var folderNameJob: Job? = null
     private var threadsJob: Job? = null
 
-    private var menuDrawerFragment: MenuDrawerFragment? = null
-
     private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer { binding.content.swipeRefreshLayout.isRefreshing = true }
+        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
     private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
 
+    private var menuDrawerFragment: MenuDrawerFragment? = null
+    private var menuDrawerNavigation: NavigationView? = null
+    private var drawerLayout: DrawerLayout? = null
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             // No-op
@@ -111,14 +113,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         viewModel.setup()
     }
 
-    override fun onDestroyView() {
-        binding.drawerLayout.removeDrawerListener(drawerListener)
-
-        super.onDestroyView()
-    }
-
     private fun setupOnRefresh() {
-        binding.content.swipeRefreshLayout.setOnRefreshListener(this)
+        binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
     override fun onRefresh() {
@@ -127,21 +123,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupMenuDrawer() {
-        binding.drawerLayout.addDrawerListener(drawerListener)
+        (activity as? MainActivity)?.binding?.let { activityBinding ->
 
-        val fragment = MenuDrawerFragment(
-            closeDrawer = { closeDrawer() },
-            isDrawerOpen = { binding.drawerLayout.isOpen },
-        ).also { menuDrawerFragment = it }
+            drawerLayout = activityBinding.drawerLayout.also {
+                it.addDrawerListener(drawerListener)
+            }
 
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.add(R.id.menuDrawerFragment, fragment)
-            ?.commit()
+            menuDrawerNavigation = activityBinding.menuDrawerNavigation
+        }
     }
 
     private fun setupAdapter() {
-        binding.content.threadsList.adapter = threadListAdapter
+        binding.threadsList.adapter = threadListAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
             // TODO: Manage no Internet screen
@@ -166,11 +159,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupListeners() = with(binding.content) {
+    private fun setupListeners() = with(binding) {
         // TODO: Multiselect
         // openMultiselectButton.setOnClickListener {}
 
-        toolbar.setNavigationOnClickListener { binding.drawerLayout.open() }
+        toolbar.setNavigationOnClickListener { drawerLayout?.open() }
 
         searchViewCard.apply {
             // TODO: FilterButton doesn't propagate the event to root, must display it?
@@ -210,11 +203,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupUserAvatar() {
-        AccountUtils.currentUser?.let(binding.content.userAvatarImage::loadAvatar)
+        AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+    }
+
+    override fun onDestroyView() {
+        drawerLayout?.removeDrawerListener(drawerListener)
+
+        super.onDestroyView()
     }
 
     override fun onResume() {
         super.onResume()
+
+        setupMenuDrawerCallbacks()
 
         listenToFolderName()
         listenToThreads()
@@ -229,6 +230,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onPause()
     }
 
+    private fun setupMenuDrawerCallbacks() {
+        val fragmentContainer = (activity as? MainActivity)?.binding?.menuDrawerFragment ?: return
+        (fragmentContainer.getFragment() as? MenuDrawerFragment)
+            ?.apply {
+                closeDrawer = { closeDrawer() }
+                isDrawerOpen = { drawerLayout?.isOpen ?: false }
+            }?.also {
+                menuDrawerFragment = it
+            }
+    }
+
     private fun listenToFolderName() {
         folderNameJob?.cancel()
         folderNameJob = lifecycleScope.launch {
@@ -236,7 +248,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayFolderName(folder: Folder) = with(binding.content) {
+    private fun displayFolderName(folder: Folder) = with(binding) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
         mailboxName.text = folderName
@@ -249,7 +261,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayThreads(threads: List<Thread>) = with(binding.content) {
+    private fun displayThreads(threads: List<Thread>) = with(binding) {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
         swipeRefreshLayout.isRefreshing = false
@@ -261,18 +273,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayNoEmailView() = with(binding.content) {
+    private fun displayNoEmailView() = with(binding) {
         threadsList.isGone = true
         noMailLayoutGroup.isVisible = true
     }
 
-    private fun displayThreadList() = with(binding.content) {
+    private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
     }
 
-    private fun closeDrawer() = with(binding) {
-        drawerLayout.closeDrawer(menuDrawerNavigation)
+    private fun closeDrawer() {
+        drawerLayout?.let { drawer -> menuDrawerNavigation?.let(drawer::closeDrawer) }
     }
 
     private fun downloadThreads() {
