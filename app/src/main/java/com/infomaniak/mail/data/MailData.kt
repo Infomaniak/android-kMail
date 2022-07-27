@@ -56,6 +56,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.*
 
 object MailData {
 
@@ -240,7 +241,7 @@ object MailData {
                 ?: first()
         }
         selectFolder(folder)
-        
+
         return folder
     }
 

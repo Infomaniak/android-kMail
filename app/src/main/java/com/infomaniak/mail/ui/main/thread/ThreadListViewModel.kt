@@ -26,13 +26,16 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
+    private var listenToCurrentMailboxJob: Job? = null
     private var listenToCurrentFolderJob: Job? = null
     private var listenToThreadsJob: Job? = null
 
+    val currentMailbox = SingleLiveEvent<Mailbox?>()
     val currentFolder = SingleLiveEvent<Folder?>()
     val threads = SingleLiveEvent<List<Thread>?>()
 
@@ -43,6 +46,15 @@ class ThreadListViewModel : ViewModel() {
 
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = false
+
+    fun listenToCurrentMailbox() {
+        listenToCurrentMailboxJob?.cancel()
+        listenToCurrentMailboxJob = viewModelScope.launch {
+            MailData.currentMailboxFlow.filterNotNull().collect {
+                currentMailbox.value = it
+            }
+        }
+    }
 
     fun listenToCurrentFolder() {
         listenToCurrentFolderJob?.cancel()

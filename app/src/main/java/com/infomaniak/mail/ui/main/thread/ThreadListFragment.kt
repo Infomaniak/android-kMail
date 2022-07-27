@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -53,6 +54,7 @@ import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.*
@@ -115,20 +117,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUserAvatar()
         setupUnreadCountChip()
 
+        listenToCurrentMailbox()
         listenToCurrentFolder()
         listenToThreads()
     }
 
-    private fun setupUnreadCountChip() = with(binding.content) {
-            unreadCountChip.apply {
-                isCloseIconVisible = false
-                setOnCheckedChangeListener { _, isChecked ->
-                    isCloseIconVisible = isChecked
-                    viewModel.filter = if (isChecked) ThreadFilter.UNSEEN else null
-                    swipeRefreshLayout.isRefreshing = true
-                    onRefresh()
-                }
+    private fun setupUnreadCountChip() {
+            binding.unreadCountChip.apply {
+            setOnClickListener {
+                isCloseIconVisible = isChecked
+                viewModel.filter = if (isChecked) ThreadFilter.UNSEEN else null
+                binding.swipeRefreshLayout.isRefreshing = true
+                viewModel.refreshThreads()
+                scrollToTop()
             }
+        }
         }
 
     private fun setupOnRefresh() {
@@ -270,15 +273,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         viewModel.loadMailData()
     }
 
-    private fun resetList() {
-        clearFilter()
-        scrollToTop()
-    }
+        with(viewModel) {
+            currentFolder.value?.threads?.toList()?.let(::displayThreads)
 
-    private fun clearFilter() = with(binding.unreadCountChip) {
-        viewModel.filter = null
-        isChecked = false
-        isCloseIconVisible = false
+            currentOffset = OFFSET_FIRST_PAGE
+            binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
+            loadMailData()
+        }
     }
 
 private fun setupMenuDrawerCallbacks() {
@@ -292,15 +293,42 @@ private fun setupMenuDrawerCallbacks() {
             }
     }
 
+    private fun listenToCurrentMailbox() {
+        viewModel.currentMailbox.observeNotNull(this, ::onMailboxChange)
+        viewModel.listenToCurrentMailbox()
+    }
+
     private fun listenToCurrentFolder() {
-        viewModel.currentFolder.observeNotNull(this, ::displayFolderName)
+        viewModel.currentFolder.observeNotNull(this, ::updateFolderInfo)
         viewModel.listenToCurrentFolder()
     }
 
-    private fun updateFolderInfo(folder: Folder) = with(binding) {
-        val folderName = folder.getLocalizedName(context)
+    private fun resetList() {
+        clearFilter()
+        scrollToTop()
+    }
+
+    private fun clearFilter() = with(binding.unreadCountChip) {
+        viewModel.filter = null
+        isChecked = false
+        isCloseIconVisible = false
+    }
+
+    private fun onMailboxChange(mailbox: Mailbox) = with(viewModel) {
+        if (mailbox.objectId != lastMailboxId) resetList()
+        lastMailboxId = mailbox.objectId
+    }
+
+    private fun updateFolderInfo(folder: Folder) = with(viewModel) {
+        if (lastFolderRole != folder.role) {
+            lastUnreadCount = folder.unreadCount
+            resetList()
+        }
+        lastFolderRole = folder.role
+
+        val folderName = folder.getLocalizedName(binding.context)
         Log.i("UI", "Received folder name (${folderName})")
-        toolbar.title = folderName
+        binding.toolbar.title = folderName
         updateUpdatedAt()
         updateUnreadCount(folder.unreadCount)
     }
@@ -339,7 +367,7 @@ private fun setupMenuDrawerCallbacks() {
 
 
     private fun scrollToTop() {
-        binding.content.threadsList.layoutManager?.scrollToPosition(0)
+        binding.threadsList.layoutManager?.scrollToPosition(0)
     }
 
     private fun downloadThreads() = with(viewModel) {
