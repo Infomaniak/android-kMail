@@ -235,7 +235,7 @@ class MenuDrawerFragment : Fragment() {
         setCustomFolderCollapsedState()
     }
 
-    private fun getMenuFolders(folders: List<Folder>): Folders {
+    private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
         return folders.toMutableList().let { list ->
 
             val inbox = list
@@ -252,13 +252,7 @@ class MenuDrawerFragment : Fragment() {
                 .sortedByDescending { it.isFavorite }
                 .formatFoldersListWithAllChildren()
 
-            Folders(inbox, defaultFolders, customFolders)
+            Triple(inbox, defaultFolders, customFolders)
         }
     }
-
-    private data class Folders(
-        val inbox: Folder?,
-        val defaultFolders: List<Folder>,
-        val customFolders: List<Folder>,
-    )
 }
