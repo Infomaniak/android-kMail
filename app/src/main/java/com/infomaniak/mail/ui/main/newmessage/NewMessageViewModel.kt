@@ -74,8 +74,11 @@ class NewMessageViewModel : ViewModel() {
             MailData.sendDraft(updatedDraft, mailbox.uuid)
         } else {
             MailData.saveDraft(updatedDraft, mailbox.uuid).data?.let {
-                currentDraft.value?.uuid = it.uuid
-                currentDraft.value?.parentMessageUid = it.uid
+                currentDraft.value?.apply {
+                    uuid = it.uuid
+                    parentMessageUid = it.uid
+                    isOffline = false
+                }
             }
         }
     }

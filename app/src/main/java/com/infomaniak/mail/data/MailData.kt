@@ -185,7 +185,7 @@ object MailData {
     }
 
     private fun saveOfflineDraftToApi(draft: Draft) {
-        val draftMailboxUuid = mailboxesFlow.value?.find { it.email == draft.from.first().email }?.uuid ?: return
+        val draftMailboxUuid = mailboxesFlow.value?.find { it.email == draft.from.firstOrNull()?.email }?.uuid ?: return
         val updatedDraft = setDraftSignature(draft)
         if (updatedDraft.isLastUpdateOnline(draftMailboxUuid)) return
 
