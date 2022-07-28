@@ -110,9 +110,7 @@ class MenuDrawerFragment : Fragment() {
             )
         }
         addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
-        inboxFolder.setOnClickListener {
-            inboxFolderId?.let { openFolder(it) }
-        }
+        inboxFolder.setOnClickListener { inboxFolderId?.let { openFolder(it) } }
         customFolders.setOnClickListener {
             customFoldersList.apply {
                 isVisible = !isVisible
@@ -205,7 +203,9 @@ class MenuDrawerFragment : Fragment() {
         viewModel.listenToCurrentFolder()
     }
 
-    private fun onCurrentFolderChange(currentFolder: Folder) = with(binding) {
+    private fun onCurrentFolderChange(currentFolder: Folder) = updateSelectedItemUi(currentFolder)
+
+    private fun updateSelectedItemUi(currentFolder: Folder) = with(binding) {
         inboxFolder.setSelectedState(currentFolder.id == inboxFolderId)
         defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
         customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
