@@ -15,19 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class)
+@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
 
 package com.infomaniak.mail.data.models.drafts
 
+import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.Companion.API_DRAFT_FOLDER_NAME
 import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -41,6 +42,7 @@ import java.util.*
 class Draft : RealmObject {
     @PrimaryKey
     var uuid: String = ""
+    var date: RealmInstant? = null
     @SerialName("identity_id")
     var identityId: Int? = null
     @SerialName("in_reply_to_uid")
@@ -76,6 +78,8 @@ class Draft : RealmObject {
     var parentMessageUid: String = ""
     @Transient
     var isOffline: Boolean = false
+    @Transient
+    var isModifiedOffline: Boolean = false
 
     fun initLocalValues(messageUid: String = "") {
 
@@ -106,7 +110,7 @@ class Draft : RealmObject {
         isDraft = true
         attachments = draft.attachments
         hasAttachments = draft.attachments.isNotEmpty()
-        date = Date().toRealmInstant()
+        date = draft.date
     }
 
     enum class DraftAction {

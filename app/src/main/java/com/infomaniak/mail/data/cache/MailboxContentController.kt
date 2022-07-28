@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
@@ -31,6 +32,7 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 object MailboxContentController {
 
@@ -194,6 +196,8 @@ object MailboxContentController {
     fun manageDraftAutoSave(draft: Draft) {
         MailRealm.mailboxContent.writeBlocking {
             val hotDraft = (if (draft.isManaged()) getLatestDraft(draft.uuid) else draft) ?: return@writeBlocking
+            hotDraft.isModifiedOffline = true
+            hotDraft.date = Date().toRealmInstant()
             copyToRealm(hotDraft, UpdatePolicy.ALL)
 
             val draftMessage = hotDraft.toMessage()
