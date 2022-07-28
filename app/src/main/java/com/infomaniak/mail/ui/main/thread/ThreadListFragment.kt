@@ -72,7 +72,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
-    private var lastUpdatedAt = Date() // TODO : Remove when implementing last updated at feature
+    private var lastUpdatedAt = Date() // TODO: Remove when implementing "Last updated at" feature
 
     private var menuDrawerFragment: MenuDrawerFragment? = null
     private var menuDrawerNavigation: NavigationView? = null
@@ -147,12 +147,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun updateUpdatedAt() = with(binding) {
         // TODO : Replace lastUpdatedAt.time with currentFolder.lastUpdatedAt ?
-        var ago: String
-        if (Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS) {
-            ago = getString(R.string.threadListHeaderLastUpdateNow)
+        val ago = if (Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS) {
+            getString(R.string.threadListHeaderLastUpdateNow)
         } else {
-            ago = DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString()
-            ago = ago.replaceFirstChar { it.lowercaseChar() }
+            DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
         }
         updatedAt.text = getString(R.string.threadListHeaderLastUpdate, ago)
     }
