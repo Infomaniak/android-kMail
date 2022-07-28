@@ -63,22 +63,22 @@ class SwitchUserMailboxesAdapter(
     }
 
     private fun ItemSwitchUserMailboxBinding.setSelectedState(isSelected: Boolean) {
-        val (color, style) = computeStyle(isSelected)
+        val (color, textStyle, badgeStyle) = computeStyle(isSelected)
         if (displayIcon) envelopeIcon.setColorFilter(color)
         emailAddress.apply {
             setTextColor(color)
-            setTextAppearance(style)
+            setTextAppearance(textStyle)
         }
-        unreadCount.setTextAppearance(style)
+        unreadCount.setTextAppearance(badgeStyle)
     }
 
-    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Pair<Int, Int> {
+    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Triple<Int, Int, Int> {
         return if (isSelected) {
             val typedValue = TypedValue()
             context.theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)
-            typedValue.data to R.style.Callout_Highlighted_Strong
+            Triple(typedValue.data, R.style.Callout_Highlighted_Strong, R.style.Callout_Highlighted_Strong)
         } else {
-            ContextCompat.getColor(context, RCore.color.title) to R.style.Callout
+            Triple(ContextCompat.getColor(context, RCore.color.title), R.style.Callout, R.style.Callout_Highlighted)
         }
     }
 
