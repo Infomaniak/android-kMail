@@ -23,7 +23,7 @@ import com.infomaniak.mail.R
 
 open class ThemedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val isPink = true
+        val isPink = false
 
         val theme = when {
             isPink -> R.style.AppTheme_Pink
