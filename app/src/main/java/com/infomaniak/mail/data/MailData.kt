@@ -22,7 +22,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.ContactsController
-import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestMessage
@@ -30,6 +29,7 @@ import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestThrea
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Folder
@@ -81,7 +81,7 @@ object MailData {
     val currentMessageFlow = mutableCurrentMessageFlow.asStateFlow()
 
     fun close() {
-        MailRealm.close()
+        RealmController.close()
 
         closeFlows()
         closeCurrentFlows()
@@ -393,11 +393,11 @@ object MailData {
         Log.d("API", "Mailboxes: Delete outdated data")
         val isCurrentMailboxDeleted = deletableMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
-            MailRealm.closeMailboxContent()
+            RealmController.closeMailboxContent()
             AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
         }
         MailboxInfoController.deleteMailboxes(deletableMailboxes)
-        deletableMailboxes.forEach { Realm.deleteRealm(MailRealm.getMailboxConfiguration(it.mailboxId)) }
+        deletableMailboxes.forEach { RealmController.deleteMailboxContent(it.mailboxId) }
 
         return if (isCurrentMailboxDeleted) {
             AccountUtils.reloadApp()
@@ -426,7 +426,7 @@ object MailData {
             thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
         }
 
-        MailRealm.mailboxContent.writeBlocking {
+        RealmController.mailboxContent.writeBlocking {
             // Save new data
             Log.d("API", "Folders: Save new data")
             apiFolders.forEach { apiFolder ->
@@ -474,7 +474,7 @@ object MailData {
         }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
 
-        MailRealm.mailboxContent.writeBlocking {
+        RealmController.mailboxContent.writeBlocking {
             // Save new data
             Log.d("API", "Threads: Save new data")
             val newPageSize = apiThreads.size - offset
@@ -533,7 +533,7 @@ object MailData {
             apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
         } ?: emptyList()
 
-        MailRealm.mailboxContent.writeBlocking {
+        RealmController.mailboxContent.writeBlocking {
             // Save new data
             Log.d("API", "Messages: Save new data")
             apiMessages.forEach { apiMessage ->
