@@ -20,7 +20,6 @@ package com.infomaniak.mail.data
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
-import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.ContactsController
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestFolder
@@ -118,7 +117,7 @@ object MailData {
 
             mutableAddressBooksFlow.value = realmAddressBooks
 
-            val apiAddressBooks = MailApi.fetchAddressBooks()
+            val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
             val mergedAddressBooks = mergeAddressBooks(realmAddressBooks, apiAddressBooks)
 
             mutableAddressBooksFlow.value = mergedAddressBooks
@@ -133,7 +132,7 @@ object MailData {
 
             mutableContactsFlow.value = realmContacts
 
-            val apiContacts = MailApi.fetchContacts()
+            val apiContacts = ApiRepository.getContacts().data ?: emptyList()
             val mergedContacts = mergeContacts(realmContacts, apiContacts)
 
             mutableContactsFlow.value = mergedContacts
@@ -287,7 +286,10 @@ object MailData {
 
     private fun getMailboxesFromApi(): List<Mailbox> {
         val realmMailboxes = mutableMailboxesFlow.value
-        val apiMailboxes = MailApi.fetchMailboxes()
+        val apiMailboxes = ApiRepository.getMailboxes().data?.map {
+            val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
+            it.initLocalValues(AccountUtils.currentUserId, quotas)
+        }
         val mergedMailboxes = mergeMailboxes(realmMailboxes, apiMailboxes)
 
         mutableMailboxesFlow.value = mergedMailboxes
@@ -297,7 +299,7 @@ object MailData {
 
     private fun getFoldersFromApi(mailbox: Mailbox) {
         val realmFolders = mutableFoldersFlow.value
-        val apiFolders = MailApi.fetchFolders(mailbox)
+        val apiFolders = ApiRepository.getFolders(mailbox.uuid).data
         val mergedFolders = mergeFolders(realmFolders, apiFolders)
 
         mutableFoldersFlow.value = mergedFolders
@@ -314,7 +316,7 @@ object MailData {
         forceRefresh: Boolean = false,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
+            val apiThreads = ApiRepository.getThreads(mailbox.uuid, folder.id, offset).data?.threads?.map { it.initLocalValues() }
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
@@ -325,10 +327,37 @@ object MailData {
     private fun getMessagesFromApi(thread: Thread) {
         CoroutineScope(Dispatchers.IO).launch {
             val realmMessages = mutableMessagesFlow.value
-            val apiMessages = MailApi.fetchMessages(thread)
+            val apiMessages = fetchMessages(thread)
             val mergedMessages = mergeMessages(realmMessages, apiMessages)
 
             mutableMessagesFlow.value = mergedMessages
+        }
+    }
+
+    private fun fetchMessages(thread: Thread): List<Message> {
+        return thread.messages.map { realmMessage ->
+            if (realmMessage.fullyDownloaded) {
+                realmMessage
+            } else {
+                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
+                    completedMessage.apply {
+                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                        fullyDownloaded = true
+                        body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
+                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                        @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                        attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
+                    }
+                    // TODO: Uncomment this when managing Drafts folder
+                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
+                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
+                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+                    //     completedMessage.draftUuid = draft?.uuid
+                    // }
+                }.let { apiMessage ->
+                    apiMessage ?: realmMessage
+                }
+            }
         }
     }
 
