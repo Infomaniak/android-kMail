@@ -20,15 +20,17 @@ package com.infomaniak.mail.data
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
-import com.infomaniak.mail.data.cache.ContactsController
-import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestFolder
-import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestMessage
-import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestThread
-import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
-import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
-import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.deleteLatestFolder
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.getLatestFolderSync
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteLatestThread
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.userInfos.AddressBookController
+import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Folder
@@ -40,7 +42,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.toRealmList
@@ -50,7 +51,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 object MailData {
@@ -113,7 +113,7 @@ object MailData {
 
     private fun loadAddressBooks(completion: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmAddressBooks = MailRealm.readAddressBooks().first().list
+            val realmAddressBooks = AddressBookController.getAddressBooksSync()
 
             mutableAddressBooksFlow.value = realmAddressBooks
 
@@ -128,7 +128,7 @@ object MailData {
 
     private fun loadContacts() {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmContacts = MailRealm.readContacts().first().list
+            val realmContacts = ContactController.getContactsSync()
 
             mutableContactsFlow.value = realmContacts
 
@@ -171,7 +171,7 @@ object MailData {
     }
 
     fun deleteDraft(message: Message) {
-        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MailboxContentController.deleteMessage(message.uid)
+        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
 
     fun selectMailbox(mailbox: Mailbox) {
@@ -240,7 +240,7 @@ object MailData {
      */
     private fun getMailboxesFromRealm(completion: (List<Mailbox>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmMailboxes = MailRealm.readMailboxes().first().list
+            val realmMailboxes = MailboxController.getMailboxesSync(AccountUtils.currentUserId)
 
             mutableMailboxesFlow.value = realmMailboxes
 
@@ -250,7 +250,7 @@ object MailData {
 
     private fun getFoldersFromRealm() {
         CoroutineScope(Dispatchers.IO).launch {
-            val realmFolders = MailRealm.readFolders().first().list
+            val realmFolders = FolderController.getFoldersSync()
 
             mutableFoldersFlow.value = realmFolders
 
@@ -265,13 +265,13 @@ object MailData {
     }
 
     private fun getThreadsFromRealm(folder: Folder, offset: Int): List<Thread> {
-        val realmThreads = MailRealm.readThreads(folder)
+        val realmThreads = RealmController.mailboxContent.writeBlocking { getLatestFolderSync(folder.id) }?.threads ?: emptyList()
         if (offset == OFFSET_FIRST_PAGE) mutableThreadsFlow.value = realmThreads
         return realmThreads
     }
 
     private fun getMessagesFromRealm(thread: Thread) {
-        val realmMessages = MailRealm.readMessages(thread)
+        val realmMessages = thread.messages
         mutableMessagesFlow.value = realmMessages
     }
 
@@ -375,11 +375,11 @@ object MailData {
 
         // Save new data
         Log.d("API", "AddressBooks: Save new data")
-        ContactsController.upsertAddressBooks(apiAddressBooks)
+        AddressBookController.upsertAddressBooks(apiAddressBooks)
 
         // Delete outdated data
         Log.d("API", "AddressBooks: Delete outdated data")
-        ContactsController.deleteAddressBooks(deletableAddressBooks)
+        AddressBookController.deleteAddressBooks(deletableAddressBooks)
 
         return apiAddressBooks
     }
@@ -395,11 +395,11 @@ object MailData {
 
         // Save new data
         Log.d("API", "Contacts: Save new data")
-        ContactsController.upsertContacts(apiContacts)
+        ContactController.upsertContacts(apiContacts)
 
         // Delete outdated data
         Log.d("API", "Contacts: Delete outdated data")
-        ContactsController.deleteContacts(deletableContacts)
+        ContactController.deleteContacts(deletableContacts)
 
         return apiContacts
     }
@@ -416,7 +416,7 @@ object MailData {
 
         // Save new data
         Log.d("API", "Mailboxes: Save new data")
-        MailboxInfoController.upsertMailboxes(apiMailboxes)
+        MailboxController.upsertMailboxes(apiMailboxes)
 
         // Delete outdated data
         Log.d("API", "Mailboxes: Delete outdated data")
@@ -425,7 +425,7 @@ object MailData {
             RealmController.closeMailboxContent()
             AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
         }
-        MailboxInfoController.deleteMailboxes(deletableMailboxes)
+        MailboxController.deleteMailboxes(deletableMailboxes)
         deletableMailboxes.forEach { RealmController.deleteMailboxContent(it.mailboxId) }
 
         return if (isCurrentMailboxDeleted) {
@@ -530,7 +530,7 @@ object MailData {
             if (realmThread != null) {
                 messages.forEach { apiMessage ->
                     realmThread.messages.find { realmMessage -> realmMessage.uid == apiMessage.uid }
-                        ?.let { realmMessage -> getLatestMessage(realmMessage.uid) }
+                        ?.let { realmMessage -> getLatestMessageSync(realmMessage.uid) }
                         ?.let { realmMessage -> saveMessageWithBackedUpData(apiMessage, realmMessage) }
                 }
             }
@@ -548,7 +548,7 @@ object MailData {
     }
 
     private fun MutableRealm.updateFolder(folder: Folder, apiThreads: List<Thread>) {
-        val latestFolder = getLatestFolder(folder.id) ?: folder
+        val latestFolder = getLatestFolderSync(folder.id) ?: folder
         latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
         copyToRealm(latestFolder, UpdatePolicy.ALL)
     }
@@ -575,10 +575,6 @@ object MailData {
         }
 
         return apiMessages
-    }
-
-    private fun MutableRealm.deleteMessages(deletableMessages: List<Message>) {
-        deletableMessages.forEach { deleteLatestMessage(it.uid) }
     }
 
     private fun MutableRealm.deleteThreads(deletableThreads: List<Thread>) {

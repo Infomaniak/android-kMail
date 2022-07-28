@@ -35,7 +35,8 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.MailApi
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
@@ -98,7 +99,14 @@ class ThreadFragment : Fragment() {
             }
             onDraftClicked = { message ->
                 lifecycleScope.launch {
-                    val draft = MailApi.fetchDraft(message.draftResource, message.uid)
+                    val parentUid = message.uid
+                    // TODO: There shouldn't be any Api call in fragments. Move this in the ViewModel.
+                    val draft = ApiRepository.getDraft(message.draftResource).data?.apply {
+                        initLocalValues(parentUid)
+                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                        attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
+                        DraftController.upsertDraft(this)
+                    }
                     message.setDraftId(draft?.uuid)
                     // TODO: Open the draft in draft editor
                 }

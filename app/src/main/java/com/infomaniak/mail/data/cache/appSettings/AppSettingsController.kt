@@ -15,21 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache
+package com.infomaniak.mail.data.cache.appSettings
 
+import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.models.AppSettings
 import io.realm.kotlin.ext.query
 
 object AppSettingsController {
-    fun getAppSettings(): AppSettings = with(MailRealm.appSettings) {
+
+    /**
+     * Get data
+     */
+    fun getAppSettings(): AppSettings = with(RealmController.appSettings) {
         query<AppSettings>().first().find() ?: writeBlocking { copyToRealm(AppSettings()) }
     }
 
+    /**
+     * Edit data
+     */
     fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
-        MailRealm.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
+        RealmController.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
     }
 
     fun removeAppSettings() {
-        MailRealm.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
+        RealmController.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
     }
 }

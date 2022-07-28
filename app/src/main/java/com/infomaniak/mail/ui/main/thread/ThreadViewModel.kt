@@ -22,13 +22,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.cache.MailboxContentController.getLatestThread
 import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getLatestThreadSync
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
@@ -40,10 +41,12 @@ class ThreadViewModel : ViewModel() {
     fun loadMessages(threadUid: String) {
         listenToMessages()
 
-        MailboxContentController.getThread(threadUid)?.let { thread ->
-            MailData.selectThread(thread)
-            markAsSeen(thread)
-            MailData.loadMessages(thread)
+        viewModelScope.launch {
+            ThreadController.getThreadAsync(threadUid).firstOrNull()?.obj?.let { thread ->
+                MailData.selectThread(thread)
+                markAsSeen(thread)
+                MailData.loadMessages(thread)
+            }
         }
     }
 
@@ -62,7 +65,7 @@ class ThreadViewModel : ViewModel() {
             val mailboxUuid = MailData.currentMailboxFlow.value?.uuid ?: return
 
             RealmController.mailboxContent.writeBlocking {
-                getLatestThread(thread.uid)?.let { latestThread ->
+                getLatestThreadSync(thread.uid)?.let { latestThread ->
 
                     val apiResponse = ApiRepository.markMessagesAsSeen(mailboxUuid, latestThread.messages.map { it.uid })
 

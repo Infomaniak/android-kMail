@@ -37,6 +37,9 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.AttachmentType
 import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.types.RealmInstant
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import java.util.*
 
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
@@ -80,6 +83,14 @@ fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 inline val ViewBinding.context: Context get() = root.context
+
+fun <T> Flow<T>.toSharedFlow(): SharedFlow<T> {
+    return distinctUntilChanged().shareIn(
+        scope = CoroutineScope(Dispatchers.IO),
+        started = SharingStarted.WhileSubscribed(),
+        replay = 1,
+    )
+}
 
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
