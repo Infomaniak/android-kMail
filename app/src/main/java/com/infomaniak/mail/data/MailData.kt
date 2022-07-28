@@ -162,12 +162,7 @@ object MailData {
         }
     }
 
-    fun loadThreads(
-        folder: Folder,
-        mailbox: Mailbox,
-        offset: Int,
-        forceRefresh: Boolean = false,
-    ) {
+    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int, forceRefresh: Boolean = false) {
         val isInternetAvailable = true // TODO: Manage this for real
         val realmThreads = getThreadsFromRealm(folder, offset)
 
@@ -180,20 +175,24 @@ object MailData {
                 .filter { it.isOffline || it.isModifiedOffline }
 
             CoroutineScope(Dispatchers.IO).launch {
-                for (draft in realmOfflineDrafts) {
-                    val draftMailboxUuid = mailboxesFlow.value?.find { it.email == draft.from.first().email }?.uuid ?: continue
-                    val updatedDraft = setDraftSignature(draft)
-                    if (updatedDraft.isLastUpdateOnline(draftMailboxUuid)) continue
-
-                    saveDraft(updatedDraft, draftMailboxUuid).data?.let {
-                        fetchDraft("/api/mail/${draftMailboxUuid}/draft/${it.uuid}", it.uid)
-                    }
+                realmOfflineDrafts.forEach { draft ->
+                    saveOfflineDraftToApi(draft)
                 }
                 getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
             }
 
         } else {
             getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
+        }
+    }
+
+    private fun saveOfflineDraftToApi(draft: Draft) {
+        val draftMailboxUuid = mailboxesFlow.value?.find { it.email == draft.from.first().email }?.uuid ?: return
+        val updatedDraft = setDraftSignature(draft)
+        if (updatedDraft.isLastUpdateOnline(draftMailboxUuid)) return
+
+        saveDraft(updatedDraft, draftMailboxUuid).data?.let {
+            fetchDraft("/api/mail/${draftMailboxUuid}/draft/${it.uuid}", it.uid)
         }
     }
 
