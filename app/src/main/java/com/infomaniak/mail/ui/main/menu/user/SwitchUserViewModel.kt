@@ -56,7 +56,7 @@ class SwitchUserViewModel : ViewModel() {
                             }
                             ?.let { user to it }
                     }
-                    .also { accounts::postValue }
+                    .also(accounts::postValue)
             }
         }
     }
