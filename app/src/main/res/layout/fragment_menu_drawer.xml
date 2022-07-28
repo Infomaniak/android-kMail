@@ -253,12 +253,12 @@
 
             <com.infomaniak.mail.views.MenuDrawerItemView
                 android:id="@+id/createNewFolderButton"
-                android:visibility="gone"
-                tools:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:icon="@drawable/ic_plus_rounded"
-                app:text="@string/buttonCreateFolder" />
+                app:text="@string/buttonCreateFolder"
+                tools:visibility="visible" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
@@ -373,9 +373,6 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
-
 </LinearLayout>

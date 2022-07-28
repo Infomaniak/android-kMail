@@ -30,6 +30,7 @@ import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.setMargins
+import com.google.android.material.R as RMaterial
 
 class MenuDrawerItemView @JvmOverloads constructor(
     context: Context,
@@ -73,13 +74,15 @@ class MenuDrawerItemView @JvmOverloads constructor(
         binding = ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true)
 
         if (attrs != null) {
+            val defaultTextSize = binding.itemName.textSize.toInt()
+
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MenuDrawerItemView, 0, 0)
 
             val iconDrawable = typedArray.getDrawable(R.styleable.MenuDrawerItemView_icon)
             val nameText = typedArray.getString(R.styleable.MenuDrawerItemView_text)
             val badgeText = typedArray.getString(R.styleable.MenuDrawerItemView_badge)
             val indentValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, 0)
-            val textSizeValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, binding.itemName.textSize.toInt())
+            val textSizeValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
 
             icon = iconDrawable
             text = nameText
@@ -94,8 +97,8 @@ class MenuDrawerItemView @JvmOverloads constructor(
     fun setSelectedState(isSelected: Boolean) = with(binding) {
         val (color, textColor, textAppearance) = if (isSelected) {
             Triple(
-                context.getAttributeColor(com.google.android.material.R.attr.colorPrimaryContainer),
-                context.getAttributeColor(com.google.android.material.R.attr.colorPrimary),
+                context.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
+                context.getAttributeColor(RMaterial.attr.colorPrimary),
                 R.style.Body_Highlighted
             )
         } else {
