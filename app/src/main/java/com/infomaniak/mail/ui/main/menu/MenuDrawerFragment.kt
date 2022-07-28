@@ -131,10 +131,7 @@ class MenuDrawerFragment : Fragment() {
         help.setOnClickListener {
             notYetImplemented()
             closeDrawer()
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToHelpFragment(),
-                currentClassName = MenuDrawerFragment::class.java.name,
-            )
+            menuDrawerSafeNavigate(R.id.helpFragment)
         }
         importMails.setOnClickListener {
             closeDrawer()
@@ -146,13 +143,16 @@ class MenuDrawerFragment : Fragment() {
             // TODO: Restore mails
             notYetImplemented()
         }
-        getMoreStorageCardview.setOnClickListener {
-            if (canNavigate) {
-                canNavigate = false
-                findNavController().navigate(R.id.getMoreStorageBottomSheetDialog)
-            }
+        getMoreStorageCardview.setOnClickListener { menuDrawerSafeNavigate(R.id.getMoreStorageBottomSheetDialog) }
+    }
+
+    private fun menuDrawerSafeNavigate(destinationResId: Int) {
+        if (canNavigate) {
+            canNavigate = false
+            findNavController().navigate(destinationResId)
         }
     }
+
 
     fun onDrawerOpened() {
         canNavigate = true
