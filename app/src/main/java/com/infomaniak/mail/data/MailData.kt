@@ -167,7 +167,6 @@ object MailData {
         val realmThreads = getThreadsFromRealm(folder, offset)
 
         if (Folder.isDraftsFolder() && isInternetAvailable) {
-
             val realmOfflineDrafts = realmThreads
                 .flatMap { it.messages }
                 .filter { it.isDraft }
@@ -180,7 +179,6 @@ object MailData {
                 }
                 getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
             }
-
         } else {
             getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
         }
@@ -227,9 +225,9 @@ object MailData {
                 isModifiedOffline = false
                 parentMessageUid = apiData.uid
                 // attachments = apiData.attachments // TODO? Not sure.
-                MailboxContentController.manageDraftAutoSave(newDraft)
+                MailboxContentController.manageDraftAutoSave(newDraft, false)
             }
-        } ?: MailboxContentController.manageDraftAutoSave(draft)
+        } ?: MailboxContentController.manageDraftAutoSave(draft, true)
 
         return response
     }

@@ -193,7 +193,7 @@ object MailboxContentController {
         }
     }
 
-    fun manageDraftAutoSave(draft: Draft) {
+    fun manageDraftAutoSave(draft: Draft, mustSaveThread: Boolean) {
         MailRealm.mailboxContent.writeBlocking {
             val hotDraft = (if (draft.isManaged()) getLatestDraft(draft.uuid) else draft) ?: return@writeBlocking
             hotDraft.isModifiedOffline = true
@@ -206,12 +206,14 @@ object MailboxContentController {
             val threadUid = MailData.threadsFlow.value?.find { thread ->
                 thread.messages.any { message -> message.uid == draft.parentMessageUid }
             }?.uid
-            val thread = Thread.from(draftMessage, threadUid)
-            copyToRealm(thread, UpdatePolicy.ALL)
+            if (mustSaveThread) {
+                val thread = Thread.from(draftMessage, threadUid)
+                copyToRealm(thread, UpdatePolicy.ALL)
 
-            val folderThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
-            if (folderThreads?.none { folderThread -> folderThread.uid == thread.uid } == true) {
-                folderThreads.add(thread)
+                val folderThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
+                if (folderThreads?.none { folderThread -> folderThread.uid == thread.uid } == true) {
+                    folderThreads.add(thread)
+                }
             }
         }
     }
@@ -222,14 +224,14 @@ object MailboxContentController {
     }
 
     private fun MutableRealm.removeDraft(uuid: String, parentUid: String) {
-        val thread = getDraftsFolder()?.id
+        val threadsToRemove = getDraftsFolder()?.id
             ?.let { getLatestFolder(it) }
             ?.threads
-            ?.find { thread ->
+            ?.filter { thread ->
                 thread.uid == uuid || thread.uid == parentUid || thread.messages.any { it.uid == uuid || it.uid == parentUid }
             }
         deleteLatestMessage(parentUid.ifEmpty { uuid })
-        thread?.let { getLatestThread(it.uid)?.let(::delete) }
+        threadsToRemove?.forEach { thread -> thread.let { getLatestThread(it.uid)?.let(::delete) } }
     }
 
     /**
