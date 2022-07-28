@@ -33,10 +33,6 @@
     <dimen name="searchViewHeight">40dp</dimen>
     <dimen name="userAvatarSizeLarge">50dp</dimen>
 
-    <!-- Cardview -->
-
-    <dimen name="materialCardviewRadius">33dp</dimen>
-
     <!-- Menu Drawer -->
 
     <dimen name="menuDrawerItemViewHeight">48dp</dimen>

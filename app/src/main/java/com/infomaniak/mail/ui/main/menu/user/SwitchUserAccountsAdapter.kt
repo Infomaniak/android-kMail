@@ -50,7 +50,7 @@ class SwitchUserAccountsAdapter(
     override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() is Unit) {
             isCollapsed[position] = true
-            holder.binding.updateAccountCard(position)
+            holder.binding.updateAccountCardUiState(position)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -83,7 +83,7 @@ class SwitchUserAccountsAdapter(
     private fun ItemSwitchUserAccountBinding.toggleMailboxes(position: Int, isFirstRun: Boolean = false) {
         if (!isFirstRun && isCollapsed[position]) closeAllBut(position)
         isCollapsed[position] = !isCollapsed[position]
-        updateAccountCard(position)
+        updateAccountCardUiState(position)
     }
 
     private fun closeAllBut(position: Int) {
@@ -92,7 +92,7 @@ class SwitchUserAccountsAdapter(
         }
     }
 
-    private fun ItemSwitchUserAccountBinding.updateAccountCard(position: Int) {
+    private fun ItemSwitchUserAccountBinding.updateAccountCardUiState(position: Int) {
         chevron.toggleChevron(isCollapsed[position])
         addressesList.isGone = isCollapsed[position]
 
