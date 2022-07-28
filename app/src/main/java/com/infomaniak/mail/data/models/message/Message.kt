@@ -25,7 +25,10 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder.Companion.API_DRAFT_FOLDER_NAME
+import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -120,5 +123,24 @@ class Message : RealmObject {
         VALID(null),
         NOT_VALID("not_valid"),
         NOT_SIGNED("not_signed"),
+    }
+
+    companion object {
+        fun from(draft: Draft) = Message().apply {
+            uid = draft.parentMessageUid.ifEmpty { draft.uuid }
+            draftUuid = draft.uuid
+            subject = draft.subject
+            folder = API_DRAFT_FOLDER_NAME
+            folderId = getDraftsFolder()?.id.toString()
+            from = draft.from
+            to = draft.to ?: realmListOf()
+            cc = draft.cc ?: realmListOf()
+            bcc = draft.bcc ?: realmListOf()
+            replyTo = draft.replyTo
+            isDraft = true
+            attachments = draft.attachments
+            hasAttachments = draft.attachments.isNotEmpty()
+            date = draft.date
+        }
     }
 }

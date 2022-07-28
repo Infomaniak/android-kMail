@@ -22,10 +22,7 @@ package com.infomaniak.mail.data.models.drafts
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Folder.Companion.API_DRAFT_FOLDER_NAME
-import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmInstant
@@ -93,24 +90,6 @@ class Draft : RealmObject {
         cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         bcc = bcc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         to = to?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-    }
-
-    fun toMessage() = Message().apply {
-        val draft = this@Draft
-        uid = draft.parentMessageUid.ifEmpty { draft.uuid }
-        draftUuid = draft.uuid
-        subject = draft.subject
-        folder = API_DRAFT_FOLDER_NAME
-        folderId = getDraftsFolder()?.id.toString()
-        from = draft.from
-        to = draft.to ?: realmListOf()
-        cc = draft.cc ?: realmListOf()
-        bcc = draft.bcc ?: realmListOf()
-        replyTo = draft.replyTo
-        isDraft = true
-        attachments = draft.attachments
-        hasAttachments = draft.attachments.isNotEmpty()
-        date = draft.date
     }
 
     enum class DraftAction {

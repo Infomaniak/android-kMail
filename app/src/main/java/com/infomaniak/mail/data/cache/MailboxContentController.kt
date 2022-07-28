@@ -200,13 +200,13 @@ object MailboxContentController {
             hotDraft.date = Date().toRealmInstant()
             copyToRealm(hotDraft, UpdatePolicy.ALL)
 
-            val draftMessage = hotDraft.toMessage()
+            val draftMessage = Message.from(hotDraft)
             copyToRealm(draftMessage, UpdatePolicy.ALL)
 
-            val threadUid = MailData.threadsFlow.value?.find { thread ->
-                thread.messages.any { message -> message.uid == draft.parentMessageUid }
-            }?.uid
             if (mustSaveThread) {
+                val threadUid = MailData.threadsFlow.value?.find { thread ->
+                    thread.messages.any { message -> message.uid == draft.parentMessageUid }
+                }?.uid
                 val thread = Thread.from(draftMessage, threadUid)
                 copyToRealm(thread, UpdatePolicy.ALL)
 

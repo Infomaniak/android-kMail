@@ -82,12 +82,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getThreads(
-        mailboxUuid: String,
-        folderId: String,
-        offset: Int,
-        filter: ThreadFilter? = null,
-    ): ApiResponse<ThreadsResult> {
+    fun getThreads(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> {
         return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name), GET)
     }
 
