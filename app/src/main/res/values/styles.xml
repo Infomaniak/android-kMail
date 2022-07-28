@@ -197,17 +197,6 @@
         <item name="closeIconEnabled">false</item>
     </style>
 
-    <style name="UnreadChip" parent="Widget.Material3.Chip.Input">
-        <item name="android:textColor">@color/chip_unread_text_color</item>
-        <item name="checkedIcon">@null</item>
-        <item name="checkedIconEnabled">false</item>
-        <item name="chipBackgroundColor">@color/chip_unread_background</item>
-        <item name="chipCornerRadius">100dp</item>
-        <item name="chipStrokeWidth">0dp</item>
-        <item name="closeIconTint">?attr/colorOnPrimary</item>
-    </style>
-
-
     <!-- Other -->
 
     <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">

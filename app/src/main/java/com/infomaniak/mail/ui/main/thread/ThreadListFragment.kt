@@ -106,12 +106,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.unreadCountChip.apply {
-            isCloseIconVisible = false
-            setOnCheckedChangeListener { _, isChecked ->
-                isCloseIconVisible = isChecked
-            }
-        }
 
         lastUpdatedAt = Date()
         startPeriodicRefreshJob()
@@ -121,9 +115,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupMenuDrawer()
         setupListeners()
         setupUserAvatar()
+        setupUnreadCountChip()
 
         listenToCurrentFolder()
         listenToThreads()
+    }
+
+    private fun setupUnreadCountChip() {
+        binding.unreadCountChip.apply {
+            isCloseIconVisible = false
+            setOnCheckedChangeListener { _, isChecked ->
+                isCloseIconVisible = isChecked
+            }
+        }
     }
 
     private fun setupOnRefresh() {

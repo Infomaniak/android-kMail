@@ -92,10 +92,17 @@
 
     <com.google.android.material.chip.Chip
         android:id="@+id/unreadCountChip"
-        style="@style/UnreadChip"
+        style="@style/Widget.Material3.Chip.Input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/marginStandardMedium"
+        android:textColor="@color/chip_unread_text_color"
+        app:checkedIcon="@null"
+        app:checkedIconEnabled="false"
+        app:chipBackgroundColor="@color/chip_unread_background"
+        app:chipCornerRadius="100dp"
+        app:chipStrokeWidth="0dp"
+        app:closeIconTint="?attr/colorOnPrimary"
         app:layout_constraintBottom_toBottomOf="@id/updatedAt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/updatedAt"
