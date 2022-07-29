@@ -39,6 +39,7 @@ object KMailHttpClient {
                 }
                 httpClientMap[Pair(userId, timeout)] = httpClient
             }
+
             return httpClient
         }
     }

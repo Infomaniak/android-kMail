@@ -68,6 +68,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
             R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
+
         return BindingViewHolder(binding)
     }
 
@@ -195,6 +196,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         override fun areItemsTheSame(oldIndex: Int, newIndex: Int): Boolean {
             val oldItem = oldList[oldIndex]
             val newItem = newList[newIndex]
+
             return when {
                 oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
                 oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
@@ -206,6 +208,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
             val oldItem = oldList[oldIndex]
             val newItem = newList[newIndex]
+
             return when {
                 oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
                 oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
