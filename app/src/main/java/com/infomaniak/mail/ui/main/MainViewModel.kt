@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
+import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.deleteFolders
@@ -96,6 +97,7 @@ class MainViewModel : ViewModel() {
     }
 
     val isInternetAvailable = MutableLiveData(false)
+    var canContinueToPaginate = true
 
     fun close() {
         RealmController.close()
@@ -302,8 +304,9 @@ class MainViewModel : ViewModel() {
         // Get current data
         Log.d("API", "Threads: Get current data")
         val realmThreads = FolderController.getFolderSync(folder.id)?.threads ?: emptyList()
-        val apiThreadsSinceOffset = ApiRepository.getThreads(mailbox.uuid, folder.id, offset).data?.threads
-            ?.map { it.initLocalValues() } ?: emptyList()
+        val apiThreadsSinceOffset = ApiRepository.getThreads(mailbox.uuid, folder.id, offset).data?.also { threadsResult ->
+            canContinueToPaginate = threadsResult.messagesCount >= PER_PAGE
+        }?.threads?.map { it.initLocalValues() } ?: emptyList()
         val apiThreads = if (offset == OFFSET_FIRST_PAGE) {
             apiThreadsSinceOffset
         } else {

@@ -64,7 +64,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var threadListAdapter = ThreadListAdapter()
 
     private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
+        Utils.createRefreshTimer(
+            // TODO: Remove & fix this. It's been put there because currently, it seems that when the refresh API call is shorter
+            // TODO: than 600ms, the spinning thingy never disappears (because it appears AFTER that everything is finished).
+            milliseconds = 0L,
+        ) { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
     private var currentOffset = OFFSET_FIRST_PAGE
@@ -264,7 +268,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val folder = MainViewModel.currentFolderFlow.value ?: return
         val mailbox = MainViewModel.currentMailboxFlow.value ?: return
 
-        if (folder.totalCount > currentOffset + PER_PAGE) {
+        if (mainViewModel.canContinueToPaginate) {
             isDownloadingChanges = true
             currentOffset += PER_PAGE
             showLoadingTimer.start()
