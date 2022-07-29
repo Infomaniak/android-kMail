@@ -58,13 +58,13 @@ object MailData {
     private val mutableMailboxesFlow = MutableStateFlow<List<Mailbox>?>(null)
     private val mutableFoldersFlow = MutableStateFlow<List<Folder>?>(null)
     private val mutableThreadsFlow = MutableStateFlow<List<Thread>?>(null)
-    private val mutableMessagesFlow = MutableStateFlow<List<Message>?>(null)
+//    private val mutableMessagesFlow = MutableStateFlow<List<Message>?>(null)
 //    val addressBooksFlow = mutableAddressBooksFlow.asStateFlow()
 //    val contactsFlow = mutableContactsFlow.asStateFlow()
     val mailboxesFlow = mutableMailboxesFlow.asStateFlow()
     val foldersFlow = mutableFoldersFlow.asStateFlow()
     val threadsFlow = mutableThreadsFlow.asStateFlow()
-    val messagesFlow = mutableMessagesFlow.asStateFlow()
+//    val messagesFlow = mutableMessagesFlow.asStateFlow()
 
     private val mutableCurrentMailboxFlow = MutableStateFlow<Mailbox?>(null)
     private val mutableCurrentFolderFlow = MutableStateFlow<Folder?>(null)
@@ -83,7 +83,7 @@ object MailData {
     }
 
     private fun closeFlows() {
-        mutableMessagesFlow.value = null
+//        mutableMessagesFlow.value = null
         mutableThreadsFlow.value = null
         mutableFoldersFlow.value = null
         mutableMailboxesFlow.value = null
@@ -161,10 +161,10 @@ object MailData {
         getThreadsFromApi(folder, mailbox, OFFSET_FIRST_PAGE, forceRefresh = true)
     }
 
-    fun loadMessages(thread: Thread) {
-        getMessagesFromRealm(thread)
-        getMessagesFromApi(thread)
-    }
+//    fun loadMessages(thread: Thread) {
+//        getMessagesFromRealm(thread)
+//        getMessagesFromApi(thread)
+//    }
 
     fun deleteDraft(message: Message) {
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
@@ -178,7 +178,7 @@ object MailData {
             mutableCurrentMessageFlow.value = null
             mutableCurrentThreadFlow.value = null
             mutableCurrentFolderFlow.value = null
-            mutableMessagesFlow.value = null
+//            mutableMessagesFlow.value = null
             mutableThreadsFlow.value = null
             mutableFoldersFlow.value = null
         }
@@ -190,7 +190,7 @@ object MailData {
 
             mutableCurrentMessageFlow.value = null
             mutableCurrentThreadFlow.value = null
-            mutableMessagesFlow.value = null
+//            mutableMessagesFlow.value = null
             mutableThreadsFlow.value = null
         }
     }
@@ -200,7 +200,7 @@ object MailData {
             mutableCurrentThreadFlow.value = thread
 
             mutableCurrentMessageFlow.value = null
-            mutableMessagesFlow.value = null
+//            mutableMessagesFlow.value = null
         }
     }
 
@@ -266,10 +266,10 @@ object MailData {
         return realmThreads
     }
 
-    private fun getMessagesFromRealm(thread: Thread) {
-        val realmMessages = thread.messages
-        mutableMessagesFlow.value = realmMessages
-    }
+//    private fun getMessagesFromRealm(thread: Thread) {
+//        val realmMessages = thread.messages
+//        mutableMessagesFlow.value = realmMessages
+//    }
 
     /**
      * Fetch API
@@ -320,42 +320,42 @@ object MailData {
         }
     }
 
-    private fun getMessagesFromApi(thread: Thread) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val realmMessages = mutableMessagesFlow.value
-            val apiMessages = fetchMessages(thread)
-            val mergedMessages = mergeMessages(realmMessages, apiMessages)
+//    private fun getMessagesFromApi(thread: Thread) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val realmMessages = mutableMessagesFlow.value
+//            val apiMessages = fetchMessages(thread)
+//            val mergedMessages = mergeMessages(realmMessages, apiMessages)
+//
+//            mutableMessagesFlow.value = mergedMessages
+//        }
+//    }
 
-            mutableMessagesFlow.value = mergedMessages
-        }
-    }
-
-    private fun fetchMessages(thread: Thread): List<Message> {
-        return thread.messages.map { realmMessage ->
-            if (realmMessage.fullyDownloaded) {
-                realmMessage
-            } else {
-                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
-                    completedMessage.apply {
-                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
-                        fullyDownloaded = true
-                        body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
-                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                        @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
-                        attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
-                    }
-                    // TODO: Uncomment this when managing Drafts folder
-                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
-                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
-                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
-                    //     completedMessage.draftUuid = draft?.uuid
-                    // }
-                }.let { apiMessage ->
-                    apiMessage ?: realmMessage
-                }
-            }
-        }
-    }
+//    private fun fetchMessages(thread: Thread): List<Message> {
+//        return thread.messages.map { realmMessage ->
+//            if (realmMessage.fullyDownloaded) {
+//                realmMessage
+//            } else {
+//                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
+//                    completedMessage.apply {
+//                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+//                        fullyDownloaded = true
+//                        body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
+//                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+//                        @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+//                        attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
+//                    }
+//                    // TODO: Uncomment this when managing Drafts folder
+//                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
+//                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
+//                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+//                    //     completedMessage.draftUuid = draft?.uuid
+//                    // }
+//                }.let { apiMessage ->
+//                    apiMessage ?: realmMessage
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Merge Realm & API data
@@ -549,29 +549,29 @@ object MailData {
         copyToRealm(latestFolder, UpdatePolicy.ALL)
     }
 
-    private fun mergeMessages(realmMessages: List<Message>?, apiMessages: List<Message>): List<Message> {
-
-        // Get outdated data
-        Log.d("API", "Messages: Get outdated data")
-        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
-        val deletableMessages = realmMessages?.filter { realmMessage ->
-            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
-        } ?: emptyList()
-
-        RealmController.mailboxContent.writeBlocking {
-            // Save new data
-            Log.d("API", "Messages: Save new data")
-            apiMessages.forEach { apiMessage ->
-                if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
-            }
-
-            // Delete outdated data
-            Log.d("API", "Messages: Delete outdated data")
-            deleteMessages(deletableMessages)
-        }
-
-        return apiMessages
-    }
+//    private fun mergeMessages(realmMessages: List<Message>?, apiMessages: List<Message>): List<Message> {
+//
+//        // Get outdated data
+//        Log.d("API", "Messages: Get outdated data")
+//        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
+//        val deletableMessages = realmMessages?.filter { realmMessage ->
+//            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
+//        } ?: emptyList()
+//
+//        RealmController.mailboxContent.writeBlocking {
+//            // Save new data
+//            Log.d("API", "Messages: Save new data")
+//            apiMessages.forEach { apiMessage ->
+//                if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
+//            }
+//
+//            // Delete outdated data
+//            Log.d("API", "Messages: Delete outdated data")
+//            deleteMessages(deletableMessages)
+//        }
+//
+//        return apiMessages
+//    }
 
     private fun MutableRealm.deleteThreads(deletableThreads: List<Thread>) {
         deletableThreads.forEach { deleteLatestThread(it.uid) }

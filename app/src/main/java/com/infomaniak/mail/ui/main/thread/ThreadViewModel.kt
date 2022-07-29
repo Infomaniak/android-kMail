@@ -17,45 +17,35 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getLatestThreadSync
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.filterNotNull
+import com.infomaniak.mail.utils.toSharedFlow
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.isManaged
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    private var listenToMessagesJob: Job? = null
-
     val messages = MutableLiveData<List<Message>?>()
 
-    fun loadMessages(threadUid: String) {
-        listenToMessages()
-
-        viewModelScope.launch {
-            ThreadController.getThreadAsync(threadUid).firstOrNull()?.obj?.let { thread ->
-                MailData.selectThread(thread)
-                markAsSeen(thread)
-                MailData.loadMessages(thread)
-            }
-        }
-    }
-
-    private fun listenToMessages() {
-        listenToMessagesJob?.cancel()
-        listenToMessagesJob = viewModelScope.launch {
-            MailData.messagesFlow.filterNotNull().collect {
-                messages.value = it
-            }
+    fun listenToThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        ThreadController.getThreadAsync(threadUid).firstOrNull()?.obj?.let { thread ->
+            MailData.selectThread(thread)
+            markAsSeen(thread)
+            listenToMessages(thread)
+            loadMessages(thread)
         }
     }
 
@@ -75,6 +65,66 @@ class ThreadViewModel : ViewModel() {
                             unseenMessagesCount = 0
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun listenToMessages(thread: Thread) = viewModelScope.launch {
+        thread.messages.asFlow().toSharedFlow().collect {
+            messages.value = it.list
+        }
+    }
+
+    private fun loadMessages(thread: Thread) {
+
+        // Get current data
+        Log.d("API", "Messages: Get current data")
+        val realmMessages = thread.messages
+        val apiMessages = fetchMessages(thread)
+
+        // Get outdated data
+        Log.d("API", "Messages: Get outdated data")
+        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
+        val deletableMessages = realmMessages.filter { realmMessage ->
+            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
+        }
+
+        RealmController.mailboxContent.writeBlocking {
+            // Save new data
+            Log.d("API", "Messages: Save new data")
+            apiMessages.forEach { apiMessage ->
+                if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
+            }
+
+            // Delete outdated data
+            Log.d("API", "Messages: Delete outdated data")
+            deleteMessages(deletableMessages)
+        }
+    }
+
+    private fun fetchMessages(thread: Thread): List<Message> {
+        return thread.messages.map { realmMessage ->
+            if (realmMessage.fullyDownloaded) {
+                realmMessage
+            } else {
+                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
+                    completedMessage.apply {
+                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                        fullyDownloaded = true
+                        body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
+                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                        @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                        attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
+                    }
+                    // TODO: Uncomment this when managing Drafts folder
+                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
+                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
+                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+                    //     completedMessage.draftUuid = draft?.uuid
+                    // }
+                }.let { apiMessage ->
+                    apiMessage ?: realmMessage
                 }
             }
         }
