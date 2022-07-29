@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapter.MenuDrawerSwitchUserMailboxViewHolder
+import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 
 class MenuDrawerSwitchUserMailboxesAdapter(
     private var mailboxes: List<Mailbox> = emptyList(),
@@ -43,9 +44,7 @@ class MenuDrawerSwitchUserMailboxesAdapter(
         text = mailbox.email
 
         val unread = mailbox.unseenMessages
-        var unreadText = unread.toString()
-        if (unread >= 100) unreadText = "99+"
-        badge = unreadText
+        badge = formatUnreadCount(unread)
         setBadgeVisibility(unread == 0)
 
         setOnClickListener { onMailboxSelected(mailbox) }

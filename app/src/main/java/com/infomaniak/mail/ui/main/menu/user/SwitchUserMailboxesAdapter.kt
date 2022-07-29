@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
+import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
@@ -52,11 +53,9 @@ class SwitchUserMailboxesAdapter(
         envelopeIcon.isVisible = displayIcon
 
         val unread = mailbox.unseenMessages
-        var unreadText = unread.toString()
-        if (unread >= 100) unreadText = "99+"
         unreadCount.apply {
             isGone = unread == 0
-            text = unreadText
+            text = formatUnreadCount(unread)
         }
 
         setSelectedState(mailbox.objectId == MailData.currentMailboxFlow.value?.objectId)
@@ -64,17 +63,7 @@ class SwitchUserMailboxesAdapter(
     }
 
     private fun ItemSwitchUserMailboxBinding.setSelectedState(isSelected: Boolean) {
-        val (color, textStyle, badgeStyle) = computeStyle(isSelected)
-        if (displayIcon) envelopeIcon.setColorFilter(color)
-        emailAddress.apply {
-            setTextColor(color)
-            setTextAppearance(textStyle)
-        }
-        unreadCount.setTextAppearance(badgeStyle)
-    }
-
-    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Triple<Int, Int, Int> {
-        return if (isSelected) {
+        val (color, textStyle, badgeStyle) = if (isSelected) {
             Triple(
                 context.getAttributeColor(RMaterial.attr.colorPrimary),
                 R.style.Callout_Highlighted_Strong,
@@ -87,6 +76,13 @@ class SwitchUserMailboxesAdapter(
                 R.style.Callout_Highlighted
             )
         }
+
+        if (displayIcon) envelopeIcon.setColorFilter(color)
+        emailAddress.apply {
+            setTextColor(color)
+            setTextAppearance(textStyle)
+        }
+        unreadCount.setTextAppearance(badgeStyle)
     }
 
     override fun getItemCount(): Int = mailboxes.count()

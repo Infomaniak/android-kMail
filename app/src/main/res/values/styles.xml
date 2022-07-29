@@ -107,7 +107,7 @@
     </style>
 
     <style name="TextButtonPrimary" parent="Widget.Material3.Button">
-        <item name="android:layout_height">@dimen/primaryButtonHeight</item>
+        <item name="android:layout_height">56dp</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:minWidth">130dp</item>
@@ -201,7 +201,6 @@
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
         <item name="shapeAppearanceOverlay">@style/MenuDrawerItem.ShapeAppearance</item>
-        <item name="strokeWidth">0dp</item>
     </style>
 
     <style name="MenuDrawerItem.ShapeAppearance" parent="">
