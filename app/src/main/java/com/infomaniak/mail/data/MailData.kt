@@ -144,10 +144,10 @@ object MailData {
         }
     }
 
-    fun loadMailboxContent(filter: ThreadFilter = ThreadFilter.ALL) {
+    fun loadInboxContent(filter: ThreadFilter = ThreadFilter.ALL) {
         getMailboxesFromRealm { realmMailboxes ->
             if (realmMailboxes.isEmpty()) {
-                getMailboxContentFromApi(filter)
+                getInboxContentFromApi(filter)
             } else {
                 computeMailboxToSelect(realmMailboxes)
                 getFoldersFromRealm(filter)
@@ -265,11 +265,11 @@ object MailData {
             mutableFoldersFlow.value = realmFolders
 
             if (realmFolders.isEmpty()) {
-                getMailboxContentFromApi(filter)
+                getInboxContentFromApi(filter)
             } else {
                 val selectedFolder = computeFolderToSelect(realmFolders)
                 getThreadsFromRealm(selectedFolder, OFFSET_FIRST_PAGE)
-                getMailboxContentFromApi(filter)
+                getInboxContentFromApi(filter)
             }
         }
     }
@@ -289,7 +289,7 @@ object MailData {
     /**
      * Fetch API
      */
-    private fun getMailboxContentFromApi(filter: ThreadFilter) {
+    private fun getInboxContentFromApi(filter: ThreadFilter) {
         val mergedMailboxes = getMailboxesFromApi()
         val selectedMailbox = computeMailboxToSelect(mergedMailboxes)
         getFoldersFromApi(selectedMailbox, filter)

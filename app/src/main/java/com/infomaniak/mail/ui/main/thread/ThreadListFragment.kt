@@ -148,9 +148,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun updateUpdatedAt() = with(binding) {
-        val lastUpdatedAt = viewModel.currentFolder.value?.lastUpdatedAt?.toDate() ?: Date(0)
+        val lastUpdatedAt = viewModel.currentFolder.value?.lastUpdatedAt?.toDate()
         val ago = when {
-            Date(0).time == lastUpdatedAt.time -> ""
+            lastUpdatedAt == null -> ""
             Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
             else -> DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
         }
@@ -169,8 +169,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             onRefresh()
         }
         viewModel.lastUnreadCount = unreadCount
-        unreadCountChip.text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
-        unreadCountChip.isVisible = unreadCount > 0
+        unreadCountChip.apply {
+            text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
+            isVisible = unreadCount > 0
+        }
     }
 
     private fun setupMenuDrawer() {
