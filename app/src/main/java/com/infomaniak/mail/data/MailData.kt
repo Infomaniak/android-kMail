@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
@@ -143,7 +144,7 @@ object MailData {
         }
     }
 
-    fun loadMailboxContent(filter: Thread.ThreadFilter? = null) {
+    fun loadMailboxContent(filter: ThreadFilter = ThreadFilter.ALL) {
         getMailboxesFromRealm { realmMailboxes ->
             if (realmMailboxes.isEmpty()) {
                 getMailboxContentFromApi(filter)
@@ -160,12 +161,12 @@ object MailData {
         }
     }
 
-    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int, filter: Thread.ThreadFilter? = null) {
+    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int, filter: ThreadFilter = ThreadFilter.ALL) {
         val realmThreads = getThreadsFromRealm(folder, offset, filter)
         getThreadsFromApi(folder, mailbox, offset, filter, realmThreads)
     }
 
-    fun refreshThreads(folder: Folder, mailbox: Mailbox, filter: Thread.ThreadFilter?) {
+    fun refreshThreads(folder: Folder, mailbox: Mailbox, filter: ThreadFilter) {
         getThreadsFromApi(folder, mailbox, OFFSET_FIRST_PAGE, filter, forceRefresh = true)
     }
 
@@ -257,7 +258,7 @@ object MailData {
         }
     }
 
-    private fun getFoldersFromRealm(filter: Thread.ThreadFilter?) {
+    private fun getFoldersFromRealm(filter: ThreadFilter) {
         CoroutineScope(Dispatchers.IO).launch {
             val realmFolders = MailRealm.readFolders().first().list
 
@@ -273,7 +274,7 @@ object MailData {
         }
     }
 
-    private fun getThreadsFromRealm(folder: Folder, offset: Int, filter: Thread.ThreadFilter? = null): List<Thread> {
+    private fun getThreadsFromRealm(folder: Folder, offset: Int, filter: ThreadFilter = ThreadFilter.ALL): List<Thread> {
         val realmThreads = MailRealm.readThreads(folder, filter)
         if (offset == OFFSET_FIRST_PAGE) mutableThreadsFlow.value = realmThreads
 
@@ -288,7 +289,7 @@ object MailData {
     /**
      * Fetch API
      */
-    private fun getMailboxContentFromApi(filter: Thread.ThreadFilter?) {
+    private fun getMailboxContentFromApi(filter: ThreadFilter) {
         val mergedMailboxes = getMailboxesFromApi()
         val selectedMailbox = computeMailboxToSelect(mergedMailboxes)
         getFoldersFromApi(selectedMailbox, filter)
@@ -304,7 +305,7 @@ object MailData {
         return mergedMailboxes
     }
 
-    private fun getFoldersFromApi(mailbox: Mailbox, filter: Thread.ThreadFilter?) {
+    private fun getFoldersFromApi(mailbox: Mailbox, filter: ThreadFilter) {
         val realmFolders = mutableFoldersFlow.value
         val apiFolders = MailApi.fetchFolders(mailbox)
         val mergedFolders = mergeFolders(realmFolders, apiFolders)
@@ -319,7 +320,7 @@ object MailData {
         folder: Folder,
         mailbox: Mailbox,
         offset: Int,
-        filter: Thread.ThreadFilter? = null,
+        filter: ThreadFilter,
         realmThreads: List<Thread>? = null,
         forceRefresh: Boolean = false,
     ) {

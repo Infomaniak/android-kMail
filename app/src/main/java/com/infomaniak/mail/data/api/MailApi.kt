@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
@@ -53,7 +54,7 @@ object MailApi {
         return ApiRepository.getFolders(mailbox.uuid).data
     }
 
-    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int, filter: Thread.ThreadFilter? = null): List<Thread>? {
+    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int, filter: ThreadFilter): List<Thread>? {
         val apiResponse = ApiRepository.getThreads(mailboxUuid, folder.id, offset, filter)
 
         return apiResponse.data?.also { threadResult ->

@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -42,7 +43,7 @@ class ThreadListViewModel : ViewModel() {
     var lastMailboxId: String? = null
     var lastFolderRole: Folder.FolderRole? = null
     var lastUnreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
-    var filter: Thread.ThreadFilter? = null
+    var filter: ThreadFilter = ThreadFilter.ALL
 
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = false

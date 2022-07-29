@@ -48,13 +48,7 @@ object ApiRoutes {
 
     // fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
 
-    fun threads(
-        uuid: String,
-        folderId: String,
-        offset: Int,
-        filter: Thread.ThreadFilter? = null,
-        searchText: String? = null
-    ): String {
+    fun threads(uuid: String, folderId: String, offset: Int, filter: Thread.ThreadFilter, searchText: String? = null): String {
         val urlSearch = searchText?.let { "&scontains=$it" } ?: ""
         val urlAttachment = if (filter == Thread.ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
         val urlFilter = when (filter) {

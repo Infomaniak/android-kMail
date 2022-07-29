@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -78,14 +79,14 @@ object MailboxContentController {
     /**
      * Threads
      */
-    fun getFolderThreads(folderId: String, filter: Thread.ThreadFilter? = null): List<Thread> {
+    fun getFolderThreads(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): List<Thread> {
         val threads = MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
 
         return when (filter) {
-            Thread.ThreadFilter.SEEN -> threads.filter { it.unseenMessagesCount == 0 }
-            Thread.ThreadFilter.UNSEEN -> threads.filter { it.unseenMessagesCount > 0 }
-            Thread.ThreadFilter.STARRED -> threads.filter { it.flagged }
-            Thread.ThreadFilter.ATTACHMENTS -> threads.filter { it.hasAttachments }
+            ThreadFilter.SEEN -> threads.filter { it.unseenMessagesCount == 0 }
+            ThreadFilter.UNSEEN -> threads.filter { it.unseenMessagesCount > 0 }
+            ThreadFilter.STARRED -> threads.filter { it.flagged }
+            ThreadFilter.ATTACHMENTS -> threads.filter { it.hasAttachments }
             else -> threads
         }
     }

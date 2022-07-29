@@ -120,7 +120,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         unreadCountChip.apply {
             setOnClickListener {
                 isCloseIconVisible = isChecked
-                viewModel.filter = if (isChecked) ThreadFilter.UNSEEN else null
+                viewModel.filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
                 swipeRefreshLayout.isRefreshing = true
                 viewModel.refreshThreads()
                 scrollToTop()
@@ -163,7 +163,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
-        if (unreadCount == 0 && viewModel.lastUnreadCount > 0 && viewModel.filter != null) {
+        if (unreadCount == 0 && viewModel.lastUnreadCount > 0 && viewModel.filter != ThreadFilter.ALL) {
             swipeRefreshLayout.isRefreshing = true
             clearFilter()
             onRefresh()
@@ -347,7 +347,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun clearFilter() = with(binding.unreadCountChip) {
-        viewModel.filter = null
+        viewModel.filter = ThreadFilter.ALL
         isChecked = false
         isCloseIconVisible = false
     }
