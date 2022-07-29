@@ -20,10 +20,12 @@ package com.infomaniak.mail.ui.main.menu
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
@@ -33,50 +35,27 @@ class MenuDrawerViewModel : ViewModel() {
     val folders = MutableLiveData<List<Folder>?>()
     val currentFolder = MutableLiveData<Folder?>()
 
-    fun listenToCurrentMailbox() {
-        viewModelScope.launch {
-            MailData.currentMailboxFlow.collect {
-                currentMailbox.value = it
-            }
+    fun listenToCurrentMailbox() = viewModelScope.launch {
+        MainViewModel.currentMailboxFlow.collect {
+            currentMailbox.value = it
         }
     }
 
-    fun listenToMailboxes() {
-        viewModelScope.launch {
-            MailData.mailboxesFlow.collect {
-                mailboxes.value = it
-            }
+    fun listenToMailboxes() = viewModelScope.launch {
+        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
+            mailboxes.value = it.list
         }
     }
 
-    fun listenToFolders() {
-        viewModelScope.launch {
-            MailData.foldersFlow.collect {
-                folders.value = it
-            }
+    fun listenToFolders() = viewModelScope.launch {
+        FolderController.getFoldersAsync().collect {
+            folders.value = it.list
         }
     }
 
-    fun listenToCurrentFolder() {
-        viewModelScope.launch {
-            MailData.currentFolderFlow.collect {
-                currentFolder.value = it
-            }
+    fun listenToCurrentFolder() = viewModelScope.launch {
+        MainViewModel.currentFolderFlow.collect {
+            currentFolder.value = it
         }
-    }
-
-    fun openFolder(folderId: String) {
-        val mailbox = MailData.currentMailboxFlow.value ?: return
-        if (folderId == MailData.currentFolderFlow.value?.id) return
-
-        val folder = (MailData.foldersFlow.value?.find { it.id == folderId } ?: return)
-
-        MailData.selectFolder(folder)
-        MailData.loadThreads(folder, mailbox, OFFSET_FIRST_PAGE)
-    }
-
-    fun switchToMailbox(mailbox: Mailbox) {
-        MailData.selectMailbox(mailbox)
-        MailData.loadInboxContent()
     }
 }

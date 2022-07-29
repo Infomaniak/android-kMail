@@ -21,7 +21,6 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
@@ -29,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getLatestThreadSync
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
@@ -42,7 +42,7 @@ class ThreadViewModel : ViewModel() {
 
     fun listenToThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         ThreadController.getThreadAsync(threadUid).firstOrNull()?.obj?.let { thread ->
-            MailData.selectThread(thread)
+            MainViewModel.selectThread(thread)
             markAsSeen(thread)
             listenToMessages(thread)
             loadMessages(thread)
@@ -52,7 +52,7 @@ class ThreadViewModel : ViewModel() {
     private fun markAsSeen(thread: Thread) {
         if (thread.unseenMessagesCount != 0) {
 
-            val mailboxUuid = MailData.currentMailboxFlow.value?.uuid ?: return
+            val mailboxUuid = MainViewModel.currentMailboxFlow.value?.uuid ?: return
 
             RealmController.mailboxContent.writeBlocking {
                 getLatestThreadSync(thread.uid)?.let { latestThread ->

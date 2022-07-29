@@ -60,8 +60,8 @@ object FolderController {
         return RealmController.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
     }
 
-    fun MutableRealm.deleteLatestFolder(id: String) {
-        getLatestFolderSync(id)?.let(::delete)
+    fun MutableRealm.deleteFolders(folders: List<Folder>) {
+        folders.forEach { deleteLatestFolder(it.id) }
     }
 
     /**
@@ -73,6 +73,10 @@ object FolderController {
 
     private fun getFolder(id: String): RealmSingleQuery<Folder> {
         return RealmController.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first()
+    }
+
+    private fun MutableRealm.deleteLatestFolder(id: String) {
+        getLatestFolderSync(id)?.let(::delete)
     }
 
     /**

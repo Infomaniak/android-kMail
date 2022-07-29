@@ -20,51 +20,36 @@ package com.infomaniak.mail.ui.main.thread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
-    private var listenToCurrentFolderJob: Job? = null
     private var listenToThreadsJob: Job? = null
 
     val currentFolder = SingleLiveEvent<Folder?>()
     val threads = SingleLiveEvent<List<Thread>?>()
 
-    fun listenToCurrentFolder() {
-        listenToCurrentFolderJob?.cancel()
-        listenToCurrentFolderJob = viewModelScope.launch {
-            MailData.currentFolderFlow.collect {
-                currentFolder.value = it
-            }
+    fun listenToCurrentFolder() = viewModelScope.launch {
+        MainViewModel.currentFolderFlow.collect {
+            currentFolder.value = it
         }
     }
 
-    fun listenToThreads() {
-        listenToThreadsJob?.cancel()
-        listenToThreadsJob = viewModelScope.launch {
-            MailData.threadsFlow.collect {
-                threads.value = it
+    fun listenToThreads() = viewModelScope.launch {
+        MainViewModel.currentFolderFlow.filterNotNull().collect { folder ->
+            listenToThreadsJob?.cancel()
+            listenToThreadsJob = viewModelScope.launch {
+                FolderController.getFolderSync(folder.id)?.threads?.asFlow()?.toSharedFlow()?.collect {
+                    threads.value = it.list
+                }
             }
         }
-    }
-
-    fun loadMailData() {
-        MailData.loadInboxContent()
-    }
-
-    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
-        MailData.loadThreads(folder, mailbox, offset)
-    }
-
-    fun refreshThreads() {
-        MailData.refreshThreads(
-            folder = MailData.currentFolderFlow.value ?: return,
-            mailbox = MailData.currentMailboxFlow.value ?: return,
-        )
     }
 }

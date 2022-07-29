@@ -34,12 +34,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
@@ -51,6 +51,8 @@ import com.infomaniak.lib.core.R as RCore
 class ThreadFragment : Fragment() {
 
     private val navigationArgs: ThreadFragmentArgs by navArgs()
+
+    private val mainViewModel: MainViewModel by viewModels()
     private val viewModel: ThreadViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadBinding
@@ -114,7 +116,7 @@ class ThreadFragment : Fragment() {
             onDeleteDraftClicked = { message ->
                 // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
                 lifecycleScope.launch(Dispatchers.IO) {
-                    MailData.deleteDraft(message)
+                    mainViewModel.deleteDraft(message)
                     // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
                 }
                 threadAdapter.removeMessage(message)

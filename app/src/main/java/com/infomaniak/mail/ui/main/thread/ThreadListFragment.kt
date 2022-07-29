@@ -39,7 +39,6 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
@@ -112,7 +111,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         currentOffset = OFFSET_FIRST_PAGE
-        viewModel.refreshThreads()
+        mainViewModel.forceRefreshThreads()
     }
 
     private fun startPeriodicRefreshJob() {
@@ -137,7 +136,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun updateUnreadCount() = with(binding.unreadCountChip) {
         // TODO: Fetch folder again to update it.
-        val unreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
+        val unreadCount = MainViewModel.currentFolderFlow.value?.unreadCount ?: 0
         text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
         isVisible = unreadCount > 0
     }
@@ -212,7 +211,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onResume() {
         super.onResume()
         currentOffset = OFFSET_FIRST_PAGE
-        viewModel.loadMailData()
+        if (MainViewModel.currentMailboxFlow.value == null) {
+            mainViewModel.openCurrentMailbox()
+        } else {
+            mainViewModel.forceRefreshThreads()
+        }
     }
 
     private fun listenToCurrentFolder() {
@@ -258,14 +261,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun downloadThreads() {
 
-        val folder = MailData.currentFolderFlow.value ?: return
-        val mailbox = MailData.currentMailboxFlow.value ?: return
+        val folder = MainViewModel.currentFolderFlow.value ?: return
+        val mailbox = MainViewModel.currentMailboxFlow.value ?: return
 
         if (folder.totalCount > currentOffset + PER_PAGE) {
             isDownloadingChanges = true
             currentOffset += PER_PAGE
             showLoadingTimer.start()
-            viewModel.loadThreads(folder, mailbox, currentOffset)
+            mainViewModel.loadMoreThreads(mailbox, folder, currentOffset)
         }
     }
 }

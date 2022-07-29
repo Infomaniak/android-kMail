@@ -47,8 +47,8 @@ object MessageController {
     /**
      * Edit data
      */
-    fun MutableRealm.deleteMessages(deletableMessages: List<Message>) {
-        deletableMessages.forEach { deleteLatestMessage(it.uid) }
+    fun MutableRealm.deleteMessages(messages: List<Message>) {
+        messages.forEach { deleteLatestMessage(it.uid) }
     }
 
     fun deleteMessage(uid: String) {

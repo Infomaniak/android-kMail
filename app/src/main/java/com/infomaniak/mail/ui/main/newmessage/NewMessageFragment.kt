@@ -38,10 +38,10 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.*
@@ -56,9 +56,8 @@ class NewMessageFragment : Fragment() {
 
     private lateinit var contactAdapter: ContactAdapter
 
-    private var mailboxes = MailData.mailboxesFlow.value ?: emptyList()
-    private var mails = mailboxes.map { it.email }
-    private var selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MailData.currentMailboxFlow.value?.objectId }
+    private var mailboxes = emptyList<Mailbox>()
+    private var selectedMailboxIndex = 0
     private var isAutocompletionOpened = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -69,7 +68,6 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         handleOnBackPressed()
-        setupFromField()
         displayChips()
 
         // TODO: Do we want this button?
@@ -118,6 +116,7 @@ class NewMessageFragment : Fragment() {
         })
 
         listenToAllContacts()
+        listenToMailboxes()
     }
 
     private fun handleOnBackPressed() {
@@ -130,17 +129,6 @@ class NewMessageFragment : Fragment() {
             } else {
                 isEnabled = false
                 activity?.onBackPressed()
-            }
-        }
-    }
-
-    private fun setupFromField() = with(binding) {
-        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
-        if (mails.count() > 1) {
-            fromMailAddress.apply {
-                setOnClickListener(::chooseFromAddress)
-                isClickable = true
-                isFocusable = true
             }
         }
     }
@@ -169,6 +157,41 @@ class NewMessageFragment : Fragment() {
         viewModel.listenToAllContacts()
     }
 
+    private fun listenToMailboxes() {
+        viewModel.mailboxes.observeNotNull(this, ::setupFromField)
+        viewModel.listenToMailboxes()
+    }
+
+    private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {
+
+        this@NewMessageFragment.mailboxes = mailboxes
+        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxFlow.value?.objectId }
+        val mails = mailboxes.map { it.email }
+
+        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
+        if (mails.count() > 1) {
+            fromMailAddress.apply {
+                setOnClickListener { view -> chooseFromAddress(view, mails) }
+                isClickable = true
+                isFocusable = true
+            }
+        }
+    }
+
+    private fun chooseFromAddress(view: View, mails: List<String>) = with(binding) {
+        val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
+        ListPopupWindow(context).apply {
+            setAdapter(adapter)
+            anchorView = view
+            width = view.width
+            setOnItemClickListener { _, _, position, _ ->
+                fromMailAddress.text = mails[position]
+                selectedMailboxIndex = position
+                dismiss()
+            }
+        }.show()
+    }
+
     private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {
         val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
         val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
@@ -193,20 +216,6 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
-
-    private fun chooseFromAddress(view: View) = with(binding) {
-        val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
-        ListPopupWindow(context).apply {
-            setAdapter(adapter)
-            anchorView = view
-            width = view.width
-            setOnItemClickListener { _, _, position, _ ->
-                fromMailAddress.text = mails[position]
-                selectedMailboxIndex = position
-                dismiss()
-            }
-        }.show()
-    }
 
     private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
         ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->

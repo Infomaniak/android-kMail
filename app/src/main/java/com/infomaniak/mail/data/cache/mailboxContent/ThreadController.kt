@@ -46,8 +46,8 @@ object ThreadController {
     /**
      * Edit data
      */
-    fun MutableRealm.deleteLatestThread(uid: String) {
-        getLatestThreadSync(uid)?.let(::delete)
+    fun MutableRealm.deleteThreads(threads: List<Thread>) {
+        threads.forEach { deleteLatestThread(it.uid) }
     }
 
     /**
@@ -55,6 +55,10 @@ object ThreadController {
      */
     private fun getThread(uid: String): RealmSingleQuery<Thread> {
         return RealmController.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first()
+    }
+
+    private fun MutableRealm.deleteLatestThread(uid: String) {
+        getLatestThreadSync(uid)?.let(::delete)
     }
 
     /**

@@ -25,9 +25,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
@@ -58,7 +58,7 @@ class SwitchUserMailboxesAdapter(
             text = formatUnreadCount(unread)
         }
 
-        setSelectedState(mailbox.objectId == MailData.currentMailboxFlow.value?.objectId)
+        setSelectedState(mailbox.objectId == MainViewModel.currentMailboxFlow.value?.objectId)
         addressItemView.setOnClickListener { onMailboxSelected(mailbox) }
     }
 
