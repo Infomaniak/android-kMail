@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestMessa
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestThread
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
+import com.infomaniak.mail.data.cache.MailboxContentController.updateDraft
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Contact
@@ -208,7 +209,12 @@ object MailData {
 
     fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
         val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
-        if (apiResponse.data == true) MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
+        if (apiResponse.data == true) {
+            MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
+        } else {
+            updateDraft(draft) { it.action = Draft.DraftAction.SAVE.apiName }
+            saveDraft(draft, mailboxUuid)
+        }
 
         return apiResponse
     }
