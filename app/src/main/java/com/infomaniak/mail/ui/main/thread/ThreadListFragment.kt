@@ -41,7 +41,6 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
@@ -117,17 +116,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         listenToThreads()
     }
 
-    private fun setupUnreadCountChip() {
-            binding.unreadCountChip.apply {
+    private fun setupUnreadCountChip() = with(binding) {
+        unreadCountChip.apply {
             setOnClickListener {
                 isCloseIconVisible = isChecked
                 viewModel.filter = if (isChecked) ThreadFilter.UNSEEN else null
-                binding.swipeRefreshLayout.isRefreshing = true
+                swipeRefreshLayout.isRefreshing = true
                 viewModel.refreshThreads()
                 scrollToTop()
             }
         }
-        }
+    }
 
     private fun setupOnRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
