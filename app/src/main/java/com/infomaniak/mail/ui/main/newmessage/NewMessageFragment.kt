@@ -44,10 +44,7 @@ import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.setMargins
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.*
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -113,34 +110,14 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        val allContacts = viewModel.getAllContacts()
-        val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
-        val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
-        val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
-
-        contactAdapter = ContactAdapter(
-            allContacts = allContacts,
-            toAlreadyUsedContactIds = toAlreadyUsedContactMails,
-            ccAlreadyUsedContactIds = ccAlreadyUsedContactMails,
-            bccAlreadyUsedContactIds = bccAlreadyUsedContactMails,
-            onItemClick = { contact, field ->
-                getInputView(field).setText("")
-                getContacts(field).add(contact)
-                createChip(field, contact)
-            },
-            addUnrecognizedContact = { field ->
-                val isEmail = addUnrecognizedMail(field)
-                if (isEmail) getInputView(field).setText("")
-            },
-        )
-        autoCompleteRecyclerView.adapter = contactAdapter
-
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
             override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
                 source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
                 return null
             }
         })
+
+        listenToAllContacts()
     }
 
     private fun handleOnBackPressed() {
@@ -185,6 +162,34 @@ class NewMessageFragment : Fragment() {
                 true // Keep keyboard open
             }
         }
+    }
+
+    private fun listenToAllContacts() {
+        viewModel.allContacts.observeNotNull(this, ::setupContactsAdapter)
+        viewModel.listenToAllContacts()
+    }
+
+    private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {
+        val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
+        val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
+        val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
+
+        contactAdapter = ContactAdapter(
+            allContacts = allContacts,
+            toAlreadyUsedContactIds = toAlreadyUsedContactMails,
+            ccAlreadyUsedContactIds = ccAlreadyUsedContactMails,
+            bccAlreadyUsedContactIds = bccAlreadyUsedContactMails,
+            onItemClick = { contact, field ->
+                getInputView(field).setText("")
+                getContacts(field).add(contact)
+                createChip(field, contact)
+            },
+            addUnrecognizedContact = { field ->
+                val isEmail = addUnrecognizedMail(field)
+                if (isEmail) getInputView(field).setText("")
+            },
+        )
+        autoCompleteRecyclerView.adapter = contactAdapter
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)

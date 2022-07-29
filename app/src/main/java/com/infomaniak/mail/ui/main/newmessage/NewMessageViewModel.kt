@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
@@ -32,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
+    val allContacts = MutableLiveData<List<UiContact>?>()
     val recipients = mutableListOf<UiContact>()
     val newMessageCc = mutableListOf<UiContact>()
     val newMessageBcc = mutableListOf<UiContact>()
@@ -39,12 +41,14 @@ class NewMessageViewModel : ViewModel() {
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
 
-    fun getAllContacts(): List<UiContact> {
-        val contacts = mutableListOf<UiContact>()
-        MailData.contactsFlow.value?.forEach { contact ->
-            contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
+    fun listenToAllContacts() = viewModelScope.launch {
+        ContactController.getContactsAsync().collect {
+            val contacts = mutableListOf<UiContact>()
+            it.list.forEach { contact ->
+                contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
+            }
+            allContacts.value = contacts
         }
-        return contacts
     }
 
     fun sendMail(draft: Draft, action: Draft.DraftAction) {

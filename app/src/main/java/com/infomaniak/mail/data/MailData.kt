@@ -29,14 +29,10 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMes
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteLatestThread
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
-import com.infomaniak.mail.data.cache.userInfos.AddressBookController
-import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -57,14 +53,14 @@ object MailData {
 
     private val DEFAULT_FOLDER_ROLE = FolderRole.INBOX
 
-    private val mutableAddressBooksFlow = MutableStateFlow<List<AddressBook>?>(null)
-    private val mutableContactsFlow = MutableStateFlow<List<Contact>?>(null)
+//    private val mutableAddressBooksFlow = MutableStateFlow<List<AddressBook>?>(null)
+//    private val mutableContactsFlow = MutableStateFlow<List<Contact>?>(null)
     private val mutableMailboxesFlow = MutableStateFlow<List<Mailbox>?>(null)
     private val mutableFoldersFlow = MutableStateFlow<List<Folder>?>(null)
     private val mutableThreadsFlow = MutableStateFlow<List<Thread>?>(null)
     private val mutableMessagesFlow = MutableStateFlow<List<Message>?>(null)
-    val addressBooksFlow = mutableAddressBooksFlow.asStateFlow()
-    val contactsFlow = mutableContactsFlow.asStateFlow()
+//    val addressBooksFlow = mutableAddressBooksFlow.asStateFlow()
+//    val contactsFlow = mutableContactsFlow.asStateFlow()
     val mailboxesFlow = mutableMailboxesFlow.asStateFlow()
     val foldersFlow = mutableFoldersFlow.asStateFlow()
     val threadsFlow = mutableThreadsFlow.asStateFlow()
@@ -91,8 +87,8 @@ object MailData {
         mutableThreadsFlow.value = null
         mutableFoldersFlow.value = null
         mutableMailboxesFlow.value = null
-        mutableContactsFlow.value = null
-        mutableAddressBooksFlow.value = null
+//        mutableContactsFlow.value = null
+//        mutableAddressBooksFlow.value = null
     }
 
     private fun closeCurrentFlows() {
@@ -105,39 +101,39 @@ object MailData {
     /**
      * Load Data
      */
-    fun loadAddressBooksAndContacts() {
-        loadAddressBooks {
-            loadContacts()
-        }
-    }
-
-    private fun loadAddressBooks(completion: () -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val realmAddressBooks = AddressBookController.getAddressBooksSync()
-
-            mutableAddressBooksFlow.value = realmAddressBooks
-
-            val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
-            val mergedAddressBooks = mergeAddressBooks(realmAddressBooks, apiAddressBooks)
-
-            mutableAddressBooksFlow.value = mergedAddressBooks
-
-            completion()
-        }
-    }
-
-    private fun loadContacts() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val realmContacts = ContactController.getContactsSync()
-
-            mutableContactsFlow.value = realmContacts
-
-            val apiContacts = ApiRepository.getContacts().data ?: emptyList()
-            val mergedContacts = mergeContacts(realmContacts, apiContacts)
-
-            mutableContactsFlow.value = mergedContacts
-        }
-    }
+//    fun loadAddressBooksAndContacts() {
+//        loadAddressBooks {
+//            loadContacts()
+//        }
+//    }
+//
+//    private fun loadAddressBooks(completion: () -> Unit) {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val realmAddressBooks = AddressBookController.getAddressBooksSync()
+//
+//            mutableAddressBooksFlow.value = realmAddressBooks
+//
+//            val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
+//            val mergedAddressBooks = mergeAddressBooks(realmAddressBooks, apiAddressBooks)
+//
+//            mutableAddressBooksFlow.value = mergedAddressBooks
+//
+//            completion()
+//        }
+//    }
+//
+//    private fun loadContacts() {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val realmContacts = ContactController.getContactsSync()
+//
+//            mutableContactsFlow.value = realmContacts
+//
+//            val apiContacts = ApiRepository.getContacts().data ?: emptyList()
+//            val mergedContacts = mergeContacts(realmContacts, apiContacts)
+//
+//            mutableContactsFlow.value = mergedContacts
+//        }
+//    }
 
     fun loadInboxContent() {
         getMailboxesFromRealm { realmMailboxes ->
@@ -364,45 +360,45 @@ object MailData {
     /**
      * Merge Realm & API data
      */
-    private fun mergeAddressBooks(realmAddressBooks: List<AddressBook>, apiAddressBooks: List<AddressBook>): List<AddressBook> {
-
-        // Get outdated data
-        Log.d("API", "AddressBooks: Get outdated data")
-        // val deletableAddressBooks = ContactsController.getDeletableAddressBooks(apiAddressBooks)
-        val deletableAddressBooks = realmAddressBooks.filter { realmContact ->
-            apiAddressBooks.none { it.id == realmContact.id }
-        }
-
-        // Save new data
-        Log.d("API", "AddressBooks: Save new data")
-        AddressBookController.upsertAddressBooks(apiAddressBooks)
-
-        // Delete outdated data
-        Log.d("API", "AddressBooks: Delete outdated data")
-        AddressBookController.deleteAddressBooks(deletableAddressBooks)
-
-        return apiAddressBooks
-    }
-
-    private fun mergeContacts(realmContacts: List<Contact>, apiContacts: List<Contact>): List<Contact> {
-
-        // Get outdated data
-        Log.d("API", "Contacts: Get outdated data")
-        // val deletableContacts = ContactsController.getDeletableContacts(apiContacts)
-        val deletableContacts = realmContacts.filter { realmContact ->
-            apiContacts.none { it.id == realmContact.id }
-        }
-
-        // Save new data
-        Log.d("API", "Contacts: Save new data")
-        ContactController.upsertContacts(apiContacts)
-
-        // Delete outdated data
-        Log.d("API", "Contacts: Delete outdated data")
-        ContactController.deleteContacts(deletableContacts)
-
-        return apiContacts
-    }
+//    private fun mergeAddressBooks(realmAddressBooks: List<AddressBook>, apiAddressBooks: List<AddressBook>): List<AddressBook> {
+//
+//        // Get outdated data
+//        Log.d("API", "AddressBooks: Get outdated data")
+//        // val deletableAddressBooks = ContactsController.getDeletableAddressBooks(apiAddressBooks)
+//        val deletableAddressBooks = realmAddressBooks.filter { realmContact ->
+//            apiAddressBooks.none { it.id == realmContact.id }
+//        }
+//
+//        // Save new data
+//        Log.d("API", "AddressBooks: Save new data")
+//        AddressBookController.upsertAddressBooks(apiAddressBooks)
+//
+//        // Delete outdated data
+//        Log.d("API", "AddressBooks: Delete outdated data")
+//        AddressBookController.deleteAddressBooks(deletableAddressBooks)
+//
+//        return apiAddressBooks
+//    }
+//
+//    private fun mergeContacts(realmContacts: List<Contact>, apiContacts: List<Contact>): List<Contact> {
+//
+//        // Get outdated data
+//        Log.d("API", "Contacts: Get outdated data")
+//        // val deletableContacts = ContactsController.getDeletableContacts(apiContacts)
+//        val deletableContacts = realmContacts.filter { realmContact ->
+//            apiContacts.none { it.id == realmContact.id }
+//        }
+//
+//        // Save new data
+//        Log.d("API", "Contacts: Save new data")
+//        ContactController.upsertContacts(apiContacts)
+//
+//        // Delete outdated data
+//        Log.d("API", "Contacts: Delete outdated data")
+//        ContactController.deleteContacts(deletableContacts)
+//
+//        return apiContacts
+//    }
 
     private fun mergeMailboxes(realmMailboxes: List<Mailbox>?, apiMailboxes: List<Mailbox>?): List<Mailbox> {
         if (apiMailboxes == null) return realmMailboxes ?: emptyList()
