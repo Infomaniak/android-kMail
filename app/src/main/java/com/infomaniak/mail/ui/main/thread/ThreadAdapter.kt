@@ -80,6 +80,11 @@ class ThreadAdapter(
         displayMessage(message)
     }
 
+    fun insertMessage(index: Int, message: Message) {
+        messageList.add(index, message)
+        notifyItemInserted(index)
+    }
+
     fun removeMessage(message: Message): Int {
         val position = messageList.indexOf(message)
         if (position != -1) {

@@ -104,7 +104,7 @@ class NewMessageActivity : ThemedActivity() {
         finish()
     }
 
-    fun sendMail(action: DraftAction): Boolean = with(viewModel) {
+    fun sendMail(action: DraftAction) = with(viewModel) {
         if (action == DraftAction.SAVE && hasStartedEditing.value == false ||
             action == DraftAction.SEND && newMessageTo.isEmpty()
         ) return false

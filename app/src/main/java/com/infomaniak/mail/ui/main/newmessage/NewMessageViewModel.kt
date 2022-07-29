@@ -44,9 +44,9 @@ class NewMessageViewModel : ViewModel() {
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
+    var currentDraft: MutableLiveData<Draft> = MutableLiveData()
     var hasStartedEditing = MutableLiveData(false)
     var autoSaveJob: Job? = null
-    var currentDraft: MutableLiveData<Draft> = MutableLiveData()
 
     fun setup(activity: Activity, draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -68,12 +68,12 @@ class NewMessageViewModel : ViewModel() {
 
     fun sendMail(draft: Draft) {
         val mailbox = MailData.currentMailboxFlow.value ?: return
-        val updatedDraft = if (draft.identityId == null) MailData.setDraftSignature(draft) else draft
+        val draftWithSignature = if (draft.identityId == null) MailData.setDraftSignature(draft) else draft
         // TODO: better handling of api response
-        if (updatedDraft.action == DraftAction.SEND.name.lowercase()) {
-            MailData.sendDraft(updatedDraft, mailbox.uuid)
+        if (draftWithSignature.action == DraftAction.SEND.apiName) {
+            MailData.sendDraft(draftWithSignature, mailbox.uuid)
         } else {
-            MailData.saveDraft(updatedDraft, mailbox.uuid).data?.let {
+            MailData.saveDraft(draftWithSignature, mailbox.uuid).data?.let {
                 currentDraft.value?.apply {
                     uuid = it.uuid
                     parentMessageUid = it.uid
@@ -94,7 +94,7 @@ class NewMessageViewModel : ViewModel() {
             it.subject = messageSubject
             it.body = messageBody
             it.priority = MessagePriority.Priority.NORMAL.getPriority()
-            it.action = draftAction.name.lowercase()
+            it.action = draftAction.apiName
             it.to = newMessageTo.toRealmRecipients()
             it.cc = newMessageCc.toRealmRecipients()
             it.bcc = newMessageBcc.toRealmRecipients()

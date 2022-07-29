@@ -174,9 +174,7 @@ object MailData {
                 .filter { it.isOffline || it.isModifiedOffline }
 
             CoroutineScope(Dispatchers.IO).launch {
-                realmOfflineDrafts.forEach { draft ->
-                    saveOfflineDraftToApi(draft)
-                }
+                realmOfflineDrafts.forEach { draft -> saveOfflineDraftToApi(draft) }
                 getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
             }
         } else {
@@ -186,9 +184,9 @@ object MailData {
 
     private fun saveOfflineDraftToApi(draft: Draft) {
         val draftMailboxUuid = mailboxesFlow.value?.find { it.email == draft.from.firstOrNull()?.email }?.uuid ?: return
-        val updatedDraft = setDraftSignature(draft)
-        if (updatedDraft.isLastUpdateOnline(draftMailboxUuid)) return
+        if (draft.isLastUpdateOnline(draftMailboxUuid)) return
 
+        val updatedDraft = setDraftSignature(draft)
         saveDraft(updatedDraft, draftMailboxUuid).data?.let {
             fetchDraft("/api/mail/${draftMailboxUuid}/draft/${it.uuid}", it.uid)
         }
@@ -209,15 +207,15 @@ object MailData {
     }
 
     fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
-        val response = ApiRepository.sendDraft(mailboxUuid, draft)
-        if (response.data == true) MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
+        val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
+        if (apiResponse.data == true) MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
 
-        return response
+        return apiResponse
     }
 
     fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
-        val response = ApiRepository.saveDraft(mailboxUuid, draft)
-        response.data?.let { apiData ->
+        val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
+        apiResponse.data?.let { apiData ->
             MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
             val newDraft = ApiRepository.getDraft(mailboxUuid, apiData.uuid).data
             newDraft?.apply {
@@ -229,7 +227,7 @@ object MailData {
             }
         } ?: MailboxContentController.manageDraftAutoSave(draft, true)
 
-        return response
+        return apiResponse
     }
 
     fun setDraftSignature(draft: Draft): Draft {
@@ -373,7 +371,7 @@ object MailData {
         mutableFoldersFlow.value = mergedFolders
 
         val selectedFolder = computeFolderToSelect(mergedFolders)
-        getThreadsFromApi(selectedFolder, mailbox, offset = OFFSET_FIRST_PAGE)
+        getThreadsFromApi(selectedFolder, mailbox)
     }
 
     private fun getThreadsFromApi(
@@ -390,7 +388,7 @@ object MailData {
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
             mutableThreadsFlow.value = mergedThreads
 
-            if (Folder.isDraftsFolder()) apiThreads?.forEach(::getMessagesFromApi) // TODO: Do we really want this? Here?
+            if (Folder.isDraftsFolder()) apiThreads?.forEach(::getMessagesFromApi)
         }
     }
 

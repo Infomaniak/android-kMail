@@ -265,8 +265,7 @@ class NewMessageFragment : Fragment() {
             }
 
             override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.clearJobs()
-                viewModel.hasStartedEditing.value = true
+                // No Op
             }
 
             override fun afterTextChanged(editable: Editable?) {

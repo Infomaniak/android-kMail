@@ -82,17 +82,28 @@ class ThreadFragment : Fragment() {
                 }
             }
             onDraftClicked = { message ->
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val draft = MailApi.fetchDraft(message.draftResource, message.uid)
                     message.setDraftId(draft?.uuid)
-                    // TODO: Open the draft in draft editor
+                    activity?.runOnUiThread {
+                        safeNavigate(
+                            ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
+                                draft?.uuid,
+                                message.draftResource,
+                                draft?.parentMessageUid
+                            )
+                        )
+                    }
                 }
             }
             onDeleteDraftClicked = { message ->
-                // TODO: When catching API error, use the position returned by removeMessage to add back the item to the list.
-                threadAdapter.removeMessage(message)
+                val position = threadAdapter.removeMessage(message)
                 lifecycleScope.launch(Dispatchers.IO) {
-                    MailData.deleteDraft(message)
+                    try {
+                        MailData.deleteDraft(message)
+                    } catch (exception: Exception) {
+                        threadAdapter.insertMessage(position, message)
+                    }
                     // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
                 }
             }

@@ -92,8 +92,9 @@ class Draft : RealmObject {
         to = to?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
     }
 
-    enum class DraftAction {
-        SEND, SAVE
+    enum class DraftAction(val apiName: String) {
+        SEND("send"),
+        SAVE("save")
     }
 
     companion object {
