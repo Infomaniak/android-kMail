@@ -150,11 +150,11 @@ object MailData {
         }
     }
 
-    fun loadMailboxes() {
-        getMailboxesFromRealm {
-            getMailboxesFromApi()
-        }
-    }
+//    fun loadMailboxes() {
+//        getMailboxesFromRealm {
+//            getMailboxesFromApi()
+//        }
+//    }
 
     fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
         val realmThreads = getThreadsFromRealm(folder, offset)
@@ -208,11 +208,11 @@ object MailData {
         }
     }
 
-    fun selectMessage(message: Message) {
-        if (message.uid != currentMessageFlow.value?.uid) {
-            mutableCurrentMessageFlow.value = message
-        }
-    }
+//    fun selectMessage(message: Message) {
+//        if (message.uid != currentMessageFlow.value?.uid) {
+//            mutableCurrentMessageFlow.value = message
+//        }
+//    }
 
     private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox {
         val mailbox = with(mailboxes) {
