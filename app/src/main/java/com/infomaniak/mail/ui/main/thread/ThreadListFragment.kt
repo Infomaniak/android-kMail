@@ -262,7 +262,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         with(viewModel) {
             currentFolder.value?.threads?.toList()?.let(::displayThreads)
-
             currentOffset = OFFSET_FIRST_PAGE
             binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
             loadMailData()
@@ -291,7 +290,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun onMailboxChange(mailbox: Mailbox) = with(viewModel) {
-        if (mailbox.objectId != lastMailboxId) resetList()
+        if (lastMailboxId != mailbox.objectId) resetList()
         lastMailboxId = mailbox.objectId
     }
 
@@ -352,9 +351,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         isCloseIconVisible = false
     }
 
-    private fun scrollToTop() {
-        binding.threadsList.layoutManager?.scrollToPosition(0)
-    }
+    private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
 
     private fun downloadThreads() = with(viewModel) {
 

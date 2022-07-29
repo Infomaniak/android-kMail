@@ -177,7 +177,7 @@
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
     <string name="settingsAccentColorDescription">Choisissez la couleur d’accentuation de l’application</string>
-    <string name="settingsAppLock">Verrouillage de l\'application</string>
+    <string name="settingsAppLock">Verrouillage de l’application</string>
     <string name="settingsCancellationPeriodDescription">Vous avez la possibilité d’annuler l’envoi de votre mail jusqu’à 30 secondes</string>
     <string name="settingsCancellationPeriodTitle">Délai d’annulation d’envoi</string>
     <string name="settingsDefault">Par défaut</string>

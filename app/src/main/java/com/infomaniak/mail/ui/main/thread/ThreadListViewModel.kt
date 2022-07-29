@@ -40,13 +40,12 @@ class ThreadListViewModel : ViewModel() {
     val currentFolder = SingleLiveEvent<Folder?>()
     val threads = SingleLiveEvent<List<Thread>?>()
 
+    var currentOffset = OFFSET_FIRST_PAGE
+    var filter: ThreadFilter = ThreadFilter.ALL
+    var isDownloadingChanges = false
     var lastMailboxId: String? = null
     var lastFolderRole: Folder.FolderRole? = null
     var lastUnreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
-    var filter: ThreadFilter = ThreadFilter.ALL
-
-    var currentOffset = OFFSET_FIRST_PAGE
-    var isDownloadingChanges = false
 
     fun listenToCurrentMailbox() {
         listenToCurrentMailboxJob?.cancel()
