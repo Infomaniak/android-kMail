@@ -24,27 +24,21 @@
         <clip-path android:pathData="M0,0h233v102h-233z" />
         <path
             android:fillColor="#FFC31D"
-            android:fillType="evenOdd"
             android:pathData="M82.56,54L93.6,58L82.56,62L84.55,59.97L64,62.44L70.02,58.42L64,54.4L84.39,56.55L82.56,54Z" />
         <path
             android:fillColor="#FFCE1D"
-            android:fillType="evenOdd"
             android:pathData="M127.56,13.86L122.04,14.67L124.57,9.98L121.87,5.21L127.42,6.21L131.26,2.45L132.17,7.75L137.24,10.2L132.25,12.48L131.54,17.75L127.56,13.86Z" />
         <path
             android:fillColor="#FFDA55"
-            android:fillType="evenOdd"
             android:pathData="M215.42,80L209.85,80.95L212.48,75.96L209.85,70.96L215.42,71.91L219.36,67.87L220.17,73.46L225.23,75.96L220.17,78.45L219.36,84.04L215.42,80Z" />
         <path
             android:fillColor="#FFC31D"
-            android:fillType="evenOdd"
             android:pathData="M218.92,41.71L211.12,42.91L214.72,36.16L210.94,29.33L218.78,30.72L224.25,25.3L225.49,32.9L232.65,36.38L225.58,39.69L224.53,47.27L218.92,41.71Z" />
         <path
             android:fillColor="#FFF7D8"
-            android:fillType="evenOdd"
             android:pathData="M188.83,35.61L185.89,36.11L187.28,33.47L185.89,30.82L188.83,31.33L190.92,29.19L191.35,32.15L194.03,33.47L191.35,34.79L190.92,37.75L188.83,35.61Z" />
         <path
             android:fillColor="#FFE277"
-            android:fillType="evenOdd"
             android:pathData="M161.2,9.02L157.27,9.69L159.12,6.17L157.27,2.64L161.2,3.31L163.98,0.46L164.55,4.4L168.12,6.17L164.55,7.93L163.98,11.87L161.2,9.02Z" />
         <path
             android:fillColor="#E10B59"

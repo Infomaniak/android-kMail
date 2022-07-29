@@ -34,7 +34,7 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/menuDrawerNavigation"
-        android:layout_width="350dp"
+        android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@color/backgroundColor"

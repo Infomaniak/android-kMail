@@ -118,7 +118,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
         binding.itemBadge.isGone = isVisible
     }
 
-    override fun setOnClickListener(l: OnClickListener?) {
-        binding.root.setOnClickListener(l)
+    override fun setOnClickListener(onClickListener: OnClickListener?) {
+        binding.root.setOnClickListener(onClickListener)
     }
 }
