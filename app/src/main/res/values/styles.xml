@@ -141,11 +141,11 @@
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="cardCornerRadius">0dp</item>
         <item name="cardElevation">6dp</item>
-        <item name="shapeAppearanceOverlay">@style/BackgroundCardview.ShapeAppearance</item>
+        <item name="shapeAppearanceOverlay">@style/BackgroundCardviewShapeAppearance</item>
         <item name="strokeWidth">0dp</item>
     </style>
 
-    <style name="BackgroundCardview.ShapeAppearance" parent="">
+    <style name="BackgroundCardviewShapeAppearance">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">0dp</item>
         <item name="cornerSizeTopLeft">0dp</item>
