@@ -56,6 +56,7 @@ import kotlinx.coroutines.launch
 class MainViewModel : ViewModel() {
 
     companion object {
+        private val TAG = "MainViewModel"
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
 
         private val mutableCurrentMailboxFlow = MutableStateFlow<Mailbox?>(null)
@@ -69,6 +70,7 @@ class MainViewModel : ViewModel() {
 
         fun selectMailbox(mailbox: Mailbox) {
             if (currentMailboxFlow.value?.objectId != mailbox.objectId) {
+                Log.i(TAG, "selectMailbox: ${mailbox.email}")
                 AccountUtils.currentMailboxId = mailbox.mailboxId
                 mutableCurrentMailboxFlow.value = mailbox
 
@@ -80,6 +82,7 @@ class MainViewModel : ViewModel() {
 
         fun selectFolder(folder: Folder) {
             if (folder.id != currentFolderFlow.value?.id) {
+                Log.i(TAG, "selectFolder: ${folder.name}")
                 mutableCurrentFolderFlow.value = folder
 
                 mutableCurrentMessageFlow.value = null
@@ -89,6 +92,7 @@ class MainViewModel : ViewModel() {
 
         fun selectThread(thread: Thread) {
             if (thread.uid != currentThreadFlow.value?.uid) {
+                Log.i(TAG, "selectThread: ${thread.subject}")
                 mutableCurrentThreadFlow.value = thread
 
                 mutableCurrentMessageFlow.value = null
@@ -100,6 +104,7 @@ class MainViewModel : ViewModel() {
     var canContinueToPaginate = true
 
     fun close() {
+        Log.i(TAG, "close")
         RealmController.close()
 
         mutableCurrentMessageFlow.value = null
@@ -109,11 +114,13 @@ class MainViewModel : ViewModel() {
     }
 
     fun loadAddressBooksAndContacts() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "loadAddressBooksAndContacts")
         loadAddressBooks()
         loadContacts()
     }
 
     fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "loadCurrentMailbox")
         val mailboxes = loadMailboxes()
         computeMailboxToSelect(mailboxes)?.let { mailbox ->
             selectMailbox(mailbox)
@@ -126,6 +133,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun switchToMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
         val folders = loadFolders(mailbox)
         computeFolderToSelect(folders)?.let { folder ->
@@ -139,22 +147,26 @@ class MainViewModel : ViewModel() {
         if (folderId == currentFolderFlow.value?.id) return@launch
 
         val folder = FolderController.getFolderSync(folderId) ?: return@launch
+        Log.i(TAG, "openFolder: ${folder.name}")
 
         selectFolder(folder)
         loadThreads(mailbox, folder)
     }
 
     fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "forceRefreshThreads")
         val mailbox = currentMailboxFlow.value ?: return@launch
         val folder = currentFolderFlow.value ?: return@launch
         loadThreads(mailbox, folder)
     }
 
     fun loadMoreThreads(mailbox: Mailbox, folder: Folder, offset: Int) = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "loadMoreThreads: $offset")
         loadThreads(mailbox, folder, offset)
     }
 
     fun deleteDraft(message: Message) {
+        Log.i(TAG, "deleteDraft: ${message.body}")
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
 
@@ -174,55 +186,58 @@ class MainViewModel : ViewModel() {
     }
 
     private fun loadAddressBooks() {
+        Log.i(TAG, "loadAddressBooks (merge)")
 
         // Get current data
-        Log.d("API", "AddressBooks: Get current data")
+        Log.d(TAG, "AddressBooks: Get current data")
         val realmAddressBooks = AddressBookController.getAddressBooksSync()
         val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
 
         // Get outdated data
-        Log.d("API", "AddressBooks: Get outdated data")
+        Log.d(TAG, "AddressBooks: Get outdated data")
         // val deletableAddressBooks = ContactsController.getDeletableAddressBooks(apiAddressBooks)
         val deletableAddressBooks = realmAddressBooks.filter { realmContact ->
             apiAddressBooks.none { it.id == realmContact.id }
         }
 
         // Save new data
-        Log.d("API", "AddressBooks: Save new data")
+        Log.d(TAG, "AddressBooks: Save new data")
         AddressBookController.upsertAddressBooks(apiAddressBooks)
 
         // Delete outdated data
-        Log.d("API", "AddressBooks: Delete outdated data")
+        Log.d(TAG, "AddressBooks: Delete outdated data")
         AddressBookController.deleteAddressBooks(deletableAddressBooks)
     }
 
     private fun loadContacts() {
+        Log.i(TAG, "loadContacts (merge)")
 
         // Get current data
-        Log.d("API", "Contacts: Get current data")
+        Log.d(TAG, "Contacts: Get current data")
         val realmContacts = ContactController.getContactsSync()
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
 
         // Get outdated data
-        Log.d("API", "Contacts: Get outdated data")
+        Log.d(TAG, "Contacts: Get outdated data")
         // val deletableContacts = ContactsController.getDeletableContacts(apiContacts)
         val deletableContacts = realmContacts.filter { realmContact ->
             apiContacts.none { it.id == realmContact.id }
         }
 
         // Save new data
-        Log.d("API", "Contacts: Save new data")
+        Log.d(TAG, "Contacts: Save new data")
         ContactController.upsertContacts(apiContacts)
 
         // Delete outdated data
-        Log.d("API", "Contacts: Delete outdated data")
+        Log.d(TAG, "Contacts: Delete outdated data")
         ContactController.deleteContacts(deletableContacts)
     }
 
     private fun loadMailboxes(): List<Mailbox> {
+        Log.i(TAG, "loadMailboxes (merge)")
 
         // Get current data
-        Log.d("API", "Mailboxes: Get current data")
+        Log.d(TAG, "Mailboxes: Get current data")
         val realmMailboxes = MailboxController.getMailboxesSync(AccountUtils.currentUserId)
         val apiMailboxes = ApiRepository.getMailboxes().data?.map {
             val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
@@ -230,18 +245,18 @@ class MainViewModel : ViewModel() {
         } ?: emptyList()
 
         // Get outdated data
-        Log.d("API", "Mailboxes: Get outdated data")
+        Log.d(TAG, "Mailboxes: Get outdated data")
         // val deletableMailboxes = MailboxInfoController.getDeletableMailboxes(apiMailboxes)
         val deletableMailboxes = realmMailboxes.filter { realmMailbox ->
             apiMailboxes.none { apiMailbox -> apiMailbox.mailboxId == realmMailbox.mailboxId }
         }
 
         // Save new data
-        Log.d("API", "Mailboxes: Save new data")
+        Log.d(TAG, "Mailboxes: Save new data")
         MailboxController.upsertMailboxes(apiMailboxes)
 
         // Delete outdated data
-        Log.d("API", "Mailboxes: Delete outdated data")
+        Log.d(TAG, "Mailboxes: Delete outdated data")
         val isCurrentMailboxDeleted = deletableMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
             RealmController.closeMailboxContent()
@@ -259,14 +274,15 @@ class MainViewModel : ViewModel() {
     }
 
     private fun loadFolders(mailbox: Mailbox): List<Folder> {
+        Log.i(TAG, "loadFolders (merge)")
 
         // Get current data
-        Log.d("API", "Folders: Get current data")
+        Log.d(TAG, "Folders: Get current data")
         val realmFolders = FolderController.getFoldersSync()
         val apiFolders = ApiRepository.getFolders(mailbox.uuid).data?.formatFoldersListWithAllChildren() ?: emptyList()
 
         // Get outdated data
-        Log.d("API", "Folders: Get outdated data")
+        Log.d(TAG, "Folders: Get outdated data")
         // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
         val deletableFolders = realmFolders.filter { realmFolder ->
             apiFolders.none { apiFolder -> apiFolder.id == realmFolder.id }
@@ -281,7 +297,7 @@ class MainViewModel : ViewModel() {
 
         RealmController.mailboxContent.writeBlocking {
             // Save new data
-            Log.d("API", "Folders: Save new data")
+            Log.d(TAG, "Folders: Save new data")
             apiFolders.forEach { apiFolder ->
                 realmFolders.find { it.id == apiFolder.id }?.threads
                     ?.mapNotNull(::findLatest)
@@ -290,7 +306,7 @@ class MainViewModel : ViewModel() {
             }
 
             // Delete outdated data
-            Log.d("API", "Folders: Delete outdated data")
+            Log.d(TAG, "Folders: Delete outdated data")
             deleteMessages(deletableMessages)
             deleteThreads(deletableThreads)
             deleteFolders(deletableFolders)
@@ -300,9 +316,10 @@ class MainViewModel : ViewModel() {
     }
 
     private fun loadThreads(mailbox: Mailbox, folder: Folder, offset: Int = OFFSET_FIRST_PAGE): List<Thread> {
+        Log.i(TAG, "loadThreads (merge)")
 
         // Get current data
-        Log.d("API", "Threads: Get current data")
+        Log.d(TAG, "Threads: Get current data")
         val realmThreads = FolderController.getFolderSync(folder.id)?.threads ?: emptyList()
         val apiThreadsSinceOffset = ApiRepository.getThreads(mailbox.uuid, folder.id, offset).data?.also { threadsResult ->
             canContinueToPaginate = threadsResult.messagesCount >= PER_PAGE
@@ -314,7 +331,7 @@ class MainViewModel : ViewModel() {
         }
 
         // Get outdated data
-        Log.d("API", "Threads: Get outdated data")
+        Log.d(TAG, "Threads: Get outdated data")
         // val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
         val deletableThreads = if (offset == OFFSET_FIRST_PAGE) {
             realmThreads.filter { realmThread ->
@@ -327,7 +344,7 @@ class MainViewModel : ViewModel() {
 
         RealmController.mailboxContent.writeBlocking {
             // Save new data
-            Log.d("API", "Threads: Save new data")
+            Log.d(TAG, "Threads: Save new data")
             val newPageSize = apiThreads.size - offset
             if (newPageSize > 0) {
                 apiThreads.takeLast(newPageSize).forEach { apiThread ->
@@ -339,7 +356,7 @@ class MainViewModel : ViewModel() {
             }
 
             // Delete outdated data
-            Log.d("API", "Threads: Delete outdated data")
+            Log.d(TAG, "Threads: Delete outdated data")
             deleteMessages(deletableMessages)
             deleteThreads(deletableThreads)
         }
