@@ -28,6 +28,7 @@ import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
+import io.realm.kotlin.ext.isValid
 import com.infomaniak.lib.core.R as RCore
 
 class FoldersAdapter(
@@ -42,7 +43,8 @@ class FoldersAdapter(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == Unit) {
             val folder = folders[position]
-            holder.binding.item.setSelectedState(MainViewModel.currentFolderFlow.value?.id == folder.id)
+            val isSelected = if (folder.isValid()) MainViewModel.currentFolderFlow.value?.id == folder.id else false
+            holder.binding.item.setSelectedState(isSelected)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
