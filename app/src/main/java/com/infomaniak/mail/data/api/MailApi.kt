@@ -55,8 +55,10 @@ object MailApi {
         return ApiRepository.getFolders(mailbox.uuid).data
     }
 
-    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int): List<Thread>? {
-        return ApiRepository.getThreads(mailboxUuid, folder.id, offset).data?.threads?.map { it.initLocalValues() }
+    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int, isDraftsFolder: Boolean): List<Thread>? {
+        return ApiRepository.getThreads(mailboxUuid, folder.id, offset, isDraftsFolder = isDraftsFolder).data?.threads?.map {
+            it.initLocalValues()
+        }
     }
 
     fun fetchMessages(thread: Thread): List<Message> {
@@ -73,7 +75,7 @@ object MailApi {
                         @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
                         attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
 
-                        if (isDraft && Folder.isDraftsFolder()) fetchDraft(draftResource, uid)
+                        if (isDraft) fetchDraft(draftResource, uid)
                         fullyDownloaded = true
                     }
                 }.let { apiMessage ->

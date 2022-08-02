@@ -47,7 +47,10 @@ import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.setMargins
+import com.infomaniak.mail.utils.toggleChevron
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -180,8 +183,8 @@ class NewMessageFragment : Fragment() {
         }
 
         with(viewModel) {
-            currentDraft.observeOnce(viewLifecycleOwner) { draft ->
-                if (draft == null) return@observeOnce
+            currentDraft.observe(viewLifecycleOwner) { draft ->
+                if (draft == null) return@observe
 
                 newMessageTo = draft.to.toUiContact()
                 newMessageCc = draft.cc.toUiContact()

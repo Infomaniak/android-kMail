@@ -25,6 +25,7 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.utils.isContentEqual
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
@@ -126,24 +127,8 @@ class SwitchUserAccountsAdapter(
         }
 
         override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            val oldItem = oldList[oldIndex]
-            val newItem = newList[newIndex]
-            return if (oldItem.mailboxes.size == newItem.mailboxes.size) {
-                var areContentsTheSame = true
-                run breaking@{
-                    oldItem.mailboxes.forEachIndexed { index, oldMailbox ->
-                        val newMailbox = newItem.mailboxes[index]
-                        if (oldMailbox.objectId != newMailbox.objectId ||
-                            oldMailbox.unseenMessages != newMailbox.unseenMessages
-                        ) {
-                            areContentsTheSame = false
-                            return@breaking
-                        }
-                    }
-                }
-                areContentsTheSame
-            } else {
-                false
+            return newList[newIndex].mailboxes.isContentEqual(oldList[oldIndex].mailboxes) { newMailbox, oldMailbox ->
+                oldMailbox.objectId == newMailbox.objectId && oldMailbox.unseenMessages == newMailbox.unseenMessages
             }
         }
     }

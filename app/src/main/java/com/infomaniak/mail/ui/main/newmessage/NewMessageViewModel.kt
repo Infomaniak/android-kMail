@@ -17,10 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
-import android.app.Activity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailboxContentController
@@ -44,17 +44,16 @@ class NewMessageViewModel : ViewModel() {
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
-    var currentDraft: MutableLiveData<Draft> = MutableLiveData()
+    var currentDraft: SingleLiveEvent<Draft> = SingleLiveEvent()
     var hasStartedEditing = MutableLiveData(false)
     var autoSaveJob: Job? = null
 
-    fun setup(activity: Activity, draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
+    fun setup(draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val draft = draftResources?.let { MailApi.fetchDraft(it, messageUid ?: "") }
                 ?: draftUuid?.let { MailboxContentController.getDraft(it) }
                 ?: Draft().apply { initLocalValues() }
-
-            activity.runOnUiThread { currentDraft.value = draft }
+            currentDraft.postValue(draft)
         }
     }
 
@@ -63,6 +62,7 @@ class NewMessageViewModel : ViewModel() {
         MailData.contactsFlow.value?.forEach { contact ->
             contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
         }
+
         return contacts
     }
 

@@ -22,8 +22,6 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.MailRealm
-import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.Companion.API_DRAFT_FOLDER_NAME
 import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
@@ -111,10 +109,6 @@ class Message : RealmObject {
         replyTo = replyTo.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
         return this
-    }
-
-    fun setDraftId(draftUuid: String?) {
-        MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.draftUuid = draftUuid }
     }
 
     fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)

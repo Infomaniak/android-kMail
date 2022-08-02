@@ -82,8 +82,14 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getThreads(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter? = null): ApiResponse<ThreadsResult> {
-        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name), GET)
+    fun getThreads(
+        mailboxUuid: String,
+        folderId: String,
+        offset: Int,
+        filter: ThreadFilter? = null,
+        isDraftsFolder: Boolean
+    ): ApiResponse<ThreadsResult> {
+        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name, isDraftsFolder), GET)
     }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {
@@ -104,10 +110,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun markAsSafe(mailboxUuid: String, messagesUids: List<String>): ApiResponse<List<Seen>> = callKotlinxApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messagesUids))
 
-    // fun trustSender(messageResource: String): ApiRe sponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
+    // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<DraftSaveResult> {
-        val body = Json.encodeToString(draft).replace("[]", "null")
+        val body = Json.encodeToString(draft).removeEmptyRealmList()
         fun postDraft(): ApiResponse<DraftSaveResult> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<DraftSaveResult> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
@@ -115,7 +121,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
-        val body = Json.encodeToString(draft).replace("[]", "null")
+        val body = Json.encodeToString(draft).removeEmptyRealmList()
         fun postDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
@@ -161,4 +167,9 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
+
+    /**
+     * Temporary replace empty [RealmList] with a null value because API doesn't support this
+     */
+    private fun String.removeEmptyRealmList() = replace("[]", "null")
 }

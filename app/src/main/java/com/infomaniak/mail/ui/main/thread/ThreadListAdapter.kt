@@ -23,8 +23,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
-import androidx.core.text.buildSpannedString
-import androidx.core.text.color
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -39,7 +37,6 @@ import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.displayedName
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.isValid
 import java.util.*
@@ -104,7 +101,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
     }
 
     private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
-        expeditor.text = formatExpeditorField(context, this)
+        expeditor.text = formatExpeditorField(context)
         mailSubject.text = subject.getFormattedThreadSubject(context)
 
         mailDate.text = displayedDate
@@ -116,18 +113,6 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
         root.setOnClickListener { onThreadClicked?.invoke(this) }
-    }
-
-    private fun formatExpeditorField(context: Context, thread: Thread) = with(thread) {
-        buildSpannedString {
-            if (hasDrafts) {
-                color(context.getColor(R.color.draftTextColor)) {
-                    append("(${context.getString(R.string.messageIsDraftOption)}) ")
-                }
-            }
-            val recipients = if (hasDrafts) to else from
-            recipients.forEach { append("${it.displayedName(context)}, ") }
-        }.removeSuffix(", ")
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {

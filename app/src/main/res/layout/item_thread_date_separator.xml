@@ -22,8 +22,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/marginStandardSmall"
-    android:layout_marginBottom="@dimen/marginStandardSmall"
     android:layout_marginTop="@dimen/marginStandard"
+    android:layout_marginBottom="@dimen/marginStandardSmall"
     android:minWidth="120dp"
     android:textColor="@color/sectionHeaderTextColor"
     tools:text="Today" />

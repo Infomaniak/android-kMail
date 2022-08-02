@@ -53,6 +53,7 @@ import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.openMessageEdition
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -193,21 +194,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             // onEmptyList = { checkIfNoFiles() }
 
             onThreadClicked = {
-                val destination = if (Folder.isDraftsFolder() && it.messages.isNotEmpty()) {
-                    val message = it.messages.first()
-                    ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity(
-                        message.draftUuid,
-                        message.draftResource,
-                        message.uid
-                    )
+                if (Folder.isDraftsFolder()) {
+                    if (it.messages.isNotEmpty()) {
+                        openMessageEdition(R.id.action_threadListFragment_to_newMessageActivity, it.messages.first())
+                    }
                 } else {
-                    ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
-                        threadUid = it.uid,
-                        threadSubject = it.subject,
-                        threadIsFavorite = it.flagged
+                    safeNavigate(
+                        ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
+                            threadUid = it.uid,
+                            threadSubject = it.subject,
+                            threadIsFavorite = it.flagged
+                        )
                     )
                 }
-                safeNavigate(destination)
             }
         }
     }
@@ -227,7 +226,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         newMessageFab.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
         }
 
         threadsList.setPagination(

@@ -238,15 +238,15 @@ object MailData {
 
     fun setDraftSignature(draft: Draft): Draft {
         val mailbox = currentMailboxFlow.value ?: return draft
-        val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
+        val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
 
-        return MailboxContentController.updateDraft(draft) {
-            it.identityId = signature.data?.defaultSignatureId
-        }
+        return updateDraft(draft) { it.identityId = apiResponse.data?.defaultSignatureId }
     }
 
-    fun deleteDraft(message: Message) {
-        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MailboxContentController.deleteMessage(message.uid)
+    fun deleteDraft(message: Message): Boolean {
+        return ApiRepository.deleteDraft(message.draftResource).isSuccess().also {
+            if (it) MailboxContentController.deleteMessage(message.uid)
+        }
     }
 
     fun selectMailbox(mailbox: Mailbox) {
@@ -388,13 +388,14 @@ object MailData {
         forceRefresh: Boolean = false,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset)
+            val isDraftsFolder = Folder.isDraftsFolder()
+            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset, isDraftsFolder)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()
             mutableThreadsFlow.value = mergedThreads
 
-            if (Folder.isDraftsFolder()) apiThreads?.forEach(::getMessagesFromApi)
+            if (isDraftsFolder) apiThreads?.forEach(::getMessagesFromApi)
         }
     }
 

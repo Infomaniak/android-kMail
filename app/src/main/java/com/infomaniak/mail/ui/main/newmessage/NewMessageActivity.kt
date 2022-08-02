@@ -72,7 +72,7 @@ class NewMessageActivity : ThemedActivity() {
             handleEditorToggle()
         }
 
-        with(navigationArgs) { viewModel.setup(this@NewMessageActivity, draftResource, draftUuid, messageUid) }
+        with(navigationArgs) { viewModel.setup(draftResource, draftUuid, messageUid) }
     }
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {
