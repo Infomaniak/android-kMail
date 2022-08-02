@@ -157,6 +157,7 @@ class MenuDrawerFragment : Fragment() {
 
     fun onDrawerOpened() {
         canNavigate = true
+        mainViewModel.forceRefreshMailboxes()
     }
 
     private fun listenToMailboxes() {

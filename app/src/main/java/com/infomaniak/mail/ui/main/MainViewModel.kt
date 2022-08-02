@@ -145,6 +145,11 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "forceRefreshMailboxes")
+        loadMailboxes()
+    }
+
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailboxFlow.value ?: return@launch
         if (folderId == currentFolderFlow.value?.id) return@launch

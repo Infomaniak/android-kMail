@@ -30,8 +30,8 @@ import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
 
-    val currentMailbox = MutableLiveData<Mailbox?>()
     val mailboxes = MutableLiveData<List<Mailbox>?>()
+    val currentMailbox = MutableLiveData<Mailbox?>()
     val folders = MutableLiveData<List<Folder>?>()
     val currentFolder = MutableLiveData<Folder?>()
 
