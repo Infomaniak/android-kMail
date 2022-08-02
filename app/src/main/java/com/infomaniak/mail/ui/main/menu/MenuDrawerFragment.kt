@@ -206,7 +206,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun onCurrentFolderChange(currentFolder: Folder) = with(binding) {
-        inboxFolder.setSelectedState(currentFolder.id == inboxFolderId)
+        inboxFolder.setSelectedState(currentFolder.role == FolderRole.INBOX)
         defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
         customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
     }
