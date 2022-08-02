@@ -68,6 +68,8 @@ class MainViewModel : ViewModel() {
         val currentThreadFlow = mutableCurrentThreadFlow.asStateFlow()
         val currentMessageFlow = mutableCurrentMessageFlow.asStateFlow()
 
+        var currentOffset = OFFSET_FIRST_PAGE
+
         fun selectMailbox(mailbox: Mailbox) {
             if (currentMailboxFlow.value?.objectId != mailbox.objectId) {
                 Log.i(TAG, "selectMailbox: ${mailbox.email}")
@@ -83,6 +85,7 @@ class MainViewModel : ViewModel() {
         fun selectFolder(folder: Folder) {
             if (folder.id != currentFolderFlow.value?.id) {
                 Log.i(TAG, "selectFolder: ${folder.name}")
+                currentOffset = OFFSET_FIRST_PAGE
                 mutableCurrentFolderFlow.value = folder
 
                 mutableCurrentMessageFlow.value = null

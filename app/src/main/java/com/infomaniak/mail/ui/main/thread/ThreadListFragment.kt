@@ -46,6 +46,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.main.MainViewModel.Companion.currentOffset
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
@@ -71,7 +72,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         ) { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
     private var lastUpdatedAt = Date() // TODO: Remove when implementing "Last updated at" feature
 
@@ -85,7 +85,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         lastUpdatedAt = Date()
         startPeriodicRefreshJob()
@@ -212,12 +211,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         AccountUtils.currentUser?.let { binding.userAvatarImage.loadAvatar(it, requireContext().imageLoader) }
     }
 
-    override fun onResume() {
-        super.onResume()
-        currentOffset = OFFSET_FIRST_PAGE
-        mainViewModel.forceRefreshThreads()
-    }
-
     private fun listenToCurrentFolder() {
         viewModel.currentFolder.observeNotNull(this, ::displayFolderName)
         viewModel.listenToCurrentFolder()
@@ -238,6 +231,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
         swipeRefreshLayout.isRefreshing = false
+        if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
 
         updateUnreadCount()
 
