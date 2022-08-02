@@ -68,11 +68,11 @@
 
                 <ImageView
                     style="@style/SettingImageAtStart"
-                    android:src="@drawable/ic_theme_tel" />
+                    android:src="@drawable/ic_theme_system" />
 
                 <TextView
                     style="@style/SettingTextWithButton"
-                    android:text="@string/settingsDefault" />
+                    android:text="@string/settingsOptionSystemTheme" />
 
                 <ImageView
                     android:id="@+id/settingsOptionDefaultThemeCheck"

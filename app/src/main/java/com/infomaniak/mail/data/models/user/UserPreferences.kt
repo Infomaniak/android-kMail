@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.user
 
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmObject
@@ -29,7 +30,8 @@ import kotlinx.serialization.Transient
 class UserPreferences : RealmObject {
 
     //region API data
-    var theme: String = ThemeMode.DEFAULT.mode
+    // TODO: Do we really need all this, as most settings are set in UiSettings ?
+    var theme: String = ThemeMode.DEFAULT.apiName
     @SerialName("density")
     var threadListDensity: String = ListDensityMode.DEFAULT.mode
     @SerialName("thread_mode")
@@ -104,8 +106,8 @@ class UserPreferences : RealmObject {
         get() = enumValueOfOrNull<SwipeAction>(_longLeftSwipe)
 
     fun getThemeMode(): ThemeMode = when (theme) {
-        ThemeMode.LIGHT.mode -> ThemeMode.LIGHT
-        ThemeMode.DARK.mode -> ThemeMode.DARK
+        ThemeMode.LIGHT.apiName -> ThemeMode.LIGHT
+        ThemeMode.DARK.apiName -> ThemeMode.DARK
         else -> ThemeMode.DEFAULT
     }
 
@@ -122,10 +124,10 @@ class UserPreferences : RealmObject {
 
     // fun getIntelligentMode(): IntelligentMode? = enumValueOfOrNull<IntelligentMode>(intelligentMode)
 
-    enum class ThemeMode(val mode: String) {
-        DEFAULT("medium"),
-        LIGHT("light"),
-        DARK("dark"),
+    enum class ThemeMode(val apiName: String, val mode: Int) {
+        DEFAULT("medium", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
+        LIGHT("light", AppCompatDelegate.MODE_NIGHT_NO),
+        DARK("dark", AppCompatDelegate.MODE_NIGHT_YES),
     }
 
     enum class ListDensityMode(val mode: String) {

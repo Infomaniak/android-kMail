@@ -94,7 +94,7 @@
 
                 <TextView
                     style="@style/SettingTextWithButton"
-                    android:text="@string/settingsCodeLock" />
+                    android:text="@string/settingsAppLock" />
 
                 <ImageView style="@style/SettingButtonChevron" />
             </LinearLayout>

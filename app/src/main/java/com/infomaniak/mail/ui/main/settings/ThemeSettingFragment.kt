@@ -22,10 +22,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.view.isInvisible
+import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.data.cache.UserInfosController.updateUserPreferences
+import com.infomaniak.mail.data.models.UiSettings
+import com.infomaniak.mail.data.models.user.UserPreferences.ThemeMode
 import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
 
 class ThemeSettingFragment : Fragment() {
@@ -39,6 +43,7 @@ class ThemeSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
+        setUpCheckMarks()
         setupListeners()
     }
 
@@ -46,18 +51,35 @@ class ThemeSettingFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
+    private fun setUpCheckMarks() = with(binding) {
+        when (UiSettings(requireContext()).nightMode) {
+            MODE_NIGHT_NO -> settingsOptionLightThemeCheck
+            MODE_NIGHT_YES -> settingsOptionDarkThemeCheck
+            else -> settingsOptionDefaultThemeCheck
+        }.selectOption()
+    }
+
     private fun setupListeners() = with(binding) {
-        settingsOptionDefaultTheme.setOnClickListener { settingsOptionDefaultThemeCheck.selectOption() }
-        settingsOptionLightTheme.setOnClickListener { settingsOptionLightThemeCheck.selectOption() }
-        settingsOptionDarkTheme.setOnClickListener { settingsOptionDarkThemeCheck.selectOption() }
+        settingsOptionDefaultTheme.setOnClickListener { chooseTheme(ThemeMode.DEFAULT, settingsOptionDefaultThemeCheck) }
+        settingsOptionLightTheme.setOnClickListener { chooseTheme(ThemeMode.LIGHT, settingsOptionLightThemeCheck) }
+        settingsOptionDarkTheme.setOnClickListener { chooseTheme(ThemeMode.DARK, settingsOptionDarkThemeCheck) }
+    }
+
+    private fun chooseTheme(theme: ThemeMode, selectedImageView: ImageView) {
+        selectedImageView.selectOption()
+        setDefaultNightMode(theme.mode)
+        UiSettings(requireContext()).nightMode = theme.mode
     }
 
     private fun ImageView.selectOption() = with(binding) {
-
-        settingsOptionDefaultThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionLightThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionDarkThemeCheck.let { if (it != this@selectOption) it.isInvisible = true }
+        settingsOptionDefaultThemeCheck.setCheckMarkGone(this@selectOption)
+        settingsOptionLightThemeCheck.setCheckMarkGone(this@selectOption)
+        settingsOptionDarkThemeCheck.setCheckMarkGone(this@selectOption)
 
         this@selectOption.isVisible = true
+    }
+
+    private fun ImageView.setCheckMarkGone(selectedOption: ImageView) {
+        if (this != selectedOption) isGone = true
     }
 }
