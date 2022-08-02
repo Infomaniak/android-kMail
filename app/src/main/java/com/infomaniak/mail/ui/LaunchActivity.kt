@@ -25,28 +25,39 @@ import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LaunchActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+    private val viewModel: LaunchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (AccountUtils.requestCurrentUser() == null) loginUser() else startApp()
+        }
+    }
 
+    private fun loginUser() {
+        launchActivity(LoginActivity::class.java)
+    }
+
+    private fun startApp() {
         mainViewModel.loadAddressBooksAndContacts()
         mainViewModel.loadCurrentMailbox()
 
-        lifecycleScope.launch(Dispatchers.IO) {
-
-            val destinationClass = if (AccountUtils.requestCurrentUser() == null) {
-                LoginActivity::class.java
-            } else {
-                MainActivity::class.java
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewModel.currentMailbox.observeNotNull(this@LaunchActivity) {
+                launchActivity(MainActivity::class.java) // TODO: If there is no Internet, the app won't be able to start.
             }
-
-            startActivity(Intent(this@LaunchActivity, destinationClass))
+            viewModel.listenToCurrentMailbox()
         }
+    }
+
+    private fun launchActivity(destinationClass: Class<out AppCompatActivity>) {
+        startActivity(Intent(this, destinationClass))
     }
 }
