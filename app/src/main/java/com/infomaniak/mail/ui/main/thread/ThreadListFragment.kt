@@ -215,11 +215,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onResume() {
         super.onResume()
         currentOffset = OFFSET_FIRST_PAGE
-        if (MainViewModel.currentMailboxFlow.value == null) {
-            mainViewModel.openCurrentMailbox()
-        } else {
-            mainViewModel.forceRefreshThreads()
-        }
+        mainViewModel.forceRefreshThreads()
     }
 
     private fun listenToCurrentFolder() {

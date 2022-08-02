@@ -77,8 +77,6 @@ class MainActivity : ThemedActivity() {
 
         setupNavController()
         setupMenuDrawerCallbacks()
-
-        mainViewModel.loadAddressBooksAndContacts()
     }
 
     private fun listenToNetworkStatus() {

@@ -108,16 +108,12 @@ class MainViewModel : ViewModel() {
         mutableCurrentMailboxFlow.value = null
     }
 
-    fun deleteDraft(message: Message) {
-        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
-    }
-
     fun loadAddressBooksAndContacts() = viewModelScope.launch(Dispatchers.IO) {
         loadAddressBooks()
         loadContacts()
     }
 
-    fun openCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
+    fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
         val mailboxes = loadMailboxes()
         computeMailboxToSelect(mailboxes)?.let { mailbox ->
             selectMailbox(mailbox)
@@ -148,14 +144,18 @@ class MainViewModel : ViewModel() {
         loadThreads(mailbox, folder)
     }
 
-    fun loadMoreThreads(mailbox: Mailbox, folder: Folder, offset: Int) = viewModelScope.launch(Dispatchers.IO) {
-        loadThreads(mailbox, folder, offset)
-    }
-
     fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailboxFlow.value ?: return@launch
         val folder = currentFolderFlow.value ?: return@launch
         loadThreads(mailbox, folder)
+    }
+
+    fun loadMoreThreads(mailbox: Mailbox, folder: Folder, offset: Int) = viewModelScope.launch(Dispatchers.IO) {
+        loadThreads(mailbox, folder, offset)
+    }
+
+    fun deleteDraft(message: Message) {
+        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
 
     private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox? {

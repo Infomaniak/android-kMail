@@ -19,17 +19,24 @@ package com.infomaniak.mail.ui
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.ui.main.MainActivity
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LaunchActivity : AppCompatActivity() {
 
+    private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mainViewModel.loadAddressBooksAndContacts()
+        mainViewModel.loadCurrentMailbox()
 
         lifecycleScope.launch(Dispatchers.IO) {
 
