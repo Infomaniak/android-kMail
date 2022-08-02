@@ -37,7 +37,7 @@ class SwitchUserViewModel : ViewModel() {
 
     val accounts = MutableLiveData<List<Pair<User, List<Mailbox>>>?>(null)
 
-    fun loadAccounts(lifecycleOwner: LifecycleOwner) {
+    fun listenToAccounts(lifecycleOwner: LifecycleOwner) {
 
         AccountUtils.getAllUsers().observeOnce(lifecycleOwner) { users ->
             viewModelScope.launch(Dispatchers.IO) {
@@ -54,7 +54,10 @@ class SwitchUserViewModel : ViewModel() {
                                 val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
                                 it.initLocalValues(user.id, quotas)
                             }
-                            ?.let { user to it }
+                            ?.let {
+                                MailboxController.upsertMailboxes(it)
+                                user to it
+                            }
                     }
                     .also(accounts::postValue)
             }

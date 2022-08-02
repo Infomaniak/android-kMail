@@ -28,6 +28,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.MainViewModel
@@ -73,16 +75,16 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun listenToAccounts() {
-        viewModel.accounts.observeNotNull(this) { accounts ->
+        viewModel.accounts.observeNotNull(this, ::onAccountsChange)
+        viewModel.listenToAccounts(viewLifecycleOwner)
+    }
 
-            val uiAccounts = accounts
-                .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
-                .sortAccounts()
+    private fun onAccountsChange(accounts: List<Pair<User, List<Mailbox>>>) {
+        val uiAccounts = accounts
+            .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
+            .sortAccounts()
 
-            accountsAdapter.notifyAdapter(uiAccounts)
-        }
-
-        viewModel.loadAccounts(viewLifecycleOwner)
+        accountsAdapter.notifyAdapter(uiAccounts)
     }
 
     private fun List<UiAccount>.sortAccounts(): List<UiAccount> {
