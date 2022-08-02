@@ -49,7 +49,6 @@ class SwitchUserAccountsAdapter(
 
     override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() is Unit) {
-            isCollapsed[position] = true
             holder.binding.updateAccountCardUiState(position)
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -58,7 +57,10 @@ class SwitchUserAccountsAdapter(
 
     override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int): Unit = with(holder.binding) {
         val account = accounts[position]
-        expandFirstMailbox(account, position)
+
+        if (!isCollapsed[position]) chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
+        updateAccountCardUiState(position)
+
         userAvatarImage.loadAvatar(account.user)
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
@@ -73,22 +75,19 @@ class SwitchUserAccountsAdapter(
         }
     }
 
-    private fun ItemSwitchUserAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
-        if (position == 0) {
-            chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
-            toggleMailboxes(position, true)
-        }
-    }
-
-    private fun ItemSwitchUserAccountBinding.toggleMailboxes(position: Int, isFirstRun: Boolean = false) {
-        if (!isFirstRun && isCollapsed[position]) closeAllBut(position)
+    private fun ItemSwitchUserAccountBinding.toggleMailboxes(position: Int) {
+        if (isCollapsed[position]) closeAllBut(position)
         isCollapsed[position] = !isCollapsed[position]
+
         updateAccountCardUiState(position)
     }
 
     private fun closeAllBut(position: Int) {
         accounts.forEachIndexed { index, _ ->
-            if (index != position) notifyItemChanged(index, Unit)
+            if (index != position) {
+                isCollapsed[index] = true
+                notifyItemChanged(index, Unit)
+            }
         }
     }
 
@@ -104,9 +103,11 @@ class SwitchUserAccountsAdapter(
     override fun getItemCount(): Int = accounts.count()
 
     fun notifyAdapter(newList: List<UiAccount>) {
+        isCollapsed = MutableList(newList.count()) { true }
+        isCollapsed[0] = false
+
         DiffUtil.calculateDiff(UiAccountsListDiffCallback(accounts, newList)).dispatchUpdatesTo(this)
         accounts = newList
-        isCollapsed = MutableList(accounts.count()) { true }
     }
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : RecyclerView.ViewHolder(binding.root)
