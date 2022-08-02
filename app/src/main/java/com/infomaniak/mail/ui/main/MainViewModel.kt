@@ -161,16 +161,21 @@ class MainViewModel : ViewModel() {
         loadThreads(mailbox, folder)
     }
 
-    fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "forceRefreshThreads")
-        val mailbox = currentMailboxFlow.value ?: return@launch
-        val folder = currentFolderFlow.value ?: return@launch
-        loadThreads(mailbox, folder)
+    fun forceRefreshFolders() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "forceRefreshFolders")
+        currentMailboxFlow.value?.let(::loadFolders)
     }
 
     fun loadMoreThreads(mailbox: Mailbox, folder: Folder, offset: Int) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
         loadThreads(mailbox, folder, offset)
+    }
+
+    fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "forceRefreshThreads")
+        val mailbox = currentMailboxFlow.value ?: return@launch
+        val folder = currentFolderFlow.value ?: return@launch
+        loadThreads(mailbox, folder)
     }
 
     fun deleteDraft(message: Message) {

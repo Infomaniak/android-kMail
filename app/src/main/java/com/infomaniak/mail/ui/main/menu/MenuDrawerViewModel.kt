@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MenuDrawerViewModel : ViewModel() {
@@ -34,6 +35,8 @@ class MenuDrawerViewModel : ViewModel() {
     val currentMailbox = MutableLiveData<Mailbox?>()
     val folders = MutableLiveData<List<Folder>?>()
     val currentFolder = MutableLiveData<Folder?>()
+
+    var foldersJob: Job? = null
 
     fun listenToCurrentMailbox() = viewModelScope.launch {
         MainViewModel.currentMailboxFlow.collect {
@@ -47,9 +50,12 @@ class MenuDrawerViewModel : ViewModel() {
         }
     }
 
-    fun listenToFolders() = viewModelScope.launch {
-        FolderController.getFoldersAsync().collect {
-            folders.value = it.list
+    fun listenToFolders() {
+        foldersJob?.cancel()
+        foldersJob = viewModelScope.launch {
+            FolderController.getFoldersAsync().collect {
+                folders.value = it.list
+            }
         }
     }
 
