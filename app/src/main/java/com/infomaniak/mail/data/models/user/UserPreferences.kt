@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.models.user
 
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
@@ -33,7 +34,7 @@ class UserPreferences : RealmObject {
     // TODO: Do we really need all this, as most settings are set in UiSettings ?
     var theme: String = ThemeMode.DEFAULT.apiName
     @SerialName("density")
-    var threadListDensity: String = ListDensityMode.DEFAULT.mode
+    var threadListDensity: String = ListDensityMode.DEFAULT.apiName
     @SerialName("thread_mode")
     var threadMode: Int = ThreadMode.THREADS.getValue
     // @SerialName("auto_trust_emails")
@@ -112,8 +113,8 @@ class UserPreferences : RealmObject {
     }
 
     fun getListDensityMode(): ListDensityMode = when (threadListDensity) {
-        ListDensityMode.COMPACT.mode -> ListDensityMode.COMPACT
-        ListDensityMode.LARGE.mode -> ListDensityMode.LARGE
+        ListDensityMode.COMPACT.apiName -> ListDensityMode.COMPACT
+        ListDensityMode.LARGE.apiName -> ListDensityMode.LARGE
         else -> ListDensityMode.DEFAULT
     }
 
@@ -127,13 +128,22 @@ class UserPreferences : RealmObject {
     enum class ThemeMode(val apiName: String, val mode: Int) {
         DEFAULT("medium", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
         LIGHT("light", AppCompatDelegate.MODE_NIGHT_NO),
-        DARK("dark", AppCompatDelegate.MODE_NIGHT_YES),
+        DARK("dark", AppCompatDelegate.MODE_NIGHT_YES);
+
+        companion object {
+            fun getLocalisedNameFromMode(mode: Int): Int = when (mode) {
+                AppCompatDelegate.MODE_NIGHT_NO -> R.string.settingsOptionLightTheme
+                AppCompatDelegate.MODE_NIGHT_YES -> R.string.settingsOptionDarkTheme
+                else -> R.string.settingsOptionSystemTheme
+            }
+        }
     }
 
-    enum class ListDensityMode(val mode: String) {
-        COMPACT("high"),
-        DEFAULT("normal"),
-        LARGE("low"),
+
+    enum class ListDensityMode(@StringRes val modeRes: Int, val apiName: String) {
+        COMPACT(R.string.settingsDensityOptionCompact, "high"),
+        DEFAULT(R.string.settingsDensityOptionNormal, "normal"),
+        LARGE(R.string.settingsDensityOptionLarge, "low"),
     }
 
     enum class ThreadMode(val getValue: Int, val setValue: String) {

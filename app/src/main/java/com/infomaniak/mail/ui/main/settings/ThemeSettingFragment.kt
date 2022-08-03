@@ -27,7 +27,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.cache.UserInfosController.updateUserPreferences
 import com.infomaniak.mail.data.models.UiSettings
 import com.infomaniak.mail.data.models.user.UserPreferences.ThemeMode
 import com.infomaniak.mail.databinding.FragmentThemeSettingBinding

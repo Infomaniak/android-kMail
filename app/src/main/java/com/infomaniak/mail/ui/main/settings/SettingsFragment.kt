@@ -25,6 +25,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.UiSettings
+import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment() {
@@ -43,6 +45,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
         setupAdapter()
+        setupTextValues()
         setupListeners()
     }
 
@@ -53,6 +56,13 @@ class SettingsFragment : Fragment() {
     private fun setupAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
         MailData.mailboxesFlow.value?.let(mailboxesAdapter::setMailboxes)
+    }
+
+    private fun setupTextValues() = with(binding) {
+        UiSettings(requireContext()).apply {
+            densitySubtitle.setText(threadListDensity)
+            themeSubtitle.setText(UserPreferences.ThemeMode.getLocalisedNameFromMode(nightMode))
+        }
     }
 
     private fun setupListeners() = with(binding) {

@@ -21,10 +21,10 @@ class UiSettings(private val context: Context) {
             apply()
         }
 
-    var threadListDensity: String
-        get() = getUiSettings().getString("threadListDensity", UserPreferences.ListDensityMode.DEFAULT.mode).toString()
+    var threadListDensity: Int
+        get() = getUiSettings().getInt("threadListDensity", UserPreferences.ListDensityMode.DEFAULT.modeRes)
         set(value) = with(getUiSettings().edit()) {
-            putString("threadListDensity", value)
+            putInt("threadListDensity", value)
             apply()
         }
 }

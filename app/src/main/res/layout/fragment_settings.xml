@@ -116,6 +116,7 @@
                         android:text="@string/settingsThreadListDensityTitle" />
 
                     <TextView
+                        android:id="@+id/densitySubtitle"
                         style="@style/SettingText2Of2WithButton"
                         android:text="@string/settingsDefault" />
                 </LinearLayout>
@@ -134,8 +135,9 @@
                         android:text="@string/settingsTheme" />
 
                     <TextView
+                        android:id="@+id/themeSubtitle"
                         style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsDefault" />
+                        android:text="@string/settingsOptionSystemTheme" />
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
