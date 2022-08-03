@@ -26,6 +26,8 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.data.cache.UserInfosController
+import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
 
 class ExternalContentSettingFragment : Fragment() {
@@ -39,6 +41,7 @@ class ExternalContentSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
+        setupUi()
         setupListeners()
     }
 
@@ -46,13 +49,28 @@ class ExternalContentSettingFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
+    private fun setupUi() = with(binding) {
+        when (UserInfosController.getUserPreferences().getExternalContentMode()) {
+            UserPreferences.ExternalContentMode.ALWAYS -> settingsOptionAlwaysCheck.selectOption()
+            UserPreferences.ExternalContentMode.ASK_ME -> settingsOptionAskMeCheck.selectOption()
+        }
+    }
+
     private fun setupListeners() = with(binding) {
-        settingsOptionAlways.setOnClickListener { settingsOptionAlwaysCheck.selectOption() }
-        settingsOptionAskMe.setOnClickListener { settingsOptionAskMeCheck.selectOption() }
+        settingsOptionAlways.setOnClickListener {
+            updateExternalContentSetting(UserPreferences.ExternalContentMode.ALWAYS, settingsOptionAlwaysCheck)
+        }
+        settingsOptionAskMe.setOnClickListener {
+            updateExternalContentSetting(UserPreferences.ExternalContentMode.ASK_ME, settingsOptionAskMeCheck)
+        }
+    }
+
+    private fun updateExternalContentSetting(externalContentMode: UserPreferences.ExternalContentMode, chosenOption: ImageView) {
+        UserInfosController.updateUserPreferences { it.autoTrustEmails = externalContentMode.apiValue }
+        chosenOption.selectOption()
     }
 
     private fun ImageView.selectOption() = with(binding) {
-
         settingsOptionAlwaysCheck.let { if (it != this@selectOption) it.isInvisible = true }
         settingsOptionAskMeCheck.let { if (it != this@selectOption) it.isInvisible = true }
 

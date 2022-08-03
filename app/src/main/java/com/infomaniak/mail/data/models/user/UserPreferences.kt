@@ -37,8 +37,8 @@ class UserPreferences : RealmObject {
     var threadListDensity: String = ListDensityMode.DEFAULT.apiName
     @SerialName("thread_mode")
     var threadMode: Int = ThreadMode.THREADS.apiValue
-    // @SerialName("auto_trust_emails")
-    // var autoTrustEmails: Int = 0
+    @SerialName("auto_trust_emails")
+    var autoTrustEmails: Int = ExternalContentMode.ASK_ME.apiValue
     // @SerialName("reabirthday_calendar_colord_pos")
     // var birthdayCalendarColor: String = ""
     // @SerialName("calendar_default_event_duration")
@@ -123,6 +123,11 @@ class UserPreferences : RealmObject {
         else -> ThreadMode.THREADS
     }
 
+    fun getExternalContentMode(): ExternalContentMode = when (autoTrustEmails) {
+        ExternalContentMode.ALWAYS.apiValue -> ExternalContentMode.ALWAYS
+        else -> ExternalContentMode.ASK_ME
+    }
+
     // fun getIntelligentMode(): IntelligentMode? = enumValueOfOrNull<IntelligentMode>(intelligentMode)
 
     enum class ThemeMode(val apiName: String, val mode: Int, @StringRes val localisedNameRes: Int) {
@@ -141,6 +146,11 @@ class UserPreferences : RealmObject {
     enum class ThreadMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
         THREADS(1, "on", R.string.settingsOptionDiscussions),
         MESSAGES(0, "off", R.string.settingsOptionMessages),
+    }
+
+    enum class ExternalContentMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
+        ALWAYS(1, "true", R.string.settingsOptionAlways),
+        ASK_ME(0, "false", R.string.settingsOptionAskMe),
     }
 
     // enum class IntelligentMode {

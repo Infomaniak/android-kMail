@@ -62,6 +62,7 @@ class SettingsFragment : Fragment() {
         densitySubtitle.setText(getListDensityMode().localisedNameRes)
         themeSubtitle.setText(getThemeMode().localisedNameRes)
         displayModeSubtitle.setText(getThreadMode().localisedNameRes)
+        externalContentSubtitle.setText(getExternalContentMode().localisedNameRes)
     }
 
     private fun setupListeners() = with(binding) {

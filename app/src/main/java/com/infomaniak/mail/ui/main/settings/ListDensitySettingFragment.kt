@@ -25,7 +25,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.UserInfosController
-import com.infomaniak.mail.data.cache.UserInfosController.updateUserPreferences
 import com.infomaniak.mail.data.models.user.UserPreferences.ListDensityMode
 import com.infomaniak.mail.databinding.FragmentListDensitySettingBinding
 
@@ -63,7 +62,7 @@ class ListDensitySettingFragment : Fragment() {
             if (!isChecked) return@addOnButtonCheckedListener
 
             val (listDensity, resId) = getDensityFromCheckedButton(buttonId)
-            updateUserPreferences { it.threadListDensity = listDensity.apiName }
+            UserInfosController.updateUserPreferences { it.threadListDensity = listDensity.apiName }
             listDensityImage.setImageResource(resId)
         }
     }

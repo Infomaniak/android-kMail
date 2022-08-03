@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.MailData.currentFolderFlow
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
+import com.infomaniak.mail.data.cache.UserInfosController.getUserPreferences
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
@@ -58,7 +59,8 @@ object MailApi {
     }
 
     fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int, filter: ThreadFilter): List<Thread>? {
-        val apiResponse = ApiRepository.getThreads(mailboxUuid, folder.id, offset, filter)
+        val threadMode = getUserPreferences().getThreadMode().apiCallValue
+        val apiResponse = ApiRepository.getThreads(mailboxUuid, folder.id, threadMode, offset, filter)
 
         return apiResponse.data?.also { threadResult ->
             currentFolderFlow.value?.let { folder -> MailData.updateCurrentFolderCounts(folder, threadResult) }

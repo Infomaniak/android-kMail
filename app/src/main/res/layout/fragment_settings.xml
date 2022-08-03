@@ -184,8 +184,9 @@
                         android:text="@string/settingsExternalContentTitle" />
 
                     <TextView
+                        android:id="@+id/externalContentSubtitle"
                         style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsOptionAlways" />
+                        android:text="@string/settingsOptionAskMe" />
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />

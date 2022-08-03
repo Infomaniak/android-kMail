@@ -50,8 +50,7 @@ object ApiRoutes {
 
     // fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
 
-    fun threads(uuid: String, folderId: String, offset: Int, filter: ThreadFilter, searchText: String? = null): String {
-        val threadMode = MailData.userPreferencesFlow.value?.getThreadMode()?.apiCallValue ?: ThreadMode.THREADS.apiCallValue
+    fun threads(uuid: String, folderId: String, threadMode: String, offset: Int, filter: ThreadFilter, searchText: String? = null): String {
         val urlSearch = searchText?.let { "&scontains=$it" } ?: ""
         val urlAttachment = if (filter == ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
         val urlFilter = when (filter) {
