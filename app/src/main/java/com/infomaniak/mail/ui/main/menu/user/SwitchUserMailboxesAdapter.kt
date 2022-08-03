@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
-import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
@@ -37,6 +36,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class SwitchUserMailboxesAdapter(
     private var mailboxes: List<Mailbox> = emptyList(),
+    private var currentMailboxObjectId: String? = null,
     private val displayIcon: Boolean = true,
     private val onMailboxSelected: (Mailbox) -> Unit,
 ) : RecyclerView.Adapter<SwitchUserMailboxViewHolder>() {
@@ -58,7 +58,7 @@ class SwitchUserMailboxesAdapter(
             text = formatUnreadCount(unread)
         }
 
-        setSelectedState(mailbox.objectId == MainViewModel.currentMailboxFlow.value?.objectId)
+        setSelectedState(currentMailboxObjectId == mailbox.objectId)
         addressItemView.setOnClickListener { onMailboxSelected(mailbox) }
     }
 
@@ -87,7 +87,8 @@ class SwitchUserMailboxesAdapter(
 
     override fun getItemCount(): Int = mailboxes.count()
 
-    fun notifyAdapter(newList: List<Mailbox>) {
+    fun notifyAdapter(newList: List<Mailbox>, newCurrentMailboxObjectId: String?) {
+        currentMailboxObjectId = newCurrentMailboxObjectId
         DiffUtil.calculateDiff(MailboxesListDiffCallback(mailboxes, newList)).dispatchUpdatesTo(this)
         mailboxes = newList
     }

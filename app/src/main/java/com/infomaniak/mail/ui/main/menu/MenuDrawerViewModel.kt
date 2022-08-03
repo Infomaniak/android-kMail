@@ -24,7 +24,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -32,17 +31,9 @@ import kotlinx.coroutines.launch
 class MenuDrawerViewModel : ViewModel() {
 
     val mailboxes = MutableLiveData<List<Mailbox>?>()
-    val currentMailbox = MutableLiveData<Mailbox?>()
     val folders = MutableLiveData<List<Folder>?>()
-    val currentFolder = MutableLiveData<Folder?>()
 
     var foldersJob: Job? = null
-
-    fun listenToCurrentMailbox() = viewModelScope.launch {
-        MainViewModel.currentMailboxFlow.collect {
-            currentMailbox.value = it
-        }
-    }
 
     fun listenToMailboxes() = viewModelScope.launch {
         MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
@@ -56,12 +47,6 @@ class MenuDrawerViewModel : ViewModel() {
             FolderController.getFoldersAsync().collect {
                 folders.value = it.list
             }
-        }
-    }
-
-    fun listenToCurrentFolder() = viewModelScope.launch {
-        MainViewModel.currentFolderFlow.collect {
-            currentFolder.value = it
         }
     }
 }

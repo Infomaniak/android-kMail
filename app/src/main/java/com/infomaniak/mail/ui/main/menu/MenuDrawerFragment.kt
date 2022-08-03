@@ -167,8 +167,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun listenToCurrentMailbox() {
-        viewModel.currentMailbox.observeNotNull(this, ::onCurrentMailboxChange)
-        viewModel.listenToCurrentMailbox()
+        MainViewModel.currentMailboxFlow.observeNotNull(this, ::onCurrentMailboxChange)
     }
 
     private fun listenToFolders() {
@@ -177,8 +176,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun listenToCurrentFolder() {
-        viewModel.currentFolder.observeNotNull(this, ::onCurrentFolderChange)
-        viewModel.listenToCurrentFolder()
+        MainViewModel.currentFolderFlow.observeNotNull(this, ::onCurrentFolderChange)
     }
 
     private fun onMailboxesChange(mailboxes: List<Mailbox>) = with(binding) {
@@ -201,8 +199,9 @@ class MenuDrawerFragment : Fragment() {
         inboxFolderId = inbox?.id
         binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
 
-        defaultFoldersAdapter.setFolders(defaultFolders)
-        customFoldersAdapter.setFolders(customFolders)
+        val currentFolderId = MainViewModel.currentFolderFlow.value?.id
+        defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
+        customFoldersAdapter.setFolders(customFolders, currentFolderId)
 
         setCustomFolderCollapsedState()
     }

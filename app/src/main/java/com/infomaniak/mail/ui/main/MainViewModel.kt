@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getLatestThreadSync
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.AddressBookController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
@@ -49,9 +50,8 @@ import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
 
@@ -59,80 +59,71 @@ class MainViewModel : ViewModel() {
         private val TAG = "MainViewModel"
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
 
-        private val mutableCurrentMailboxFlow = MutableStateFlow<Mailbox?>(null)
-        private val mutableCurrentFolderFlow = MutableStateFlow<Folder?>(null)
-        private val mutableCurrentThreadFlow = MutableStateFlow<Thread?>(null)
-        private val mutableCurrentMessageFlow = MutableStateFlow<Message?>(null)
-        val currentMailboxFlow = mutableCurrentMailboxFlow.asStateFlow()
-        val currentFolderFlow = mutableCurrentFolderFlow.asStateFlow()
-        val currentThreadFlow = mutableCurrentThreadFlow.asStateFlow()
-        val currentMessageFlow = mutableCurrentMessageFlow.asStateFlow()
-
-        var currentOffset = OFFSET_FIRST_PAGE
-
-        fun selectMailbox(mailbox: Mailbox) {
-            if (currentMailboxFlow.value?.objectId != mailbox.objectId) {
-                Log.i(TAG, "selectMailbox: ${mailbox.email}")
-                AccountUtils.currentMailboxId = mailbox.mailboxId
-                mutableCurrentMailboxFlow.value = mailbox
-
-                mutableCurrentMessageFlow.value = null
-                mutableCurrentThreadFlow.value = null
-                mutableCurrentFolderFlow.value = null
-            }
-        }
-
-        fun selectFolder(folder: Folder) {
-            if (folder.id != currentFolderFlow.value?.id) {
-                Log.i(TAG, "selectFolder: ${folder.name}")
-                currentOffset = OFFSET_FIRST_PAGE
-                mutableCurrentFolderFlow.value = folder
-
-                mutableCurrentMessageFlow.value = null
-                mutableCurrentThreadFlow.value = null
-            }
-        }
-
-        fun selectThread(thread: Thread) {
-            if (thread.uid != currentThreadFlow.value?.uid) {
-                Log.i(TAG, "selectThread: ${thread.subject}")
-                mutableCurrentThreadFlow.value = thread
-
-                mutableCurrentMessageFlow.value = null
-            }
-        }
+        val currentMailboxFlow = MutableLiveData<Mailbox?>()
+        val currentFolderFlow = MutableLiveData<Folder?>()
+        val currentThreadFlow = MutableLiveData<Thread?>()
+        val currentMessageFlow = MutableLiveData<Message?>()
     }
 
     val isInternetAvailable = MutableLiveData(false)
     var canContinueToPaginate = true
+    var currentOffset = OFFSET_FIRST_PAGE
 
     fun close() {
         Log.i(TAG, "close")
         RealmController.close()
 
-        mutableCurrentMessageFlow.value = null
-        mutableCurrentThreadFlow.value = null
-        mutableCurrentFolderFlow.value = null
-        mutableCurrentMailboxFlow.value = null
+        currentMessageFlow.value = null
+        currentThreadFlow.value = null
+        currentFolderFlow.value = null
+        currentMailboxFlow.value = null
+    }
+
+    suspend fun selectMailbox(mailbox: Mailbox) {
+        if (currentMailboxFlow.value?.objectId != mailbox.objectId) {
+            Log.i(TAG, "selectMailbox: ${mailbox.email}")
+            AccountUtils.currentMailboxId = mailbox.mailboxId
+
+            withContext(Dispatchers.Main) {
+                currentMailboxFlow.value = mailbox
+
+                currentMessageFlow.value = null
+                currentThreadFlow.value = null
+                currentFolderFlow.value = null
+            }
+        }
+    }
+
+    suspend fun selectFolder(folder: Folder) {
+        if (folder.id != currentFolderFlow.value?.id) {
+            Log.i(TAG, "selectFolder: ${folder.name}")
+            currentOffset = OFFSET_FIRST_PAGE
+
+            withContext(Dispatchers.Main) {
+                currentFolderFlow.value = folder
+
+                currentMessageFlow.value = null
+                currentThreadFlow.value = null
+            }
+        }
+    }
+
+    suspend fun selectThread(thread: Thread) {
+        if (thread.uid != currentThreadFlow.value?.uid) {
+            Log.i(TAG, "selectThread: ${thread.subject}")
+
+            withContext(Dispatchers.Main) {
+                currentThreadFlow.value = thread
+
+                currentMessageFlow.value = null
+            }
+        }
     }
 
     fun loadAddressBooksAndContacts() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadAddressBooksAndContacts")
         loadAddressBooks()
         loadContacts()
-    }
-
-    fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "loadCurrentMailbox")
-        val mailboxes = loadMailboxes()
-        computeMailboxToSelect(mailboxes)?.let { mailbox ->
-            selectMailbox(mailbox)
-            val folders = loadFolders(mailbox)
-            computeFolderToSelect(folders)?.let { folder ->
-                selectFolder(folder)
-                loadThreads(mailbox, folder)
-            }
-        }
     }
 
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
@@ -148,6 +139,19 @@ class MainViewModel : ViewModel() {
     fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshMailboxes")
         loadMailboxes()
+    }
+
+    fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "loadCurrentMailbox")
+        val mailboxes = loadMailboxes()
+        computeMailboxToSelect(mailboxes)?.let { mailbox ->
+            selectMailbox(mailbox)
+            val folders = loadFolders(mailbox)
+            computeFolderToSelect(folders)?.let { folder ->
+                selectFolder(folder)
+                loadThreads(mailbox, folder)
+            }
+        }
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -166,9 +170,31 @@ class MainViewModel : ViewModel() {
         currentMailboxFlow.value?.let(::loadFolders)
     }
 
-    fun loadMoreThreads(mailbox: Mailbox, folder: Folder, offset: Int) = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "loadMoreThreads: $offset")
-        loadThreads(mailbox, folder, offset)
+    fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+        selectThread(thread)
+        markAsSeen(thread)
+        loadMessages(thread)
+    }
+
+    private fun markAsSeen(thread: Thread) {
+        if (thread.unseenMessagesCount != 0) {
+
+            val mailboxUuid = currentMailboxFlow.value?.uuid ?: return
+
+            RealmController.mailboxContent.writeBlocking {
+                getLatestThreadSync(thread.uid)?.let { latestThread ->
+
+                    val apiResponse = ApiRepository.markMessagesAsSeen(mailboxUuid, latestThread.messages.map { it.uid })
+
+                    if (apiResponse.isSuccess()) {
+                        latestThread.apply {
+                            messages.forEach { it.seen = true }
+                            unseenMessagesCount = 0
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
@@ -178,7 +204,12 @@ class MainViewModel : ViewModel() {
         loadThreads(mailbox, folder)
     }
 
-    fun deleteDraft(message: Message) {
+    fun loadMoreThreads(mailbox: Mailbox, folder: Folder, offset: Int) = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "loadMoreThreads: $offset")
+        loadThreads(mailbox, folder, offset)
+    }
+
+    fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "deleteDraft: ${message.body}")
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
@@ -399,14 +430,68 @@ class MainViewModel : ViewModel() {
         copyToRealm(apiMessage, UpdatePolicy.ALL)
     }
 
+    private fun <T> RealmList<T>.setRealmListValues(values: RealmList<T>) {
+        if (isNotEmpty()) clear()
+        addAll(values)
+    }
+
     private fun MutableRealm.updateFolder(folder: Folder, apiThreads: List<Thread>) {
         val latestFolder = getLatestFolderSync(folder.id) ?: folder
         latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
         copyToRealm(latestFolder, UpdatePolicy.ALL)
     }
 
-    private fun <T> RealmList<T>.setRealmListValues(values: RealmList<T>) {
-        if (isNotEmpty()) clear()
-        addAll(values)
+    private fun loadMessages(thread: Thread) {
+
+        // Get current data
+        Log.d(TAG, "Messages: Get current data")
+        val realmMessages = thread.messages
+        val apiMessages = fetchMessages(thread)
+
+        // Get outdated data
+        Log.d(TAG, "Messages: Get outdated data")
+        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
+        val deletableMessages = realmMessages.filter { realmMessage ->
+            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
+        }
+
+        RealmController.mailboxContent.writeBlocking {
+            // Save new data
+            Log.d(TAG, "Messages: Save new data")
+            apiMessages.forEach { apiMessage ->
+                if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
+            }
+
+            // Delete outdated data
+            Log.d(TAG, "Messages: Delete outdated data")
+            deleteMessages(deletableMessages)
+        }
+    }
+
+    private fun fetchMessages(thread: Thread): List<Message> {
+        return thread.messages.map { realmMessage ->
+            if (realmMessage.fullyDownloaded) {
+                realmMessage
+            } else {
+                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
+                    completedMessage.apply {
+                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
+                        fullyDownloaded = true
+                        body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
+                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                        @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
+                        attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
+                    }
+                    // TODO: Uncomment this when managing Drafts folder
+                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
+                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
+                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+                    //     completedMessage.draftUuid = draft?.uuid
+                    // }
+                }.let { apiMessage ->
+                    apiMessage ?: realmMessage
+                }
+            }
+        }
     }
 }

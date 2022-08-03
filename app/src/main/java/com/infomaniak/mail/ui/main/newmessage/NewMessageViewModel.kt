@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.realmListOf
@@ -65,8 +64,7 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun sendMail(draft: Draft, action: DraftAction) {
-        val mailbox = MainViewModel.currentMailboxFlow.value ?: return
+    fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
         fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
         fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
 

@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
 import io.realm.kotlin.ext.realmListOf
@@ -112,7 +113,8 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun sendMail(action: DraftAction): Boolean {
         if (viewModel.recipients.isEmpty()) return false
-        viewModel.sendMail(createDraft(), action)
+        val mailbox = MainViewModel.currentMailboxFlow.value ?: return false
+        viewModel.sendMail(createDraft(), action, mailbox)
 
         return true
     }

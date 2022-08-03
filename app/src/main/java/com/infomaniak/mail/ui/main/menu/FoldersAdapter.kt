@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
-import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
 import io.realm.kotlin.ext.isValid
@@ -33,6 +32,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class FoldersAdapter(
     private var folders: List<Folder> = emptyList(),
+    private var currentFolderId: String? = null,
     private val openFolder: (folderId: String) -> Unit,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
@@ -43,7 +43,7 @@ class FoldersAdapter(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == Unit) {
             val folder = folders[position]
-            val isSelected = if (folder.isValid()) MainViewModel.currentFolderFlow.value?.id == folder.id else false
+            val isSelected = if (folder.isValid()) currentFolderId == folder.id else false
             holder.binding.item.setSelectedState(isSelected)
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -79,12 +79,13 @@ class FoldersAdapter(
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
         badge = badgeText ?: ""
 
-        setSelectedState(MainViewModel.currentFolderFlow.value?.id == id)
+        setSelectedState(currentFolderId == id)
 
         setOnClickListener { openFolder.invoke(id) }
     }
 
-    fun setFolders(newFolders: List<Folder>) {
+    fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
+        currentFolderId = newCurrentFolderId
         folders = newFolders
         notifyDataSetChanged()
     }

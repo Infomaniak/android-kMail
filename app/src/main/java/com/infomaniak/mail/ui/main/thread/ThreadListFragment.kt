@@ -28,7 +28,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,22 +40,22 @@ import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
-import com.infomaniak.mail.ui.main.MainViewModel.Companion.currentOffset
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.*
 import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val viewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
 
@@ -96,7 +95,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUnreadCountChip()
 
         listenToCurrentFolder()
-        listenToThreads()
     }
 
     private fun setupUnreadCountChip() {
@@ -113,7 +111,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        currentOffset = OFFSET_FIRST_PAGE
+        mainViewModel.currentOffset = OFFSET_FIRST_PAGE
         mainViewModel.forceRefreshThreads()
     }
 
@@ -212,8 +210,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToCurrentFolder() {
-        viewModel.currentFolder.observeNotNull(this, ::displayFolderName)
-        viewModel.listenToCurrentFolder()
+        MainViewModel.currentFolderFlow.observeNotNull(this) { currentFolder ->
+            displayFolderName(currentFolder)
+            listenToThreads(currentFolder)
+        }
     }
 
     private fun displayFolderName(folder: Folder) = with(binding) {
@@ -222,9 +222,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         toolbar.title = folderName
     }
 
-    private fun listenToThreads() {
-        viewModel.threads.observeNotNull(this, ::displayThreads)
-        viewModel.listenToThreads()
+    private fun listenToThreads(folder: Folder) = lifecycleScope.launch {
+        FolderController.getFolderSync(folder.id)?.threads?.asFlow()?.toSharedFlow()?.collect {
+            displayThreads(it.list)
+        }
     }
 
     private fun displayThreads(threads: List<Thread>) = with(binding) {
@@ -260,9 +261,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (mainViewModel.canContinueToPaginate) {
             isDownloadingChanges = true
-            currentOffset += PER_PAGE
+            mainViewModel.currentOffset += PER_PAGE
             showLoadingTimer.start()
-            mainViewModel.loadMoreThreads(mailbox, folder, currentOffset)
+            mainViewModel.loadMoreThreads(mailbox, folder, mainViewModel.currentOffset)
         }
     }
 }

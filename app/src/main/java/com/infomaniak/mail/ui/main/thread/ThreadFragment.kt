@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
@@ -44,7 +45,9 @@ import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import com.infomaniak.lib.core.R as RCore
 
@@ -53,7 +56,6 @@ class ThreadFragment : Fragment() {
     private val navigationArgs: ThreadFragmentArgs by navArgs()
 
     private val mainViewModel: MainViewModel by viewModels()
-    private val viewModel: ThreadViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadBinding
     private var threadAdapter = ThreadAdapter()
@@ -124,9 +126,13 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun listenToMessages() {
-        viewModel.messages.observeNotNull(this, ::displayMessages)
-        viewModel.listenToThread(navigationArgs.threadUid)
+    private fun listenToMessages() = lifecycleScope.launch(Dispatchers.IO) {
+        ThreadController.getThreadAsync(navigationArgs.threadUid).firstOrNull()?.obj?.let { thread ->
+            mainViewModel.openThread(thread)
+            thread.messages.asFlow().toSharedFlow().collect {
+                displayMessages(it.list)
+            }
+        }
     }
 
     private fun displayMessages(messages: List<Message>) {

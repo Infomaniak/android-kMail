@@ -32,7 +32,6 @@ import kotlinx.coroutines.launch
 class LaunchActivity : AppCompatActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
-    private val viewModel: LaunchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,10 +49,9 @@ class LaunchActivity : AppCompatActivity() {
         mainViewModel.loadCurrentMailbox()
 
         lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.currentMailbox.observeNotNull(this@LaunchActivity) {
+            MainViewModel.currentMailboxFlow.observeNotNull(this@LaunchActivity) {
                 launchActivity(MainActivity::class.java) // TODO: If there is no Internet, the app won't be able to start.
             }
-            viewModel.listenToCurrentMailbox()
         }
     }
 
