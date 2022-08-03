@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.animation.LayoutTransition
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log
@@ -42,6 +41,7 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,12 +74,12 @@ class ThreadFragment : Fragment() {
 
         quickActionBar.setOnItemClickListener {
             val action = values()[it]
-            when (action) { // TODO : Replace with actual actions
-                ANSWER -> Log.e("gibran", "setupUi: ANSWER")
-                TRANSFER -> Log.e("gibran", "setupUi: TRANSFER")
-                ARCHIVE -> Log.e("gibran", "setupUi: ARCHIVE")
-                DELETE -> Log.e("gibran", "setupUi: DELETE")
-                PLUS -> Log.e("gibran", "setupUi: PLUS")
+            when (action) {
+                ANSWER -> notYetImplemented()
+                TRANSFER -> notYetImplemented()
+                ARCHIVE -> notYetImplemented()
+                DELETE -> notYetImplemented()
+                PLUS -> notYetImplemented()
             }
         }
 
@@ -93,10 +93,8 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            onContactClicked = { contact, isExpanded ->
-                if (isExpanded) {
-                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
-                }
+            onContactClicked = { contact ->
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
             }
             onDraftClicked = { message ->
                 lifecycleScope.launch {
