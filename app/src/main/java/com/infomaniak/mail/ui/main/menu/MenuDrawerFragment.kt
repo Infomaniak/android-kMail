@@ -179,6 +179,12 @@ class MenuDrawerFragment : Fragment() {
         MainViewModel.currentFolderFlow.observeNotNull(this, ::onCurrentFolderChange)
     }
 
+    override fun onDestroyView() {
+        MainViewModel.currentMailboxFlow.removeObservers(this)
+        MainViewModel.currentFolderFlow.removeObservers(this)
+        super.onDestroyView()
+    }
+
     private fun onMailboxesChange(mailboxes: List<Mailbox>) = with(binding) {
         val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
         addressAdapter.setMailboxes(sortedMailboxes)

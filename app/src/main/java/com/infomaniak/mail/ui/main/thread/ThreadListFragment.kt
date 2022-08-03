@@ -216,6 +216,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    override fun onDestroyView() {
+        MainViewModel.currentFolderFlow.removeObservers(this)
+        super.onDestroyView()
+    }
+
     private fun displayFolderName(folder: Folder) = with(binding) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")

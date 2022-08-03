@@ -58,4 +58,9 @@ class LaunchActivity : AppCompatActivity() {
     private fun launchActivity(destinationClass: Class<out AppCompatActivity>) {
         startActivity(Intent(this, destinationClass))
     }
+
+    override fun onDestroy() {
+        MainViewModel.currentMailboxFlow.removeObservers(this)
+        super.onDestroy()
+    }
 }
