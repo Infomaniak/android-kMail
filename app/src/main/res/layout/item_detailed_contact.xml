@@ -23,12 +23,15 @@
     app:alignItems="baseline"
     app:flexWrap="wrap">
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/name"
-        style="@style/Callout.Highlighted"
+        style="@style/TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/marginStandardSmall"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minHeight="0dp"
+        android:paddingVertical="0dp"
         tools:text="@tools:sample/full_names" />
 
     <TextView

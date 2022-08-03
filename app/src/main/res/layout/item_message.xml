@@ -19,8 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/messageHeader"
@@ -115,8 +114,8 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    tools:text="Myriam Rais, George Li, +3"
-                    tools:ignore="InefficientWeight" />
+                    tools:ignore="InefficientWeight"
+                    tools:text="Myriam Rais, George Li, +3" />
 
                 <ImageView
                     android:id="@+id/recipientChevron"
@@ -202,7 +201,7 @@
         android:id="@+id/fromRecyclerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefixBarrier"
@@ -225,7 +224,7 @@
         android:id="@+id/toRecyclerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefixBarrier"
@@ -248,7 +247,7 @@
         android:id="@+id/ccRecyclerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefixBarrier"

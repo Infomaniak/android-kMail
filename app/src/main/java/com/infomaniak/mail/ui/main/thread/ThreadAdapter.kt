@@ -154,12 +154,12 @@ class ThreadAdapter(
     }
 
     private fun ItemMessageBinding.bindRecipientDetails(message: Message, messageDate: Date?) {
-        fromRecyclerView.adapter = DetailedRecipientAdapter(message.from.toList())
-        toRecyclerView.adapter = DetailedRecipientAdapter(message.to.toList())
+        fromRecyclerView.adapter = DetailedRecipientAdapter(message.from.toList(), onContactClicked)
+        toRecyclerView.adapter = DetailedRecipientAdapter(message.to.toList(), onContactClicked)
 
         val ccIsNotEmpty = !message.cc.isEmpty()
         ccGroup.isVisible = ccIsNotEmpty
-        if (ccIsNotEmpty) ccRecyclerView.adapter = DetailedRecipientAdapter(message.cc.toList())
+        if (ccIsNotEmpty) ccRecyclerView.adapter = DetailedRecipientAdapter(message.cc.toList(), onContactClicked)
 
         val dateNotNull = messageDate != null
         detailedMessageDate.isVisible = dateNotNull
