@@ -105,6 +105,9 @@
         <action
             android:id="@+id/action_threadFragment_to_contactFragment"
             app:destination="@id/contactFragment" />
+        <action
+            android:id="@+id/action_threadFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
     </fragment>
 
     <fragment
@@ -132,6 +135,12 @@
         android:name="com.infomaniak.mail.ui.main.thread.MessageActionsBottomSheetDialog"
         android:label="MessageActionBottomSheetDialog"
         tools:layout="@layout/fragment_bottom_sheet_message_actions" />
+
+    <dialog
+        android:id="@+id/threadActionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadActionsBottomSheetDialog"
+        android:label="ThreadActionsBottomSheetDialog"
+        tools:layout="@layout/fragment_bottom_sheet_menu_thread" />
 
     <fragment
         android:id="@+id/helpFragment"

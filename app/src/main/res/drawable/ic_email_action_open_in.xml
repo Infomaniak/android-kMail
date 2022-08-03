@@ -1,0 +1,29 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M12,13C11.724,13 11.5,12.792 11.5,12.536V1.585L7.854,4.971C7.759,5.059 7.634,5.107 7.5,5.107C7.366,5.107 7.241,5.059 7.146,4.971C7.051,4.882 7,4.766 7,4.643C7,4.519 7.052,4.402 7.146,4.314L11.646,0.136C11.692,0.093 11.747,0.058 11.808,0.035C11.87,0.012 11.934,0 12,0C12.066,0 12.13,0.012 12.191,0.035C12.253,0.059 12.307,0.093 12.354,0.136L16.854,4.314C16.948,4.402 17,4.518 17,4.643C17,4.767 16.948,4.883 16.854,4.972C16.76,5.06 16.634,5.107 16.5,5.107C16.366,5.107 16.241,5.059 16.146,4.972L12.5,1.585V12.536C12.5,12.791 12.276,13 12,13Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M4.588,24C3.713,24 3,23.327 3,22.5V9.5C3,8.673 3.713,8 4.588,8H8.824C9.116,8 9.353,8.224 9.353,8.5C9.353,8.776 9.116,9 8.824,9H4.588C4.296,9 4.059,9.224 4.059,9.5V22.5C4.059,22.776 4.296,23 4.588,23H19.412C19.704,23 19.941,22.776 19.941,22.5V9.5C19.941,9.224 19.704,9 19.412,9H15.177C14.884,9 14.647,8.776 14.647,8.5C14.647,8.224 14.884,8 15.177,8H19.412C20.287,8 21,8.673 21,9.5V22.5C21,23.327 20.287,24 19.412,24H4.588Z" />
+</vector>

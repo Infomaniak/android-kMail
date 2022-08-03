@@ -83,7 +83,7 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> notYetImplemented()
+                R.id.quickActionMenu -> safeNavigate(ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog())
             }
         }
 

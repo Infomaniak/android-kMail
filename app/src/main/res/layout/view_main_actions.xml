@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button1"
+        style="@style/IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorPrimaryContainer"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:padding="20dp"
+        app:cornerRadius="8dp"
+        app:iconSize="30dp"
+        app:iconTint="?android:attr/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/button2"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:icon="@drawable/ic_email_action_reply" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/textButton1"
+        style="@style/TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="0dp"
+        android:paddingTop="@dimen/marginStandardSmall"
+        app:layout_constraintEnd_toEndOf="@id/button1"
+        app:layout_constraintStart_toStartOf="@id/button1"
+        app:layout_constraintTop_toBottomOf="@id/button1"
+        tools:text="@string/actionReply" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button2"
+        style="@style/IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorPrimaryContainer"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:padding="20dp"
+        app:cornerRadius="8dp"
+        app:iconSize="30dp"
+        app:iconTint="?android:attr/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/button3"
+        app:layout_constraintStart_toEndOf="@+id/button1"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:icon="@drawable/ic_email_action_reply_to_all" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/textButton2"
+        style="@style/TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="0dp"
+        android:paddingTop="@dimen/marginStandardSmall"
+        app:layout_constraintEnd_toEndOf="@id/button2"
+        app:layout_constraintStart_toStartOf="@id/button2"
+        app:layout_constraintTop_toBottomOf="@id/button2"
+        tools:text="@string/actionReplyAll" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button3"
+        style="@style/IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorPrimaryContainer"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:padding="20dp"
+        app:cornerRadius="8dp"
+        app:iconSize="30dp"
+        app:iconTint="?android:attr/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/button4"
+        app:layout_constraintStart_toEndOf="@+id/button2"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:icon="@drawable/ic_email_action_send" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/textButton3"
+        style="@style/TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="0dp"
+        android:paddingTop="@dimen/marginStandardSmall"
+        app:layout_constraintEnd_toEndOf="@id/button3"
+        app:layout_constraintStart_toStartOf="@id/button3"
+        app:layout_constraintTop_toBottomOf="@id/button3"
+        tools:text="@string/actionForward" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button4"
+        style="@style/IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorPrimaryContainer"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:padding="20dp"
+        app:cornerRadius="8dp"
+        app:iconSize="30dp"
+        app:iconTint="?android:attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/button3"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:icon="@drawable/ic_bin" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/textButton4"
+        style="@style/TextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingHorizontal="0dp"
+        android:paddingTop="@dimen/marginStandardSmall"
+        app:layout_constraintEnd_toEndOf="@id/button4"
+        app:layout_constraintStart_toStartOf="@id/button4"
+        app:layout_constraintTop_toBottomOf="@id/button4"
+        tools:text="@string/actionDelete" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
