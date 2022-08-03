@@ -61,7 +61,7 @@ class MenuDrawerFragment : Fragment() {
     private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
-        mainViewModel.switchToMailbox(selectedMailbox)
+        mainViewModel.openMailbox(selectedMailbox)
         // TODO: This is not enough. It won't refresh the MenuDrawer data (ex: unread counts)
         closeDrawer()
     }

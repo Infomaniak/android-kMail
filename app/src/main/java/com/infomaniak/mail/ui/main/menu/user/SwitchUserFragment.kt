@@ -48,7 +48,7 @@ class SwitchUserFragment : Fragment() {
 
     private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
         if (selectedMailbox.userId == AccountUtils.currentUserId) {
-            mainViewModel.switchToMailbox(selectedMailbox)
+            mainViewModel.openMailbox(selectedMailbox)
             findNavController().popBackStack()
         } else {
             lifecycleScope.launch {

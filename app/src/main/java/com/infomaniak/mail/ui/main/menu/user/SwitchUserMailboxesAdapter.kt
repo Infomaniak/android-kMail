@@ -87,11 +87,6 @@ class SwitchUserMailboxesAdapter(
 
     override fun getItemCount(): Int = mailboxes.count()
 
-    fun setMailboxes(newMailboxes: List<Mailbox>) {
-        mailboxes = newMailboxes
-        notifyDataSetChanged()
-    }
-
     fun notifyAdapter(newList: List<Mailbox>) {
         DiffUtil.calculateDiff(MailboxesListDiffCallback(mailboxes, newList)).dispatchUpdatesTo(this)
         mailboxes = newList

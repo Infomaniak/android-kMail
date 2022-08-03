@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.ui.main.MainViewModel
@@ -64,7 +65,7 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun sendMail(draft: Draft, action: Draft.DraftAction) {
+    fun sendMail(draft: Draft, action: DraftAction) {
         val mailbox = MainViewModel.currentMailboxFlow.value ?: return
         fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
         fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
@@ -72,7 +73,7 @@ class NewMessageViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
             draft.identityId = signature.data?.defaultSignatureId
-            if (action == Draft.DraftAction.SEND) sendDraft() else saveDraft()
+            if (action == DraftAction.SEND) sendDraft() else saveDraft()
         }
     }
 

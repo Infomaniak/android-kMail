@@ -24,6 +24,7 @@ import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
@@ -51,11 +52,11 @@ class NewMessageActivity : ThemedActivity() {
             setContentView(root)
 
             toolbar.setNavigationOnClickListener {
-                sendMail(Draft.DraftAction.SAVE)
+                sendMail(DraftAction.SAVE)
                 onBackPressed()
             }
             toolbar.setOnMenuItemClickListener {
-                if (sendMail(Draft.DraftAction.SEND)) finish()
+                if (sendMail(DraftAction.SEND)) finish()
                 true
             }
 
@@ -109,7 +110,7 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    private fun sendMail(action: Draft.DraftAction): Boolean {
+    private fun sendMail(action: DraftAction): Boolean {
         if (viewModel.recipients.isEmpty()) return false
         viewModel.sendMail(createDraft(), action)
 

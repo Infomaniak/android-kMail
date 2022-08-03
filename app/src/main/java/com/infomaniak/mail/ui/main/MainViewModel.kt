@@ -135,7 +135,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun switchToMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
         val folders = loadFolders(mailbox)
