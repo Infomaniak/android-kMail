@@ -50,6 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import com.infomaniak.lib.core.R as RCore
+import kotlinx.coroutines.withContext
 
 class ThreadFragment : Fragment() {
 
@@ -130,7 +131,7 @@ class ThreadFragment : Fragment() {
         ThreadController.getThreadAsync(navigationArgs.threadUid).firstOrNull()?.obj?.let { thread ->
             mainViewModel.openThread(thread)
             thread.messages.asFlow().toSharedFlow().collect {
-                displayMessages(it.list)
+                withContext(Dispatchers.Main) { displayMessages(it.list) }
             }
         }
     }

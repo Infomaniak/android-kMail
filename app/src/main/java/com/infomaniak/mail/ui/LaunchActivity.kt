@@ -28,6 +28,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LaunchActivity : AppCompatActivity() {
 
@@ -44,11 +45,11 @@ class LaunchActivity : AppCompatActivity() {
         launchActivity(LoginActivity::class.java)
     }
 
-    private fun startApp() {
+    private suspend fun startApp() {
         mainViewModel.loadAddressBooksAndContacts()
         mainViewModel.loadCurrentMailbox()
 
-        lifecycleScope.launch(Dispatchers.Main) {
+        withContext(Dispatchers.Main) {
             MainViewModel.currentMailboxFlow.observeNotNull(this@LaunchActivity) {
                 launchActivity(MainActivity::class.java) // TODO: If there is no Internet, the app won't be able to start.
             }

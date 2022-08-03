@@ -50,6 +50,7 @@ import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -166,9 +167,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun listenToMailboxes() = lifecycleScope.launch(Dispatchers.IO) {
         MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
-            lifecycleScope.launch(Dispatchers.Main) {
-                onMailboxesChange(it.list)
-            }
+            withContext(Dispatchers.Main) { onMailboxesChange(it.list) }
         }
     }
 
@@ -183,9 +182,7 @@ class MenuDrawerFragment : Fragment() {
         foldersJob?.cancel()
         foldersJob = lifecycleScope.launch(Dispatchers.IO) {
             FolderController.getFoldersAsync().collect {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    onFoldersChange(it.list)
-                }
+                withContext(Dispatchers.Main) { onFoldersChange(it.list) }
             }
         }
     }
