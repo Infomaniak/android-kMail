@@ -24,7 +24,8 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ItemDetailedContactBinding
 
 class DetailedRecipientAdapter(
-    private val recipients: List<Recipient> = listOf()
+    private val recipients: List<Recipient> = listOf(),
+    private val onContactClicked: ((contact: Recipient) -> Unit)?
 ) : RecyclerView.Adapter<DetailedRecipientAdapter.DetailedRecipientViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailedRecipientViewHolder {
@@ -41,6 +42,8 @@ class DetailedRecipientAdapter(
             name.text = recipient.name
             emailAddress.text = recipient.email
         }
+
+        name.setOnClickListener { onContactClicked?.invoke(recipient) }
     }
 
     override fun getItemCount(): Int = recipients.count()
