@@ -24,7 +24,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.UiSettings
+import com.infomaniak.mail.data.cache.UserInfosController
+import com.infomaniak.mail.data.cache.UserInfosController.updateUserPreferences
 import com.infomaniak.mail.data.models.user.UserPreferences.ListDensityMode
 import com.infomaniak.mail.databinding.FragmentListDensitySettingBinding
 
@@ -61,22 +62,22 @@ class ListDensitySettingFragment : Fragment() {
         listDensityButtonsGroup.addOnButtonCheckedListener { _, buttonId, isChecked ->
             if (!isChecked) return@addOnButtonCheckedListener
 
-            val (densityMode, resId) = getDensityFromCheckedButton(buttonId)
-            UiSettings(requireContext()).threadListDensity = densityMode
+            val (listDensity, resId) = getDensityFromCheckedButton(buttonId)
+            updateUserPreferences { it.threadListDensity = listDensity.apiName }
             listDensityImage.setImageResource(resId)
         }
     }
 
-    private fun getCheckedButtonFromDensity() = when (UiSettings(requireContext()).threadListDensity) {
-        ListDensityMode.COMPACT.modeRes -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
-        ListDensityMode.LARGE.modeRes -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
+    private fun getCheckedButtonFromDensity() = when (UserInfosController.getUserPreferences().getListDensityMode()) {
+        ListDensityMode.COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
+        ListDensityMode.LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
         else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default
     }
 
     private fun getDensityFromCheckedButton(buttonId: Int) = when (buttonId) {
-        R.id.listDensityButtonCompact -> ListDensityMode.COMPACT.modeRes to R.drawable.bg_list_density_compact
-        R.id.listDensityButtonLarge -> ListDensityMode.LARGE.modeRes to R.drawable.bg_list_density_large
-        else -> ListDensityMode.DEFAULT.modeRes to R.drawable.bg_list_density_default
+        R.id.listDensityButtonCompact -> ListDensityMode.COMPACT to R.drawable.bg_list_density_compact
+        R.id.listDensityButtonLarge -> ListDensityMode.LARGE to R.drawable.bg_list_density_large
+        else -> ListDensityMode.DEFAULT to R.drawable.bg_list_density_default
     }
 
     override fun onPause() {

@@ -165,6 +165,7 @@
                         android:text="@string/settingsMessageDisplayTitle" />
 
                     <TextView
+                        android:id="@+id/displayModeSubtitle"
                         style="@style/SettingText2Of2WithButton"
                         android:text="@string/settingsOptionDiscussions" />
                 </LinearLayout>

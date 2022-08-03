@@ -36,7 +36,7 @@ class UserPreferences : RealmObject {
     @SerialName("density")
     var threadListDensity: String = ListDensityMode.DEFAULT.apiName
     @SerialName("thread_mode")
-    var threadMode: Int = ThreadMode.THREADS.getValue
+    var threadMode: Int = ThreadMode.THREADS.apiValue
     // @SerialName("auto_trust_emails")
     // var autoTrustEmails: Int = 0
     // @SerialName("reabirthday_calendar_colord_pos")
@@ -119,36 +119,28 @@ class UserPreferences : RealmObject {
     }
 
     fun getThreadMode(): ThreadMode = when (threadMode) {
-        ThreadMode.MESSAGES.getValue -> ThreadMode.MESSAGES
+        ThreadMode.MESSAGES.apiValue -> ThreadMode.MESSAGES
         else -> ThreadMode.THREADS
     }
 
     // fun getIntelligentMode(): IntelligentMode? = enumValueOfOrNull<IntelligentMode>(intelligentMode)
 
-    enum class ThemeMode(val apiName: String, val mode: Int) {
-        DEFAULT("medium", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
-        LIGHT("light", AppCompatDelegate.MODE_NIGHT_NO),
-        DARK("dark", AppCompatDelegate.MODE_NIGHT_YES);
-
-        companion object {
-            fun getLocalisedNameFromMode(mode: Int): Int = when (mode) {
-                AppCompatDelegate.MODE_NIGHT_NO -> R.string.settingsOptionLightTheme
-                AppCompatDelegate.MODE_NIGHT_YES -> R.string.settingsOptionDarkTheme
-                else -> R.string.settingsOptionSystemTheme
-            }
-        }
+    enum class ThemeMode(val apiName: String, val mode: Int, @StringRes val localisedNameRes: Int) {
+        DEFAULT("medium", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM, R.string.settingsOptionSystemTheme),
+        LIGHT("light", AppCompatDelegate.MODE_NIGHT_NO, R.string.settingsOptionLightTheme),
+        DARK("dark", AppCompatDelegate.MODE_NIGHT_YES, R.string.settingsOptionDarkTheme);
     }
 
 
-    enum class ListDensityMode(@StringRes val modeRes: Int, val apiName: String) {
-        COMPACT(R.string.settingsDensityOptionCompact, "high"),
-        DEFAULT(R.string.settingsDensityOptionNormal, "normal"),
-        LARGE(R.string.settingsDensityOptionLarge, "low"),
+    enum class ListDensityMode(val apiName: String, @StringRes val localisedNameRes: Int) {
+        COMPACT("high", R.string.settingsDensityOptionCompact),
+        DEFAULT("normal", R.string.settingsDensityOptionNormal),
+        LARGE("low", R.string.settingsDensityOptionLarge),
     }
 
-    enum class ThreadMode(val getValue: Int, val setValue: String) {
-        THREADS(1, "on"),
-        MESSAGES(0, "off"),
+    enum class ThreadMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
+        THREADS(1, "on", R.string.settingsOptionDiscussions),
+        MESSAGES(0, "off", R.string.settingsOptionMessages),
     }
 
     // enum class IntelligentMode {

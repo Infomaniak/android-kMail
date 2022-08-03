@@ -26,6 +26,8 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.data.cache.UserInfosController
+import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
 
 class DisplayModeSettingFragment : Fragment() {
@@ -39,6 +41,7 @@ class DisplayModeSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
+        setupUi()
         setupListeners()
     }
 
@@ -46,9 +49,21 @@ class DisplayModeSettingFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
+    private fun setupUi() = with(binding) {
+        when (UserInfosController.getUserPreferences().getThreadMode()) {
+            ThreadMode.THREADS -> settingsOptionDiscussionsCheck.selectOption()
+            ThreadMode.MESSAGES -> settingsOptionMessagesCheck.selectOption()
+        }
+    }
+
     private fun setupListeners() = with(binding) {
-        settingsOptionDiscussions.setOnClickListener { settingsOptionDiscussionsCheck.selectOption() }
-        settingsOptionMessages.setOnClickListener { settingsOptionMessagesCheck.selectOption() }
+        settingsOptionDiscussions.setOnClickListener { updateDisplayMode(ThreadMode.THREADS, settingsOptionDiscussionsCheck) }
+        settingsOptionMessages.setOnClickListener { updateDisplayMode(ThreadMode.MESSAGES, settingsOptionMessagesCheck) }
+    }
+
+    private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {
+        UserInfosController.updateUserPreferences { it.threadMode = displayMode.apiValue }
+        chosenOption.selectOption()
     }
 
     private fun ImageView.selectOption() = with(binding) {
