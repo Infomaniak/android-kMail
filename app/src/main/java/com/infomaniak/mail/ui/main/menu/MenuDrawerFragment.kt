@@ -27,7 +27,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -35,6 +35,8 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -45,6 +47,9 @@ import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapte
 import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -53,16 +58,16 @@ class MenuDrawerFragment : Fragment() {
     var isDrawerOpen: (() -> Boolean)? = null
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val viewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
+
+    private var foldersJob: Job? = null
 
     private var inboxFolderId: String? = null
     private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
         mainViewModel.openMailbox(selectedMailbox)
-        // TODO: This is not enough. It won't refresh the MenuDrawer data (ex: unread counts)
         closeDrawer()
     }
 
@@ -80,7 +85,6 @@ class MenuDrawerFragment : Fragment() {
         setupListener()
         listenToMailboxes()
         listenToCurrentMailbox()
-        listenToFolders()
         listenToCurrentFolder()
     }
 
@@ -158,21 +162,32 @@ class MenuDrawerFragment : Fragment() {
     fun onDrawerOpened() {
         canNavigate = true
         mainViewModel.forceRefreshMailboxes()
-        viewModel.listenToFolders()
     }
 
-    private fun listenToMailboxes() {
-        viewModel.mailboxes.observeNotNull(this, ::onMailboxesChange)
-        viewModel.listenToMailboxes()
+    private fun listenToMailboxes() = lifecycleScope.launch(Dispatchers.IO) {
+        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
+            lifecycleScope.launch(Dispatchers.Main) {
+                onMailboxesChange(it.list)
+            }
+        }
     }
 
     private fun listenToCurrentMailbox() {
-        MainViewModel.currentMailboxFlow.observeNotNull(this, ::onCurrentMailboxChange)
+        MainViewModel.currentMailboxFlow.observeNotNull(this) {
+            listenToFolders()
+            onCurrentMailboxChange(it)
+        }
     }
 
     private fun listenToFolders() {
-        viewModel.folders.observeNotNull(this, ::onFoldersChange)
-        viewModel.listenToFolders()
+        foldersJob?.cancel()
+        foldersJob = lifecycleScope.launch(Dispatchers.IO) {
+            FolderController.getFoldersAsync().collect {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    onFoldersChange(it.list)
+                }
+            }
+        }
     }
 
     private fun listenToCurrentFolder() {
