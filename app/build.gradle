@@ -54,8 +54,5 @@ dependencies {
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
     // Realm Kotlin - END /!\
 
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
