@@ -138,7 +138,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun updateUnreadCount() = with(binding.unreadCountChip) {
         // TODO: Fetch folder again to update it.
-        val unreadCount = MainViewModel.currentFolderFlow.value?.unreadCount ?: 0
+        val unreadCount = MainViewModel.currentFolder.value?.unreadCount ?: 0
         text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
         isVisible = unreadCount > 0
     }
@@ -211,14 +211,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToCurrentFolder() {
-        MainViewModel.currentFolderFlow.observeNotNull(this) { currentFolder ->
+        MainViewModel.currentFolder.observeNotNull(this) { currentFolder ->
             displayFolderName(currentFolder)
             listenToThreads(currentFolder)
         }
     }
 
     override fun onDestroyView() {
-        MainViewModel.currentFolderFlow.removeObservers(this)
+        MainViewModel.currentFolder.removeObservers(this)
         super.onDestroyView()
     }
 
@@ -266,8 +266,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun downloadThreads() {
 
-        val folder = MainViewModel.currentFolderFlow.value ?: return
-        val mailbox = MainViewModel.currentMailboxFlow.value ?: return
+        val folder = MainViewModel.currentFolder.value ?: return
+        val mailbox = MainViewModel.currentMailbox.value ?: return
 
         if (mainViewModel.canContinueToPaginate) {
             isDownloadingChanges = true

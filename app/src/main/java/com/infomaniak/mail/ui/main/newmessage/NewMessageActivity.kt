@@ -113,7 +113,7 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun sendMail(action: DraftAction): Boolean {
         if (viewModel.recipients.isEmpty()) return false
-        val mailbox = MainViewModel.currentMailboxFlow.value ?: return false
+        val mailbox = MainViewModel.currentMailbox.value ?: return false
         viewModel.sendMail(createDraft(), action, mailbox)
 
         return true

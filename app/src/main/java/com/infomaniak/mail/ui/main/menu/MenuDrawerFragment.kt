@@ -172,7 +172,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun listenToCurrentMailbox() {
-        MainViewModel.currentMailboxFlow.observeNotNull(this) {
+        MainViewModel.currentMailbox.observeNotNull(this) {
             listenToFolders()
             onCurrentMailboxChange(it)
         }
@@ -188,12 +188,12 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun listenToCurrentFolder() {
-        MainViewModel.currentFolderFlow.observeNotNull(this, ::onCurrentFolderChange)
+        MainViewModel.currentFolder.observeNotNull(this, ::onCurrentFolderChange)
     }
 
     override fun onDestroyView() {
-        MainViewModel.currentMailboxFlow.removeObservers(this)
-        MainViewModel.currentFolderFlow.removeObservers(this)
+        MainViewModel.currentMailbox.removeObservers(this)
+        MainViewModel.currentFolder.removeObservers(this)
         super.onDestroyView()
     }
 
@@ -217,7 +217,7 @@ class MenuDrawerFragment : Fragment() {
         inboxFolderId = inbox?.id
         binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
 
-        val currentFolderId = MainViewModel.currentFolderFlow.value?.id
+        val currentFolderId = MainViewModel.currentFolder.value?.id
         defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
         customFoldersAdapter.setFolders(customFolders, currentFolderId)
 
@@ -246,7 +246,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun setCustomFolderCollapsedState() = with(binding) {
-        val currentFolder = MainViewModel.currentFolderFlow.value
+        val currentFolder = MainViewModel.currentFolder.value
         val isExpanded = currentFolder != null && (currentFolder.role == null || customFoldersAdapter.itemCount == 0)
         val angleResource = if (isExpanded) R.dimen.angleViewRotated else R.dimen.angleViewNotRotated
         val angle = ResourcesCompat.getFloat(resources, angleResource)

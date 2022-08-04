@@ -167,7 +167,7 @@ class NewMessageFragment : Fragment() {
     private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {
 
         this@NewMessageFragment.mailboxes = mailboxes
-        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxFlow.value?.objectId }
+        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailbox.value?.objectId }
         val mails = mailboxes.map { it.email }
 
         fromMailAddress.text = mailboxes[selectedMailboxIndex].email
