@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.userInfos
 
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.utils.toSharedFlow
@@ -62,6 +63,28 @@ object ContactController {
     /**
      * Edit data
      */
+    fun upsertApiData(apiContacts: List<Contact>) {
+
+        // Get current data
+        Log.d(RealmController.TAG, "Contacts: Get current data")
+        val realmContacts = getContactsSync()
+
+        // Get outdated data
+        Log.d(RealmController.TAG, "Contacts: Get outdated data")
+        // val deletableContacts = ContactsController.getDeletableContacts(apiContacts)
+        val deletableContacts = realmContacts.filter { realmContact ->
+            apiContacts.none { it.id == realmContact.id }
+        }
+
+        // Save new data
+        Log.d(RealmController.TAG, "Contacts: Save new data")
+        upsertContacts(apiContacts)
+
+        // Delete outdated data
+        Log.d(RealmController.TAG, "Contacts: Delete outdated data")
+        deleteContacts(deletableContacts)
+    }
+
     fun upsertContacts(contacts: List<Contact>) {
         RealmController.userInfos.writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.userInfos
 
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.utils.toSharedFlow
@@ -54,6 +55,28 @@ object AddressBookController {
     /**
      * Edit data
      */
+    fun upsertApiData(apiAddressBooks: List<AddressBook>) {
+
+        // Get current data
+        Log.d(RealmController.TAG, "AddressBooks: Get current data")
+        val realmAddressBooks = getAddressBooksSync()
+
+        // Get outdated data
+        Log.d(RealmController.TAG, "AddressBooks: Get outdated data")
+        // val deletableAddressBooks = ContactsController.getDeletableAddressBooks(apiAddressBooks)
+        val deletableAddressBooks = realmAddressBooks.filter { realmContact ->
+            apiAddressBooks.none { it.id == realmContact.id }
+        }
+
+        // Save new data
+        Log.d(RealmController.TAG, "AddressBooks: Save new data")
+        upsertAddressBooks(apiAddressBooks)
+
+        // Delete outdated data
+        Log.d(RealmController.TAG, "AddressBooks: Delete outdated data")
+        deleteAddressBooks(deletableAddressBooks)
+    }
+
     fun upsertAddressBooks(addressBooks: List<AddressBook>) {
         RealmController.userInfos.writeBlocking { addressBooks.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }

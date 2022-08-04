@@ -17,8 +17,11 @@
  */
 package com.infomaniak.mail.data.cache.mailboxInfos
 
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
@@ -54,6 +57,41 @@ object MailboxController {
     /**
      * Edit data
      */
+    fun upsertApiData(apiMailboxes: List<Mailbox>): List<Mailbox> {
+
+        // Get current data
+        Log.d(RealmController.TAG, "Mailboxes: Get current data")
+        val realmMailboxes = getMailboxesSync(AccountUtils.currentUserId)
+
+        // Get outdated data
+        Log.d(RealmController.TAG, "Mailboxes: Get outdated data")
+        // val deletableMailboxes = MailboxInfoController.getDeletableMailboxes(apiMailboxes)
+        val deletableMailboxes = realmMailboxes.filter { realmMailbox ->
+            apiMailboxes.none { apiMailbox -> apiMailbox.mailboxId == realmMailbox.mailboxId }
+        }
+
+        // Save new data
+        Log.d(RealmController.TAG, "Mailboxes: Save new data")
+        upsertMailboxes(apiMailboxes)
+
+        // Delete outdated data
+        Log.d(RealmController.TAG, "Mailboxes: Delete outdated data")
+        val isCurrentMailboxDeleted = deletableMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
+        if (isCurrentMailboxDeleted) {
+            RealmController.closeMailboxContent()
+            AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
+        }
+        deleteMailboxes(deletableMailboxes)
+        deletableMailboxes.forEach { RealmController.deleteMailboxContent(it.mailboxId) }
+
+        return if (isCurrentMailboxDeleted) {
+            AccountUtils.reloadApp()
+            emptyList()
+        } else {
+            apiMailboxes
+        }
+    }
+
     fun upsertMailboxes(mailboxes: List<Mailbox>) {
         RealmController.mailboxInfos.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }

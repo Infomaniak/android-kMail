@@ -17,11 +17,15 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getLatestDraftSync
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
@@ -58,6 +62,32 @@ object MessageController {
     /**
      * Utils
      */
+    fun upsertApiData(apiMessages: List<Message>, thread: Thread) {
+
+        // Get current data
+        Log.d(RealmController.TAG, "Messages: Get current data")
+        val realmMessages = thread.messages
+
+        // Get outdated data
+        Log.d(RealmController.TAG, "Messages: Get outdated data")
+        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
+        val deletableMessages = realmMessages.filter { realmMessage ->
+            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
+        }
+
+        RealmController.mailboxContent.writeBlocking {
+            // Save new data
+            Log.d(RealmController.TAG, "Messages: Save new data")
+            apiMessages.forEach { apiMessage ->
+                if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
+            }
+
+            // Delete outdated data
+            Log.d(RealmController.TAG, "Messages: Delete outdated data")
+            deleteMessages(deletableMessages)
+        }
+    }
+
     private fun getMessage(uid: String): RealmSingleQuery<Message> {
         return RealmController.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first()
     }
