@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +30,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -37,6 +39,7 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
@@ -49,6 +52,8 @@ import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
+import kotlinx.coroutines.*
+import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -56,6 +61,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
+
+    private var updatedAtRefreshJob: Job? = null
 
     private var threadListAdapter = ThreadListAdapter()
 
@@ -65,6 +72,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var currentOffset = OFFSET_FIRST_PAGE
     private var isDownloadingChanges = false
+    private var lastUpdatedAt = Date() // TODO: Remove when implementing "Last updated at" feature
 
     private var menuDrawerFragment: MenuDrawerFragment? = null
     private var menuDrawerNavigation: NavigationView? = null
@@ -98,14 +106,28 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        lastUpdatedAt = Date()
+        startPeriodicRefreshJob()
+
         setupOnRefresh()
         setupAdapter()
         setupMenuDrawer()
         setupListeners()
         setupUserAvatar()
+        setupUnreadCountChip()
 
         listenToCurrentFolder()
         listenToThreads()
+    }
+
+    private fun setupUnreadCountChip() {
+        binding.unreadCountChip.apply {
+            isCloseIconVisible = false
+            setOnCheckedChangeListener { _, isChecked ->
+                isCloseIconVisible = isChecked
+            }
+        }
     }
 
     private fun setupOnRefresh() {
@@ -115,6 +137,33 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onRefresh() {
         currentOffset = OFFSET_FIRST_PAGE
         viewModel.refreshThreads()
+    }
+
+    private fun startPeriodicRefreshJob() {
+        updatedAtRefreshJob?.cancel()
+        updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
+            while (true) {
+                withContext(Dispatchers.Main) { updateUpdatedAt() }
+                delay(DateUtils.MINUTE_IN_MILLIS)
+            }
+        }
+    }
+
+    private fun updateUpdatedAt() = with(binding) {
+        // TODO : Replace lastUpdatedAt.time with currentFolder.lastUpdatedAt ?
+        val ago = if (Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS) {
+            getString(R.string.threadListHeaderLastUpdateNow)
+        } else {
+            DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
+        }
+        updatedAt.text = getString(R.string.threadListHeaderLastUpdate, ago)
+    }
+
+    private fun updateUnreadCount() = with(binding.unreadCountChip) {
+        // TODO: Fetch folder again to update it.
+        val unreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
+        text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
+        isVisible = unreadCount > 0
     }
 
     private fun setupMenuDrawer() {
@@ -160,14 +209,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         toolbar.setNavigationOnClickListener { drawerLayout?.open() }
 
-        searchViewCard.apply {
-            // TODO: FilterButton doesn't propagate the event to root, must display it?
-            searchView.isGone = true
-            searchViewText.isVisible = true
-            filterButton.isEnabled = false
-            root.setOnClickListener {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
-            }
+        searchButton.setOnClickListener {
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
         }
 
         userAvatar.setOnClickListener {
@@ -235,7 +278,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun displayFolderName(folder: Folder) = with(binding) {
         val folderName = folder.getLocalizedName(context)
         Log.i("UI", "Received folder name (${folderName})")
-        mailboxName.text = folderName
+        toolbar.title = folderName
     }
 
     private fun listenToThreads() {
@@ -248,11 +291,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         isDownloadingChanges = false
         swipeRefreshLayout.isRefreshing = false
 
+        updateUnreadCount()
+
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
         with(threadListAdapter) {
             notifyAdapter(formatList(threads, context))
         }
+        startPeriodicRefreshJob()
     }
 
     private fun displayNoEmailView() = with(binding) {

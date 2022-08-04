@@ -26,66 +26,98 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/backgroundHeaderColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:contentInsetEnd="0dp"
-            app:navigationContentDescription="@string/contentDescriptionButtonMenu"
-            app:navigationIcon="@drawable/ic_burger">
+            android:layout_height="wrap_content">
 
-            <LinearLayout
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                app:contentInsetEnd="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navigationContentDescription="@string/contentDescriptionButtonMenu"
+                app:navigationIcon="@drawable/ic_burger"
+                app:navigationIconTint="?android:attr/colorPrimary"
+                tools:title="Boite de réception">
 
-                <include
-                    android:id="@+id/searchViewCard"
-                    layout="@layout/item_search_view"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/searchViewHeight"
-                    android:layout_weight="1" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/userAvatar"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/iconButtonSize"
-                    android:layout_gravity="center"
-                    android:layout_marginHorizontal="@dimen/marginStandard"
-                    app:cardCornerRadius="@dimen/roundCornerRadius">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/userAvatarImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@string/titleMyAccount"
-                        android:src="@drawable/placeholder"
-                        tools:src="@tools:sample/avatars" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/searchButton"
+                        style="@style/IconButton"
+                        app:icon="@drawable/ic_search"
+                        app:iconSize="24dp"
+                        app:iconTint="?android:attr/colorPrimary" />
 
-                </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/userAvatar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/iconButtonSize"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                        app:cardCornerRadius="@dimen/roundCornerRadius"
+                        app:strokeWidth="0dp">
 
-            </LinearLayout>
+                        <ImageView
+                            android:id="@+id/userAvatarImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/titleMyAccount"
+                            android:src="@drawable/placeholder"
+                            tools:src="@tools:sample/avatars" />
 
-        </com.google.android.material.appbar.MaterialToolbar>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+            </com.google.android.material.appbar.MaterialToolbar>
+
+            <TextView
+                android:id="@+id/updatedAt"
+                style="@style/Body.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                tools:text="Mis à jour à l'instant" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/unreadCountChip"
+                style="@style/Widget.Material3.Chip.Input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/marginStandardMedium"
+                android:textColor="@color/chip_unread_text_color"
+                app:checkedIcon="@null"
+                app:checkedIconEnabled="false"
+                app:chipBackgroundColor="@color/chip_unread_background"
+                app:chipCornerRadius="100dp"
+                app:chipStrokeWidth="0dp"
+                app:closeIconTint="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/updatedAt"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/updatedAt"
+                tools:closeIcon="@null"
+                tools:text="2 non lus" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
-
-    <TextView
-        android:id="@+id/mailboxName"
-        style="@style/H1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/marginLarge"
-        android:layout_marginTop="@dimen/marginStandard"
-        android:text="@string/inboxFolder"
-        app:layout_constraintBottom_toTopOf="@id/swipeRefreshLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-        tools:text="Inbox" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -93,7 +125,7 @@
         android:layout_height="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mailboxName">
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -103,6 +135,9 @@
                 android:id="@+id/threadsList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/backgroundColor"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -166,11 +201,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandard"
                 android:layout_marginBottom="@dimen/marginStandard"
-                android:paddingHorizontal="18dp"
                 android:text="@string/buttonNewMessage"
                 android:textAllCaps="false"
                 app:icon="@drawable/ic_pencil"
-                app:iconGravity="end"
+                app:iconGravity="start"
                 app:iconSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />

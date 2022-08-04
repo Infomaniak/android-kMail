@@ -235,6 +235,7 @@
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Objet :</string>
     <string name="threadListHeaderLastUpdate">Mis à jour %s</string>
+    <string name="threadListHeaderLastUpdateNow">à l’instant</string>
     <plurals name="threadListHeaderUnreadCount">
         <item quantity="one">%d non lu</item>
         <item quantity="other">%d non lus</item>
