@@ -18,9 +18,14 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewActionItemBinding
 
@@ -31,6 +36,18 @@ class ActionItemView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     var binding: ViewActionItemBinding
+
+    var icon: Drawable? = null
+        set(value) {
+            field = value
+            binding.button.icon = value
+        }
+
+    var text: CharSequence? = null
+        set(value) {
+            field = value
+            binding.button.text = value
+        }
 
     init {
         binding = ViewActionItemBinding.inflate(LayoutInflater.from(context), this, true)
@@ -49,4 +66,16 @@ class ActionItemView @JvmOverloads constructor(
             }
         }
     }
+
+    override fun setOnClickListener(onClickListener: OnClickListener?) {
+        binding.button.setOnClickListener(onClickListener)
+    }
+
+    fun setIconResource(@DrawableRes iconResourceId: Int) = binding.button.setIconResource(iconResourceId)
+
+    fun setIconTint(@ColorInt color: Int) {
+        binding.button.iconTint = ColorStateList.valueOf(color)
+    }
+
+    fun setText(@StringRes textResourceId: Int) = binding.button.setText(textResourceId)
 }

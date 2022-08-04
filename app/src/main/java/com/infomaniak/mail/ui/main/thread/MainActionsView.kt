@@ -67,10 +67,6 @@ class MainActionsView @JvmOverloads constructor(
                 val icons = listOf(icon1, icon2, icon3, icon4)
                 val titles = listOf(title1, title2, title3, title4)
 
-                for (button in buttons) {
-                    button.setOnClickListener { root.findFragment<ThreadFragment>().notYetImplemented() }
-                }
-
                 icons.forEachIndexed { index, drawable ->
                     if (drawable == null) {
                         buttons[index].isInvisible = true
@@ -85,7 +81,7 @@ class MainActionsView @JvmOverloads constructor(
                         textButtons[index].isInvisible = true
                     } else {
                         textButtons[index].text = text
-                        textButtons[index].setOnTouchListener { v, event ->
+                        textButtons[index].setOnTouchListener { _, event ->
                             (buttons[index].background as RippleDrawable).setHotspot(event.x, buttons[index].height.toFloat())
                             when (event.action) {
                                 MotionEvent.ACTION_DOWN -> buttons[index].isPressed = true
@@ -102,6 +98,12 @@ class MainActionsView @JvmOverloads constructor(
 
                 typedArray.recycle()
             }
+        }
+    }
+
+    fun setOnItemClickListener(callback: (Int) -> Unit) {
+        buttons.forEachIndexed { index, button ->
+            button.setOnClickListener { callback(index) }
         }
     }
 }

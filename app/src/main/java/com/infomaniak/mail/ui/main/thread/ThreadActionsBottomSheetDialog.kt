@@ -17,22 +17,71 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.infomaniak.mail.databinding.FragmentBottomSheetMenuThreadBinding
+import androidx.core.view.isGone
+import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.ui.main.thread.ActionsBottomSheetDialog.MainActions.*
+import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.notYetImplemented
 
-class ThreadActionsBottomSheetDialog : BottomSheetDialogFragment() {
+class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
-    private lateinit var binding: FragmentBottomSheetMenuThreadBinding
+    private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentBottomSheetMenuThreadBinding.inflate(inflater, container, false).also { binding = it }.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+
+        adaptUiToThread()
+
+        postpone.isGone = true // TODO : Support this? (not in webmail)
+        blockSender.isGone = true // TODO : Support this? (not in webmail)
+        phishing.isGone = true // TODO : Support this? (not in webmail)
+        rule.isGone = true // TODO : Support this? (not in webmail)
+
+        archive.setOnClickListener { notYetImplemented() }
+        markAsRead.setOnClickListener { notYetImplemented() }
+        move.setOnClickListener { notYetImplemented() }
+        favorite.setOnClickListener { notYetImplemented() }
+        spam.setOnClickListener { notYetImplemented() }
+        print.setOnClickListener { notYetImplemented() }
+        saveAsPdf.setOnClickListener { notYetImplemented() }
+        openIn.setOnClickListener { notYetImplemented() }
+        reportDisplayProblem.setOnClickListener { notYetImplemented() }
+
+        mainActions.setOnItemClickListener { index: Int ->
+            val action = values()[index]
+            when (action) {
+                REPLY -> notYetImplemented()
+                REPLAY_TO_ALL -> notYetImplemented()
+                FORWARD -> notYetImplemented()
+                DELETE -> notYetImplemented()
+            }
+        }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun adaptUiToThread() = with(binding) {
+        val (readIconRes, readTextRes) = if (navigationArgs.unseenMessagesCount > 0) {
+            R.drawable.ic_envelope_open to R.string.actionMarkAsRead
+        } else {
+            R.drawable.ic_envelope to R.string.actionMarkAsUnread
+        }
+        markAsRead.setIconResource(readIconRes)
+        markAsRead.setText(readTextRes)
+
+        val (favoriteIconRes, favoriteTint) = if (navigationArgs.isFavorite) {
+            R.drawable.ic_star_filled to Color.parseColor("#F1BE41")
+        } else {
+            R.drawable.ic_star to root.context.getAttributeColor(androidx.appcompat.R.attr.colorPrimary)
+        }
+        favorite.setIconResource(favoriteIconRes)
+        favorite.setIconTint(favoriteTint)
+
+        val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == Folder.FolderRole.SPAM
+        spam.setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)
     }
 }

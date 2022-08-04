@@ -125,6 +125,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         threadUid = it.uid,
                         threadSubject = it.subject,
                         threadIsFavorite = it.isFavorite,
+                        unseenMessagesCount = it.unseenMessagesCount,
                     )
                 )
             }

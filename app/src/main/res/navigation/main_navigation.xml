@@ -96,6 +96,9 @@
             android:name="threadIsFavorite"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="unseenMessagesCount"
+            app:argType="integer" />
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />
@@ -108,6 +111,9 @@
         <action
             android:id="@+id/action_threadFragment_to_threadActionsBottomSheetDialog"
             app:destination="@id/threadActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadFragment_to_replyBottomSheetDialog"
+            app:destination="@id/replyBottomSheetDialog" />
     </fragment>
 
     <fragment
@@ -134,13 +140,33 @@
         android:id="@+id/messageActionBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.MessageActionsBottomSheetDialog"
         android:label="MessageActionBottomSheetDialog"
-        tools:layout="@layout/fragment_bottom_sheet_message_actions" />
+        tools:layout="@layout/fragment_bottom_sheet_message_actions">
+        <argument
+            android:name="isFavorite"
+            app:argType="boolean" />
+        <argument
+            android:name="isSeen"
+            app:argType="boolean" />
+    </dialog>
 
     <dialog
         android:id="@+id/threadActionsBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadActionsBottomSheetDialog"
         android:label="ThreadActionsBottomSheetDialog"
-        tools:layout="@layout/fragment_bottom_sheet_menu_thread" />
+        tools:layout="@layout/bottom_sheet_actions_menu">
+        <argument
+            android:name="isFavorite"
+            app:argType="boolean" />
+        <argument
+            android:name="unseenMessagesCount"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/replyBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog"
+        android:label="ReplyBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_reply" />
 
     <fragment
         android:id="@+id/helpFragment"

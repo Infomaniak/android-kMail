@@ -79,11 +79,16 @@ class ThreadFragment : Fragment() {
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
-                R.id.quickActionReply -> notYetImplemented()
+                R.id.quickActionReply -> safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog())
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> safeNavigate(ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog())
+                R.id.quickActionMenu -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                        isFavorite = navigationArgs.threadIsFavorite,
+                        unseenMessagesCount = navigationArgs.unseenMessagesCount
+                    )
+                )
             }
         }
 
