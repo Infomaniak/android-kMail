@@ -65,6 +65,10 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
+    fun initLocalValues(parent: Folder) {
+        parentLink = parent
+    }
+
     fun getLocalizedName(context: Context): String {
         return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name
     }
