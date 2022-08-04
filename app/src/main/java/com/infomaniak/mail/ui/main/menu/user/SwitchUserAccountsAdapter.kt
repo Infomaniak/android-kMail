@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.menu.user
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.DiffUtil
@@ -38,6 +39,7 @@ class SwitchUserAccountsAdapter(
 ) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
 
     private val mailboxesAdapter = mutableListOf<SwitchUserMailboxesAdapter>()
+    private lateinit var isCollapsed: MutableList<Boolean>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserAccountViewHolder {
         return SwitchUserAccountViewHolder(
@@ -45,13 +47,24 @@ class SwitchUserAccountsAdapter(
         )
     }
 
+    override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.firstOrNull() is Unit) {
+            holder.binding.updateAccountCardUiState(position)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
+    }
+
     override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int): Unit = with(holder.binding) {
         val account = accounts[position]
-        expandFirstMailbox(account, position)
+
+        if (!isCollapsed[position]) chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
+        updateAccountCardUiState(position)
+
         userAvatarImage.loadAvatar(account.user)
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
-        accountCardview.setOnClickListener { toggleMailboxes(account) }
+        accountCardview.setOnClickListener { toggleMailboxes(position) }
 
         addressesList.adapter = if (position < mailboxesAdapter.size) {
             mailboxesAdapter[position]
@@ -62,22 +75,37 @@ class SwitchUserAccountsAdapter(
         }
     }
 
-    private fun ItemSwitchUserAccountBinding.expandFirstMailbox(account: UiAccount, position: Int) {
-        if (position == 0) {
-            chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
-            toggleMailboxes(account)
+    private fun ItemSwitchUserAccountBinding.toggleMailboxes(position: Int) {
+        if (isCollapsed[position]) closeAllBut(position)
+        isCollapsed[position] = !isCollapsed[position]
+
+        updateAccountCardUiState(position)
+    }
+
+    private fun closeAllBut(position: Int) {
+        accounts.forEachIndexed { index, _ ->
+            if (index != position) {
+                isCollapsed[index] = true
+                notifyItemChanged(index, Unit)
+            }
         }
     }
 
-    private fun ItemSwitchUserAccountBinding.toggleMailboxes(account: UiAccount) {
-        account.collapsed = !account.collapsed
-        chevron.toggleChevron(account.collapsed)
-        addressesList.isGone = account.collapsed
+    private fun ItemSwitchUserAccountBinding.updateAccountCardUiState(position: Int) {
+        chevron.toggleChevron(isCollapsed[position])
+        addressesList.isGone = isCollapsed[position]
+
+        val backgroundColorResource = if (isCollapsed[position]) R.color.backgroundColor else R.color.selectedAccountCardviewColor
+        val backgroundColor = ContextCompat.getColor(root.context, backgroundColorResource)
+        accountCardview.setCardBackgroundColor(backgroundColor)
     }
 
     override fun getItemCount(): Int = accounts.count()
 
     fun notifyAdapter(newList: List<UiAccount>) {
+        isCollapsed = MutableList(newList.count()) { true }
+        isCollapsed[0] = false
+
         DiffUtil.calculateDiff(UiAccountsListDiffCallback(accounts, newList)).dispatchUpdatesTo(this)
         accounts = newList
     }
@@ -118,6 +146,5 @@ class SwitchUserAccountsAdapter(
     data class UiAccount(
         val user: User,
         var mailboxes: List<Mailbox>,
-        var collapsed: Boolean = true,
     )
 }

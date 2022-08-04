@@ -33,13 +33,13 @@
     <color name="backgroundOnBoardingColor">@color/black</color>
     <color name="backgroundSnackbarColor">@color/black</color>
     <color name="backgroundNewMailColor">@color/grey_title</color>
+    <color name="selectedAccountCardviewColor">#1A1A1A</color>
 
     <!-- Texts -->
     <color name="secondaryTextColor">@color/secondaryText</color>
     <color name="snackbarTextColor">@color/hover</color>
     <color name="sectionHeaderTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/grey_text</color>
-    <color name="emphasizedTextColor">@color/blueTextLight</color>
     <color name="emailChipTextColor">@color/secondaryText</color>
 
     <!-- Drawables -->

@@ -34,6 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import coil.imageLoader
 import com.google.android.material.navigation.NavigationView
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
@@ -241,7 +242,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupUserAvatar() {
-        AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+        AccountUtils.currentUser?.let { binding.userAvatarImage.loadAvatar(it, requireContext().imageLoader) }
     }
 
     override fun onDestroyView() {
