@@ -118,10 +118,8 @@ class ThreadFragment : Fragment() {
             }
             onDeleteDraftClicked = { message ->
                 // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
-                lifecycleScope.launch(Dispatchers.IO) {
-                    mainViewModel.deleteDraft(message)
-                    // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
-                }
+                mainViewModel.deleteDraft(message)
+                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
                 threadAdapter.removeMessage(message)
             }
         }

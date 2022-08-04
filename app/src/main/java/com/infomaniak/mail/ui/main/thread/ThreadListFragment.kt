@@ -59,6 +59,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var binding: FragmentThreadListBinding
 
+    private var threadsJob: Job? = null
     private var updatedAtRefreshJob: Job? = null
 
     private var threadListAdapter = ThreadListAdapter()
@@ -227,9 +228,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         toolbar.title = folderName
     }
 
-    private fun listenToThreads(folder: Folder) = lifecycleScope.launch {
-        FolderController.getFolderSync(folder.id)?.threads?.asFlow()?.toSharedFlow()?.collect {
-            displayThreads(it.list)
+    private fun listenToThreads(folder: Folder) {
+        threadsJob?.cancel()
+        threadsJob = lifecycleScope.launch {
+            FolderController.getFolderSync(folder.id)?.threads?.asFlow()?.toSharedFlow()?.collect {
+                Log.e("TOTO", "listenToThreads: ${folder.name}")
+                displayThreads(it.list)
+            }
         }
     }
 

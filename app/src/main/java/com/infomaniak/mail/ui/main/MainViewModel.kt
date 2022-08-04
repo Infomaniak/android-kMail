@@ -79,7 +79,7 @@ class MainViewModel : ViewModel() {
         currentMailboxFlow.value = null
     }
 
-    suspend fun selectMailbox(mailbox: Mailbox) {
+    private suspend fun selectMailbox(mailbox: Mailbox) {
         if (currentMailboxFlow.value?.objectId != mailbox.objectId) {
             Log.i(TAG, "selectMailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
@@ -94,7 +94,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    suspend fun selectFolder(folder: Folder) {
+    private suspend fun selectFolder(folder: Folder) {
         if (folder.id != currentFolderFlow.value?.id) {
             Log.i(TAG, "selectFolder: ${folder.name}")
             currentOffset = OFFSET_FIRST_PAGE
@@ -108,7 +108,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    suspend fun selectThread(thread: Thread) {
+    private suspend fun selectThread(thread: Thread) {
         if (thread.uid != currentThreadFlow.value?.uid) {
             Log.i(TAG, "selectThread: ${thread.subject}")
 
