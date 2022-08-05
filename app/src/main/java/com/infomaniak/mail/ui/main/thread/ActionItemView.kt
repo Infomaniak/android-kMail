@@ -26,6 +26,8 @@ import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
 
@@ -58,9 +60,11 @@ class ActionItemView @JvmOverloads constructor(
 
                 val icon = typedArray.getDrawable(R.styleable.ActionItemView_icon)
                 val text = typedArray.getString(R.styleable.ActionItemView_text)
+                val visibleDivider = typedArray.getBoolean(R.styleable.ActionItemView_visibleDivider, true)
 
                 button.icon = icon
                 button.text = text
+                divider.isVisible = visibleDivider
 
                 typedArray.recycle()
             }

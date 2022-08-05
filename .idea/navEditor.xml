@@ -41,13 +41,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="contactFragment">
+                  <entry key="detailedContactBottomSheetDialog">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="988" />
-                            <option name="y" value="54" />
+                            <option name="x" value="7" />
+                            <option name="y" value="711" />
                           </Point>
                         </option>
                       </LayoutPositions>

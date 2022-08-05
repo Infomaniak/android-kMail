@@ -61,5 +61,6 @@
     <declare-styleable name="ActionItemView">
         <attr name="icon" />
         <attr name="text" />
+        <attr name="visibleDivider" format="boolean" />
     </declare-styleable>
 </resources>

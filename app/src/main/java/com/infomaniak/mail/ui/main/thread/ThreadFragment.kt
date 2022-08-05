@@ -116,7 +116,12 @@ class ThreadFragment : Fragment() {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onContactClicked = { contact ->
-                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(
+                        contact.name,
+                        contact.email
+                    )
+                )
             }
             onDraftClicked = { message ->
                 lifecycleScope.launch(Dispatchers.IO) {

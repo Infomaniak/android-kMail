@@ -22,13 +22,12 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.firstOrEmpty
-import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newmessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.loadAvatar
 
 class ContactAdapter(
     private val allContacts: List<UiContact> = emptyList(),
@@ -50,7 +49,7 @@ class ContactAdapter(
         val contact = contacts[position]
         userName.text = contact.name
         userEmail.text = contact.email
-        userAvatar.loadAvatar(contact.email.hashCode(), null, contact.name?.firstOrEmpty().toString())
+        userAvatar.loadAvatar(contact.name, contact.email)
         root.setOnClickListener { selectContact(contact) }
     }
 

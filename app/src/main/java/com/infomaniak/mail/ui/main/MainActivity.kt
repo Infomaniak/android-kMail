@@ -113,6 +113,7 @@ class MainActivity : ThemedActivity() {
             R.id.searchFragment, R.id.threadFragment -> window.statusBarColor = getColor(R.color.backgroundColor)
             R.id.messageActionBottomSheetDialog,
             R.id.replyBottomSheetDialog,
+            R.id.detailedContactBottomSheetDialog,
             R.id.threadActionsBottomSheetDialog -> Unit
             else -> window.statusBarColor = getColor(R.color.backgroundHeaderColor)
         }
