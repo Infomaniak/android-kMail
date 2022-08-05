@@ -259,12 +259,6 @@ class ThreadAdapter(
         }
     }
 
-    fun removeMessage(message: Message) {
-        val position = messageList.indexOf(message)
-        messageList.removeAt(position)
-        notifyItemRemoved(position)
-    }
-
     fun notifyAdapter(newList: MutableList<Message>) {
         DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
         messageList = newList

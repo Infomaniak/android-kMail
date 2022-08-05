@@ -39,18 +39,17 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
 import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import com.infomaniak.lib.core.R as RCore
 import kotlinx.coroutines.withContext
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
@@ -120,7 +119,6 @@ class ThreadFragment : Fragment() {
                 // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
                 mainViewModel.deleteDraft(message)
                 // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
-                threadAdapter.removeMessage(message)
             }
         }
     }
