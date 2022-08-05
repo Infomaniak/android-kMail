@@ -46,12 +46,7 @@ class MainActionsView @JvmOverloads constructor(
 
         with(binding) {
             if (attrs != null) {
-//                val defaultIconColor = icon.iconTint.defaultColor
-//                val defaultTextColor = buttonTitle.textColors.defaultColor
-
                 val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MainActionsView, 0, 0)
-//                val iconColor = typedArray.getColor(R.styleable.MainActionsView_iconColor, defaultIconColor)
-//                val textColor = typedArray.getColor(R.styleable.MainActionsView_textColor, defaultTextColor)
                 val icon1 = typedArray.getDrawable(R.styleable.MainActionsView_icon1)
                 val icon2 = typedArray.getDrawable(R.styleable.MainActionsView_icon2)
                 val icon3 = typedArray.getDrawable(R.styleable.MainActionsView_icon3)
@@ -62,7 +57,6 @@ class MainActionsView @JvmOverloads constructor(
                 val title4 = typedArray.getString(R.styleable.MainActionsView_title4)
 
                 buttons = listOf(button1, button2, button3, button4)
-//                textButtons = listOf(textButton1, textButton2, textButton3, textButton4)
                 textViews = listOf(textView1, textView2, textView3, textView4)
                 val icons = listOf(icon1, icon2, icon3, icon4)
                 val titles = listOf(title1, title2, title3, title4)

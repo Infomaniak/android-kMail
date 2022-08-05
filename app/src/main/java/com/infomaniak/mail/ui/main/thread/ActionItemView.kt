@@ -27,7 +27,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.ViewActionItemBinding
+import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
 
 class ActionItemView @JvmOverloads constructor(
     context: Context,
@@ -35,7 +35,7 @@ class ActionItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var binding: ViewActionItemBinding
+    var binding: ItemBottomSheetActionBinding
 
     var icon: Drawable? = null
         set(value) {
@@ -50,7 +50,7 @@ class ActionItemView @JvmOverloads constructor(
         }
 
     init {
-        binding = ViewActionItemBinding.inflate(LayoutInflater.from(context), this, true)
+        binding = ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true)
 
         with(binding) {
             if (attrs != null) {

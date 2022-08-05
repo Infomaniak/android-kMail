@@ -17,12 +17,16 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
+import com.infomaniak.mail.utils.getAttributeColor
 
 open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -30,6 +34,28 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetActionsMenuBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    fun computeUnreadStyle(isSeen: Boolean) = if (isSeen) {
+        R.drawable.ic_envelope to R.string.actionMarkAsUnread
+    } else {
+        R.drawable.ic_envelope_open to R.string.actionMarkAsRead
+    }
+
+    fun computeFavoriteStyle(context: Context, isFavorite: Boolean): Triple<Int, Int, Int> {
+        return if (isFavorite) {
+            Triple(
+                R.drawable.ic_star_filled,
+                Color.parseColor("#F1BE41"),
+                R.string.actionUnstar
+            )
+        } else {
+            Triple(
+                R.drawable.ic_star,
+                context.getAttributeColor(androidx.appcompat.R.attr.colorPrimary),
+                R.string.actionStar
+            )
+        }
     }
 
     enum class MainActions {

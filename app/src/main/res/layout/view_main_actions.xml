@@ -98,7 +98,8 @@
         app:layout_constraintDimensionRatio="1"
         app:layout_constraintEnd_toStartOf="@+id/button4"
         app:layout_constraintStart_toEndOf="@+id/button2"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:icon="@drawable/ic_email_action_send" />
 
     <TextView
         android:id="@+id/textView3"

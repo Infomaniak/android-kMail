@@ -17,14 +17,12 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.notYetImplemented
 
 class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -62,21 +60,14 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun adaptUiToThread() = with(binding) {
-        val (readIconRes, readTextRes) = if (navigationArgs.isSeen) {
-            R.drawable.ic_envelope to R.string.actionMarkAsUnread
-        } else {
-            R.drawable.ic_envelope_open to R.string.actionMarkAsRead
-        }
+        val (readIconRes, readTextRes) = computeUnreadStyle(navigationArgs.isSeen)
         markAsRead.setIconResource(readIconRes)
         markAsRead.setText(readTextRes)
 
-        val (favoriteIconRes, favoriteTint) = if (navigationArgs.isFavorite) {
-            R.drawable.ic_star_filled to Color.parseColor("#F1BE41")
-        } else {
-            R.drawable.ic_star to root.context.getAttributeColor(androidx.appcompat.R.attr.colorPrimary)
-        }
+        val (favoriteIconRes, favoriteTint, favoriteText) = computeFavoriteStyle(root.context, navigationArgs.isFavorite)
         favorite.setIconResource(favoriteIconRes)
         favorite.setIconTint(favoriteTint)
+        favorite.setText(favoriteText)
 
         val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == Folder.FolderRole.SPAM
         spam.setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)

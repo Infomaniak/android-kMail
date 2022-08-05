@@ -65,21 +65,15 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     }
 
     private fun adaptUiToThread() = with(binding) {
-        val (readIconRes, readTextRes) = if (navigationArgs.unseenMessagesCount > 0) {
-            R.drawable.ic_envelope_open to R.string.actionMarkAsRead
-        } else {
-            R.drawable.ic_envelope to R.string.actionMarkAsUnread
-        }
+
+        val (readIconRes, readTextRes) = computeUnreadStyle(navigationArgs.unseenMessagesCount == 0)
         markAsRead.setIconResource(readIconRes)
         markAsRead.setText(readTextRes)
 
-        val (favoriteIconRes, favoriteTint) = if (navigationArgs.isFavorite) {
-            R.drawable.ic_star_filled to Color.parseColor("#F1BE41")
-        } else {
-            R.drawable.ic_star to root.context.getAttributeColor(androidx.appcompat.R.attr.colorPrimary)
-        }
+        val (favoriteIconRes, favoriteTint, favoriteText) = computeFavoriteStyle(root.context, navigationArgs.isFavorite)
         favorite.setIconResource(favoriteIconRes)
         favorite.setIconTint(favoriteTint)
+        favorite.setText(favoriteText)
 
         val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == Folder.FolderRole.SPAM
         spam.setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)

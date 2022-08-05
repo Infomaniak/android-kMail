@@ -109,12 +109,13 @@ class MainActivity : ThemedActivity() {
 
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
-        window.statusBarColor = getColor(
-            when (destination.id) {
-                R.id.searchFragment, R.id.threadFragment -> R.color.backgroundColor
-                else -> R.color.backgroundHeaderColor
-            }
-        )
+        when (destination.id) {
+            R.id.searchFragment, R.id.threadFragment -> window.statusBarColor = getColor(R.color.backgroundColor)
+            R.id.messageActionBottomSheetDialog,
+            R.id.replyBottomSheetDialog,
+            R.id.threadActionsBottomSheetDialog -> Unit
+            else -> window.statusBarColor = getColor(R.color.backgroundHeaderColor)
+        }
 
         window.navigationBarColor = getColor(
             when (destination.id) {
