@@ -24,12 +24,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.core.view.isInvisible
-import androidx.fragment.app.findFragment
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMainActionsBinding
-import com.infomaniak.mail.utils.notYetImplemented
 
 @SuppressLint("ClickableViewAccessibility")
 class MainActionsView @JvmOverloads constructor(
@@ -40,7 +39,7 @@ class MainActionsView @JvmOverloads constructor(
 
     var binding: ViewMainActionsBinding
     lateinit var buttons: List<MaterialButton>
-    lateinit var textButtons: List<MaterialButton>
+    lateinit var textViews: List<TextView>
 
     init {
         binding = ViewMainActionsBinding.inflate(LayoutInflater.from(context), this, true)
@@ -63,35 +62,44 @@ class MainActionsView @JvmOverloads constructor(
                 val title4 = typedArray.getString(R.styleable.MainActionsView_title4)
 
                 buttons = listOf(button1, button2, button3, button4)
-                textButtons = listOf(textButton1, textButton2, textButton3, textButton4)
+//                textButtons = listOf(textButton1, textButton2, textButton3, textButton4)
+                textViews = listOf(textView1, textView2, textView3, textView4)
                 val icons = listOf(icon1, icon2, icon3, icon4)
                 val titles = listOf(title1, title2, title3, title4)
 
                 icons.forEachIndexed { index, drawable ->
                     if (drawable == null) {
                         buttons[index].isInvisible = true
-                        textButtons[index].isInvisible = true
-                    }
-                    else buttons[index].icon = drawable
+                        textViews[index].isInvisible = true
+                    } else buttons[index].icon = drawable
                 }
 
                 titles.forEachIndexed { index, text ->
+                    val associatedButton = buttons[index]
+                    val thisTextView = textViews[index]
+
                     if (text == null) {
-                        buttons[index].isInvisible = true
-                        textButtons[index].isInvisible = true
+                        associatedButton.isInvisible = true
+                        thisTextView.isInvisible = true
                     } else {
-                        textButtons[index].text = text
-                        textButtons[index].setOnTouchListener { _, event ->
-                            (buttons[index].background as RippleDrawable).setHotspot(event.x, buttons[index].height.toFloat())
+                        thisTextView.text = text
+                        thisTextView.setOnTouchListener { _, event ->
+                            (associatedButton.background as RippleDrawable).setHotspot(event.x, associatedButton.height.toFloat())
                             when (event.action) {
-                                MotionEvent.ACTION_DOWN -> buttons[index].isPressed = true
-                                MotionEvent.ACTION_UP -> buttons[index].isPressed = false
+                                MotionEvent.ACTION_DOWN -> associatedButton.isPressed = true
+                                MotionEvent.ACTION_UP -> {
+                                    if (associatedButton.isPressed) {
+                                        associatedButton.isPressed = false
+                                        associatedButton.callOnClick()
+                                    }
+                                }
+                                MotionEvent.ACTION_MOVE -> associatedButton.isPressed = false
                             }
                             true
                         }
-                        textButtons[index].setOnClickListener {
-                            buttons[index].isPressed = true
-                            buttons[index].isPressed = false
+                        thisTextView.setOnClickListener {
+                            associatedButton.isPressed = true
+                            associatedButton.isPressed = false
                         }
                     }
                 }
