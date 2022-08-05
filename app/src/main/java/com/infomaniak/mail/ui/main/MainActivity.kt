@@ -62,9 +62,7 @@ class MainActivity : ThemedActivity() {
             (binding.menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDropdowns()
         }
 
-        override fun onDrawerStateChanged(newState: Int) {
-            // No-op
-        }
+        override fun onDrawerStateChanged(newState: Int) = Unit
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
