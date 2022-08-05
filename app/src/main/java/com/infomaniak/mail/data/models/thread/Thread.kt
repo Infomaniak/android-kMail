@@ -63,7 +63,8 @@ class Thread : RealmObject {
     var hasStAttachments: Boolean = false
     @SerialName("has_drafts")
     var hasDrafts: Boolean = false
-    var flagged: Boolean = false
+    @SerialName("flagged")
+    var isFavorite: Boolean = false
     var answered: Boolean = false
     var forwarded: Boolean = false
     var size: Int = 0

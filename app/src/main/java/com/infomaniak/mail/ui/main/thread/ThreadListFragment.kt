@@ -197,7 +197,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
                         threadUid = it.uid,
                         threadSubject = it.subject,
-                        threadIsFavorite = it.flagged
+                        threadIsFavorite = it.isFavorite,
                     )
                 )
             }
