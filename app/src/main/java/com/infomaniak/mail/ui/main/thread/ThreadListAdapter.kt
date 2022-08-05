@@ -108,7 +108,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
 
         iconAttachment.isVisible = hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
-        iconFavorite.isVisible = flagged
+        iconFavorite.isVisible = isFavorite
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
@@ -212,7 +212,8 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
                         oldItem.subject == newItem.subject &&
                                 oldItem.messagesCount == newItem.messagesCount &&
                                 oldItem.unseenMessagesCount == newItem.unseenMessagesCount &&
-                                oldItem.displayedDate == newItem.displayedDate
+                                oldItem.displayedDate == newItem.displayedDate &&
+                                oldItem.isFavorite == newItem.isFavorite
                         // TODO: Add other fields checks
                     } else { // Not same items
                         false
