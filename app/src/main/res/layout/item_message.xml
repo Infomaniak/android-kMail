@@ -74,7 +74,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/full_names" />
 
-
             <TextView
                 android:id="@+id/subjectTextView"
                 style="@style/Callout.Secondary"

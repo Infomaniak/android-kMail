@@ -44,7 +44,6 @@ import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
-
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
@@ -74,7 +73,6 @@ class ThreadAdapter(
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
-
 
     private fun ItemMessageBinding.bindHeader(message: Message) {
         val messageDate = message.date?.toDate()
@@ -167,7 +165,6 @@ class ThreadAdapter(
         if (dateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
-
     private fun ItemMessageBinding.bindAttachment(attachments: List<Attachment>) {
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentsSizeText.text = context.resources.getQuantityString(
@@ -190,7 +187,6 @@ class ThreadAdapter(
 
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
-
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
         collapseMessageDetails(message)
@@ -262,7 +258,6 @@ class ThreadAdapter(
             }
         }
     }
-
 
     fun removeMessage(message: Message) {
         val position = messageList.indexOf(message)
