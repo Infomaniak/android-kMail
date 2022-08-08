@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -58,9 +59,9 @@ object MailboxContentController {
 
     fun upsertFolder(folder: Folder): Folder = MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
 
-    // fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
-    // }
+    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Folder): Folder? {
+        return MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
+    }
 
     // fun deleteFolder(id: String) {
     //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
@@ -77,8 +78,16 @@ object MailboxContentController {
     /**
      * Threads
      */
-    fun getFolderThreads(folderId: String): List<Thread> {
-        return MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
+    fun getFolderThreads(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): List<Thread> {
+        val threads = MailRealm.mailboxContent.writeBlocking { getLatestFolder(folderId) }?.threads ?: emptyList()
+
+        return when (filter) {
+            ThreadFilter.SEEN -> threads.filter { it.unseenMessagesCount == 0 }
+            ThreadFilter.UNSEEN -> threads.filter { it.unseenMessagesCount > 0 }
+            ThreadFilter.STARRED -> threads.filter { it.isFavorite }
+            ThreadFilter.ATTACHMENTS -> threads.filter { it.hasAttachments }
+            else -> threads
+        }
     }
 
     fun getThread(uid: String): Thread? = MailRealm.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first().find()

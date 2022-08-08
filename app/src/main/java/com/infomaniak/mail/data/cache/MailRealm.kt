@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignatureEmail
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.user.UserInfos
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
@@ -97,7 +98,9 @@ object MailRealm {
 
     fun readFolders(): SharedFlow<ResultsChange<Folder>> = MailboxContentController.getFoldersAsync().toSharedFlow()
 
-    fun readThreads(folder: Folder): List<Thread> = MailboxContentController.getFolderThreads(folder.id)
+    fun readThreads(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): List<Thread> {
+        return MailboxContentController.getFolderThreads(folder.id, filter)
+    }
 
     fun readMessages(thread: Thread): List<Message> = thread.messages
 

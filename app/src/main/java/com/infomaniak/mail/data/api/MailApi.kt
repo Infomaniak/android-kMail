@@ -19,12 +19,15 @@ package com.infomaniak.mail.data.api
 
 import android.util.Log
 import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.MailData.currentFolderFlow
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
@@ -51,8 +54,12 @@ object MailApi {
         return ApiRepository.getFolders(mailbox.uuid).data
     }
 
-    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int): List<Thread>? {
-        return ApiRepository.getThreads(mailboxUuid, folder.id, offset).data?.threads?.map { it.initLocalValues() }
+    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int, filter: ThreadFilter): List<Thread>? {
+        val apiResponse = ApiRepository.getThreads(mailboxUuid, folder.id, offset, filter)
+
+        return apiResponse.data?.also { threadResult ->
+            currentFolderFlow.value?.let { folder -> MailData.updateCurrentFolderCounts(folder, threadResult) }
+        }?.threads?.map { it.initLocalValues() }
     }
 
     fun fetchMessages(thread: Thread): List<Message> {
