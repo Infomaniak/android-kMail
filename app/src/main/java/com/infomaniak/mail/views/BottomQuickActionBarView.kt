@@ -18,7 +18,6 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -43,12 +42,7 @@ class BottomQuickActionBarView @JvmOverloads constructor(
 
         with(binding) {
             if (attrs != null) {
-                val defaultIconColor = button1.iconTint.defaultColor
-                val defaultTextColor = button1.textColors.defaultColor
-
                 val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomQuickActionBarView, 0, 0)
-                val iconColor = typedArray.getColor(R.styleable.BottomQuickActionBarView_iconColor, defaultIconColor)
-                val textColor = typedArray.getColor(R.styleable.BottomQuickActionBarView_textColor, defaultTextColor)
                 val src1 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src1)
                 val src2 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src2)
                 val src3 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src3)
@@ -63,11 +57,6 @@ class BottomQuickActionBarView @JvmOverloads constructor(
                 buttons = listOf(button1, button2, button3, button4, button5)
                 val srcs = listOf(src1, src2, src3, src4, src5)
                 val texts = listOf(text1, text2, text3, text4, text5)
-
-                for (button in buttons) {
-                    button.setTextColor(textColor)
-                    button.iconTint = ColorStateList.valueOf(iconColor)
-                }
 
                 srcs.forEachIndexed { index, drawable ->
                     if (drawable == null) buttons[index].isGone = true

@@ -133,7 +133,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
     }
 
-    // Do not change the order of the enum, it's important
+    // Do not change the order of the enum, it's important that it represents the order of the buttons in the UI
     enum class QuickActionButton {
         ANSWER,
         TRANSFER,

@@ -87,7 +87,6 @@
         app:text2="@string/actionForward"
         app:text3="@string/actionArchive"
         app:text4="@string/actionDelete"
-        app:text5="@string/buttonMore"
-        app:textColor="@color/secondaryTextColor" />
+        app:text5="@string/buttonMore" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

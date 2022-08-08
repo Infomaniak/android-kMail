@@ -25,7 +25,7 @@ import com.infomaniak.mail.databinding.ItemDetailedContactBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
-    private val recipients: List<Recipient> = listOf(),
+    private val recipients: List<Recipient> = emptyList(),
     private val onContactClicked: ((contact: Recipient) -> Unit)?
 ) : RecyclerView.Adapter<DetailedRecipientAdapter.DetailedRecipientViewHolder>() {
 
