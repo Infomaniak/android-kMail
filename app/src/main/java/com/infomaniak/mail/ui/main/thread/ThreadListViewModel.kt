@@ -21,20 +21,40 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
+    private var listenToCurrentMailboxJob: Job? = null
     private var listenToCurrentFolderJob: Job? = null
     private var listenToThreadsJob: Job? = null
 
+    val currentMailbox = SingleLiveEvent<Mailbox?>()
     val currentFolder = SingleLiveEvent<Folder?>()
     val threads = SingleLiveEvent<List<Thread>?>()
+
+    var currentOffset = OFFSET_FIRST_PAGE
+    var filter: ThreadFilter = ThreadFilter.ALL
+    var isDownloadingChanges = false
+    var lastMailboxId: String? = null
+    var lastFolderRole: Folder.FolderRole? = null
+    var lastUnreadCount = MailData.currentFolderFlow.value?.unreadCount ?: 0
+
+    fun listenToCurrentMailbox() {
+        listenToCurrentMailboxJob?.cancel()
+        listenToCurrentMailboxJob = viewModelScope.launch {
+            MailData.currentMailboxFlow.filterNotNull().collect {
+                currentMailbox.value = it
+            }
+        }
+    }
 
     fun listenToCurrentFolder() {
         listenToCurrentFolderJob?.cancel()
@@ -55,19 +75,21 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun loadMailData() {
-        MailData.loadInboxContent()
+        currentOffset = OFFSET_FIRST_PAGE
+        MailData.loadInboxContent(filter)
     }
 
-    fun loadThreadsAfterPagination(folder: Folder, mailbox: Mailbox, offset: Int) {
-        MailData.loadThreads(folder, mailbox, offset)
+    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int) {
+        MailData.loadThreads(folder, mailbox, offset, filter)
     }
 
-    fun loadThreadsAfterRefresh() {
-        MailData.loadThreads(
+    fun refreshThreads() {
+        currentOffset = OFFSET_FIRST_PAGE
+        isDownloadingChanges = true
+        MailData.refreshThreads(
             folder = MailData.currentFolderFlow.value ?: return,
             mailbox = MailData.currentMailboxFlow.value ?: return,
-            offset = ApiRepository.OFFSET_FIRST_PAGE,
-            forceRefresh = true,
+            filter = filter,
         )
     }
 }

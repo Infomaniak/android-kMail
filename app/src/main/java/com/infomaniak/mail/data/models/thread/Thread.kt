@@ -20,6 +20,7 @@
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
+import androidx.annotation.IdRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.color
 import com.infomaniak.lib.core.utils.*
@@ -68,7 +69,8 @@ class Thread : RealmObject {
     var hasStAttachments: Boolean = false
     @SerialName("has_drafts")
     var hasDrafts: Boolean = false
-    var flagged: Boolean = false
+    @SerialName("flagged")
+    var isFavorite: Boolean = false
     var answered: Boolean = false
     var forwarded: Boolean = false
     var size: Int = 0
@@ -118,13 +120,13 @@ class Thread : RealmObject {
         }.removeSuffix(", ")
     }
 
-    // enum class ThreadFilter(@IdRes val filterNameRes: Int) {
-    enum class ThreadFilter(filterNameRes: String) { // TODO: Put these strings in strings.xml (like the `FolderRole` enum class)
-        ALL("All"),
-        SEEN("Seen"),
-        UNSEEN("Unseen"),
-        STARRED("Starred"),
-        UNSTARRED("Unstarred"),
+    enum class ThreadFilter(@IdRes val filterNameRes: Int) {
+        ALL(R.string.searchAllMessages),
+        SEEN(R.string.searchFilterRead),
+        UNSEEN(R.string.searchFilterUnread),
+        STARRED(R.string.favoritesFolder),
+        ATTACHMENTS(R.string.searchFilterAttachment),
+        FOLDER(R.string.searchFilterFolder),
     }
 
     companion object {
@@ -141,7 +143,7 @@ class Thread : RealmObject {
             date = message.date
             messagesCount = 1
             size = message.attachments.size
-            flagged = message.flagged
+            isFavorite = message.isFavorite
             displayedDate = message.date?.toDate()?.formatDate() ?: ""
             parentFolderId = message.folderId
         }

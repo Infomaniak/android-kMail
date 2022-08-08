@@ -19,6 +19,8 @@ package com.infomaniak.mail.data.api
 
 import android.util.Log
 import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.MailData.currentFolderFlow
 import com.infomaniak.mail.data.cache.MailRealm
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.Attachment
@@ -29,6 +31,7 @@ import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
@@ -55,10 +58,18 @@ object MailApi {
         return ApiRepository.getFolders(mailbox.uuid).data
     }
 
-    fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int, isDraftsFolder: Boolean): List<Thread>? {
-        return ApiRepository.getThreads(mailboxUuid, folder.id, offset, isDraftsFolder = isDraftsFolder).data?.threads?.map {
-            it.initLocalValues(folder.id)
-        }
+    fun fetchThreads(
+        folder: Folder,
+        mailboxUuid: String,
+        offset: Int,
+        filter: ThreadFilter,
+        isDraftsFolder: Boolean
+    ): List<Thread>? {
+        val apiResponse = ApiRepository.getThreads(mailboxUuid, folder.id, offset, filter, isDraftsFolder)
+
+        return apiResponse.data?.also { threadResult ->
+            currentFolderFlow.value?.let { folder -> MailData.updateCurrentFolderCounts(folder, threadResult) }
+        }?.threads?.map { it.initLocalValues(folder.id) }
     }
 
     fun fetchMessages(thread: Thread): List<Message> {

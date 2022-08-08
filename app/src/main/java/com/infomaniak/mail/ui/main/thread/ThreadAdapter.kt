@@ -254,6 +254,7 @@ class ThreadAdapter(
         override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
             val oldItem = oldList[oldIndex]
             val newItem = newList[newIndex]
+
             return oldItem.uid == newItem.uid
                     && oldItem.from == newItem.from
                     && oldItem.date == newItem.date

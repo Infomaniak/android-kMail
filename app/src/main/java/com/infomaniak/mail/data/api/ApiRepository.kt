@@ -86,10 +86,10 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxUuid: String,
         folderId: String,
         offset: Int,
-        filter: ThreadFilter? = null,
+        filter: ThreadFilter,
         isDraftsFolder: Boolean
     ): ApiResponse<ThreadsResult> {
-        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter?.name, isDraftsFolder), GET)
+        return callKotlinxApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter, isDraftsFolder), GET)
     }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {

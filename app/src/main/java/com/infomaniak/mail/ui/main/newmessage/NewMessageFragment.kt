@@ -288,6 +288,7 @@ class NewMessageFragment : Fragment() {
                 viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             }
         }
+
         return isEmail
     }
 

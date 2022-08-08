@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -62,6 +63,7 @@ class Folder : RealmObject {
      */
     var threads: RealmList<Thread> = realmListOf()
     var parentLink: Folder? = null
+    var lastUpdatedAt: RealmInstant? = null
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)

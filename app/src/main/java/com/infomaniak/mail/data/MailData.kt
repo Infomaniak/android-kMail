@@ -43,9 +43,12 @@ import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.DraftSaveResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -59,6 +62,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.*
 
 object MailData {
 
@@ -146,13 +150,13 @@ object MailData {
         }
     }
 
-    fun loadInboxContent() {
+    fun loadInboxContent(filter: ThreadFilter = ThreadFilter.ALL) {
         getMailboxesFromRealm { realmMailboxes ->
             if (realmMailboxes.isEmpty()) {
-                getInboxContentFromApi()
+                getInboxContentFromApi(filter)
             } else {
                 computeMailboxToSelect(realmMailboxes)
-                getFoldersFromRealm()
+                getFoldersFromRealm(filter)
             }
         }
     }
@@ -163,9 +167,19 @@ object MailData {
         }
     }
 
-    fun loadThreads(folder: Folder, mailbox: Mailbox, offset: Int, forceRefresh: Boolean = false) {
+    fun refreshThreads(folder: Folder, mailbox: Mailbox, filter: ThreadFilter) {
+        getThreadsFromApi(folder, mailbox, OFFSET_FIRST_PAGE, filter, forceRefresh = true)
+    }
+
+    fun loadThreads(
+        folder: Folder,
+        mailbox: Mailbox,
+        offset: Int,
+        filter: ThreadFilter = ThreadFilter.ALL,
+        forceRefresh: Boolean = false
+    ) {
         val isInternetAvailable = true // TODO: Manage this for real
-        val realmThreads = getThreadsFromRealm(folder, offset)
+        val realmThreads = getThreadsFromRealm(folder, offset, filter)
 
         if (Folder.isDraftsFolder() && isInternetAvailable) {
             val realmOfflineDrafts = realmThreads
@@ -176,10 +190,10 @@ object MailData {
 
             CoroutineScope(Dispatchers.IO).launch {
                 realmOfflineDrafts.forEach { draft -> saveOfflineDraftToApi(draft) }
-                getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
+                getThreadsFromApi(folder, mailbox, offset, filter, realmThreads, forceRefresh)
             }
         } else {
-            getThreadsFromApi(folder, mailbox, realmThreads, offset, forceRefresh)
+            getThreadsFromApi(folder, mailbox, offset, filter, realmThreads, forceRefresh)
         }
     }
 
@@ -274,6 +288,16 @@ object MailData {
         }
     }
 
+    fun updateCurrentFolderCounts(folder: Folder, threadResult: ThreadsResult) {
+        mutableCurrentFolderFlow.value = MailboxContentController.updateFolder(folder.id) {
+            it.apply {
+                unreadCount = threadResult.folderUnseenMessage
+                totalCount = threadResult.totalMessagesCount
+                lastUpdatedAt = Date().toRealmInstant()
+            }
+        }
+    }
+
     fun selectThread(thread: Thread) {
         if (thread.uid != currentThreadFlow.value?.uid) {
             mutableCurrentThreadFlow.value = thread
@@ -290,12 +314,9 @@ object MailData {
     }
 
     private fun computeMailboxToSelect(mailboxes: List<Mailbox>): Mailbox {
-        val mailbox = with(mailboxes) {
-            find { it.mailboxId == AccountUtils.currentMailboxId }
-                ?: first()
-        }
-
+        val mailbox = with(mailboxes) { find { it.mailboxId == AccountUtils.currentMailboxId } ?: first() }
         selectMailbox(mailbox)
+
         return mailbox
     }
 
@@ -305,8 +326,8 @@ object MailData {
                 ?: find { it.role == DEFAULT_FOLDER_ROLE }
                 ?: first()
         }
-
         selectFolder(folder)
+
         return folder
     }
 
@@ -323,25 +344,26 @@ object MailData {
         }
     }
 
-    private fun getFoldersFromRealm() {
+    private fun getFoldersFromRealm(filter: ThreadFilter) {
         CoroutineScope(Dispatchers.IO).launch {
             val realmFolders = MailRealm.readFolders().first().list
 
             mutableFoldersFlow.value = realmFolders
 
             if (realmFolders.isEmpty()) {
-                getInboxContentFromApi()
+                getInboxContentFromApi(filter)
             } else {
                 val selectedFolder = computeFolderToSelect(realmFolders)
                 getThreadsFromRealm(selectedFolder, OFFSET_FIRST_PAGE)
-                getInboxContentFromApi()
+                getInboxContentFromApi(filter)
             }
         }
     }
 
-    private fun getThreadsFromRealm(folder: Folder, offset: Int): List<Thread> {
-        val realmThreads = MailRealm.readThreads(folder)
+    private fun getThreadsFromRealm(folder: Folder, offset: Int, filter: ThreadFilter = ThreadFilter.ALL): List<Thread> {
+        val realmThreads = MailRealm.readThreads(folder, filter)
         if (offset == OFFSET_FIRST_PAGE) mutableThreadsFlow.value = realmThreads
+
         return realmThreads
     }
 
@@ -353,10 +375,10 @@ object MailData {
     /**
      * Fetch API
      */
-    private fun getInboxContentFromApi() {
+    private fun getInboxContentFromApi(filter: ThreadFilter) {
         val mergedMailboxes = getMailboxesFromApi()
         val selectedMailbox = computeMailboxToSelect(mergedMailboxes)
-        getFoldersFromApi(selectedMailbox)
+        getFoldersFromApi(selectedMailbox, filter)
     }
 
     private fun getMailboxesFromApi(): List<Mailbox> {
@@ -369,7 +391,7 @@ object MailData {
         return mergedMailboxes
     }
 
-    private fun getFoldersFromApi(mailbox: Mailbox) {
+    private fun getFoldersFromApi(mailbox: Mailbox, filter: ThreadFilter) {
         val realmFolders = mutableFoldersFlow.value
         val apiFolders = MailApi.fetchFolders(mailbox)
         val mergedFolders = mergeFolders(realmFolders, apiFolders)
@@ -377,19 +399,20 @@ object MailData {
         mutableFoldersFlow.value = mergedFolders
 
         val selectedFolder = computeFolderToSelect(mergedFolders)
-        getThreadsFromApi(selectedFolder, mailbox)
+        getThreadsFromApi(selectedFolder, mailbox, OFFSET_FIRST_PAGE, filter)
     }
 
     private fun getThreadsFromApi(
         folder: Folder,
         mailbox: Mailbox,
+        offset: Int,
+        filter: ThreadFilter,
         realmThreads: List<Thread>? = null,
-        offset: Int = OFFSET_FIRST_PAGE,
         forceRefresh: Boolean = false,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             val isDraftsFolder = Folder.isDraftsFolder()
-            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset, isDraftsFolder)
+            val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset, filter, isDraftsFolder)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 
             if (forceRefresh || mergedThreads.isEmpty()) mutableThreadsFlow.forceRefresh()

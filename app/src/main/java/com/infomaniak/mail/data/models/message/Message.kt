@@ -78,7 +78,8 @@ class Message : RealmObject {
     var seen: Boolean = false
     var forwarded: Boolean = false
     var answered: Boolean = false
-    var flagged: Boolean = false
+    @SerialName("flagged")
+    var isFavorite: Boolean = false
     var scheduled: Boolean = false
     var preview: String = ""
     var size: Int = 0
