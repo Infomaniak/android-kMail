@@ -63,7 +63,7 @@ object ThreadController {
         mailbox: Mailbox,
         folder: Folder,
         offset: Int,
-        filter: ThreadFilter = ThreadFilter.ALL,
+        filter: ThreadFilter,
         canContinueToPaginate: (Boolean) -> Unit,
     ): List<Thread> {
 
@@ -79,7 +79,10 @@ object ThreadController {
             }
         } ?: emptyList()
         val apiThreadsSinceOffset = ApiRepository.getThreads(mailbox.uuid, folder.id, offset, filter).data
-            ?.also { threadsResult -> canContinueToPaginate(threadsResult.messagesCount >= ApiRepository.PER_PAGE) }
+            ?.also { threadsResult ->
+                FolderController.updateFolderCounts(folder.id, threadsResult)
+                canContinueToPaginate(threadsResult.messagesCount >= ApiRepository.PER_PAGE)
+            }
             ?.threads?.map { it.initLocalValues() }
             ?: emptyList()
         val apiThreads = if (offset == ApiRepository.OFFSET_FIRST_PAGE) {

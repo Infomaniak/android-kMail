@@ -22,6 +22,8 @@ import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.thread.ThreadsResult
+import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
@@ -33,6 +35,7 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.SharedFlow
+import java.util.*
 
 object FolderController {
 
@@ -104,6 +107,21 @@ object FolderController {
         return RealmController.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
     }
 
+    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
+        RealmController.mailboxContent.writeBlocking {
+            getLatestFolderSync(id)
+                ?.let(onUpdate)
+        }
+    }
+
+    fun updateFolderCounts(id: String, threadsResult: ThreadsResult) {
+        updateFolder(id) {
+            it.unreadCount = threadsResult.folderUnseenMessage
+            // it.totalCount = threadsResult.totalMessagesCount // TODO: We don't use this for now.
+            it.lastUpdatedAt = Date().toRealmInstant()
+        }
+    }
+
     fun MutableRealm.deleteFolders(folders: List<Folder>) {
         folders.forEach { deleteLatestFolder(it.id) }
     }
@@ -126,10 +144,6 @@ object FolderController {
     /**
      * TODO?
      */
-    // fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
-    // }
-
     // fun deleteFolders(folders: List<Folder>) {
     //     MailRealm.mailboxContent.writeBlocking { folders.forEach { getLatestFolder(it.id)?.let(::delete) } }
     // }

@@ -58,6 +58,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var binding: FragmentThreadListBinding
 
+    private var folderJob: Job? = null
     private var threadsJob: Job? = null
     private var updatedAtRefreshJob: Job? = null
 
@@ -71,9 +72,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         ) { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    var isDownloadingChanges = false // TODO: Do we need this?
     var filter: ThreadFilter = ThreadFilter.ALL // TODO: Do we need this? Here?
-    //    var lastMailboxId: String? = null
     var lastFolderRole: FolderRole? = null // TODO: Do we need this?
     var lastUnreadCount = MainViewModel.currentFolder.value?.unreadCount ?: 0 // TODO: Do we need this?
 
@@ -92,7 +91,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUserAvatar()
         setupUnreadCountChip()
 
-//        listenToCurrentMailbox()
         listenToCurrentFolder()
     }
 
@@ -100,7 +98,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         updatedAtRefreshJob?.cancel()
         updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
             while (true) {
-                withContext(Dispatchers.Main) { updateUpdatedAt() }
+                val folder = MainViewModel.currentFolder.value?.id?.let(FolderController::getFolderSync)
+                withContext(Dispatchers.Main) { folder?.let(::updateUpdatedAt) }
                 delay(DateUtils.MINUTE_IN_MILLIS)
             }
         }
@@ -111,8 +110,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        mainViewModel.currentOffset = OFFSET_FIRST_PAGE
-        isDownloadingChanges = true
         mainViewModel.forceRefreshThreads(filter)
     }
 
@@ -159,7 +156,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         threadsList.setPagination(
-            whenLoadMoreIsPossible = { if (!isDownloadingChanges) downloadThreads() },
+            whenLoadMoreIsPossible = { if (!mainViewModel.isDownloadingChanges) downloadThreads() },
             triggerOffset = OFFSET_TRIGGER,
         )
 
@@ -187,8 +184,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 isCloseIconVisible = isChecked
                 filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
                 swipeRefreshLayout.isRefreshing = true
-                mainViewModel.currentOffset = OFFSET_FIRST_PAGE
-                isDownloadingChanges = true
                 mainViewModel.forceRefreshThreads(filter)
             }
         }
@@ -196,27 +191,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onResume() {
         super.onResume()
-
-//        with(viewModel) {
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
-//            currentOffset = OFFSET_FIRST_PAGE
-//            loadMailData(filter)
-//        }
     }
-
-//    private fun listenToCurrentMailbox() {
-//        viewModel.currentMailbox.observeNotNull(this, ::onMailboxChange)
-//        viewModel.listenToCurrentMailbox()
-//    }
-
-//    private fun listenToCurrentFolder() {
-//        viewModel.currentFolder.observeNotNull(this, ::updateFolderInfo)
-//        viewModel.listenToCurrentFolder()
-//    }
 
     private fun listenToCurrentFolder() {
         MainViewModel.currentFolder.observeNotNull(this) { currentFolder ->
-            displayFolderInfos(currentFolder)
+            displayFolderName(currentFolder)
+            updateHeader(currentFolder)
             listenToThreads(currentFolder)
         }
     }
@@ -226,54 +207,52 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onDestroyView()
     }
 
-//    private fun onMailboxChange(mailbox: Mailbox) = with(viewModel) {
-//        if (lastMailboxId != mailbox.objectId) {
-//            resetList()
-//            lastMailboxId = mailbox.objectId
-//        }
-//    }
-
-    private fun displayFolderInfos(folder: Folder) {
-        if (lastFolderRole != folder.role) {
-            lastUnreadCount = folder.unreadCount
-            resetList()
-            lastFolderRole = folder.role
-        }
-
+    private fun displayFolderName(folder: Folder) {
         val folderName = folder.getLocalizedName(binding.context)
         Log.i("UI", "Received folder name (${folderName})")
         binding.toolbar.title = folderName
-
-        updateUnreadCount(folder.unreadCount)
-        updateUpdatedAt()
     }
 
-    private fun updateUnreadCount(unreadCount: Int) = with(binding) {
-        if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
-            swipeRefreshLayout.isRefreshing = true
-            clearFilter()
-            onRefresh()
-        }
-        lastUnreadCount = unreadCount
-        unreadCountChip.apply {
-            text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
-            isVisible = unreadCount > 0
+    private fun updateHeader(folder: Folder) {
+//        if (lastFolderRole != folder.role) {
+//            lastFolderRole = folder.role
+//            lastUnreadCount = folder.unreadCount
+//            resetList()
+//        }
+        folder.id.let(FolderController::getFolderSync)?.let {
+            updateUpdatedAt(it)
+            updateUnreadCount(it.unreadCount)
         }
     }
 
-    private fun updateUpdatedAt() {
-        val folder = MainViewModel.currentFolder.value ?: return
+    private fun updateUpdatedAt(folder: Folder) {
         val lastUpdatedAt = folder.lastUpdatedAt?.toDate()
         val ago = when {
             lastUpdatedAt == null -> ""
             Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
-            else -> DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
+            else -> DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString()
+                .replaceFirstChar { it.lowercaseChar() }
         }
 
         binding.updatedAt.text = if (ago.isEmpty()) {
             getString(R.string.noNetworkDescription)
         } else {
             getString(R.string.threadListHeaderLastUpdate, ago)
+        }
+    }
+
+    private fun updateUnreadCount(unreadCount: Int) = with(binding) {
+        if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
+            swipeRefreshLayout.isRefreshing = true
+            clearFilter()
+            mainViewModel.forceRefreshThreads(filter)
+        }
+
+        lastUnreadCount = unreadCount
+
+        unreadCountChip.apply {
+            text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
+            isVisible = unreadCount > 0
         }
     }
 
@@ -287,21 +266,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayThreads(threads: List<Thread>) = with(binding) {
+    private fun displayThreads(threads: List<Thread>) = with(mainViewModel) {
         Log.i("UI", "Received threads (${threads.size})")
         isDownloadingChanges = false
-        swipeRefreshLayout.isRefreshing = false
-        if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
+        binding.swipeRefreshLayout.isRefreshing = false
+        if (threads.size < PER_PAGE) canContinueToPaginate = false
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
-        with(threadListAdapter) {
-            notifyAdapter(formatList(threads, context))
-        }
+        threadListAdapter.notifyAdapter(threadListAdapter.formatList(threads, binding.context))
 
-        if (mainViewModel.currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
+        if (currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
 
-        startPeriodicRefreshJob()
+        MainViewModel.currentFolder.value?.let(::updateHeader)
     }
 
     private fun displayNoEmailView() = with(binding) {
@@ -314,24 +291,23 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         noMailLayoutGroup.isGone = true
     }
 
-    private fun downloadThreads() {
+    private fun downloadThreads() = with(mainViewModel) {
 
         val folder = MainViewModel.currentFolder.value ?: return
         val mailbox = MainViewModel.currentMailbox.value ?: return
 
-        if (mainViewModel.canContinueToPaginate) {
-            isDownloadingChanges = true
-            mainViewModel.currentOffset += PER_PAGE
+        if (canContinueToPaginate) {
+            currentOffset += PER_PAGE
             showLoadingTimer.start()
-            mainViewModel.loadMoreThreads(mailbox, folder, mainViewModel.currentOffset)
+            loadMoreThreads(mailbox, folder, currentOffset, filter)
         }
     }
 
-    private fun resetList() {
-        mainViewModel.currentOffset = OFFSET_FIRST_PAGE
-        clearFilter()
-        scrollToTop()
-    }
+//    private fun resetList() {
+//        mainViewModel.currentOffset = OFFSET_FIRST_PAGE
+//        clearFilter()
+//        scrollToTop()
+//    }
 
     private fun clearFilter() = with(binding.unreadCountChip) {
         filter = ThreadFilter.ALL

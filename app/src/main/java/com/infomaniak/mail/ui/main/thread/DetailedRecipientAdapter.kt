@@ -22,12 +22,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ItemDetailedContactBinding
+import com.infomaniak.mail.ui.main.thread.DetailedRecipientAdapter.DetailedRecipientViewHolder
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
     private val recipients: List<Recipient> = listOf(),
     private val onContactClicked: ((contact: Recipient) -> Unit)?
-) : RecyclerView.Adapter<DetailedRecipientAdapter.DetailedRecipientViewHolder>() {
+) : RecyclerView.Adapter<DetailedRecipientViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailedRecipientViewHolder {
         return DetailedRecipientViewHolder(ItemDetailedContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
