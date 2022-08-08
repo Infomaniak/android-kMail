@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache
 
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.drafts.Draft
@@ -205,34 +204,30 @@ object MailboxContentController {
             copyToRealm(draftMessage, UpdatePolicy.ALL)
 
             if (mustSaveThread) {
-                val threadUid = MailData.threadsFlow.value?.find { thread ->
-                    thread.messages.any { message -> message.uid == draft.parentMessageUid }
-                }?.uid
+                val queryThread =
+                    "SUBQUERY(${Thread::messages.name}, \$message, \$message.${Message::uid.name} == '${draft.parentMessageUid}').@count > 0"
+                val threadUid = MailRealm.mailboxContent.query<Thread>(queryThread).first().find()?.uid
                 val thread = Thread.from(draftMessage, threadUid)
                 copyToRealm(thread, UpdatePolicy.ALL)
 
-                val folderThreads = getLatestFolder(getDraftsFolder()?.id ?: "")?.threads
-                if (folderThreads?.none { folderThread -> folderThread.uid == thread.uid } == true) {
-                    folderThreads.add(thread)
-                }
+                val queryDraftFolder =
+                    "id == '${getDraftsFolder()?.id}' AND NONE ${Folder::threads.name}.${Thread::uid.name} == '${thread.uid}'"
+                val draftFolder = MailRealm.mailboxContent.query<Folder>(queryDraftFolder).first().find()
+                draftFolder?.id?.let { getLatestFolder(it)?.threads?.add(thread) }
             }
         }
     }
-
 
     fun removeDraft(uuid: String, parentUid: String) {
         MailRealm.mailboxContent.writeBlocking { removeDraft(uuid, parentUid) }
     }
 
     private fun MutableRealm.removeDraft(uuid: String, parentUid: String) {
-        val threadsToRemove = getDraftsFolder()?.id
-            ?.let { getLatestFolder(it) }
-            ?.threads
-            ?.filter { thread ->
-                thread.uid == uuid || thread.uid == parentUid || thread.messages.any { it.uid == uuid || it.uid == parentUid }
-            }
+        val query =
+            "${Thread::parentFolderId.name} == '${getDraftsFolder()?.id}' AND (${Thread::uid.name} == '$uuid' OR ${Thread::uid.name} == '$parentUid' OR SUBQUERY(${Thread::messages.name}, \$message, \$message.${Message::uid.name} == '$uuid' OR \$message.${Message::uid.name} == '$parentUid').@count > 0)"
+        val threadsToRemove = MailRealm.mailboxContent.query<Thread>(query).find()
         deleteLatestMessage(parentUid.ifEmpty { uuid })
-        threadsToRemove?.forEach { thread -> thread.let { getLatestThread(it.uid)?.let(::delete) } }
+        threadsToRemove.forEach { thread -> thread.let { getLatestThread(it.uid)?.let(::delete) } }
     }
 
     /**

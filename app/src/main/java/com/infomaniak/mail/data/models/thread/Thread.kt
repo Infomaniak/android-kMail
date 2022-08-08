@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.displayedName
@@ -78,10 +79,12 @@ class Thread : RealmObject {
      */
     @Transient
     var displayedDate: String = ""
+    var parentFolderId: String = ""
 
-    fun initLocalValues(): Thread {
+    fun initLocalValues(parentId: String): Thread {
         messages.removeIf { it.isDuplicate }
 
+        parentFolderId = parentId
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
@@ -141,6 +144,7 @@ class Thread : RealmObject {
             size = message.attachments.size
             flagged = message.flagged
             displayedDate = message.date?.toDate()?.formatDate() ?: ""
+            parentFolderId = message.folderId
         }
     }
 }

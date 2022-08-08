@@ -57,7 +57,7 @@ object MailApi {
 
     fun fetchThreads(folder: Folder, mailboxUuid: String, offset: Int, isDraftsFolder: Boolean): List<Thread>? {
         return ApiRepository.getThreads(mailboxUuid, folder.id, offset, isDraftsFolder = isDraftsFolder).data?.threads?.map {
-            it.initLocalValues()
+            it.initLocalValues(folder.id)
         }
     }
 
