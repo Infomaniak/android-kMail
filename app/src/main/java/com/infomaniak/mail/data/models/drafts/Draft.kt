@@ -67,7 +67,9 @@ class Draft : RealmObject {
     private var _action: String = ""
     var action
         get() = enumValueOfOrNull<DraftAction>(_action)
-        set(value) { _action = value?.apiName ?: "" }
+        set(value) {
+            _action = value?.apiName ?: ""
+        }
     var delay: Int = 0
     var priority: String? = null
     @SerialName("st_uuid")

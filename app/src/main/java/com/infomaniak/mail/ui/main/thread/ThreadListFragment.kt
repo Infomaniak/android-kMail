@@ -74,21 +74,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var menuDrawerNavigation: NavigationView? = null
     private var drawerLayout: DrawerLayout? = null
     private val drawerListener = object : DrawerLayout.DrawerListener {
-        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            // No-op
-        }
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) = Unit
 
-        override fun onDrawerOpened(drawerView: View) {
-            // No-op
-        }
+        override fun onDrawerOpened(drawerView: View) = Unit
 
         override fun onDrawerClosed(drawerView: View) {
             menuDrawerFragment?.closeDropdowns()
         }
 
-        override fun onDrawerStateChanged(newState: Int) {
-            // No-op
-        }
+        override fun onDrawerStateChanged(newState: Int) = Unit
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

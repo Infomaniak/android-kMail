@@ -52,7 +52,7 @@ class NewMessageActivity : ThemedActivity() {
 
             toolbar.setOnMenuItemClickListener {
                 with(newMessageFragment) {
-                    if (viewModel.sendMail(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) finish()
+                    if (viewModel.sendDraft(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) finish()
                     true
                 }
             }
@@ -99,7 +99,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     fun closeDraft() = with(newMessageFragment) {
-        viewModel.sendMail(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
+        viewModel.sendDraft(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
         finish()
     }
 

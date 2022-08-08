@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.MessagePriority
-import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
@@ -72,11 +71,11 @@ class NewMessageViewModel : ViewModel() {
         clearJobs()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(3_000L)
-            sendMail(DraftAction.SAVE, email, subject, body)
+            sendDraft(DraftAction.SAVE, email, subject, body)
         }
     }
 
-    fun sendMail(action: DraftAction, email: String, subject: String, body: String): Boolean {
+    fun sendDraft(action: DraftAction, email: String, subject: String, body: String): Boolean {
         if (action == DraftAction.SAVE && hasStartedEditing.value == false ||
             action == DraftAction.SEND && newMessageTo.isEmpty()
         ) {
@@ -85,13 +84,13 @@ class NewMessageViewModel : ViewModel() {
 
         currentDraft.value?.let { draft ->
             draft.fill(draftAction = action, messageEmail = email, messageSubject = subject, messageBody = body)
-            viewModelScope.launch(Dispatchers.IO) { sendOrSaveMail(draft) }
+            viewModelScope.launch(Dispatchers.IO) { sendOrSaveDraft(draft) }
         }
 
         return true
     }
 
-    private fun sendOrSaveMail(draft: Draft) {
+    private fun sendOrSaveDraft(draft: Draft) {
         val mailbox = MailData.currentMailboxFlow.value ?: return
         val draftWithSignature = if (draft.identityId == null) MailData.setDraftSignature(draft) else draft
         // TODO: better handling of api response
@@ -118,7 +117,7 @@ class NewMessageViewModel : ViewModel() {
             it.from = realmListOf(Recipient().apply { email = messageEmail })
             it.subject = messageSubject
             it.body = messageBody
-            it.priority = MessagePriority.Priority.NORMAL.getPriority()
+            it.priority = MessagePriority.Priority.NORMAL.toString()
             it.action = draftAction
             it.to = newMessageTo.toRealmRecipients()
             it.cc = newMessageCc.toRealmRecipients()

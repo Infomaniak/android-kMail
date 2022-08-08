@@ -92,7 +92,7 @@ class ThreadListViewModel : ViewModel() {
             filter
         )
     }
-    
+
     fun loadThreadsAfterRefresh() {
         MailData.loadThreads(
             folder = MailData.currentFolderFlow.value ?: return,

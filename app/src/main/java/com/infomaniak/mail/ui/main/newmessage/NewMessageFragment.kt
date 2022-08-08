@@ -260,13 +260,9 @@ class NewMessageFragment : Fragment() {
     private fun EditText.setUpAutoSave() {
         addTextChangedListener(object : TextWatcher {
 
-            override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) {
-                // No Op
-            }
+            override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
-            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {
-                // No Op
-            }
+            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
             override fun afterTextChanged(editable: Editable?) {
                 viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
