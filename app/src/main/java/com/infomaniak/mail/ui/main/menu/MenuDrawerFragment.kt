@@ -58,7 +58,7 @@ class MenuDrawerFragment : Fragment() {
     private val inboxFolderId: String? by lazy { MailData.foldersFlow.value?.find { it.role == FolderRole.INBOX }?.id }
     private var canNavigate = true
 
-    private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter() { selectedMailbox ->
+    private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
         viewModel.switchToMailbox(selectedMailbox)
         // TODO: This is not enough. It won't refresh the MenuDrawer data (ex: unread counts)
         closeDrawer()
