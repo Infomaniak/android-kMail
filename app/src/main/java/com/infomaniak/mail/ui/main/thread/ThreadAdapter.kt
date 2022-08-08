@@ -27,6 +27,7 @@ import androidx.core.text.color
 import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager.findFragment
 import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -178,6 +179,7 @@ class ThreadAdapter(
         attachmentsRecyclerView.adapter = AttachmentAdapter(attachments)
         attachmentsDownloadAllButton.setOnClickListener {
             // TODO: AttachmentsList Fragment
+            findFragment<ThreadFragment>(it).notYetImplemented()
         }
     }
 

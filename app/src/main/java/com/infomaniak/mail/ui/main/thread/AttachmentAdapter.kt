@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
@@ -26,6 +27,7 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getFileTypeFromExtension
+import com.infomaniak.mail.utils.notYetImplemented
 
 class AttachmentAdapter(
     private var items: List<Attachment> = emptyList()
@@ -38,8 +40,9 @@ class AttachmentAdapter(
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
         val item = items[position]
 
-        root.setOnClickListener { /*TODO*/ }
+        root.setOnClickListener { findFragment<ThreadFragment>(root).notYetImplemented() }
         fileName.text = item.name
+        // TODO : Find how to add the file type prefix before the size of the file
         fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, item.size.toLong())
         icon.load(item.getFileTypeFromExtension().icon)
     }
