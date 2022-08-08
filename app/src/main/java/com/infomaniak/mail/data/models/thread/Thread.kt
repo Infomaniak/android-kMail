@@ -116,8 +116,8 @@ class Thread : RealmObject {
                 }
             }
             val recipients = if (hasDrafts) to else from
-            recipients.forEach { append("${it.displayedName(context)}, ") }
-        }.removeSuffix(", ")
+            append(recipients.joinToString { it.displayedName(context) })
+        }
     }
 
     enum class ThreadFilter(@IdRes val filterNameRes: Int) {

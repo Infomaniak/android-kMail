@@ -127,8 +127,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    override fun onRefresh() {
-        viewModel.refreshThreads()
+    override fun onRefresh() = with(viewModel) {
+        currentOffset = OFFSET_FIRST_PAGE
+        loadThreadsAfterRefresh()
     }
 
     private fun startPeriodicRefreshJob() {

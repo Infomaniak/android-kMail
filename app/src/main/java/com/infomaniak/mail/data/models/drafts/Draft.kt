@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.drafts
 
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
@@ -62,7 +63,11 @@ class Draft : RealmObject {
     var subject: String = ""
     @SerialName("ack_request")
     var ackRequest: Boolean = false
-    var action: String = ""
+    @SerialName("action")
+    private var _action: String = ""
+    var action
+        get() = enumValueOfOrNull<DraftAction>(_action)
+        set(value) { _action = value?.apiName ?: "" }
     var delay: Int = 0
     var priority: String? = null
     @SerialName("st_uuid")

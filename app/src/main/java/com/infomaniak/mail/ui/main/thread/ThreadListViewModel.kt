@@ -87,9 +87,18 @@ class ThreadListViewModel : ViewModel() {
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges = true
         MailData.refreshThreads(
+            MailData.currentFolderFlow.value ?: return,
+            MailData.currentMailboxFlow.value ?: return,
+            filter
+        )
+    }
+    
+    fun loadThreadsAfterRefresh() {
+        MailData.loadThreads(
             folder = MailData.currentFolderFlow.value ?: return,
             mailbox = MailData.currentMailboxFlow.value ?: return,
-            filter = filter,
+            offset = OFFSET_FIRST_PAGE,
+            forceRefresh = true,
         )
     }
 }

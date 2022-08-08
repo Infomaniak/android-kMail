@@ -95,7 +95,7 @@ class NewMessageViewModel : ViewModel() {
         val mailbox = MailData.currentMailboxFlow.value ?: return
         val draftWithSignature = if (draft.identityId == null) MailData.setDraftSignature(draft) else draft
         // TODO: better handling of api response
-        if (draftWithSignature.action == DraftAction.SEND.apiName) {
+        if (draftWithSignature.action == DraftAction.SEND) {
             MailData.sendDraft(draftWithSignature, mailbox.uuid)
         } else {
             MailData.saveDraft(draftWithSignature, mailbox.uuid).data?.let {
@@ -119,7 +119,7 @@ class NewMessageViewModel : ViewModel() {
             it.subject = messageSubject
             it.body = messageBody
             it.priority = MessagePriority.Priority.NORMAL.getPriority()
-            it.action = draftAction.apiName
+            it.action = draftAction
             it.to = newMessageTo.toRealmRecipients()
             it.cc = newMessageCc.toRealmRecipients()
             it.bcc = newMessageBcc.toRealmRecipients()
@@ -131,6 +131,7 @@ class NewMessageViewModel : ViewModel() {
             // it.inReplyTo = ""
             // it.inReplyToUid = ""
             // it.replyTo = realmListOf()
+            // it.attachments = realmListOf()
         }
     }
 

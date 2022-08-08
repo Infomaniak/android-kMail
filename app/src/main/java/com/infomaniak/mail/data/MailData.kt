@@ -226,7 +226,7 @@ object MailData {
         if (apiResponse.data == true) {
             MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
         } else {
-            updateDraft(draft) { it.action = Draft.DraftAction.SAVE.apiName }
+            updateDraft(draft) { it.action = Draft.DraftAction.SAVE }
             saveDraft(draft, mailboxUuid)
         }
 
