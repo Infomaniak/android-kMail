@@ -18,16 +18,15 @@
 package com.infomaniak.mail.data.models
 
 import android.util.Log
+import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
-import androidx.annotation.DrawableRes
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName

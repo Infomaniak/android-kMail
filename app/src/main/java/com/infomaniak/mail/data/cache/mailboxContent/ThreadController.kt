@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
@@ -58,14 +59,29 @@ object ThreadController {
     /**
      * Edit data
      */
-    fun upsertApiData(mailbox: Mailbox, folder: Folder, offset: Int, canContinueToPaginate: (Boolean) -> Unit): List<Thread> {
+    fun upsertApiData(
+        mailbox: Mailbox,
+        folder: Folder,
+        offset: Int,
+        filter: ThreadFilter = ThreadFilter.ALL,
+        canContinueToPaginate: (Boolean) -> Unit,
+    ): List<Thread> {
 
         // Get current data
         Log.d(RealmController.TAG, "Threads: Get current data")
-        val realmThreads = FolderController.getFolderSync(folder.id)?.threads ?: emptyList()
-        val apiThreadsSinceOffset = ApiRepository.getThreads(mailbox.uuid, folder.id, offset).data?.also { threadsResult ->
-            canContinueToPaginate(threadsResult.messagesCount >= ApiRepository.PER_PAGE)
-        }?.threads?.map { it.initLocalValues() } ?: emptyList()
+        val realmThreads = FolderController.getFolderSync(folder.id)?.threads?.filter {
+            when (filter) {
+                ThreadFilter.SEEN -> it.unseenMessagesCount == 0
+                ThreadFilter.UNSEEN -> it.unseenMessagesCount > 0
+                ThreadFilter.STARRED -> it.isFavorite
+                ThreadFilter.ATTACHMENTS -> it.hasAttachments
+                else -> true
+            }
+        } ?: emptyList()
+        val apiThreadsSinceOffset = ApiRepository.getThreads(mailbox.uuid, folder.id, offset, filter).data
+            ?.also { threadsResult -> canContinueToPaginate(threadsResult.messagesCount >= ApiRepository.PER_PAGE) }
+            ?.threads?.map { it.initLocalValues() }
+            ?: emptyList()
         val apiThreads = if (offset == ApiRepository.OFFSET_FIRST_PAGE) {
             apiThreadsSinceOffset
         } else {

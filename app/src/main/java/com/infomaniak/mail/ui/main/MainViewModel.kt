@@ -186,7 +186,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
+    fun forceRefreshThreads(filter: Thread.ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshThreads")
         val mailbox = currentMailbox.value ?: return@launch
         val folder = currentFolder.value ?: return@launch
