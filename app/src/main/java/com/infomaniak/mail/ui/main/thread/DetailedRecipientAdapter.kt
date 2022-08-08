@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ItemDetailedContactBinding
+import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
     private val recipients: List<Recipient> = listOf(),
@@ -35,13 +36,7 @@ class DetailedRecipientAdapter(
     override fun onBindViewHolder(holder: DetailedRecipientViewHolder, position: Int): Unit = with(holder.binding) {
         val recipient = recipients[position]
 
-        if (recipient.name.isNullOrEmpty()) {
-            name.text = recipient.email
-            emailAddress.text = ""
-        } else {
-            name.text = recipient.name
-            emailAddress.text = recipient.email
-        }
+        fillInUserNameAndEmail(name, recipient.name, emailAddress, recipient.email)
 
         name.setOnClickListener { onContactClicked?.invoke(recipient) }
     }
