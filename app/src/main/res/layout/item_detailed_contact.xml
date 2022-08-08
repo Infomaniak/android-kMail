@@ -30,8 +30,11 @@
         android:layout_height="wrap_content"
         android:insetTop="0dp"
         android:insetBottom="0dp"
+        android:minWidth="0dp"
         android:minHeight="0dp"
-        android:paddingVertical="0dp"
+        android:paddingHorizontal="@dimen/marginStandardVerySmall"
+        android:paddingVertical="1dp"
+        app:cornerRadius="6dp"
         tools:text="@tools:sample/full_names" />
 
     <TextView
@@ -39,6 +42,7 @@
         style="@style/Callout.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
         android:textSize="12sp"
         tools:text="isabella.lesyeuxbleus@ik.me" />
 

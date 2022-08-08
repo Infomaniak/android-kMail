@@ -79,6 +79,8 @@ fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
+fun String.isMe(): Boolean = AccountUtils.currentUser?.email == this
+
 inline val ViewBinding.context: Context get() = root.context
 
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {

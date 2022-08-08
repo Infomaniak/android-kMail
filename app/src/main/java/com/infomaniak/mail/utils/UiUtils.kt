@@ -18,6 +18,8 @@
 package com.infomaniak.mail.utils
 
 import android.graphics.Color
+import android.widget.TextView
+import com.infomaniak.mail.R
 
 object UiUtils {
     fun pointBetweenColors(from: Color, to: Color, percent: Float) =
@@ -32,4 +34,21 @@ object UiUtils {
         from + percent * (to - from)
 
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
+
+    fun fillInUserNameAndEmail(nameTextView: TextView?, name: String?, emailTextView: TextView?, email: String) {
+        when {
+            email.isMe() -> {
+                val context = nameTextView?.context ?: emailTextView?.context!!
+                nameTextView?.text = context.getString(R.string.contactMe)
+                emailTextView?.text = email
+            }
+            name.isNullOrBlank() || name == email -> {
+                nameTextView?.text = email
+            }
+            else -> {
+                nameTextView?.text = name
+                emailTextView?.text = email
+            }
+        }
+    }
 }
