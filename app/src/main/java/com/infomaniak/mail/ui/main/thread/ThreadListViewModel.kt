@@ -75,6 +75,7 @@ class ThreadListViewModel : ViewModel() {
     }
 
     fun loadMailData() {
+        currentOffset = OFFSET_FIRST_PAGE
         MailData.loadInboxContent(filter)
     }
 

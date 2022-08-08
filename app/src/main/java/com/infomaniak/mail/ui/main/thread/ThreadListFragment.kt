@@ -101,7 +101,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         startPeriodicRefreshJob()
 
         setupOnRefresh()
@@ -123,7 +122,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 viewModel.filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
                 swipeRefreshLayout.isRefreshing = true
                 viewModel.refreshThreads()
-                scrollToTop()
             }
         }
     }
@@ -134,7 +132,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         viewModel.refreshThreads()
-        scrollToTop()
     }
 
     private fun startPeriodicRefreshJob() {
@@ -263,8 +260,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupMenuDrawerCallbacks()
 
         with(viewModel) {
-            currentFolder.value?.threads?.toList()?.let(::displayThreads)
-            currentOffset = OFFSET_FIRST_PAGE
             binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
             loadMailData()
         }
@@ -292,16 +287,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun onMailboxChange(mailbox: Mailbox) = with(viewModel) {
-        if (lastMailboxId != mailbox.objectId) resetList()
-        lastMailboxId = mailbox.objectId
+        if (lastMailboxId != mailbox.objectId) {
+            resetList()
+            lastMailboxId = mailbox.objectId
+        }
     }
 
     private fun updateFolderInfo(folder: Folder) = with(viewModel) {
         if (lastFolderRole != folder.role) {
             lastUnreadCount = folder.unreadCount
             resetList()
+            lastFolderRole = folder.role
         }
-        lastFolderRole = folder.role
 
         val folderName = folder.getLocalizedName(binding.context)
         Log.i("UI", "Received folder name (${folderName})")
@@ -325,6 +322,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         with(threadListAdapter) {
             notifyAdapter(formatList(threads, context))
         }
+
+        if (viewModel.currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
+
         startPeriodicRefreshJob()
     }
 
@@ -343,6 +343,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun resetList() {
+        viewModel.currentOffset = OFFSET_FIRST_PAGE
         clearFilter()
         scrollToTop()
     }
