@@ -131,6 +131,7 @@
                 style="@style/TextButton"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                app:cornerRadius="6dp"
                 app:layout_constraintBottom_toBottomOf="@id/recipientLayout"
                 app:layout_constraintEnd_toEndOf="@id/recipientLayout"
                 app:layout_constraintStart_toStartOf="@id/recipientLayout"
@@ -201,10 +202,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefixBarrier"
         app:layout_constraintTop_toTopOf="@id/fromPrefix"
+        tools:ignore="RtlSymmetry"
         tools:itemCount="2"
         tools:listitem="@layout/item_detailed_contact" />
 
@@ -224,10 +227,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefixBarrier"
         app:layout_constraintTop_toTopOf="@id/toPrefix"
+        tools:ignore="RtlSymmetry"
         tools:itemCount="3"
         tools:listitem="@layout/item_detailed_contact" />
 
@@ -247,10 +252,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/prefixBarrier"
         app:layout_constraintTop_toTopOf="@id/ccPrefix"
+        tools:ignore="RtlSymmetry"
         tools:itemCount="2"
         tools:listitem="@layout/item_detailed_contact" />
 

@@ -44,6 +44,7 @@ import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
+
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
@@ -286,6 +287,7 @@ class ThreadAdapter(
         override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
             val oldItem = oldList[oldIndex]
             val newItem = newList[newIndex]
+
             return oldItem.uid == newItem.uid
                     && oldItem.from == newItem.from
                     && oldItem.date == newItem.date

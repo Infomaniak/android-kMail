@@ -23,6 +23,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder

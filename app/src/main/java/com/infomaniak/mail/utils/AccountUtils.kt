@@ -86,6 +86,7 @@ object AccountUtils : CredentialManager {
         if (currentUser == null) {
             currentUser = userDatabase.userDao().getFirst()
         }
+
         return currentUser
     }
 

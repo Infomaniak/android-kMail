@@ -86,6 +86,7 @@ class ContactAdapter(
                         it.name?.standardize()?.contains(searchTerm) == true || it.email.standardize().contains(searchTerm)
                     }
                     .filterNot { displayedItem -> getAlreadyUsedEmails(currentField).any { it == displayedItem.email } }
+
                 return FilterResults().apply {
                     values = finalUserList
                     count = finalUserList.size

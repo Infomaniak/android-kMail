@@ -239,6 +239,7 @@ class NewMessageFragment : Fragment() {
                 createChip(fieldType, contact)
             }
         }
+
         return isEmail
     }
 

@@ -226,7 +226,6 @@
         <item name="drawableStartCompat">@drawable/ic_folder</item>
     </style>
 
-
     <!-- Chips -->
 
     <style name="EmailAddressChip" parent="Widget.Material3.Chip.Input">

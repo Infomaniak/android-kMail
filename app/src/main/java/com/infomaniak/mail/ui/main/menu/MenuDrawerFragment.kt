@@ -245,6 +245,41 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
+    // TODO: duplicate?
+    private fun listenToMailboxes() = with(binding) {
+        viewModel.mailboxes.observeNotNull(this@MenuDrawerFragment) { mailboxes ->
+            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
+            addressAdapter.setMailboxes(sortedMailboxes)
+            if (sortedMailboxes.isEmpty()) {
+                addressesList.isGone = true
+                addressesListDivider.isGone = true
+            }
+        }
+        viewModel.listenToMailboxes()
+    }
+
+    // TODO: duplicate?
+    private fun listenToFolders() {
+        viewModel.folders.observeNotNull(this, ::onFoldersChange)
+        viewModel.listenToFolders()
+    }
+
+    // TODO: duplicate?
+    private fun listenToCurrentFolder() = with(binding) {
+        viewModel.currentFolder.observeNotNull(this@MenuDrawerFragment, ::onCurrentFolderChange)
+        viewModel.listenToCurrentFolder()
+    }
+
+    // TODO: duplicate?
+    private fun onCurrentFolderChange(currentFolder: Folder) = updateSelectedItemUi(currentFolder)
+
+    // TODO: duplicate?
+    private fun updateSelectedItemUi(currentFolder: Folder) = with(binding) {
+        inboxFolder.setSelectedState(currentFolder.id == inboxFolderId)
+        defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
+        customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
+    }
+
     private fun setCustomFolderCollapsedState() = with(binding) {
         val currentFolder = MainViewModel.currentFolder.value
         val isExpanded = currentFolder != null && (currentFolder.role == null || customFoldersAdapter.itemCount == 0)
@@ -273,6 +308,19 @@ class MenuDrawerFragment : Fragment() {
     private fun openFolder(folderId: String) {
         mainViewModel.openFolder(folderId)
         closeDrawer()
+    }
+
+    // TODO: duplicate?
+    private fun onFoldersChange(folders: List<Folder>) {
+
+        val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
+
+        binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
+
+        defaultFoldersAdapter.setFolders(defaultFolders)
+        customFoldersAdapter.setFolders(customFolders)
+
+        setCustomFolderCollapsedState()
     }
 
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
