@@ -26,6 +26,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -34,6 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.imageLoader
+import com.google.android.material.navigation.NavigationView
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -48,6 +51,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.observeNotNull
@@ -73,7 +77,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var menuDrawerFragment: MenuDrawerFragment? = null
     private var menuDrawerNavigation: NavigationView? = null
     private var drawerLayout: DrawerLayout? = null
-    private val drawerListener = object : DrawerLayout.DrawerListener {
+    private val drawerListener = object : DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             // No-op
         }
@@ -237,23 +241,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onResume() {
         super.onResume()
 
-        setupMenuDrawerCallbacks()
-
         with(viewModel) {
             binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
             loadMailData()
         }
-    }
-
-    private fun setupMenuDrawerCallbacks() {
-        val fragmentContainer = (activity as? MainActivity)?.binding?.menuDrawerFragment ?: return
-        (fragmentContainer.getFragment() as? MenuDrawerFragment)
-            ?.apply {
-                closeDrawer = { closeDrawer() }
-                isDrawerOpen = { drawerLayout?.isOpen ?: false }
-            }?.also {
-                menuDrawerFragment = it
-            }
     }
 
     private fun listenToCurrentMailbox() {
