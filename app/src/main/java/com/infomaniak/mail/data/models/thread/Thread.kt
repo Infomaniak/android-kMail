@@ -19,12 +19,11 @@
 
 package com.infomaniak.mail.data.models.thread
 
+import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
 import com.infomaniak.lib.core.utils.FORMAT_DATE_HOUR_MINUTE
 import com.infomaniak.lib.core.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
 import com.infomaniak.lib.core.utils.format
-import androidx.annotation.IdRes
-import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
