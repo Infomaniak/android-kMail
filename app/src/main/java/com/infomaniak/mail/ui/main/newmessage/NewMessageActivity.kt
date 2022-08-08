@@ -21,7 +21,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
@@ -29,8 +28,6 @@ import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class NewMessageActivity : ThemedActivity() {
 
@@ -54,8 +51,10 @@ class NewMessageActivity : ThemedActivity() {
             toolbar.setNavigationOnClickListener { closeDraft() }
 
             toolbar.setOnMenuItemClickListener {
-                if (sendMail(DraftAction.SEND)) finish()
-                true
+                with(newMessageFragment) {
+                    if (viewModel.sendMail(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) finish()
+                    true
+                }
             }
 
             linkEditor(editorAttachment, ATTACHMENT)
@@ -99,27 +98,9 @@ class NewMessageActivity : ThemedActivity() {
         view.setOnClickListener { viewModel.editorAction.value = action }
     }
 
-    fun closeDraft() {
-        sendMail(DraftAction.SAVE)
+    fun closeDraft() = with(newMessageFragment) {
+        viewModel.sendMail(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
         finish()
-    }
-
-    fun sendMail(action: DraftAction) = with(viewModel) {
-        if (action == DraftAction.SAVE && hasStartedEditing.value == false ||
-            action == DraftAction.SEND && newMessageTo.isEmpty()
-        ) return false
-
-        currentDraft.value?.let { draft ->
-            draft.fill(
-                draftAction = action,
-                messageEmail = newMessageFragment.getFromMailbox().email,
-                messageSubject = newMessageFragment.getSubject(),
-                messageBody = newMessageFragment.getBody(),
-            )
-            lifecycleScope.launch(Dispatchers.IO) { sendMail(draft) }
-        }
-
-        true
     }
 
     fun toggleEditor(isVisible: Boolean) {

@@ -35,6 +35,7 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
@@ -66,7 +67,31 @@ class NewMessageViewModel : ViewModel() {
         return contacts
     }
 
-    fun sendMail(draft: Draft) {
+    fun startAutoSave(email: String, subject: String, body: String) {
+        hasStartedEditing.value = true
+        clearJobs()
+        autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(3_000L)
+            sendMail(DraftAction.SAVE, email, subject, body)
+        }
+    }
+
+    fun sendMail(action: DraftAction, email: String, subject: String, body: String): Boolean {
+        if (action == DraftAction.SAVE && hasStartedEditing.value == false ||
+            action == DraftAction.SEND && newMessageTo.isEmpty()
+        ) {
+            return false
+        }
+
+        currentDraft.value?.let { draft ->
+            draft.fill(draftAction = action, messageEmail = email, messageSubject = subject, messageBody = body)
+            viewModelScope.launch(Dispatchers.IO) { sendOrSaveMail(draft) }
+        }
+
+        return true
+    }
+
+    private fun sendOrSaveMail(draft: Draft) {
         val mailbox = MailData.currentMailboxFlow.value ?: return
         val draftWithSignature = if (draft.identityId == null) MailData.setDraftSignature(draft) else draft
         // TODO: better handling of api response
@@ -87,7 +112,7 @@ class NewMessageViewModel : ViewModel() {
         autoSaveJob?.cancel()
     }
 
-    fun Draft.fill(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
+    private fun Draft.fill(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
         // TODO: Should userInformation (here 'from') be stored in mainViewModel? See ApiRepository.getUser()
         MailboxContentController.updateDraft(this) {
             it.from = realmListOf(Recipient().apply { email = messageEmail })

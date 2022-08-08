@@ -35,14 +35,12 @@ import androidx.core.view.*
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.viewModelScope
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
@@ -51,9 +49,6 @@ import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.setMargins
 import com.infomaniak.mail.utils.toggleChevron
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -118,7 +113,7 @@ class NewMessageFragment : Fragment() {
                 null -> Unit
             }
 
-            startAutoSave()
+            viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
         }
 
         val allContacts = viewModel.getAllContacts()
@@ -135,7 +130,8 @@ class NewMessageFragment : Fragment() {
                 getInputView(field).setText("")
                 getContacts(field).add(contact)
                 createChip(field, contact)
-                startAutoSave()
+
+                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             },
             addUnrecognizedContact = { field ->
                 val isEmail = addUnrecognizedMail(field)
@@ -241,7 +237,8 @@ class NewMessageFragment : Fragment() {
             setOnItemClickListener { _, _, position, _ ->
                 fromMailAddress.text = mails[position]
                 selectedMailboxIndex = position
-                startAutoSave()
+
+                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
                 dismiss()
             }
         }.show()
@@ -272,18 +269,9 @@ class NewMessageFragment : Fragment() {
             }
 
             override fun afterTextChanged(editable: Editable?) {
-                startAutoSave()
+                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             }
         })
-    }
-
-    fun startAutoSave() = with(viewModel) {
-        hasStartedEditing.value = true
-        clearJobs()
-        autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
-            delay(3_000L)
-            (activity as NewMessageActivity).sendMail(DraftAction.SAVE)
-        }
     }
 
     private fun addUnrecognizedMail(fieldType: FieldType): Boolean {
@@ -296,7 +284,8 @@ class NewMessageFragment : Fragment() {
                 val contact = UiContact(input)
                 getContacts(fieldType).add(contact)
                 createChip(fieldType, contact)
-                startAutoSave()
+
+                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             }
         }
         return isEmail
@@ -335,7 +324,8 @@ class NewMessageFragment : Fragment() {
     private fun removeEmail(field: FieldType, contact: UiContact) {
         val index = getContacts(field).indexOfFirst { it.email == contact.email }
         removeEmail(field, index)
-        startAutoSave()
+
+        viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
     }
 
     private fun removeEmail(field: FieldType, index: Int) {
@@ -389,7 +379,7 @@ class NewMessageFragment : Fragment() {
                 && viewModel.newMessageTo.count() > 1
                 && !viewModel.areAdvancedFieldsOpened)
 
-        plusOthersChip.root.text = "+${viewModel.newMessageTo.count() - 1}"
+        plusOthersChip.root.text = "+${viewModel.newMessageTo.count() - STICKY_RECIPIENT_COUNT}"
 
         advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
     }
@@ -467,5 +457,9 @@ class NewMessageFragment : Fragment() {
         TO(R.string.toTitle),
         CC(R.string.ccTitle),
         BCC(R.string.bccTitle),
+    }
+
+    companion object {
+        private const val STICKY_RECIPIENT_COUNT = 1
     }
 }
