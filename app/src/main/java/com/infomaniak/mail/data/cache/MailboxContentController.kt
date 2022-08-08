@@ -59,9 +59,8 @@ object MailboxContentController {
 
     fun upsertFolder(folder: Folder): Folder = MailRealm.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
 
-    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit): Folder? {
-        MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
-        return getFolder(id)
+    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Folder): Folder? {
+        return MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(onUpdate) }
     }
 
     // fun deleteFolder(id: String) {
@@ -85,7 +84,7 @@ object MailboxContentController {
         return when (filter) {
             ThreadFilter.SEEN -> threads.filter { it.unseenMessagesCount == 0 }
             ThreadFilter.UNSEEN -> threads.filter { it.unseenMessagesCount > 0 }
-            ThreadFilter.STARRED -> threads.filter { it.flagged }
+            ThreadFilter.STARRED -> threads.filter { it.isFavorite }
             ThreadFilter.ATTACHMENTS -> threads.filter { it.hasAttachments }
             else -> threads
         }

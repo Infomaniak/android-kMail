@@ -206,9 +206,11 @@ object MailData {
 
     fun updateCurrentFolderCounts(folder: Folder, threadResult: ThreadsResult) {
         mutableCurrentFolderFlow.value = MailboxContentController.updateFolder(folder.id) {
-            it.unreadCount = threadResult.folderUnseenMessage
-            it.totalCount = threadResult.totalMessagesCount
-            it.lastUpdatedAt = Date().toRealmInstant()
+            it.apply {
+                unreadCount = threadResult.folderUnseenMessage
+                totalCount = threadResult.totalMessagesCount
+                lastUpdatedAt = Date().toRealmInstant()
+            }
         }
     }
 

@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
-import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 
 object ApiRoutes {
 
@@ -48,13 +48,13 @@ object ApiRoutes {
 
     // fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
 
-    fun threads(uuid: String, folderId: String, offset: Int, filter: Thread.ThreadFilter, searchText: String? = null): String {
+    fun threads(uuid: String, folderId: String, offset: Int, filter: ThreadFilter, searchText: String? = null): String {
         val urlSearch = searchText?.let { "&scontains=$it" } ?: ""
-        val urlAttachment = if (filter == Thread.ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
+        val urlAttachment = if (filter == ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
         val urlFilter = when (filter) {
-            Thread.ThreadFilter.SEEN,
-            Thread.ThreadFilter.STARRED,
-            Thread.ThreadFilter.UNSEEN -> "&filters=${filter.name.lowercase()}"
+            ThreadFilter.SEEN,
+            ThreadFilter.STARRED,
+            ThreadFilter.UNSEEN -> "&filters=${filter.name.lowercase()}"
             else -> ""
         }
 

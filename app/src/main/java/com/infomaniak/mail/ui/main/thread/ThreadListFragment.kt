@@ -144,15 +144,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun updateUpdatedAt() = with(binding) {
-        val lastUpdatedAt = viewModel.currentFolder.value?.lastUpdatedAt?.toDate()
+    private fun updateUpdatedAt() {
+        val folder = viewModel.currentFolder.value ?: return
+        val lastUpdatedAt = folder.lastUpdatedAt?.toDate()
         val ago = when {
             lastUpdatedAt == null -> ""
             Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
             else -> DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
         }
 
-        updatedAt.text = if (ago.isEmpty()) {
+        binding.updatedAt.text = if (ago.isEmpty()) {
             getString(R.string.noNetworkDescription)
         } else {
             getString(R.string.threadListHeaderLastUpdate, ago)

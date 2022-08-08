@@ -108,6 +108,6 @@ class Thread : RealmObject {
         UNSEEN(R.string.searchFilterUnread),
         STARRED(R.string.favoritesFolder),
         ATTACHMENTS(R.string.searchFilterAttachment),
-        FOLDER(R.string.searchFilterFolder)
+        FOLDER(R.string.searchFilterFolder),
     }
 }
