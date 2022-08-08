@@ -44,6 +44,7 @@ class NewMessageViewModel : ViewModel() {
         MailData.contactsFlow.value?.forEach { contact ->
             contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
         }
+
         return contacts
     }
 

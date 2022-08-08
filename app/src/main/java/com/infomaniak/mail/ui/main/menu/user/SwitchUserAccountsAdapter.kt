@@ -128,6 +128,7 @@ class SwitchUserAccountsAdapter(
         override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
             val oldItem = oldList[oldIndex]
             val newItem = newList[newIndex]
+
             return if (oldItem.mailboxes.size == newItem.mailboxes.size) {
                 var areContentsTheSame = true
                 oldItem.mailboxes.forEachIndexed { index, oldMailbox ->

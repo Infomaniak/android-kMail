@@ -51,6 +51,7 @@ object MailboxInfoController {
             separator = "' OR ${Mailbox::objectId.name} == '",
             postfix = "')"
         )
+
         return MailRealm.mailboxInfo.query<Mailbox>(query).find()
     }
 
