@@ -85,8 +85,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        startPeriodicRefreshJob()
-
         setupOnRefresh()
         setupAdapter()
         setupListeners()
@@ -95,17 +93,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         listenToCurrentMailbox()
         listenToCurrentFolder()
-    }
-
-    private fun startPeriodicRefreshJob() {
-        updatedAtRefreshJob?.cancel()
-        updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
-            while (true) {
-                val lastUpdatedAt = MainViewModel.currentFolderId.value?.let(FolderController::getFolderSync)?.lastUpdatedAt
-                withContext(Dispatchers.Main) { lastUpdatedAt?.let(::updateUpdatedAt) }
-                delay(DateUtils.MINUTE_IN_MILLIS)
-            }
-        }
     }
 
     private fun setupOnRefresh() {
@@ -207,6 +194,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun listenToCurrentFolder() {
         MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
+
+            startPeriodicRefreshJob(folderId)
+
             folderJob?.cancel()
             folderJob = lifecycleScope.launch(Dispatchers.IO) {
 
@@ -228,6 +218,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         MainViewModel.currentFolderId.removeObservers(this)
         MainViewModel.currentMailboxObjectId.removeObservers(this)
         super.onDestroyView()
+    }
+
+    private fun startPeriodicRefreshJob(folderId: String) {
+        updatedAtRefreshJob?.cancel()
+        updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
+            while (true) {
+                val lastUpdatedAt = FolderController.getFolderSync(folderId)?.lastUpdatedAt
+                withContext(Dispatchers.Main) { updateUpdatedAt(lastUpdatedAt) }
+                delay(DateUtils.MINUTE_IN_MILLIS + 1_000L)
+            }
+        }
     }
 
     private fun displayFolderName(folder: Folder) {
@@ -277,7 +278,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsJob?.cancel()
         threadsJob = lifecycleScope.launch(Dispatchers.IO) {
             folder.threads.asFlow().toSharedFlow().collect {
-                Log.e("TOTO", "listenToThreads: ${folder.name}")
                 withContext(Dispatchers.Main) { displayThreads(it.list) }
             }
         }
