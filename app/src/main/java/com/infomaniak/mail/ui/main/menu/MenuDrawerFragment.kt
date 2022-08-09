@@ -44,7 +44,7 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapter
-import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
+import com.infomaniak.mail.ui.main.thread.ThreadsFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
@@ -103,7 +103,7 @@ class MenuDrawerFragment : Fragment() {
         settingsButton.setOnClickListener {
             closeDrawer()
             safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment(),
+                directions = ThreadsFragmentDirections.actionThreadsFragmentToSettingsFragment(),
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
@@ -116,7 +116,7 @@ class MenuDrawerFragment : Fragment() {
         manageAccount.setOnClickListener {
             closeDrawer()
             safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToManageMailAddressFragment(),
+                directions = ThreadsFragmentDirections.actionThreadsFragmentToManageMailAddressFragment(),
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }

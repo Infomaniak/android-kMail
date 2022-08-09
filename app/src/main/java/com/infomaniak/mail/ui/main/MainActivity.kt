@@ -107,7 +107,7 @@ class MainActivity : ThemedActivity() {
             level = SentryLevel.INFO
         })
 
-        setDrawerLockMode(destination.id == R.id.threadListFragment)
+        setDrawerLockMode(destination.id == R.id.threadsFragment)
 
         window.statusBarColor = getColor(
             when (destination.id) {

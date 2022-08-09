@@ -42,7 +42,7 @@ import io.realm.kotlin.ext.isValid
 import java.util.*
 
 // TODO: Use LoaderAdapter from Core instead?
-class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf()) : RecyclerView.Adapter<ViewHolder>() {
+class ThreadsAdapter(private var itemsList: MutableList<Any> = mutableListOf()) : RecyclerView.Adapter<ViewHolder>() {
 
     @StringRes
     var previousSectionName: Int = -1
@@ -167,7 +167,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
     private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
 
     fun notifyAdapter(newList: MutableList<Any>) {
-        DiffUtil.calculateDiff(ThreadListDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
+        DiffUtil.calculateDiff(ThreadsDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
         itemsList = newList
     }
 
@@ -184,10 +184,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
         TWO_WEEKS({ Date().startOfTheWeek().time - DAY_LENGTH_MS * 14 }, R.string.threadListSectionTwoWeeks),
     }
 
-    private class ThreadListDiffCallback(
-        private val oldList: List<Any>,
-        private val newList: List<Any>,
-    ) : DiffUtil.Callback() {
+    private class ThreadsDiffCallback(private val oldList: List<Any>, private val newList: List<Any>) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int = oldList.size
 

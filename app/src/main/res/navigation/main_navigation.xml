@@ -19,7 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
-    app:startDestination="@id/threadListFragment">
+    app:startDestination="@id/threadsFragment">
 
     <dialog
         android:id="@+id/getMoreStorageBottomSheetDialog"
@@ -28,33 +28,33 @@
         tools:layout="@layout/fragment_bottom_sheet_get_more_storage" />
 
     <fragment
-        android:id="@+id/threadListFragment"
-        android:name="com.infomaniak.mail.ui.main.thread.ThreadListFragment"
-        android:label="ThreadListFragment"
-        tools:layout="@layout/fragment_thread_list">
+        android:id="@+id/threadsFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadsFragment"
+        android:label="ThreadsFragment"
+        tools:layout="@layout/fragment_threads">
         <action
-            android:id="@+id/action_threadListFragment_to_newFolderDialog"
+            android:id="@+id/action_threadsFragment_to_newFolderDialog"
             app:destination="@id/newFolderDialog" />
         <action
             android:id="@+id/action_homeFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
-            android:id="@+id/action_threadListFragment_to_searchFragment"
+            android:id="@+id/action_threadsFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_threadFragment"
+            android:id="@+id/action_threadsFragment_to_threadFragment"
             app:destination="@id/threadFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_switchUserFragment"
+            android:id="@+id/action_threadsFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_manageMailAddressFragment"
+            android:id="@+id/action_threadsFragment_to_manageMailAddressFragment"
             app:destination="@id/manageMailAddressFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_helpFragment"
+            android:id="@+id/action_threadsFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_settingsFragment"
+            android:id="@+id/action_threadsFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
     </fragment>
 
