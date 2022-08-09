@@ -84,8 +84,10 @@ class MenuDrawerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+
         setupAdapters()
         setupListener()
+
         listenToMailboxes()
         listenToCurrentMailbox()
         listenToCurrentFolder()

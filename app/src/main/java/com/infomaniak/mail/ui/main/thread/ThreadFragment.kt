@@ -102,7 +102,7 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
             }
             onDraftClicked = { message ->
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val parentUid = message.uid
                     // TODO: There shouldn't be any Api call in fragments. Move this in the ViewModel.
                     val draft = ApiRepository.getDraft(message.draftResource).data?.apply {

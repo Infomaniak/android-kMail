@@ -89,7 +89,7 @@ class MainActivity : ThemedActivity() {
             })
             mainViewModel.isInternetAvailable.value = isAvailable
             if (isAvailable) {
-                // lifecycleScope.launch { AccountUtils.updateCurrentUserAndDrives(this@MainActivity) } // TODO?
+                // lifecycleScope.launch(Dispatchers.IO) { AccountUtils.updateCurrentUserAndDrives(this@MainActivity) } // TODO?
             }
         }
     }
@@ -153,4 +153,3 @@ class MainActivity : ThemedActivity() {
         super.onDestroy()
     }
 }
-

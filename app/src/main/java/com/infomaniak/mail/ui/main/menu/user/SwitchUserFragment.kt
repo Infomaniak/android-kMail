@@ -37,6 +37,7 @@ import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.sortMailboxes
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SwitchUserFragment : Fragment() {
@@ -51,7 +52,7 @@ class SwitchUserFragment : Fragment() {
             mainViewModel.openMailbox(selectedMailbox)
             findNavController().popBackStack()
         } else {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 

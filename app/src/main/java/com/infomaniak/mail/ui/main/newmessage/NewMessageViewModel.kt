@@ -48,7 +48,7 @@ class NewMessageViewModel : ViewModel() {
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
 
-    fun listenToAllContacts() = viewModelScope.launch {
+    fun listenToAllContacts() = viewModelScope.launch(Dispatchers.IO) {
         ContactController.getContactsAsync().collect {
             val contacts = mutableListOf<UiContact>()
             it.list.forEach { contact ->
@@ -58,7 +58,7 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun listenToMailboxes() = viewModelScope.launch {
+    fun listenToMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
             mailboxes.value = it.list
         }
