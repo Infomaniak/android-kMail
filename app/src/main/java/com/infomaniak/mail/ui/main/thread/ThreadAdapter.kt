@@ -283,7 +283,7 @@ class ThreadAdapter(
     fun lastIndex() = messageList.lastIndex
 
     private fun Recipient.displayedName(context: Context): String {
-        return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
+        return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
     }
 
     private fun Recipient.getNameOrEmail() = name.ifBlank { email }
