@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.menu.user
 
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -30,7 +29,10 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
+import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.getAttributeColor
+import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 class SwitchUserMailboxesAdapter(
@@ -51,11 +53,9 @@ class SwitchUserMailboxesAdapter(
         envelopeIcon.isVisible = displayIcon
 
         val unread = mailbox.unseenMessages
-        var unreadText = unread.toString()
-        if (unread >= 100) unreadText = "99+"
         unreadCount.apply {
             isGone = unread == 0
-            text = unreadText
+            text = formatUnreadCount(unread)
         }
 
         setSelectedState(mailbox.objectId == MailData.currentMailboxFlow.value?.objectId)
@@ -63,23 +63,26 @@ class SwitchUserMailboxesAdapter(
     }
 
     private fun ItemSwitchUserMailboxBinding.setSelectedState(isSelected: Boolean) {
-        val (color, textStyle, badgeStyle) = computeStyle(isSelected)
+        val (color, textStyle, badgeStyle) = if (isSelected) {
+            Triple(
+                context.getAttributeColor(RMaterial.attr.colorPrimary),
+                R.style.Callout_Highlighted_Strong,
+                R.style.Callout_Highlighted_Strong
+            )
+        } else {
+            Triple(
+                ContextCompat.getColor(context, RCore.color.title),
+                R.style.Callout,
+                R.style.Callout_Highlighted
+            )
+        }
+
         if (displayIcon) envelopeIcon.setColorFilter(color)
         emailAddress.apply {
             setTextColor(color)
             setTextAppearance(textStyle)
         }
         unreadCount.setTextAppearance(badgeStyle)
-    }
-
-    private fun ItemSwitchUserMailboxBinding.computeStyle(isSelected: Boolean): Triple<Int, Int, Int> {
-        return if (isSelected) {
-            val typedValue = TypedValue()
-            context.theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)
-            Triple(typedValue.data, R.style.Callout_Highlighted_Strong, R.style.Callout_Highlighted_Strong)
-        } else {
-            Triple(ContextCompat.getColor(context, RCore.color.title), R.style.Callout, R.style.Callout_Highlighted)
-        }
     }
 
     override fun getItemCount(): Int = mailboxes.count()
@@ -92,10 +95,6 @@ class SwitchUserMailboxesAdapter(
     fun notifyAdapter(newList: List<Mailbox>) {
         DiffUtil.calculateDiff(MailboxesListDiffCallback(mailboxes, newList)).dispatchUpdatesTo(this)
         mailboxes = newList
-    }
-
-    companion object {
-        fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
     }
 
     private class MailboxesListDiffCallback(

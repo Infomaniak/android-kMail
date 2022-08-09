@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +31,7 @@ class MenuDrawerViewModel : ViewModel() {
     val currentMailbox = MutableLiveData<Mailbox?>()
     val mailboxes = MutableLiveData<List<Mailbox>?>()
     val folders = MutableLiveData<List<Folder>?>()
+    val currentFolder = MutableLiveData<Folder?>()
 
     fun listenToCurrentMailbox() {
         viewModelScope.launch {
@@ -57,11 +57,19 @@ class MenuDrawerViewModel : ViewModel() {
         }
     }
 
-    fun openFolder(folderName: String, context: Context) {
-        val folder = (MailData.foldersFlow.value?.find { it.getLocalizedName(context) == folderName } ?: return).also {
-            if (it.id == MailData.currentFolderFlow.value?.id) return
+    fun listenToCurrentFolder() {
+        viewModelScope.launch {
+            MailData.currentFolderFlow.collect {
+                currentFolder.value = it
+            }
         }
+    }
+
+    fun openFolder(folderId: String) {
         val mailbox = MailData.currentMailboxFlow.value ?: return
+        if (folderId == MailData.currentFolderFlow.value?.id) return
+
+        val folder = (MailData.foldersFlow.value?.find { it.id == folderId } ?: return)
 
         MailData.selectFolder(folder)
         MailData.loadThreads(folder, mailbox, OFFSET_FIRST_PAGE)

@@ -17,9 +17,14 @@
  */
 package com.infomaniak.mail.ui.main
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
+import androidx.core.graphics.toColor
+import androidx.core.graphics.toColorInt
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.navigation.NavDestination
@@ -28,6 +33,8 @@ import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.databinding.ActivityMainBinding
+import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.utils.UiUtils
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -38,13 +45,39 @@ class MainActivity : ThemedActivity() {
 
     val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
+    lateinit var backgroundColor: Color
+    lateinit var backgroundHeaderColor: Color
+
+    private val drawerListener = object : DrawerLayout.DrawerListener {
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset).toColorInt()
+        }
+
+        override fun onDrawerOpened(drawerView: View) {
+            window.statusBarColor = getColor(R.color.backgroundColor)
+            (binding.menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
+        }
+
+        override fun onDrawerClosed(drawerView: View) {
+            (binding.menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDropdowns()
+        }
+
+        override fun onDrawerStateChanged(newState: Int) = Unit
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        backgroundColor = getColor(R.color.backgroundColor).toColor()
+        backgroundHeaderColor = getColor(R.color.backgroundHeaderColor).toColor()
+
         // TODO: This is removed for now because it makes the NewMessageActivity crash when there is too much recipients.
         // listenToNetworkStatus()
+        binding.drawerLayout.addDrawerListener(drawerListener)
+
         setupNavController()
+        setupMenuDrawerCallbacks()
 
         MailData.loadAddressBooksAndContacts()
     }
@@ -92,7 +125,28 @@ class MainActivity : ThemedActivity() {
         // }
     }
 
+    override fun onBackPressed(): Unit = with(binding) {
+        if (drawerLayout.isOpen) {
+            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun setupMenuDrawerCallbacks() = with(binding) {
+        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.apply {
+            exitDrawer = { drawerLayout.close() }
+            isDrawerOpen = { drawerLayout.isOpen }
+        }
+    }
+
     private fun setDrawerLockMode(isUnlocked: Boolean) {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
     }
+
+    override fun onDestroy() {
+        binding.drawerLayout.removeDrawerListener(drawerListener)
+        super.onDestroy()
+    }
 }
+

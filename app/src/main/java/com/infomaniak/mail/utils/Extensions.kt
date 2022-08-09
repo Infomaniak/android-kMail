@@ -19,8 +19,10 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.util.Patterns
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -31,6 +33,7 @@ import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.types.RealmInstant
 import java.util.*
 
@@ -73,6 +76,14 @@ fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> U
     observe(owner) { it?.let(observer) }
 }
 
+fun Context.getAttributeColor(@IdRes attribute: Int): Int {
+    val typedValue = TypedValue()
+    theme.resolveAttribute(attribute, typedValue, true)
+    return typedValue.data
+}
+
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
 }
+
+fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
