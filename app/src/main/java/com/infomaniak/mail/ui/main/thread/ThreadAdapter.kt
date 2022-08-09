@@ -92,7 +92,7 @@ class ThreadAdapter(
             userAvatarImage.loadAvatar(
                 firstSender.email.hashCode(),
                 null,
-                firstSender.getNameOrEmail().firstOrEmpty().uppercase()
+                firstSender.getNameOrEmail().firstOrEmpty().uppercase(),
             )
             expeditorName.apply {
                 text = firstSender.displayedName(context)
@@ -114,12 +114,12 @@ class ThreadAdapter(
             isYesterday() -> getString(
                 R.string.messageDetailsDateAt,
                 getString(R.string.messageDetailsYesterday),
-                format(FORMAT_EMAIL_DATE_HOUR)
+                format(FORMAT_EMAIL_DATE_HOUR),
             )
             isThisYear() -> getString(
                 R.string.messageDetailsDateAt,
                 format(FORMAT_EMAIL_DATE_SHORT_DATE),
-                format(FORMAT_EMAIL_DATE_HOUR)
+                format(FORMAT_EMAIL_DATE_HOUR),
             )
             else -> this@mailFormattedDate.mostDetailedDate(this@with)
         }
@@ -264,7 +264,6 @@ class ThreadAdapter(
             }
         }
     }
-
 
     fun removeMessage(message: Message) {
         val position = messageList.indexOf(message)

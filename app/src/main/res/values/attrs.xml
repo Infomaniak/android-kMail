@@ -25,9 +25,6 @@
     </declare-styleable>
 
     <declare-styleable name="BottomQuickActionBarView">
-        <attr name="iconColor" format="color" />
-        <attr name="textColor" format="color" />
-
         <attr name="src1" format="reference" />
         <attr name="src2" format="reference" />
         <attr name="src3" format="reference" />

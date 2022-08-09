@@ -72,8 +72,8 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
-        quickActionBar.setOnItemClickListener {
-            val action = values()[it]
+        quickActionBar.setOnItemClickListener { index ->
+            val action = QuickActionButton.values()[index]
             when (action) {
                 ANSWER -> notYetImplemented()
                 TRANSFER -> notYetImplemented()

@@ -31,7 +31,7 @@ import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
 class BottomQuickActionBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     var binding: ViewBottomQuickActionBarBinding

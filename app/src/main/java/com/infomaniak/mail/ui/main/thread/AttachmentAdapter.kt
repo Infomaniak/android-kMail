@@ -30,7 +30,7 @@ import com.infomaniak.mail.utils.getFileTypeFromExtension
 import com.infomaniak.mail.utils.notYetImplemented
 
 class AttachmentAdapter(
-    private var items: List<Attachment> = emptyList()
+    private var items: List<Attachment> = emptyList(),
 ) : RecyclerView.Adapter<AttachmentAdapter.AttachmentViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
@@ -42,7 +42,7 @@ class AttachmentAdapter(
 
         root.setOnClickListener { findFragment<ThreadFragment>(root).notYetImplemented() }
         fileName.text = item.name
-        // TODO : Find how to add the file type prefix before the size of the file
+        // TODO: Find how to add the FileType prefix before the file' size.
         fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, item.size.toLong())
         icon.load(item.getFileTypeFromExtension().icon)
     }
