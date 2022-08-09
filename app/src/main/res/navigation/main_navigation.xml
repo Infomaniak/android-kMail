@@ -157,8 +157,8 @@
             android:id="@+id/action_settingsFragment_to_cancelDelaySettingFragment"
             app:destination="@id/cancelDelaySettingFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_messageListDensitySettingFragment"
-            app:destination="@id/messageListDensitySettingFragment" />
+            android:id="@+id/action_settingsFragment_to_threadsDensitySettingFragment"
+            app:destination="@id/threadsDensitySettingFragment" />
         <action
             android:id="@+id/action_settingsFragment_to_messageDisplayModeSettingFragment"
             app:destination="@id/messageDisplayModeSettingFragment" />
@@ -197,12 +197,12 @@
     </fragment>
 
     <fragment
-        android:id="@+id/messageListDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.MessageListDensitySettingFragment"
-        android:label="MessageListDensitySettingFragment"
-        tools:layout="@layout/fragment_message_list_density_setting">
+        android:id="@+id/threadsDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.ThreadsDensitySettingFragment"
+        android:label="ThreadsDensitySettingFragment"
+        tools:layout="@layout/fragment_threads_density_setting">
         <action
-            android:id="@+id/action_messageListDensitySettingFragment_to_selectSettingsFragment"
+            android:id="@+id/action_threadsDensitySettingFragment_to_selectSettingsFragment"
             app:destination="@id/selectSettingsFragment" />
     </fragment>
 

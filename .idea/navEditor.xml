@@ -186,7 +186,7 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="messageListDensitySettingFragment">
+                  <entry key="messagesFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
@@ -197,7 +197,6 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_messageListDensitySettingFragment_to_selectSettingsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -295,12 +294,12 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_settingsFragment_to_messageListDensitySettingFragment">
+                            <entry key="action_settingsFragment_to_themeSettingFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_settingsFragment_to_themeSettingFragment">
+                            <entry key="action_settingsFragment_to_threadsDensitySettingFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -376,7 +375,7 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="threadFragment">
+                  <entry key="threadsDensitySettingFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
@@ -398,6 +397,7 @@
                               </value>
                             </entry>
                             <entry key="action_threadFragment_to_newMessageActivity">
+                            <entry key="action_threadsDensitySettingFragment_to_selectSettingsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
