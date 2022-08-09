@@ -143,10 +143,10 @@ object MailData {
     fun updateSwipeAction(titleResId: Int, swipeAction: SwipeAction) {
         mutableUserPreferencesFlow.value = UserInfosController.updateUserPreferences {
             when (titleResId) {
-                R.string.settingsSwipeShortRight -> it._shortRightSwipe = swipeAction.name
-                R.string.settingsSwipeLongRight -> it._longRightSwipe = swipeAction.name
-                R.string.settingsSwipeShortLeft -> it._shortLeftSwipe = swipeAction.name
-                R.string.settingsSwipeLongLeft -> it._longLeftSwipe = swipeAction.name
+                R.string.settingsSwipeShortRight -> it.shortRightSwipe = swipeAction
+                R.string.settingsSwipeLongRight -> it.longRightSwipe = swipeAction
+                R.string.settingsSwipeShortLeft -> it.shortLeftSwipe = swipeAction
+                R.string.settingsSwipeLongLeft -> it.longLeftSwipe = swipeAction
             }
         }
     }

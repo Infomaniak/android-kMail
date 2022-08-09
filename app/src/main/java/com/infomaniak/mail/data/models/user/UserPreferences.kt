@@ -90,21 +90,33 @@ class UserPreferences : RealmObject {
     // private var intelligentMode: String = IntelligentMode.DISABLED.name
     //endregion
 
-    var _shortRightSwipe: String = SwipeAction.NONE.name
-    val shortRightSwipe: SwipeAction?
-        get() = enumValueOfOrNull<SwipeAction>(_shortRightSwipe)
+    private var _shortRightSwipe: String = SwipeAction.NONE.name
+    var shortRightSwipe: SwipeAction
+        get() = enumValueOfOrNull<SwipeAction>(_shortRightSwipe) ?: SwipeAction.NONE
+        set(value) {
+            _shortRightSwipe = value.name
+        }
 
-    var _longRightSwipe: String = SwipeAction.NONE.name
-    val longRightSwipe: SwipeAction?
-        get() = enumValueOfOrNull<SwipeAction>(_longRightSwipe)
+    private var _longRightSwipe: String = SwipeAction.NONE.name
+    var longRightSwipe: SwipeAction
+        get() = enumValueOfOrNull<SwipeAction>(_longRightSwipe) ?: SwipeAction.NONE
+        set(value) {
+            _longRightSwipe = value.name
+        }
 
-    var _shortLeftSwipe: String = SwipeAction.NONE.name
-    val shortLeftSwipe: SwipeAction?
-        get() = enumValueOfOrNull<SwipeAction>(_shortLeftSwipe)
+    private var _shortLeftSwipe: String = SwipeAction.NONE.name
+    var shortLeftSwipe: SwipeAction
+        get() = enumValueOfOrNull<SwipeAction>(_shortLeftSwipe) ?: SwipeAction.NONE
+        set(value) {
+            _shortLeftSwipe = value.name
+        }
 
-    var _longLeftSwipe: String = SwipeAction.NONE.name
-    val longLeftSwipe: SwipeAction?
-        get() = enumValueOfOrNull<SwipeAction>(_longLeftSwipe)
+    private var _longLeftSwipe: String = SwipeAction.NONE.name
+    var longLeftSwipe: SwipeAction
+        get() = enumValueOfOrNull<SwipeAction>(_longLeftSwipe) ?: SwipeAction.NONE
+        set(value) {
+            _longLeftSwipe = value.name
+        }
 
     fun getThemeMode(): ThemeMode = when (theme) {
         ThemeMode.LIGHT.apiName -> ThemeMode.LIGHT
@@ -126,6 +138,14 @@ class UserPreferences : RealmObject {
     fun getExternalContentMode(): ExternalContentMode = when (autoTrustEmails) {
         ExternalContentMode.ALWAYS.apiValue -> ExternalContentMode.ALWAYS
         else -> ExternalContentMode.ASK_ME
+    }
+
+    fun getSwipeAction(@StringRes nameRes: Int): SwipeAction? = when (nameRes) {
+        R.string.settingsSwipeShortRight -> shortRightSwipe
+        R.string.settingsSwipeLongRight -> longRightSwipe
+        R.string.settingsSwipeShortLeft -> shortLeftSwipe
+        R.string.settingsSwipeLongLeft -> longLeftSwipe
+        else -> null
     }
 
     // fun getIntelligentMode(): IntelligentMode? = enumValueOfOrNull<IntelligentMode>(intelligentMode)

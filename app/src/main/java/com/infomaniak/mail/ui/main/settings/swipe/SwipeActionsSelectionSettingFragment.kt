@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.cache.UserInfosController.getUserPreferences
 import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 
@@ -51,8 +52,22 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    private fun setupUi() {
-        binding.toolbarText.setText(navigationArgs.titleResId)
+    private fun setupUi() = with(binding) {
+        val actionResId = navigationArgs.titleResId
+        toolbarText.setText(actionResId)
+        when (getUserPreferences().getSwipeAction(actionResId)) {
+            SwipeAction.NONE -> actionNoneCheck
+            SwipeAction.ARCHIVE -> actionArchiveCheck
+            SwipeAction.DELETE -> actionDeleteCheck
+            SwipeAction.FAVORITE -> actionFavoriteCheck
+            SwipeAction.MOVE -> actionMoveCheck
+            SwipeAction.POSTPONE -> actionPostponeCheck
+            SwipeAction.QUICKACTIONS_MENU -> actionQuickActionsMenuCheck
+            SwipeAction.READ_AND_ARCHIVE -> actionReadAndArchiveCheck
+            SwipeAction.READ_UNREAD -> actionReadUnreadCheck
+            SwipeAction.SPAM -> actionSpamCheck
+            else -> null
+        }?.selectOption()
     }
 
     private fun setupListeners() = with(binding) {
