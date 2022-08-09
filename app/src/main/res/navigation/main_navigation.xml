@@ -42,8 +42,8 @@
             android:id="@+id/action_threadsFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
-            android:id="@+id/action_threadsFragment_to_threadFragment"
-            app:destination="@id/threadFragment" />
+            android:id="@+id/action_threadsFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
         <action
             android:id="@+id/action_threadsFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
@@ -81,9 +81,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/threadFragment"
-        android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
-        android:label="ThreadFragment"
+        android:id="@+id/messagesFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.MessagesFragment"
+        android:label="MessagesFragment"
         tools:layout="@layout/cardview_thread_item">
         <argument
             android:name="threadUid"
@@ -97,13 +97,13 @@
             android:defaultValue="false"
             app:argType="boolean" />
         <action
-            android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
+            android:id="@+id/action_messagesFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />
         <action
-            android:id="@+id/action_threadFragment_to_newMessageActivity"
+            android:id="@+id/action_messagesFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
-            android:id="@+id/action_threadFragment_to_contactFragment"
+            android:id="@+id/action_messagesFragment_to_contactFragment"
             app:destination="@id/contactFragment" />
     </fragment>
 

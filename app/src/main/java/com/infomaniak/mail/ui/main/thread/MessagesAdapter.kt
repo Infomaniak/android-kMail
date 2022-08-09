@@ -44,23 +44,22 @@ import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
-
-class ThreadAdapter(
-    private var messageList: MutableList<Message> = mutableListOf(),
+class MessagesAdapter(
+    private var messages: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null
 
-    override fun getItemCount() = messageList.size
+    override fun getItemCount() = messages.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> {
         return BindingViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
-        val message = messageList[position]
+        val message = messages[position]
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
         bindHeader(message)
@@ -225,11 +224,11 @@ class ThreadAdapter(
         }
         replyButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+            setOnClickListener { findFragment<MessagesFragment>().notYetImplemented() }
         }
         menuButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+            setOnClickListener { findFragment<MessagesFragment>().notYetImplemented() }
         }
 
         recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject
@@ -261,11 +260,11 @@ class ThreadAdapter(
     }
 
     fun notifyAdapter(newList: MutableList<Message>) {
-        DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
-        messageList = newList
+        DiffUtil.calculateDiff(MessagesDiffCallback(messages, newList)).dispatchUpdatesTo(this)
+        messages = newList
     }
 
-    fun lastIndex() = messageList.lastIndex
+    fun lastIndex() = messages.lastIndex
 
     private fun Recipient.displayedName(context: Context): String {
         return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
@@ -273,7 +272,7 @@ class ThreadAdapter(
 
     private fun Recipient.getNameOrEmail() = name?.let { it.ifBlank { email } } ?: email
 
-    private class MessageListDiffCallback(
+    private class MessagesDiffCallback(
         private val oldList: List<Message>,
         private val newList: List<Message>,
     ) : DiffUtil.Callback() {

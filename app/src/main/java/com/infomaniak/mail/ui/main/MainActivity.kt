@@ -111,14 +111,14 @@ class MainActivity : ThemedActivity() {
 
         window.statusBarColor = getColor(
             when (destination.id) {
-                R.id.searchFragment, R.id.threadFragment -> R.color.backgroundColor
+                R.id.searchFragment, R.id.messagesFragment -> R.color.backgroundColor
                 else -> R.color.backgroundHeaderColor
             }
         )
 
         window.navigationBarColor = getColor(
             when (destination.id) {
-                R.id.threadFragment -> R.color.backgroundQuickActions
+                R.id.messagesFragment -> R.color.backgroundQuickActions
                 else -> R.color.backgroundColor
             }
         )

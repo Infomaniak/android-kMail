@@ -197,6 +197,17 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_messagesFragment_to_contactFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_messagesFragment_to_messageActionBottomSheetDialog">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_messagesFragment_to_newMessageActivity">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -386,17 +397,6 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_threadFragment_to_contactFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_threadFragment_to_messageActionBottomSheetDialog">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_threadFragment_to_newMessageActivity">
                             <entry key="action_threadsDensitySettingFragment_to_selectSettingsFragment">
                               <value>
                                 <LayoutPositions />
