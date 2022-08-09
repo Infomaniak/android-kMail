@@ -39,6 +39,7 @@ import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.sortMailboxes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SwitchUserFragment : Fragment() {
 
@@ -56,9 +57,11 @@ class SwitchUserFragment : Fragment() {
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 
-                mainViewModel.close()
+                withContext(Dispatchers.Main) {
+                    mainViewModel.close()
 
-                AccountUtils.reloadApp?.invoke(bundleOf())
+                    AccountUtils.reloadApp?.invoke(bundleOf())
+                }
             }
         }
     }
