@@ -86,6 +86,7 @@
                     android:text="@string/settingsSendTitle" />
 
                 <ImageView style="@style/SettingButtonChevron" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -97,6 +98,7 @@
                     android:text="@string/settingsAppLock" />
 
                 <ImageView style="@style/SettingButtonChevron" />
+
             </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
@@ -122,6 +124,7 @@
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -141,6 +144,27 @@
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/settingsAccentColor"
+                style="@style/MenuDrawerItem">
+
+                <LinearLayout style="@style/Setting2TextsWithButton">
+
+                    <TextView
+                        style="@style/SettingText1Of2WithButton"
+                        android:text="@string/settingsAccentColor" />
+
+                    <TextView
+                        android:id="@+id/accentColorSubtitle"
+                        style="@style/SettingText2Of2WithButton"
+                        android:text="@string/accentColorPinkTitle" />
+                </LinearLayout>
+
+                <ImageView style="@style/SettingButtonChevron" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -152,6 +176,7 @@
                     android:text="@string/settingsSwipeActionsTitle" />
 
                 <ImageView style="@style/SettingButtonChevron" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -171,6 +196,7 @@
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -190,6 +216,7 @@
                 </LinearLayout>
 
                 <ImageView style="@style/SettingButtonChevron" />
+
             </LinearLayout>
 
         </LinearLayout>

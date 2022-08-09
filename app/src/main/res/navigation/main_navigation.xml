@@ -194,6 +194,9 @@
             android:id="@+id/action_settings_to_themeSetting"
             app:destination="@id/themeSettingFragment" />
         <action
+            android:id="@+id/action_settings_to_accentColorSetting"
+            app:destination="@id/accentColorSettingFragment" />
+        <action
             android:id="@+id/action_settings_to_swipeActionsSetting"
             app:destination="@id/swipeActionsSettingsFragment" />
         <action
@@ -215,6 +218,12 @@
         android:name="com.infomaniak.mail.ui.main.settings.ThemeSettingFragment"
         android:label="ThemeSettingFragment"
         tools:layout="@layout/fragment_theme_setting" />
+
+    <fragment
+        android:id="@+id/accentColorSettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.AccentColorSettingFragment"
+        android:label="AccentColorSettingFragment"
+        tools:layout="@layout/fragment_accent_color_setting" />
 
     <fragment
         android:id="@+id/displayModeSettingFragment"

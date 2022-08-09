@@ -329,7 +329,7 @@
         <item name="android:layout_width">15dp</item>
         <item name="android:layout_height">15dp</item>
         <item name="android:src">@drawable/ic_check</item>
-        <item name="android:tint">@color/buttonToggleStroke</item>
+        <item name="android:tint">?android:attr/colorPrimary</item>
         <item name="android:visibility">invisible</item>
     </style>
 

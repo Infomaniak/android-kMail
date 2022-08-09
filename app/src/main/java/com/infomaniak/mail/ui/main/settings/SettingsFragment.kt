@@ -26,6 +26,7 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.cache.UserInfosController.getUserPreferences
+import com.infomaniak.mail.data.models.UiSettings
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 
@@ -63,6 +64,7 @@ class SettingsFragment : Fragment() {
         themeSubtitle.setText(getThemeMode().localisedNameRes)
         displayModeSubtitle.setText(getThreadMode().localisedNameRes)
         externalContentSubtitle.setText(getExternalContentMode().localisedNameRes)
+        accentColorSubtitle.setText(UiSettings(requireContext()).colorTheme.localisedNameRes)
     }
 
     private fun setupListeners() = with(binding) {
@@ -81,6 +83,10 @@ class SettingsFragment : Fragment() {
 
         settingsTheme.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsToThemeSetting())
+        }
+
+        settingsAccentColor.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToAccentColorSetting())
         }
 
         settingsSwipeActions.setOnClickListener {
