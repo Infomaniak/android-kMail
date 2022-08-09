@@ -77,7 +77,7 @@ class SwitchUserFragment : Fragment() {
 
     private fun listenToAccounts() {
         viewModel.accounts.observeNotNull(this, ::onAccountsChange)
-        viewModel.listenToAccounts(viewLifecycleOwner)
+        viewModel.listenToAccounts()
     }
 
     private fun onAccountsChange(accounts: List<Pair<User, List<Mailbox>>>) {
