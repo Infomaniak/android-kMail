@@ -237,6 +237,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun updateHeader(folder: Folder) {
+        resetForFurtherThreadsLoading()
         updateUpdatedAt(folder.lastUpdatedAt)
         updateUnreadCount(folder.unreadCount)
     }
@@ -284,8 +285,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayThreads(threads: List<Thread>) = with(mainViewModel) {
         Log.i("UI", "Received threads (${threads.size})")
-        isDownloadingChanges = false
-        binding.swipeRefreshLayout.isRefreshing = false
+        resetForFurtherThreadsLoading()
         if (threads.size < PER_PAGE) canContinueToPaginate = false
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
@@ -324,6 +324,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
+
+    private fun resetForFurtherThreadsLoading() {
+        mainViewModel.isDownloadingChanges = false
+        binding.swipeRefreshLayout.isRefreshing = false
+    }
 
     private companion object {
         const val OFFSET_TRIGGER = 1

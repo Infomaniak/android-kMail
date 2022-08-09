@@ -57,13 +57,7 @@ object ThreadController {
     /**
      * Edit data
      */
-    fun upsertApiData(
-        mailboxUuid: String,
-        folderId: String,
-        offset: Int,
-        filter: ThreadFilter,
-        canContinueToPaginate: (Boolean) -> Unit,
-    ): List<Thread> {
+    fun upsertApiData(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): Boolean {
 
         // Get current data
         Log.d(RealmController.TAG, "Threads: Get current data")
@@ -76,12 +70,8 @@ object ThreadController {
                 else -> true
             }
         } ?: emptyList()
-        val apiThreadsSinceOffset = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data
-            ?.also { threadsResult ->
-                FolderController.updateFolderCounts(folderId, threadsResult)
-                canContinueToPaginate(threadsResult.messagesCount >= ApiRepository.PER_PAGE)
-            }
-            ?.threads?.map { it.initLocalValues(mailboxUuid) }
+        val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data
+        val apiThreadsSinceOffset = threadsResult?.threads?.map { it.initLocalValues(mailboxUuid) }
             ?: emptyList()
         val apiThreads = if (offset == ApiRepository.OFFSET_FIRST_PAGE) {
             apiThreadsSinceOffset
@@ -120,7 +110,11 @@ object ThreadController {
             deleteThreads(deletableThreads)
         }
 
-        return apiThreads
+        return threadsResult?.let {
+            val canContinueToPaginate = it.messagesCount >= ApiRepository.PER_PAGE
+            FolderController.updateFolderCounts(folderId, it)
+            canContinueToPaginate
+        } ?: false
     }
 
     fun MutableRealm.deleteThreads(threads: List<Thread>) {

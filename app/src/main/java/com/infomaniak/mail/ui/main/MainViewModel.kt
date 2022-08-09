@@ -254,8 +254,8 @@ class MainViewModel : ViewModel() {
         folderId: String,
         offset: Int = OFFSET_FIRST_PAGE,
         filter: ThreadFilter = ThreadFilter.ALL,
-    ): List<Thread> = ThreadController.upsertApiData(mailboxUuid, folderId, offset, filter) {
-        canContinueToPaginate = it
+    ) {
+        canContinueToPaginate = ThreadController.upsertApiData(mailboxUuid, folderId, offset, filter)
     }
 
     private fun loadMessages(thread: Thread) {
