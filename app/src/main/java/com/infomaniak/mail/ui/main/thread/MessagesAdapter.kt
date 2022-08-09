@@ -46,7 +46,7 @@ import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
-class ThreadAdapter(
+class MessagesAdapter(
     private var messages: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<ThreadViewHolder>() {
 
@@ -229,11 +229,11 @@ class ThreadAdapter(
         }
         replyButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+            setOnClickListener { findFragment<MessagesFragment>().notYetImplemented() }
         }
         menuButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+            setOnClickListener { findFragment<MessagesFragment>().notYetImplemented() }
         }
 
         recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject
@@ -273,7 +273,7 @@ class ThreadAdapter(
     }
 
     fun notifyAdapter(newList: MutableList<Message>) {
-        DiffUtil.calculateDiff(MessageListDiffCallback(messages, newList)).dispatchUpdatesTo(this)
+        DiffUtil.calculateDiff(MessagesDiffCallback(messages, newList)).dispatchUpdatesTo(this)
         messages = newList
         messages.forEachIndexed { index, message ->
             if ((index == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
@@ -286,7 +286,7 @@ class ThreadAdapter(
         return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
     }
 
-    private class MessageListDiffCallback(
+    private class MessagesDiffCallback(
         private val oldList: List<Message>,
         private val newList: List<Message>,
     ) : DiffUtil.Callback() {
