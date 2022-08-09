@@ -84,7 +84,7 @@ class SwitchUserFragment : Fragment() {
             .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
             .sortAccounts()
 
-        accountsAdapter.notifyAdapter(uiAccounts, MainViewModel.currentMailbox.value?.objectId)
+        accountsAdapter.notifyAdapter(uiAccounts, MainViewModel.currentMailboxObjectId.value)
     }
 
     private fun List<UiAccount>.sortAccounts(): List<UiAccount> {

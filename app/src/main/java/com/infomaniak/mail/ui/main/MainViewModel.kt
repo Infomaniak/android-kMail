@@ -49,10 +49,10 @@ class MainViewModel : ViewModel() {
         private val TAG = "MainViewModel"
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
 
-        val currentMailbox = MutableLiveData<Mailbox?>()
-        val currentFolder = MutableLiveData<Folder?>()
-        val currentThread = MutableLiveData<Thread?>()
-        val currentMessage = MutableLiveData<Message?>()
+        val currentMailboxObjectId = MutableLiveData<String?>()
+        val currentFolderId = MutableLiveData<String?>()
+        val currentThreadUid = MutableLiveData<String?>()
+        val currentMessageUid = MutableLiveData<String?>()
     }
 
     val isInternetAvailable = MutableLiveData(false)
@@ -64,49 +64,49 @@ class MainViewModel : ViewModel() {
         Log.i(TAG, "close")
         RealmController.close()
 
-        currentMessage.value = null
-        currentThread.value = null
-        currentFolder.value = null
-        currentMailbox.value = null
+        currentMessageUid.value = null
+        currentThreadUid.value = null
+        currentFolderId.value = null
+        currentMailboxObjectId.value = null
     }
 
     private suspend fun selectMailbox(mailbox: Mailbox) {
-        if (currentMailbox.value?.objectId != mailbox.objectId) {
+        if (mailbox.objectId != currentMailboxObjectId.value) {
             Log.i(TAG, "selectMailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
 
             withContext(Dispatchers.Main) {
-                currentMailbox.value = mailbox
+                currentMailboxObjectId.value = mailbox.objectId
 
-                currentMessage.value = null
-                currentThread.value = null
-                currentFolder.value = null
+                currentMessageUid.value = null
+                currentThreadUid.value = null
+                currentFolderId.value = null
             }
         }
     }
 
-    private suspend fun selectFolder(folder: Folder) {
-        if (folder.id != currentFolder.value?.id) {
-            Log.i(TAG, "selectFolder: ${folder.name}")
+    private suspend fun selectFolder(folderId: String) {
+        if (folderId != currentFolderId.value) {
+            Log.i(TAG, "selectFolder: $folderId")
             currentOffset = OFFSET_FIRST_PAGE
 
             withContext(Dispatchers.Main) {
-                currentFolder.value = folder
+                currentFolderId.value = folderId
 
-                currentMessage.value = null
-                currentThread.value = null
+                currentMessageUid.value = null
+                currentThreadUid.value = null
             }
         }
     }
 
     private suspend fun selectThread(thread: Thread) {
-        if (thread.uid != currentThread.value?.uid) {
+        if (thread.uid != currentThreadUid.value) {
             Log.i(TAG, "selectThread: ${thread.subject}")
 
             withContext(Dispatchers.Main) {
-                currentThread.value = thread
+                currentThreadUid.value = thread.uid
 
-                currentMessage.value = null
+                currentMessageUid.value = null
             }
         }
     }
@@ -122,8 +122,8 @@ class MainViewModel : ViewModel() {
         selectMailbox(mailbox)
         val folders = loadFolders(mailbox)
         computeFolderToSelect(folders)?.let { folder ->
-            selectFolder(folder)
-            loadThreads(mailbox, folder)
+            selectFolder(folder.id)
+            loadThreads(mailbox.uuid, folder.id)
         }
     }
 
@@ -134,8 +134,8 @@ class MainViewModel : ViewModel() {
             selectMailbox(mailbox)
             val folders = loadFolders(mailbox)
             computeFolderToSelect(folders)?.let { folder ->
-                selectFolder(folder)
-                loadThreads(mailbox, folder)
+                selectFolder(folder.id)
+                loadThreads(mailbox.uuid, folder.id)
             }
         }
     }
@@ -146,19 +146,14 @@ class MainViewModel : ViewModel() {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        if (folderId == currentFolder.value?.id) return@launch
+        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
+        val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
+        if (folderId == currentFolderId.value) return@launch
 
-        val folder = FolderController.getFolderSync(folderId) ?: return@launch
-        Log.i(TAG, "openFolder: ${folder.name}")
+        Log.i(TAG, "openFolder: $folderId")
 
-        selectFolder(folder)
-        loadThreads(mailbox, folder)
-    }
-
-    fun forceRefreshFolders() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "forceRefreshFolders")
-        currentMailbox.value?.let(::loadFolders)
+        selectFolder(folderId)
+        loadThreads(mailboxUuid, folderId)
     }
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
@@ -170,12 +165,10 @@ class MainViewModel : ViewModel() {
     private fun markAsSeen(thread: Thread) {
         if (thread.unseenMessagesCount != 0) {
 
-            val mailboxUuid = currentMailbox.value?.uuid ?: return
-
             RealmController.mailboxContent.writeBlocking {
                 getLatestThreadSync(thread.uid)?.let { latestThread ->
 
-                    val apiResponse = ApiRepository.markMessagesAsSeen(mailboxUuid, latestThread.messages.map { it.uid })
+                    val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, latestThread.messages.map { it.uid })
 
                     if (apiResponse.isSuccess()) {
                         latestThread.apply {
@@ -190,22 +183,23 @@ class MainViewModel : ViewModel() {
 
     fun forceRefreshThreads(filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshThreads")
-        val mailbox = currentMailbox.value ?: return@launch
-        val folder = currentFolder.value ?: return@launch
+        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
+        val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
+        val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges = true
-        loadThreads(mailbox, folder, currentOffset, filter)
+        loadThreads(mailboxUuid, folderId, currentOffset, filter)
     }
 
     fun loadMoreThreads(
-        mailbox: Mailbox,
-        folder: Folder,
+        mailboxUuid: String,
+        folderId: String,
         offset: Int,
         filter: ThreadFilter,
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
         isDownloadingChanges = true
-        loadThreads(mailbox, folder, offset, filter)
+        loadThreads(mailboxUuid, folderId, offset, filter)
     }
 
     fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
@@ -222,7 +216,7 @@ class MainViewModel : ViewModel() {
 
     private fun computeFolderToSelect(folders: List<Folder>): Folder? {
         return with(folders) {
-            find { it.id == currentFolder.value?.id }
+            find { it.id == currentFolderId.value }
                 ?: find { it.role == DEFAULT_SELECTED_FOLDER }
                 ?: firstOrNull()
         }
@@ -256,11 +250,11 @@ class MainViewModel : ViewModel() {
     }
 
     private fun loadThreads(
-        mailbox: Mailbox,
-        folder: Folder,
+        mailboxUuid: String,
+        folderId: String,
         offset: Int = OFFSET_FIRST_PAGE,
         filter: ThreadFilter = ThreadFilter.ALL,
-    ): List<Thread> = ThreadController.upsertApiData(mailbox, folder, offset, filter) {
+    ): List<Thread> = ThreadController.upsertApiData(mailboxUuid, folderId, offset, filter) {
         canContinueToPaginate = it
     }
 

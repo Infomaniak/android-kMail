@@ -23,8 +23,6 @@ import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.getLatestFolderSync
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -60,8 +58,8 @@ object ThreadController {
      * Edit data
      */
     fun upsertApiData(
-        mailbox: Mailbox,
-        folder: Folder,
+        mailboxUuid: String,
+        folderId: String,
         offset: Int,
         filter: ThreadFilter,
         canContinueToPaginate: (Boolean) -> Unit,
@@ -69,7 +67,7 @@ object ThreadController {
 
         // Get current data
         Log.d(RealmController.TAG, "Threads: Get current data")
-        val realmThreads = FolderController.getFolderSync(folder.id)?.threads?.filter {
+        val realmThreads = FolderController.getFolderSync(folderId)?.threads?.filter {
             when (filter) {
                 ThreadFilter.SEEN -> it.unseenMessagesCount == 0
                 ThreadFilter.UNSEEN -> it.unseenMessagesCount > 0
@@ -78,9 +76,9 @@ object ThreadController {
                 else -> true
             }
         } ?: emptyList()
-        val apiThreadsSinceOffset = ApiRepository.getThreads(mailbox.uuid, folder.id, offset, filter).data
+        val apiThreadsSinceOffset = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data
             ?.also { threadsResult ->
-                FolderController.updateFolderCounts(folder.id, threadsResult)
+                FolderController.updateFolderCounts(folderId, threadsResult)
                 canContinueToPaginate(threadsResult.messagesCount >= ApiRepository.PER_PAGE)
             }
             ?.threads?.map { it.initLocalValues() }
@@ -101,7 +99,7 @@ object ThreadController {
         } else {
             emptyList()
         }
-        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
+        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folderId } }
 
         RealmController.mailboxContent.writeBlocking {
             // Save new data
@@ -113,7 +111,7 @@ object ThreadController {
                     val mergedThread = getMergedThread(apiThread, realmThread)
                     copyToRealm(mergedThread, UpdatePolicy.ALL)
                 }
-                updateFolder(folder, apiThreads)
+                updateFolder(folderId, apiThreads)
             }
 
             // Delete outdated data
@@ -167,10 +165,11 @@ object ThreadController {
         addAll(values)
     }
 
-    private fun MutableRealm.updateFolder(folder: Folder, apiThreads: List<Thread>) {
-        val latestFolder = getLatestFolderSync(folder.id) ?: folder
-        latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
-        copyToRealm(latestFolder, UpdatePolicy.ALL)
+    private fun MutableRealm.updateFolder(folderId: String, apiThreads: List<Thread>) {
+        getLatestFolderSync(folderId)?.let { latestFolder ->
+            latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
+            copyToRealm(latestFolder, UpdatePolicy.ALL)
+        }
     }
 
     /**
