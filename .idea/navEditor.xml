@@ -191,8 +191,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="1232" />
-                            <option name="y" value="1793" />
+                            <option name="x" value="744" />
+                            <option name="y" value="2820" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -380,8 +380,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="744" />
-                            <option name="y" value="2820" />
+                            <option name="x" value="1232" />
+                            <option name="y" value="1793" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -407,7 +407,7 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="threadListFragment">
+                  <entry key="threadsFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
@@ -423,37 +423,37 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_helpFragment">
+                            <entry key="action_threadsFragment_to_helpFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_manageMailAddressFragment">
+                            <entry key="action_threadsFragment_to_manageMailAddressFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_newFolderDialog">
+                            <entry key="action_threadsFragment_to_messagesFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_searchFragment">
+                            <entry key="action_threadsFragment_to_newFolderDialog">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_settingsFragment">
+                            <entry key="action_threadsFragment_to_searchFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_switchUserFragment">
+                            <entry key="action_threadsFragment_to_settingsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_threadFragment">
+                            <entry key="action_threadsFragment_to_switchUserFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
