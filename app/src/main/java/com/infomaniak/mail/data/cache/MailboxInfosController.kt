@@ -52,7 +52,7 @@ object MailboxInfosController {
             postfix = "')"
         )
 
-        return MailRealm.mailboxInfo.query<Mailbox>(query).find()
+        return MailRealm.mailboxInfos.query<Mailbox>(query).find()
     }
 
     // fun upsertMailbox(mailbox: Mailbox) {

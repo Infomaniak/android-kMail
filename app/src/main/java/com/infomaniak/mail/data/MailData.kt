@@ -39,10 +39,10 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.user.UserPreferences
-import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
+import com.infomaniak.mail.data.models.user.UserPreferences
+import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.utils.toRealmInstant

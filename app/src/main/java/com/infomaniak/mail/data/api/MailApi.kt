@@ -28,8 +28,8 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
