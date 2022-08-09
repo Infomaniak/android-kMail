@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class)
+@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
 
 package com.infomaniak.mail.data.models
 
@@ -24,6 +24,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
@@ -67,8 +68,10 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun initLocalValues(parent: Folder) {
-        parentLink = parent
+    fun initLocalValues(threads: RealmList<Thread>, parentLink: Folder?, lastUpdatedAt: RealmInstant?) {
+        this.threads = threads
+        this.parentLink = parentLink
+        this.lastUpdatedAt = lastUpdatedAt
     }
 
     fun getLocalizedName(context: Context): String {

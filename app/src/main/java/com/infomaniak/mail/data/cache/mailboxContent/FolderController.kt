@@ -87,9 +87,14 @@ object FolderController {
             // Save new data
             Log.d(RealmController.TAG, "Folders: Save new data")
             apiFolders.forEach { apiFolder ->
-                realmFolders.find { it.id == apiFolder.id }?.threads
-                    ?.mapNotNull(::findLatest)
-                    ?.let { apiFolder.threads = it.toRealmList() }
+                realmFolders.find { it.id == apiFolder.id }?.let { realmFolder ->
+                    apiFolder.initLocalValues(
+                        threads = realmFolder.threads.mapNotNull(::findLatest).toRealmList(),
+                        parentLink = realmFolder.parentLink?.let(::findLatest),
+                        lastUpdatedAt = realmFolder.lastUpdatedAt,
+                    )
+                }
+
                 copyToRealm(apiFolder, UpdatePolicy.ALL)
             }
 
