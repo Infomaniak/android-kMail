@@ -81,7 +81,7 @@ object ThreadController {
                 FolderController.updateFolderCounts(folderId, threadsResult)
                 canContinueToPaginate(threadsResult.messagesCount >= ApiRepository.PER_PAGE)
             }
-            ?.threads?.map { it.initLocalValues() }
+            ?.threads?.map { it.initLocalValues(mailboxUuid) }
             ?: emptyList()
         val apiThreads = if (offset == ApiRepository.OFFSET_FIRST_PAGE) {
             apiThreadsSinceOffset
