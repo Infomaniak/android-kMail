@@ -39,18 +39,6 @@ class ActionItemView @JvmOverloads constructor(
 
     var binding: ItemBottomSheetActionBinding
 
-    var icon: Drawable? = null
-        set(value) {
-            field = value
-            binding.button.icon = value
-        }
-
-    var text: CharSequence? = null
-        set(value) {
-            field = value
-            binding.button.text = value
-        }
-
     init {
         binding = ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true)
 

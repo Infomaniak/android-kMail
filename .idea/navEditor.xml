@@ -46,8 +46,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="7" />
-                            <option name="y" value="711" />
+                            <option name="x" value="988" />
+                            <option name="y" value="54" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -237,7 +237,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="988" />
-                            <option name="y" value="766" />
+                            <option name="y" value="1122" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -254,7 +254,7 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_searchFragment_to_contactFragment">
+                            <entry key="action_searchFragment_to_detailedContactBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -394,7 +394,7 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="988" />
-                            <option name="y" value="1122" />
+                            <option name="y" value="766" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -411,7 +411,7 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_threadFragment_to_contactFragment">
+                            <entry key="action_threadFragment_to_detailedContactBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
                               </value>

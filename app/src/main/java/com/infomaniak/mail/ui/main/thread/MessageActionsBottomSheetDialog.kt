@@ -20,9 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.ui.main.thread.ActionsBottomSheetDialog.MainActions.*
 import com.infomaniak.mail.utils.notYetImplemented
 
 class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -32,7 +30,9 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        adaptUiToThread()
+        setMarkAsReadUi(navigationArgs.isSeen)
+        setFavoriteUi(navigationArgs.isFavorite)
+        setSpamUi()
 
         archive.setOnClickListener { notYetImplemented() }
         markAsRead.setOnClickListener { notYetImplemented() }
@@ -44,32 +44,17 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         phishing.setOnClickListener { notYetImplemented() }
         print.setOnClickListener { notYetImplemented() }
         saveAsPdf.setOnClickListener { notYetImplemented() }
-        openIn.setOnClickListener { notYetImplemented() }
         rule.setOnClickListener { notYetImplemented() }
         reportDisplayProblem.setOnClickListener { notYetImplemented() }
 
         mainActions.setOnItemClickListener { index: Int ->
             val action = MainActions.values()[index]
             when (action) {
-                MainActions.REPLY -> notYetImplemented()
-                MainActions.REPLAY_TO_ALL -> notYetImplemented()
-                MainActions.FORWARD -> notYetImplemented()
-                MainActions.DELETE -> notYetImplemented()
+                REPLY -> notYetImplemented()
+                REPLAY_TO_ALL -> notYetImplemented()
+                FORWARD -> notYetImplemented()
+                DELETE -> notYetImplemented()
             }
         }
-    }
-
-    private fun adaptUiToThread() = with(binding) {
-        val (readIconRes, readTextRes) = computeUnreadStyle(navigationArgs.isSeen)
-        markAsRead.setIconResource(readIconRes)
-        markAsRead.setText(readTextRes)
-
-        val (favoriteIconRes, favoriteTint, favoriteText) = computeFavoriteStyle(root.context, navigationArgs.isFavorite)
-        favorite.setIconResource(favoriteIconRes)
-        favorite.setIconTint(favoriteTint)
-        favorite.setText(favoriteText)
-
-        val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == Folder.FolderRole.SPAM
-        spam.setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)
     }
 }

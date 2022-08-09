@@ -68,6 +68,7 @@
     <color name="chevronColor">@color/grey_text</color>
     <color name="iconColor">@color/grey_text</color>
     <color name="iconToolbarButton">@color/primaryTextColor</color>
+    <color name="favoriteYellow">#F1BE41</color>
 
     <!-- Buttons -->
     <color name="textButtonBlueLight">@color/blueTextLight</color>

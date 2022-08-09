@@ -23,7 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
-import com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog.ReplyType.*
+import com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog.ReplyType.REPLY
+import com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog.ReplyType.REPLY_TO_ALL
 import com.infomaniak.mail.utils.notYetImplemented
 
 open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
@@ -38,7 +39,7 @@ open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainActions.setOnItemClickListener { index: Int ->
-            val action = values()[index]
+            val action = ReplyType.values()[index]
             when (action) {
                 REPLY -> notYetImplemented()
                 REPLY_TO_ALL -> notYetImplemented()

@@ -17,16 +17,11 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.ui.main.thread.ActionsBottomSheetDialog.MainActions.*
-import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.notYetImplemented
 
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -36,12 +31,14 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        adaptUiToThread()
+        setMarkAsReadUi(navigationArgs.unseenMessagesCount == 0)
+        setFavoriteUi(navigationArgs.isFavorite)
+        setSpamUi()
 
-        postpone.isGone = true // TODO : Support this? (not in webmail)
-        blockSender.isGone = true // TODO : Support this? (not in webmail)
-        phishing.isGone = true // TODO : Support this? (not in webmail)
-        rule.isGone = true // TODO : Support this? (not in webmail)
+        postpone.isGone = true
+        blockSender.isGone = true
+        phishing.isGone = true
+        rule.isGone = true
 
         archive.setOnClickListener { notYetImplemented() }
         markAsRead.setOnClickListener { notYetImplemented() }
@@ -50,11 +47,10 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         spam.setOnClickListener { notYetImplemented() }
         print.setOnClickListener { notYetImplemented() }
         saveAsPdf.setOnClickListener { notYetImplemented() }
-        openIn.setOnClickListener { notYetImplemented() }
         reportDisplayProblem.setOnClickListener { notYetImplemented() }
 
         mainActions.setOnItemClickListener { index: Int ->
-            val action = values()[index]
+            val action = MainActions.values()[index]
             when (action) {
                 REPLY -> notYetImplemented()
                 REPLAY_TO_ALL -> notYetImplemented()
@@ -62,20 +58,5 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 DELETE -> notYetImplemented()
             }
         }
-    }
-
-    private fun adaptUiToThread() = with(binding) {
-
-        val (readIconRes, readTextRes) = computeUnreadStyle(navigationArgs.unseenMessagesCount == 0)
-        markAsRead.setIconResource(readIconRes)
-        markAsRead.setText(readTextRes)
-
-        val (favoriteIconRes, favoriteTint, favoriteText) = computeFavoriteStyle(root.context, navigationArgs.isFavorite)
-        favorite.setIconResource(favoriteIconRes)
-        favorite.setIconTint(favoriteTint)
-        favorite.setText(favoriteText)
-
-        val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == Folder.FolderRole.SPAM
-        spam.setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)
     }
 }

@@ -80,20 +80,6 @@
             app:destination="@id/detailedContactBottomSheetDialog" />
     </fragment>
 
-    <dialog
-        android:id="@+id/detailedContactBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialog"
-        android:label="DetailedContactBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_detailed_contact">
-        <argument
-            android:name="contactName"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="contactEmail"
-            app:argType="string" />
-    </dialog>
-
     <fragment
         android:id="@+id/threadFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
@@ -136,19 +122,19 @@
         android:label="SwitchUSerFragment"
         tools:layout="@layout/fragment_switch_user" />
 
-    <!--    <fragment-->
-    <!--        android:id="@+id/contactFragment"-->
-    <!--        android:name="com.infomaniak.mail.ui.main.ContactFragment"-->
-    <!--        android:label="ContactFragment"-->
-    <!--        tools:layout="@layout/fragment_contact">-->
-    <!--        <argument-->
-    <!--            android:name="contactName"-->
-    <!--            app:argType="string"-->
-    <!--            app:nullable="true" />-->
-    <!--        <argument-->
-    <!--            android:name="contactEmail"-->
-    <!--            app:argType="string" />-->
-    <!--    </fragment>-->
+    <dialog
+        android:id="@+id/detailedContactBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialog"
+        android:label="DetailedContactBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_detailed_contact">
+        <argument
+            android:name="contactName"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="contactEmail"
+            app:argType="string" />
+    </dialog>
 
     <dialog
         android:id="@+id/messageActionBottomSheetDialog"

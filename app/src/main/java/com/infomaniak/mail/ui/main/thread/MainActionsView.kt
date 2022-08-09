@@ -65,7 +65,9 @@ class MainActionsView @JvmOverloads constructor(
                     if (drawable == null) {
                         buttons[index].isInvisible = true
                         textViews[index].isInvisible = true
-                    } else buttons[index].icon = drawable
+                    } else {
+                        buttons[index].icon = drawable
+                    }
                 }
 
                 titles.forEachIndexed { index, text ->

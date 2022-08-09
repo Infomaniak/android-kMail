@@ -125,13 +125,6 @@
             app:text="@string/actionSavePDF" />
 
         <com.infomaniak.mail.ui.main.thread.ActionItemView
-            android:id="@+id/openIn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_email_action_open_in"
-            app:text="@string/actionOpenIn" />
-
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
             android:id="@+id/rule"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
