@@ -21,6 +21,12 @@
     android:id="@+id/main_navigation"
     app:startDestination="@id/threadListFragment">
 
+    <dialog
+        android:id="@+id/getMoreStorageBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.menu.GetMoreStorageBottomSheetDialog"
+        android:label="GetMoreStorageBottomSheetDialog"
+        tools:layout="@layout/fragment_bottom_sheet_get_more_storage" />
+
     <fragment
         android:id="@+id/threadListFragment"
         android:name="com.infomaniak.mail.ui.main.thread.ThreadListFragment"
@@ -41,9 +47,6 @@
         <action
             android:id="@+id/action_threadListFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
-        <action
-            android:id="@+id/action_threadListFragment_to_menuDrawerFragment"
-            app:destination="@id/menuDrawerFragment" />
         <action
             android:id="@+id/action_threadListFragment_to_manageMailAddressFragment"
             app:destination="@id/manageMailAddressFragment" />

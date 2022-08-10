@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.util.Patterns
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
@@ -33,6 +34,7 @@ import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivityArgs
@@ -78,6 +80,12 @@ fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> U
     observe(owner) { it?.let(observer) }
 }
 
+fun Context.getAttributeColor(@IdRes attribute: Int): Int {
+    val typedValue = TypedValue()
+    theme.resolveAttribute(attribute, typedValue, true)
+    return typedValue.data
+}
+
 fun Recipient.displayedName(context: Context): String {
     return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
 }
@@ -87,6 +95,8 @@ fun Recipient.getNameOrEmail() = name?.ifBlank { email } ?: email
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
 }
+
+fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
 
 fun Fragment.openMessageEdition(@IdRes direction: Int, message: Message? = null) {
     safeNavigate(direction, NewMessageActivityArgs(message?.draftUuid, message?.draftResource, message?.uid).toBundle())

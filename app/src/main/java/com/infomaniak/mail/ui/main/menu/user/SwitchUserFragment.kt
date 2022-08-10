@@ -31,9 +31,9 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
-import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.Companion.sortMailboxes
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.sortMailboxes
 import kotlinx.coroutines.launch
 
 class SwitchUserFragment : Fragment() {

@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -73,7 +74,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var menuDrawerFragment: MenuDrawerFragment? = null
     private var menuDrawerNavigation: NavigationView? = null
     private var drawerLayout: DrawerLayout? = null
-    private val drawerListener = object : DrawerLayout.DrawerListener {
+    private val drawerListener = object : DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) = Unit
 
         override fun onDrawerOpened(drawerView: View) = Unit
@@ -96,7 +97,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         setupOnRefresh()
         setupAdapter()
-        setupMenuDrawer()
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
@@ -165,17 +165,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun setupMenuDrawer() {
-        (activity as? MainActivity)?.binding?.let { activityBinding ->
-
-            drawerLayout = activityBinding.drawerLayout.also {
-                it.addDrawerListener(drawerListener)
-            }
-
-            menuDrawerNavigation = activityBinding.menuDrawerNavigation
-        }
-    }
-
     private fun setupAdapter() {
         binding.threadsList.adapter = threadListAdapter
 
@@ -210,7 +199,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupListeners() = with(binding) {
 
-        toolbar.setNavigationOnClickListener { drawerLayout?.open() }
+        toolbar.setNavigationOnClickListener { (activity as? MainActivity)?.binding?.drawerLayout?.open() }
 
         searchButton.setOnClickListener {
             safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
@@ -247,32 +236,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         AccountUtils.currentUser?.let { binding.userAvatarImage.loadAvatar(it, requireContext().imageLoader) }
     }
 
-    override fun onDestroyView() {
-        drawerLayout?.removeDrawerListener(drawerListener)
-
-        super.onDestroyView()
-    }
-
     override fun onResume() {
         super.onResume()
-
-        setupMenuDrawerCallbacks()
 
         with(viewModel) {
             binding.unreadCountChip.apply { isCloseIconVisible = isChecked }
             loadMailData()
         }
-    }
-
-    private fun setupMenuDrawerCallbacks() {
-        val fragmentContainer = (activity as? MainActivity)?.binding?.menuDrawerFragment ?: return
-        (fragmentContainer.getFragment() as? MenuDrawerFragment)
-            ?.apply {
-                closeDrawer = { closeDrawer() }
-                isDrawerOpen = { drawerLayout?.isOpen ?: false }
-            }?.also {
-                menuDrawerFragment = it
-            }
     }
 
     private fun listenToCurrentMailbox() {

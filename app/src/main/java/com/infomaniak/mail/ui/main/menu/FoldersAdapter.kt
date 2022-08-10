@@ -23,20 +23,29 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.setMargins
 import com.infomaniak.lib.core.R as RCore
 
 class FoldersAdapter(
     private var folders: List<Folder> = emptyList(),
-    private val openFolder: (folderName: String) -> Unit,
+    private val openFolder: (folderId: String) -> Unit,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
         return FolderViewHolder(ItemFolderMenuDrawerBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    }
+
+    override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.firstOrNull() == Unit) {
+            val folder = folders[position]
+            holder.binding.item.setSelectedState(MailData.currentFolderFlow.value?.id == folder.id)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
@@ -44,32 +53,33 @@ class FoldersAdapter(
         val badgeText = folder.getUnreadCountOrNull()
 
         folder.role?.let {
-            setFolderUi(context.getString(it.folderNameRes), it.folderIconRes, badgeText)
+            setFolderUi(folder.id, context.getString(it.folderNameRes), it.folderIconRes, badgeText)
         } ?: setFolderUi(
+            id = folder.id,
             name = folder.name,
             iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
             badgeText = badgeText,
-            indent = folder.path.split(folder.separator).size - 1,
+            folderIndent = folder.path.split(folder.separator).size - 1,
         )
     }
 
     override fun getItemCount() = folders.size
 
     private fun ItemFolderMenuDrawerBinding.setFolderUi(
+        id: String,
         name: String,
         @DrawableRes iconId: Int,
         badgeText: String? = null,
-        indent: Int? = null,
-    ) {
-        folderName.apply {
-            text = name
-            setCompoundDrawablesWithIntrinsicBounds(AppCompatResources.getDrawable(context, iconId), null, null, null)
-            setMargins(left = resources.getDimension(RCore.dimen.marginStandard).toInt() * (indent ?: 0))
-        }
+        folderIndent: Int? = null,
+    ) = with(item) {
+        text = name
+        icon = AppCompatResources.getDrawable(context, iconId)
+        indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
+        badge = badgeText ?: ""
 
-        folderBadge.text = badgeText
+        setSelectedState(MailData.currentFolderFlow.value?.id == id)
 
-        root.setOnClickListener { openFolder.invoke(name) }
+        setOnClickListener { openFolder.invoke(id) }
     }
 
     fun setFolders(newFolders: List<Folder>) {

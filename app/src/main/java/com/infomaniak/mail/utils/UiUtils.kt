@@ -15,22 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main
+package com.infomaniak.mail.utils
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.R
+import android.graphics.Color
 
-open class ThemedActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        val isPink = true
+object UiUtils {
+    fun pointBetweenColors(from: Color, to: Color, percent: Float) =
+        Color.pack(
+            pointBetweenColors(from.red(), to.red(), percent),
+            pointBetweenColors(from.green(), to.green(), percent),
+            pointBetweenColors(from.blue(), to.blue(), percent),
+            pointBetweenColors(from.alpha(), to.alpha(), percent),
+        )
 
-        val theme = when {
-            isPink -> R.style.AppTheme_Pink
-            else -> R.style.AppTheme_Blue
-        }
-        setTheme(theme)
+    private fun pointBetweenColors(from: Float, to: Float, percent: Float): Float =
+        from + percent * (to - from)
 
-        super.onCreate(savedInstanceState)
-    }
+    fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 }
