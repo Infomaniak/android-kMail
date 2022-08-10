@@ -113,7 +113,7 @@
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="AppTheme.AppBarOverlayBase">
-        <item name="android:backgroundTint">@color/backgroundColor</item>
+        <item name="android:backgroundTint">@color/backgroundHeaderColor</item>
     </style>
 
     <style name="LoginAppBarTheme" parent="AppTheme.AppBarOverlayBase">

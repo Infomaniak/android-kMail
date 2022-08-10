@@ -73,7 +73,7 @@ class MenuDrawerFragment : Fragment() {
         AccountUtils.currentUser?.let(binding.userAvatar::loadAvatar)
 
         setupAdapters()
-        setupListener()
+        setupListeners()
 
         observeMailboxes()
         observeCurrentMailbox()
@@ -228,7 +228,7 @@ class MenuDrawerFragment : Fragment() {
         expandCustomFolderButton.rotation = angle
     }
 
-    fun closeDrawer() = with(binding) {
+    fun closeDrawer() {
         exitDrawer?.invoke()
         closeDropdowns()
     }
