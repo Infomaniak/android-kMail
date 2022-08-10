@@ -50,7 +50,7 @@ class AccentColorSettingFragment : Fragment() {
     }
 
     private fun setUpCheckMarks() = with(binding) {
-        UiSettings(requireContext()).colorTheme?.let { colorTheme ->
+        UiSettings(requireContext()).colorTheme.let { colorTheme ->
             if (colorTheme == UiSettings.ColorTheme.PINK) {
                 settingsOptionPinkAccentColorCheck
             } else {

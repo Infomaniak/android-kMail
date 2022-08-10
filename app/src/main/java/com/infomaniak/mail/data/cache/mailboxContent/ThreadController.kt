@@ -58,7 +58,7 @@ object ThreadController {
     //endregion
 
     //region Edit data
-    fun update(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): Boolean {
+    fun update(mailboxUuid: String, folderId: String, threadMode: String, offset: Int, filter: ThreadFilter): Boolean {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Threads: Get current data")
@@ -72,7 +72,7 @@ object ThreadController {
             }
         } ?: emptyList()
         DuplicateController.removeDuplicates()
-        val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data
+        val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, threadMode, offset, filter).data
         val apiThreadsSinceOffset = threadsResult?.threads?.map { it.initLocalValues(mailboxUuid) }
             ?: emptyList()
         val apiThreads = if (offset == ApiRepository.OFFSET_FIRST_PAGE) {

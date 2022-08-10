@@ -22,13 +22,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.cache.UserInfosController.getUserPreferences
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.UiSettings
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.notYetImplemented
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
@@ -47,7 +53,7 @@ class SettingsFragment : Fragment() {
         setupBack()
         setupAdapter()
         setupListeners()
-        getUserPreferences().setupPreferencesText()
+        UserPreferencesController.getUserPreferences().setupPreferencesText()
     }
 
     private fun setupBack() {
@@ -56,7 +62,10 @@ class SettingsFragment : Fragment() {
 
     private fun setupAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
-        MailData.mailboxesFlow.value?.let(mailboxesAdapter::setMailboxes)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val mailboxes = MailboxController.getMailboxesSync(AccountUtils.currentUserId)
+            withContext(Dispatchers.Main) { mailboxesAdapter.setMailboxes(mailboxes) }
+        }
     }
 
     private fun UserPreferences.setupPreferencesText() = with(binding) {

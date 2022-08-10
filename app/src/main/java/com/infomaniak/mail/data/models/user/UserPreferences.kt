@@ -156,7 +156,6 @@ class UserPreferences : RealmObject {
         DARK("dark", AppCompatDelegate.MODE_NIGHT_YES, R.string.settingsOptionDarkTheme);
     }
 
-
     enum class ListDensityMode(val apiName: String, @StringRes val localisedNameRes: Int) {
         COMPACT("high", R.string.settingsDensityOptionCompact),
         DEFAULT("normal", R.string.settingsDensityOptionNormal),

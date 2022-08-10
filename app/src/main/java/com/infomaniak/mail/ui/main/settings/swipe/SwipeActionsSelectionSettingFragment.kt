@@ -27,8 +27,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.cache.UserInfosController.getUserPreferences
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 
@@ -55,7 +55,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     private fun setupUi() = with(binding) {
         val actionResId = navigationArgs.titleResId
         toolbarText.setText(actionResId)
-        when (getUserPreferences().getSwipeAction(actionResId)) {
+        when (UserPreferencesController.getUserPreferences().getSwipeAction(actionResId)) {
             SwipeAction.NONE -> actionNoneCheck
             SwipeAction.ARCHIVE -> actionArchiveCheck
             SwipeAction.DELETE -> actionDeleteCheck
@@ -130,6 +130,13 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     }
 
     private fun saveAction(swipeAction: SwipeAction) {
-        MailData.updateSwipeAction(navigationArgs.titleResId, swipeAction)
+        UserPreferencesController.updateUserPreferences {
+            when (navigationArgs.titleResId) {
+                R.string.settingsSwipeShortRight -> it.shortRightSwipe = swipeAction
+                R.string.settingsSwipeLongRight -> it.longRightSwipe = swipeAction
+                R.string.settingsSwipeShortLeft -> it.shortLeftSwipe = swipeAction
+                R.string.settingsSwipeLongLeft -> it.longLeftSwipe = swipeAction
+            }
+        }
     }
 }

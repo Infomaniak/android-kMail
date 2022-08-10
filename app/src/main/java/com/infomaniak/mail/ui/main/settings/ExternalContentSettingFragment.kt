@@ -26,7 +26,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.cache.UserInfosController
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
 
@@ -50,7 +50,7 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UserInfosController.getUserPreferences().getExternalContentMode()) {
+        when (UserPreferencesController.getUserPreferences().getExternalContentMode()) {
             UserPreferences.ExternalContentMode.ALWAYS -> settingsOptionAlwaysCheck.selectOption()
             UserPreferences.ExternalContentMode.ASK_ME -> settingsOptionAskMeCheck.selectOption()
         }
@@ -66,7 +66,7 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun updateExternalContentSetting(externalContentMode: UserPreferences.ExternalContentMode, chosenOption: ImageView) {
-        UserInfosController.updateUserPreferences { it.autoTrustEmails = externalContentMode.apiValue }
+        UserPreferencesController.updateUserPreferences { it.autoTrustEmails = externalContentMode.apiValue }
         chosenOption.selectOption()
     }
 

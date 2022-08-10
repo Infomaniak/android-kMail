@@ -27,7 +27,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.cache.UserInfosController
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.UiSettings
 import com.infomaniak.mail.data.models.user.UserPreferences.ThemeMode
 import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
@@ -68,7 +68,7 @@ class ThemeSettingFragment : Fragment() {
     private fun chooseTheme(theme: ThemeMode, selectedImageView: ImageView) {
         selectedImageView.selectOption()
         setDefaultNightMode(theme.mode)
-        UserInfosController.updateUserPreferences { it.theme = theme.apiName }
+        UserPreferencesController.updateUserPreferences { it.theme = theme.apiName }
         UiSettings(requireContext()).nightMode = theme.mode
     }
 

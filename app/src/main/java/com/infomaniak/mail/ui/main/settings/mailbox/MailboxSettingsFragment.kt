@@ -22,11 +22,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MailboxSettingsFragment : Fragment() {
 
@@ -39,9 +42,8 @@ class MailboxSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mailbox = MailData.mailboxesFlow.value?.find { it.objectId == navigationArgs.mailboxObjectId } ?: return
         setupBack()
-        setupUi(mailbox)
+        setupUi()
         setupListeners()
     }
 
@@ -49,8 +51,9 @@ class MailboxSettingsFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    private fun setupUi(mailbox: Mailbox) {
-        binding.toolbarText.text = mailbox.email
+    private fun setupUi() = lifecycleScope.launch(Dispatchers.IO) {
+        val email = MailboxController.getMailboxSync(navigationArgs.mailboxObjectId)?.email ?: return@launch
+        withContext(Dispatchers.Main) { binding.toolbarText.text = email }
     }
 
     private fun setupListeners() = with(binding) {

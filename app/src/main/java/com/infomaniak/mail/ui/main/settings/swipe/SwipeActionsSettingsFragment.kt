@@ -26,7 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.UserInfosController.getUserPreferences
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
 
@@ -41,7 +41,7 @@ class SwipeActionsSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
-        getUserPreferences().setupUi()
+        UserPreferencesController.getUserPreferences().setupUi()
         setupListeners()
     }
 

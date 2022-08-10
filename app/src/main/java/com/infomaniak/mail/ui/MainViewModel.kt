@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.AddressBookController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -119,8 +120,9 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun updateAddressBooksAndContacts() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "loadAddressBooksAndContacts")
+    fun updateUserInfos() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "updateUserInfos")
+        updateUserPreferences()
         updateAddressBooks()
         updateContacts()
     }
@@ -201,6 +203,13 @@ class MainViewModel : ViewModel() {
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
 
+    // TODO: Save wanted API UserPreferences into Realm.
+    private fun updateUserPreferences() {
+        // val userPreferences =  ApiRepository.getUser().data?.preferences
+
+        // UserPreferencesController.upsertApiData(userPreferences)
+    }
+
     private fun updateAddressBooks() {
         val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
 
@@ -234,7 +243,8 @@ class MainViewModel : ViewModel() {
         filter: ThreadFilter = ThreadFilter.ALL,
         setFolderLastUpdatedAt: Boolean = true,
     ) {
-        canContinueToPaginate = ThreadController.update(mailboxUuid, folderId, offset, filter)
+        val threadMode = UserPreferencesController.getUserPreferences().getThreadMode().apiCallValue
+        canContinueToPaginate = ThreadController.update(mailboxUuid, folderId, threadMode, offset, filter)
         if (setFolderLastUpdatedAt) FolderController.updateFolderLastUpdatedAt(folderId)
         isDownloadingChanges.postValue(false)
     }

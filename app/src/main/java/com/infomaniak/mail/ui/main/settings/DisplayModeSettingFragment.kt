@@ -26,7 +26,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.cache.UserInfosController
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
 
@@ -50,7 +50,7 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UserInfosController.getUserPreferences().getThreadMode()) {
+        when (UserPreferencesController.getUserPreferences().getThreadMode()) {
             ThreadMode.THREADS -> settingsOptionDiscussionsCheck.selectOption()
             ThreadMode.MESSAGES -> settingsOptionMessagesCheck.selectOption()
         }
@@ -62,7 +62,7 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {
-        UserInfosController.updateUserPreferences { it.threadMode = displayMode.apiValue }
+        UserPreferencesController.updateUserPreferences { it.threadMode = displayMode.apiValue }
         chosenOption.selectOption()
     }
 

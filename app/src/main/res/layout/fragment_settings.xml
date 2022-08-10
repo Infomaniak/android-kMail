@@ -15,20 +15,18 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.main.settings.SettingsFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -49,184 +47,188 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <com.google.android.material.card.MaterialCardView
+        style="@style/BackgroundCardview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:animateLayoutChanges="true"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        android:layout_weight="1">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:animateLayoutChanges="true"
+            android:scrollbars="none">
 
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsSectionEmailAddresses" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/mailboxesList"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:overScrollMode="never"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_settings_mailbox" />
-
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsSectionGeneral" />
-
-            <LinearLayout
-                android:id="@+id/settingsSend"
-                style="@style/MenuDrawerItem">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsSendTitle" />
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsSectionEmailAddresses" />
 
-                <ImageView style="@style/SettingButtonChevron" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mailboxesList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_settings_mailbox" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsCodeLock"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsAppLock" />
-
-                <ImageView style="@style/SettingButtonChevron" />
-
-            </LinearLayout>
-
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsSectionAppearance" />
-
-            <LinearLayout
-                android:id="@+id/settingsThreadListDensity"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
-
-                    <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsThreadListDensityTitle" />
-
-                    <TextView
-                        android:id="@+id/densitySubtitle"
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsDefault" />
-                </LinearLayout>
-
-                <ImageView style="@style/SettingButtonChevron" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsTheme"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
-
-                    <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsTheme" />
-
-                    <TextView
-                        android:id="@+id/themeSubtitle"
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsOptionSystemTheme" />
-                </LinearLayout>
-
-                <ImageView style="@style/SettingButtonChevron" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsAccentColor"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
-
-                    <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsAccentColor" />
-
-                    <TextView
-                        android:id="@+id/accentColorSubtitle"
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/accentColorPinkTitle" />
-                </LinearLayout>
-
-                <ImageView style="@style/SettingButtonChevron" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsSwipeActions"
-                style="@style/MenuDrawerItem">
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
                 <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsSwipeActionsTitle" />
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsSectionGeneral" />
 
-                <ImageView style="@style/SettingButtonChevron" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsMessageDisplay"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                <LinearLayout
+                    android:id="@+id/settingsSend"
+                    style="@style/MenuDrawerItem">
 
                     <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsMessageDisplayTitle" />
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsSendTitle" />
 
-                    <TextView
-                        android:id="@+id/displayModeSubtitle"
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsOptionDiscussions" />
+                    <ImageView style="@style/SettingButtonChevron" />
+
                 </LinearLayout>
 
-                <ImageView style="@style/SettingButtonChevron" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsExternalContent"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                <LinearLayout
+                    android:id="@+id/settingsCodeLock"
+                    style="@style/MenuDrawerItem">
 
                     <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsExternalContentTitle" />
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsAppLock" />
 
-                    <TextView
-                        android:id="@+id/externalContentSubtitle"
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsOptionAskMe" />
+                    <ImageView style="@style/SettingButtonChevron" />
+
                 </LinearLayout>
 
-                <ImageView style="@style/SettingButtonChevron" />
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <TextView
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsSectionAppearance" />
+
+                <LinearLayout
+                    android:id="@+id/settingsThreadListDensity"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsThreadListDensityTitle" />
+
+                        <TextView
+                            android:id="@+id/densitySubtitle"
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsDefault" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsTheme"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsTheme" />
+
+                        <TextView
+                            android:id="@+id/themeSubtitle"
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsOptionSystemTheme" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsAccentColor"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsAccentColor" />
+
+                        <TextView
+                            android:id="@+id/accentColorSubtitle"
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/accentColorPinkTitle" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsSwipeActions"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsSwipeActionsTitle" />
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsMessageDisplay"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsMessageDisplayTitle" />
+
+                        <TextView
+                            android:id="@+id/displayModeSubtitle"
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsOptionDiscussions" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsExternalContent"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsExternalContentTitle" />
+
+                        <TextView
+                            android:id="@+id/externalContentSubtitle"
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsOptionAskMe" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
-    </androidx.core.widget.NestedScrollView>
+    </com.google.android.material.card.MaterialCardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
