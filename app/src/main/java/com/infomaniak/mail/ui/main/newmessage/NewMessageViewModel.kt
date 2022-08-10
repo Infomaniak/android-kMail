@@ -54,13 +54,13 @@ class NewMessageViewModel : ViewModel() {
             it.list.forEach { contact ->
                 contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
             }
-            allContacts.value = contacts
+            allContacts.postValue(contacts)
         }
     }
 
     fun listenToMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
-            mailboxes.value = it.list
+            mailboxes.postValue(it.list)
         }
     }
 
@@ -81,13 +81,13 @@ class NewMessageViewModel : ViewModel() {
         cc = newMessageCc.toRealmRecipients()
         bcc = newMessageBcc.toRealmRecipients()
 
-//        // TODO: manage advanced functionalities
-//        quote = ""
-//        references = ""
-//        delay = 0
-//        inReplyTo = ""
-//        inReplyToUid = ""
-//        replyTo = realmListOf()
+        // TODO: manage advanced functionalities
+        // quote = ""
+        // references = ""
+        // delay = 0
+        // inReplyTo = ""
+        // inReplyToUid = ""
+        // replyTo = realmListOf()
     }
 
     private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient>? {

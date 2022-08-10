@@ -35,7 +35,6 @@ import androidx.core.view.*
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
@@ -51,7 +50,6 @@ import com.infomaniak.lib.core.R as RCore
 
 class NewMessageFragment : Fragment() {
 
-    private val mainViewModel: MainViewModel by viewModels()
     private val viewModel: NewMessageViewModel by activityViewModels()
 
     private lateinit var binding: FragmentNewMessageBinding
