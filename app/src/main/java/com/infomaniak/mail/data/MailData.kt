@@ -31,7 +31,6 @@ import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestMessa
 import com.infomaniak.mail.data.cache.MailboxContentController.deleteLatestThread
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestFolder
 import com.infomaniak.mail.data.cache.MailboxContentController.getLatestMessage
-import com.infomaniak.mail.data.cache.MailboxContentController.updateDraft
 import com.infomaniak.mail.data.cache.MailboxInfoController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Contact
@@ -201,8 +200,8 @@ object MailData {
         val draftMailboxUuid = mailboxesFlow.value?.find { it.email == draft.from.firstOrNull()?.email }?.uuid ?: return
         if (draft.isLastUpdateOnline(draftMailboxUuid)) return
 
-        val updatedDraft = setDraftSignature(draft)
-        saveDraft(updatedDraft, draftMailboxUuid).data?.let {
+        val draftForApi = setDraftSignature(draft, Draft.DraftAction.SAVE)
+        saveDraft(draftForApi, draftMailboxUuid).data?.let {
             fetchDraft("/api/mail/${draftMailboxUuid}/draft/${it.uuid}", it.uid)
         }
     }
@@ -224,9 +223,9 @@ object MailData {
     fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
         val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
         if (apiResponse.data == true) {
-            MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
+            MailboxContentController.removeDraft(draft.uuid, draft.messageUid)
         } else {
-            updateDraft(draft) { it.action = Draft.DraftAction.SAVE }
+            MailboxContentController.updateDraft(draft) { it.action = Draft.DraftAction.SAVE }
             saveDraft(draft, mailboxUuid)
         }
 
@@ -236,12 +235,12 @@ object MailData {
     fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
         val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
         apiResponse.data?.let { apiData ->
-            MailboxContentController.removeDraft(draft.uuid, draft.parentMessageUid)
+            MailboxContentController.removeDraft(draft.uuid, draft.messageUid)
             val newDraft = ApiRepository.getDraft(mailboxUuid, apiData.uuid).data
             newDraft?.apply {
                 isOffline = false
                 isModifiedOffline = false
-                parentMessageUid = apiData.uid
+                messageUid = apiData.uid
                 // attachments = apiData.attachments // TODO? Not sure.
                 MailboxContentController.manageDraftAutoSave(newDraft, false)
             }
@@ -250,11 +249,14 @@ object MailData {
         return apiResponse
     }
 
-    fun setDraftSignature(draft: Draft): Draft {
+    fun setDraftSignature(draft: Draft, action: Draft.DraftAction? = null): Draft {
         val mailbox = currentMailboxFlow.value ?: return draft
         val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
 
-        return updateDraft(draft) { it.identityId = apiResponse.data?.defaultSignatureId }
+        return MailboxContentController.updateDraft(draft) { draftToUpdate ->
+            draftToUpdate.identityId = apiResponse.data?.defaultSignatureId
+            action?.let { draftToUpdate.action = it }
+        }
     }
 
     fun deleteDraft(message: Message): Boolean {

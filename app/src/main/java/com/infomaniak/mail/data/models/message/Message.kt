@@ -122,7 +122,7 @@ class Message : RealmObject {
 
     companion object {
         fun from(draft: Draft) = Message().apply {
-            uid = draft.parentMessageUid.ifEmpty { draft.uuid }
+            uid = draft.messageUid.ifEmpty { draft.uuid }
             draftUuid = draft.uuid
             subject = draft.subject
             folder = API_DRAFT_FOLDER_NAME

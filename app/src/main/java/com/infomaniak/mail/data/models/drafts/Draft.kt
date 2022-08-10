@@ -79,7 +79,7 @@ class Draft : RealmObject {
     /**
      * Local
      */
-    var parentMessageUid: String = ""
+    var messageUid: String = ""
     @Transient
     var isOffline: Boolean = false
     @Transient
@@ -92,7 +92,7 @@ class Draft : RealmObject {
             isOffline = true
         }
 
-        parentMessageUid = messageUid
+        this.messageUid = messageUid
 
         cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         bcc = bcc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects

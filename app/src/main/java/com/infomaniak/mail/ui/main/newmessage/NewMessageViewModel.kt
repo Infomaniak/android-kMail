@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
+import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
@@ -92,7 +93,7 @@ class NewMessageViewModel : ViewModel() {
 
     private fun sendOrSaveDraft(draft: Draft) {
         val mailbox = MailData.currentMailboxFlow.value ?: return
-        val draftWithSignature = if (draft.identityId == null) MailData.setDraftSignature(draft) else draft
+        val draftWithSignature = if (draft.identityId == null) MailData.setDraftSignature(draft, draft.action ?: DraftAction.SAVE) else draft
         // TODO: better handling of api response
         if (draftWithSignature.action == DraftAction.SEND) {
             MailData.sendDraft(draftWithSignature, mailbox.uuid)
@@ -100,7 +101,7 @@ class NewMessageViewModel : ViewModel() {
             MailData.saveDraft(draftWithSignature, mailbox.uuid).data?.let {
                 currentDraft.value?.apply {
                     uuid = it.uuid
-                    parentMessageUid = it.uid
+                    messageUid = it.uid
                     isOffline = false
                 }
             }

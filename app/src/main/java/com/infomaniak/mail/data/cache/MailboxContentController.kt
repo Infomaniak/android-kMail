@@ -213,30 +213,51 @@ object MailboxContentController {
             copyToRealm(draftMessage, UpdatePolicy.ALL)
 
             if (mustSaveThread) {
-                val queryThread =
-                    "SUBQUERY(${Thread::messages.name}, \$message, \$message.${Message::uid.name} == '${draft.parentMessageUid}').@count > 0"
-                val threadUid = MailRealm.mailboxContent.query<Thread>(queryThread).first().find()?.uid
-                val thread = Thread.from(draftMessage, threadUid)
+                val thread = Thread.from(draftMessage, getThreadByMessageUid(draft)?.uid)
                 copyToRealm(thread, UpdatePolicy.ALL)
-
-                val queryDraftFolder =
-                    "id == '${getDraftsFolder()?.id}' AND NONE ${Folder::threads.name}.${Thread::uid.name} == '${thread.uid}'"
-                val draftFolder = MailRealm.mailboxContent.query<Folder>(queryDraftFolder).first().find()
-                draftFolder?.id?.let { getLatestFolder(it)?.threads?.add(thread) }
+                insertInDraftFolderIfNeeded(thread)
             }
         }
+    }
+
+    private fun getThreadByMessageUid(draft: Draft): Thread? {
+        val queryThread = "${Thread::messages.name}.${Message::uid.name} == '${draft.messageUid}'"
+
+        return MailRealm.mailboxContent.query<Thread>(queryThread).first().find()
+    }
+
+    private fun MutableRealm.insertInDraftFolderIfNeeded(thread: Thread) {
+        getDraftFolderWhenThreadDoesntExist(thread)?.id?.let { getLatestFolder(it)?.threads?.add(thread) }
+    }
+
+    private fun getDraftFolderWhenThreadDoesntExist(thread: Thread): Folder? {
+        val queryDraftFolderWhenThreadDoesntExist =
+            "id == '${getDraftsFolder()?.id}' AND NONE ${Folder::threads.name}.${Thread::uid.name} == '${thread.uid}'"
+
+        return MailRealm.mailboxContent.query<Folder>(queryDraftFolderWhenThreadDoesntExist).first().find()
     }
 
     fun removeDraft(uuid: String, parentUid: String) {
         MailRealm.mailboxContent.writeBlocking { removeDraft(uuid, parentUid) }
     }
 
-    private fun MutableRealm.removeDraft(uuid: String, parentUid: String) {
-        val query =
-            "${Thread::parentFolderId.name} == '${getDraftsFolder()?.id}' AND (${Thread::uid.name} == '$uuid' OR ${Thread::uid.name} == '$parentUid' OR SUBQUERY(${Thread::messages.name}, \$message, \$message.${Message::uid.name} == '$uuid' OR \$message.${Message::uid.name} == '$parentUid').@count > 0)"
-        val threadsToRemove = MailRealm.mailboxContent.query<Thread>(query).find()
-        deleteLatestMessage(parentUid.ifEmpty { uuid })
+    private fun MutableRealm.removeDraft(uuid: String, messageUid: String) {
+        val threadsToRemove = getThreadsToRemoveByMessageUid(uuid, messageUid)
+        deleteLatestMessage(messageUid.ifEmpty { uuid })
         threadsToRemove.forEach { thread -> thread.let { getLatestThread(it.uid)?.let(::delete) } }
+    }
+
+    private fun getThreadsToRemoveByMessageUid(uuid: String, messageUid: String): RealmResults<Thread> {
+        val threadUidPropertyName = Thread::uid.name
+        val messageUidPropertyName = "${Thread::messages.name}.${Message::uid.name}"
+        val query = """
+                ${Thread::parentFolderId.name} == '${getDraftsFolder()?.id}' AND (
+                   $threadUidPropertyName == '$uuid' OR $threadUidPropertyName == '$messageUid' OR
+                   $messageUidPropertyName == '$uuid' OR $messageUidPropertyName == '$messageUid'
+                )
+            """.trimIndent()
+
+        return MailRealm.mailboxContent.query<Thread>(query).find()
     }
 
     /**
