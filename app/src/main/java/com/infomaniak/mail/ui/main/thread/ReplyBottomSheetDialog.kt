@@ -49,6 +49,6 @@ open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
 
     enum class ReplyType {
         REPLY,
-        REPLY_TO_ALL
+        REPLY_TO_ALL,
     }
 }

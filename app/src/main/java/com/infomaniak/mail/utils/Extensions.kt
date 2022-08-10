@@ -85,7 +85,7 @@ fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0
 fun ImageView.loadAvatar(
     name: String?,
     email: String,
-    imageLoader: ImageLoader = ImageLoader.Builder(context).build()
+    imageLoader: ImageLoader = ImageLoader.Builder(context).build(),
 ): Disposable {
     val initials = (if (name.isNullOrBlank()) email else name).firstOrEmpty().toString().uppercase()
     return loadAvatar(email.hashCode(), null, initials, imageLoader)

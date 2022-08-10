@@ -53,7 +53,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             val action = MainActions.values()[index]
             when (action) {
                 REPLY -> notYetImplemented()
-                REPLAY_TO_ALL -> notYetImplemented()
+                REPLY_TO_ALL -> notYetImplemented()
                 FORWARD -> notYetImplemented()
                 DELETE -> notYetImplemented()
             }

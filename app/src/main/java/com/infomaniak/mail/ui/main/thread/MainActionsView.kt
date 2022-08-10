@@ -34,7 +34,7 @@ import com.infomaniak.mail.databinding.ViewMainActionsBinding
 class MainActionsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     var binding: ViewMainActionsBinding

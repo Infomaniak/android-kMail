@@ -30,6 +30,7 @@ import com.infomaniak.mail.utils.loadAvatar
 import com.infomaniak.mail.utils.notYetImplemented
 
 class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
+
     lateinit var binding: BottomSheetDetailedContactBinding
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
 

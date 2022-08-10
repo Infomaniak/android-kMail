@@ -25,7 +25,7 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
@@ -49,39 +49,39 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
             Triple(
                 R.drawable.ic_star_filled,
                 context.getColor(R.color.favoriteYellow),
-                R.string.actionUnstar
+                R.string.actionUnstar,
             )
         } else {
             Triple(
                 R.drawable.ic_star,
                 context.getAttributeColor(RMaterial.attr.colorPrimary),
-                R.string.actionStar
+                R.string.actionStar,
             )
         }
     }
 
-    fun BottomSheetActionsMenuBinding.setMarkAsReadUi(isSeen: Boolean) {
+    fun setMarkAsReadUi(isSeen: Boolean) = with(binding.markAsRead) {
         val (readIconRes, readTextRes) = computeUnreadStyle(isSeen)
-        markAsRead.setIconResource(readIconRes)
-        markAsRead.setText(readTextRes)
+        setIconResource(readIconRes)
+        setText(readTextRes)
     }
 
-    fun BottomSheetActionsMenuBinding.setFavoriteUi(isFavorite: Boolean) {
-        val (favoriteIconRes, favoriteTint, favoriteText) = computeFavoriteStyle(root.context, isFavorite)
-        favorite.setIconResource(favoriteIconRes)
-        favorite.setIconTint(favoriteTint)
-        favorite.setText(favoriteText)
+    fun setFavoriteUi(isFavorite: Boolean) = with(binding.favorite) {
+        val (favoriteIconRes, favoriteTint, favoriteText) = computeFavoriteStyle(context, isFavorite)
+        setIconResource(favoriteIconRes)
+        setIconTint(favoriteTint)
+        setText(favoriteText)
     }
 
-    fun BottomSheetActionsMenuBinding.setSpamUi() {
-        val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == Folder.FolderRole.SPAM
-        spam.setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)
+    fun setSpamUi() = with(binding.spam) {
+        val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == FolderRole.SPAM
+        setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)
     }
 
     enum class MainActions {
         REPLY,
-        REPLAY_TO_ALL,
+        REPLY_TO_ALL,
         FORWARD,
-        DELETE
+        DELETE,
     }
 }

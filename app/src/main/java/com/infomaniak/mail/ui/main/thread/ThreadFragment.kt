@@ -86,7 +86,7 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                         isFavorite = navigationArgs.threadIsFavorite,
-                        unseenMessagesCount = navigationArgs.unseenMessagesCount
+                        unseenMessagesCount = navigationArgs.unseenMessagesCount,
                     )
                 )
             }
@@ -119,7 +119,7 @@ class ThreadFragment : Fragment() {
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(
                         contact.name,
-                        contact.email
+                        contact.email,
                     )
                 )
             }
