@@ -65,6 +65,8 @@ class Folder : RealmObject {
     var parentLink: Folder? = null
     var lastUpdatedAt: RealmInstant? = null
 
+    val isDraftFolder get() = role == FolderRole.DRAFT
+
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
@@ -88,7 +90,6 @@ class Folder : RealmObject {
     companion object {
         const val API_DRAFT_FOLDER_NAME = "Drafts"
 
-        fun isDraftsFolder() = MailData.currentFolderFlow.value?.role == FolderRole.DRAFT
-        fun getDraftsFolder() = MailData.foldersFlow.value?.find { it.role == FolderRole.DRAFT }
+        inline val draftsFolder get() = MailData.foldersFlow.value?.find { it.role == FolderRole.DRAFT }
     }
 }

@@ -23,8 +23,8 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.Companion.API_DRAFT_FOLDER_NAME
-import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.thread.Thread
@@ -126,7 +126,7 @@ class Message : RealmObject {
             draftUuid = draft.uuid
             subject = draft.subject
             folder = API_DRAFT_FOLDER_NAME
-            folderId = getDraftsFolder()?.id.toString()
+            folderId = Folder.draftsFolder?.id.toString()
             from = draft.from
             to = draft.to ?: realmListOf()
             cc = draft.cc ?: realmListOf()

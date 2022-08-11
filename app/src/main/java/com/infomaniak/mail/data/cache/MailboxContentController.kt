@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.cache
 
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.Companion.getDraftsFolder
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -227,14 +226,13 @@ object MailboxContentController {
     }
 
     private fun MutableRealm.insertInDraftFolderIfNeeded(thread: Thread) {
-        getDraftFolderWhenThreadDoesntExist(thread)?.id?.let { getLatestFolder(it)?.threads?.add(thread) }
+        thread.getDraftFolderIfNotExist()?.id?.let { getLatestFolder(it)?.threads?.add(thread) }
     }
 
-    private fun getDraftFolderWhenThreadDoesntExist(thread: Thread): Folder? {
-        val queryDraftFolderWhenThreadDoesntExist =
-            "id == '${getDraftsFolder()?.id}' AND NONE ${Folder::threads.name}.${Thread::uid.name} == '${thread.uid}'"
-
-        return MailRealm.mailboxContent.query<Folder>(queryDraftFolderWhenThreadDoesntExist).first().find()
+    private fun Thread.getDraftFolderIfNotExist(): Folder? {
+        return MailRealm.mailboxContent.query<Folder>(
+            "id == '${Folder.draftsFolder?.id}' AND NONE ${Folder::threads.name}.${Thread::uid.name} == '${uid}'"
+        ).first().find()
     }
 
     fun removeDraft(uuid: String, parentUid: String) {
@@ -251,7 +249,7 @@ object MailboxContentController {
         val threadUidPropertyName = Thread::uid.name
         val messageUidPropertyName = "${Thread::messages.name}.${Message::uid.name}"
         val query = """
-                ${Thread::parentFolderId.name} == '${getDraftsFolder()?.id}' AND (
+                ${Thread::parentFolderId.name} == '${Folder.draftsFolder?.id}' AND (
                    $threadUidPropertyName == '$uuid' OR $threadUidPropertyName == '$messageUid' OR
                    $messageUidPropertyName == '$uuid' OR $messageUidPropertyName == '$messageUid'
                 )

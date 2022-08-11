@@ -35,7 +35,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivityArgs
 import io.realm.kotlin.types.RealmInstant
@@ -85,12 +84,6 @@ fun Context.getAttributeColor(@IdRes attribute: Int): Int {
     theme.resolveAttribute(attribute, typedValue, true)
     return typedValue.data
 }
-
-fun Recipient.displayedName(context: Context): String {
-    return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
-}
-
-fun Recipient.getNameOrEmail() = name?.ifBlank { email } ?: email
 
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")

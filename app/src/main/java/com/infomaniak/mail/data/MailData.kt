@@ -180,7 +180,7 @@ object MailData {
         val isInternetAvailable = true // TODO: Manage this for real
         val realmThreads = getThreadsFromRealm(folder, offset, filter)
 
-        if (Folder.isDraftsFolder() && isInternetAvailable) {
+        if (currentFolderFlow.value?.isDraftFolder == true && isInternetAvailable) {
             val realmOfflineDrafts = realmThreads
                 .flatMap { it.messages }
                 .filter { it.isDraft }
@@ -413,7 +413,7 @@ object MailData {
         forceRefresh: Boolean = false,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val isDraftsFolder = Folder.isDraftsFolder()
+            val isDraftsFolder = currentFolderFlow.value?.isDraftFolder ?: false
             val apiThreads = MailApi.fetchThreads(folder, mailbox.uuid, offset, filter, isDraftsFolder)
             val mergedThreads = mergeThreads(realmThreads ?: mutableThreadsFlow.value, apiThreads, folder, offset)
 

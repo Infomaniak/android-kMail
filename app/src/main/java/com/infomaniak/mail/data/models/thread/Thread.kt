@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.displayedName
 import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.realmListOf
@@ -100,12 +99,10 @@ class Thread : RealmObject {
         return this
     }
 
-    private fun Date.formatDate(): String {
-        return when {
-            isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-            year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
-            else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
-        }
+    private fun Date.formatDate() = when {
+        isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
+        year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
+        else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
     }
 
     fun formatExpeditorField(context: Context): CharSequence {

@@ -54,7 +54,7 @@ class NewMessageActivity : ThemedActivity() {
 
             toolbar.setOnMenuItemClickListener {
                 with(newMessageFragment) {
-                    if (viewModel.sendDraft(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) {
+                    if (viewModel.sendDraftAction(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) {
                         finish()
                     } else {
                         showSnackbar(RCore.string.anErrorHasOccurred)
@@ -77,7 +77,7 @@ class NewMessageActivity : ThemedActivity() {
             handleEditorToggle()
         }
 
-        with(navigationArgs) { viewModel.setup(draftResource, draftUuid, messageUid) }
+        with(navigationArgs) { viewModel.loadDraft(draftResource, draftUuid, messageUid) }
     }
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {
@@ -105,7 +105,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     fun closeDraft() = with(newMessageFragment) {
-        viewModel.sendDraft(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
+        viewModel.sendDraftAction(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
         finish()
     }
 

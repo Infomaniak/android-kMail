@@ -39,7 +39,7 @@ import java.util.*
 @Serializable
 class Draft : RealmObject {
     @PrimaryKey
-    var uuid: String = ""
+    var uuid: String = "${OFFLINE_DRAFT_UUID_PREFIX}_${UUID.randomUUID()}"
     var date: RealmInstant? = null
     @SerialName("identity_id")
     var identityId: Int? = null
@@ -65,11 +65,6 @@ class Draft : RealmObject {
     var ackRequest: Boolean = false
     @SerialName("action")
     private var _action: String = ""
-    var action
-        get() = enumValueOfOrNull<DraftAction>(_action)
-        set(value) {
-            _action = value?.apiName ?: ""
-        }
     var delay: Int = 0
     var priority: String? = null
     @SerialName("st_uuid")
@@ -85,13 +80,13 @@ class Draft : RealmObject {
     @Transient
     var isModifiedOffline: Boolean = false
 
-    fun initLocalValues(messageUid: String = "") {
-
-        if (uuid.isEmpty()) {
-            uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${UUID.randomUUID()}"
-            isOffline = true
+    var action
+        get() = enumValueOfOrNull<DraftAction>(_action)
+        set(value) {
+            _action = value.toString()
         }
 
+    fun initLocalValues(messageUid: String = "") {
         this.messageUid = messageUid
 
         cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
@@ -99,9 +94,10 @@ class Draft : RealmObject {
         to = to?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
     }
 
-    enum class DraftAction(val apiName: String) {
-        SEND("send"),
-        SAVE("save")
+    enum class DraftAction {
+        SEND, SAVE;
+
+        override fun toString() = name.lowercase()
     }
 
     companion object {

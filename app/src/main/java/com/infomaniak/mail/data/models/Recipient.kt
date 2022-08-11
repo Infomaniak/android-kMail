@@ -17,6 +17,9 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.content.Context
+import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.Serializable
@@ -41,6 +44,12 @@ class Recipient : RealmObject {
 
         return this
     }
+
+    fun displayedName(context: Context): String {
+        return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
+    }
+
+    private fun getNameOrEmail() = name?.ifBlank { email } ?: email
 
     override fun equals(other: Any?): Boolean = other is Recipient && other.objectId == objectId
 

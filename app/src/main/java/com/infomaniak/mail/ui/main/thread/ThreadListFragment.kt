@@ -42,6 +42,7 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
@@ -180,7 +181,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             // onEmptyList = { checkIfNoFiles() }
 
             onThreadClicked = {
-                if (Folder.isDraftsFolder()) {
+                if (MailData.currentFolderFlow.value?.isDraftFolder == true) {
                     if (it.messages.isNotEmpty()) {
                         openMessageEdition(R.id.action_threadListFragment_to_newMessageActivity, it.messages.first())
                     }

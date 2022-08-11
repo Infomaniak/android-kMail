@@ -43,7 +43,6 @@ import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.displayedName
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toggleChevron
 import com.infomaniak.lib.core.R as RCore

@@ -74,7 +74,6 @@ class NewMessageFragment : Fragment() {
 
         handleOnBackPressed()
         setupFromField()
-        setUpAutoSave()
         displayChips()
 
         // TODO: Do we want this button?
@@ -148,11 +147,6 @@ class NewMessageFragment : Fragment() {
         })
     }
 
-    override fun onPause() {
-        viewModel.clearJobs()
-        super.onPause()
-    }
-
     private fun handleOnBackPressed() {
         activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner) {
             if (isAutocompletionOpened) {
@@ -196,9 +190,9 @@ class NewMessageFragment : Fragment() {
 
                 subjectTextField.text = SpannableStringBuilder(draft.subject)
                 bodyText.text = Html.fromHtml(draft.body, Html.FROM_HTML_MODE_COMPACT) as Editable
-
-                clearJobs()
                 hasStartedEditing.value = false
+
+                setUpAutoSave()
             }
         }
     }

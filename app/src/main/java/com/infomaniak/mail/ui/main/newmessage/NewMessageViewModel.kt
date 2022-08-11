@@ -24,12 +24,10 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.cache.MailboxContentController
-import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
@@ -49,11 +47,14 @@ class NewMessageViewModel : ViewModel() {
     var hasStartedEditing = MutableLiveData(false)
     var autoSaveJob: Job? = null
 
-    fun setup(draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
+    fun loadDraft(draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val draft = draftResources?.let { MailApi.fetchDraft(it, messageUid ?: "") }
                 ?: draftUuid?.let { MailboxContentController.getDraft(it) }
-                ?: Draft().apply { initLocalValues() }
+                ?: Draft().apply {
+                    isOffline = true
+                    initLocalValues()
+                }
             currentDraft.postValue(draft)
         }
     }
@@ -69,14 +70,14 @@ class NewMessageViewModel : ViewModel() {
 
     fun startAutoSave(email: String, subject: String, body: String) {
         hasStartedEditing.value = true
-        clearJobs()
+        autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(3_000L)
-            sendDraft(DraftAction.SAVE, email, subject, body)
+            sendDraftAction(DraftAction.SAVE, email, subject, body)
         }
     }
 
-    fun sendDraft(action: DraftAction, email: String, subject: String, body: String): Boolean {
+    fun sendDraftAction(action: DraftAction, email: String, subject: String, body: String): Boolean {
         if (action == DraftAction.SAVE && hasStartedEditing.value == false ||
             action == DraftAction.SEND && newMessageTo.isEmpty()
         ) {
@@ -84,16 +85,17 @@ class NewMessageViewModel : ViewModel() {
         }
 
         currentDraft.value?.let { draft ->
-            draft.fill(draftAction = action, messageEmail = email, messageSubject = subject, messageBody = body)
-            viewModelScope.launch(Dispatchers.IO) { sendOrSaveDraft(draft) }
+            draft.update(draftAction = action, messageEmail = email, messageSubject = subject, messageBody = body)
+            viewModelScope.launch(Dispatchers.IO) { draft.sendOrSaveDraft() }
         }
 
         return true
     }
 
-    private fun sendOrSaveDraft(draft: Draft) {
+    private fun Draft.sendOrSaveDraft() {
         val mailbox = MailData.currentMailboxFlow.value ?: return
-        val draftWithSignature = if (draft.identityId == null) MailData.setDraftSignature(draft, draft.action ?: DraftAction.SAVE) else draft
+        val draftWithSignature =
+            if (identityId == null) MailData.setDraftSignature(this, action ?: DraftAction.SAVE) else this
         // TODO: better handling of api response
         if (draftWithSignature.action == DraftAction.SEND) {
             MailData.sendDraft(draftWithSignature, mailbox.uuid)
@@ -108,17 +110,17 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun clearJobs() {
+    override fun onCleared() {
         autoSaveJob?.cancel()
+        super.onCleared()
     }
 
-    private fun Draft.fill(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
+    private fun Draft.update(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
         // TODO: Should userInformation (here 'from') be stored in mainViewModel? See ApiRepository.getUser()
         MailboxContentController.updateDraft(this) {
             it.from = realmListOf(Recipient().apply { email = messageEmail })
             it.subject = messageSubject
             it.body = messageBody
-            it.priority = MessagePriority.Priority.NORMAL.toString()
             it.action = draftAction
             it.to = newMessageTo.toRealmRecipients()
             it.cc = newMessageCc.toRealmRecipients()
