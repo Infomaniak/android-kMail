@@ -72,6 +72,7 @@ class AccentColorSettingFragment : Fragment() {
         activity?.setTheme(if (color == UiSettings.ColorTheme.PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
         UiSettings(requireContext()).colorTheme = color
         selectedImageView.selectColor(color)
+        activity?.recreate()
     }
 
     private fun ImageView.selectColor(color: UiSettings.ColorTheme) {
