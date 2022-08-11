@@ -208,10 +208,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/listDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ListDensitySettingFragment"
+        android:id="@+id/threadsDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ThreadsDensitySettingFragment"
         android:label="ListDensitySettingFragment"
-        tools:layout="@layout/fragment_list_density_setting" />
+        tools:layout="@layout/fragment_threads_density_setting" />
 
     <fragment
         android:id="@+id/themeSettingFragment"
@@ -267,46 +267,6 @@
         android:name="com.infomaniak.mail.ui.main.settings.mailbox.AutoReplySettingFragment"
         android:label="AutoReplySettingFragment"
         tools:layout="@layout/fragment_auto_reply_settings" />
-
-    <fragment
-        android:id="@+id/messageListDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.MessageListDensitySettingFragment"
-        android:label="MessageListDensitySettingFragment"
-        tools:layout="@layout/fragment_message_list_density_setting">
-        <action
-            android:id="@+id/action_messageListDensitySettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/messageDisplayModeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.MessageDisplayModeSettingFragment"
-        android:label="messageDisplayModeSettingFragment"
-        tools:layout="@layout/fragment_message_display_mode_setting">
-        <action
-            android:id="@+id/action_messageDisplayModeSettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/externalContentSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.ExternalContentSettingFragment"
-        android:label="externalContentSettingFragment"
-        tools:layout="@layout/fragment_external_content_setting">
-        <action
-            android:id="@+id/action_externalContentSettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/themeSettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.ThemeSettingFragment"
-        android:label="themeSettingFragment"
-        tools:layout="@layout/fragment_theme_setting">
-        <action
-            android:id="@+id/action_themeSettingFragment_to_selectSettingsFragment"
-            app:destination="@id/selectSettingsFragment" />
-    </fragment>
 
     <fragment
         android:id="@+id/spamSettingFragment"
