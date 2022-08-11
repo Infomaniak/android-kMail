@@ -113,10 +113,7 @@ object FolderController {
     }
 
     fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-        RealmController.mailboxContent.writeBlocking {
-            getLatestFolderSync(id)
-                ?.let(onUpdate)
-        }
+        RealmController.mailboxContent.writeBlocking { getLatestFolderSync(id)?.let(onUpdate) }
     }
 
     fun updateFolderUnreadCount(id: String, unreadCount: Int) {

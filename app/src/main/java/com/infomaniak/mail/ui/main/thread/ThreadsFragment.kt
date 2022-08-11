@@ -38,7 +38,6 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -49,7 +48,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadsBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
-import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.*
@@ -120,18 +118,24 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             // onEmptyList = { checkIfNoFiles() }
 
             onThreadClicked = {
-                if (MailData.currentFolderFlow.value?.isDraftFolder == true) {
-                    if (it.messages.isNotEmpty()) {
-                        openMessageEdition(R.id.action_threadListFragment_to_newMessageActivity, it.messages.first())
+                lifecycleScope.launch(Dispatchers.IO) {
+                    if (MainViewModel.currentFolderId.value?.let(FolderController::getFolderSync)?.isDraftFolder == true) {
+                        if (it.messages.isNotEmpty()) {
+                            withContext(Dispatchers.Main) {
+                                openMessageEdition(R.id.action_threadsFragment_to_newMessageActivity, it.messages.first())
+                            }
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            safeNavigate(
+                                ThreadsFragmentDirections.actionThreadsFragmentToMessagesFragment(
+                                    threadUid = it.uid,
+                                    threadSubject = it.subject,
+                                    threadIsFavorite = it.isFavorite,
+                                )
+                            )
+                        }
                     }
-                } else {
-                    safeNavigate(
-                        ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
-                            threadUid = it.uid,
-                            threadSubject = it.subject,
-                            threadIsFavorite = it.isFavorite,
-                        )
-                    )
                 }
             }
         }
@@ -142,7 +146,8 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         toolbar.setNavigationOnClickListener { (activity as? MainActivity)?.binding?.drawerLayout?.open() }
 
         searchButton.setOnClickListener {
-            safeNavigate(ThreadsFragmentDirections.actionThreadsFragmentToSearchFragment())
+            notYetImplemented()
+            // safeNavigate(ThreadsFragmentDirections.actionThreadsFragmentToSearchFragment()) // TODO
         }
 
         userAvatar.setOnClickListener {
@@ -150,7 +155,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         newMessageFab.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionThreadsFragmentToNewMessageActivity())
+            safeNavigate(ThreadsFragmentDirections.actionThreadsFragmentToNewMessageActivity())
         }
 
         threadsList.setPagination(
@@ -316,12 +321,11 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun downloadThreads() = with(mainViewModel) {
 
         val uuid = mailboxUuid ?: return
-        val folderId = MainViewModel.currentFolderId.value ?: return
 
         if (canContinueToPaginate) {
             currentOffset += PER_PAGE
             showLoadingTimer.start()
-            loadMoreThreads(uuid, folderId, currentOffset, filter)
+            loadMoreThreads(uuid, currentOffset, filter)
         }
     }
 

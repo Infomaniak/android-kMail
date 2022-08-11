@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.getLatestFolderSync
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -57,21 +58,18 @@ object ThreadController {
     /**
      * Edit data
      */
-    fun upsertApiData(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): Boolean {
+    fun upsertApiData(
+        realmThreads: List<Thread>,
+        mailboxUuid: String,
+        folder: Folder,
+        offset: Int,
+        filter: ThreadFilter,
+    ): Boolean {
 
         // Get current data
         Log.d(RealmController.TAG, "Threads: Get current data")
-        val realmThreads = FolderController.getFolderSync(folderId)?.threads?.filter {
-            when (filter) {
-                ThreadFilter.SEEN -> it.unseenMessagesCount == 0
-                ThreadFilter.UNSEEN -> it.unseenMessagesCount > 0
-                ThreadFilter.STARRED -> it.isFavorite
-                ThreadFilter.ATTACHMENTS -> it.hasAttachments
-                else -> true
-            }
-        } ?: emptyList()
-        val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data
-        val apiThreadsSinceOffset = threadsResult?.threads?.map { it.initLocalValues(mailboxUuid) }
+        val threadsResult = ApiRepository.getThreads(mailboxUuid, folder.id, offset, filter, folder.isDraftFolder).data
+        val apiThreadsSinceOffset = threadsResult?.threads?.map { it.initLocalValues(mailboxUuid, folder.id) }
             ?: emptyList()
         val apiThreads = if (offset == ApiRepository.OFFSET_FIRST_PAGE) {
             apiThreadsSinceOffset
@@ -89,7 +87,7 @@ object ThreadController {
         } else {
             emptyList()
         }
-        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folderId } }
+        val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folder.id } }
 
         RealmController.mailboxContent.writeBlocking {
             // Save new data
@@ -101,7 +99,7 @@ object ThreadController {
                     val mergedThread = getMergedThread(apiThread, realmThread)
                     copyToRealm(mergedThread, UpdatePolicy.ALL)
                 }
-                updateFolder(folderId, apiThreads)
+                updateFolder(folder.id, apiThreads)
             }
 
             // Delete outdated data
@@ -112,7 +110,7 @@ object ThreadController {
 
         return threadsResult?.let {
             val canContinueToPaginate = it.messagesCount >= ApiRepository.PER_PAGE
-            FolderController.updateFolderUnreadCount(folderId, it.folderUnseenMessage)
+            FolderController.updateFolderUnreadCount(folder.id, it.folderUnseenMessage)
             canContinueToPaginate
         } ?: false
     }
@@ -184,8 +182,6 @@ object ThreadController {
     // fun updateThread(uid: String, onUpdate: (thread: Thread) -> Unit) {
     //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(onUpdate) }
     // }
-
-    // fun getLatestThread(uid: String): Thread? = RealmController.mailboxContent.writeBlocking { getLatestThread(uid) }
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640

@@ -26,19 +26,15 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentMessagesBinding
 import com.infomaniak.mail.ui.main.MainViewModel
@@ -46,9 +42,8 @@ import com.infomaniak.mail.ui.main.thread.MessagesFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.toSharedFlow
-import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.openMessageEdition
+import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -59,7 +54,7 @@ class MessagesFragment : Fragment() {
 
     private val navigationArgs: MessagesFragmentArgs by navArgs()
 
-    private val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMessagesBinding
     private var messagesAdapter = MessagesAdapter()
@@ -110,19 +105,10 @@ class MessagesFragment : Fragment() {
                     )
                 )
             }
-            onDraftClicked = { message -> openMessageEdition(R.id.action_threadFragment_to_newMessageActivity, message) }
+            onDraftClicked = { message -> openMessageEdition(R.id.action_messagesFragment_to_newMessageActivity, message) }
             onDeleteDraftClicked = { message ->
-                val isInternetAvailable = true // TODO: Manage this for real
-                if (!isInternetAvailable) {
-                    val position = threadAdapter.removeMessage(message)
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        if (!MailData.deleteDraft(message)) {
-                            threadAdapter.insertMessage(position, message)
-                            showSnackbar(RCore.string.anErrorHasOccurred) // TODO: Add real error message
-                        }
-                        // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
-                    }
-                }
+                mainViewModel.deleteDraft(message)
+                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
             }
         }
     }

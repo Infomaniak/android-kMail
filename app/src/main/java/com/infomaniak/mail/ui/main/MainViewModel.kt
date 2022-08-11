@@ -21,9 +21,11 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.decrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -35,15 +37,19 @@ import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.drafts.Draft
+import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
+import com.infomaniak.mail.data.models.drafts.DraftSaveResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import com.infomaniak.mail.utils.toDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 
 class MainViewModel : ViewModel() {
 
@@ -55,6 +61,51 @@ class MainViewModel : ViewModel() {
         val currentFolderId = MutableLiveData<String?>()
         val currentThreadUid = MutableLiveData<String?>()
         val currentMessageUid = MutableLiveData<String?>()
+
+        fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
+            val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
+            if (apiResponse.data == true) {
+                DraftController.removeDraft(draft.uuid, draft.messageUid)
+            } else {
+                DraftController.updateDraft(draft.uuid) { it.apply { action = DraftAction.SAVE } }
+                saveDraft(draft, mailboxUuid)
+            }
+
+            return apiResponse
+        }
+
+        fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
+            val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
+            apiResponse.data?.let { apiData ->
+                DraftController.removeDraft(draft.uuid, draft.messageUid)
+                val newDraft = ApiRepository.getDraft(mailboxUuid, apiData.uuid).data
+                newDraft?.apply {
+                    isOffline = false
+                    isModifiedOffline = false
+                    messageUid = apiData.uid
+                    // attachments = apiData.attachments // TODO? Not sure.
+                    DraftController.manageDraftAutoSave(newDraft, false)
+                }
+            } ?: DraftController.manageDraftAutoSave(draft, true)
+
+            return apiResponse
+        }
+
+        fun setDraftSignature(draft: Draft, draftAction: DraftAction? = null): Draft {
+
+            fun updateDraft(draftToUpdate: Draft, defaultSignatureId: Int?): Draft = draftToUpdate.apply {
+                identityId = defaultSignatureId
+                draftAction?.let { action = it }
+            }
+
+            val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return draft
+            val defaultSignatureId = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox).data?.defaultSignatureId
+
+            return DraftController.updateDraft(draft.uuid) { draftToUpdate ->
+                updateDraft(draftToUpdate, defaultSignatureId)
+            } ?: updateDraft(draft, defaultSignatureId)
+        }
+
     }
 
     val isInternetAvailable = MutableLiveData(false)
@@ -126,7 +177,7 @@ class MainViewModel : ViewModel() {
         val folders = loadFolders(mailbox)
         computeFolderToSelect(folders)?.let { folder ->
             selectFolder(folder.id)
-            loadThreads(mailbox.uuid, folder.id)
+            loadThreads(mailbox.uuid)
         }
     }
 
@@ -138,7 +189,7 @@ class MainViewModel : ViewModel() {
             val folders = loadFolders(mailbox)
             computeFolderToSelect(folders)?.let { folder ->
                 selectFolder(folder.id)
-                loadThreads(mailbox.uuid, folder.id)
+                loadThreads(mailbox.uuid)
             }
         }
     }
@@ -156,7 +207,7 @@ class MainViewModel : ViewModel() {
         Log.i(TAG, "openFolder: $folderId")
 
         selectFolder(folderId)
-        loadThreads(mailboxUuid, folderId)
+        loadThreads(mailboxUuid)
     }
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
@@ -189,21 +240,15 @@ class MainViewModel : ViewModel() {
         Log.i(TAG, "forceRefreshThreads")
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
         val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
-        val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges = true
-        loadThreads(mailboxUuid, folderId, currentOffset, filter)
+        loadThreads(mailboxUuid, currentOffset, filter)
     }
 
-    fun loadMoreThreads(
-        mailboxUuid: String,
-        folderId: String,
-        offset: Int,
-        filter: ThreadFilter,
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    fun loadMoreThreads(mailboxUuid: String, offset: Int, filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
         isDownloadingChanges = true
-        loadThreads(mailboxUuid, folderId, offset, filter)
+        loadThreads(mailboxUuid, offset, filter)
     }
 
     fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
@@ -255,12 +300,95 @@ class MainViewModel : ViewModel() {
 
     private fun loadThreads(
         mailboxUuid: String,
-        folderId: String,
         offset: Int = OFFSET_FIRST_PAGE,
         filter: ThreadFilter = ThreadFilter.ALL,
-    ) {
-        canContinueToPaginate = ThreadController.upsertApiData(mailboxUuid, folderId, offset, filter)
+    ) = viewModelScope.launch(Dispatchers.IO) {
+
+        val folder = currentFolderId.value?.let(FolderController::getFolderSync) ?: return@launch
+        val realmThreads = folder.threads.filter {
+            when (filter) {
+                ThreadFilter.SEEN -> it.unseenMessagesCount == 0
+                ThreadFilter.UNSEEN -> it.unseenMessagesCount > 0
+                ThreadFilter.STARRED -> it.isFavorite
+                ThreadFilter.ATTACHMENTS -> it.hasAttachments
+                else -> true
+            }
+        }
+
+        val isInternetAvailable = true // TODO
+        if (folder.isDraftFolder == true && isInternetAvailable) {
+            realmThreads
+                .flatMap { it.messages }
+                .filter { it.isDraft }
+                .mapNotNull { it.draftUuid?.let(DraftController::getDraftSync) }
+                .filter { it.isOffline || it.isModifiedOffline }
+                .forEach { draft -> saveOfflineDraftToApi(draft) }
+        }
+
+        canContinueToPaginate = ThreadController.upsertApiData(realmThreads, mailboxUuid, folder, offset, filter)
     }
+
+    private fun saveOfflineDraftToApi(draft: Draft) {
+        val draftMailboxUuid = MailboxController.getMailboxesSync(AccountUtils.currentUserId)
+            .find { it.email == draft.from.firstOrNull()?.email }
+            ?.uuid ?: return
+        if (draft.isLastUpdateOnline(draftMailboxUuid)) return
+
+        val draftForApi = setDraftSignature(draft, DraftAction.SAVE)
+        saveDraft(draftForApi, draftMailboxUuid).data?.let {
+            fetchDraft("/api/mail/${draftMailboxUuid}/draft/${it.uuid}", it.uid)
+        }
+    }
+
+    private fun Draft.isLastUpdateOnline(mailboxUuid: String): Boolean {
+        if (isOffline) return false
+        if (!isModifiedOffline) return true
+
+        val apiDraft = ApiRepository.getDraft(mailboxUuid, uuid).data
+
+        return apiDraft?.date?.toDate()?.after(date?.toDate()) == true
+    }
+
+//    fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
+//        val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
+//        if (apiResponse.data == true) {
+//            DraftController.removeDraft(draft.uuid, draft.messageUid)
+//        } else {
+//            DraftController.updateDraft(draft.uuid) { it.apply { action = DraftAction.SAVE } }
+//            saveDraft(draft, mailboxUuid)
+//        }
+//
+//        return apiResponse
+//    }
+//
+//    fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
+//        val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
+//        apiResponse.data?.let { apiData ->
+//            DraftController.removeDraft(draft.uuid, draft.messageUid)
+//            val newDraft = ApiRepository.getDraft(mailboxUuid, apiData.uuid).data
+//            newDraft?.apply {
+//                isOffline = false
+//                isModifiedOffline = false
+//                messageUid = apiData.uid
+//                // attachments = apiData.attachments // TODO? Not sure.
+//                DraftController.manageDraftAutoSave(newDraft, false)
+//            }
+//        } ?: DraftController.manageDraftAutoSave(draft, true)
+//
+//        return apiResponse
+//    }
+//
+//    fun setDraftSignature(draft: Draft, draftAction: DraftAction? = null): Draft {
+//        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return draft
+//        val apiResponse = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
+//
+//        return DraftController.updateDraft(draft.uuid) { draftToUpdate ->
+//            draftToUpdate.apply {
+//                identityId = apiResponse.data?.defaultSignatureId
+//                draftAction?.let { action = it }
+//            }
+//        } ?: draft
+//    }
 
     private fun loadMessages(thread: Thread) {
         val apiMessages = fetchMessages(thread)
@@ -273,25 +401,31 @@ class MainViewModel : ViewModel() {
             if (realmMessage.fullyDownloaded) {
                 realmMessage
             } else {
+                // TODO: Handle if this API call fails
                 ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
                     completedMessage.apply {
                         initLocalValues() // TODO: Remove this when we have EmbeddedObjects
-                        fullyDownloaded = true
                         body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
                         // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
                         @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
                         attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
+
+                        if (isDraft) fetchDraft(draftResource, uid)
+                        fullyDownloaded = true
                     }
-                    // TODO: Uncomment this when managing Drafts folder
-                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
-                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
-                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
-                    //     completedMessage.draftUuid = draft?.uuid
-                    // }
                 }.let { apiMessage ->
                     apiMessage ?: realmMessage
                 }
             }
+        }
+    }
+
+    fun fetchDraft(draftResource: String, messageUid: String): Draft? {
+        return ApiRepository.getDraft(draftResource).data?.apply {
+            initLocalValues(messageUid)
+            // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+            attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, messageUid) }
+            DraftController.upsertDraft(this)
         }
     }
 }

@@ -20,19 +20,15 @@ package com.infomaniak.mail.ui.main.newmessage
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
-import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.MailApi
-import com.infomaniak.mail.data.cache.MailboxContentController
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.realmListOf
@@ -45,26 +41,29 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
+    val allContacts = MutableLiveData<List<UiContact>?>()
+    val mailboxes = MutableLiveData<List<Mailbox>?>()
+
     var newMessageTo = mutableListOf<UiContact>()
     var newMessageCc = mutableListOf<UiContact>()
     var newMessageBcc = mutableListOf<UiContact>()
+
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
+
     val editorAction = MutableLiveData<EditorAction>()
     var currentDraft: SingleLiveEvent<Draft> = SingleLiveEvent()
     var hasStartedEditing = MutableLiveData(false)
     var autoSaveJob: Job? = null
 
-    fun loadDraft(draftResources: String? = null, draftUuid: String? = null, messageUid: String? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val draft = draftResources?.let { MailApi.fetchDraft(it, messageUid ?: "") }
-                ?: draftUuid?.let { MailboxContentController.getDraft(it) }
-                ?: Draft().apply {
-                    isOffline = true
-                    initLocalValues()
-                }
-            currentDraft.postValue(draft)
-        }
+    fun loadDraft(apiDraft: Draft?, draftUuid: String?) {
+        val draft = apiDraft
+            ?: draftUuid?.let(DraftController::getDraftSync)
+            ?: Draft().apply {
+                isOffline = true
+                initLocalValues()
+            }
+        currentDraft.postValue(draft)
     }
 
     fun listenToAllContacts() = viewModelScope.launch(Dispatchers.IO) {
@@ -74,6 +73,12 @@ class NewMessageViewModel : ViewModel() {
                 contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
             }
             allContacts.postValue(contacts)
+        }
+    }
+
+    fun listenToMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
+            mailboxes.postValue(it.list)
         }
     }
 
@@ -102,14 +107,16 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun Draft.sendOrSaveDraft() {
-        val mailbox = MailData.currentMailboxFlow.value ?: return
-        val draftWithSignature =
-            if (identityId == null) MailData.setDraftSignature(this, action ?: DraftAction.SAVE) else this
-        // TODO: better handling of api response
-        if (draftWithSignature.action == DraftAction.SEND) {
-            MailData.sendDraft(draftWithSignature, mailbox.uuid)
+        val mailbox = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return
+        val draftWithSignature = if (identityId == null) {
+            MainViewModel.setDraftSignature(this, action ?: DraftAction.SAVE) // TODO: Better handling of API response
         } else {
-            MailData.saveDraft(draftWithSignature, mailbox.uuid).data?.let {
+            this
+        }
+        if (draftWithSignature.action == DraftAction.SEND) {
+            MainViewModel.sendDraft(draftWithSignature, mailbox.uuid)
+        } else {
+            MainViewModel.saveDraft(draftWithSignature, mailbox.uuid).data?.let {
                 currentDraft.value?.apply {
                     uuid = it.uuid
                     messageUid = it.uid
@@ -126,23 +133,25 @@ class NewMessageViewModel : ViewModel() {
 
     private fun Draft.update(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
         // TODO: Should userInformation (here 'from') be stored in mainViewModel? See ApiRepository.getUser()
-        MailboxContentController.updateDraft(this) {
-            it.from = realmListOf(Recipient().apply { email = messageEmail })
-            it.subject = messageSubject
-            it.body = messageBody
-            it.action = draftAction
-            it.to = newMessageTo.toRealmRecipients()
-            it.cc = newMessageCc.toRealmRecipients()
-            it.bcc = newMessageBcc.toRealmRecipients()
+        DraftController.updateDraft(uuid) {
+            it.apply {
+                from = realmListOf(Recipient().apply { email = messageEmail })
+                subject = messageSubject
+                body = messageBody
+                action = draftAction
+                to = newMessageTo.toRealmRecipients()
+                cc = newMessageCc.toRealmRecipients()
+                bcc = newMessageBcc.toRealmRecipients()
 
-            // TODO: Manage advanced functionalities
-            // it.quote = ""
-            // it.references = ""
-            // it.delay = 0
-            // it.inReplyTo = ""
-            // it.inReplyToUid = ""
-            // it.replyTo = realmListOf()
-            // it.attachments = realmListOf()
+                // TODO: Manage advanced functionalities
+                // it.quote = ""
+                // it.references = ""
+                // it.delay = 0
+                // it.inReplyTo = ""
+                // it.inReplyToUid = ""
+                // it.replyTo = realmListOf()
+                // it.attachments = realmListOf()
+            }
         }
     }
 

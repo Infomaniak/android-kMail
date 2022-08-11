@@ -74,6 +74,7 @@ class Draft : RealmObject {
     /**
      * Local
      */
+    @Transient
     var messageUid: String = ""
     @Transient
     var isOffline: Boolean = false

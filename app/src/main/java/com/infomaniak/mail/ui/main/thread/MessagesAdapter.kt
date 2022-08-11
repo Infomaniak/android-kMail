@@ -63,7 +63,7 @@ class MessagesAdapter(
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
         bindHeader(message)
-        bindAttachment(message.attachments)
+        bindAttachments(message.attachments)
         loadBodyInWebView(message.body)
 
         displayExpandedCollapsedMessage(message)
@@ -165,7 +165,7 @@ class MessagesAdapter(
         if (dateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
-    private fun ItemMessageBinding.bindAttachment(attachments: List<Attachment>) {
+    private fun ItemMessageBinding.bindAttachments(attachments: List<Attachment>) {
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentsSizeText.text = context.resources.getQuantityString(
             R.plurals.attachmentQuantity,
@@ -265,10 +265,6 @@ class MessagesAdapter(
     }
 
     fun lastIndex() = messages.lastIndex
-
-    private fun Recipient.displayedName(context: Context): String {
-        return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
-    }
 
     private fun Recipient.getNameOrEmail() = name?.let { it.ifBlank { email } } ?: email
 

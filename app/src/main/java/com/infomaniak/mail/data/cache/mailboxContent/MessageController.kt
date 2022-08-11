@@ -51,17 +51,6 @@ object MessageController {
     /**
      * Edit data
      */
-    fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.forEach { deleteLatestMessage(it.uid) }
-    }
-
-    fun deleteMessage(uid: String) {
-        RealmController.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
-    }
-
-    /**
-     * Utils
-     */
     fun upsertApiData(apiMessages: List<Message>, thread: Thread) {
 
         // Get current data
@@ -88,14 +77,25 @@ object MessageController {
         }
     }
 
-    private fun getMessage(uid: String): RealmSingleQuery<Message> {
-        return RealmController.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first()
+    fun MutableRealm.deleteMessages(messages: List<Message>) {
+        messages.forEach { deleteLatestMessage(it.uid) }
     }
 
-    private fun MutableRealm.deleteLatestMessage(uid: String) {
+    fun deleteMessage(uid: String) {
+        RealmController.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
+    }
+
+    fun MutableRealm.deleteLatestMessage(uid: String) {
         getLatestMessageSync(uid)?.also { message ->
             message.draftUuid?.let { getLatestDraftSync(it) }?.let(::delete)
         }?.let(::delete)
+    }
+
+    /**
+     * Utils
+     */
+    private fun getMessage(uid: String): RealmSingleQuery<Message> {
+        return RealmController.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first()
     }
 
     /**

@@ -110,30 +110,6 @@ class NewMessageFragment : Fragment() {
             viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
         }
 
-        val allContacts = viewModel.getAllContacts()
-        val toAlreadyUsedContactMails = viewModel.newMessageTo.map { it.email }.toMutableList()
-        val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
-        val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
-
-        contactAdapter = ContactAdapter(
-            allContacts = allContacts,
-            toAlreadyUsedContactIds = toAlreadyUsedContactMails,
-            ccAlreadyUsedContactIds = ccAlreadyUsedContactMails,
-            bccAlreadyUsedContactIds = bccAlreadyUsedContactMails,
-            onItemClick = { contact, field ->
-                getInputView(field).setText("")
-                getContacts(field).add(contact)
-                createChip(field, contact)
-
-                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
-            },
-            addUnrecognizedContact = { field ->
-                val isEmail = addUnrecognizedMail(field)
-                if (isEmail) getInputView(field).setText("")
-            },
-        )
-        autoCompleteRecyclerView.adapter = contactAdapter
-
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
             override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
                 source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
@@ -155,42 +131,6 @@ class NewMessageFragment : Fragment() {
             } else {
                 isEnabled = false
                 (activity as NewMessageActivity).closeDraft()
-            }
-        }
-    }
-
-    private fun setupFromField() = with(binding) {
-        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
-
-        if (mails.count() > 1) {
-            fromMailAddress.apply {
-                setOnClickListener(::chooseFromAddress)
-                isClickable = true
-                isFocusable = true
-            }
-        }
-
-        with(viewModel) {
-            currentDraft.observe(viewLifecycleOwner) { draft ->
-                if (draft == null) return@observe
-
-                newMessageTo = draft.to.toUiContact()
-                newMessageCc = draft.cc.toUiContact()
-                newMessageBcc = draft.bcc.toUiContact()
-                displayChips()
-                updateToAutocompleteInputLayout()
-
-                fromMailAddress.text = if (draft.from.isEmpty()) {
-                    mailboxes[selectedMailboxIndex].email
-                } else {
-                    draft.from.first().email
-                }
-
-                subjectTextField.text = SpannableStringBuilder(draft.subject)
-                bodyText.text = Html.fromHtml(draft.body, Html.FROM_HTML_MODE_COMPACT) as Editable
-                hasStartedEditing.value = false
-
-                setUpAutoSave()
             }
         }
     }
@@ -234,12 +174,35 @@ class NewMessageFragment : Fragment() {
         selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxObjectId.value }
         val mails = mailboxes.map { it.email }
 
-        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
         if (mails.count() > 1) {
             fromMailAddress.apply {
                 setOnClickListener { view -> chooseFromAddress(view, mails) }
                 isClickable = true
                 isFocusable = true
+            }
+        }
+
+        with(viewModel) {
+            currentDraft.observe(viewLifecycleOwner) { draft ->
+                if (draft == null) return@observe
+
+                newMessageTo = draft.to.toUiContact()
+                newMessageCc = draft.cc.toUiContact()
+                newMessageBcc = draft.bcc.toUiContact()
+                displayChips()
+                updateToAutocompleteInputLayout()
+
+                fromMailAddress.text = if (draft.from.isEmpty()) {
+                    mailboxes[selectedMailboxIndex].email
+                } else {
+                    draft.from.first().email
+                }
+
+                subjectTextField.text = SpannableStringBuilder(draft.subject)
+                bodyText.text = Html.fromHtml(draft.body, Html.FROM_HTML_MODE_COMPACT) as Editable
+                hasStartedEditing.value = false
+
+                setUpAutoSave()
             }
         }
     }
@@ -261,7 +224,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {
-        val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
+        val toAlreadyUsedContactMails = viewModel.newMessageTo.map { it.email }.toMutableList()
         val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
         val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
 
@@ -274,12 +237,15 @@ class NewMessageFragment : Fragment() {
                 getInputView(field).setText("")
                 getContacts(field).add(contact)
                 createChip(field, contact)
+
+                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             },
             addUnrecognizedContact = { field ->
                 val isEmail = addUnrecognizedMail(field)
                 if (isEmail) getInputView(field).setText("")
             },
         )
+
         autoCompleteRecyclerView.adapter = contactAdapter
     }
 

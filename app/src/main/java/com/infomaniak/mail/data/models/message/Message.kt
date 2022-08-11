@@ -128,7 +128,7 @@ class Message : RealmObject {
             draftUuid = draft.uuid
             subject = draft.subject
             folder = API_DRAFT_FOLDER_NAME
-            folderId = Folder.draftsFolder?.id.toString()
+            folderId = Folder.draftFolder?.id.toString()
             from = draft.from
             to = draft.to ?: realmListOf()
             cc = draft.cc ?: realmListOf()

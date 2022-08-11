@@ -25,8 +25,8 @@ import androidx.annotation.StringRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
@@ -97,6 +97,6 @@ class Folder : RealmObject {
     companion object {
         const val API_DRAFT_FOLDER_NAME = "Drafts"
 
-        inline val draftsFolder get() = MailData.foldersFlow.value?.find { it.role == FolderRole.DRAFT }
+        inline val draftFolder: Folder? get() = FolderController.getFoldersSync().find { it.role == FolderRole.DRAFT }
     }
 }

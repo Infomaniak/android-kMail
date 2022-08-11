@@ -113,17 +113,16 @@ fun Fragment.notYetImplemented() {
 
 fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
 
-fun Attachment.getFileTypeFromExtension(): AttachmentType {
-    return when {
-        mimeType.contains(Regex("application/(zip|rar|x-tar|.*compressed|.*archive)")) -> AttachmentType.ARCHIVE
-        mimeType.contains(Regex("audio/")) -> AttachmentType.AUDIO
-        mimeType.contains(Regex("image/")) -> AttachmentType.IMAGE
-        mimeType.contains(Regex("/pdf")) -> AttachmentType.PDF
-        mimeType.contains(Regex("spreadsheet|excel|comma-separated-values")) -> AttachmentType.SPREADSHEET
-        mimeType.contains(Regex("document|text/plain|msword")) -> AttachmentType.TEXT
-        mimeType.contains(Regex("video/")) -> AttachmentType.VIDEO
-        else -> AttachmentType.UNKNOWN
-    }
+fun Attachment.getFileTypeFromExtension(): AttachmentType = when {
+    mimeType.contains(Regex("application/(zip|rar|x-tar|.*compressed|.*archive)")) -> AttachmentType.ARCHIVE
+    mimeType.contains(Regex("audio/")) -> AttachmentType.AUDIO
+    mimeType.contains(Regex("image/")) -> AttachmentType.IMAGE
+    mimeType.contains(Regex("/pdf")) -> AttachmentType.PDF
+    mimeType.contains(Regex("spreadsheet|excel|comma-separated-values")) -> AttachmentType.SPREADSHEET
+    mimeType.contains(Regex("document|text/plain|msword")) -> AttachmentType.TEXT
+    mimeType.contains(Regex("video/")) -> AttachmentType.VIDEO
+    else -> AttachmentType.UNKNOWN
+}
 
 fun Fragment.openMessageEdition(@IdRes direction: Int, message: Message? = null) {
     safeNavigate(direction, NewMessageActivityArgs(message?.draftUuid, message?.draftResource, message?.uid).toBundle())

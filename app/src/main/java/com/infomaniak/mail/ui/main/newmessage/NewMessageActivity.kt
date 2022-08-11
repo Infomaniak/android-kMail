@@ -26,26 +26,20 @@ import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
-import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.data.models.Draft.DraftAction
-import com.infomaniak.mail.data.models.MessagePriority
-import com.infomaniak.mail.data.models.MessagePriority.getPriority
-import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
-import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import com.infomaniak.lib.core.R as RCore
 
 class NewMessageActivity : ThemedActivity() {
 
     private val navigationArgs: NewMessageActivityArgs by navArgs()
+
+    private val mainViewModel: MainViewModel by viewModels()
     private val viewModel: NewMessageViewModel by viewModels()
 
     private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
@@ -89,7 +83,18 @@ class NewMessageActivity : ThemedActivity() {
             handleEditorToggle()
         }
 
-        with(navigationArgs) { viewModel.loadDraft(draftResource, draftUuid, messageUid) }
+        loadDraft()
+    }
+
+    private fun loadDraft() = with(navigationArgs) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val draft = if (draftResource != null && messageUid != null) {
+                mainViewModel.fetchDraft(draftResource!!, messageUid!!)
+            } else {
+                null
+            }
+            viewModel.loadDraft(draft, navigationArgs.draftUuid)
+        }
     }
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {

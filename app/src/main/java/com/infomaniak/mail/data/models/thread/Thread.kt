@@ -23,7 +23,10 @@ import android.content.Context
 import androidx.annotation.IdRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.color
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
+import com.infomaniak.lib.core.utils.FORMAT_DATE_HOUR_MINUTE
+import com.infomaniak.lib.core.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
+import com.infomaniak.lib.core.utils.format
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
