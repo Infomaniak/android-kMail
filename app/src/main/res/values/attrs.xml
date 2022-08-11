@@ -25,16 +25,16 @@
     </declare-styleable>
 
     <declare-styleable name="BottomQuickActionBarView">
-        <attr name="src1" format="reference" />
-        <attr name="src2" format="reference" />
-        <attr name="src3" format="reference" />
-        <attr name="src4" format="reference" />
-        <attr name="src5" format="reference" />
+        <attr name="icon1" format="reference" />
+        <attr name="icon2" format="reference" />
+        <attr name="icon3" format="reference" />
+        <attr name="icon4" format="reference" />
+        <attr name="icon5" format="reference" />
 
-        <attr name="text1" format="string" />
-        <attr name="text2" format="string" />
-        <attr name="text3" format="string" />
-        <attr name="text4" format="string" />
-        <attr name="text5" format="string" />
+        <attr name="title1" format="string" />
+        <attr name="title2" format="string" />
+        <attr name="title3" format="string" />
+        <attr name="title4" format="string" />
+        <attr name="title5" format="string" />
     </declare-styleable>
 </resources>

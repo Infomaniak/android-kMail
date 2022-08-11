@@ -43,27 +43,27 @@ class BottomQuickActionBarView @JvmOverloads constructor(
         with(binding) {
             if (attrs != null) {
                 val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomQuickActionBarView, 0, 0)
-                val src1 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src1)
-                val src2 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src2)
-                val src3 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src3)
-                val src4 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src4)
-                val src5 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src5)
-                val text1 = typedArray.getString(R.styleable.BottomQuickActionBarView_text1)
-                val text2 = typedArray.getString(R.styleable.BottomQuickActionBarView_text2)
-                val text3 = typedArray.getString(R.styleable.BottomQuickActionBarView_text3)
-                val text4 = typedArray.getString(R.styleable.BottomQuickActionBarView_text4)
-                val text5 = typedArray.getString(R.styleable.BottomQuickActionBarView_text5)
+                val icon1 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_icon1)
+                val icon2 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_icon2)
+                val icon3 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_icon3)
+                val icon4 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_icon4)
+                val icon5 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_icon5)
+                val title1 = typedArray.getString(R.styleable.BottomQuickActionBarView_title1)
+                val title2 = typedArray.getString(R.styleable.BottomQuickActionBarView_title2)
+                val title3 = typedArray.getString(R.styleable.BottomQuickActionBarView_title3)
+                val title4 = typedArray.getString(R.styleable.BottomQuickActionBarView_title4)
+                val title5 = typedArray.getString(R.styleable.BottomQuickActionBarView_title5)
 
                 buttons = listOf(button1, button2, button3, button4, button5)
-                val srcs = listOf(src1, src2, src3, src4, src5)
-                val texts = listOf(text1, text2, text3, text4, text5)
+                val icons = listOf(icon1, icon2, icon3, icon4, icon5)
+                val titles = listOf(title1, title2, title3, title4, title5)
 
-                srcs.forEachIndexed { index, drawable ->
+                icons.forEachIndexed { index, drawable ->
                     if (drawable == null) buttons[index].isGone = true
                     else buttons[index].icon = drawable
                 }
 
-                texts.forEachIndexed { index, text ->
+                titles.forEachIndexed { index, text ->
                     if (text == null) buttons[index].isGone = true
                     else buttons[index].text = text
                 }
