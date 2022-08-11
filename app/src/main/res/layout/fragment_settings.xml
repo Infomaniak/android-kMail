@@ -96,14 +96,16 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/settingsCodeLock"
+                    android:id="@+id/settingsAppLock"
                     style="@style/MenuDrawerItem">
 
                     <TextView
                         style="@style/SettingTextWithButton"
                         android:text="@string/settingsAppLock" />
 
-                    <ImageView style="@style/SettingButtonChevron" />
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsAppLockSwitch"
+                        style="@style/SettingButtonSwitch" />
 
                 </LinearLayout>
 

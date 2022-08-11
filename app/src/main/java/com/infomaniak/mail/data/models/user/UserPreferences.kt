@@ -31,7 +31,6 @@ import kotlinx.serialization.Transient
 class UserPreferences : RealmObject {
 
     //region API data
-    // TODO: Do we really need all this, as most settings are set in UiSettings ?
     var theme: String = ThemeMode.DEFAULT.apiName
     @SerialName("density")
     var threadListDensity: String = ListDensityMode.DEFAULT.apiName

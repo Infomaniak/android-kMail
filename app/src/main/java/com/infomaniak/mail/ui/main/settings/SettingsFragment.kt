@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.UiSettings
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
@@ -82,9 +83,9 @@ class SettingsFragment : Fragment() {
             safeNavigate(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
-        settingsCodeLock.setOnClickListener {
-            // TODO
-        }
+        settingsAppLock.setOnClickListener { settingsAppLockSwitch.performClick() }
+
+        settingsAppLockSwitch.setOnClickListener { if (settingsAppLockSwitch.isChecked) notYetImplemented() }
 
         settingsThreadListDensity.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsToListDensitySetting())

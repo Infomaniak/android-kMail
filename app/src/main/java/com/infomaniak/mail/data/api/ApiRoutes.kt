@@ -22,6 +22,11 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 
 object ApiRoutes {
 
+    fun securedMailbox(hostingId: Int, mailboxName: String, hasMailboxAuth: Boolean = false): String {
+        val mailboxAuth = if (hasMailboxAuth) "/proxymailboxauth" else ""
+        return "$MAIL_API/api/securedProxy$mailboxAuth/1/mail_hostings/$hostingId/mailboxes/$mailboxName"
+    }
+
     fun resource(resource: String) = "$MAIL_API$resource"
 
     fun addressBooks() = "$MAIL_API/api/pim/addressbook"
@@ -30,11 +35,11 @@ object ApiRoutes {
 
     fun user() = "$MAIL_API/api/user"
 
-    fun signatures(hostingId: Int, mailboxName: String): String {
-        return "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
-    }
+    fun signatures(hostingId: Int, mailboxName: String) = "${securedMailbox(hostingId, mailboxName)}/signatures"
 
     fun mailbox() = "$MAIL_API/api/mailbox?with=unseen"
+
+    fun securedFolders(hostingId: Int, mailboxName: String) = "${securedMailbox(hostingId, mailboxName, true)}/auth/folders"
 
     fun folders(uuid: String) = "$MAIL_API/api/mail/$uuid/folder"
 

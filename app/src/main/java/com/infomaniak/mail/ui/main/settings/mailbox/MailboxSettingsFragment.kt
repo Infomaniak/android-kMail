@@ -57,16 +57,29 @@ class MailboxSettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
+//        val mailbox = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return
         settingsMailboxGeneralSignature.setOnClickListener { } // TODO
         settingsMailboxGeneralAutoreply.setOnClickListener { } // TODO
         settingsMailboxGeneralFolders.setOnClickListener { } // TODO
-        settingsMailboxGeneralNotifications.setOnClickListener { settingsMailboxGeneralNotificationsSwitch.toggle() } // TODO
+        settingsMailboxGeneralNotifications.setOnClickListener { settingsMailboxGeneralNotificationsSwitch.performClick() } // TODO
         settingsInboxType.setOnClickListener { } // TODO
         settingsInboxRules.setOnClickListener { } // TODO
         settingsInboxRedirect.setOnClickListener { } // TODO
         settingsInboxAlias.setOnClickListener { } // TODO
-        settingsSecurityAdsFilter.setOnClickListener { settingsSecurityAdsFilterSwitch.toggle() } // TODO
-        settingsSecuritySpamFilter.setOnClickListener { settingsSecuritySpamFilterSwitch.toggle() } // TODO
+        settingsSecurityAdsFilter.setOnClickListener { settingsSecurityAdsFilterSwitch.performClick() }
+        settingsSecurityAdsFilterSwitch.setOnClickListener { switch ->
+//            MailboxInfosController.updateMailboxInfo(mailbox.objectId) {
+//                it.hasSocialAndCommercialFiltering = (switch as SwitchMaterial).isChecked
+//            }
+//            ApiRepository.updateMailboxSettings(mailbox.hostingId, mailbox.mailbox)
+        }
+        settingsSecuritySpamFilter.setOnClickListener { settingsSecuritySpamFilterSwitch.performClick() }
+        settingsSecuritySpamFilterSwitch.setOnClickListener {
+//            MailboxInfosController.updateMailboxInfo(mailbox.objectId) {
+//                it. = (switch as SwitchMaterial).isChecked
+//            }
+//            ApiRepository.updateMailboxSettings(mailbox.hostingId, mailbox.mailbox, )
+        }
         settingsSecurityBlockedRecipients.setOnClickListener { } // TODO
         settingsPrivacyDeleteSearchHistory.setOnClickListener { } // TODO
         settingsPrivacyViewLogs.setOnClickListener { } // TODO
