@@ -24,36 +24,46 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.MailData
+import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.sortMailboxes
+import io.realm.kotlin.notifications.ResultsChange
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SwitchUserFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: SwitchUserViewModel by viewModels()
 
     private lateinit var binding: FragmentSwitchUserBinding
 
     private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
         if (selectedMailbox.userId == AccountUtils.currentUserId) {
-            MailData.selectMailbox(selectedMailbox)
+            mainViewModel.openMailbox(selectedMailbox)
             findNavController().popBackStack()
         } else {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 
-                MailData.close()
+                withContext(Dispatchers.Main) {
+                    mainViewModel.close()
 
-                AccountUtils.reloadApp?.invoke(bundleOf())
+                    AccountUtils.reloadApp?.invoke(bundleOf())
+                }
             }
         }
     }
@@ -71,16 +81,38 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun listenToAccounts() {
-        viewModel.accounts.observeNotNull(this) { accounts ->
+        lifecycleScope.launch(Dispatchers.IO) {
 
-            val uiAccounts = accounts
-                .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
-                .sortAccounts()
+            val users = AccountUtils.getAllUsersSync()
+            viewModel.fetchAccounts(users)
 
-            accountsAdapter.notifyAdapter(uiAccounts)
+            val flows = users.map { user -> MailboxController.getMailboxesAsync(user.id) }
+
+            combine(flows) { mailboxesFlows ->
+                transformMailboxesFlowsIntoAccounts(mailboxesFlows, users)
+            }.collect {
+                withContext(Dispatchers.Main) { onAccountsChange(it) }
+            }
+        }
+    }
+
+    private fun transformMailboxesFlowsIntoAccounts(mailboxesFlows: Array<ResultsChange<Mailbox>>, users: List<User>) =
+        mutableListOf<Pair<User, List<Mailbox>>>().apply {
+            mailboxesFlows.forEach { flow ->
+                val mailboxes = flow.list
+                val userId = mailboxes.firstOrNull()?.userId
+                users.find { it.id == userId }?.let { user ->
+                    add(user to mailboxes)
+                }
+            }
         }
 
-        viewModel.loadAccounts(viewLifecycleOwner)
+    private fun onAccountsChange(accounts: List<Pair<User, List<Mailbox>>>) {
+        val uiAccounts = accounts
+            .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
+            .sortAccounts()
+
+        accountsAdapter.notifyAdapter(uiAccounts, MainViewModel.currentMailboxObjectId.value)
     }
 
     private fun List<UiAccount>.sortAccounts(): List<UiAccount> {

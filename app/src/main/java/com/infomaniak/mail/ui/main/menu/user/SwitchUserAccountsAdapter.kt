@@ -36,10 +36,10 @@ import com.infomaniak.mail.utils.toggleChevron
 
 class SwitchUserAccountsAdapter(
     private var accounts: List<UiAccount> = emptyList(),
+    private var currentMailboxObjectId: String? = null,
     private val onMailboxSelected: (Mailbox) -> Unit,
 ) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
 
-    private val mailboxesAdapter = mutableListOf<SwitchUserMailboxesAdapter>()
     private lateinit var isCollapsed: MutableList<Boolean>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserAccountViewHolder {
@@ -67,13 +67,11 @@ class SwitchUserAccountsAdapter(
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(position) }
 
-        addressesList.adapter = if (position < mailboxesAdapter.size) {
-            mailboxesAdapter[position]
-                .also { it.notifyAdapter(account.mailboxes) }
-        } else {
-            SwitchUserMailboxesAdapter(mailboxes = account.mailboxes, onMailboxSelected = onMailboxSelected)
-                .also(mailboxesAdapter::add)
-        }
+        addressesList.adapter = SwitchUserMailboxesAdapter(
+            mailboxes = account.mailboxes,
+            currentMailboxObjectId = currentMailboxObjectId,
+            onMailboxSelected = onMailboxSelected,
+        )
     }
 
     private fun ItemSwitchUserAccountBinding.toggleMailboxes(position: Int) {
@@ -103,10 +101,10 @@ class SwitchUserAccountsAdapter(
 
     override fun getItemCount(): Int = accounts.count()
 
-    fun notifyAdapter(newList: List<UiAccount>) {
+    fun notifyAdapter(newList: List<UiAccount>, newCurrentMailboxObjectId: String?) {
         isCollapsed = MutableList(newList.count()) { true }
         isCollapsed[0] = false
-
+        currentMailboxObjectId = newCurrentMailboxObjectId
         DiffUtil.calculateDiff(UiAccountsListDiffCallback(accounts, newList)).dispatchUpdatesTo(this)
         accounts = newList
     }

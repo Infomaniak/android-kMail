@@ -21,11 +21,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
@@ -36,8 +33,8 @@ import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 class SwitchUserMailboxesAdapter(
-    private var mailboxes: List<Mailbox> = emptyList(),
-    private val displayIcon: Boolean = true,
+    private var mailboxes: List<Mailbox>,
+    private var currentMailboxObjectId: String?,
     private val onMailboxSelected: (Mailbox) -> Unit,
 ) : RecyclerView.Adapter<SwitchUserMailboxViewHolder>() {
 
@@ -50,7 +47,6 @@ class SwitchUserMailboxesAdapter(
     override fun onBindViewHolder(holder: SwitchUserMailboxViewHolder, position: Int): Unit = with(holder.binding) {
         val mailbox = mailboxes[position]
         emailAddress.text = mailbox.email
-        envelopeIcon.isVisible = displayIcon
 
         val unread = mailbox.unseenMessages
         unreadCount.apply {
@@ -58,7 +54,7 @@ class SwitchUserMailboxesAdapter(
             text = formatUnreadCount(unread)
         }
 
-        setSelectedState(mailbox.objectId == MailData.currentMailboxFlow.value?.objectId)
+        setSelectedState(currentMailboxObjectId == mailbox.objectId)
         addressItemView.setOnClickListener { onMailboxSelected(mailbox) }
     }
 
@@ -77,7 +73,7 @@ class SwitchUserMailboxesAdapter(
             )
         }
 
-        if (displayIcon) envelopeIcon.setColorFilter(color)
+        envelopeIcon.setColorFilter(color)
         emailAddress.apply {
             setTextColor(color)
             setTextAppearance(textStyle)
@@ -86,34 +82,6 @@ class SwitchUserMailboxesAdapter(
     }
 
     override fun getItemCount(): Int = mailboxes.count()
-
-    fun setMailboxes(newMailboxes: List<Mailbox>) {
-        mailboxes = newMailboxes
-        notifyDataSetChanged()
-    }
-
-    fun notifyAdapter(newList: List<Mailbox>) {
-        DiffUtil.calculateDiff(MailboxesListDiffCallback(mailboxes, newList)).dispatchUpdatesTo(this)
-        mailboxes = newList
-    }
-
-    private class MailboxesListDiffCallback(
-        private val oldList: List<Mailbox>,
-        private val newList: List<Mailbox>,
-    ) : DiffUtil.Callback() {
-
-        override fun getOldListSize(): Int = oldList.size
-
-        override fun getNewListSize(): Int = newList.size
-
-        override fun areItemsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            return oldList[oldIndex].mailboxId == newList[newIndex].mailboxId
-        }
-
-        override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            return oldList[oldIndex].unseenMessages == newList[newIndex].unseenMessages
-        }
-    }
 
     class SwitchUserMailboxViewHolder(val binding: ItemSwitchUserMailboxBinding) : RecyclerView.ViewHolder(binding.root)
 }

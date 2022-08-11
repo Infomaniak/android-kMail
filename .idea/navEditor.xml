@@ -13,8 +13,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="757" />
-                            <option name="y" value="2296" />
+                            <option name="x" value="1232" />
+                            <option name="y" value="724" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -25,8 +25,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="757" />
-                            <option name="y" value="2967" />
+                            <option name="x" value="1232" />
+                            <option name="y" value="2149" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -46,8 +46,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="247" />
-                            <option name="y" value="637" />
+                            <option name="x" value="988" />
+                            <option name="y" value="3176" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -58,8 +58,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="233" />
-                            <option name="y" value="2701" />
+                            <option name="x" value="988" />
+                            <option name="y" value="368" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -89,8 +89,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="228" />
-                            <option name="y" value="3904" />
+                            <option name="x" value="988" />
+                            <option name="y" value="1258" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -105,13 +105,25 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="getMoreStorageBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="helpFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-572" />
-                            <option name="y" value="2628" />
+                            <option name="x" value="744" />
+                            <option name="y" value="3575" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -122,8 +134,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-2271" />
-                            <option name="y" value="1169" />
+                            <option name="x" value="256" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -134,8 +146,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-573" />
-                            <option name="y" value="2105" />
+                            <option name="x" value="744" />
+                            <option name="y" value="2464" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -146,8 +158,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="245" />
-                            <option name="y" value="1135" />
+                            <option name="x" value="988" />
+                            <option name="y" value="2820" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -158,8 +170,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="231" />
-                            <option name="y" value="3532" />
+                            <option name="x" value="1232" />
+                            <option name="y" value="1437" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -174,18 +186,28 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="messageListDensitySettingFragment">
+                  <entry key="messagesFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="757" />
-                            <option name="y" value="3323" />
+                            <option name="x" value="744" />
+                            <option name="y" value="2820" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_messageListDensitySettingFragment_to_selectSettingsFragment">
+                            <entry key="action_messagesFragment_to_contactFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_messagesFragment_to_messageActionBottomSheetDialog">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_messagesFragment_to_newMessageActivity">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -200,8 +222,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-560" />
-                            <option name="y" value="68" />
+                            <option name="x" value="744" />
+                            <option name="y" value="564" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -212,8 +234,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="240" />
-                            <option name="y" value="1733" />
+                            <option name="x" value="988" />
+                            <option name="y" value="2328" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -224,8 +246,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-560" />
-                            <option name="y" value="424" />
+                            <option name="x" value="744" />
+                            <option name="y" value="3219" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -245,8 +267,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="1429" />
-                            <option name="y" value="3524" />
+                            <option name="x" value="1476" />
+                            <option name="y" value="103" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -257,8 +279,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-577" />
-                            <option name="y" value="3176" />
+                            <option name="x" value="744" />
+                            <option name="y" value="1276" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -283,12 +305,12 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_settingsFragment_to_messageListDensitySettingFragment">
+                            <entry key="action_settingsFragment_to_themeSettingFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_settingsFragment_to_themeSettingFragment">
+                            <entry key="action_settingsFragment_to_threadsDensitySettingFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -303,8 +325,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="757" />
-                            <option name="y" value="2611" />
+                            <option name="x" value="1232" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -324,8 +346,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="751" />
-                            <option name="y" value="1957" />
+                            <option name="x" value="1232" />
+                            <option name="y" value="368" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -336,8 +358,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-560" />
-                            <option name="y" value="780" />
+                            <option name="x" value="744" />
+                            <option name="y" value="920" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -348,8 +370,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="224" />
-                            <option name="y" value="4277" />
+                            <option name="x" value="988" />
+                            <option name="y" value="902" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -364,28 +386,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="threadFragment">
+                  <entry key="threadsDensitySettingFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-560" />
-                            <option name="y" value="1136" />
+                            <option name="x" value="1232" />
+                            <option name="y" value="1793" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_threadFragment_to_contactFragment">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_threadFragment_to_messageActionBottomSheetDialog">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
-                            <entry key="action_threadFragment_to_newMessageActivity">
+                            <entry key="action_threadsDensitySettingFragment_to_selectSettingsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -395,13 +407,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="threadListFragment">
+                  <entry key="threadsFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-2251" />
-                            <option name="y" value="1581" />
+                            <option name="x" value="500" />
+                            <option name="y" value="2299" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -411,42 +423,80 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_helpFragment">
+                            <entry key="action_threadsFragment_to_helpFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_manageMailAddressFragment">
+                            <entry key="action_threadsFragment_to_manageMailAddressFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_menuDrawerFragment">
+                            <entry key="action_threadsFragment_to_messagesFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_newFolderDialog">
+                            <entry key="action_threadsFragment_to_newFolderDialog">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_searchFragment">
+                            <entry key="action_threadsFragment_to_searchFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_settingsFragment">
+                            <entry key="action_threadsFragment_to_settingsFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_switchUserFragment">
+                            <entry key="action_threadsFragment_to_switchUserFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
                             </entry>
-                            <entry key="action_threadListFragment_to_threadFragment">
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </LayoutPositions>
+          </value>
+        </entry>
+        <entry key="menu_drawer_navigation.xml">
+          <value>
+            <LayoutPositions>
+              <option name="myPositions">
+                <map>
+                  <entry key="getMoreStorageBottomSheetDialog">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="256" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="menuDrawerFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_menuDrawerFragment_to_getMoreStorageBottomSheetDialog">
                               <value>
                                 <LayoutPositions />
                               </value>

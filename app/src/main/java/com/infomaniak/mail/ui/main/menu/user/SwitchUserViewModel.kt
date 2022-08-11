@@ -17,7 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.menu.user
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.BuildConfig
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -26,8 +27,7 @@ import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxInfoController
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,39 +35,18 @@ import okhttp3.OkHttpClient
 
 class SwitchUserViewModel : ViewModel() {
 
-    val accounts = MutableLiveData<List<Pair<User, List<Mailbox>>>?>(null)
-
-    fun loadAccounts(lifecycleOwner: LifecycleOwner) {
-
-        AccountUtils.getAllUsers().observeOnce(lifecycleOwner) { users ->
-            viewModelScope.launch(Dispatchers.IO) {
-
-                users
-                    .map { user -> user to MailboxInfoController.getMailboxesSync(user.id) }
-                    .also(accounts::postValue)
-
-                users
-                    .mapNotNull { user ->
-                        val okHttpClient = createOkHttpClientForSpecificUser(user)
-                        ApiRepository.getMailboxes(okHttpClient).data
-                            ?.map {
-                                val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
-                                it.initLocalValues(user.id, quotas)
-                            }
-                            ?.let { user to it }
+    fun fetchAccounts(users: List<User>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            users.forEach { user ->
+                val okHttpClient = createOkHttpClientForSpecificUser(user)
+                ApiRepository.getMailboxes(okHttpClient).data
+                    ?.map {
+                        val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
+                        it.initLocalValues(user.id, quotas)
                     }
-                    .also(accounts::postValue)
+                    ?.let(MailboxController::upsertMailboxes)
             }
         }
-    }
-
-    private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
-        observe(lifecycleOwner, object : Observer<T> {
-            override fun onChanged(t: T?) {
-                observer.onChanged(t)
-                removeObserver(this)
-            }
-        })
     }
 
     private fun createOkHttpClientForSpecificUser(user: User): OkHttpClient {

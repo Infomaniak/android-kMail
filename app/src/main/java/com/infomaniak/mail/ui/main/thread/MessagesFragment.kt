@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -34,27 +35,37 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.databinding.FragmentThreadBinding
+import com.infomaniak.mail.databinding.FragmentMessagesBinding
+import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.main.thread.MessagesFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.toSharedFlow
 import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.openMessageEdition
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.infomaniak.lib.core.R as RCore
 
-class ThreadFragment : Fragment() {
+class MessagesFragment : Fragment() {
 
-    private val navigationArgs: ThreadFragmentArgs by navArgs()
-    private val viewModel: ThreadViewModel by viewModels()
+    private val navigationArgs: MessagesFragmentArgs by navArgs()
 
-    private lateinit var binding: FragmentThreadBinding
-    private var threadAdapter = ThreadAdapter()
+    private val mainViewModel: MainViewModel by viewModels()
+
+    private lateinit var binding: FragmentMessagesBinding
+    private var messagesAdapter = MessagesAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentMessagesBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,18 +81,34 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
+        quickActionBar.setOnItemClickListener {
+            val action = values()[it]
+            when (action) {
+                ANSWER -> notYetImplemented()
+                TRANSFER -> notYetImplemented()
+                ARCHIVE -> notYetImplemented()
+                DELETE -> notYetImplemented()
+                PLUS -> notYetImplemented()
+            }
+        }
+
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(it))
+            val margin = resources.getDimensionPixelSize(RCore.dimen.marginStandardSmall)
+            val divider = InsetDrawable(it, margin, 0, margin, 0)
+            messagesList.addItemDecoration(DividerItemDecorator(divider))
         }
     }
 
     private fun setupAdapter() = with(binding) {
-        messagesList.adapter = threadAdapter.apply {
+        messagesList.adapter = messagesAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            onContactClicked = { contact, isExpanded ->
-                if (isExpanded) {
-                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
-                }
+            onContactClicked = { contact ->
+                safeNavigate(
+                    MessagesFragmentDirections.actionMessagesFragmentToContactFragment(
+                        contact.name,
+                        contact.email,
+                    )
+                )
             }
             onDraftClicked = { message -> openMessageEdition(R.id.action_threadFragment_to_newMessageActivity, message) }
             onDeleteDraftClicked = { message ->
@@ -100,9 +127,13 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun listenToMessages() {
-        viewModel.messages.observeNotNull(this, ::displayMessages)
-        viewModel.loadMessages(navigationArgs.threadUid)
+    private fun listenToMessages() = lifecycleScope.launch(Dispatchers.IO) {
+        ThreadController.getThreadAsync(navigationArgs.threadUid).firstOrNull()?.obj?.let { thread ->
+            mainViewModel.openThread(thread)
+            thread.messages.asFlow().toSharedFlow().collect {
+                withContext(Dispatchers.Main) { displayMessages(it.list) }
+            }
+        }
     }
 
     private fun displayMessages(messages: List<Message>) {
@@ -115,7 +146,16 @@ class ThreadFragment : Fragment() {
         //     Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")// | $displayedBody")
         // }
 
-        threadAdapter.notifyAdapter(messages.toMutableList())
-        binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+        messagesAdapter.notifyAdapter(messages.toMutableList())
+        binding.messagesList.scrollToPosition(messagesAdapter.lastIndex())
+    }
+
+    // Do not change the order of the enum, it's important
+    enum class QuickActionButton {
+        ANSWER,
+        TRANSFER,
+        ARCHIVE,
+        DELETE,
+        PLUS,
     }
 }

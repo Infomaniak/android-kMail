@@ -39,6 +39,7 @@
     <color name="backgroundNewMailColor">@color/grey_title</color>
     <color name="selectedAccountCardviewColor">#1A1A1A</color>
     <color name="backgroundDisabledPrimaryButton">@color/grey_title</color>
+    <color name="backgroundQuickActions">#1A1A1A</color>
 
     <!-- Texts -->
     <color name="secondaryTextColor">@color/secondaryText</color>
@@ -56,7 +57,7 @@
     <color name="iconToolbarButton">@color/lightenedGrey</color>
 
     <!-- Cardview -->
-    <color name="cardviewStrokeColor">#242424</color>
+    <color name="attachmentStrokeColor">@color/grey_title</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_text</color>

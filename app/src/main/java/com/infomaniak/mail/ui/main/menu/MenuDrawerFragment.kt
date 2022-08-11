@@ -26,7 +26,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -34,16 +35,23 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.LoginActivity
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapter
-import com.infomaniak.mail.ui.main.thread.ThreadListFragmentDirections
+import com.infomaniak.mail.ui.main.thread.ThreadsFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -51,16 +59,18 @@ class MenuDrawerFragment : Fragment() {
     var exitDrawer: (() -> Unit)? = null
     var isDrawerOpen: (() -> Boolean)? = null
 
-    private val viewModel: MenuDrawerViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
-    private val inboxFolderId: String? by lazy { MailData.foldersFlow.value?.find { it.role == FolderRole.INBOX }?.id }
+    private var foldersJob: Job? = null
+
+    private var currentFolderRole: FolderRole? = null
+    private var inboxFolderId: String? = null
     private var canNavigate = true
 
-    private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter() { selectedMailbox ->
-        viewModel.switchToMailbox(selectedMailbox)
-        // TODO: This is not enough. It won't refresh the MenuDrawer data (ex: unread counts)
+    private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
+        mainViewModel.openMailbox(selectedMailbox)
         closeDrawer()
     }
 
@@ -74,11 +84,12 @@ class MenuDrawerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+
         setupAdapters()
         setupListener()
-        listenToCurrentMailbox()
+
         listenToMailboxes()
-        listenToFolders()
+        listenToCurrentMailbox()
         listenToCurrentFolder()
     }
 
@@ -92,7 +103,7 @@ class MenuDrawerFragment : Fragment() {
         settingsButton.setOnClickListener {
             closeDrawer()
             safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment(),
+                directions = ThreadsFragmentDirections.actionThreadsFragmentToSettingsFragment(),
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
@@ -105,12 +116,12 @@ class MenuDrawerFragment : Fragment() {
         manageAccount.setOnClickListener {
             closeDrawer()
             safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToManageMailAddressFragment(),
+                directions = ThreadsFragmentDirections.actionThreadsFragmentToManageMailAddressFragment(),
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
         addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
-        inboxFolder.setOnClickListener { inboxFolderId?.let { openFolder(it) } }
+        inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
         customFolders.setOnClickListener {
             customFoldersList.apply {
                 isVisible = !isVisible
@@ -153,17 +164,87 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-
     fun onDrawerOpened() {
         canNavigate = true
+        mainViewModel.forceRefreshMailboxes()
+    }
+
+    private fun listenToMailboxes() = lifecycleScope.launch(Dispatchers.IO) {
+        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
+            withContext(Dispatchers.Main) { onMailboxesChange(it.list) }
+        }
     }
 
     private fun listenToCurrentMailbox() {
-        viewModel.currentMailbox.observeNotNull(this) { currentMailbox ->
-            binding.mailboxSwitcherText.text = currentMailbox.email
-            displayMailboxQuotas(currentMailbox)
+        MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
+            listenToFolders()
+            onCurrentMailboxChange(mailboxObjectId)
         }
-        viewModel.listenToCurrentMailbox()
+    }
+
+    private fun listenToFolders() {
+        foldersJob?.cancel()
+        foldersJob = lifecycleScope.launch(Dispatchers.IO) {
+            FolderController.getFoldersAsync().collect {
+                withContext(Dispatchers.Main) { onFoldersChange(it.list) }
+            }
+        }
+    }
+
+    private fun listenToCurrentFolder() {
+        MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                FolderController.getFolderAsync(folderId).firstOrNull()?.obj?.role?.let { folderRole ->
+                    withContext(Dispatchers.Main) { onCurrentFolderChange(folderRole) }
+                }
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        MainViewModel.currentMailboxObjectId.removeObservers(this)
+        MainViewModel.currentFolderId.removeObservers(this)
+        super.onDestroyView()
+    }
+
+    private fun onMailboxesChange(mailboxes: List<Mailbox>) = with(binding) {
+        val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
+        addressAdapter.setMailboxes(sortedMailboxes)
+        if (sortedMailboxes.isEmpty()) {
+            addressesList.isGone = true
+            addressesListDivider.isGone = true
+        }
+    }
+
+    private fun onCurrentMailboxChange(mailboxObjectId: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.let { mailbox ->
+                withContext(Dispatchers.Main) {
+                    binding.mailboxSwitcherText.text = mailbox.email
+                    displayMailboxQuotas(mailbox)
+                }
+            }
+        }
+    }
+
+    private fun onFoldersChange(folders: List<Folder>) {
+        val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
+
+        inboxFolderId = inbox?.id
+        binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
+
+        val currentFolderId = MainViewModel.currentFolderId.value
+        defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
+        customFoldersAdapter.setFolders(customFolders, currentFolderId)
+
+        setCustomFoldersCollapsedState()
+    }
+
+    private fun onCurrentFolderChange(folderRole: FolderRole) = with(binding) {
+        currentFolderRole = folderRole
+        inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
+        defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
+        customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
     }
 
     private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {
@@ -181,39 +262,9 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun listenToMailboxes() = with(binding) {
-        viewModel.mailboxes.observeNotNull(this@MenuDrawerFragment) { mailboxes ->
-            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
-            addressAdapter.setMailboxes(sortedMailboxes)
-            if (sortedMailboxes.isEmpty()) {
-                addressesList.isGone = true
-                addressesListDivider.isGone = true
-            }
-        }
-        viewModel.listenToMailboxes()
-    }
-
-    private fun listenToFolders() {
-        viewModel.folders.observeNotNull(this, ::onFoldersChange)
-        viewModel.listenToFolders()
-    }
-
-    private fun listenToCurrentFolder() = with(binding) {
-        viewModel.currentFolder.observeNotNull(this@MenuDrawerFragment, ::onCurrentFolderChange)
-        viewModel.listenToCurrentFolder()
-    }
-
-    private fun onCurrentFolderChange(currentFolder: Folder) = updateSelectedItemUi(currentFolder)
-
-    private fun updateSelectedItemUi(currentFolder: Folder) = with(binding) {
-        inboxFolder.setSelectedState(currentFolder.id == inboxFolderId)
-        defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
-        customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
-    }
-
-    private fun setCustomFolderCollapsedState() = with(binding) {
-        val currentFolder = MailData.currentFolderFlow.value
-        val isExpanded = currentFolder != null && (currentFolder.role == null || customFoldersAdapter.itemCount == 0)
+    private fun setCustomFoldersCollapsedState() = with(binding) {
+        val folderId = MainViewModel.currentFolderId.value
+        val isExpanded = folderId != null && (currentFolderRole == null || customFoldersAdapter.itemCount == 0)
         val angleResource = if (isExpanded) R.dimen.angleViewRotated else R.dimen.angleViewNotRotated
         val angle = ResourcesCompat.getFloat(resources, angleResource)
         customFoldersList.isVisible = isExpanded
@@ -233,24 +284,12 @@ class MenuDrawerFragment : Fragment() {
         customFoldersList.isGone = true
         createNewFolderButton.isGone = true
         expandCustomFolderButton.rotation = 0.0f
-        setCustomFolderCollapsedState()
+        setCustomFoldersCollapsedState()
     }
 
     private fun openFolder(folderId: String) {
-        viewModel.openFolder(folderId)
+        mainViewModel.openFolder(folderId)
         closeDrawer()
-    }
-
-    private fun onFoldersChange(folders: List<Folder>) {
-
-        val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
-
-        binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
-
-        defaultFoldersAdapter.setFolders(defaultFolders)
-        customFoldersAdapter.setFolders(customFolders)
-
-        setCustomFolderCollapsedState()
     }
 
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {

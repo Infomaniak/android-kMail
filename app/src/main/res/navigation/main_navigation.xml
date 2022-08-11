@@ -19,7 +19,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
-    app:startDestination="@id/threadListFragment">
+    app:startDestination="@id/threadsFragment">
 
     <dialog
         android:id="@+id/getMoreStorageBottomSheetDialog"
@@ -28,33 +28,33 @@
         tools:layout="@layout/fragment_bottom_sheet_get_more_storage" />
 
     <fragment
-        android:id="@+id/threadListFragment"
-        android:name="com.infomaniak.mail.ui.main.thread.ThreadListFragment"
-        android:label="ThreadListFragment"
-        tools:layout="@layout/fragment_thread_list">
+        android:id="@+id/threadsFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadsFragment"
+        android:label="ThreadsFragment"
+        tools:layout="@layout/fragment_threads">
         <action
-            android:id="@+id/action_threadListFragment_to_newFolderDialog"
+            android:id="@+id/action_threadsFragment_to_newFolderDialog"
             app:destination="@id/newFolderDialog" />
         <action
             android:id="@+id/action_threadListFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
-            android:id="@+id/action_threadListFragment_to_searchFragment"
+            android:id="@+id/action_threadsFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_threadFragment"
-            app:destination="@id/threadFragment" />
+            android:id="@+id/action_threadsFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_switchUserFragment"
+            android:id="@+id/action_threadsFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_manageMailAddressFragment"
+            android:id="@+id/action_threadsFragment_to_manageMailAddressFragment"
             app:destination="@id/manageMailAddressFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_helpFragment"
+            android:id="@+id/action_threadsFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_settingsFragment"
+            android:id="@+id/action_threadsFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
     </fragment>
 
@@ -97,9 +97,9 @@
     </fragment>
 
     <fragment
-        android:id="@+id/threadFragment"
-        android:name="com.infomaniak.mail.ui.main.thread.ThreadFragment"
-        android:label="ThreadFragment"
+        android:id="@+id/messagesFragment"
+        android:name="com.infomaniak.mail.ui.main.thread.MessagesFragment"
+        android:label="MessagesFragment"
         tools:layout="@layout/cardview_thread_item">
         <argument
             android:name="threadUid"
@@ -113,13 +113,13 @@
             android:defaultValue="false"
             app:argType="boolean" />
         <action
-            android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
+            android:id="@+id/action_messagesFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />
         <action
-            android:id="@+id/action_threadFragment_to_newMessageActivity"
+            android:id="@+id/action_messagesFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
-            android:id="@+id/action_threadFragment_to_contactFragment"
+            android:id="@+id/action_messagesFragment_to_contactFragment"
             app:destination="@id/contactFragment" />
     </fragment>
 
@@ -173,8 +173,8 @@
             android:id="@+id/action_settingsFragment_to_cancelDelaySettingFragment"
             app:destination="@id/cancelDelaySettingFragment" />
         <action
-            android:id="@+id/action_settingsFragment_to_messageListDensitySettingFragment"
-            app:destination="@id/messageListDensitySettingFragment" />
+            android:id="@+id/action_settingsFragment_to_threadsDensitySettingFragment"
+            app:destination="@id/threadsDensitySettingFragment" />
         <action
             android:id="@+id/action_settingsFragment_to_messageDisplayModeSettingFragment"
             app:destination="@id/messageDisplayModeSettingFragment" />
@@ -213,12 +213,12 @@
     </fragment>
 
     <fragment
-        android:id="@+id/messageListDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.select.MessageListDensitySettingFragment"
-        android:label="MessageListDensitySettingFragment"
-        tools:layout="@layout/fragment_message_list_density_setting">
+        android:id="@+id/threadsDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.select.ThreadsDensitySettingFragment"
+        android:label="ThreadsDensitySettingFragment"
+        tools:layout="@layout/fragment_threads_density_setting">
         <action
-            android:id="@+id/action_messageListDensitySettingFragment_to_selectSettingsFragment"
+            android:id="@+id/action_threadsDensitySettingFragment_to_selectSettingsFragment"
             app:destination="@id/selectSettingsFragment" />
     </fragment>
 

@@ -100,6 +100,8 @@ class Message : RealmObject {
     var isExpanded = false
     @Ignore
     var isExpandedHeaderMode = false
+    @Ignore
+    var detailsAreExpanded = false
 
     fun initLocalValues(): Message {
         draftUuid = draftResource.substringAfter("/draft/")

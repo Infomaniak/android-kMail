@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.isThisYear
 import com.infomaniak.mail.utils.isToday
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.realmListOf
@@ -79,12 +80,14 @@ class Thread : RealmObject {
      */
     @Transient
     var displayedDate: String = ""
+    @Transient
+    var mailboxUuid: String = ""
+    @Transient
     var parentFolderId: String = ""
 
-    fun initLocalValues(parentId: String): Thread {
+    fun initLocalValues(mailboxUuid: String, parentFolderId: String): Thread {
         messages.removeIf { it.isDuplicate }
 
-        parentFolderId = parentId
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
         bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
@@ -96,12 +99,15 @@ class Thread : RealmObject {
         // TODO: only update when we get data from the API. We probably don't want that.
         displayedDate = date?.toDate()?.formatDate() ?: ""
 
+        this.mailboxUuid = mailboxUuid
+        this.parentFolderId = parentFolderId
+
         return this
     }
 
     private fun Date.formatDate() = when {
         isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
-        year() == Date().year() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
+        isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
         else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
     }
 

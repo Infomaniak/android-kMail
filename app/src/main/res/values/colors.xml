@@ -49,6 +49,7 @@
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
     <color name="selectedAccountCardviewColor">@color/lightenedGrey</color>
     <color name="backgroundDisabledPrimaryButton">@color/grey_text_secondary</color>
+    <color name="backgroundQuickActions">#FCFCFC</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/title</color>
@@ -72,7 +73,7 @@
     <color name="textButtonBlueLight">@color/blueTextLight</color>
 
     <!-- Cardview -->
-    <color name="cardviewStrokeColor">@android:color/transparent</color>
+    <color name="attachmentStrokeColor">@color/border</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_border</color>

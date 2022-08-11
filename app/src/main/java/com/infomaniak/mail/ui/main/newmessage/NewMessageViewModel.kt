@@ -20,6 +20,12 @@ package com.infomaniak.mail.ui.main.newmessage
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.userInfos.ContactController
+import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.Draft.DraftAction
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
@@ -28,6 +34,7 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
@@ -37,6 +44,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
+
     var newMessageTo = mutableListOf<UiContact>()
     var newMessageCc = mutableListOf<UiContact>()
     var newMessageBcc = mutableListOf<UiContact>()
@@ -59,13 +67,14 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun getAllContacts(): List<UiContact> {
-        val contacts = mutableListOf<UiContact>()
-        MailData.contactsFlow.value?.forEach { contact ->
-            contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
+    fun listenToAllContacts() = viewModelScope.launch(Dispatchers.IO) {
+        ContactController.getContactsAsync().collect {
+            val contacts = mutableListOf<UiContact>()
+            it.list.forEach { contact ->
+                contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
+            }
+            allContacts.postValue(contacts)
         }
-
-        return contacts
     }
 
     fun startAutoSave(email: String, subject: String, body: String) {
