@@ -119,7 +119,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupAdapter() {
         binding.threadsList.adapter = threadListAdapter
 
-        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
             // TODO: Manage no Internet screen
             // threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
             // binding.noNetwork.isGone = isInternetAvailable
@@ -277,8 +277,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsJob?.cancel()
         threadsJob = lifecycleScope.launch(Dispatchers.IO) {
             folder.threads.asFlow().toSharedFlow().collect {
-                Log.e("TOTO", "listenToThreads: ${folder.name}")
-                withContext(Dispatchers.Main) { displayThreads(it.list) }
+                if (isResumed) withContext(Dispatchers.Main) { displayThreads(it.list) }
             }
         }
     }
