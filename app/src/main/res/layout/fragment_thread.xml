@@ -93,18 +93,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:icon1="@drawable/ic_email_action_reply"
-        app:icon2="@drawable/ic_email_action_send"
-        app:icon3="@drawable/ic_archive_folder"
-        app:icon4="@drawable/ic_bin"
-        app:icon5="@drawable/ic_param_dots"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:title1="@string/actionReply"
-        app:title2="@string/actionForward"
-        app:title3="@string/actionArchive"
-        app:title4="@string/actionDelete"
-        app:title5="@string/buttonMore" />
+        app:menu="@menu/message_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

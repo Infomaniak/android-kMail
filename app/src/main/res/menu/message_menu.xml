@@ -15,16 +15,20 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
-    <declare-styleable name="MenuDrawerItemView">
-        <attr name="badge" format="string" />
-        <attr name="icon" format="reference" />
-        <attr name="indent" format="dimension" />
-        <attr name="text" format="string" />
-        <attr name="textSize" format="dimension" />
-    </declare-styleable>
-
-    <declare-styleable name="BottomQuickActionBarView">
-        <attr name="menu" />
-    </declare-styleable>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/ic_email_action_reply"
+        android:title="@string/actionReply" />
+    <item
+        android:icon="@drawable/ic_email_action_send"
+        android:title="@string/actionForward" />
+    <item
+        android:icon="@drawable/ic_archive_folder"
+        android:title="@string/actionArchive" />
+    <item
+        android:icon="@drawable/ic_bin"
+        android:title="@string/actionDelete" />
+    <item
+        android:icon="@drawable/ic_param_dots"
+        android:title="@string/buttonMore" />
+</menu>
