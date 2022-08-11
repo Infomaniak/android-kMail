@@ -37,10 +37,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardMedium"
-            app:src1="@drawable/ic_email_action_reply"
-            app:src2="@drawable/ic_email_action_reply_to_all"
-            app:text1="@string/actionReply"
-            app:text2="@string/actionReplyAll" />
+            app:icon1="@drawable/ic_email_action_reply"
+            app:icon2="@drawable/ic_email_action_reply_to_all"
+            app:title1="@string/actionReply"
+            app:title2="@string/actionReplyAll" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
