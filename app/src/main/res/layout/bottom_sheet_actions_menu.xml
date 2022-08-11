@@ -45,14 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/marginStandardMedium"
             android:layout_marginBottom="@dimen/marginStandardMedium"
-            app:icon1="@drawable/ic_email_action_reply"
-            app:icon2="@drawable/ic_email_action_reply_to_all"
-            app:icon3="@drawable/ic_email_action_send"
-            app:icon4="@drawable/ic_bin"
-            app:title1="@string/actionReply"
-            app:title2="@string/actionReplyAll"
-            app:title3="@string/actionForward"
-            app:title4="@string/actionDelete" />
+            app:menu="@menu/main_actions_thread_message_menu" />
 
         <com.infomaniak.mail.ui.main.thread.ActionItemView
             android:id="@+id/archive"
