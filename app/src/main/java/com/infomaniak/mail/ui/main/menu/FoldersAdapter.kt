@@ -43,7 +43,7 @@ class FoldersAdapter(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() == Unit) {
             val folder = folders[position]
-            val isSelected = if (folder.isValid()) currentFolderId == folder.id else false
+            val isSelected = folder.isValid() && currentFolderId == folder.id
             holder.binding.item.setSelectedState(isSelected)
         } else {
             super.onBindViewHolder(holder, position, payloads)

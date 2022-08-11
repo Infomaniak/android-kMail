@@ -106,7 +106,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupAdapter() {
         binding.threadsList.adapter = threadsAdapter
 
-        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isInternetAvailable ->
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
             // TODO: Manage no Internet screen
             // threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
             // binding.noNetwork.isGone = isInternetAvailable
