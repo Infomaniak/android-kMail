@@ -50,7 +50,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class NewMessageFragment : Fragment() {
 
-    private val viewModel: NewMessageViewModel by activityViewModels()
+    private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private lateinit var binding: FragmentNewMessageBinding
 
@@ -76,7 +76,7 @@ class NewMessageFragment : Fragment() {
         //     openAdvancedFields()
         // }
         chevron.setOnClickListener {
-            viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
+            newMessageViewModel.areAdvancedFieldsOpened = !newMessageViewModel.areAdvancedFieldsOpened
             openAdvancedFields()
         }
 
@@ -88,7 +88,7 @@ class NewMessageFragment : Fragment() {
 
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
 
-        viewModel.editorAction.observe(requireActivity()) {
+        newMessageViewModel.editorAction.observe(requireActivity()) {
 
             val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) ?: "" }
             // TODO: Do stuff here with this `selectedText`?
@@ -153,13 +153,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun listenToAllContacts() {
-        viewModel.allContacts.observeNotNull(this, ::setupContactsAdapter)
-        viewModel.listenToAllContacts()
+        newMessageViewModel.allContacts.observeNotNull(this, ::setupContactsAdapter)
+        newMessageViewModel.listenToAllContacts()
     }
 
     private fun listenToMailboxes() {
-        viewModel.mailboxes.observeNotNull(this, ::setupFromField)
-        viewModel.listenToMailboxes()
+        newMessageViewModel.mailboxes.observeNotNull(this, ::setupFromField)
+        newMessageViewModel.listenToMailboxes()
     }
 
     private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {
@@ -193,9 +193,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {
-        val toAlreadyUsedContactMails = viewModel.recipients.map { it.email }.toMutableList()
-        val ccAlreadyUsedContactMails = viewModel.newMessageCc.map { it.email }.toMutableList()
-        val bccAlreadyUsedContactMails = viewModel.newMessageBcc.map { it.email }.toMutableList()
+        val toAlreadyUsedContactMails = newMessageViewModel.recipients.map { it.email }.toMutableList()
+        val ccAlreadyUsedContactMails = newMessageViewModel.newMessageCc.map { it.email }.toMutableList()
+        val bccAlreadyUsedContactMails = newMessageViewModel.newMessageBcc.map { it.email }.toMutableList()
 
         contactAdapter = ContactAdapter(
             allContacts = allContacts,
@@ -243,9 +243,9 @@ class NewMessageFragment : Fragment() {
 
     //region Chips behavior
     private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
-        TO -> viewModel.recipients
-        CC -> viewModel.newMessageCc
-        BCC -> viewModel.newMessageBcc
+        TO -> newMessageViewModel.recipients
+        CC -> newMessageViewModel.newMessageCc
+        BCC -> newMessageViewModel.newMessageBcc
     }
 
     private fun getChipGroup(field: FieldType): ChipGroup = when (field) {
@@ -288,16 +288,16 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateSingleChipText() {
-        viewModel.recipients.firstOrNull()?.let { binding.singleChip.root.text = it.name ?: it.email }
+        newMessageViewModel.recipients.firstOrNull()?.let { binding.singleChip.root.text = it.name ?: it.email }
     }
 
     private fun refreshChips() = with(binding) {
         toItemsChipGroup.removeAllViews()
         ccItemsChipGroup.removeAllViews()
         bccItemsChipGroup.removeAllViews()
-        viewModel.recipients.forEach { createChip(TO, it) }
-        viewModel.newMessageCc.forEach { createChip(CC, it) }
-        viewModel.newMessageBcc.forEach { createChip(BCC, it) }
+        newMessageViewModel.recipients.forEach { createChip(TO, it) }
+        newMessageViewModel.newMessageCc.forEach { createChip(CC, it) }
+        newMessageViewModel.newMessageBcc.forEach { createChip(BCC, it) }
     }
 
     private fun createChip(field: FieldType, contact: UiContact) {
@@ -312,10 +312,10 @@ class NewMessageFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun updateChipVisibility() = with(binding) {
         singleChipGroup.isInvisible = !(!isAutocompletionOpened
-                && !viewModel.areAdvancedFieldsOpened
-                && viewModel.recipients.isNotEmpty())
+                && !newMessageViewModel.areAdvancedFieldsOpened
+                && newMessageViewModel.recipients.isNotEmpty())
 
-        toItemsChipGroup.isInvisible = !viewModel.areAdvancedFieldsOpened
+        toItemsChipGroup.isInvisible = !newMessageViewModel.areAdvancedFieldsOpened
 
         // TODO: Do we want this button?
         // toTransparentButton.isVisible = !isAutocompletionOpened
@@ -323,16 +323,16 @@ class NewMessageFragment : Fragment() {
         //         && !viewModel.areAdvancedFieldsOpened
 
         plusOthers.isInvisible = !(!isAutocompletionOpened
-                && viewModel.recipients.count() > 1
-                && !viewModel.areAdvancedFieldsOpened)
+                && newMessageViewModel.recipients.count() > 1
+                && !newMessageViewModel.areAdvancedFieldsOpened)
 
-        plusOthersChip.root.text = "+${viewModel.recipients.count() - 1}"
+        plusOthersChip.root.text = "+${newMessageViewModel.recipients.count() - 1}"
 
-        advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
+        advancedFields.isVisible = newMessageViewModel.areAdvancedFieldsOpened
     }
 
     private fun openAutocompletionView(fieldType: FieldType) {
-        viewModel.areAdvancedFieldsOpened = true
+        newMessageViewModel.areAdvancedFieldsOpened = true
         openAdvancedFields()
 
         isAutocompletionOpened = true
@@ -361,8 +361,8 @@ class NewMessageFragment : Fragment() {
 
         updateToAutocompleteInputLayout()
 
-        advancedFields.isVisible = viewModel.areAdvancedFieldsOpened
-        chevron.toggleChevron(!viewModel.areAdvancedFieldsOpened)
+        advancedFields.isVisible = newMessageViewModel.areAdvancedFieldsOpened
+        chevron.toggleChevron(!newMessageViewModel.areAdvancedFieldsOpened)
 
         refreshChips()
         updateSingleChipText()
@@ -375,8 +375,8 @@ class NewMessageFragment : Fragment() {
             ConstraintSet().apply {
                 clone(constraintLayout)
                 val topView = when {
-                    viewModel.areAdvancedFieldsOpened -> R.id.toItemsChipGroup
-                    viewModel.recipients.isEmpty() -> R.id.divider1
+                    newMessageViewModel.areAdvancedFieldsOpened -> R.id.toItemsChipGroup
+                    newMessageViewModel.recipients.isEmpty() -> R.id.divider1
                     else -> R.id.singleChipGroup
                 }
                 connect(R.id.toAutocompleteInput, ConstraintSet.TOP, topView, ConstraintSet.BOTTOM, 0)
