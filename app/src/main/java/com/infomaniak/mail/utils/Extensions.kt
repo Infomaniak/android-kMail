@@ -99,15 +99,17 @@ fun Fragment.notYetImplemented() {
 
 fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
 
+operator fun Regex.contains(input: String) = containsMatchIn(input)
+
 fun Attachment.getFileTypeFromExtension(): AttachmentType {
-    return when {
-        mimeType.contains(Regex("application/(zip|rar|x-tar|.*compressed|.*archive)")) -> AttachmentType.ARCHIVE
-        mimeType.contains(Regex("audio/")) -> AttachmentType.AUDIO
-        mimeType.contains(Regex("image/")) -> AttachmentType.IMAGE
-        mimeType.contains(Regex("/pdf")) -> AttachmentType.PDF
-        mimeType.contains(Regex("spreadsheet|excel|comma-separated-values")) -> AttachmentType.SPREADSHEET
-        mimeType.contains(Regex("document|text/plain|msword")) -> AttachmentType.TEXT
-        mimeType.contains(Regex("video/")) -> AttachmentType.VIDEO
+    return when (mimeType) {
+        in (Regex("application/(zip|rar|x-tar|.*compressed|.*archive)")) -> AttachmentType.ARCHIVE
+        in (Regex("audio/")) -> AttachmentType.AUDIO
+        in (Regex("image/")) -> AttachmentType.IMAGE
+        in (Regex("/pdf")) -> AttachmentType.PDF
+        in (Regex("spreadsheet|excel|comma-separated-values")) -> AttachmentType.SPREADSHEET
+        in (Regex("document|text/plain|msword")) -> AttachmentType.TEXT
+        in (Regex("video/")) -> AttachmentType.VIDEO
         else -> AttachmentType.UNKNOWN
     }
 }

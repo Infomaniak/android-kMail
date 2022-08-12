@@ -35,12 +35,14 @@ import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.loadAvatar
+import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
@@ -48,7 +50,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
-) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
+) : RecyclerView.Adapter<ThreadViewHolder>() {
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -56,15 +58,15 @@ class ThreadAdapter(
 
     override fun getItemCount() = messageList.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> {
-        return BindingViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
+        return ThreadViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false), onContactClicked)
     }
 
-    override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
-        bindHeader(message)
+        holder.bindHeader(message)
         bindAttachment(message.attachments)
         loadBodyInWebView(message.body)
 
@@ -77,7 +79,7 @@ class ThreadAdapter(
     }
 
 
-    private fun ItemMessageBinding.bindHeader(message: Message) {
+    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date?.toDate()
 
         if (message.isDraft) {
@@ -154,13 +156,13 @@ class ThreadAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindRecipientDetails(message: Message, messageDate: Date?) {
-        fromRecyclerView.adapter = DetailedRecipientAdapter(message.from.toList(), onContactClicked)
-        toRecyclerView.adapter = DetailedRecipientAdapter(message.to.toList(), onContactClicked)
+    private fun ThreadViewHolder.bindRecipientDetails(message: Message, messageDate: Date?) = with(binding) {
+        fromAdapter.updateList(message.from.toList())
+        toAdapter.updateList(message.to.toList())
 
         val ccIsNotEmpty = !message.cc.isEmpty()
         ccGroup.isVisible = ccIsNotEmpty
-        if (ccIsNotEmpty) ccRecyclerView.adapter = DetailedRecipientAdapter(message.cc.toList(), onContactClicked)
+        if (ccIsNotEmpty) ccAdapter.updateList(message.cc.toList())
 
         val dateNotNull = messageDate != null
         detailedMessageDate.isVisible = dateNotNull
@@ -314,5 +316,20 @@ class ThreadAdapter(
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
 
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
+    }
+
+    class ThreadViewHolder(
+        val binding: ItemMessageBinding,
+        onContactClicked: ((contact: Recipient) -> Unit)?
+    ) : ViewHolder(binding.root) {
+        val fromAdapter = DetailedRecipientAdapter(onContactClicked)
+        val toAdapter = DetailedRecipientAdapter(onContactClicked)
+        val ccAdapter = DetailedRecipientAdapter(onContactClicked)
+
+        init {
+            binding.fromRecyclerView.adapter = fromAdapter
+            binding.toRecyclerView.adapter = toAdapter
+            binding.ccRecyclerView.adapter = ccAdapter
+        }
     }
 }

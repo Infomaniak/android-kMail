@@ -132,7 +132,7 @@
                 style="@style/TextButton"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:cornerRadius="6dp"
+                app:cornerRadius="@dimen/smallCorderRadius"
                 app:layout_constraintBottom_toBottomOf="@id/recipientLayout"
                 app:layout_constraintEnd_toEndOf="@id/recipientLayout"
                 app:layout_constraintStart_toStartOf="@id/recipientLayout"
@@ -199,6 +199,7 @@
         app:layout_constraintTop_toBottomOf="@id/messageHeader" />
 
     <androidx.recyclerview.widget.RecyclerView
+
         android:id="@+id/fromRecyclerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

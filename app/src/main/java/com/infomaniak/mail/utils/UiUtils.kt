@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.graphics.Color
 import android.widget.TextView
+import androidx.core.view.isGone
 import com.infomaniak.mail.R
 
 object UiUtils {
@@ -44,6 +45,7 @@ object UiUtils {
             }
             name.isNullOrBlank() || name == email -> {
                 nameTextView?.text = email
+                emailTextView?.isGone = true
             }
             else -> {
                 nameTextView?.text = name

@@ -25,9 +25,9 @@ import com.infomaniak.mail.databinding.ItemDetailedContactBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
-    private val recipients: List<Recipient> = emptyList(),
     private val onContactClicked: ((contact: Recipient) -> Unit)?,
 ) : RecyclerView.Adapter<DetailedRecipientAdapter.DetailedRecipientViewHolder>() {
+    private var recipients = emptyList<Recipient>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailedRecipientViewHolder {
         return DetailedRecipientViewHolder(ItemDetailedContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -42,6 +42,10 @@ class DetailedRecipientAdapter(
     }
 
     override fun getItemCount(): Int = recipients.count()
+
+    fun updateList(newList: List<Recipient>) {
+        recipients = newList
+    }
 
     class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : RecyclerView.ViewHolder(binding.root)
 }

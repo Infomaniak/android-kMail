@@ -39,15 +39,15 @@ class BottomQuickActionBarView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     var binding: ViewBottomQuickActionBarBinding
-    private lateinit var buttons: List<MaterialButton>
+    private var buttons: List<MaterialButton>
 
     init {
         binding = ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true)
 
         with(binding) {
-            if (attrs != null) {
-                buttons = listOf(button1, button2, button3, button4, button5)
+            buttons = listOf(button1, button2, button3, button4, button5)
 
+            if (attrs != null) {
                 val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomQuickActionBarView, 0, 0)
 
                 val menuRes = typedArray.getResourceId(R.styleable.BottomQuickActionBarView_menu, -1)
