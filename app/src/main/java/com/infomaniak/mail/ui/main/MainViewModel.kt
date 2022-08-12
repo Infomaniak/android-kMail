@@ -53,61 +53,6 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
 
-    companion object {
-        private val TAG = "MainViewModel"
-        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
-
-        val currentMailboxObjectId = MutableLiveData<String?>()
-        val currentFolderId = MutableLiveData<String?>()
-        val currentThreadUid = MutableLiveData<String?>()
-        val currentMessageUid = MutableLiveData<String?>()
-
-        fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
-            val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
-            if (apiResponse.data == true) {
-                DraftController.removeDraft(draft.uuid, draft.messageUid)
-            } else {
-                DraftController.updateDraft(draft.uuid) { it.apply { action = DraftAction.SAVE } }
-                saveDraft(draft, mailboxUuid)
-            }
-
-            return apiResponse
-        }
-
-        fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
-            val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
-            apiResponse.data?.let { apiData ->
-                DraftController.removeDraft(draft.uuid, draft.messageUid)
-                val newDraft = ApiRepository.getDraft(mailboxUuid, apiData.uuid).data
-                newDraft?.apply {
-                    isOffline = false
-                    isModifiedOffline = false
-                    messageUid = apiData.uid
-                    // attachments = apiData.attachments // TODO? Not sure.
-                    DraftController.manageDraftAutoSave(newDraft, false)
-                }
-            } ?: DraftController.manageDraftAutoSave(draft, true)
-
-            return apiResponse
-        }
-
-        fun setDraftSignature(draft: Draft, draftAction: DraftAction? = null): Draft {
-
-            fun updateDraft(draftToUpdate: Draft, defaultSignatureId: Int?): Draft = draftToUpdate.apply {
-                identityId = defaultSignatureId
-                draftAction?.let { action = it }
-            }
-
-            val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return draft
-            val defaultSignatureId = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox).data?.defaultSignatureId
-
-            return DraftController.updateDraft(draft.uuid) { draftToUpdate ->
-                updateDraft(draftToUpdate, defaultSignatureId)
-            } ?: updateDraft(draft, defaultSignatureId)
-        }
-
-    }
-
     val isInternetAvailable = MutableLiveData(false)
     var canContinueToPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
@@ -334,7 +279,7 @@ class MainViewModel : ViewModel() {
             ?.uuid ?: return
         if (draft.isLastUpdateOnline(draftMailboxUuid)) return
 
-        val draftForApi = setDraftSignature(draft, DraftAction.SAVE)
+        val draftForApi = draft.updateForApi(DraftAction.SAVE)
         saveDraft(draftForApi, draftMailboxUuid).data?.let {
             fetchDraft("/api/mail/${draftMailboxUuid}/draft/${it.uuid}", it.uid)
         }
@@ -426,6 +371,60 @@ class MainViewModel : ViewModel() {
             // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
             attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, messageUid) }
             DraftController.upsertDraft(this)
+        }
+    }
+
+    companion object {
+        private val TAG = "MainViewModel"
+        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+
+        val currentMailboxObjectId = MutableLiveData<String?>()
+        val currentFolderId = MutableLiveData<String?>()
+        val currentThreadUid = MutableLiveData<String?>()
+        val currentMessageUid = MutableLiveData<String?>()
+
+        fun sendDraft(draft: Draft, mailboxUuid: String): ApiResponse<Boolean> {
+            val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
+            if (apiResponse.data == true) {
+                DraftController.removeDraft(draft.uuid, draft.messageUid)
+            } else {
+                draft.updateForApi(DraftAction.SAVE)
+                saveDraft(draft, mailboxUuid)
+            }
+
+            return apiResponse
+        }
+
+        fun saveDraft(draft: Draft, mailboxUuid: String): ApiResponse<DraftSaveResult> {
+            val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
+            apiResponse.data?.let { apiData ->
+                DraftController.removeDraft(draft.uuid, draft.messageUid)
+                val newDraft = ApiRepository.getDraft(mailboxUuid, apiData.uuid).data
+                newDraft?.apply {
+                    isOffline = false
+                    isModifiedOffline = false
+                    messageUid = apiData.uid
+                    // attachments = apiData.attachments // TODO? Not sure.
+                    DraftController.manageDraftAutoSave(newDraft, false)
+                }
+            } ?: DraftController.manageDraftAutoSave(draft, true)
+
+            return apiResponse
+        }
+
+        fun Draft.updateForApi(draftAction: DraftAction? = null): Draft {
+
+            fun updateDraft(draftToUpdate: Draft, defaultSignatureId: Int?, draftAction: DraftAction?) = draftToUpdate.apply {
+                identityId = defaultSignatureId
+                draftAction?.let { action = it }
+            }
+
+            val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return this
+            val defaultSignatureId = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox).data?.defaultSignatureId
+
+            return DraftController.updateDraft(uuid) { draftToUpdate ->
+                updateDraft(draftToUpdate, defaultSignatureId, draftAction)
+            } ?: updateDraft(this, defaultSignatureId, draftAction)
         }
     }
 }

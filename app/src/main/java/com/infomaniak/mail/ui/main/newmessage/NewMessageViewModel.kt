@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
 import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.main.MainViewModel.Companion.updateForApi
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.realmListOf
@@ -99,8 +100,7 @@ class NewMessageViewModel : ViewModel() {
         }
 
         currentDraft.value?.let { draft ->
-            draft.update(draftAction = action, messageEmail = email, messageSubject = subject, messageBody = body)
-            viewModelScope.launch(Dispatchers.IO) { draft.sendOrSaveDraft() }
+            viewModelScope.launch(Dispatchers.IO) { draft.update(action, email, subject, body).sendOrSaveDraft() }
         }
 
         return true
@@ -108,11 +108,8 @@ class NewMessageViewModel : ViewModel() {
 
     private fun Draft.sendOrSaveDraft() {
         val mailbox = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return
-        val draftWithSignature = if (identityId == null) {
-            MainViewModel.setDraftSignature(this, action ?: DraftAction.SAVE) // TODO: Better handling of API response
-        } else {
-            this
-        }
+        // TODO: Better handling of API response
+        val draftWithSignature = if (identityId == null) updateForApi() else this
         if (draftWithSignature.action == DraftAction.SEND) {
             MainViewModel.sendDraft(draftWithSignature, mailbox.uuid)
         } else {
@@ -131,28 +128,34 @@ class NewMessageViewModel : ViewModel() {
         super.onCleared()
     }
 
-    private fun Draft.update(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String) {
-        // TODO: Should userInformation (here 'from') be stored in mainViewModel? See ApiRepository.getUser()
-        DraftController.updateDraft(uuid) {
-            it.apply {
-                from = realmListOf(Recipient().apply { email = messageEmail })
-                subject = messageSubject
-                body = messageBody
-                action = draftAction
-                to = newMessageTo.toRealmRecipients()
-                cc = newMessageCc.toRealmRecipients()
-                bcc = newMessageBcc.toRealmRecipients()
+    private fun Draft.update(draftAction: DraftAction, messageEmail: String, messageSubject: String, messageBody: String): Draft {
+        fun Draft.updateData(
+            draftAction: DraftAction,
+            messageEmail: String,
+            messageSubject: String,
+            messageBody: String,
+        ) = apply {
+            from = realmListOf(Recipient().apply { email = messageEmail })
+            subject = messageSubject
+            body = messageBody
+            action = draftAction
+            to = newMessageTo.toRealmRecipients()
+            cc = newMessageCc.toRealmRecipients()
+            bcc = newMessageBcc.toRealmRecipients()
 
-                // TODO: Manage advanced functionalities
-                // it.quote = ""
-                // it.references = ""
-                // it.delay = 0
-                // it.inReplyTo = ""
-                // it.inReplyToUid = ""
-                // it.replyTo = realmListOf()
-                // it.attachments = realmListOf()
-            }
+            // TODO: Manage advanced functionalities
+            // it.quote = ""
+            // it.references = ""
+            // it.delay = 0
+            // it.inReplyTo = ""
+            // it.inReplyToUid = ""
+            // it.replyTo = realmListOf()
+            // it.attachments = realmListOf()
         }
+
+        // TODO: Should userInformation (here 'from') be stored in mainViewModel? See ApiRepository.getUser()
+        return DraftController.updateDraft(uuid) { it.updateData(draftAction, messageEmail, messageSubject, messageBody) }
+            ?: updateData(draftAction, messageEmail, messageSubject, messageBody)
     }
 
     private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient> {
