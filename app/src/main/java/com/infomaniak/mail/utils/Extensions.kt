@@ -29,6 +29,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
@@ -98,8 +99,6 @@ fun Fragment.notYetImplemented() {
 }
 
 fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
-
-operator fun Regex.contains(input: String) = containsMatchIn(input)
 
 fun Attachment.getFileTypeFromExtension(): AttachmentType {
     return when (mimeType) {

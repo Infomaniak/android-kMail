@@ -26,6 +26,7 @@ import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import com.google.android.material.button.MaterialButton
@@ -49,9 +50,7 @@ class BottomQuickActionBarView @JvmOverloads constructor(
 
             if (attrs != null) {
                 val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomQuickActionBarView, 0, 0)
-
-                val menuRes = typedArray.getResourceId(R.styleable.BottomQuickActionBarView_menu, -1)
-                if (menuRes == -1) return@with
+                val menuRes = typedArray.getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu)
 
                 val menu = MenuBuilder(context)
                 MenuInflater(context).inflate(menuRes, menu)
