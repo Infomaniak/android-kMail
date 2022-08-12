@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 class SwitchUserFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val viewModel: SwitchUserViewModel by viewModels()
+    private val switchUserViewModel: SwitchUserViewModel by viewModels()
 
     private lateinit var binding: FragmentSwitchUserBinding
 
@@ -84,7 +84,7 @@ class SwitchUserFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
 
             val users = AccountUtils.getAllUsersSync()
-            viewModel.fetchAccounts(users)
+            switchUserViewModel.fetchAccounts(users)
 
             val flows = users.map { user -> MailboxController.getMailboxesAsync(user.id) }
 
