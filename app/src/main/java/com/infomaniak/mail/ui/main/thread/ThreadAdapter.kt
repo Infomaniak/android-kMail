@@ -30,7 +30,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.*
+import com.infomaniak.lib.core.utils.FormatterFileSize
+import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.loadAvatar
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
