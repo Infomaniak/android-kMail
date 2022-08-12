@@ -21,6 +21,7 @@ import android.graphics.Color
 import android.widget.TextView
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Correspondent
 
 object UiUtils {
     fun pointBetweenColors(from: Color, to: Color, percent: Float) =
@@ -36,7 +37,11 @@ object UiUtils {
 
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 
-    fun fillInUserNameAndEmail(nameTextView: TextView, name: String?, emailTextView: TextView?, email: String) {
+    fun fillInUserNameAndEmail(
+        nameTextView: TextView,
+        emailTextView: TextView?,
+        correspondent: Correspondent
+    ) = with(correspondent) {
         when {
             email.isMe() -> {
                 val context = nameTextView.context ?: emailTextView?.context!!

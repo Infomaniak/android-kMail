@@ -23,16 +23,17 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-class Contact : RealmObject {
+class Contact : RealmObject, Correspondent {
     @PrimaryKey
     var id: String = ""
-    var name: String = ""
+    override var name: String = ""
     @SerialName("firstname")
     var firstName: String = ""
     @SerialName("lastname")
@@ -44,6 +45,9 @@ class Contact : RealmObject {
     var emails: RealmList<String> = realmListOf()
     @SerialName("addressbook_id")
     var addressBookId: Int = 0
+
+    @Ignore
+    override var email: String = emails.firstOrNull() ?: ""
 
     fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
