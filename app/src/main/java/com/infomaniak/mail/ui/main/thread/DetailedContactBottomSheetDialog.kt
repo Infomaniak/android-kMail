@@ -43,7 +43,6 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
 
         userAvatarImage.loadAvatar(navigationArgs.contactName, navigationArgs.contactEmail)
         fillInUserNameAndEmail(name, navigationArgs.contactName, email, navigationArgs.contactEmail)
-        if (email.text.isBlank()) email.isGone = true
 
         writeMail.setOnClickListener { notYetImplemented() }
         addToContacts.setOnClickListener { notYetImplemented() }
