@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.getFileTypeFromExtension
 import com.infomaniak.mail.utils.notYetImplemented
 
 class AttachmentAdapter(

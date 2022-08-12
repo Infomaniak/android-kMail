@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -45,6 +46,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
@@ -87,6 +89,19 @@ class ThreadFragment : Fragment() {
             val margin = resources.getDimensionPixelSize(RCore.dimen.marginStandardSmall)
             val divider = InsetDrawable(it, margin, 0, margin, 0)
             messagesList.addItemDecoration(DividerItemDecorator(divider))
+        }
+
+        toolbar.title = navigationArgs.threadSubject
+
+        val defaultTextColor = context.getColor(R.color.primaryTextColor)
+        appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
+            val removed = appBarLayout.height - total
+            val progress = ((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0)
+            val opacity = ((progress / total) * 255).roundToInt()
+
+            val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
+            toolbar.setTitleTextColor(textColor)
         }
     }
 
@@ -131,6 +146,10 @@ class ThreadFragment : Fragment() {
 
         threadAdapter.notifyAdapter(messages.toMutableList())
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+    }
+
+    companion object {
+        const val COLLAPSE_TITLE_THRESHOLD = 0.5
     }
 
     // Do not change the order of the enum, it's important that it represents the order of the buttons in the UI

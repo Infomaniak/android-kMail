@@ -99,16 +99,3 @@ fun Fragment.notYetImplemented() {
 }
 
 fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
-
-fun Attachment.getFileTypeFromExtension(): AttachmentType {
-    return when (mimeType) {
-        in (Regex("application/(zip|rar|x-tar|.*compressed|.*archive)")) -> AttachmentType.ARCHIVE
-        in (Regex("audio/")) -> AttachmentType.AUDIO
-        in (Regex("image/")) -> AttachmentType.IMAGE
-        in (Regex("/pdf")) -> AttachmentType.PDF
-        in (Regex("spreadsheet|excel|comma-separated-values")) -> AttachmentType.SPREADSHEET
-        in (Regex("document|text/plain|msword")) -> AttachmentType.TEXT
-        in (Regex("video/")) -> AttachmentType.VIDEO
-        else -> AttachmentType.UNKNOWN
-    }
-}
