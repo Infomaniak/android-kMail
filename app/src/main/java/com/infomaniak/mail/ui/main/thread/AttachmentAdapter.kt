@@ -39,11 +39,11 @@ class AttachmentAdapter(
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
         val item = items[position]
 
-        root.setOnClickListener { findFragment<ThreadFragment>(root).notYetImplemented() }
         fileName.text = item.name
         // TODO: Find how to add the FileType prefix before the file' size.
         fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, item.size.toLong())
         icon.load(item.getFileTypeFromExtension().icon)
+        root.setOnClickListener { findFragment<ThreadFragment>(root).notYetImplemented() }
     }
 
     override fun getItemCount(): Int = items.count()

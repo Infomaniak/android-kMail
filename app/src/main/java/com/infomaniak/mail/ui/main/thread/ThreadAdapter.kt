@@ -259,7 +259,7 @@ class ThreadAdapter(
         recipientsList.forEach {
             if (isExpandedHeaderMode) {
                 color(context.getColor(RCore.color.accent)) { append(it.displayedName(context)) }
-                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name?.isNotBlank() == true) append(" (${it.email})") }
+                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name.isNotBlank()) append(" (${it.email})") }
                     .append(",\n")
             } else {
                 append("${it.displayedName(context)}, ")
@@ -284,7 +284,7 @@ class ThreadAdapter(
         return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
     }
 
-    private fun Recipient.getNameOrEmail() = name?.let { it.ifBlank { email } } ?: email
+    private fun Recipient.getNameOrEmail() = name.ifBlank { email }
 
     private class MessageListDiffCallback(
         private val oldList: List<Message>,

@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.MailApi
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
-import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
@@ -74,14 +73,13 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
-        quickActionBar.setOnItemClickListener { index ->
-            val action = QuickActionButton.values()[index]
-            when (action) {
-                ANSWER -> notYetImplemented()
-                TRANSFER -> notYetImplemented()
-                ARCHIVE -> notYetImplemented()
-                DELETE -> notYetImplemented()
-                PLUS -> notYetImplemented()
+        quickActionBar.setOnItemClickListener { menuId ->
+            when (menuId) {
+                R.id.quickActionReply -> notYetImplemented()
+                R.id.quickActionForward -> notYetImplemented()
+                R.id.quickActionArchive -> notYetImplemented()
+                R.id.quickActionDelete -> notYetImplemented()
+                R.id.quickActionMenu -> notYetImplemented()
             }
         }
 

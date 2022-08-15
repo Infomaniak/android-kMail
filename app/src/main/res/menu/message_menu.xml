@@ -17,18 +17,23 @@
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/quickActionReply"
         android:icon="@drawable/ic_email_action_reply"
         android:title="@string/actionReply" />
     <item
+        android:id="@+id/quickActionForward"
         android:icon="@drawable/ic_email_action_send"
         android:title="@string/actionForward" />
     <item
+        android:id="@+id/quickActionArchive"
         android:icon="@drawable/ic_archive_folder"
         android:title="@string/actionArchive" />
     <item
+        android:id="@+id/quickActionDelete"
         android:icon="@drawable/ic_bin"
         android:title="@string/actionDelete" />
     <item
+        android:id="@+id/quickActionMenu"
         android:icon="@drawable/ic_param_dots"
         android:title="@string/buttonMore" />
 </menu>

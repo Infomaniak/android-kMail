@@ -48,7 +48,7 @@ object UiUtils {
                 nameTextView.text = context.getString(R.string.contactMe)
                 emailTextView?.text = email
             }
-            name.isNullOrBlank() || name == email -> {
+            name.isBlank() || name == email -> {
                 nameTextView.text = email
                 emailTextView?.isGone = true
             }
