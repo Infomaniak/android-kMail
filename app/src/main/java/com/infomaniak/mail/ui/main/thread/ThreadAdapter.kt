@@ -56,6 +56,8 @@ class ThreadAdapter(
     var onDraftClicked: ((message: Message) -> Unit)? = null
     var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
     var onDownloadAllClicked: (() -> Unit)? = null
+    var onReplyClicked: ((Message) -> Unit)? = null
+    var onMenuClicked: ((Message) -> Unit)? = null
 
     override fun getItemCount() = messages.size
 
@@ -232,20 +234,11 @@ class ThreadAdapter(
         }
         replyButton.apply {
             isVisible = isExpanded
-            setOnClickListener {
-                findFragment<ThreadFragment>().safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog())
-            }
+            setOnClickListener { onReplyClicked?.invoke(message) }
         }
         menuButton.apply {
             isVisible = isExpanded
-            setOnClickListener {
-                findFragment<ThreadFragment>().safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
-                        isFavorite = message.isFavorite,
-                        isSeen = message.seen
-                    )
-                )
-            }
+            setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
         recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject

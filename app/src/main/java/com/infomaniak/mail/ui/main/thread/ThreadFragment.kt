@@ -148,6 +148,17 @@ class ThreadFragment : Fragment() {
             onDownloadAllClicked = {
                 notYetImplemented()
             }
+            onReplyClicked = {
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog())
+            }
+            onMenuClicked = { message ->
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
+                        isFavorite = message.isFavorite,
+                        isSeen = message.seen
+                    )
+                )
+            }
         }
     }
 
