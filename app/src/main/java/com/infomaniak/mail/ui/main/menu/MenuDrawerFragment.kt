@@ -49,7 +49,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.ceil
@@ -194,9 +193,8 @@ class MenuDrawerFragment : Fragment() {
     private fun listenToCurrentFolder() {
         MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
             lifecycleScope.launch(Dispatchers.IO) {
-                FolderController.getFolderAsync(folderId).firstOrNull()?.obj?.role?.let { folderRole ->
-                    withContext(Dispatchers.Main) { onCurrentFolderChange(folderRole) }
-                }
+                val folderRole = FolderController.getFolderSync(folderId)?.role
+                withContext(Dispatchers.Main) { onCurrentFolderChange(folderRole) }
             }
         }
     }
@@ -218,7 +216,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onCurrentMailboxChange(mailboxObjectId: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.let { mailbox ->
+            MailboxController.getMailboxSync(mailboxObjectId)?.let { mailbox ->
                 withContext(Dispatchers.Main) {
                     binding.mailboxSwitcherText.text = mailbox.email
                     displayMailboxQuotas(mailbox)
@@ -240,7 +238,7 @@ class MenuDrawerFragment : Fragment() {
         setCustomFoldersCollapsedState()
     }
 
-    private fun onCurrentFolderChange(folderRole: FolderRole) = with(binding) {
+    private fun onCurrentFolderChange(folderRole: FolderRole?) = with(binding) {
         currentFolderRole = folderRole
         inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
         defaultFolderAdapter.notifyItemRangeChanged(0, defaultFolderAdapter.itemCount, Unit)

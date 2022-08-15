@@ -46,7 +46,6 @@ import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
@@ -143,7 +142,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun listenToMessages() = lifecycleScope.launch(Dispatchers.IO) {
-        ThreadController.getThreadAsync(navigationArgs.threadUid).firstOrNull()?.obj?.let { thread ->
+        ThreadController.getThreadSync(navigationArgs.threadUid)?.let { thread ->
             mainViewModel.openThread(thread)
             thread.messages.asFlow().toSharedFlow().collect {
                 withContext(Dispatchers.Main) { displayMessages(it.list) }
