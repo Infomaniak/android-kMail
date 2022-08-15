@@ -36,7 +36,6 @@ import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
 import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class NewMessageActivity : ThemedActivity() {
@@ -121,7 +120,7 @@ class NewMessageActivity : ThemedActivity() {
 
         val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return false
         lifecycleScope.launch(Dispatchers.IO) {
-            MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.let { mailbox ->
+            MailboxController.getMailboxSync(mailboxObjectId)?.let { mailbox ->
                 newMessageViewModel.sendMail(createDraft(), action, mailbox)
             }
         }
