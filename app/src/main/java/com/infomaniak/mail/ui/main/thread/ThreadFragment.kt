@@ -124,6 +124,12 @@ class ThreadFragment : Fragment() {
                 }
                 threadAdapter.removeMessage(message)
             }
+            onAttachmentClicked = { attachment ->
+                notYetImplemented()
+            }
+            onDownloadAllClicked = {
+                notYetImplemented()
+            }
         }
     }
 

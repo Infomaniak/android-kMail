@@ -27,7 +27,6 @@ import androidx.core.text.color
 import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager.findFragment
 import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -55,11 +54,17 @@ class ThreadAdapter(
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null
+    var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
+    var onDownloadAllClicked: (() -> Unit)? = null
 
     override fun getItemCount() = messageList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
-        return ThreadViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false), onContactClicked)
+        return ThreadViewHolder(
+            ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onContactClicked,
+            onAttachmentClicked
+        )
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
@@ -67,7 +72,7 @@ class ThreadAdapter(
         if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
         holder.bindHeader(message)
-        bindAttachment(message.attachments)
+        holder.bindAttachment(message.attachments)
         loadBodyInWebView(message.body)
 
         displayExpandedCollapsedMessage(message)
@@ -171,17 +176,17 @@ class ThreadAdapter(
     }
 
 
-    private fun ItemMessageBinding.bindAttachment(attachments: List<Attachment>) {
+    private fun ThreadViewHolder.bindAttachment(attachments: List<Attachment>) = with(binding) {
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentsSizeText.text = context.resources.getQuantityString(
             R.plurals.attachmentQuantity,
             attachments.size,
             attachments.size,
         ) + " ($fileSize)"
-        attachmentsRecyclerView.adapter = AttachmentAdapter(attachments)
+        attachmentAdapter.setAttachments(attachments)
         attachmentsDownloadAllButton.setOnClickListener {
             // TODO: AttachmentsList Fragment
-            findFragment<ThreadFragment>(it).notYetImplemented()
+            onDownloadAllClicked?.invoke()
         }
     }
 
@@ -320,16 +325,21 @@ class ThreadAdapter(
 
     class ThreadViewHolder(
         val binding: ItemMessageBinding,
-        onContactClicked: ((contact: Recipient) -> Unit)?
+        onContactClicked: ((contact: Recipient) -> Unit)?,
+        onAttachmentClicked: ((attachment: Attachment) -> Unit)?
     ) : ViewHolder(binding.root) {
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
+        val attachmentAdapter = AttachmentAdapter(onAttachmentClicked)
 
         init {
-            binding.fromRecyclerView.adapter = fromAdapter
-            binding.toRecyclerView.adapter = toAdapter
-            binding.ccRecyclerView.adapter = ccAdapter
+            with(binding) {
+                fromRecyclerView.adapter = fromAdapter
+                toRecyclerView.adapter = toAdapter
+                ccRecyclerView.adapter = ccAdapter
+                attachmentsRecyclerView.adapter = attachmentAdapter
+            }
         }
     }
 }
