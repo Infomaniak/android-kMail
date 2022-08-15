@@ -17,12 +17,14 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -39,9 +41,12 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
@@ -68,18 +73,41 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
+        quickActionBar.setOnItemClickListener { menuId ->
+            when (menuId) {
+                R.id.quickActionReply -> notYetImplemented()
+                R.id.quickActionForward -> notYetImplemented()
+                R.id.quickActionArchive -> notYetImplemented()
+                R.id.quickActionDelete -> notYetImplemented()
+                R.id.quickActionMenu -> notYetImplemented()
+            }
+        }
+
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(it))
+            val margin = resources.getDimensionPixelSize(RCore.dimen.marginStandardSmall)
+            val divider = InsetDrawable(it, margin, 0, margin, 0)
+            messagesList.addItemDecoration(DividerItemDecorator(divider))
+        }
+
+        toolbar.title = navigationArgs.threadSubject
+
+        val defaultTextColor = context.getColor(R.color.primaryTextColor)
+        appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
+            val removed = appBarLayout.height - total
+            val progress = ((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0)
+            val opacity = ((progress / total) * 255).roundToInt()
+
+            val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
+            toolbar.setTitleTextColor(textColor)
         }
     }
 
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            onContactClicked = { contact, isExpanded ->
-                if (isExpanded) {
-                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
-                }
+            onContactClicked = { contact ->
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
             }
             onDraftClicked = { message ->
                 lifecycleScope.launch {
@@ -95,6 +123,12 @@ class ThreadFragment : Fragment() {
                     // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
                 }
                 threadAdapter.removeMessage(message)
+            }
+            onAttachmentClicked = { attachment ->
+                notYetImplemented()
+            }
+            onDownloadAllClicked = {
+                notYetImplemented()
             }
         }
     }
@@ -116,5 +150,18 @@ class ThreadFragment : Fragment() {
 
         threadAdapter.notifyAdapter(messages.toMutableList())
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+    }
+
+    companion object {
+        const val COLLAPSE_TITLE_THRESHOLD = 0.5
+    }
+
+    // Do not change the order of the enum, it's important that it represents the order of the buttons in the UI
+    enum class QuickActionButton {
+        ANSWER,
+        TRANSFER,
+        ARCHIVE,
+        DELETE,
+        PLUS,
     }
 }

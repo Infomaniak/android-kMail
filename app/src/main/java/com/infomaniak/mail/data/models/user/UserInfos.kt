@@ -17,17 +17,18 @@
  */
 package com.infomaniak.mail.data.models.user
 
+import com.infomaniak.mail.data.models.Correspondent
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class UserInfos : RealmObject {
-    var name: String = ""
+class UserInfos : RealmObject, Correspondent {
+    override var name: String = ""
     @SerialName("firstname")
     var firstName: String = ""
     var login: String = ""
-    var email: String = ""
+    override var email: String = ""
     @SerialName("hosting_url")
     var hostingUrl: String = ""
     @SerialName("manager_url")

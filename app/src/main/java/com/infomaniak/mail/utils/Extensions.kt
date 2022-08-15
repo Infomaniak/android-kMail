@@ -47,6 +47,13 @@ fun Date.toRealmInstant(): RealmInstant {
 
 fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }
 
+fun Date.isYesterday(): Boolean {
+    val yesterday = Calendar.getInstance().apply { add(Calendar.DATE, -1) }.time
+    return year() == yesterday.year() && month() == yesterday.month() && day() == yesterday.day()
+}
+
+fun Date.isThisYear(): Boolean = Date().let { now -> year() == now.year() }
+
 fun View.toggleChevron(
     isCollapsed: Boolean,
     collapsedAngle: Float? = null,
@@ -69,6 +76,8 @@ fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0
 }
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
+fun String.isMe(): Boolean = AccountUtils.currentUser?.email == this
 
 inline val ViewBinding.context: Context get() = root.context
 

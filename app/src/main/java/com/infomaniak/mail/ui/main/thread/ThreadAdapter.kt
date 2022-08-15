@@ -19,66 +19,257 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.Html
 import android.text.SpannedString
-import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.annotation.DimenRes
 import androidx.core.text.buildSpannedString
 import androidx.core.text.color
 import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
 import com.infomaniak.lib.core.utils.FormatterFileSize
+import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.loadAvatar
+import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.toDate
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
+import com.infomaniak.mail.utils.*
+import java.util.*
 import com.infomaniak.lib.core.R as RCore
+
 
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
-) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
+) : RecyclerView.Adapter<ThreadViewHolder>() {
 
-    var onContactClicked: ((contact: Recipient, isExpanded: Boolean) -> Unit)? = null
+    var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null
+    var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
+    var onDownloadAllClicked: (() -> Unit)? = null
 
     override fun getItemCount() = messageList.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> {
-        return BindingViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
+        return ThreadViewHolder(
+            ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onContactClicked,
+            onAttachmentClicked
+        )
     }
 
-    override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
-        root.setOnClickListener(null)
-        if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
-        if (!message.isExpanded) {
-            root.setOnClickListener {
-                if (message.isDraft) {
-                    onDraftClicked?.invoke(message)
+
+        holder.bindHeader(message)
+        holder.bindAttachment(message.attachments)
+        loadBodyInWebView(message.body)
+
+        displayExpandedCollapsedMessage(message)
+    }
+
+    private fun ItemMessageBinding.loadBodyInWebView(body: Body?) {
+        // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
+        body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
+    }
+
+
+    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
+        val messageDate = message.date?.toDate()
+
+        if (message.isDraft) {
+            userAvatarImage.loadAvatar(AccountUtils.currentUser!!)
+            expeditorName.apply {
+                text = context.getString(R.string.messageIsDraftOption)
+                setTextColor(context.getColor(R.color.draftTextColor))
+            }
+            shortMessageDate.text = ""
+        } else {
+            val firstSender = message.from.first()
+            userAvatarImage.loadAvatar(
+                firstSender.email.hashCode(),
+                null,
+                firstSender.getNameOrEmail().firstOrEmpty().uppercase(),
+            )
+            expeditorName.apply {
+                text = firstSender.displayedName(context)
+                setTextColor(context.getColor(R.color.primaryTextColor))
+            }
+            shortMessageDate.text = messageDate?.let { context.mailFormattedDate(it) } ?: ""
+        }
+
+        userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
+
+        handleHeaderClick(message)
+        handleExpandDetailsClick(message)
+        bindRecipientDetails(message, messageDate)
+    }
+
+    private fun Context.mailFormattedDate(date: Date): CharSequence = with(date) {
+        return when {
+            isToday() -> format(FORMAT_EMAIL_DATE_HOUR)
+            isYesterday() -> getString(
+                R.string.messageDetailsDateAt,
+                getString(R.string.messageDetailsYesterday),
+                format(FORMAT_EMAIL_DATE_HOUR),
+            )
+            isThisYear() -> getString(
+                R.string.messageDetailsDateAt,
+                format(FORMAT_EMAIL_DATE_SHORT_DATE),
+                format(FORMAT_EMAIL_DATE_HOUR),
+            )
+            else -> this@mailFormattedDate.mostDetailedDate(this@with)
+        }
+    }
+
+    private fun Context.mostDetailedDate(date: Date) =
+        getString(R.string.messageDetailsDateAt, date.format(FORMAT_EMAIL_DATE_LONG_DATE), date.format(FORMAT_EMAIL_DATE_HOUR))
+
+    private fun ItemMessageBinding.handleHeaderClick(message: Message) = with(message) {
+        messageHeader.setOnClickListener {
+            if (isExpanded) {
+                isExpanded = false
+                displayExpandedCollapsedMessage(this@with)
+            } else {
+                if (isDraft) {
+                    onDraftClicked?.invoke(this@with)
                 } else {
-                    message.isExpanded = true
-                    displayMessage(message)
+                    isExpanded = true
+                    displayExpandedCollapsedMessage(this@with)
                 }
             }
         }
+    }
 
-        displayMessage(message)
+    private fun ItemMessageBinding.handleExpandDetailsClick(message: Message) {
+        recipientOverlayedButton.setOnClickListener {
+            message.detailsAreExpanded = !message.detailsAreExpanded
+            val isExpanded = message.detailsAreExpanded
+            recipientChevron.toggleChevron(!isExpanded)
+            detailedFieldsGroup.isVisible = isExpanded
+            ccGroup.isVisible = isExpanded && !message.cc.isEmpty()
+        }
+    }
+
+    private fun ThreadViewHolder.bindRecipientDetails(message: Message, messageDate: Date?) = with(binding) {
+        fromAdapter.updateList(message.from.toList())
+        toAdapter.updateList(message.to.toList())
+
+        val ccIsNotEmpty = !message.cc.isEmpty()
+        ccGroup.isVisible = ccIsNotEmpty
+        if (ccIsNotEmpty) ccAdapter.updateList(message.cc.toList())
+
+        val isDateNotNull = messageDate != null
+        detailedMessageDate.isVisible = isDateNotNull
+        detailedMessagePrefix.isVisible = isDateNotNull
+        if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
+    }
+
+
+    private fun ThreadViewHolder.bindAttachment(attachments: List<Attachment>) = with(binding) {
+        val fileSize = formatAttachmentFileSize(attachments)
+        attachmentsSizeText.text = context.resources.getQuantityString(
+            R.plurals.attachmentQuantity,
+            attachments.size,
+            attachments.size,
+        ) + " ($fileSize)"
+        attachmentAdapter.setAttachments(attachments)
+        attachmentsDownloadAllButton.setOnClickListener {
+            onDownloadAllClicked?.invoke()
+        }
+    }
+
+    private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
+        if (attachments.isEmpty()) return ""
+
+        val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
+            attachment.size.toLong()
+        }.reduce { accumulator: Long, size: Long -> accumulator + size }
+
+        return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
+    }
+
+
+    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
+        collapseMessageDetails(message)
+        setHeaderState(message)
+        if (message.isExpanded) displayAttachments(message.attachments) else hideAttachments()
+        webViewFrameLayout.isVisible = message.isExpanded
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun ItemMessageBinding.displayAttachments(attachments: List<Attachment>) {
+        if (attachments.isEmpty()) hideAttachments() else showAttachments()
+    }
+
+    private fun ItemMessageBinding.hideAttachments() {
+        attachmentsGroup.isGone = true
+        attachmentsRecyclerView.isGone = true
+    }
+
+    private fun ItemMessageBinding.showAttachments() {
+        attachmentsGroup.isVisible = true
+        attachmentsRecyclerView.isVisible = true
+    }
+
+    private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
+        message.detailsAreExpanded = false
+        ccGroup.isGone = true
+        detailedFieldsGroup.isGone = true
+        recipientChevron.rotation = 0f
+    }
+
+    private fun ItemMessageBinding.setHeaderState(message: Message) = with(message) {
+        deleteDraftButton.apply {
+            isVisible = isDraft
+            setOnClickListener { onDeleteDraftClicked?.invoke(this@with) }
+        }
+        replyButton.apply {
+            isVisible = isExpanded
+            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+        }
+        menuButton.apply {
+            isVisible = isExpanded
+            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+        }
+
+        recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject
+        recipientChevron.isVisible = isExpanded
+        recipientOverlayedButton.isVisible = isExpanded
+    }
+
+    private fun ItemMessageBinding.formatRecipientsName(message: Message): SpannedString = with(message) {
+        val to = recipientsToSpannedString(context, to)
+        val cc = recipientsToSpannedString(context, cc)
+
+        // TODO : Rewrite properly this part
+        return buildSpannedString {
+            if (isExpandedHeaderMode) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append("${context.getString(R.string.toTitle)} ") }
+            append(to)
+            if (cc.isNotBlank()) append(cc)
+        }.dropLast(2) as SpannedString
+    }
+
+    // TODO : Rewrite properly this part
+    private fun Message.recipientsToSpannedString(context: Context, recipientsList: List<Recipient>) = buildSpannedString {
+        recipientsList.forEach {
+            if (isExpandedHeaderMode) {
+                color(context.getColor(RCore.color.accent)) { append(it.displayedName(context)) }
+                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name.isNotBlank()) append(" (${it.email})") }
+                    .append(",\n")
+            } else {
+                append("${it.displayedName(context)}, ")
+            }
+        }
     }
 
     fun removeMessage(message: Message) {
@@ -90,153 +281,18 @@ class ThreadAdapter(
     fun notifyAdapter(newList: MutableList<Message>) {
         DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
         messageList = newList
+        messageList.forEachIndexed { index, message ->
+            if ((index == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
+        }
     }
 
     fun lastIndex() = messageList.lastIndex
-
-    private fun ItemMessageBinding.displayMessage(message: Message) = with(message) {
-        displayHeader(message)
-        hideAttachments()
-        if (isExpanded) {
-            displayAttachments(attachments)
-            displayBody(body)
-        }
-    }
-
-    private fun ItemMessageBinding.displayHeader(message: Message) = with(message) {
-        deleteDraftButton.apply {
-            isVisible = isDraft
-            setOnClickListener { onDeleteDraftClicked?.invoke(message) }
-        }
-
-        messageDate.text = if (isDraft) "" else date?.toDate()?.format(FORMAT_EMAIL_DATE)
-
-        expeditorName.apply {
-            setTextColor(context.getColor(if (isDraft) R.color.draftTextColor else R.color.primaryTextColor))
-            text = if (isDraft) {
-                context.getString(R.string.messageIsDraftOption)
-            } else {
-                from.first().displayedName(context)
-            }
-        }
-
-        expandHeaderButton.isVisible = isExpanded
-        webViewFrameLayout.isVisible = isExpanded
-        recipient.text = if (isExpanded) formatRecipientsName(message) else Html.fromHtml(preview, Html.FROM_HTML_MODE_LEGACY)
-        expeditorEmail.text = if (isExpanded) from.first().email else ""
-
-        if (isExpanded) {
-            messageHeader.addExpandHeaderListener(this@displayHeader, message)
-            expandHeaderButton.addExpandHeaderListener(this@displayHeader, message)
-        }
-    }
-
-    private fun ItemMessageBinding.formatRecipientsName(message: Message): SpannedString = with(message) {
-        val to = recipientsToSpannedString(context, to)
-        val cc = recipientsToSpannedString(context, cc)
-
-        return buildSpannedString {
-            if (isExpandedHeaderMode) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append("${context.getString(R.string.toTitle)} ") }
-            append(to)
-            if (cc.isNotBlank()) append(cc)
-        }.dropLast(2) as SpannedString
-    }
-
-    private fun Message.recipientsToSpannedString(context: Context, recipientsList: List<Recipient>) = buildSpannedString {
-        recipientsList.forEach {
-            if (isExpandedHeaderMode) {
-                color(context.getColor(RCore.color.accent)) { append(it.displayedName(context)) }
-                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name?.isNotBlank() == true) append(" (${it.email})") }
-                    .append(",\n")
-            } else {
-                append("${it.displayedName(context)}, ")
-            }
-        }
-    }
-
-    private fun View.addExpandHeaderListener(binding: ItemMessageBinding, message: Message) = with(message) {
-        setOnClickListener {
-            isExpandedHeaderMode = !isExpandedHeaderMode
-            binding.expandHeader(message)
-        }
-    }
-
-    private fun ItemMessageBinding.expandHeader(message: Message) = with(message) {
-
-        expeditorEmail.isVisible = isExpandedHeaderMode
-        expandHeaderButton.toggleChevron(!message.isExpandedHeaderMode)
-        recipient.maxLines = if (isExpandedHeaderMode) Int.MAX_VALUE else 1
-        recipient.changeSize(if (isExpandedHeaderMode) R.dimen.textSmallSize else R.dimen.textHintSize)
-
-        recipient.text = formatRecipientsName(message)
-        // TODO: Add listener to name and email of all recipient ?
-        userAvatar.setOnClickListener { onContactClicked?.invoke(from.first(), isExpandedHeaderMode) }
-    }
-
-    private fun TextView.changeSize(@DimenRes dimension: Int) {
-        setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(dimension))
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun ItemMessageBinding.displayAttachments(attachments: List<Attachment>) {
-        if (attachments.isEmpty()) {
-            hideAttachments()
-        } else {
-            showAttachments()
-
-            val fileSize = formatAttachmentFileSize(attachments)
-            attachmentsSizeText.text = context.resources.getQuantityString(
-                R.plurals.attachmentQuantity,
-                attachments.size,
-                attachments.size,
-            ) + " ($fileSize)"
-
-            with(attachmentsChipGroup) {
-                removeAllViews()
-                attachments.forEach { addView(createChip(it.name)) }
-            }
-
-            attachmentsDownloadAllButton.setOnClickListener {
-                // TODO: AttachmentsList Fragment
-            }
-        }
-    }
-
-    private fun ItemMessageBinding.hideAttachments() {
-        attachmentsGroup.isGone = true
-        attachmentsScrollView.isGone = true
-    }
-
-    private fun ItemMessageBinding.showAttachments() {
-        attachmentsGroup.isVisible = true
-        attachmentsScrollView.isVisible = true
-    }
-
-    private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
-        val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
-            attachment.size.toLong()
-        }.reduce { accumulator: Long, size: Long -> accumulator + size }
-
-        return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
-    }
-
-    private fun ItemMessageBinding.createChip(attachmentName: String): Chip {
-        val layoutInflater = LayoutInflater.from(context)
-        val chip = layoutInflater.inflate(R.layout.chip_attachment, attachmentsChipGroup, false) as Chip
-
-        return chip.apply { text = attachmentName }
-    }
-
-    private fun ItemMessageBinding.displayBody(body: Body?) {
-        // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
-        body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
-    }
 
     private fun Recipient.displayedName(context: Context): String {
         return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
     }
 
-    private fun Recipient.getNameOrEmail() = name?.ifBlank { email } ?: email
+    private fun Recipient.getNameOrEmail() = name.ifBlank { email }
 
     private class MessageListDiffCallback(
         private val oldList: List<Message>,
@@ -263,7 +319,30 @@ class ThreadAdapter(
     }
 
     private companion object {
-        const val FORMAT_EMAIL_DATE = "d MMM yyyy, HH:mm"
+        const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
+        const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
+        const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
+    }
+
+    class ThreadViewHolder(
+        val binding: ItemMessageBinding,
+        onContactClicked: ((contact: Recipient) -> Unit)?,
+        onAttachmentClicked: ((attachment: Attachment) -> Unit)?
+    ) : ViewHolder(binding.root) {
+        val fromAdapter = DetailedRecipientAdapter(onContactClicked)
+        val toAdapter = DetailedRecipientAdapter(onContactClicked)
+        val ccAdapter = DetailedRecipientAdapter(onContactClicked)
+        val attachmentAdapter = AttachmentAdapter(onAttachmentClicked)
+
+        init {
+            with(binding) {
+                fromRecyclerView.adapter = fromAdapter
+                toRecyclerView.adapter = toAdapter
+                ccRecyclerView.adapter = ccAdapter
+                attachmentsRecyclerView.adapter = attachmentAdapter
+            }
+        }
     }
 }

@@ -17,7 +17,10 @@
  */
 package com.infomaniak.mail.data.models
 
+import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.lib.core.utils.contains
+import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -53,8 +56,36 @@ class Attachment : RealmObject {
 
     override fun hashCode(): Int = uuid.hashCode()
 
+
+    fun getFileTypeFromExtension(): AttachmentType {
+        return when (mimeType) {
+            in Regex("application/(zip|rar|x-tar|.*compressed|.*archive)") -> AttachmentType.ARCHIVE
+            in Regex("audio/") -> AttachmentType.AUDIO
+            in Regex("image/") -> AttachmentType.IMAGE
+            in Regex("/pdf") -> AttachmentType.PDF
+            in Regex("spreadsheet|excel|comma-separated-values") -> AttachmentType.SPREADSHEET
+            in Regex("document|text/plain|msword") -> AttachmentType.TEXT
+            in Regex("video/") -> AttachmentType.VIDEO
+            else -> AttachmentType.UNKNOWN
+        }
+    }
+
     enum class AttachmentDisposition {
         INLINE,
         ATTACHMENT,
+    }
+
+    enum class AttachmentType(@DrawableRes val icon: Int) {
+        ARCHIVE(R.drawable.ic_file_zip),
+        AUDIO(R.drawable.ic_file_audio),
+        IMAGE(R.drawable.ic_file_image),
+        PDF(R.drawable.ic_file_pdf),
+        SPREADSHEET(R.drawable.ic_file_office_sheet),
+        TEXT(R.drawable.ic_file_text),
+        VIDEO(R.drawable.ic_file_video),
+        UNKNOWN(R.drawable.ic_file_unknown),
+
+        BOOK(R.drawable.ic_file_single_neutral_book),
+        GRAPH(R.drawable.ic_file_office_graph)
     }
 }
