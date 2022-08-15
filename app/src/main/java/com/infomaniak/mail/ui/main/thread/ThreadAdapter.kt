@@ -46,7 +46,6 @@ import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
-
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<ThreadViewHolder>() {
@@ -173,7 +172,6 @@ class ThreadAdapter(
         if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
-
     private fun ThreadViewHolder.bindAttachment(attachments: List<Attachment>) = with(binding) {
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentsSizeText.text = context.resources.getQuantityString(
@@ -194,7 +192,6 @@ class ThreadAdapter(
 
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
-
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
         collapseMessageDetails(message)

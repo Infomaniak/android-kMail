@@ -22,7 +22,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-    app:cardCornerRadius="@dimen/smallCorderRadius"
+    app:cardCornerRadius="@dimen/smallCornerRadius"
     app:strokeColor="@color/attachmentStrokeColor"
     app:strokeWidth="1dp">
 
