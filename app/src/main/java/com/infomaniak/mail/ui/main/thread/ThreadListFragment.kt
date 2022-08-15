@@ -51,7 +51,6 @@ import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.firstOrNull
 import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -187,7 +186,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
             lifecycleScope.launch(Dispatchers.IO) {
-                mailboxUuid = MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.uuid
+                mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid
             }
         }
     }
@@ -200,7 +199,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             folderJob?.cancel()
             folderJob = lifecycleScope.launch(Dispatchers.IO) {
 
-                FolderController.getFolderAsync(folderId).firstOrNull()?.obj?.let { folder ->
+                FolderController.getFolderSync(folderId)?.let { folder ->
                     withContext(Dispatchers.Main) {
                         displayFolderName(folder)
                         listenToThreads(folder)
