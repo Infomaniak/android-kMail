@@ -127,7 +127,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
+    suspend fun loadCurrentMailbox() {
         Log.i(TAG, "loadCurrentMailbox")
         val mailboxes = loadMailboxes()
         computeMailboxToSelect(mailboxes)?.let { mailbox ->
