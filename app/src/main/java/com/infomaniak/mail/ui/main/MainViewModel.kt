@@ -25,10 +25,8 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController.decrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getLatestThreadSync
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.AddressBookController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
@@ -159,28 +157,8 @@ class MainViewModel : ViewModel() {
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         selectThread(thread)
-        markAsSeen(thread)
+        ThreadController.markAsSeen(thread)
         loadMessages(thread)
-    }
-
-    private fun markAsSeen(thread: Thread) {
-        if (thread.unseenMessagesCount != 0) {
-
-            RealmController.mailboxContent.writeBlocking {
-                getLatestThreadSync(thread.uid)?.let { latestThread ->
-
-                    val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, latestThread.messages.map { it.uid })
-
-                    if (apiResponse.isSuccess()) {
-                        currentFolderId.value?.let { decrementFolderUnreadCount(it) }
-                        latestThread.apply {
-                            messages.forEach { it.seen = true }
-                            unseenMessagesCount = 0
-                        }
-                    }
-                }
-            }
-        }
     }
 
     fun forceRefreshThreads(filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
