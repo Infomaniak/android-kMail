@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -44,10 +45,12 @@ import com.infomaniak.mail.ui.main.thread.ThreadFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlinx.coroutines.withContext
 import com.infomaniak.lib.core.R as RCore
 
@@ -77,14 +80,13 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.isVisible = navigationArgs.threadIsFavorite
 
-        quickActionBar.setOnItemClickListener {
-            val action = values()[it]
-            when (action) {
-                ANSWER -> notYetImplemented()
-                TRANSFER -> notYetImplemented()
-                ARCHIVE -> notYetImplemented()
-                DELETE -> notYetImplemented()
-                PLUS -> notYetImplemented()
+        quickActionBar.setOnItemClickListener { menuId ->
+            when (menuId) {
+                R.id.quickActionReply -> notYetImplemented()
+                R.id.quickActionForward -> notYetImplemented()
+                R.id.quickActionArchive -> notYetImplemented()
+                R.id.quickActionDelete -> notYetImplemented()
+                R.id.quickActionMenu -> notYetImplemented()
             }
         }
 
@@ -92,6 +94,19 @@ class ThreadFragment : Fragment() {
             val margin = resources.getDimensionPixelSize(RCore.dimen.marginStandardSmall)
             val divider = InsetDrawable(it, margin, 0, margin, 0)
             messagesList.addItemDecoration(DividerItemDecorator(divider))
+        }
+
+        toolbar.title = navigationArgs.threadSubject
+
+        val defaultTextColor = context.getColor(R.color.primaryTextColor)
+        appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
+            val removed = appBarLayout.height - total
+            val progress = ((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0)
+            val opacity = ((progress / total) * 255).roundToInt()
+
+            val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
+            toolbar.setTitleTextColor(textColor)
         }
     }
 
@@ -120,6 +135,12 @@ class ThreadFragment : Fragment() {
                 mainViewModel.deleteDraft(message)
                 // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
             }
+            onAttachmentClicked = { attachment ->
+                notYetImplemented()
+            }
+            onDownloadAllClicked = {
+                notYetImplemented()
+            }
         }
     }
 
@@ -146,7 +167,11 @@ class ThreadFragment : Fragment() {
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
     }
 
-    // Do not change the order of the enum, it's important
+    companion object {
+        const val COLLAPSE_TITLE_THRESHOLD = 0.5
+    }
+
+    // Do not change the order of the enum, it's important that it represents the order of the buttons in the UI
     enum class QuickActionButton {
         ANSWER,
         TRANSFER,

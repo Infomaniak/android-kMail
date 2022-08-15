@@ -18,15 +18,15 @@
 package com.infomaniak.mail.data.models
 
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
+import kotlinx.serialization.*
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 @Serializable
-class Recipient : RealmObject {
-    var email: String = ""
-    var name: String? = null
+class Recipient : RealmObject, Correspondent {
+    override var email: String = ""
+    override var name: String = ""
 
     /**
      * Local

@@ -22,7 +22,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-    app:cardCornerRadius="6dp"
+    app:cardCornerRadius="@dimen/smallCorderRadius"
     app:strokeColor="@color/attachmentStrokeColor"
     app:strokeWidth="1dp">
 
@@ -39,6 +39,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription"
             tools:src="@drawable/ic_file_pdf" />
 
         <TextView

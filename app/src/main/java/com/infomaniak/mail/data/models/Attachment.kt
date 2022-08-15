@@ -67,6 +67,20 @@ class Attachment : RealmObject {
 
     override fun hashCode(): Int = uuid.hashCode()
 
+
+    fun getFileTypeFromExtension(): AttachmentType {
+        return when (mimeType) {
+            in Regex("application/(zip|rar|x-tar|.*compressed|.*archive)") -> AttachmentType.ARCHIVE
+            in Regex("audio/") -> AttachmentType.AUDIO
+            in Regex("image/") -> AttachmentType.IMAGE
+            in Regex("/pdf") -> AttachmentType.PDF
+            in Regex("spreadsheet|excel|comma-separated-values") -> AttachmentType.SPREADSHEET
+            in Regex("document|text/plain|msword") -> AttachmentType.TEXT
+            in Regex("video/") -> AttachmentType.VIDEO
+            else -> AttachmentType.UNKNOWN
+        }
+    }
+
     enum class AttachmentDisposition {
         INLINE,
         ATTACHMENT,
@@ -81,6 +95,7 @@ class Attachment : RealmObject {
         TEXT(R.drawable.ic_file_text),
         VIDEO(R.drawable.ic_file_video),
         UNKNOWN(R.drawable.ic_file_unknown),
+
         BOOK(R.drawable.ic_file_single_neutral_book),
         GRAPH(R.drawable.ic_file_office_graph),
     }

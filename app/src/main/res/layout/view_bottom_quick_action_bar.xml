@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
     android:background="@color/backgroundQuickActions">
 
     <com.google.android.material.button.MaterialButton
@@ -39,8 +40,10 @@
         app:iconTint="?android:attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/button2"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_email_action_reply"
         tools:text="Répondre" />
 
@@ -62,6 +65,7 @@
         app:layout_constraintEnd_toStartOf="@id/button3"
         app:layout_constraintStart_toEndOf="@id/button1"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_email_action_send"
         tools:text="Transférer" />
 
@@ -83,6 +87,7 @@
         app:layout_constraintEnd_toStartOf="@id/button4"
         app:layout_constraintStart_toEndOf="@id/button2"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_archive_folder"
         tools:text="Archiver" />
 
@@ -104,6 +109,7 @@
         app:layout_constraintEnd_toStartOf="@id/button5"
         app:layout_constraintStart_toEndOf="@id/button3"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_bin"
         tools:text="Supprimer" />
 
@@ -125,6 +131,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/button4"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_param_dots"
         tools:text="Plus" />
 

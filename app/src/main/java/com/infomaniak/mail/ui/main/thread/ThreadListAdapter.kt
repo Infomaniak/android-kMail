@@ -104,7 +104,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
     private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
         if (!isValid()) return // TODO: remove this when realm management will be refactored and stable
 
-        expeditor.text = from.first().run { if (name.isNullOrEmpty()) email else name }
+        expeditor.text = from.first().run { name.ifBlank { email } }
         mailSubject.text = subject.getFormattedThreadSubject(context)
 
         mailDate.text = displayedDate

@@ -18,13 +18,17 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.content.res.getResourceIdOrThrow
+import androidx.core.view.get
 import androidx.core.view.isGone
+import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
@@ -32,61 +36,42 @@ import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
 class BottomQuickActionBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var binding: ViewBottomQuickActionBarBinding
-    lateinit var buttons: List<MaterialButton>
+    private val binding: ViewBottomQuickActionBarBinding by lazy {
+        ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true)
+    }
+    private val buttons: List<MaterialButton> by lazy {
+        with(binding) { listOf(button1, button2, button3, button4, button5) }
+    }
+    private val menu: MenuBuilder by lazy { MenuBuilder(context) }
 
     init {
-        binding = ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true)
+        attrs?.let {
+            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomQuickActionBarView, 0, 0)
+            val menuRes = typedArray.getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu)
 
-        with(binding) {
-            if (attrs != null) {
-                val defaultIconColor = button1.iconTint.defaultColor
-                val defaultTextColor = button1.textColors.defaultColor
+            MenuInflater(context).inflate(menuRes, menu)
 
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomQuickActionBarView, 0, 0)
-                val iconColor = typedArray.getColor(R.styleable.BottomQuickActionBarView_iconColor, defaultIconColor)
-                val textColor = typedArray.getColor(R.styleable.BottomQuickActionBarView_textColor, defaultTextColor)
-                val src1 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src1)
-                val src2 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src2)
-                val src3 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src3)
-                val src4 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src4)
-                val src5 = typedArray.getDrawable(R.styleable.BottomQuickActionBarView_src5)
-                val text1 = typedArray.getString(R.styleable.BottomQuickActionBarView_text1)
-                val text2 = typedArray.getString(R.styleable.BottomQuickActionBarView_text2)
-                val text3 = typedArray.getString(R.styleable.BottomQuickActionBarView_text3)
-                val text4 = typedArray.getString(R.styleable.BottomQuickActionBarView_text4)
-                val text5 = typedArray.getString(R.styleable.BottomQuickActionBarView_text5)
-
-                buttons = listOf(button1, button2, button3, button4, button5)
-                val srcs = listOf(src1, src2, src3, src4, src5)
-                val texts = listOf(text1, text2, text3, text4, text5)
-
-                for (button in buttons) {
-                    button.setTextColor(textColor)
-                    button.iconTint = ColorStateList.valueOf(iconColor)
+            buttons.forEachIndexed { index, button ->
+                if (index >= menu.size) {
+                    button.isGone = true
+                } else {
+                    with(menu[index]) {
+                        button.icon = icon
+                        button.text = title
+                    }
                 }
-
-                srcs.forEachIndexed { index, drawable ->
-                    if (drawable == null) buttons[index].isGone = true
-                    else buttons[index].icon = drawable
-                }
-
-                texts.forEachIndexed { index, text ->
-                    if (text == null) buttons[index].isGone = true
-                    else buttons[index].text = text
-                }
-
-                typedArray.recycle()
             }
+
+            typedArray.recycle()
         }
     }
 
     fun setOnItemClickListener(callback: (Int) -> Unit) {
         buttons.forEachIndexed { index, button ->
-            button.setOnClickListener { callback(index) }
+            button.setOnClickListener { callback(menu[index].itemId) }
         }
     }
 
