@@ -25,10 +25,13 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
+@Suppress("PROPERTY_WONT_BE_SERIALIZED")
+@Parcelize
 @Serializable
 class Contact : RealmObject, Correspondent {
     @PrimaryKey

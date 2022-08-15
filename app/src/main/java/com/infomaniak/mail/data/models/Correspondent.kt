@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.os.Parcelable
 import android.content.Context
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils

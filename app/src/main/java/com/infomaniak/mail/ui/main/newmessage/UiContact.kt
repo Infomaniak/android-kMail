@@ -17,7 +17,17 @@
  */
 package com.infomaniak.mail.ui.main.newmessage
 
+import com.infomaniak.mail.data.models.Correspondent
+import com.infomaniak.mail.data.models.Recipient
+
 data class UiContact(
     val email: String,
     val name: String? = null,
-)
+) {
+    fun toCorrespondent(): Correspondent {
+        return Recipient().apply {
+            name = this@UiContact.name ?: ""
+            email = this@UiContact.email
+        }
+    }
+}

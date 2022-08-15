@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.data.models.Correspondent
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newmessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType
@@ -49,7 +50,7 @@ class ContactAdapter(
         val contact = contacts[position]
         userName.text = contact.name
         userEmail.text = contact.email
-        userAvatar.loadAvatar(contact.name, contact.email)
+        userAvatar.loadAvatar(contact.toCorrespondent())
         root.setOnClickListener { selectContact(contact) }
     }
 

@@ -41,11 +41,8 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        userAvatarImage.loadAvatar(navigationArgs.contactName, navigationArgs.contactEmail)
-        fillInUserNameAndEmail(name, email, object : Correspondent {
-            override var email: String = navigationArgs.contactName
-            override var name: String = navigationArgs.contactEmail
-        })
+        userAvatarImage.loadAvatar(navigationArgs.correspondent)
+        fillInUserNameAndEmail(name, email, navigationArgs.correspondent)
 
         writeMail.setOnClickListener { notYetImplemented() }
         addToContacts.setOnClickListener { notYetImplemented() }
