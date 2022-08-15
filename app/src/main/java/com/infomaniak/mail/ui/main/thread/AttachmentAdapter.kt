@@ -24,11 +24,12 @@ import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
+import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
 import com.infomaniak.mail.utils.context
 
 class AttachmentAdapter(
     private val onAttachmentClicked: ((Attachment) -> Unit)?,
-) : RecyclerView.Adapter<AttachmentAdapter.AttachmentViewHolder>() {
+) : RecyclerView.Adapter<AttachmentViewHolder>() {
 
     private var items: List<Attachment> = emptyList()
 
