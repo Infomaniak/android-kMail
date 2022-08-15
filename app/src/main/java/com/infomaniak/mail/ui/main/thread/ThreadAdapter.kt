@@ -168,10 +168,10 @@ class ThreadAdapter(
         ccGroup.isVisible = ccIsNotEmpty
         if (ccIsNotEmpty) ccAdapter.updateList(message.cc.toList())
 
-        val dateNotNull = messageDate != null
-        detailedMessageDate.isVisible = dateNotNull
-        detailedMessagePrefix.isVisible = dateNotNull
-        if (dateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
+        val isDateNotNull = messageDate != null
+        detailedMessageDate.isVisible = isDateNotNull
+        detailedMessagePrefix.isVisible = isDateNotNull
+        if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
 
@@ -184,7 +184,6 @@ class ThreadAdapter(
         ) + " ($fileSize)"
         attachmentAdapter.setAttachments(attachments)
         attachmentsDownloadAllButton.setOnClickListener {
-            // TODO: AttachmentsList Fragment
             onDownloadAllClicked?.invoke()
         }
     }
@@ -252,6 +251,7 @@ class ThreadAdapter(
         val to = recipientsToSpannedString(context, to)
         val cc = recipientsToSpannedString(context, cc)
 
+        // TODO : Rewrite properly this part
         return buildSpannedString {
             if (isExpandedHeaderMode) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append("${context.getString(R.string.toTitle)} ") }
             append(to)
@@ -259,6 +259,7 @@ class ThreadAdapter(
         }.dropLast(2) as SpannedString
     }
 
+    // TODO : Rewrite properly this part
     private fun Message.recipientsToSpannedString(context: Context, recipientsList: List<Recipient>) = buildSpannedString {
         recipientsList.forEach {
             if (isExpandedHeaderMode) {
