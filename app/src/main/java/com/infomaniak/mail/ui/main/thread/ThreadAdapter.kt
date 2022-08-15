@@ -69,7 +69,6 @@ class ThreadAdapter(
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
         val message = messageList[position]
-        if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
         holder.bindHeader(message)
         holder.bindAttachment(message.attachments)
@@ -281,6 +280,9 @@ class ThreadAdapter(
     fun notifyAdapter(newList: MutableList<Message>) {
         DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
         messageList = newList
+        messageList.forEachIndexed { index, message ->
+            if ((index == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
+        }
     }
 
     fun lastIndex() = messageList.lastIndex
