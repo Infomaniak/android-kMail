@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.mail.data.models.Correspondent
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.loadAvatar
@@ -41,7 +42,10 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         userAvatarImage.loadAvatar(navigationArgs.contactName, navigationArgs.contactEmail)
-        fillInUserNameAndEmail(name, navigationArgs.contactName, email, navigationArgs.contactEmail)
+        fillInUserNameAndEmail(name, email, object : Correspondent {
+            override var email: String = navigationArgs.contactName
+            override var name: String = navigationArgs.contactEmail
+        })
 
         writeMail.setOnClickListener { notYetImplemented() }
         addToContacts.setOnClickListener { notYetImplemented() }

@@ -129,8 +129,7 @@
         tools:layout="@layout/bottom_sheet_detailed_contact">
         <argument
             android:name="contactName"
-            app:argType="string"
-            app:nullable="true" />
+            app:argType="string" />
         <argument
             android:name="contactEmail"
             app:argType="string" />
