@@ -106,7 +106,7 @@ class ThreadListAdapter(
 
         expeditor.text = from.first().getNameOrEmail()
         mailSubject.text = subject.getFormattedThreadSubject(context)
-        mailBodyPreview.text = messages.lastOrNull()?.preview ?: ""
+        mailBodyPreview.text = messages.last().preview.ifBlank { context.getString(R.string.noBodyTitle) }
 
         mailDate.text = displayedDate
 

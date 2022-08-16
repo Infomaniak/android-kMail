@@ -28,7 +28,7 @@ object ModelsUtils {
 
     fun String?.getFormattedThreadSubject(context: Context): Spanned {
         return this?.replace("\n+".toRegex(), " ")?.toSpanned()
-            ?: HtmlCompat.fromHtml("<i>${context.getString(R.string.messageNoSubject)}</i>", HtmlCompat.FROM_HTML_MODE_COMPACT)
+            ?: HtmlCompat.fromHtml("<i>${context.getString(R.string.noSubjectTitle)}</i>", HtmlCompat.FROM_HTML_MODE_COMPACT)
     }
 
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
