@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -28,9 +27,10 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
-import androidx.core.view.forEach
+import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.get
 import androidx.core.view.isInvisible
+import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMainActionsBinding
@@ -42,64 +42,63 @@ class MainActionsView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var binding: ViewMainActionsBinding
-    lateinit var buttons: List<MaterialButton>
-    lateinit var textViews: List<TextView>
+    private val binding: ViewMainActionsBinding by lazy {
+        ViewMainActionsBinding.inflate(LayoutInflater.from(context), this, true)
+    }
+    private val buttons: List<MaterialButton> by lazy {
+        with(binding) { listOf(button1, button2, button3, button4) }
+    }
+    private val textViews: List<TextView> by lazy {
+        with(binding) { listOf(textView1, textView2, textView3, textView4) }
+    }
+
     private val menu: MenuBuilder by lazy { MenuBuilder(context) }
 
     init {
-        binding = ViewMainActionsBinding.inflate(LayoutInflater.from(context), this, true)
+        if (attrs != null) {
+            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MainActionsView, 0, 0)
+            val menuRes = typedArray.getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu)
 
-        with(binding) {
-            if (attrs != null) {
-                buttons = listOf(button1, button2, button3, button4)
-                textViews = listOf(textView1, textView2, textView3, textView4)
+            MenuInflater(context).inflate(menuRes, menu)
 
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MainActionsView, 0, 0)
-
-                val menuRes = typedArray.getResourceId(R.styleable.BottomQuickActionBarView_menu, -1)
-                if (menuRes == -1) return@with
-
-                MenuInflater(context).inflate(menuRes, menu)
-
-                val items = mutableListOf<Pair<Drawable, CharSequence>>().apply {
-                    menu.forEach { item -> add(item.icon to item.title) }
-                }.take(buttons.count())
-
-                buttons.forEachIndexed { index, button ->
-                    val textView = textViews[index]
-                    if (index >= items.count()) {
-                        button.isInvisible = true
-                        textView.isInvisible = true
-                    } else {
-                        val (icon, title) = items[index]
+            buttons.forEachIndexed { index, button ->
+                val textView = textViews[index]
+                if (index >= menu.size) {
+                    button.isInvisible = true
+                    textView.isInvisible = true
+                } else {
+                    with(menu[index]) {
                         button.icon = icon
                         textView.apply {
                             text = title
-                            setOnTouchListener { _, event ->
-                                (button.background as RippleDrawable).setHotspot(event.x, button.height.toFloat())
-                                when (event.action) {
-                                    MotionEvent.ACTION_DOWN -> button.isPressed = true
-                                    MotionEvent.ACTION_UP -> {
-                                        if (button.isPressed) {
-                                            button.isPressed = false
-                                            button.callOnClick()
-                                        }
-                                    }
-                                    MotionEvent.ACTION_MOVE -> button.isPressed = false
-                                }
-                                true
-                            }
-                            setOnClickListener {
-                                button.isPressed = true
-                                button.isPressed = false
-                            }
+                            transferClickToButton(button)
                         }
                     }
                 }
-
-                typedArray.recycle()
             }
+
+            typedArray.recycle()
+        }
+    }
+
+    private fun TextView.transferClickToButton(button: MaterialButton) {
+        setOnTouchListener { _, event ->
+            (button.background as RippleDrawable).setHotspot(event.x, button.height.toFloat())
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> button.isPressed = true
+                MotionEvent.ACTION_UP -> {
+                    if (button.isPressed) {
+                        button.isPressed = false
+                        button.callOnClick()
+                    }
+                }
+                MotionEvent.ACTION_MOVE -> button.isPressed = false
+            }
+            true
+        }
+        setOnClickListener {
+            button.isPressed = true
+            button.isPressed = false
         }
     }
 
