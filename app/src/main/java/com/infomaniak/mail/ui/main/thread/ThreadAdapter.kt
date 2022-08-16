@@ -47,7 +47,7 @@ import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
-    private var messageList: MutableList<Message> = mutableListOf(),
+    private var messages: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<ThreadViewHolder>() {
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
@@ -56,7 +56,7 @@ class ThreadAdapter(
     var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
     var onDownloadAllClicked: (() -> Unit)? = null
 
-    override fun getItemCount() = messageList.size
+    override fun getItemCount() = messages.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         return ThreadViewHolder(
@@ -67,7 +67,7 @@ class ThreadAdapter(
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
-        val message = messageList[position]
+        val message = messages[position]
 
         holder.bindHeader(message)
         holder.bindAttachment(message.attachments)
@@ -267,20 +267,20 @@ class ThreadAdapter(
     }
 
     fun removeMessage(message: Message) {
-        val position = messageList.indexOf(message)
-        messageList.removeAt(position)
+        val position = messages.indexOf(message)
+        messages.removeAt(position)
         notifyItemRemoved(position)
     }
 
     fun notifyAdapter(newList: MutableList<Message>) {
-        DiffUtil.calculateDiff(MessageListDiffCallback(messageList, newList)).dispatchUpdatesTo(this)
-        messageList = newList
-        messageList.forEachIndexed { index, message ->
+        DiffUtil.calculateDiff(MessageListDiffCallback(messages, newList)).dispatchUpdatesTo(this)
+        messages = newList
+        messages.forEachIndexed { index, message ->
             if ((index == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
         }
     }
 
-    fun lastIndex() = messageList.lastIndex
+    fun lastIndex() = messages.lastIndex
 
     private fun Recipient.displayedName(context: Context): String {
         return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
@@ -321,8 +321,9 @@ class ThreadAdapter(
     class ThreadViewHolder(
         val binding: ItemMessageBinding,
         onContactClicked: ((contact: Recipient) -> Unit)?,
-        onAttachmentClicked: ((attachment: Attachment) -> Unit)?
+        onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
     ) : ViewHolder(binding.root) {
+
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)

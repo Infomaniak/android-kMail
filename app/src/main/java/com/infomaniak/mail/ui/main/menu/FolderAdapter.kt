@@ -25,12 +25,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
-import com.infomaniak.mail.ui.main.menu.FoldersAdapter.FolderViewHolder
+import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
 import io.realm.kotlin.ext.isValid
 import com.infomaniak.lib.core.R as RCore
 
-class FoldersAdapter(
+class FolderAdapter(
     private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
     private val openFolder: (folderId: String) -> Unit,
