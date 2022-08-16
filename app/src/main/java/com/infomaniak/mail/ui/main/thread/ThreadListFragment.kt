@@ -195,7 +195,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun listenToCurrentFolder() {
         MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
 
-            startPeriodicRefreshJob(folderId)
+            startPeriodicUpdatedAtRefreshJob(folderId)
 
             folderJob?.cancel()
             folderJob = lifecycleScope.launch(Dispatchers.IO) {
@@ -208,7 +208,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }
 
                 FolderController.getFolderAsync(folderId).collect {
-                    withContext(Dispatchers.Main) { it.obj?.let(::updateHeader) }
+                    startPeriodicUpdatedAtRefreshJob(folderId)
+                    withContext(Dispatchers.Main) {
+                        resetForFurtherThreadsLoading()
+                        it.obj?.unreadCount?.let(::updateUnreadCount)
+                    }
                 }
             }
         }
@@ -220,13 +224,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onDestroyView()
     }
 
-    private fun startPeriodicRefreshJob(folderId: String) {
+    private fun startPeriodicUpdatedAtRefreshJob(folderId: String) {
         updatedAtRefreshJob?.cancel()
         updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
             while (true) {
                 val lastUpdatedAt = FolderController.getFolderSync(folderId)?.lastUpdatedAt
                 withContext(Dispatchers.Main) { updateUpdatedAt(lastUpdatedAt) }
-                delay(DateUtils.MINUTE_IN_MILLIS + 1_000L)
+                delay(DateUtils.MINUTE_IN_MILLIS)
             }
         }
     }
@@ -235,12 +239,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val folderName = folder.getLocalizedName(binding.context)
         Log.i("UI", "Received folder name (${folderName})")
         binding.toolbar.title = folderName
-    }
-
-    private fun updateHeader(folder: Folder) {
-        resetForFurtherThreadsLoading()
-        updateUpdatedAt(folder.lastUpdatedAt)
-        updateUnreadCount(folder.unreadCount)
     }
 
     private fun updateUpdatedAt(lastUpdatedAt: RealmInstant?) {
