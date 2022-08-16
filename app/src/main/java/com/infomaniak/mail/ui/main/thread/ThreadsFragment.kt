@@ -63,7 +63,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var threadsJob: Job? = null
     private var updatedAtRefreshJob: Job? = null
 
-    private var threadsAdapter = ThreadsAdapter()
+    private var threadAdapter = ThreadAdapter()
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(
@@ -103,7 +103,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupAdapter() {
-        binding.threadsList.adapter = threadsAdapter
+        binding.threadsList.adapter = threadAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
             // TODO: Manage no Internet screen
@@ -111,7 +111,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             // binding.noNetwork.isGone = isInternetAvailable
         }
 
-        threadsAdapter.apply {
+        threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
             // onEmptyList = { checkIfNoFiles() }
@@ -287,7 +287,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreads()
 
-        threadsAdapter.notifyAdapter(threadsAdapter.formatList(threads, binding.context))
+        threadAdapter.notifyAdapter(threadAdapter.formatList(threads, binding.context))
 
         if (currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
     }

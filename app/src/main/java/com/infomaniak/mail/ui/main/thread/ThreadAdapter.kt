@@ -42,7 +42,7 @@ import io.realm.kotlin.ext.isValid
 import java.util.*
 
 // TODO: Use LoaderAdapter from Core instead?
-class ThreadsAdapter(
+class ThreadAdapter(
     private var items: MutableList<Any> = mutableListOf(),
 ) : RecyclerView.Adapter<ViewHolder>() {
 
