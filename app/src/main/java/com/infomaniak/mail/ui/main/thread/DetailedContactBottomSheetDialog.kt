@@ -41,7 +41,7 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         userAvatarImage.loadAvatar(navigationArgs.correspondent)
-        fillInUserNameAndEmail(name, email, navigationArgs.correspondent)
+        fillInUserNameAndEmail(navigationArgs.correspondent, name, email)
 
         writeMail.setOnClickListener { notYetImplemented() }
         addToContacts.setOnClickListener { notYetImplemented() }

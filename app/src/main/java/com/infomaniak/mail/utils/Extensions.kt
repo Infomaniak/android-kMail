@@ -82,14 +82,6 @@ fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0
     }
 }
 
-fun ImageView.loadAvatar(
-    correspondent: Correspondent,
-    imageLoader: ImageLoader = ImageLoader.Builder(context).build(),
-): Disposable = with(correspondent) {
-    val initials = (name.ifBlank { email }).firstOrEmpty().toString().uppercase()
-    return loadAvatar(email.hashCode(), null, initials, imageLoader)
-}
-
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 fun ImageView.loadAvatar(
