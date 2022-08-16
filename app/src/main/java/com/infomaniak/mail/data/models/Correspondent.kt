@@ -17,7 +17,19 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.content.Context
+import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.AccountUtils
+
 interface Correspondent {
     var email: String
     var name: String
+
+    fun isMe(): Boolean = AccountUtils.currentUser?.email == this.email
+
+    private fun getNameOrEmail() = name.ifBlank { email }
+
+    fun displayedName(context: Context): String {
+        return if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
+    }
 }

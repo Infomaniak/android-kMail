@@ -42,8 +42,6 @@ class Recipient : RealmObject, Correspondent {
         return this
     }
 
-    fun getNameOrEmail() = name.ifBlank { email }
-
     override fun equals(other: Any?): Boolean = other is Recipient && other.objectId == objectId
 
     override fun hashCode(): Int = objectId.hashCode()

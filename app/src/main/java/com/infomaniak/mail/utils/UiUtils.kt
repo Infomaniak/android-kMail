@@ -38,13 +38,13 @@ object UiUtils {
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 
     fun fillInUserNameAndEmail(
-        nameTextView: TextView,
-        emailTextView: TextView?,
         correspondent: Correspondent,
+        nameTextView: TextView,
+        emailTextView: TextView? = null,
     ) = with(correspondent) {
         when {
-            email.isMe() -> {
-                val context = nameTextView.context ?: emailTextView?.context!!
+            isMe() -> {
+                val context = nameTextView.context
                 nameTextView.text = context.getString(R.string.contactMe)
                 emailTextView?.text = email
             }
