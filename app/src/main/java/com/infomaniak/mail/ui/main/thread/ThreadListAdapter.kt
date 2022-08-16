@@ -43,7 +43,7 @@ import java.util.*
 
 // TODO: Use LoaderAdapter from Core instead?
 class ThreadListAdapter(
-    private var itemsList: MutableList<Any> = mutableListOf(),
+    private var items: MutableList<Any> = mutableListOf(),
 ) : RecyclerView.Adapter<ViewHolder>() {
 
     @StringRes
@@ -53,10 +53,10 @@ class ThreadListAdapter(
     var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
-    override fun getItemCount(): Int = itemsList.size
+    override fun getItemCount(): Int = items.size
 
     override fun getItemViewType(position: Int): Int = when {
-        itemsList[position] is String -> DisplayType.DATE_SEPARATOR.layout
+        items[position] is String -> DisplayType.DATE_SEPARATOR.layout
         displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
         else -> DisplayType.THREAD.layout
     }
@@ -89,7 +89,7 @@ class ThreadListAdapter(
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(position: Int) {
         sectionTitle.apply {
-            text = itemsList[position] as String
+            text = items[position] as String
             setTextAppearance(R.style.Callout)
             setTextColor(context.getColor(R.color.sectionHeaderTextColor))
         }
@@ -101,7 +101,7 @@ class ThreadListAdapter(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
+    private fun CardviewThreadItemBinding.displayThread(position: Int) = with(items[position] as Thread) {
         if (!isValid()) return // TODO: remove this when realm management will be refactored and stable
 
         expeditor.text = from.first().getNameOrEmail()
@@ -168,8 +168,8 @@ class ThreadListAdapter(
     private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
 
     fun notifyAdapter(newList: MutableList<Any>) {
-        DiffUtil.calculateDiff(ThreadListDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
-        itemsList = newList
+        DiffUtil.calculateDiff(ThreadListDiffCallback(items, newList)).dispatchUpdatesTo(this)
+        items = newList
     }
 
     private enum class DisplayType(val layout: Int) {
