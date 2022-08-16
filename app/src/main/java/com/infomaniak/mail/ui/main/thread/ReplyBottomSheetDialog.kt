@@ -21,10 +21,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
-import com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog.ReplyType.REPLY
-import com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog.ReplyType.REPLY_TO_ALL
 import com.infomaniak.mail.utils.notYetImplemented
 
 open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
@@ -38,17 +38,12 @@ open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainActions.setOnItemClickListener { index: Int ->
-            val action = ReplyType.values()[index]
-            when (action) {
-                REPLY -> notYetImplemented()
-                REPLY_TO_ALL -> notYetImplemented()
+        mainActions.setOnItemClickListener { id: Int ->
+            when (id) {
+                R.id.actionReply -> notYetImplemented()
+                R.id.actionReplyAll -> notYetImplemented()
             }
+            findNavController().popBackStack()
         }
-    }
-
-    enum class ReplyType {
-        REPLY,
-        REPLY_TO_ALL,
     }
 }

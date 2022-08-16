@@ -29,6 +29,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.view.forEach
+import androidx.core.view.get
 import androidx.core.view.isInvisible
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
@@ -44,6 +45,7 @@ class MainActionsView @JvmOverloads constructor(
     var binding: ViewMainActionsBinding
     lateinit var buttons: List<MaterialButton>
     lateinit var textViews: List<TextView>
+    private val menu: MenuBuilder by lazy { MenuBuilder(context) }
 
     init {
         binding = ViewMainActionsBinding.inflate(LayoutInflater.from(context), this, true)
@@ -58,7 +60,6 @@ class MainActionsView @JvmOverloads constructor(
                 val menuRes = typedArray.getResourceId(R.styleable.BottomQuickActionBarView_menu, -1)
                 if (menuRes == -1) return@with
 
-                val menu = MenuBuilder(context)
                 MenuInflater(context).inflate(menuRes, menu)
 
                 val items = mutableListOf<Pair<Drawable, CharSequence>>().apply {
@@ -104,7 +105,7 @@ class MainActionsView @JvmOverloads constructor(
 
     fun setOnItemClickListener(callback: (Int) -> Unit) {
         buttons.forEachIndexed { index, button ->
-            button.setOnClickListener { callback(index) }
+            button.setOnClickListener { callback(menu[index].itemId) }
         }
     }
 }

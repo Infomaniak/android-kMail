@@ -17,9 +17,11 @@
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/actionReply"
         android:icon="@drawable/ic_email_action_reply"
         android:title="@string/actionReply" />
     <item
+        android:id="@+id/actionReplyAll"
         android:icon="@drawable/ic_email_action_reply_to_all"
         android:title="@string/actionReplyAll" />
 </menu>

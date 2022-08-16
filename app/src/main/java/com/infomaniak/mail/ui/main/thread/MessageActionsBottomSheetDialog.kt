@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.ui.main.thread.ActionsBottomSheetDialog.MainActions.*
+import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.notYetImplemented
 
 class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -47,13 +47,12 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         rule.setClosingOnClickListener { notYetImplemented() }
         reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
-        mainActions.setClosingOnClickListener { index: Int ->
-            val action = MainActions.values()[index]
-            when (action) {
-                REPLY -> notYetImplemented()
-                REPLY_TO_ALL -> notYetImplemented()
-                FORWARD -> notYetImplemented()
-                DELETE -> notYetImplemented()
+        mainActions.setClosingOnClickListener { id: Int ->
+            when (id) {
+                R.id.actionReply -> notYetImplemented()
+                R.id.actionReplyAll -> notYetImplemented()
+                R.id.actionForward -> notYetImplemented()
+                R.id.actionDelete -> notYetImplemented()
             }
         }
     }

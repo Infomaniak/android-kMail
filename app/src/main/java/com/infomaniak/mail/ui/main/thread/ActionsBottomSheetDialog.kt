@@ -95,16 +95,9 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     fun MainActionsView.setClosingOnClickListener(callback: ((Int) -> Unit)) {
-        setOnItemClickListener { index ->
-            callback(index)
+        setOnItemClickListener { id ->
+            callback(id)
             findNavController().popBackStack()
         }
-    }
-
-    enum class MainActions {
-        REPLY,
-        REPLY_TO_ALL,
-        FORWARD,
-        DELETE,
     }
 }
