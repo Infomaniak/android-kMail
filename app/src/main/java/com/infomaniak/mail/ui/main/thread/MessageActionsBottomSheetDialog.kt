@@ -34,20 +34,20 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         setFavoriteUi(navigationArgs.isFavorite)
         setSpamUi()
 
-        archive.setOnClickListener { notYetImplemented() }
-        markAsRead.setOnClickListener { notYetImplemented() }
-        move.setOnClickListener { notYetImplemented() }
-        postpone.setOnClickListener { notYetImplemented() }
-        favorite.setOnClickListener { notYetImplemented() }
-        spam.setOnClickListener { notYetImplemented() }
-        blockSender.setOnClickListener { notYetImplemented() }
-        phishing.setOnClickListener { notYetImplemented() }
-        print.setOnClickListener { notYetImplemented() }
-        saveAsPdf.setOnClickListener { notYetImplemented() }
-        rule.setOnClickListener { notYetImplemented() }
-        reportDisplayProblem.setOnClickListener { notYetImplemented() }
+        archive.setClosingOnClickListener { notYetImplemented() }
+        markAsRead.setClosingOnClickListener { notYetImplemented() }
+        move.setClosingOnClickListener { notYetImplemented() }
+        postpone.setClosingOnClickListener { notYetImplemented() }
+        favorite.setClosingOnClickListener { notYetImplemented() }
+        spam.setClosingOnClickListener { notYetImplemented() }
+        blockSender.setClosingOnClickListener { notYetImplemented() }
+        phishing.setClosingOnClickListener { notYetImplemented() }
+        print.setClosingOnClickListener { notYetImplemented() }
+        saveAsPdf.setClosingOnClickListener { notYetImplemented() }
+        rule.setClosingOnClickListener { notYetImplemented() }
+        reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
-        mainActions.setOnItemClickListener { index: Int ->
+        mainActions.setClosingOnClickListener { index: Int ->
             val action = MainActions.values()[index]
             when (action) {
                 REPLY -> notYetImplemented()

@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -83,6 +84,20 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
             val currentFolderRole = MainViewModel.currentFolderId.value?.let(FolderController::getFolderSync)?.role
             val currentFolderIsSpam = currentFolderRole == FolderRole.SPAM
             withContext(Dispatchers.Main) { setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam) }
+        }
+    }
+
+    fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {
+        setOnClickListener {
+            callback()
+            findNavController().popBackStack()
+        }
+    }
+
+    fun MainActionsView.setClosingOnClickListener(callback: ((Int) -> Unit)) {
+        setOnItemClickListener { index ->
+            callback(index)
+            findNavController().popBackStack()
         }
     }
 

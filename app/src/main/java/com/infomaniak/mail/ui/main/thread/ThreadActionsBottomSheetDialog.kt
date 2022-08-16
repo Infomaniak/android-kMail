@@ -40,16 +40,16 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         phishing.isGone = true
         rule.isGone = true
 
-        archive.setOnClickListener { notYetImplemented() }
-        markAsRead.setOnClickListener { notYetImplemented() }
-        move.setOnClickListener { notYetImplemented() }
-        favorite.setOnClickListener { notYetImplemented() }
-        spam.setOnClickListener { notYetImplemented() }
-        print.setOnClickListener { notYetImplemented() }
-        saveAsPdf.setOnClickListener { notYetImplemented() }
-        reportDisplayProblem.setOnClickListener { notYetImplemented() }
+        archive.setClosingOnClickListener { notYetImplemented() }
+        markAsRead.setClosingOnClickListener { notYetImplemented() }
+        move.setClosingOnClickListener { notYetImplemented() }
+        favorite.setClosingOnClickListener { notYetImplemented() }
+        spam.setClosingOnClickListener { notYetImplemented() }
+        print.setClosingOnClickListener { notYetImplemented() }
+        saveAsPdf.setClosingOnClickListener { notYetImplemented() }
+        reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
-        mainActions.setOnItemClickListener { index: Int ->
+        mainActions.setClosingOnClickListener { index: Int ->
             val action = MainActions.values()[index]
             when (action) {
                 REPLY -> notYetImplemented()
