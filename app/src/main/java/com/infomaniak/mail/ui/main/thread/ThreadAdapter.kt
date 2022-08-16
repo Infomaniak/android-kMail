@@ -229,11 +229,11 @@ class ThreadAdapter(
         }
         replyButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<MessagesFragment>().notYetImplemented() }
+            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
         }
         menuButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<MessagesFragment>().notYetImplemented() }
+            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
         }
 
         recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject

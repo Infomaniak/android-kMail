@@ -60,7 +60,7 @@ class NewMessageActivity : ThemedActivity() {
 
             toolbar.setOnMenuItemClickListener {
                 with(newMessageFragment) {
-                    if (viewModel.sendDraftAction(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) {
+                    if (newMessageViewModel.sendDraftAction(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) {
                         finish()
                     } else {
                         showSnackbar(RCore.string.anErrorHasOccurred)
@@ -93,7 +93,7 @@ class NewMessageActivity : ThemedActivity() {
             } else {
                 null
             }
-            viewModel.loadDraft(draft, navigationArgs.draftUuid)
+            newMessageViewModel.loadDraft(draft, navigationArgs.draftUuid)
         }
     }
 

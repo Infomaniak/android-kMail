@@ -45,7 +45,7 @@ import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.databinding.FragmentThreadsBinding
+import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.*
@@ -53,17 +53,17 @@ import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.*
 import java.util.*
 
-class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
-    private lateinit var binding: FragmentThreadsBinding
+    private lateinit var binding: FragmentThreadListBinding
 
     private var folderJob: Job? = null
     private var threadsJob: Job? = null
     private var updatedAtRefreshJob: Job? = null
 
-    private var threadsAdapter = ThreadsAdapter()
+    private var threadListAdapter = ThreadListAdapter()
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(
@@ -78,7 +78,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     var mailboxUuid: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThreadsBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -103,7 +103,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupAdapter() {
-        binding.threadsList.adapter = threadsAdapter
+        binding.threadsList.adapter = threadListAdapter
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
             // TODO: Manage no Internet screen
@@ -111,7 +111,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             // binding.noNetwork.isGone = isInternetAvailable
         }
 
-        threadsAdapter.apply {
+        threadListAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
             // onEmptyList = { checkIfNoFiles() }
@@ -121,13 +121,13 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     if (MainViewModel.currentFolderId.value?.let(FolderController::getFolderSync)?.isDraftFolder == true) {
                         if (it.messages.isNotEmpty()) {
                             withContext(Dispatchers.Main) {
-                                openMessageEdition(R.id.action_threadsFragment_to_newMessageActivity, it.messages.first())
+                                openMessageEdition(R.id.action_threadListFragment_to_newMessageActivity, it.messages.first())
                             }
                         }
                     } else {
                         withContext(Dispatchers.Main) {
                             safeNavigate(
-                                ThreadsFragmentDirections.actionThreadsFragmentToMessagesFragment(
+                                ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
                                     threadUid = it.uid,
                                     threadSubject = it.subject,
                                     threadIsFavorite = it.isFavorite,
@@ -146,15 +146,15 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         searchButton.setOnClickListener {
             notYetImplemented()
-            // safeNavigate(ThreadsFragmentDirections.actionThreadsFragmentToSearchFragment()) // TODO
+            // safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment()) // TODO
         }
 
         userAvatar.setOnClickListener {
-            safeNavigate(ThreadsFragmentDirections.actionThreadsFragmentToSwitchUserFragment())
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment())
         }
 
         newMessageFab.setOnClickListener {
-            safeNavigate(ThreadsFragmentDirections.actionThreadsFragmentToNewMessageActivity())
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
         }
 
         threadsList.setPagination(
@@ -300,9 +300,9 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         resetForFurtherThreadsLoading()
         if (threads.size < PER_PAGE) canContinueToPaginate = false
 
-        if (threads.isEmpty()) displayNoEmailView() else displayThreads()
+        if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
-        threadsAdapter.notifyAdapter(threadsAdapter.formatList(threads, binding.context))
+        threadListAdapter.notifyAdapter(threadListAdapter.formatList(threads, binding.context))
 
         if (currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
     }
@@ -312,7 +312,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         noMailLayoutGroup.isVisible = true
     }
 
-    private fun displayThreads() = with(binding) {
+    private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
     }

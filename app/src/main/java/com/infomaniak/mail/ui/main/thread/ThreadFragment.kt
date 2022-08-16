@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentMessagesBinding
 import com.infomaniak.mail.ui.main.MainViewModel
-import com.infomaniak.mail.ui.main.thread.MessagesFragment.QuickActionButton.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
@@ -51,14 +50,14 @@ import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
-class MessagesFragment : Fragment() {
+class ThreadFragment : Fragment() {
 
-    private val navigationArgs: MessagesFragmentArgs by navArgs()
+    private val navigationArgs: ThreadFragmentArgs by navArgs()
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMessagesBinding
-    private var messagesAdapter = MessagesAdapter()
+    private var threadAdapter = ThreadAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMessagesBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -108,17 +107,17 @@ class MessagesFragment : Fragment() {
     }
 
     private fun setupAdapter() = with(binding) {
-        messagesList.adapter = messagesAdapter.apply {
+        messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onContactClicked = { contact ->
                 safeNavigate(
-                    MessagesFragmentDirections.actionMessagesFragmentToContactFragment(
+                    ThreadFragmentDirections.actionThreadFragmentToContactFragment(
                         contact.name,
                         contact.email,
                     )
                 )
             }
-            onDraftClicked = { message -> openMessageEdition(R.id.action_messagesFragment_to_newMessageActivity, message) }
+            onDraftClicked = { message -> openMessageEdition(R.id.action_threadFragment_to_newMessageActivity, message) }
             onDeleteDraftClicked = { message ->
                 mainViewModel.deleteDraft(message)
                 // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
@@ -151,8 +150,8 @@ class MessagesFragment : Fragment() {
         //     Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")// | $displayedBody")
         // }
 
-        messagesAdapter.notifyAdapter(messages.toMutableList())
-        binding.messagesList.scrollToPosition(messagesAdapter.lastIndex())
+        threadAdapter.notifyAdapter(messages.toMutableList())
+        binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
     }
 
     companion object {

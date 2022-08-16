@@ -54,7 +54,7 @@ object ApiRoutes {
         offset: Int,
         filter: ThreadFilter,
         isDraftsFolder: Boolean,
-        searchText: String? = null
+        searchText: String? = null,
     ): String {
         val threadMode = if (isDraftsFolder) "off" else "on" // TODO: Handle the ThreadMode setting.
         val urlSearch = searchText?.let { "&scontains=$it" } ?: ""

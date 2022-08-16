@@ -17,4 +17,4 @@
  */
 package com.infomaniak.mail.ui.main.settings.select
 
-class ThreadsDensitySettingFragment : SelectSettingsFragment()
+class MessageListDensitySettingFragment : SelectSettingsFragment()

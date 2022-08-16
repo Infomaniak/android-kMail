@@ -107,18 +107,18 @@ class MainActivity : ThemedActivity() {
             level = SentryLevel.INFO
         })
 
-        setDrawerLockMode(destination.id == R.id.threadsFragment)
+        setDrawerLockMode(destination.id == R.id.threadListFragment)
 
         window.statusBarColor = getColor(
             when (destination.id) {
-                R.id.searchFragment, R.id.messagesFragment -> R.color.backgroundColor
+                R.id.searchFragment, R.id.threadFragment -> R.color.backgroundColor
                 else -> R.color.backgroundHeaderColor
             }
         )
 
         window.navigationBarColor = getColor(
             when (destination.id) {
-                R.id.messagesFragment -> R.color.backgroundQuickActions
+                R.id.threadFragment -> R.color.backgroundQuickActions
                 else -> R.color.backgroundColor
             }
         )

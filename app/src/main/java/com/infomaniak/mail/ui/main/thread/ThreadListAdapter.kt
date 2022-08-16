@@ -183,7 +183,10 @@ class ThreadListAdapter(
         TWO_WEEKS({ Date().startOfTheWeek().time - DAY_LENGTH_MS * 14 }, R.string.threadListSectionTwoWeeks),
     }
 
-    private class ThreadsDiffCallback(private val oldList: List<Any>, private val newList: List<Any>) : DiffUtil.Callback() {
+    private class ThreadListDiffCallback(
+        private val oldList: List<Any>,
+        private val newList: List<Any>,
+    ) : DiffUtil.Callback() {
 
         override fun getOldListSize(): Int = oldList.size
 

@@ -73,7 +73,7 @@ class NewMessageFragment : Fragment() {
 
         // TODO: Do we want this button?
         // toTransparentButton.setOnClickListener {
-        //     viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
+        //     newMessageViewModel.areAdvancedFieldsOpened = !newMessageViewModel.areAdvancedFieldsOpened
         //     openAdvancedFields()
         // }
         chevron.setOnClickListener {
@@ -108,7 +108,7 @@ class NewMessageFragment : Fragment() {
                 null -> Unit
             }
 
-            viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+            newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
         }
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
@@ -183,7 +183,7 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        with(viewModel) {
+        with(newMessageViewModel) {
             currentDraft.observe(viewLifecycleOwner) { draft ->
                 if (draft == null) return@observe
 
@@ -218,14 +218,14 @@ class NewMessageFragment : Fragment() {
                 fromMailAddress.text = mails[position]
                 selectedMailboxIndex = position
 
-                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
                 dismiss()
             }
         }.show()
     }
 
     private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {
-        val toAlreadyUsedContactMails = newMessageViewModel.recipients.map { it.email }.toMutableList()
+        val toAlreadyUsedContactMails = newMessageViewModel.newMessageTo.map { it.email }.toMutableList()
         val ccAlreadyUsedContactMails = newMessageViewModel.newMessageCc.map { it.email }.toMutableList()
         val bccAlreadyUsedContactMails = newMessageViewModel.newMessageBcc.map { it.email }.toMutableList()
 
@@ -239,7 +239,7 @@ class NewMessageFragment : Fragment() {
                 getContacts(field).add(contact)
                 createChip(field, contact)
 
-                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             },
             addUnrecognizedContact = { field ->
                 val isEmail = addUnrecognizedMail(field)
@@ -273,7 +273,7 @@ class NewMessageFragment : Fragment() {
             override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
             override fun afterTextChanged(editable: Editable?) {
-                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             }
         })
     }
@@ -289,7 +289,7 @@ class NewMessageFragment : Fragment() {
                 getContacts(fieldType).add(contact)
                 createChip(fieldType, contact)
 
-                viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
             }
         }
 
@@ -298,7 +298,7 @@ class NewMessageFragment : Fragment() {
 
     //region Chips behavior
     private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
-        TO -> newMessageViewModel.recipients
+        TO -> newMessageViewModel.newMessageTo
         CC -> newMessageViewModel.newMessageCc
         BCC -> newMessageViewModel.newMessageBcc
     }
@@ -330,7 +330,7 @@ class NewMessageFragment : Fragment() {
         val index = getContacts(field).indexOfFirst { it.email == contact.email }
         removeEmail(field, index)
 
-        viewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+        newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
     }
 
     private fun removeEmail(field: FieldType, index: Int) {
@@ -377,8 +377,8 @@ class NewMessageFragment : Fragment() {
 
         // TODO: Do we want this button?
         // toTransparentButton.isVisible = !isAutocompletionOpened
-        //         && viewModel.recipients.isNotEmpty()
-        //         && !viewModel.areAdvancedFieldsOpened
+        //         && newMessageViewModel.recipients.isNotEmpty()
+        //         && !newMessageViewModel.areAdvancedFieldsOpened
 
         plusOthers.isInvisible = !(!isAutocompletionOpened
                 && newMessageViewModel.newMessageTo.count() > 1
