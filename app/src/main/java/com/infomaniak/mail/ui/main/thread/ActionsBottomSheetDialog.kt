@@ -22,12 +22,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.getAttributeColor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.google.android.material.R as RMaterial
 
 open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
@@ -74,8 +79,11 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     fun setSpamUi() = with(binding.spam) {
-        val currentFolderIsSpam = MailData.currentFolderFlow.value?.role == FolderRole.SPAM
-        setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val currentFolderRole = MainViewModel.currentFolderId.value?.let(FolderController::getFolderSync)?.role
+            val currentFolderIsSpam = currentFolderRole == FolderRole.SPAM
+            withContext(Dispatchers.Main) { setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam) }
+        }
     }
 
     enum class MainActions {
