@@ -88,7 +88,7 @@ fun ImageView.loadAvatar(
     correspondent: Correspondent,
     imageLoader: ImageLoader = ImageLoader.Builder(context).build(),
 ): Disposable = with(correspondent) {
-    val initials = (name.ifBlank { email }).firstOrEmpty().toString().uppercase()
+    val initials = getNameOrEmail().firstOrEmpty().toString().uppercase()
     return loadAvatar(email.hashCode(), null, initials, imageLoader)
 }
 

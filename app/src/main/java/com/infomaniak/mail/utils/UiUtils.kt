@@ -44,8 +44,7 @@ object UiUtils {
     ) = with(correspondent) {
         when {
             isMe() -> {
-                val context = nameTextView.context
-                nameTextView.text = context.getString(R.string.contactMe)
+                nameTextView.setText(R.string.contactMe)
                 emailTextView?.text = email
             }
             name.isBlank() || name == email -> {
