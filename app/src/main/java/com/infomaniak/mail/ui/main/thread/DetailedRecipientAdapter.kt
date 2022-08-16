@@ -26,23 +26,28 @@ import com.infomaniak.mail.ui.main.thread.DetailedRecipientAdapter.DetailedRecip
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 
 class DetailedRecipientAdapter(
-    private val recipients: List<Recipient> = listOf(),
-    private val onContactClicked: ((contact: Recipient) -> Unit)?
+    private val onContactClicked: ((contact: Recipient) -> Unit)?,
 ) : RecyclerView.Adapter<DetailedRecipientViewHolder>() {
+
+    private var items = emptyList<Recipient>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailedRecipientViewHolder {
         return DetailedRecipientViewHolder(ItemDetailedContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: DetailedRecipientViewHolder, position: Int): Unit = with(holder.binding) {
-        val recipient = recipients[position]
+        val item = items[position]
 
-        fillInUserNameAndEmail(name, recipient.name, emailAddress, recipient.email)
+        fillInUserNameAndEmail(name, emailAddress, item)
 
-        name.setOnClickListener { onContactClicked?.invoke(recipient) }
+        name.setOnClickListener { onContactClicked?.invoke(item) }
     }
 
-    override fun getItemCount(): Int = recipients.count()
+    override fun getItemCount(): Int = items.count()
+
+    fun updateList(newList: List<Recipient>) {
+        items = newList
+    }
 
     class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : RecyclerView.ViewHolder(binding.root)
 }

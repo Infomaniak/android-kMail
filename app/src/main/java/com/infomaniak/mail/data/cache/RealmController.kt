@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.data.models.message.Body
+import com.infomaniak.mail.data.models.message.Duplicate
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignatureEmail
@@ -145,6 +146,7 @@ object RealmController {
                 Thread::class,
                 Message::class,
                 Draft::class,
+                Duplicate::class,
                 Recipient::class,
                 Body::class,
                 Attachment::class,

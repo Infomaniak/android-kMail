@@ -49,7 +49,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.ceil
@@ -74,8 +73,8 @@ class MenuDrawerFragment : Fragment() {
         closeDrawer()
     }
 
-    private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderId -> openFolder(folderId) })
-    private val customFoldersAdapter = FoldersAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val defaultFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val customFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -95,8 +94,8 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupAdapters() = with(binding) {
         addressesList.adapter = addressAdapter
-        defaultFoldersList.adapter = defaultFoldersAdapter
-        customFoldersList.adapter = customFoldersAdapter
+        defaultFoldersList.adapter = defaultFolderAdapter
+        customFoldersList.adapter = customFolderAdapter
     }
 
     private fun setupListener() = with(binding) {
@@ -194,9 +193,8 @@ class MenuDrawerFragment : Fragment() {
     private fun listenToCurrentFolder() {
         MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
             lifecycleScope.launch(Dispatchers.IO) {
-                FolderController.getFolderAsync(folderId).firstOrNull()?.obj?.role?.let { folderRole ->
-                    withContext(Dispatchers.Main) { onCurrentFolderChange(folderRole) }
-                }
+                val folderRole = FolderController.getFolderSync(folderId)?.role
+                withContext(Dispatchers.Main) { onCurrentFolderChange(folderRole) }
             }
         }
     }
@@ -218,7 +216,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun onCurrentMailboxChange(mailboxObjectId: String) {
         lifecycleScope.launch(Dispatchers.IO) {
-            MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.let { mailbox ->
+            MailboxController.getMailboxSync(mailboxObjectId)?.let { mailbox ->
                 withContext(Dispatchers.Main) {
                     binding.mailboxSwitcherText.text = mailbox.email
                     displayMailboxQuotas(mailbox)
@@ -234,17 +232,17 @@ class MenuDrawerFragment : Fragment() {
         binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
 
         val currentFolderId = MainViewModel.currentFolderId.value
-        defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
-        customFoldersAdapter.setFolders(customFolders, currentFolderId)
+        defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
+        customFolderAdapter.setFolders(customFolders, currentFolderId)
 
         setCustomFoldersCollapsedState()
     }
 
-    private fun onCurrentFolderChange(folderRole: FolderRole) = with(binding) {
+    private fun onCurrentFolderChange(folderRole: FolderRole?) = with(binding) {
         currentFolderRole = folderRole
         inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
-        defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
-        customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
+        defaultFolderAdapter.notifyItemRangeChanged(0, defaultFolderAdapter.itemCount, Unit)
+        customFolderAdapter.notifyItemRangeChanged(0, customFolderAdapter.itemCount, Unit)
     }
 
     private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {
@@ -264,7 +262,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setCustomFoldersCollapsedState() = with(binding) {
         val folderId = MainViewModel.currentFolderId.value
-        val isExpanded = folderId != null && (currentFolderRole == null || customFoldersAdapter.itemCount == 0)
+        val isExpanded = folderId != null && (currentFolderRole == null || customFolderAdapter.itemCount == 0)
         val angleResource = if (isExpanded) R.dimen.angleViewRotated else R.dimen.angleViewNotRotated
         val angle = ResourcesCompat.getFloat(resources, angleResource)
         customFoldersList.isVisible = isExpanded

@@ -40,7 +40,7 @@ class NewMessageActivity : ThemedActivity() {
     private val navigationArgs: NewMessageActivityArgs by navArgs()
 
     private val mainViewModel: MainViewModel by viewModels()
-    private val viewModel: NewMessageViewModel by viewModels()
+    private val newMessageViewModel: NewMessageViewModel by viewModels()
 
     private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
 
@@ -99,8 +99,8 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {
         editorTextOptions.setOnClickListener {
-            viewModel.isEditorExpanded = !viewModel.isEditorExpanded
-            updateEditorVisibility(viewModel.isEditorExpanded)
+            newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
+            updateEditorVisibility(newMessageViewModel.isEditorExpanded)
         }
     }
 
@@ -118,18 +118,18 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun linkEditor(view: MaterialButton, action: EditorAction) {
-        view.setOnClickListener { viewModel.editorAction.value = action }
+        view.setOnClickListener { newMessageViewModel.editorAction.value = action }
     }
 
     fun closeDraft() = with(newMessageFragment) {
-        viewModel.sendDraftAction(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
+        newMessageViewModel.sendDraftAction(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
         finish()
     }
 
     fun toggleEditor(isVisible: Boolean) {
         binding.editor.isVisible = isVisible
         if (!isVisible) {
-            viewModel.isEditorExpanded = false
+            newMessageViewModel.isEditorExpanded = false
             binding.updateEditorVisibility(false)
         }
     }

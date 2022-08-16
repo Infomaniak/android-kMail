@@ -162,7 +162,7 @@ class NewMessageViewModel : ViewModel() {
         return if (isEmpty()) realmListOf() else map {
             Recipient().apply {
                 email = it.email
-                name = it.name
+                name = it.name ?: ""
             }
         }.toRealmList()
     }

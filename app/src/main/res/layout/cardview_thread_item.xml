@@ -135,11 +135,9 @@
                 android:layout_height="match_parent"
                 android:ellipsize="end"
                 android:lines="1"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:text="@tools:sample/lorem/random"
-                tools:visibility="visible" />
+                tools:text="@tools:sample/lorem/random" />
 
         </LinearLayout>
 

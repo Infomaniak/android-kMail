@@ -42,7 +42,9 @@ import io.realm.kotlin.ext.isValid
 import java.util.*
 
 // TODO: Use LoaderAdapter from Core instead?
-class ThreadsAdapter(private var itemsList: MutableList<Any> = mutableListOf()) : RecyclerView.Adapter<ViewHolder>() {
+class ThreadListAdapter(
+    private var items: MutableList<Any> = mutableListOf(),
+) : RecyclerView.Adapter<ViewHolder>() {
 
     @StringRes
     var previousSectionName: Int = -1
@@ -51,14 +53,12 @@ class ThreadsAdapter(private var itemsList: MutableList<Any> = mutableListOf()) 
     var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
-    override fun getItemCount(): Int = itemsList.size
+    override fun getItemCount(): Int = items.size
 
-    override fun getItemViewType(position: Int): Int {
-        return when {
-            itemsList[position] is String -> DisplayType.DATE_SEPARATOR.layout
-            displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
-            else -> DisplayType.THREAD.layout
-        }
+    override fun getItemViewType(position: Int): Int = when {
+        items[position] is String -> DisplayType.DATE_SEPARATOR.layout
+        displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
+        else -> DisplayType.THREAD.layout
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -89,7 +89,7 @@ class ThreadsAdapter(private var itemsList: MutableList<Any> = mutableListOf()) 
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(position: Int) {
         sectionTitle.apply {
-            text = itemsList[position] as String
+            text = items[position] as String
             setTextAppearance(R.style.Callout)
             setTextColor(context.getColor(R.color.sectionHeaderTextColor))
         }
@@ -101,9 +101,10 @@ class ThreadsAdapter(private var itemsList: MutableList<Any> = mutableListOf()) 
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
+    private fun CardviewThreadItemBinding.displayThread(position: Int) = with(items[position] as Thread) {
         expeditor.text = formatExpeditorField(context)
         mailSubject.text = subject.getFormattedThreadSubject(context)
+        mailBodyPreview.text = messages.lastOrNull()?.preview ?: ""
 
         mailDate.text = displayedDate
 
@@ -165,8 +166,8 @@ class ThreadsAdapter(private var itemsList: MutableList<Any> = mutableListOf()) 
     private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
 
     fun notifyAdapter(newList: MutableList<Any>) {
-        DiffUtil.calculateDiff(ThreadsDiffCallback(itemsList, newList)).dispatchUpdatesTo(this)
-        itemsList = newList
+        DiffUtil.calculateDiff(ThreadListDiffCallback(items, newList)).dispatchUpdatesTo(this)
+        items = newList
     }
 
     private enum class DisplayType(val layout: Int) {

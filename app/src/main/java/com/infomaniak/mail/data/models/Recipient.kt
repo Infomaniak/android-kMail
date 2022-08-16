@@ -27,9 +27,9 @@ import kotlinx.serialization.Transient
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 @Serializable
-class Recipient : RealmObject {
-    var email: String = ""
-    var name: String? = null
+class Recipient : RealmObject, Correspondent {
+    override var email: String = ""
+    override var name: String = ""
 
     /**
      * Local
@@ -49,7 +49,7 @@ class Recipient : RealmObject {
         return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
     }
 
-    private fun getNameOrEmail() = name?.ifBlank { email } ?: email
+    fun getNameOrEmail() = name.ifBlank { email }
 
     override fun equals(other: Any?): Boolean = other is Recipient && other.objectId == objectId
 

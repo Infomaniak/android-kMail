@@ -24,12 +24,14 @@ import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.databinding.ItemAttachmentBinding
+import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.getFileTypeFromExtension
 
 class AttachmentAdapter(
+    private val onAttachmentClicked: ((Attachment) -> Unit)?,
+) : RecyclerView.Adapter<AttachmentViewHolder>() {
+
     private var items: List<Attachment> = emptyList()
-) : RecyclerView.Adapter<AttachmentAdapter.AttachmentViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -38,13 +40,18 @@ class AttachmentAdapter(
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
         val item = items[position]
 
-        root.setOnClickListener { /*TODO*/ }
         fileName.text = item.name
+        // TODO: Find how to add the FileType prefix before the file' size.
         fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, item.size.toLong())
         icon.load(item.getFileTypeFromExtension().icon)
+        root.setOnClickListener { onAttachmentClicked?.invoke(item) }
     }
 
     override fun getItemCount(): Int = items.count()
+
+    fun setAttachments(newList: List<Attachment>) {
+        items = newList
+    }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : RecyclerView.ViewHolder(binding.root)
 }

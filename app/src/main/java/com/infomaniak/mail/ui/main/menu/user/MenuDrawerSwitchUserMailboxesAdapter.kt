@@ -38,7 +38,7 @@ class MenuDrawerSwitchUserMailboxesAdapter(
 
     override fun onBindViewHolder(
         holder: MenuDrawerSwitchUserMailboxViewHolder,
-        position: Int
+        position: Int,
     ): Unit = with(holder.binding.emailAddress) {
         val mailbox = mailboxes[position]
         text = mailbox.email
@@ -57,6 +57,7 @@ class MenuDrawerSwitchUserMailboxesAdapter(
         notifyDataSetChanged()
     }
 
-    class MenuDrawerSwitchUserMailboxViewHolder(val binding: ItemSwitchUserMailboxMenuDrawerBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    class MenuDrawerSwitchUserMailboxViewHolder(
+        val binding: ItemSwitchUserMailboxMenuDrawerBinding,
+    ) : RecyclerView.ViewHolder(binding.root)
 }

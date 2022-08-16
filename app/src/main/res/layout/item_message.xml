@@ -40,8 +40,8 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/userAvatar"
-                android:layout_width="@dimen/userAvatarSizeLarge"
-                android:layout_height="@dimen/userAvatarSizeLarge"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:src="@drawable/placeholder"
                 app:cardCornerRadius="@dimen/roundCornerRadius"
                 app:layout_constraintStart_toStartOf="parent"
@@ -131,7 +131,7 @@
                 style="@style/TextButton"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:cornerRadius="6dp"
+                app:cornerRadius="@dimen/smallCornerRadius"
                 app:layout_constraintBottom_toBottomOf="@id/recipientLayout"
                 app:layout_constraintEnd_toEndOf="@id/recipientLayout"
                 app:layout_constraintStart_toStartOf="@id/recipientLayout"
@@ -377,7 +377,8 @@
         <WebView
             android:id="@+id/messageBody"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal" />
 
     </FrameLayout>
 

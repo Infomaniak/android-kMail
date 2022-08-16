@@ -34,7 +34,7 @@
         android:minHeight="0dp"
         android:paddingHorizontal="@dimen/marginStandardVerySmall"
         android:paddingVertical="1dp"
-        app:cornerRadius="6dp"
+        app:cornerRadius="@dimen/smallCornerRadius"
         tools:text="@tools:sample/full_names" />
 
     <TextView

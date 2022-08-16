@@ -51,7 +51,6 @@ import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.firstOrNull
 import java.util.*
 
 class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -200,7 +199,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
             lifecycleScope.launch(Dispatchers.IO) {
-                mailboxUuid = MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.uuid
+                mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid
             }
         }
     }
@@ -213,7 +212,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             folderJob?.cancel()
             folderJob = lifecycleScope.launch(Dispatchers.IO) {
 
-                FolderController.getFolderAsync(folderId).firstOrNull()?.obj?.let { folder ->
+                FolderController.getFolderSync(folderId)?.let { folder ->
                     withContext(Dispatchers.Main) {
                         displayFolderName(folder)
                         listenToThreads(folder)
@@ -291,7 +290,7 @@ class ThreadsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsJob?.cancel()
         threadsJob = lifecycleScope.launch(Dispatchers.IO) {
             folder.threads.asFlow().toSharedFlow().collect {
-                withContext(Dispatchers.Main) { displayThreads(it.list) }
+                if (isResumed) withContext(Dispatchers.Main) { displayThreads(it.list) }
             }
         }
     }

@@ -31,6 +31,7 @@
     <dimen name="noMailIlluViewSize">180dp</dimen>
     <dimen name="noMailTextViewSize">300dp</dimen>
     <dimen name="searchViewHeight">40dp</dimen>
+    <dimen name="smallCornerRadius">6dp</dimen>
     <dimen name="userAvatarSizeLarge">42dp</dimen>
 
     <!-- Menu Drawer -->

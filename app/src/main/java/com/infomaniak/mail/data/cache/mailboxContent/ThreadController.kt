@@ -68,6 +68,7 @@ object ThreadController {
 
         // Get current data
         Log.d(RealmController.TAG, "Threads: Get current data")
+        DuplicateController.removeDuplicates()
         val threadsResult = ApiRepository.getThreads(mailboxUuid, folder.id, offset, filter, folder.isDraftFolder).data
         val apiThreadsSinceOffset = threadsResult?.threads?.map { it.initLocalValues(mailboxUuid, folder.id) }
             ?: emptyList()
@@ -113,6 +114,36 @@ object ThreadController {
             FolderController.updateFolderUnreadCount(folder.id, it.folderUnseenMessage)
             canContinueToPaginate
         } ?: false
+    }
+
+    fun markAsSeen(thread: Thread) {
+        if (thread.unseenMessagesCount != 0) {
+
+            RealmController.mailboxContent.writeBlocking {
+                val latestThread = getLatestThreadSync(thread.uid) ?: return@writeBlocking
+
+                var nbUnseenMessages = 0
+                val uids = mutableListOf<String>().apply {
+                    latestThread.messages.forEach {
+                        if (!it.seen) {
+                            nbUnseenMessages++
+                            add(it.uid)
+                            addAll(it.duplicates.map { duplicate -> duplicate.uid })
+                        }
+                    }
+                }
+
+                val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, uids)
+
+                if (apiResponse.isSuccess()) {
+                    // MainViewModel.currentFolderId.value?.let { decrementFolderUnreadCount(it, nbUnseenMessages) }
+                    latestThread.apply {
+                        messages.forEach { it.seen = true }
+                        unseenMessagesCount = 0
+                    }
+                }
+            }
+        }
     }
 
     fun MutableRealm.deleteThreads(threads: List<Thread>) {

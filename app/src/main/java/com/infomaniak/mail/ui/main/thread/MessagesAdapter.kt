@@ -34,36 +34,43 @@ import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.loadAvatar
+import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
+import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
-class MessagesAdapter(
+class ThreadAdapter(
     private var messages: MutableList<Message> = mutableListOf(),
-) : RecyclerView.Adapter<BindingViewHolder<ItemMessageBinding>>() {
+) : RecyclerView.Adapter<ThreadViewHolder>() {
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null
+    var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
+    var onDownloadAllClicked: (() -> Unit)? = null
 
     override fun getItemCount() = messages.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder<ItemMessageBinding> {
-        return BindingViewHolder(ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
+        return ThreadViewHolder(
+            ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onContactClicked,
+            onAttachmentClicked,
+        )
     }
 
-    override fun onBindViewHolder(holder: BindingViewHolder<ItemMessageBinding>, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
         val message = messages[position]
-        if ((position == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
 
-        bindHeader(message)
-        bindAttachments(message.attachments)
+        holder.bindHeader(message)
+        holder.bindAttachment(message.attachments)
         loadBodyInWebView(message.body)
 
         displayExpandedCollapsedMessage(message)
@@ -74,7 +81,7 @@ class MessagesAdapter(
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
 
-    private fun ItemMessageBinding.bindHeader(message: Message) {
+    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date?.toDate()
 
         if (message.isDraft) {
@@ -89,7 +96,7 @@ class MessagesAdapter(
             userAvatarImage.loadAvatar(
                 firstSender.email.hashCode(),
                 null,
-                firstSender.getNameOrEmail().firstOrEmpty().uppercase()
+                firstSender.getNameOrEmail().firstOrEmpty().uppercase(),
             )
             expeditorName.apply {
                 text = firstSender.displayedName(context)
@@ -111,12 +118,12 @@ class MessagesAdapter(
             isYesterday() -> getString(
                 R.string.messageDetailsDateAt,
                 getString(R.string.messageDetailsYesterday),
-                format(FORMAT_EMAIL_DATE_HOUR)
+                format(FORMAT_EMAIL_DATE_HOUR),
             )
             isThisYear() -> getString(
                 R.string.messageDetailsDateAt,
                 format(FORMAT_EMAIL_DATE_SHORT_DATE),
-                format(FORMAT_EMAIL_DATE_HOUR)
+                format(FORMAT_EMAIL_DATE_HOUR),
             )
             else -> this@mailFormattedDate.mostDetailedDate(this@with)
         }
@@ -151,31 +158,29 @@ class MessagesAdapter(
         }
     }
 
-    private fun ItemMessageBinding.bindRecipientDetails(message: Message, messageDate: Date?) {
-        fromRecyclerView.adapter = DetailedRecipientAdapter(message.from.toList(), onContactClicked)
-        toRecyclerView.adapter = DetailedRecipientAdapter(message.to.toList(), onContactClicked)
+    private fun ThreadViewHolder.bindRecipientDetails(message: Message, messageDate: Date?) = with(binding) {
+        fromAdapter.updateList(message.from.toList())
+        toAdapter.updateList(message.to.toList())
 
         val ccIsNotEmpty = !message.cc.isEmpty()
         ccGroup.isVisible = ccIsNotEmpty
-        if (ccIsNotEmpty) ccRecyclerView.adapter = DetailedRecipientAdapter(message.cc.toList(), onContactClicked)
+        if (ccIsNotEmpty) ccAdapter.updateList(message.cc.toList())
 
-        val dateNotNull = messageDate != null
-        detailedMessageDate.isVisible = dateNotNull
-        detailedMessagePrefix.isVisible = dateNotNull
-        if (dateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
+        val isDateNotNull = messageDate != null
+        detailedMessageDate.isVisible = isDateNotNull
+        detailedMessagePrefix.isVisible = isDateNotNull
+        if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
-    private fun ItemMessageBinding.bindAttachments(attachments: List<Attachment>) {
+    private fun ThreadViewHolder.bindAttachment(attachments: List<Attachment>) = with(binding) {
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentsSizeText.text = context.resources.getQuantityString(
             R.plurals.attachmentQuantity,
             attachments.size,
             attachments.size,
         ) + " ($fileSize)"
-        attachmentsRecyclerView.adapter = AttachmentAdapter(attachments)
-        attachmentsDownloadAllButton.setOnClickListener {
-            // TODO: AttachmentsList Fragment
-        }
+        attachmentAdapter.setAttachments(attachments)
+        attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke() }
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
@@ -240,6 +245,7 @@ class MessagesAdapter(
         val to = recipientsToSpannedString(context, to)
         val cc = recipientsToSpannedString(context, cc)
 
+        // TODO : Rewrite properly this part
         return buildSpannedString {
             if (isExpandedHeaderMode) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append("${context.getString(R.string.toTitle)} ") }
             append(to)
@@ -247,11 +253,12 @@ class MessagesAdapter(
         }.dropLast(2) as SpannedString
     }
 
+    // TODO : Rewrite properly this part
     private fun Message.recipientsToSpannedString(context: Context, recipientsList: List<Recipient>) = buildSpannedString {
         recipientsList.forEach {
             if (isExpandedHeaderMode) {
                 color(context.getColor(RCore.color.accent)) { append(it.displayedName(context)) }
-                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name?.isNotBlank() == true) append(" (${it.email})") }
+                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name.isNotBlank()) append(" (${it.email})") }
                     .append(",\n")
             } else {
                 append("${it.displayedName(context)}, ")
@@ -260,15 +267,20 @@ class MessagesAdapter(
     }
 
     fun notifyAdapter(newList: MutableList<Message>) {
-        DiffUtil.calculateDiff(MessagesDiffCallback(messages, newList)).dispatchUpdatesTo(this)
+        DiffUtil.calculateDiff(MessageListDiffCallback(messages, newList)).dispatchUpdatesTo(this)
         messages = newList
+        messages.forEachIndexed { index, message ->
+            if ((index == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
+        }
     }
 
     fun lastIndex() = messages.lastIndex
 
-    private fun Recipient.getNameOrEmail() = name?.let { it.ifBlank { email } } ?: email
+    private fun Recipient.displayedName(context: Context): String {
+        return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
+    }
 
-    private class MessagesDiffCallback(
+    private class MessageListDiffCallback(
         private val oldList: List<Message>,
         private val newList: List<Message>,
     ) : DiffUtil.Callback() {
@@ -298,5 +310,26 @@ class MessagesAdapter(
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
 
         const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
+    }
+
+    class ThreadViewHolder(
+        val binding: ItemMessageBinding,
+        onContactClicked: ((contact: Recipient) -> Unit)?,
+        onAttachmentClicked: ((attachment: Attachment) -> Unit)?,
+    ) : ViewHolder(binding.root) {
+
+        val fromAdapter = DetailedRecipientAdapter(onContactClicked)
+        val toAdapter = DetailedRecipientAdapter(onContactClicked)
+        val ccAdapter = DetailedRecipientAdapter(onContactClicked)
+        val attachmentAdapter = AttachmentAdapter(onAttachmentClicked)
+
+        init {
+            with(binding) {
+                fromRecyclerView.adapter = fromAdapter
+                toRecyclerView.adapter = toAdapter
+                ccRecyclerView.adapter = ccAdapter
+                attachmentsRecyclerView.adapter = attachmentAdapter
+            }
+        }
     }
 }

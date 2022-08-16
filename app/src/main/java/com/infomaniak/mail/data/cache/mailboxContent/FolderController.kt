@@ -35,7 +35,6 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.SharedFlow
 import java.util.*
-import kotlin.math.max
 
 object FolderController {
 
@@ -124,11 +123,11 @@ object FolderController {
         }
     }
 
-    fun MutableRealm.decrementFolderUnreadCount(folderId: String) {
-        getLatestFolderSync(folderId)?.let { latestFolder ->
-            if (latestFolder.unreadCount > 0) latestFolder.unreadCount = max(latestFolder.unreadCount - 1, 0)
-        }
-    }
+    // fun MutableRealm.decrementFolderUnreadCount(folderId: String, nbUnseenMessages: Int) {
+    //     getLatestFolderSync(folderId)?.let { latestFolder ->
+    //         if (latestFolder.unreadCount > 0) latestFolder.unreadCount = max(latestFolder.unreadCount - nbUnseenMessages, 0)
+    //     }
+    // }
 
     fun MutableRealm.deleteFolders(folders: List<Folder>) {
         folders.forEach { deleteLatestFolder(it.id) }
