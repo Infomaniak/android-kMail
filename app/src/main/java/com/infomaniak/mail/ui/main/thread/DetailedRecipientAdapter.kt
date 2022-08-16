@@ -29,24 +29,24 @@ class DetailedRecipientAdapter(
     private val onContactClicked: ((contact: Recipient) -> Unit)?,
 ) : RecyclerView.Adapter<DetailedRecipientViewHolder>() {
 
-    private var recipients = emptyList<Recipient>()
+    private var items = emptyList<Recipient>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailedRecipientViewHolder {
         return DetailedRecipientViewHolder(ItemDetailedContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: DetailedRecipientViewHolder, position: Int): Unit = with(holder.binding) {
-        val recipient = recipients[position]
+        val item = items[position]
 
-        fillInUserNameAndEmail(name, emailAddress, recipient)
+        fillInUserNameAndEmail(name, emailAddress, item)
 
-        name.setOnClickListener { onContactClicked?.invoke(recipient) }
+        name.setOnClickListener { onContactClicked?.invoke(item) }
     }
 
-    override fun getItemCount(): Int = recipients.count()
+    override fun getItemCount(): Int = items.count()
 
     fun updateList(newList: List<Recipient>) {
-        recipients = newList
+        items = newList
     }
 
     class DetailedRecipientViewHolder(val binding: ItemDetailedContactBinding) : RecyclerView.ViewHolder(binding.root)
