@@ -24,19 +24,28 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.FragmentListDensitySettingBinding
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
+import com.infomaniak.mail.data.models.user.UserPreferences.ListDensityMode
+import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
 
-class ListDensitySettingFragment : Fragment() {
+class ThreadListDensitySettingFragment : Fragment() {
 
-    private lateinit var binding: FragmentListDensitySettingBinding
+    private lateinit var binding: FragmentThreadListDensitySettingBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentThreadListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupUi()
         setupBack()
+    }
+
+    private fun setupUi() = with(binding) {
+        val (checkedButtonId, resId) = getCheckedButtonFromDensity()
+        listDensityButtonsGroup.check(checkedButtonId)
+        listDensityImage.setImageResource(resId)
     }
 
     private fun setupBack() {
@@ -52,14 +61,22 @@ class ListDensitySettingFragment : Fragment() {
         listDensityButtonsGroup.addOnButtonCheckedListener { _, buttonId, isChecked ->
             if (!isChecked) return@addOnButtonCheckedListener
 
-            val resId = when (buttonId) {
-                R.id.listDensityButtonCompact -> R.drawable.bg_list_density_compact
-                R.id.listDensityButtonNormal -> R.drawable.bg_list_density_default
-                else -> R.drawable.bg_list_density_large
-            }
-
+            val (listDensity, resId) = getDensityFromCheckedButton(buttonId)
+            UserPreferencesController.updateUserPreferences { it.threadListDensity = listDensity.apiName }
             listDensityImage.setImageResource(resId)
         }
+    }
+
+    private fun getCheckedButtonFromDensity() = when (UserPreferencesController.getUserPreferences().getListDensityMode()) {
+        ListDensityMode.COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
+        ListDensityMode.LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
+        else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default
+    }
+
+    private fun getDensityFromCheckedButton(buttonId: Int) = when (buttonId) {
+        R.id.listDensityButtonCompact -> ListDensityMode.COMPACT to R.drawable.bg_list_density_compact
+        R.id.listDensityButtonLarge -> ListDensityMode.LARGE to R.drawable.bg_list_density_large
+        else -> ListDensityMode.DEFAULT to R.drawable.bg_list_density_default
     }
 
     override fun onPause() {

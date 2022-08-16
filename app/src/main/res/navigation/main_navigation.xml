@@ -189,7 +189,7 @@
             app:destination="@id/sendSettingsFragment" />
         <action
             android:id="@+id/action_settings_to_threadsDensitySetting"
-            app:destination="@id/threadsDensitySettingFragment" />
+            app:destination="@id/threadListDensitySettingFragment" />
         <action
             android:id="@+id/action_settings_to_themeSetting"
             app:destination="@id/themeSettingFragment" />
@@ -208,10 +208,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/threadsDensitySettingFragment"
-        android:name="com.infomaniak.mail.ui.main.settings.ThreadsDensitySettingFragment"
+        android:id="@+id/threadListDensitySettingFragment"
+        android:name="com.infomaniak.mail.ui.main.settings.ThreadListDensitySettingFragment"
         android:label="ListDensitySettingFragment"
-        tools:layout="@layout/fragment_threads_density_setting" />
+        tools:layout="@layout/fragment_thread_list_density_setting" />
 
     <fragment
         android:id="@+id/themeSettingFragment"

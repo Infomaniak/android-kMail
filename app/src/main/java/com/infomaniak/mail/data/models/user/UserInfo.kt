@@ -27,17 +27,17 @@ import kotlinx.serialization.Serializable
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
 @Parcelize
 @Serializable
-class UserInfos : RealmObject, Correspondent {
+class UserInfo : RealmObject, Correspondent {
     @PrimaryKey
-    var email: String = ""
+    override var email: String = ""
+    override var name: String = ""
+    @SerialName("firstname")
+    var firstName: String = ""
     var country: String = ""
     @SerialName("double_auth")
     var doubleAuth: Boolean = false
     @SerialName("drive_url")
     var driveUrl: String = "" // TODO: Do we really need a DriveURL in kMail?
-    @SerialName("firstname")
-    var firstName: String = ""
-    var name: String = ""
     @SerialName("from_webmail1")
     var fromWebmail: Boolean = false
     @SerialName("hosting_url")
