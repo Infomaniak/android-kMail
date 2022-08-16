@@ -31,26 +31,26 @@ class AttachmentAdapter(
     private val onAttachmentClicked: ((Attachment) -> Unit)?,
 ) : RecyclerView.Adapter<AttachmentViewHolder>() {
 
-    private var items: List<Attachment> = emptyList()
+    private var attachments: List<Attachment> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int): Unit = with(holder.binding) {
-        val item = items[position]
+        val attachment = attachments[position]
 
-        fileName.text = item.name
+        fileName.text = attachment.name
         // TODO: Find how to add the FileType prefix before the file' size.
-        fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, item.size.toLong())
-        icon.load(item.getFileTypeFromExtension().icon)
-        root.setOnClickListener { onAttachmentClicked?.invoke(item) }
+        fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, attachment.size.toLong())
+        icon.load(attachment.getFileTypeFromExtension().icon)
+        root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
     }
 
-    override fun getItemCount(): Int = items.count()
+    override fun getItemCount(): Int = attachments.count()
 
     fun setAttachments(newList: List<Attachment>) {
-        items = newList
+        attachments = newList
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : RecyclerView.ViewHolder(binding.root)
