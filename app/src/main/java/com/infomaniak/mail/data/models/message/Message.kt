@@ -124,16 +124,16 @@ class Message : RealmObject {
     }
 
     companion object {
-        fun from(draft: Draft) = Message().apply {
-            uid = draft.messageUid.ifEmpty { draft.uuid }
+        fun from(draft: Draft, messageUid:String) = Message().apply {
+            uid = messageUid
             draftUuid = draft.uuid
             subject = draft.subject
             folder = API_DRAFT_FOLDER_NAME
             folderId = Folder.draftFolder?.id.toString()
             from = draft.from
-            to = draft.to ?: realmListOf()
-            cc = draft.cc ?: realmListOf()
-            bcc = draft.bcc ?: realmListOf()
+            to = draft.to
+            cc = draft.cc
+            bcc = draft.bcc
             replyTo = draft.replyTo
             isDraft = true
             attachments = draft.attachments

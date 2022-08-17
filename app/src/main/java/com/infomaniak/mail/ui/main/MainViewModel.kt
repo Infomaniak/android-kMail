@@ -365,6 +365,7 @@ class MainViewModel : ViewModel() {
         val currentMessageUid = MutableLiveData<String?>()
 
         fun saveDraft(realmDraft: Draft, mailboxUuid: String, isNewMessage: Boolean): String {
+
             val apiResponse = ApiRepository.saveDraft(mailboxUuid, realmDraft)
 
             val draftUuid = apiResponse.data?.let { draftSaveResult ->
@@ -374,17 +375,20 @@ class MainViewModel : ViewModel() {
                     } else {
                         DraftController.deleteDraftAndItsParents(realmDraft.uuid, realmDraft.messageUid)
                     }
-                    apiDraft.initLocalValues(draftSaveResult.messageUid)
+                    apiDraft.initLocalValues()
                     DraftController.upsertDraft(apiDraft)
                     // attachments = draftSaveResult.attachments // TODO? Not sure.
                     apiDraft.uuid.also {
                         DraftController.saveDraftAndItsParents(
                             draftUuid = it,
+                            messageUid = draftSaveResult.messageUid,
                             isOnline = true,
                         )
                     }
                 }
-            } ?: realmDraft.uuid.also { DraftController.saveDraftAndItsParents(draftUuid = it, isOnline = false) }
+            } ?: realmDraft.uuid.also {
+                DraftController.saveDraftAndItsParents(draftUuid = it, messageUid = it, isOnline = false)
+            }
 
             return draftUuid
         }

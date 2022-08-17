@@ -64,7 +64,7 @@ object DraftController {
         return RealmController.mailboxContent.writeBlocking { getLatestDraftSync(uuid)?.let(onUpdate) }
     }
 
-    fun saveDraftAndItsParents(draftUuid: String, isOnline: Boolean) {
+    fun saveDraftAndItsParents(draftUuid: String, messageUid: String, isOnline: Boolean) {
         RealmController.mailboxContent.writeBlocking {
 
             // Save Draft
@@ -77,10 +77,11 @@ object DraftController {
                     isModifiedOffline = true
                     date = Date().toRealmInstant()
                 }
+                this.messageUid = messageUid
             }
 
             // Save Message
-            val draftMessage = Message.from(latestDraft)
+            val draftMessage = Message.from(latestDraft, messageUid)
             copyToRealm(draftMessage, UpdatePolicy.ALL)
 
             // Save Thread
