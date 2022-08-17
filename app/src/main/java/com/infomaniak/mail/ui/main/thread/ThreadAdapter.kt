@@ -158,11 +158,11 @@ class ThreadAdapter(
         fromAdapter.updateList(message.from.toList())
         toAdapter.updateList(message.to.toList())
 
-        val ccIsNotEmpty = !message.cc.isEmpty()
+        val ccIsNotEmpty = message.cc.isNotEmpty()
         ccGroup.isVisible = ccIsNotEmpty
         if (ccIsNotEmpty) ccAdapter.updateList(message.cc.toList())
 
-        val bccIsNotEmpty = !message.bcc.isEmpty()
+        val bccIsNotEmpty = message.bcc.isNotEmpty()
         bccGroup.isVisible = bccIsNotEmpty
         if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
 
