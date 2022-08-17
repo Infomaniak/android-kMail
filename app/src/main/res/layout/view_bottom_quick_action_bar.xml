@@ -45,7 +45,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_email_action_reply"
-        tools:text="Répondre" />
+        tools:text="@string/actionReply" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button2"
@@ -67,7 +67,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_email_action_send"
-        tools:text="Transférer" />
+        tools:text="@string/actionForward" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button3"
@@ -89,7 +89,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_archive_folder"
-        tools:text="Archiver" />
+        tools:text="@string/actionArchive" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button4"
@@ -111,7 +111,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_bin"
-        tools:text="Supprimer" />
+        tools:text="@string/actionDelete" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button5"
@@ -133,6 +133,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="120dp"
         tools:icon="@drawable/ic_param_dots"
-        tools:text="Plus" />
+        tools:text="@string/buttonMore" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
