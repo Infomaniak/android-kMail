@@ -19,11 +19,14 @@
 package com.infomaniak.mail.data.models.drafts
 
 import com.infomaniak.mail.data.models.Attachment
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class DraftSaveResult(
-    val uuid: String,
-    val uid: String,
+    @SerialName("uuid")
+    val draftUuid: String,
+    @SerialName("uid")
+    val messageUid: String,
     val attachments: List<Attachment>,
 )

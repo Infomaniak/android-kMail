@@ -26,7 +26,8 @@ import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.drafts.Draft.DraftAction
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.models.drafts.Draft
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.ThemedActivity
@@ -44,31 +45,12 @@ class NewMessageActivity : ThemedActivity() {
 
     private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
 
-    private val newMessageFragment: NewMessageFragment by lazy {
-        supportFragmentManager.findFragmentById(R.id.fragmentContainer)?.let {
-            it.childFragmentManager.primaryNavigationFragment as NewMessageFragment
-        }!!
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding.apply {
             setContentView(root)
-
-            toolbar.setNavigationOnClickListener { closeDraft() }
-
-            toolbar.setOnMenuItemClickListener {
-                with(newMessageFragment) {
-                    if (newMessageViewModel.sendDraftAction(DraftAction.SEND, getFromMailbox().email, getSubject(), getBody())) {
-                        finish()
-                    } else {
-                        showSnackbar(RCore.string.anErrorHasOccurred)
-                    }
-                    true
-                }
-            }
-
+            setupClickListeners()
             linkEditor(editorAttachment, ATTACHMENT)
             linkEditor(editorCamera, CAMERA)
             linkEditor(editorLink, LINK)
@@ -86,15 +68,34 @@ class NewMessageActivity : ThemedActivity() {
         loadDraft()
     }
 
-    private fun loadDraft() = with(navigationArgs) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val draft = if (draftResource != null && messageUid != null) {
-                mainViewModel.fetchDraft(draftResource!!, messageUid!!)
-            } else {
-                null
-            }
-            newMessageViewModel.loadDraft(draft, navigationArgs.draftUuid)
+    private fun setupClickListeners() = with(binding) {
+
+        toolbar.setNavigationOnClickListener {
+            toolbar.setNavigationOnClickListener(null)
+            closeDraft()
         }
+
+        toolbar.setOnMenuItemClickListener {
+            toolbarOnMenuItemClickListener()
+            true
+        }
+    }
+
+    private fun toolbarOnMenuItemClickListener() {
+        binding.toolbar.setOnMenuItemClickListener(null)
+        newMessageViewModel.sendDraft { isSuccess ->
+            if (isSuccess) finish() else {
+                binding.toolbar.setOnMenuItemClickListener {
+                    toolbarOnMenuItemClickListener()
+                    true
+                }
+                showSnackbar(RCore.string.anErrorHasOccurred)
+            }
+        }
+    }
+
+    private fun linkEditor(view: MaterialButton, action: EditorAction) {
+        view.setOnClickListener { newMessageViewModel.editorAction.value = action }
     }
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {
@@ -117,13 +118,42 @@ class NewMessageActivity : ThemedActivity() {
         textEditing.isVisible = isEditorExpanded
     }
 
-    private fun linkEditor(view: MaterialButton, action: EditorAction) {
-        view.setOnClickListener { newMessageViewModel.editorAction.value = action }
+    private fun loadDraft() {
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            val draft = getDraftFromApi()
+                ?: getDraftFromRealm()
+                ?: createNewDraft()
+
+            newMessageViewModel.currentDraftUuid.postValue(draft.uuid)
+        }
     }
 
-    fun closeDraft() = with(newMessageFragment) {
-        newMessageViewModel.sendDraftAction(DraftAction.SAVE, getFromMailbox().email, getSubject(), getBody())
-        finish()
+    private fun getDraftFromApi(): Draft? = with(navigationArgs) {
+        if (draftResource != null && messageUid != null) {
+            mainViewModel.fetchDraft(draftResource!!, messageUid!!)
+        } else {
+            null
+        }
+    }
+
+    private fun getDraftFromRealm(): Draft? = navigationArgs.draftUuid?.let(DraftController::getDraftSync)
+
+    private fun createNewDraft(): Draft {
+        newMessageViewModel.isNewMessage = true
+        return Draft().apply {
+            isOffline = true
+            initLocalValues()
+        }.also(DraftController::upsertDraft)
+    }
+
+    fun closeDraft() {
+        newMessageViewModel.saveDraft { isSuccess ->
+            if (!isSuccess && newMessageViewModel.isNewMessage) {
+                newMessageViewModel.currentDraftUuid.value?.let(DraftController::deleteDraft)
+            }
+            finish()
+        }
     }
 
     fun toggleEditor(isVisible: Boolean) {

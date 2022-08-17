@@ -29,7 +29,6 @@ import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmResults
@@ -65,33 +64,35 @@ object DraftController {
         return RealmController.mailboxContent.writeBlocking { getLatestDraftSync(uuid)?.let(onUpdate) }
     }
 
-    fun manageDraftAutoSave(draft: Draft, mustSaveThread: Boolean) {
+    fun saveDraftAndItsParents(draftUuid: String, isOnline: Boolean) {
         RealmController.mailboxContent.writeBlocking {
 
             // Save Draft
-            val latestDraft = (if (draft.isManaged()) getLatestDraftSync(draft.uuid) else draft) ?: return@writeBlocking
+            val latestDraft = getLatestDraftSync(draftUuid) ?: return@writeBlocking
             latestDraft.apply {
-                isModifiedOffline = true
-                date = Date().toRealmInstant()
+                if (isOnline) {
+                    isOffline = false
+                    isModifiedOffline = false
+                } else {
+                    isModifiedOffline = true
+                    date = Date().toRealmInstant()
+                }
             }
-            if (!latestDraft.isManaged()) copyToRealm(latestDraft, UpdatePolicy.ALL)
 
             // Save Message
             val draftMessage = Message.from(latestDraft)
             copyToRealm(draftMessage, UpdatePolicy.ALL)
 
             // Save Thread
-            if (mustSaveThread) {
-                val thread = Thread.from(draftMessage, getThreadByMessageUid(draft)?.uid)
-                copyToRealm(thread, UpdatePolicy.ALL)
+            val thread = Thread.from(draftMessage, getThreadByMessageUid(latestDraft.messageUid)?.uid)
+            copyToRealm(thread, UpdatePolicy.ALL)
 
-                // Save in Draft Folder
-                insertInDraftFolderIfNeeded(thread)
-            }
+            // Save in Draft Folder
+            insertInDraftFolderIfNeeded(thread)
         }
     }
 
-    fun removeDraft(uuid: String, messageUid: String) {
+    fun deleteDraftAndItsParents(uuid: String, messageUid: String) {
         RealmController.mailboxContent.writeBlocking {
             val threadsToRemove = getThreadsToRemoveByMessageUid(uuid, messageUid)
             deleteLatestMessage(messageUid.ifEmpty { uuid })
@@ -112,6 +113,10 @@ object DraftController {
         return RealmController.mailboxContent.query<Thread>(query).find()
     }
 
+    fun deleteDraft(uuid: String) {
+        RealmController.mailboxContent.writeBlocking { getLatestDraftSync(uuid)?.let(::delete) }
+    }
+
     /**
      * Utils
      */
@@ -119,17 +124,19 @@ object DraftController {
         return RealmController.mailboxContent.query<Draft>("${Draft::uuid.name} == '$uuid'").first()
     }
 
-    private fun getThreadByMessageUid(draft: Draft): Thread? {
-        val queryThread = "${Thread::messages.name}.${Message::uid.name} == '${draft.messageUid}'"
+    private fun getThreadByMessageUid(messageUid: String): Thread? {
+        val queryThread = "${Thread::messages.name}.${Message::uid.name} == '$messageUid'"
 
         return RealmController.mailboxContent.query<Thread>(queryThread).first().find()
     }
 
     private fun MutableRealm.insertInDraftFolderIfNeeded(thread: Thread) {
-        thread.getDraftFolderIfNotExist()?.id?.let { getLatestFolderSync(it)?.threads?.add(thread) }
+        getDraftFolderIfThreadIsOrphan(thread.uid)?.id?.let {
+            getLatestFolderSync(it)?.threads?.add(thread)
+        }
     }
 
-    private fun Thread.getDraftFolderIfNotExist(): Folder? {
+    private fun getDraftFolderIfThreadIsOrphan(uid: String): Folder? {
         return RealmController.mailboxContent.query<Folder>(
             "id == '${Folder.draftFolder?.id}' AND NONE ${Folder::threads.name}.${Thread::uid.name} == '${uid}'"
         ).first().find()

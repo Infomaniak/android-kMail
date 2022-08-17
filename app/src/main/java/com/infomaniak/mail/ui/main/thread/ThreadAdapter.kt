@@ -276,10 +276,6 @@ class ThreadAdapter(
 
     fun lastIndex() = messages.lastIndex
 
-    private fun Recipient.displayedName(context: Context): String {
-        return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
-    }
-
     private class MessageListDiffCallback(
         private val oldList: List<Message>,
         private val newList: List<Message>,

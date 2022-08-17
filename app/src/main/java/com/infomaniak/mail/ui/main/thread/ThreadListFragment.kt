@@ -41,6 +41,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
@@ -116,21 +117,22 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             // onEmptyList = { checkIfNoFiles() }
 
-            onThreadClicked = {
+            onThreadClicked = { thread ->
                 lifecycleScope.launch(Dispatchers.IO) {
                     if (MainViewModel.currentFolderId.value?.let(FolderController::getFolderSync)?.isDraftFolder == true) {
-                        if (it.messages.isNotEmpty()) {
+                        val messages = ThreadController.getThreadSync(thread.uid)?.messages ?: return@launch
+                        if (messages.isNotEmpty()) {
                             withContext(Dispatchers.Main) {
-                                openMessageEdition(R.id.action_threadListFragment_to_newMessageActivity, it.messages.first())
+                                openMessageEdition(R.id.action_threadListFragment_to_newMessageActivity, messages.first())
                             }
                         }
                     } else {
                         withContext(Dispatchers.Main) {
                             safeNavigate(
                                 ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
-                                    threadUid = it.uid,
-                                    threadSubject = it.subject,
-                                    threadIsFavorite = it.isFavorite,
+                                    threadUid = thread.uid,
+                                    threadSubject = thread.subject,
+                                    threadIsFavorite = thread.isFavorite,
                                 )
                             )
                         }
@@ -290,7 +292,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsJob?.cancel()
         threadsJob = lifecycleScope.launch(Dispatchers.IO) {
             folder.threads.asFlow().toSharedFlow().collect {
-                if (isResumed) withContext(Dispatchers.Main) { displayThreads(it.list) }
+                withContext(Dispatchers.Main) { displayThreads(it.list) }
             }
         }
     }
@@ -300,9 +302,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         resetForFurtherThreadsLoading()
         if (threads.size < PER_PAGE) canContinueToPaginate = false
 
-        if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
-
         threadListAdapter.notifyAdapter(threadListAdapter.formatList(threads, binding.context))
+
+        if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
         if (currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
     }

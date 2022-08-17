@@ -27,8 +27,11 @@ import com.infomaniak.mail.data.models.Folder
 object ModelsUtils {
 
     fun String?.getFormattedThreadSubject(context: Context): Spanned {
-        return this?.replace("\n+".toRegex(), " ")?.toSpanned()
-            ?: HtmlCompat.fromHtml("<i>${context.getString(R.string.messageNoSubject)}</i>", HtmlCompat.FROM_HTML_MODE_COMPACT)
+        return if (isNullOrEmpty()) {
+            HtmlCompat.fromHtml("<i>${context.getString(R.string.messageNoSubject)}</i>", HtmlCompat.FROM_HTML_MODE_COMPACT)
+        } else {
+            replace("\n+".toRegex(), " ").toSpanned()
+        }
     }
 
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {

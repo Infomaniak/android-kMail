@@ -56,10 +56,10 @@ class Draft : RealmObject {
     @SerialName("mime_type")
     var mimeType: String = "text/html"
     var body: String = ""
-    var cc: RealmList<Recipient>? = null
-    var bcc: RealmList<Recipient>? = null
+    var cc: RealmList<Recipient> = realmListOf()
+    var bcc: RealmList<Recipient> = realmListOf()
     var from: RealmList<Recipient> = realmListOf()
-    var to: RealmList<Recipient>? = null
+    var to: RealmList<Recipient> = realmListOf()
     var subject: String = ""
     @SerialName("ack_request")
     var ackRequest: Boolean = false
@@ -90,9 +90,9 @@ class Draft : RealmObject {
     fun initLocalValues(messageUid: String = "") {
         this.messageUid = messageUid
 
-        cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        bcc = bcc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        to = to?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
+        to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
     }
 
     enum class DraftAction {

@@ -25,9 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ListPopupWindow
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintSet
@@ -35,9 +33,13 @@ import androidx.core.view.*
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
@@ -46,7 +48,9 @@ import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.*
-import com.google.android.material.R as RMaterial
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.infomaniak.lib.core.R as RCore
 
 class NewMessageFragment : Fragment() {
@@ -108,7 +112,7 @@ class NewMessageFragment : Fragment() {
                 null -> Unit
             }
 
-            newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+            newMessageViewModel.startDraftAutoSave()
         }
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
@@ -160,74 +164,21 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun listenToAllContacts() {
-        newMessageViewModel.allContacts.observeNotNull(this, ::setupContactsAdapter)
-        newMessageViewModel.listenToAllContacts()
-    }
-
-    private fun listenToMailboxes() {
-        newMessageViewModel.mailboxes.observeNotNull(this, ::setupFromField)
-        newMessageViewModel.listenToMailboxes()
-    }
-
-    private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {
-
-        this@NewMessageFragment.mailboxes = mailboxes
-        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxObjectId.value }
-        val mails = mailboxes.map { it.email }
-
-        if (mails.count() > 1) {
-            fromMailAddress.apply {
-                setOnClickListener { view -> chooseFromAddress(view, mails) }
-                isClickable = true
-                isFocusable = true
-            }
-        }
-
-        with(newMessageViewModel) {
-            currentDraft.observe(viewLifecycleOwner) { draft ->
-                if (draft == null) return@observe
-
-                newMessageTo = draft.to.toUiContact()
-                newMessageCc = draft.cc.toUiContact()
-                newMessageBcc = draft.bcc.toUiContact()
-                displayChips()
-                updateToAutocompleteInputLayout()
-
-                fromMailAddress.text = if (draft.from.isEmpty()) {
-                    mailboxes[selectedMailboxIndex].email
-                } else {
-                    draft.from.first().email
+        lifecycleScope.launch(Dispatchers.IO) {
+            ContactController.getContactsAsync().collect {
+                val contacts = mutableListOf<UiContact>()
+                it.list.forEach { contact ->
+                    contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
                 }
-
-                subjectTextField.text = SpannableStringBuilder(draft.subject)
-                bodyText.text = Html.fromHtml(draft.body, Html.FROM_HTML_MODE_COMPACT) as Editable
-                hasStartedEditing.value = false
-
-                setUpAutoSave()
+                setupContactsAdapter(contacts)
             }
         }
-    }
-
-    private fun chooseFromAddress(view: View, mails: List<String>) = with(binding) {
-        val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
-        ListPopupWindow(context).apply {
-            setAdapter(adapter)
-            anchorView = view
-            width = view.width
-            setOnItemClickListener { _, _, position, _ ->
-                fromMailAddress.text = mails[position]
-                selectedMailboxIndex = position
-
-                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
-                dismiss()
-            }
-        }.show()
     }
 
     private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {
-        val toAlreadyUsedContactMails = newMessageViewModel.newMessageTo.map { it.email }.toMutableList()
-        val ccAlreadyUsedContactMails = newMessageViewModel.newMessageCc.map { it.email }.toMutableList()
-        val bccAlreadyUsedContactMails = newMessageViewModel.newMessageBcc.map { it.email }.toMutableList()
+        val toAlreadyUsedContactMails = newMessageViewModel.draftTo.map { it.email }.toMutableList()
+        val ccAlreadyUsedContactMails = newMessageViewModel.draftCc.map { it.email }.toMutableList()
+        val bccAlreadyUsedContactMails = newMessageViewModel.draftBcc.map { it.email }.toMutableList()
 
         contactAdapter = ContactAdapter(
             allContacts = allContacts,
@@ -238,8 +189,7 @@ class NewMessageFragment : Fragment() {
                 getInputView(field).setText("")
                 getContacts(field).add(contact)
                 createChip(field, contact)
-
-                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+                newMessageViewModel.startDraftAutoSave()
             },
             addUnrecognizedContact = { field ->
                 val isEmail = addUnrecognizedMail(field)
@@ -248,6 +198,105 @@ class NewMessageFragment : Fragment() {
         )
 
         autoCompleteRecyclerView.adapter = contactAdapter
+    }
+
+    private fun listenToMailboxes() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
+                withContext(Dispatchers.Main) { setupDraftUI(it.list) }
+            }
+        }
+    }
+
+    private fun setupDraftUI(mailboxes: List<Mailbox>) = with(binding) {
+
+        this@NewMessageFragment.mailboxes = mailboxes
+        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxObjectId.value }
+        val mails = mailboxes.map { it.email }
+
+        if (mails.count() > 1) {
+            fromMailAddress.apply {
+                // TODO: Put this back when we know exactly how this feature is supposed to work.
+                // setOnClickListener { view -> chooseFromAddress(view, mails) }
+                // isClickable = true
+                // isFocusable = true
+            }
+        }
+
+        with(newMessageViewModel) {
+            currentDraftUuid.observeNotNull(this@NewMessageFragment) { draftUuid ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val draft = DraftController.getDraftSync(draftUuid) ?: return@launch
+
+                    withContext(Dispatchers.Main) {
+                        draftTo = draft.to.toUiContact()
+                        draftCc = draft.cc.toUiContact()
+                        draftBcc = draft.bcc.toUiContact()
+                        displayChips()
+                        updateToAutocompleteInputLayout()
+
+                        (draft.from.firstOrNull()?.email ?: mailboxes[selectedMailboxIndex].email).also { from ->
+                            fromMailAddress.text = from
+                            draftEmail = from
+                        }
+
+                        SpannableStringBuilder(draft.subject).also { subject ->
+                            subjectTextField.text = subject
+                            draftSubject = subject.toString()
+                        }
+
+                        (Html.fromHtml(draft.body, Html.FROM_HTML_MODE_COMPACT) as Editable).also { body ->
+                            bodyText.text = body
+                            draftBody = body.toString()
+                        }
+
+                        hasStartedEditing = false
+
+                        setupAutoSave()
+
+                        // TODO: Check if we can do this differently. We need to listen only once to this datum.
+                        currentDraftUuid.removeObservers(this@NewMessageFragment)
+                    }
+                }
+            }
+        }
+    }
+
+    // TODO: Put this back when we know exactly how this feature is supposed to work.
+    // private fun chooseFromAddress(view: View, mails: List<String>) = with(binding) {
+    //     val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
+    //     ListPopupWindow(context).apply {
+    //         setAdapter(adapter)
+    //         anchorView = view
+    //         width = view.width
+    //         setOnItemClickListener { _, _, position, _ ->
+    //             val email = mails[position]
+    //             fromMailAddress.text = email
+    //             selectedMailboxIndex = position
+    //             newMessageViewModel.draftEmail = email
+    //             if (newMessageViewModel.hasStartedEditing) newMessageViewModel.startDraftAutoSave()
+    //             dismiss()
+    //         }
+    //     }.show()
+    // }
+
+    private fun setupAutoSave() = with(binding) {
+        subjectTextField.setupAutoSave { newMessageViewModel.draftSubject = getDraftSubject() }
+        bodyText.setupAutoSave { newMessageViewModel.draftBody = getDraftBody() }
+    }
+
+    private fun TextView.setupAutoSave(afterTextChanged: () -> Unit) {
+        addTextChangedListener(object : TextWatcher {
+
+            override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged()
+                newMessageViewModel.startDraftAutoSave()
+            }
+        })
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
@@ -260,24 +309,6 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setUpAutoSave() = with(binding) {
-        subjectTextField.setUpAutoSave()
-        bodyText.setUpAutoSave()
-    }
-
-    private fun EditText.setUpAutoSave() {
-        addTextChangedListener(object : TextWatcher {
-
-            override fun beforeTextChanged(text: CharSequence?, start: Int, count: Int, after: Int) = Unit
-
-            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) = Unit
-
-            override fun afterTextChanged(editable: Editable?) {
-                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
-            }
-        })
-    }
-
     private fun addUnrecognizedMail(fieldType: FieldType): Boolean {
         val input = getInputView(fieldType).text.toString().trim()
         val isEmail = input.isEmail()
@@ -288,8 +319,7 @@ class NewMessageFragment : Fragment() {
                 val contact = UiContact(input)
                 getContacts(fieldType).add(contact)
                 createChip(fieldType, contact)
-
-                newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+                newMessageViewModel.startDraftAutoSave()
             }
         }
 
@@ -298,9 +328,9 @@ class NewMessageFragment : Fragment() {
 
     //region Chips behavior
     private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
-        TO -> newMessageViewModel.newMessageTo
-        CC -> newMessageViewModel.newMessageCc
-        BCC -> newMessageViewModel.newMessageBcc
+        TO -> newMessageViewModel.draftTo
+        CC -> newMessageViewModel.draftCc
+        BCC -> newMessageViewModel.draftBcc
     }
 
     private fun getChipGroup(field: FieldType): ChipGroup = when (field) {
@@ -329,8 +359,7 @@ class NewMessageFragment : Fragment() {
     private fun removeEmail(field: FieldType, contact: UiContact) {
         val index = getContacts(field).indexOfFirst { it.email == contact.email }
         removeEmail(field, index)
-
-        newMessageViewModel.startAutoSave(getFromMailbox().email, getSubject(), getBody())
+        newMessageViewModel.startDraftAutoSave()
     }
 
     private fun removeEmail(field: FieldType, index: Int) {
@@ -346,16 +375,16 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun updateSingleChipText() {
-        newMessageViewModel.newMessageTo.firstOrNull()?.let { binding.singleChip.root.text = it.name ?: it.email }
+        newMessageViewModel.draftTo.firstOrNull()?.let { binding.singleChip.root.text = it.name ?: it.email }
     }
 
     private fun refreshChips() = with(binding) {
         toItemsChipGroup.removeAllViews()
         ccItemsChipGroup.removeAllViews()
         bccItemsChipGroup.removeAllViews()
-        newMessageViewModel.newMessageTo.forEach { createChip(TO, it) }
-        newMessageViewModel.newMessageCc.forEach { createChip(CC, it) }
-        newMessageViewModel.newMessageBcc.forEach { createChip(BCC, it) }
+        newMessageViewModel.draftTo.forEach { createChip(TO, it) }
+        newMessageViewModel.draftCc.forEach { createChip(CC, it) }
+        newMessageViewModel.draftBcc.forEach { createChip(BCC, it) }
     }
 
     private fun createChip(field: FieldType, contact: UiContact) {
@@ -371,7 +400,7 @@ class NewMessageFragment : Fragment() {
     private fun updateChipVisibility() = with(binding) {
         singleChipGroup.isInvisible = !(!isAutocompletionOpened
                 && !newMessageViewModel.areAdvancedFieldsOpened
-                && newMessageViewModel.newMessageTo.isNotEmpty())
+                && newMessageViewModel.draftTo.isNotEmpty())
 
         toItemsChipGroup.isInvisible = !newMessageViewModel.areAdvancedFieldsOpened
 
@@ -381,10 +410,10 @@ class NewMessageFragment : Fragment() {
         //         && !newMessageViewModel.areAdvancedFieldsOpened
 
         plusOthers.isInvisible = !(!isAutocompletionOpened
-                && newMessageViewModel.newMessageTo.count() > 1
+                && newMessageViewModel.draftTo.count() > 1
                 && !newMessageViewModel.areAdvancedFieldsOpened)
 
-        plusOthersChip.root.text = "+${newMessageViewModel.newMessageTo.count() - STICKY_RECIPIENT_COUNT}"
+        plusOthersChip.root.text = "+${newMessageViewModel.draftTo.count() - STICKY_RECIPIENT_COUNT}"
 
         advancedFields.isVisible = newMessageViewModel.areAdvancedFieldsOpened
     }
@@ -434,7 +463,7 @@ class NewMessageFragment : Fragment() {
                 clone(constraintLayout)
                 val topView = when {
                     newMessageViewModel.areAdvancedFieldsOpened -> R.id.toItemsChipGroup
-                    newMessageViewModel.newMessageTo.isEmpty() -> R.id.divider1
+                    newMessageViewModel.draftTo.isEmpty() -> R.id.divider1
                     else -> R.id.singleChipGroup
                 }
                 connect(R.id.toAutocompleteInput, ConstraintSet.TOP, topView, ConstraintSet.BOTTOM, 0)
@@ -452,11 +481,9 @@ class NewMessageFragment : Fragment() {
     }
     //endregion
 
-    fun getFromMailbox(): Mailbox = mailboxes[selectedMailboxIndex]
+    private fun getDraftSubject(): String = binding.subjectTextField.text.toString()
 
-    fun getSubject(): String = binding.subjectTextField.text.toString()
-
-    fun getBody(): String = binding.bodyText.text.toString()
+    private fun getDraftBody(): String = binding.bodyText.text.toString()
 
     enum class FieldType(@StringRes val displayedName: Int) {
         TO(R.string.toTitle),

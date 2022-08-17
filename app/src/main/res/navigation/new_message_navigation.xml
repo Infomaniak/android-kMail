@@ -26,4 +26,5 @@
         android:name="com.infomaniak.mail.ui.main.newmessage.NewMessageFragment"
         android:label="fragment_new_message"
         tools:layout="@layout/fragment_new_message" />
+
 </navigation>
