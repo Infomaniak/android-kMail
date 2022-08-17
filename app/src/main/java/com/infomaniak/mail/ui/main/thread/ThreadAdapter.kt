@@ -162,6 +162,10 @@ class ThreadAdapter(
         ccGroup.isVisible = ccIsNotEmpty
         if (ccIsNotEmpty) ccAdapter.updateList(message.cc.toList())
 
+        val bccIsNotEmpty = !message.bcc.isEmpty()
+        bccGroup.isVisible = bccIsNotEmpty
+        if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
+
         val isDateNotNull = messageDate != null
         detailedMessageDate.isVisible = isDateNotNull
         detailedMessagePrefix.isVisible = isDateNotNull
@@ -319,6 +323,7 @@ class ThreadAdapter(
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
+        val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter(onAttachmentClicked)
 
         init {
@@ -326,6 +331,7 @@ class ThreadAdapter(
                 fromRecyclerView.adapter = fromAdapter
                 toRecyclerView.adapter = toAdapter
                 ccRecyclerView.adapter = ccAdapter
+                bccRecyclerView.adapter = bccAdapter
                 attachmentsRecyclerView.adapter = attachmentAdapter
             }
         }
