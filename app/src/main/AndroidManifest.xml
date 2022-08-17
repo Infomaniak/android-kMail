@@ -68,6 +68,10 @@
             android:theme="@style/WebViewTheme" />
 
         <activity
+            android:name="com.infomaniak.lib.core.bugtracker.BugTrackerActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.MainActivity"
             android:exported="false" />
 

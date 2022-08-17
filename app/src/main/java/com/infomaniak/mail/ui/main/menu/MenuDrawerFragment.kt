@@ -26,6 +26,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.infomaniak.lib.core.bugtracker.BugTrackerActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -125,7 +126,11 @@ class MenuDrawerFragment : Fragment() {
         }
         feedbacks.setOnClickListener {
             closeDrawer()
-            context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
+            if (AccountUtils.currentUser?.isStaff == true) {
+                startActivity(Intent(context, BugTrackerActivity::class.java))
+            } else {
+                context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
+            }
         }
         help.setOnClickListener {
             notYetImplemented()
