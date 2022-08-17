@@ -194,6 +194,7 @@
     </style>
 
     <style name="MenuDrawerItem" parent="Widget.Material3.CardView.Filled">
+        <item name="android:gravity">center</item>
         <item name="android:layout_height">@dimen/menuDrawerItemViewHeight</item>
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
         <item name="android:layout_width">match_parent</item>

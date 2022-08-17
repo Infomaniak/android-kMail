@@ -86,6 +86,7 @@
                         android:id="@+id/settingsOptionDefaultThemeCheck"
                         style="@style/SettingButtonCheck"
                         android:visibility="visible" />
+
                 </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
@@ -106,6 +107,7 @@
                         android:id="@+id/settingsOptionLightThemeCheck"
                         style="@style/SettingButtonCheck"
                         tools:visibility="visible" />
+
                 </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
@@ -126,6 +128,7 @@
                         android:id="@+id/settingsOptionDarkThemeCheck"
                         style="@style/SettingButtonCheck"
                         tools:visibility="visible" />
+
                 </LinearLayout>
 
             </LinearLayout>

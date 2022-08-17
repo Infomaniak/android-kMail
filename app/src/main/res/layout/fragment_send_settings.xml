@@ -15,21 +15,18 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.main.settings.send.SendSettingsFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -50,91 +47,101 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <com.google.android.material.card.MaterialCardView
+        style="@style/BackgroundCardview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:animateLayoutChanges="true"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBar">
+        android:layout_weight="1">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:animateLayoutChanges="true"
+            android:scrollbars="none">
 
             <LinearLayout
-                android:id="@+id/settingsCancellationPeriod"
-                style="@style/MenuDrawerItem">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                <LinearLayout
+                    android:id="@+id/settingsCancellationPeriod"
+                    style="@style/MenuDrawerItem">
 
-                    <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsCancellationPeriodTitle" />
+                    <LinearLayout style="@style/Setting2TextsWithButton">
 
-                    <TextView
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsDisabled" />
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsCancellationPeriodTitle" />
+
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsDisabled" />
+
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
                 </LinearLayout>
 
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+                <LinearLayout
+                    android:id="@+id/settingsTransferEmails"
+                    style="@style/MenuDrawerItem">
 
-            <LinearLayout
-                android:id="@+id/settingsTransferEmails"
-                style="@style/MenuDrawerItem">
+                    <LinearLayout style="@style/Setting2TextsWithButton">
 
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsTransferEmailsTitle" />
 
-                    <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsTransferEmailsTitle" />
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsTransferInBody" />
 
-                    <TextView
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsTransferInBody" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
                 </LinearLayout>
 
-                <ImageView style="@style/SettingButtonChevron" />
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <LinearLayout
+                    android:id="@+id/settingsSendIncludeOriginalMessage"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsSendIncludeOriginalMessage" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsSendIncludeOriginalMessageSwitch"
+                        style="@style/SettingButtonSwitch" />
+
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <LinearLayout
+                    android:id="@+id/settingsSendAcknowledgement"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsSendAcknowledgement" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsSendAcknowledgementSwitch"
+                        style="@style/SettingButtonSwitch" />
+
+                </LinearLayout>
+
             </LinearLayout>
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+        </androidx.core.widget.NestedScrollView>
 
-            <LinearLayout
-                android:id="@+id/settingsSendIncludeOriginalMessage"
-                style="@style/MenuDrawerItem">
+    </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsSendIncludeOriginalMessage" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/settingsSendIncludeOriginalMessageSwitch"
-                    style="@style/SettingButtonSwitch" />
-            </LinearLayout>
-
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-            <LinearLayout
-                android:id="@+id/settingsSendAcknowledgement"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsSendAcknowledgement" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/settingsSendAcknowledgementSwitch"
-                    style="@style/SettingButtonSwitch" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

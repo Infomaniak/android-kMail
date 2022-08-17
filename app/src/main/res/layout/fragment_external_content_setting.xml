@@ -15,21 +15,18 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.main.settings.ExternalContentSettingFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -50,57 +47,62 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <com.google.android.material.card.MaterialCardView
+        style="@style/BackgroundCardview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:animateLayoutChanges="true"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBar">
+        android:layout_weight="1">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsSelectDisplayModeDescription" />
+            android:animateLayoutChanges="true"
+            android:scrollbars="none">
 
             <LinearLayout
-                android:id="@+id/settingsOptionAlways"
-                style="@style/MenuDrawerItem">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsOptionAlways" />
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsSelectDisplayModeDescription" />
 
-                <ImageView
-                    android:id="@+id/settingsOptionAlwaysCheck"
-                    style="@style/SettingButtonCheck"
-                    android:visibility="visible" />
+                <LinearLayout
+                    android:id="@+id/settingsOptionAlways"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsOptionAlways" />
+
+                    <ImageView
+                        android:id="@+id/settingsOptionAlwaysCheck"
+                        style="@style/SettingButtonCheck"
+                        android:visibility="visible" />
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <LinearLayout
+                    android:id="@+id/settingsOptionAskMe"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsOptionAskMe" />
+
+                    <ImageView
+                        android:id="@+id/settingsOptionAskMeCheck"
+                        style="@style/SettingButtonCheck"
+                        tools:visibility="visible" />
+
+                </LinearLayout>
+
             </LinearLayout>
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+        </androidx.core.widget.NestedScrollView>
 
-            <LinearLayout
-                android:id="@+id/settingsOptionAskMe"
-                style="@style/MenuDrawerItem">
+    </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsOptionAskMe" />
-
-                <ImageView
-                    android:id="@+id/settingsOptionAskMeCheck"
-                    style="@style/SettingButtonCheck"
-                    tools:visibility="visible" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -15,21 +15,18 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.main.settings.mailbox.MailboxSettingsFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -51,217 +48,232 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <com.google.android.material.card.MaterialCardView
+        style="@style/BackgroundCardview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:animateLayoutChanges="true"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBar">
+        android:layout_weight="1">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsSectionGeneral" />
+            android:animateLayoutChanges="true"
+            android:scrollbars="none">
 
             <LinearLayout
-                android:id="@+id/settingsMailboxGeneralSignature"
-                style="@style/MenuDrawerItem">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsMailboxGeneralSignature" />
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsSectionGeneral" />
 
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsMailboxGeneralAutoreply"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                <LinearLayout
+                    android:id="@+id/settingsMailboxGeneralSignature"
+                    style="@style/MenuDrawerItem">
 
                     <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsMailboxGeneralAutoreply" />
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsMailboxGeneralSignature" />
 
-                    <TextView
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsDisabled" />
+                    <ImageView style="@style/SettingButtonChevron" />
+
                 </LinearLayout>
 
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/settingsMailboxGeneralAutoreply"
+                    style="@style/MenuDrawerItem">
 
-            <LinearLayout
-                android:id="@+id/settingsMailboxGeneralFolders"
-                style="@style/MenuDrawerItem">
+                    <LinearLayout style="@style/Setting2TextsWithButton">
 
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsMailboxGeneralFolders" />
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsMailboxGeneralAutoreply" />
 
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsDisabled" />
+                    </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/settingsMailboxGeneralNotifications"
-                style="@style/MenuDrawerItem">
+                    <ImageView style="@style/SettingButtonChevron" />
 
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsMailboxGeneralNotifications" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/settingsMailboxGeneralNotificationsSwitch"
-                    style="@style/SettingButtonSwitch" />
-            </LinearLayout>
-
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsInboxType" />
-
-            <LinearLayout
-                android:id="@+id/settingsInboxType"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
-
-                    <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsInboxType" />
-
-                    <TextView
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsDefault" />
                 </LinearLayout>
 
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsInboxRules"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsInboxRules" />
-
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsInboxRedirect"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsInboxRedirect" />
-
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsInboxAlias"
-                style="@style/MenuDrawerItem">
-
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/settingsInboxAlias" />
-
-                <ImageView style="@style/SettingButtonChevron" />
-            </LinearLayout>
-
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsSectionSecurity" />
-
-            <LinearLayout
-                android:id="@+id/settingsSecurityAdsFilter"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                <LinearLayout
+                    android:id="@+id/settingsMailboxGeneralFolders"
+                    style="@style/MenuDrawerItem">
 
                     <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsSecurityAdsFilter" />
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsMailboxGeneralFolders" />
 
-                    <TextView
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsDisabled" />
+                    <ImageView style="@style/SettingButtonChevron" />
+
                 </LinearLayout>
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/settingsSecurityAdsFilterSwitch"
-                    style="@style/SettingButtonSwitch" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsSecuritySpamFilter"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                <LinearLayout
+                    android:id="@+id/settingsMailboxGeneralNotifications"
+                    style="@style/MenuDrawerItem">
 
                     <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsSecuritySpamFilter" />
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsMailboxGeneralNotifications" />
 
-                    <TextView
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsDisabled" />
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsMailboxGeneralNotificationsSwitch"
+                        style="@style/SettingButtonSwitch" />
+
                 </LinearLayout>
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/settingsSecuritySpamFilterSwitch"
-                    style="@style/SettingButtonSwitch" />
-            </LinearLayout>
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
-            <LinearLayout
-                android:id="@+id/settingsSecurityBlockedRecipients"
-                style="@style/MenuDrawerItem">
+                <TextView
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsInboxType" />
 
-                <LinearLayout style="@style/Setting2TextsWithButton">
+                <LinearLayout
+                    android:id="@+id/settingsInboxType"
+                    style="@style/MenuDrawerItem">
 
-                    <TextView
-                        style="@style/SettingText1Of2WithButton"
-                        android:text="@string/settingsSecurityBlockedRecipients" />
+                    <LinearLayout style="@style/Setting2TextsWithButton">
 
-                    <TextView
-                        style="@style/SettingText2Of2WithButton"
-                        android:text="@string/settingsSecurityBlockedRecipients" />
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsInboxType" />
+
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsDefault" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
                 </LinearLayout>
 
-                <ImageView style="@style/SettingButtonChevron" />
+                <LinearLayout
+                    android:id="@+id/settingsInboxRules"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsInboxRules" />
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsInboxRedirect"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsInboxRedirect" />
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsInboxAlias"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsInboxAlias" />
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <TextView
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsSectionSecurity" />
+
+                <LinearLayout
+                    android:id="@+id/settingsSecurityAdsFilter"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsSecurityAdsFilter" />
+
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsDisabled" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsSecurityAdsFilterSwitch"
+                        style="@style/SettingButtonSwitch" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsSecuritySpamFilter"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsSecuritySpamFilter" />
+
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsDisabled" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsSecuritySpamFilterSwitch"
+                        style="@style/SettingButtonSwitch" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsSecurityBlockedRecipients"
+                    style="@style/MenuDrawerItem">
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsSecurityBlockedRecipients" />
+
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsSecurityBlockedRecipients" />
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <TextView
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsSectionPrivacy" />
+
+                <TextView
+                    android:id="@+id/settingsPrivacyDeleteSearchHistory"
+                    style="@style/SettingText"
+                    android:text="@string/settingsPrivacyDeleteSearchHistory" />
+
+                <TextView
+                    android:id="@+id/settingsPrivacyViewLogs"
+                    style="@style/SettingText"
+                    android:text="@string/settingsPrivacyViewLogs" />
+
             </LinearLayout>
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+        </androidx.core.widget.NestedScrollView>
 
-            <TextView
-                style="@style/SettingHeader"
-                android:text="@string/settingsSectionPrivacy" />
+    </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:id="@+id/settingsPrivacyDeleteSearchHistory"
-                style="@style/SettingText"
-                android:text="@string/settingsPrivacyDeleteSearchHistory" />
-
-            <TextView
-                android:id="@+id/settingsPrivacyViewLogs"
-                style="@style/SettingText"
-                android:text="@string/settingsPrivacyViewLogs" />
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
