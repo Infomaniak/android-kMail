@@ -136,20 +136,19 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="true">
 
-                <androidx.recyclerview.widget.RecyclerView
+                <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
                     android:id="@+id/threadsList"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/backgroundColor"
                     android:clipToPadding="false"
                     android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                     android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:behind_swiped_item_custom_layout="@layout/view_behind_swipe_delete"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:listitem="@layout/cardview_thread_item"
                     tools:visibility="visible" />
 
                 <ImageView

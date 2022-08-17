@@ -36,14 +36,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.imageLoader
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.setPagination
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
@@ -107,7 +113,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupAdapter() {
-        binding.threadsList.adapter = threadListAdapter
+        binding.threadsList.apply {
+            adapter = threadListAdapter
+            layoutManager = LinearLayoutManager(context)
+            orientation = DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
+            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.UP)
+            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.DOWN)
+            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
+            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
+        }
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
             // TODO: Manage no Internet screen
@@ -149,23 +163,59 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
         }
 
-        threadsList.setPagination(
-            whenLoadMoreIsPossible = { if (mainViewModel.isDownloadingChanges.value == false) downloadThreads() },
-            triggerOffset = offsetTrigger,
-        )
+        threadsList.scrollListener = object : OnListScrollListener {
+            override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
 
-        threadsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 || dy <= 0) {
-                    newMessageFab.extend()
-                } else {
-                    newMessageFab.shrink()
-                }
-
-                super.onScrolled(recyclerView, dx, dy)
+            override fun onListScrolled(scrollDirection: ScrollDirection, distance: Int) {
+                val layoutManager = threadsList.layoutManager as LinearLayoutManager
+                handlePagination(
+                    layoutManager,
+                    scrollDirection,
+                    whenLoadMoreIsPossible = { if (mainViewModel.isDownloadingChanges.value == false) downloadThreads() },
+                    triggerOffset = offsetTrigger,
+                )
+                extendCollapseFab(layoutManager, scrollDirection)
             }
-        })
+        }
+
+        threadsList.swipeListener = object : OnItemSwipeListener<Any> {
+            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Any): Boolean {
+                if (direction == SwipeDirection.LEFT_TO_RIGHT) {
+                    // TODO : Toggle between seen and unseen
+                    ThreadController.markAsSeen(item as Thread)
+                } else if (direction == SwipeDirection.RIGHT_TO_LEFT) {
+                    // TODO : Delete thread
+                    notYetImplemented()
+                }
+                return true
+            }
+        }
+    }
+
+    fun handlePagination(
+        layoutManager: LinearLayoutManager,
+        scrollDirection: ScrollDirection,
+        whenLoadMoreIsPossible: () -> Unit,
+        triggerOffset: Int = 3
+    ) = with(layoutManager) {
+        if (scrollDirection == ScrollDirection.DOWN) {
+            val visibleItemCount = childCount
+            val totalItemCount = itemCount
+            val pastVisibleItems = findFirstVisibleItemPosition().plus(triggerOffset)
+            val isLastElement = (visibleItemCount + pastVisibleItems) >= totalItemCount
+            if (isLastElement) whenLoadMoreIsPossible()
+        }
+    }
+
+    private fun FragmentThreadListBinding.extendCollapseFab(
+        layoutManager: LinearLayoutManager,
+        scrollDirection: ScrollDirection
+    ) {
+        if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 || scrollDirection == ScrollDirection.UP) {
+            newMessageFab.extend()
+        } else {
+            newMessageFab.shrink()
+        }
     }
 
     private fun setupUserAvatar() {

@@ -54,6 +54,7 @@ dependencies {
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
     // Realm Kotlin - END /!\
 
+    implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'com.tbuonomo:dotsindicator:4.3'
 

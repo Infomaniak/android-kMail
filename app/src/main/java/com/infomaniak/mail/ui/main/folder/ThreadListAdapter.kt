@@ -18,18 +18,22 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
+import android.graphics.Canvas
+import android.text.format.DateUtils.DAY_IN_MILLIS
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
+import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.infomaniak.lib.core.utils.startOfTheDay
 import com.infomaniak.lib.core.utils.startOfTheWeek
-import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
@@ -37,15 +41,13 @@ import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.isValid
 import java.util.*
+import kotlin.math.abs
 
-// TODO: Use LoaderAdapter from Core instead?
-class ThreadListAdapter(
-    private var items: MutableList<Any> = mutableListOf(),
-) : RecyclerView.Adapter<ViewHolder>() {
+class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
+    DragDropSwipeAdapter<Any, ThreadListAdapter.ThreadViewHolder>(dataSet) {
 
     @StringRes
     var previousSectionName: Int = -1
@@ -54,15 +56,13 @@ class ThreadListAdapter(
     var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
-    override fun getItemCount(): Int = items.size
-
     override fun getItemViewType(position: Int): Int = when {
-        items[position] is String -> DisplayType.DATE_SEPARATOR.layout
+        dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
         displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
         else -> DisplayType.THREAD.layout
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
@@ -70,44 +70,23 @@ class ThreadListAdapter(
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
 
-        return BindingViewHolder(binding)
+        return ThreadViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val viewHolder = holder as BindingViewHolder<*>
+    override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding!!) {
         when (getItemViewType(position)) {
-            DisplayType.DATE_SEPARATOR.layout -> {
-                (viewHolder.binding as ItemThreadDateSeparatorBinding).displayDateSeparator(position)
-            }
-            DisplayType.SEE_ALL_BUTTON.layout -> {
-                (viewHolder.binding as ItemThreadSeeAllButtonBinding).displaySeeAllButton()
-            }
-            DisplayType.THREAD.layout -> {
-                (viewHolder.binding as CardviewThreadItemBinding).displayThread(position)
-            }
+            DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
+            DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
+            DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
         }
     }
 
-    private fun ItemThreadDateSeparatorBinding.displayDateSeparator(position: Int) {
-        sectionTitle.apply {
-            text = items[position] as String
-            setTextAppearance(R.style.Callout)
-            setTextColor(context.getColor(R.color.sectionHeaderTextColor))
-        }
-    }
-
-    private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton() {
-        // TODO: Implement when we have intelligent mailbox
-        // val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
-        // seeAllText.text = "See all $threadsNumber"
-    }
-
-    private fun CardviewThreadItemBinding.displayThread(position: Int) = with(items[position] as Thread) {
+    private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
         if (!isValid()) return // TODO: remove this when realm management will be refactored and stable
 
         fillInUserNameAndEmail(from.first(), expeditor)
-        mailSubject.text = subject.getFormattedThreadSubject(context)
-        mailBodyPreview.text = messages.last().preview.ifBlank { context.getString(R.string.noBodyTitle) }
+        mailSubject.text = subject.getFormattedThreadSubject(root.context)
+        mailBodyPreview.text = messages.last().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
 
         mailDate.text = displayedDate
 
@@ -117,7 +96,9 @@ class ThreadListAdapter(
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
-        root.setOnClickListener { onThreadClicked?.invoke(this) }
+        root.setOnClickListener {
+            onThreadClicked?.invoke(this@with)
+        }
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
@@ -125,8 +106,8 @@ class ThreadListAdapter(
         expeditor.setTextAppearance(R.style.H2_Secondary)
         mailSubject.setTextAppearance(R.style.Body_Secondary)
         mailDate.setTextAppearance(R.style.Callout_Secondary)
-        iconAttachment.setDrawableColor(context, R.color.secondaryTextColor)
-        iconCalendar.setDrawableColor(context, R.color.secondaryTextColor)
+        iconAttachment.setDrawableColor(root.context, R.color.secondaryTextColor)
+        iconCalendar.setDrawableColor(root.context, R.color.secondaryTextColor)
     }
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
@@ -134,8 +115,52 @@ class ThreadListAdapter(
         expeditor.setTextAppearance(R.style.H2)
         mailSubject.setTextAppearance(R.style.H3)
         mailDate.setTextAppearance(R.style.Callout_Strong)
-        iconAttachment.setDrawableColor(context, R.color.primaryTextColor)
-        iconCalendar.setDrawableColor(context, R.color.primaryTextColor)
+        iconAttachment.setDrawableColor(root.context, R.color.primaryTextColor)
+        iconCalendar.setDrawableColor(root.context, R.color.primaryTextColor)
+    }
+
+    private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
+
+    private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
+        sectionTitle.apply {
+            text = title
+            setTextAppearance(R.style.Callout)
+            setTextColor(context.getColor(R.color.sectionHeaderTextColor))
+        }
+    }
+
+    private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {
+        // TODO: Implement when we have intelligent mailbox
+        // val threadsNumber = itemsList.size - NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER
+        // seeAllText.text = "See all $threadsNumber"
+    }
+
+    override fun getBehindSwipedItemSecondaryLayoutId(item: Any, viewHolder: ThreadViewHolder, position: Int): Int? {
+        return when (getItemViewType(position)) {
+            DisplayType.THREAD.layout -> if ((item as Thread).unseenMessagesCount > 0) R.layout.view_behind_swipe_read else R.layout.view_behind_swipe_unread
+            else -> null
+        }
+    }
+
+    override fun getViewHolder(itemView: View): ThreadViewHolder = ThreadViewHolder(null)
+
+    override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadViewHolder, position: Int): View? {
+        return when (getItemViewType(position)) {
+            DisplayType.THREAD.layout -> (viewHolder.binding as CardviewThreadItemBinding).goneHandle
+            else -> null
+        }
+    }
+
+    override fun canBeSwiped(item: Any, viewHolder: ThreadViewHolder, position: Int): Boolean {
+        return getItemViewType(position) == DisplayType.THREAD.layout
+    }
+
+    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any> {
+        return ThreadListDiffCallback(oldList, newList)
+    }
+
+    fun notifyAdapter(newList: MutableList<Any>) {
+        dataSet = newList
     }
 
     fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
@@ -166,13 +191,6 @@ class ThreadListAdapter(
         }
     }
 
-    private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
-
-    fun notifyAdapter(newList: MutableList<Any>) {
-        DiffUtil.calculateDiff(ThreadListDiffCallback(items, newList)).dispatchUpdatesTo(this)
-        items = newList
-    }
-
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
@@ -182,35 +200,26 @@ class ThreadListAdapter(
     private enum class DateFilter(val start: () -> Long, @StringRes val value: Int) {
         TODAY({ Date().startOfTheDay().time }, R.string.threadListSectionToday),
         CURRENT_WEEK({ Date().startOfTheWeek().time }, R.string.threadListSectionThisWeek),
-        LAST_WEEK({ Date().startOfTheWeek().time - DAY_LENGTH_MS * 7 }, R.string.threadListSectionLastWeek),
-        TWO_WEEKS({ Date().startOfTheWeek().time - DAY_LENGTH_MS * 14 }, R.string.threadListSectionTwoWeeks),
+        LAST_WEEK(
+            { Date().startOfTheWeek().time - DAY_IN_MILLIS * 7 },
+            R.string.threadListSectionLastWeek
+        ),
+        TWO_WEEKS(
+            { Date().startOfTheWeek().time - DAY_IN_MILLIS * 14 },
+            R.string.threadListSectionTwoWeeks
+        ),
     }
 
     private class ThreadListDiffCallback(
         private val oldList: List<Any>,
         private val newList: List<Any>,
-    ) : DiffUtil.Callback() {
+    ) : DragDropSwipeDiffCallback<Any>(oldList, newList) {
 
         override fun getOldListSize(): Int = oldList.size
 
         override fun getNewListSize(): Int = newList.size
 
-        override fun areItemsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            val oldItem = oldList[oldIndex]
-            val newItem = newList[newIndex]
-
-            return when {
-                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
-                oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
-                oldItem.isValid() && newItem.isValid() -> oldItem.uid == newItem.uid // Both are valid
-                else -> false
-            }
-        }
-
-        override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            val oldItem = oldList[oldIndex]
-            val newItem = newList[newIndex]
-
+        override fun isSameContent(oldItem: Any, newItem: Any): Boolean {
             return when {
                 oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
                 oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
@@ -228,10 +237,18 @@ class ThreadListAdapter(
                 }
             }
         }
+
+        override fun isSameItem(oldItem: Any, newItem: Any): Boolean {
+            return when {
+                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
+                oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
+                oldItem.isValid() && newItem.isValid() -> oldItem.uid == newItem.uid // Both are valid
+                else -> false
+            }
+        }
     }
 
-    private companion object {
-        const val NUMBER_OF_DISPLAYED_MAILS_OF_FOLDER = 3
-        const val DAY_LENGTH_MS = 1_000 * 3_600 * 24
+    class ThreadViewHolder(val binding: ViewBinding?) : DragDropSwipeAdapter.ViewHolder(binding!!.root) {
+        var isSwippedOverHalf = false
     }
 }

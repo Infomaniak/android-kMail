@@ -18,9 +18,17 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/threadCard"
     style="@style/CardViewMail"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
+    <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
+    <View
+        android:id="@+id/goneHandle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
