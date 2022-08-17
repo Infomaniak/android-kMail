@@ -21,14 +21,12 @@
     android:viewportWidth="22"
     android:viewportHeight="22">
     <path
-        android:fillColor="#00000000"
         android:pathData="M21,1L1,21"
         android:strokeWidth="1.3"
         android:strokeColor="@color/iconColor"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
     <path
-        android:fillColor="#00000000"
         android:pathData="M1,1L21,21"
         android:strokeWidth="1.3"
         android:strokeColor="@color/iconColor"
