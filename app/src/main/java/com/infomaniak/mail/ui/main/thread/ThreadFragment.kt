@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -98,7 +99,9 @@ class ThreadFragment : Fragment() {
             messagesList.addItemDecoration(DividerItemDecorator(divider))
         }
 
-        toolbar.title = navigationArgs.threadSubject
+        // There is a space character at the end of the noSubjectTitle string because when displaying it in a MaterialToolbar
+        // (ThreadFragment) as the title, the last italic character is cut off. Adding an extra space character solves this issue.
+        toolbar.title = TextUtils.concat(navigationArgs.threadSubject.getFormattedThreadSubject(context), " ")
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
