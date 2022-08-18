@@ -124,11 +124,9 @@ object ThreadController {
             RealmController.mailboxContent.writeBlocking {
                 val latestThread = getLatestThreadSync(thread.uid) ?: return@writeBlocking
 
-                var nbUnseenMessages = 0
                 val uids = mutableListOf<String>().apply {
                     latestThread.messages.forEach {
                         if (!it.seen) {
-                            nbUnseenMessages++
                             add(it.uid)
                             addAll(it.duplicates.map { duplicate -> duplicate.uid })
                         }
