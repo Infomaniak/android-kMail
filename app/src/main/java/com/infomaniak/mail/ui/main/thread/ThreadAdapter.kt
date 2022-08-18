@@ -150,7 +150,8 @@ class ThreadAdapter(
             val isExpanded = message.detailsAreExpanded
             recipientChevron.toggleChevron(!isExpanded)
             detailedFieldsGroup.isVisible = isExpanded
-            ccGroup.isVisible = isExpanded && !message.cc.isEmpty()
+            ccGroup.isVisible = isExpanded && message.cc.isNotEmpty()
+            bccGroup.isVisible = isExpanded && message.bcc.isNotEmpty()
         }
     }
 
@@ -218,6 +219,7 @@ class ThreadAdapter(
     private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
         message.detailsAreExpanded = false
         ccGroup.isGone = true
+        bccGroup.isGone = true
         detailedFieldsGroup.isGone = true
         recipientChevron.rotation = 0f
     }
