@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getLatestDraftSync
 import com.infomaniak.mail.data.models.message.Message
@@ -77,17 +78,23 @@ object MessageController {
         }
     }
 
-    fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.forEach { deleteLatestMessage(it.uid) }
+    fun MutableRealm.deleteMessages(messages: List<Message>, mailboxUuid: String? = null) {
+        messages.forEach { deleteLatestMessage(it.uid, mailboxUuid) }
     }
 
     fun deleteMessage(uid: String) {
         RealmController.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
     }
 
-    fun MutableRealm.deleteLatestMessage(uid: String) {
+    fun MutableRealm.deleteLatestMessage(uid: String, mailboxUuid: String? = null) {
         getLatestMessageSync(uid)?.also { message ->
-            message.draftUuid?.let { getLatestDraftSync(it) }?.let(::delete)
+            message.draftUuid?.let { draftUuid ->
+                if (mailboxUuid?.let { ApiRepository.getDraft(it, draftUuid).isSuccess() } == true) {
+                    null
+                } else {
+                    getLatestDraftSync(draftUuid)
+                }
+            }?.let(::delete)
         }?.let(::delete)
     }
 

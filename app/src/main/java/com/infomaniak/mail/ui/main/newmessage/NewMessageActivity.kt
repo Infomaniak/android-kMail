@@ -28,6 +28,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.models.drafts.Draft
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.ThemedActivity
@@ -84,7 +85,9 @@ class NewMessageActivity : ThemedActivity() {
     private fun toolbarOnMenuItemClickListener() {
         binding.toolbar.setOnMenuItemClickListener(null)
         newMessageViewModel.sendDraft { isSuccess ->
-            if (isSuccess) finish() else {
+            if (isSuccess) {
+                updateThreadThenLeave()
+            } else {
                 binding.toolbar.setOnMenuItemClickListener {
                     toolbarOnMenuItemClickListener()
                     true
@@ -152,7 +155,7 @@ class NewMessageActivity : ThemedActivity() {
             if (!isSuccess && newMessageViewModel.isNewMessage) {
                 newMessageViewModel.currentDraftUuid.value?.let(DraftController::deleteDraft)
             }
-            finish()
+            updateThreadThenLeave()
         }
     }
 
@@ -162,6 +165,11 @@ class NewMessageActivity : ThemedActivity() {
             newMessageViewModel.isEditorExpanded = false
             binding.updateEditorVisibility(false)
         }
+    }
+
+    private fun updateThreadThenLeave() {
+        mainViewModel.forceRefreshThreads(ThreadFilter.ALL)
+        finish()
     }
 
     enum class EditorAction {

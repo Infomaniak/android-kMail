@@ -105,7 +105,7 @@ object ThreadController {
 
             // Delete outdated data
             Log.d(RealmController.TAG, "Threads: Delete outdated data")
-            deleteMessages(deletableMessages)
+            deleteMessages(deletableMessages, mailboxUuid)
             deleteThreads(deletableThreads)
         }
 

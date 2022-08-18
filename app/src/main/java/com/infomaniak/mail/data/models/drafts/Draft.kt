@@ -102,6 +102,6 @@ class Draft : RealmObject {
     }
 
     companion object {
-        private const val OFFLINE_DRAFT_UUID_PREFIX = "offline"
+        const val OFFLINE_DRAFT_UUID_PREFIX = "local"
     }
 }
