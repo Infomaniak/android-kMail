@@ -28,7 +28,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -49,7 +51,6 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.main.MainActivity
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.*
-import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
 import java.util.*
@@ -65,6 +66,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var updatedAtRefreshJob: Job? = null
 
     private var threadListAdapter = ThreadListAdapter()
+    var lastUpdatedDate: Date? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(
@@ -195,7 +197,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun listenToCurrentFolder() {
         MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
 
-            startPeriodicUpdatedAtRefreshJob(folderId)
+            lastUpdatedDate = null
+            updateUpdatedAt()
 
             folderJob?.cancel()
             folderJob = lifecycleScope.launch(Dispatchers.IO) {
@@ -204,12 +207,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     withContext(Dispatchers.Main) {
                         displayFolderName(folder)
                         listenToThreads(folder)
+                        updateUpdatedAt(folder.lastUpdatedAt?.toDate())
                     }
                 }
 
                 FolderController.getFolderAsync(folderId).collect {
-                    startPeriodicUpdatedAtRefreshJob(folderId)
+                    startPeriodicUpdatedAtRefreshJob()
                     withContext(Dispatchers.Main) {
+                        updateUpdatedAt(it.obj?.lastUpdatedAt?.toDate())
                         resetForFurtherThreadsLoading()
                         it.obj?.unreadCount?.let(::updateUnreadCount)
                     }
@@ -224,13 +229,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onDestroyView()
     }
 
-    private fun startPeriodicUpdatedAtRefreshJob(folderId: String) {
+    private fun startPeriodicUpdatedAtRefreshJob() {
         updatedAtRefreshJob?.cancel()
         updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
-            while (true) {
-                val lastUpdatedAt = FolderController.getFolderSync(folderId)?.lastUpdatedAt
-                withContext(Dispatchers.Main) { updateUpdatedAt(lastUpdatedAt) }
-                delay(DateUtils.MINUTE_IN_MILLIS)
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                while (true) {
+                    delay(DateUtils.MINUTE_IN_MILLIS)
+                    withContext(Dispatchers.Main) { updateUpdatedAt() }
+                }
             }
         }
     }
@@ -241,19 +247,22 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun updateUpdatedAt(lastUpdatedAt: RealmInstant?) {
-        val lastUpdatedDate = lastUpdatedAt?.toDate()
+    private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
+        newLastUpdatedDate?.let { lastUpdatedDate = it }
         val ago = when {
             lastUpdatedDate == null -> ""
-            Date().time - lastUpdatedDate.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
-            else -> DateUtils.getRelativeTimeSpanString(lastUpdatedDate.time).toString()
+            Date().time - lastUpdatedDate!!.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
+            else -> DateUtils.getRelativeTimeSpanString(lastUpdatedDate!!.time).toString()
                 .replaceFirstChar { it.lowercaseChar() }
         }
 
-        binding.updatedAt.text = if (ago.isEmpty()) {
-            getString(R.string.noNetworkDescription)
-        } else {
-            getString(R.string.threadListHeaderLastUpdate, ago)
+        binding.updatedAt.apply {
+            if (ago.isEmpty()) {
+                isGone = true
+            } else {
+                text = getString(R.string.threadListHeaderLastUpdate, ago)
+                isVisible = true
+            }
         }
     }
 
