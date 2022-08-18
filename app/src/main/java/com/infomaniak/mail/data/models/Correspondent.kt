@@ -27,9 +27,7 @@ interface Correspondent {
 
     fun isMe(): Boolean = AccountUtils.currentUser?.email == this.email
 
-    fun getNameOrEmail() = name.ifBlank { email }
+    fun getNameOrEmail(): String = name.ifBlank { email }
 
-    fun displayedName(context: Context): String {
-        return if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
-    }
+    fun displayedName(context: Context): String = if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
 }
