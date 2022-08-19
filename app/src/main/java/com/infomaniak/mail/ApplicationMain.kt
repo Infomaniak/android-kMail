@@ -151,10 +151,11 @@ class ApplicationMain : Application(), ImageLoaderFactory {
             .okHttpClient {
                 OkHttpClient.Builder().apply {
                     addInterceptor(Interceptor { chain ->
-                        with(chain.request()) {
-                            val request = newBuilder().headers(HttpUtils.getHeaders()).removeHeader("Cache-Control").build()
-                            chain.proceed(request)
-                        }
+                        chain.request().newBuilder().headers(HttpUtils.getHeaders())
+                            .removeHeader("Cache-Control")
+                            .removeHeader("Authorization")
+                            .build()
+                            .let(chain::proceed)
                     })
                     if (com.infomaniak.lib.core.BuildConfig.DEBUG) {
                         addNetworkInterceptor(StethoInterceptor())
