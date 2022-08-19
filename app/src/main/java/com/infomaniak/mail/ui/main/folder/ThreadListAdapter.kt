@@ -94,6 +94,9 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
         iconFavorite.isVisible = isFavorite
 
+        threadCount.text = messagesCount.toString()
+        threadCountCardview.isVisible = messages.count() > 1
+
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
         root.setOnClickListener {
