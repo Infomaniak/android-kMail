@@ -23,7 +23,7 @@
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/marginStandardMedium"
     android:paddingBottom="@dimen/marginStandardMedium"
-    tools:context=".ui.main.thread.MessageActionsBottomSheetDialog">
+    tools:context=".ui.main.thread.actions.MessageActionsBottomSheetDialog">
 
     <include layout="@layout/view_bottom_sheet_separator" />
 

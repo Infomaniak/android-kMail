@@ -27,11 +27,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="@dimen/marginStandardMedium"
-        tools:context=".ui.main.thread.MessageActionsBottomSheetDialog">
+        tools:context=".ui.main.thread.actions.MessageActionsBottomSheetDialog">
 
         <include layout="@layout/view_bottom_sheet_separator" />
 
-        <com.infomaniak.mail.ui.main.thread.MainActionsView
+        <com.infomaniak.mail.ui.main.thread.actions.MainActionsView
             android:id="@+id/mainActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

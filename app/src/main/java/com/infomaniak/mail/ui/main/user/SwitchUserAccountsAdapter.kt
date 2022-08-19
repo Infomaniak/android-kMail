@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu.user
+package com.infomaniak.mail.ui.main.user
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -29,7 +29,7 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
-import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
+import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toggleChevron
 

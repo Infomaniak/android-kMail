@@ -68,11 +68,11 @@
             android:theme="@style/WebViewTheme" />
 
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.main.newmessage.NewMessageActivity"
+            android:name=".ui.main.newMessage.NewMessageActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
 

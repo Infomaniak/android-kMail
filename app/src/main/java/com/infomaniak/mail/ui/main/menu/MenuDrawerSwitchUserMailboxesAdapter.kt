@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu.user
+package com.infomaniak.mail.ui.main.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxMenuDrawerBinding
-import com.infomaniak.mail.ui.main.menu.user.MenuDrawerSwitchUserMailboxesAdapter.MenuDrawerSwitchUserMailboxViewHolder
+import com.infomaniak.mail.ui.main.menu.MenuDrawerSwitchUserMailboxesAdapter.MenuDrawerSwitchUserMailboxViewHolder
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 
 class MenuDrawerSwitchUserMailboxesAdapter(

@@ -15,19 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newmessage
+package com.infomaniak.mail.ui.main.menu
 
-import com.infomaniak.mail.data.models.Correspondent
-import com.infomaniak.mail.data.models.Recipient
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
+import com.infomaniak.mail.R
 
-data class UiContact(
-    val email: String,
-    val name: String? = null,
-) {
-    fun toCorrespondent(): Correspondent {
-        return Recipient().apply {
-            name = this@UiContact.name ?: ""
-            email = this@UiContact.email
-        }
+class NewFolderDialog : DialogFragment() {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.dialog_new_folder, container, false)
     }
 }

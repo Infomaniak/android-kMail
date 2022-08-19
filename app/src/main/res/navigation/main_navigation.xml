@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/threadListFragment"
-        android:name="com.infomaniak.mail.ui.main.thread.ThreadListFragment"
+        android:name="com.infomaniak.mail.ui.main.folder.ThreadListFragment"
         android:label="ThreadListFragment"
         tools:layout="@layout/fragment_thread_list">
         <action
@@ -60,19 +60,19 @@
 
     <dialog
         android:id="@+id/newFolderDialog"
-        android:name="com.infomaniak.mail.ui.main.NewFolderDialog"
+        android:name="com.infomaniak.mail.ui.main.menu.NewFolderDialog"
         android:label="NewFolderDialog"
         tools:layout="@layout/dialog_new_folder" />
 
     <activity
         android:id="@+id/newMessageActivity"
-        android:name="com.infomaniak.mail.ui.main.newmessage.NewMessageActivity"
+        android:name="com.infomaniak.mail.ui.main.newMessage.NewMessageActivity"
         android:label="NewMessageActivity"
         tools:layout="@layout/activity_new_message" />
 
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.infomaniak.mail.ui.main.SearchFragment"
+        android:name="com.infomaniak.mail.ui.main.search.SearchFragment"
         android:label="SearchFragment"
         tools:layout="@layout/fragment_search">
         <action
@@ -118,7 +118,7 @@
 
     <fragment
         android:id="@+id/switchUserFragment"
-        android:name="com.infomaniak.mail.ui.main.menu.user.SwitchUserFragment"
+        android:name="com.infomaniak.mail.ui.main.user.SwitchUserFragment"
         android:label="SwitchUSerFragment"
         tools:layout="@layout/fragment_switch_user" />
 
@@ -134,7 +134,7 @@
 
     <dialog
         android:id="@+id/messageActionBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.thread.MessageActionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.MessageActionsBottomSheetDialog"
         android:label="MessageActionBottomSheetDialog"
         tools:layout="@layout/fragment_bottom_sheet_message_actions">
         <argument
@@ -147,7 +147,7 @@
 
     <dialog
         android:id="@+id/threadActionsBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.thread.ThreadActionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.ThreadActionsBottomSheetDialog"
         android:label="ThreadActionsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_actions_menu">
         <argument
@@ -160,7 +160,7 @@
 
     <dialog
         android:id="@+id/replyBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialog"
         android:label="ReplyBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_reply" />
 
@@ -174,7 +174,7 @@
         android:id="@+id/manageMailAddressFragment"
         android:name="com.infomaniak.mail.ui.main.menu.ManageMailAddressFragment"
         android:label="ManageMailAddressFragment"
-        tools:layout="@layout/fragment_manager_mail_address" />
+        tools:layout="@layout/fragment_manage_mail_address" />
 
     <fragment
         android:id="@+id/settingsFragment"
@@ -297,7 +297,7 @@
 
     <activity
         android:id="@+id/mainActivity"
-        android:name="com.infomaniak.mail.ui.main.MainActivity"
+        android:name="com.infomaniak.mail.ui.MainActivity"
         android:label="MainActivity"
         tools:layout="@layout/activity_main" />
 

@@ -15,36 +15,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread
+package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isGone
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.notYetImplemented
 
-class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
+class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
-    private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
+    private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        setMarkAsReadUi(navigationArgs.isSeen)
+        setMarkAsReadUi(navigationArgs.unseenMessagesCount == 0)
         setFavoriteUi(navigationArgs.isFavorite)
         setSpamUi()
+
+        postpone.isGone = true
+        blockSender.isGone = true
+        phishing.isGone = true
+        rule.isGone = true
 
         archive.setClosingOnClickListener { notYetImplemented() }
         markAsRead.setClosingOnClickListener { notYetImplemented() }
         move.setClosingOnClickListener { notYetImplemented() }
-        postpone.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { notYetImplemented() }
         spam.setClosingOnClickListener { notYetImplemented() }
-        blockSender.setClosingOnClickListener { notYetImplemented() }
-        phishing.setClosingOnClickListener { notYetImplemented() }
         print.setClosingOnClickListener { notYetImplemented() }
         saveAsPdf.setClosingOnClickListener { notYetImplemented() }
-        rule.setClosingOnClickListener { notYetImplemented() }
         reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
         mainActions.setClosingOnClickListener { id: Int ->

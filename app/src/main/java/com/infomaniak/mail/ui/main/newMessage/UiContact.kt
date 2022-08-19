@@ -15,22 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main
+package com.infomaniak.mail.ui.main.newMessage
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Correspondent
+import com.infomaniak.mail.data.models.Recipient
 
-open class ThemedActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        val isPink = false
-
-        val theme = when {
-            isPink -> R.style.AppTheme_Pink
-            else -> R.style.AppTheme_Blue
+data class UiContact(
+    val email: String,
+    val name: String? = null,
+) {
+    fun toCorrespondent(): Correspondent {
+        return Recipient().apply {
+            name = this@UiContact.name ?: ""
+            email = this@UiContact.email
         }
-        setTheme(theme)
-
-        super.onCreate(savedInstanceState)
     }
 }

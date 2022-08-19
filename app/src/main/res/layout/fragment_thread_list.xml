@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundHeaderColor"
-    tools:context=".ui.main.thread.ThreadListFragment">
+    tools:context=".ui.main.folder.ThreadListFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
