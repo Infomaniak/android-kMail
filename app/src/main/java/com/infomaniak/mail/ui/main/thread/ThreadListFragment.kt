@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -186,6 +187,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
     }
 
+    override fun onDestroyView() {
+        MainViewModel.currentFolderId.removeObservers(this)
+        MainViewModel.currentMailboxObjectId.removeObservers(this)
+        super.onDestroyView()
+    }
+
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
             lifecycleScope.launch(Dispatchers.IO) {
@@ -215,18 +222,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     startPeriodicUpdatedAtRefreshJob()
                     withContext(Dispatchers.Main) {
                         updateUpdatedAt(it.obj?.lastUpdatedAt?.toDate())
-                        resetForFurtherThreadsLoading()
                         it.obj?.unreadCount?.let(::updateUnreadCount)
+                        resetForFurtherThreadsLoading()
                     }
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        MainViewModel.currentFolderId.removeObservers(this)
-        MainViewModel.currentMailboxObjectId.removeObservers(this)
-        super.onDestroyView()
     }
 
     private fun startPeriodicUpdatedAtRefreshJob() {
@@ -241,28 +242,26 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun displayFolderName(folder: Folder) {
-        val folderName = folder.getLocalizedName(binding.context)
-        Log.i("UI", "Received folder name (${folderName})")
-        binding.toolbar.title = folderName
-    }
-
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
+
         newLastUpdatedDate?.let { lastUpdatedDate = it }
+        val lastUpdatedAt = lastUpdatedDate
+
         val ago = when {
-            lastUpdatedDate == null -> ""
-            Date().time - lastUpdatedDate!!.time < DateUtils.MINUTE_IN_MILLIS -> getString(R.string.threadListHeaderLastUpdateNow)
-            else -> DateUtils.getRelativeTimeSpanString(lastUpdatedDate!!.time).toString()
-                .replaceFirstChar { it.lowercaseChar() }
+            lastUpdatedAt == null -> {
+                ""
+            }
+            Date().time - lastUpdatedAt.time < DateUtils.MINUTE_IN_MILLIS -> {
+                getString(R.string.threadListHeaderLastUpdateNow)
+            }
+            else -> {
+                DateUtils.getRelativeTimeSpanString(lastUpdatedAt.time).toString().replaceFirstChar { it.lowercaseChar() }
+            }
         }
 
         binding.updatedAt.apply {
-            if (ago.isEmpty()) {
-                isGone = true
-            } else {
-                text = getString(R.string.threadListHeaderLastUpdate, ago)
-                isVisible = true
-            }
+            isInvisible = ago.isEmpty()
+            if (ago.isNotEmpty()) text = getString(R.string.threadListHeaderLastUpdate, ago)
         }
     }
 
@@ -279,6 +278,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
             isVisible = unreadCount > 0
         }
+    }
+
+    private fun displayFolderName(folder: Folder) {
+        val folderName = folder.getLocalizedName(binding.context)
+        Log.i("UI", "Received folder name (${folderName})")
+        binding.toolbar.title = folderName
     }
 
     private fun listenToThreads(folder: Folder) {
