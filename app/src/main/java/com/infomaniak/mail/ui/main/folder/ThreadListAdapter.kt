@@ -142,6 +142,30 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         }
     }
 
+    override fun onIsSwiping(
+        item: Any?,
+        viewHolder: ThreadViewHolder,
+        offsetX: Int,
+        offsetY: Int,
+        canvasUnder: Canvas?,
+        canvasOver: Canvas?,
+        isUserControlled: Boolean
+    ): Unit = with(viewHolder.binding!!)
+    {
+        val dx = abs(offsetX)
+        if (dx > root.width / 2.0 && !viewHolder.isSwippedOverHalf) {
+            viewHolder.isSwippedOverHalf = true
+            root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+        } else if (dx < root.width / 2.0 && viewHolder.isSwippedOverHalf) {
+            viewHolder.isSwippedOverHalf = false
+            root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
+        }
+    }
+
+    override fun onSwipeAnimationFinished(viewHolder: ThreadViewHolder) {
+        viewHolder.isSwippedOverHalf = false
+    }
+
     override fun getViewHolder(itemView: View): ThreadViewHolder = ThreadViewHolder(null)
 
     override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadViewHolder, position: Int): View? {
