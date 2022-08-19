@@ -32,8 +32,10 @@ import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
+import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.utils.startOfTheDay
 import com.infomaniak.lib.core.utils.startOfTheWeek
+import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
@@ -156,12 +158,26 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
     ): Unit = with(viewHolder.binding!!)
     {
         val dx = abs(offsetX)
-        if (dx > root.width / 2.0 && !viewHolder.isSwippedOverHalf) {
+        val progress = dx.toFloat() / root.width
+
+        if (progress < 0.5 && !viewHolder.isSwippedOverHalf) {
             viewHolder.isSwippedOverHalf = true
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-        } else if (dx < root.width / 2.0 && viewHolder.isSwippedOverHalf) {
+        } else if (progress > 0.5 && viewHolder.isSwippedOverHalf) {
             viewHolder.isSwippedOverHalf = false
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
+        }
+
+        val cardView = root as MaterialCardView
+        cardView.cardElevation = cappedLinearInterpolator(CARD_ELEVATION, progress)
+        cardView.radius = cappedLinearInterpolator(CARD_CORNER_RADIUS, progress)
+    }
+
+    private fun cappedLinearInterpolator(max: Float, progress: Float): Float {
+        return if (progress < SWIPE_ANIMATION_THRESHOLD) {
+            max * progress / SWIPE_ANIMATION_THRESHOLD
+        } else {
+            max
         }
     }
 
@@ -273,6 +289,12 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
                 else -> false
             }
         }
+    }
+
+    companion object {
+        const val SWIPE_ANIMATION_THRESHOLD = 0.15f
+        private val CARD_ELEVATION = 6.toPx().toFloat()
+        private val CARD_CORNER_RADIUS = 12.toPx().toFloat()
     }
 
     class ThreadViewHolder(val binding: ViewBinding?) : DragDropSwipeAdapter.ViewHolder(binding!!.root) {
