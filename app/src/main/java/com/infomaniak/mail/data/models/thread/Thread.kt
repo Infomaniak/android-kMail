@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.thread
 
+import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
 import com.infomaniak.lib.core.utils.FORMAT_DATE_HOUR_MINUTE
@@ -29,9 +30,7 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.isThisYear
-import com.infomaniak.mail.utils.isToday
-import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.*
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmInstant
@@ -62,7 +61,8 @@ class Thread : RealmObject {
     var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
-    var date: RealmInstant? = null
+    @SerialName("date")
+    private var _date: RealmInstant? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
     @SerialName("has_st_attachments")
@@ -79,9 +79,9 @@ class Thread : RealmObject {
      * Local
      */
     @Transient
-    var displayedDate: String = ""
-    @Transient
     var mailboxUuid: String = ""
+
+    val date: Date get() = _date?.toDate() ?: Date(0)
 
     fun initLocalValues(mailboxUuid: String): Thread {
         messages.removeIf { it.isDuplicate }
@@ -93,18 +93,16 @@ class Thread : RealmObject {
 
         messages = messages.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
 
-        // TODO: When do we want to update this value? This is a quick fix. The date will
-        // TODO: only update when we get data from the API. We probably don't want that.
-        displayedDate = formatDate(date?.toDate() ?: Date(0))
-
         this.mailboxUuid = mailboxUuid
 
         return this
     }
 
-    private fun formatDate(date: Date): String = with(date) {
+    fun formatDate(context: Context): String = with(date) {
         when {
             isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
+            isYesterday() -> context.getString(R.string.messageDetailsYesterday)
+            isSmallerThanDays(6) -> format(FORMAT_DAY_OF_THE_WEEK)
             isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
             else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
         }
@@ -117,5 +115,9 @@ class Thread : RealmObject {
         STARRED(R.string.favoritesFolder),
         ATTACHMENTS(R.string.searchFilterAttachment),
         FOLDER(R.string.searchFilterFolder),
+    }
+
+    companion object {
+        const val FORMAT_DAY_OF_THE_WEEK = "EEE"
     }
 }

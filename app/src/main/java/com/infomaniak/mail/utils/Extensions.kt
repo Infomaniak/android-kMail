@@ -57,6 +57,14 @@ fun Date.isYesterday(): Boolean {
     return year() == yesterday.year() && month() == yesterday.month() && day() == yesterday.day()
 }
 
+fun Date.isSmallerThanDays(daysAgo: Int): Boolean {
+    val lastDay = Calendar.getInstance().apply {
+        add(Calendar.DATE, -daysAgo)
+        startOfTheDay()
+    }.time
+    return lastDay <= this
+}
+
 fun Date.isThisYear(): Boolean = Date().let { now -> year() == now.year() }
 
 fun View.toggleChevron(

@@ -43,7 +43,6 @@ import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.isValid
 import java.util.*
 import kotlin.math.abs
@@ -90,7 +89,7 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
         mailBodyPreview.text = messages.last().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
 
-        mailDate.text = displayedDate
+        mailDate.text = formatDate(root.context)
 
         iconAttachment.isVisible = hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
@@ -210,8 +209,9 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         previousSectionName = -1
         val formattedList = mutableListOf<Any>()
 
+        // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
         threads.sortedByDescending { it.date }.forEach { thread ->
-            val currentItemDateCategory = getDateCategories(thread.date?.toDate()?.time ?: 0L).value
+            val currentItemDateCategory = getDateCategories(thread.date.time).value
             when {
                 currentItemDateCategory != previousSectionName -> {
                     previousSectionName = currentItemDateCategory
@@ -271,7 +271,6 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
                         oldItem.subject == newItem.subject &&
                                 oldItem.messagesCount == newItem.messagesCount &&
                                 oldItem.unseenMessagesCount == newItem.unseenMessagesCount &&
-                                oldItem.displayedDate == newItem.displayedDate &&
                                 oldItem.isFavorite == newItem.isFavorite
                         // TODO: Add other fields checks
                     } else { // Not same items
