@@ -29,7 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
-import coil.ImageLoader
+import coil.imageLoader
 import coil.request.Disposable
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -85,11 +85,10 @@ fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
 fun ImageView.loadAvatar(
-    correspondent: Correspondent,
-    imageLoader: ImageLoader = ImageLoader.Builder(context).build(),
+    correspondent: Correspondent
 ): Disposable = with(correspondent) {
     val initials = getNameOrEmail().firstOrEmpty().toString().uppercase()
-    return loadAvatar(email.hashCode(), null, initials, imageLoader)
+    return loadAvatar(email.hashCode(), null, initials, context.imageLoader)
 }
 
 inline val ViewBinding.context: Context get() = root.context

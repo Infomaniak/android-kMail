@@ -23,11 +23,17 @@ import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
 import androidx.core.app.NotificationManagerCompat
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import com.facebook.stetho.Stetho
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.ui.LaunchActivity
@@ -42,9 +48,11 @@ import io.sentry.android.core.SentryAndroidOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import java.util.*
 
-class ApplicationMain : Application() {
+class ApplicationMain : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
@@ -135,5 +143,34 @@ class ApplicationMain : Application() {
         }
 
         override suspend fun getApiToken(): ApiToken = AccountUtils.currentUser!!.apiToken
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(applicationContext)
+            .crossfade(true)
+            .okHttpClient {
+                OkHttpClient.Builder().apply {
+                    addInterceptor(Interceptor { chain ->
+                        with(chain.request()) {
+                            val request = newBuilder().headers(HttpUtils.getHeaders()).removeHeader("Cache-Control").build()
+                            chain.proceed(request)
+                        }
+                    })
+                    if (com.infomaniak.lib.core.BuildConfig.DEBUG) {
+                        addNetworkInterceptor(StethoInterceptor())
+                    }
+                }.build()
+            }
+            .memoryCache {
+                MemoryCache.Builder(applicationContext).build()
+            }
+            .diskCache {
+                DiskCache.Builder().directory(applicationContext.cacheDir.resolve(COIL_CACHE_DIR)).build()
+            }
+            .build()
+    }
+
+    private companion object {
+        const val COIL_CACHE_DIR = "coil_cache"
     }
 }
