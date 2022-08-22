@@ -65,15 +65,45 @@
                 <TextView
                     android:id="@+id/expeditor"
                     style="@style/H2.Secondary"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@+id/iconCalendar"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toStartOf="@+id/threadCountCardview"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="@tools:sample/full_names" />
+
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/threadCountCardview"
+                    style="@style/CardViewMail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    android:visibility="gone"
+                    app:cardCornerRadius="3dp"
+                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
+                    app:layout_constraintEnd_toStartOf="@id/iconCalendar"
+                    app:layout_constraintStart_toEndOf="@id/expeditor"
+                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    app:strokeColor="@color/progressbarTrackColor"
+                    app:strokeWidth="1dp"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/threadCount"
+                        style="@style/Body.Secondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/marginStandardVerySmall"
+                        tools:text="2" />
+
+                </com.google.android.material.card.MaterialCardView>
 
                 <ImageView
                     android:id="@+id/iconCalendar"
@@ -135,9 +165,9 @@
                     android:contentDescription="@string/contentDescriptionIconFavorite"
                     android:src="@drawable/ic_star_filled"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@id/threadCountCardview"
+                    app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/mailDate"
+                    app:layout_constraintTop_toTopOf="@id/mailSubject"
                     tools:visibility="visible" />
 
                 <TextView
@@ -149,34 +179,10 @@
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@id/threadCountCardview"
+                    app:layout_constraintEnd_toStartOf="@id/iconFavorite"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/mailSubject"
                     tools:text="@tools:sample/lorem/random" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/threadCountCardview"
-                    style="@style/CardViewMail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    app:cardCornerRadius="3dp"
-                    app:layout_constraintBottom_toBottomOf="@id/mailBodyPreview"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/mailBodyPreview"
-                    app:strokeColor="@color/progressbarTrackColor"
-                    app:strokeWidth="1dp"
-                    tools:visibility="visible">
-
-                    <TextView
-                        android:id="@+id/threadCount"
-                        style="@style/Body.Secondary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingHorizontal="@dimen/marginStandardVerySmall"
-                        tools:text="2" />
-
-                </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
