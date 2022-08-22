@@ -151,6 +151,7 @@
                     app:behind_swiped_item_custom_layout="@layout/view_behind_swipe_delete"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/cardview_thread_item"
                     tools:visibility="visible" />
 
                 <ImageView
