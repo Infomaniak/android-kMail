@@ -104,6 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 android:textColor="@color/chip_unread_text_color"
+                android:visibility="gone"
                 app:checkedIcon="@null"
                 app:checkedIconEnabled="false"
                 app:chipBackgroundColor="@color/chip_unread_background"
@@ -114,7 +115,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/updatedAt"
                 tools:closeIcon="@null"
-                tools:text="2 non lus" />
+                tools:text="2 non lus"
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

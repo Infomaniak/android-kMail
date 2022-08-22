@@ -121,6 +121,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.DOWN)
             disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
             disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
+            addItemDecoration(HeaderItemDecoration(this, false) { position ->
+                threadListAdapter.dataSet[position] is String
+            })
         }
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {

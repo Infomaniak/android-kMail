@@ -40,6 +40,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
+import com.infomaniak.mail.databinding.ItemThreadEmptySpaceBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
@@ -59,6 +60,7 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
 
     override fun getItemViewType(position: Int): Int = when {
         dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
+        dataSet[position] is Unit -> DisplayType.EMPTY_SPACE.layout
         displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
         else -> DisplayType.THREAD.layout
     }
@@ -67,6 +69,7 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_empty_space -> ItemThreadEmptySpaceBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
@@ -210,11 +213,12 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         val formattedList = mutableListOf<Any>()
 
         // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
-        threads.sortedByDescending { it.date }.forEach { thread ->
+        threads.sortedByDescending { it.date }.forEachIndexed { index, thread ->
             val currentItemDateCategory = getDateCategories(thread.date.time).value
             when {
                 currentItemDateCategory != previousSectionName -> {
                     previousSectionName = currentItemDateCategory
+                    if (index != 0) formattedList.add(Unit)
                     formattedList.add(context.getString(currentItemDateCategory))
                 }
                 // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
@@ -237,6 +241,7 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
+        EMPTY_SPACE(R.layout.item_thread_empty_space),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
