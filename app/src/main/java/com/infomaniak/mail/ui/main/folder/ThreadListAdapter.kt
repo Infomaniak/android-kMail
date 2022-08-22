@@ -19,22 +19,20 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
 import android.graphics.Canvas
-import android.text.format.DateUtils.DAY_IN_MILLIS
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
-import com.infomaniak.lib.core.utils.startOfTheDay
-import com.infomaniak.lib.core.utils.startOfTheWeek
+import com.infomaniak.lib.core.utils.capitalizeFirstChar
+import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
@@ -42,17 +40,16 @@ import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadEmptySpaceBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import io.realm.kotlin.ext.isValid
-import java.util.*
 import kotlin.math.abs
 
 class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
     DragDropSwipeAdapter<Any, ThreadListAdapter.ThreadViewHolder>(dataSet) {
 
-    @StringRes
-    var previousSectionName: Int = -1
+    private var previousSectionTitle: String = ""
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
 
     var onEmptyList: (() -> Unit)? = null
@@ -209,17 +206,17 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
     }
 
     fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
-        previousSectionName = -1
+        previousSectionTitle = ""
         val formattedList = mutableListOf<Any>()
 
         // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
         threads.sortedByDescending { it.date }.forEachIndexed { index, thread ->
-            val currentItemDateCategory = getDateCategories(thread.date.time).value
+            val sectionTitle = thread.getSectionTitle(context)
             when {
-                currentItemDateCategory != previousSectionName -> {
-                    previousSectionName = currentItemDateCategory
-                    if (index != 0) formattedList.add(Unit)
-                    formattedList.add(context.getString(currentItemDateCategory))
+                sectionTitle != previousSectionTitle -> {
+                    if (index != 0) formattedList.add(Unit) // Adds a space before the next date separator
+                    formattedList.add(sectionTitle)
+                    previousSectionTitle = sectionTitle
                 }
                 // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
             }
@@ -229,12 +226,14 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         return formattedList
     }
 
-    private fun getDateCategories(dateTime: Long): DateFilter {
+    private fun Thread.getSectionTitle(context: Context): String = with(date) {
         return when {
-            dateTime >= DateFilter.TODAY.start() -> DateFilter.TODAY
-            dateTime >= DateFilter.CURRENT_WEEK.start() -> DateFilter.CURRENT_WEEK
-            dateTime >= DateFilter.LAST_WEEK.start() -> DateFilter.LAST_WEEK
-            else -> DateFilter.TWO_WEEKS
+            isToday() -> context.getString(R.string.threadListSectionToday)
+            isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)
+            isLastWeek() -> context.getString(R.string.threadListSectionLastWeek)
+            isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
+            isThisYear() -> format(FULL_MONTH).capitalizeFirstChar()
+            else -> format(MONTH_AND_YEAR).capitalizeFirstChar()
         }
     }
 
@@ -243,19 +242,6 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         EMPTY_SPACE(R.layout.item_thread_empty_space),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
-    }
-
-    private enum class DateFilter(val start: () -> Long, @StringRes val value: Int) {
-        TODAY({ Date().startOfTheDay().time }, R.string.threadListSectionToday),
-        CURRENT_WEEK({ Date().startOfTheWeek().time }, R.string.threadListSectionThisWeek),
-        LAST_WEEK(
-            { Date().startOfTheWeek().time - DAY_IN_MILLIS * 7 },
-            R.string.threadListSectionLastWeek
-        ),
-        TWO_WEEKS(
-            { Date().startOfTheWeek().time - DAY_IN_MILLIS * 14 },
-            R.string.threadListSectionTwoWeeks
-        ),
     }
 
     private class ThreadListDiffCallback(
@@ -299,6 +285,9 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         const val SWIPE_ANIMATION_THRESHOLD = 0.15f
         private val CARD_ELEVATION = 6.toPx().toFloat()
         private val CARD_CORNER_RADIUS = 12.toPx().toFloat()
+
+        private const val FULL_MONTH = "MMMM"
+        private const val MONTH_AND_YEAR = "MMMM yyyy"
     }
 
     class ThreadViewHolder(val binding: ViewBinding?) : DragDropSwipeAdapter.ViewHolder(binding!!.root) {
