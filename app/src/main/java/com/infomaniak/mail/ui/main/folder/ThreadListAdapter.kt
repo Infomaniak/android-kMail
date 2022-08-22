@@ -29,6 +29,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.utils.capitalizeFirstChar
@@ -48,6 +49,8 @@ import kotlin.math.abs
 
 class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
     DragDropSwipeAdapter<Any, ThreadListAdapter.ThreadViewHolder>(dataSet) {
+
+    private var parentRecycler: DragDropSwipeRecyclerView? = null
 
     private var previousSectionTitle: String = ""
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -139,10 +142,13 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    override fun getBehindSwipedItemSecondaryLayoutId(item: Any, viewHolder: ThreadViewHolder, position: Int): Int? {
-        return when (getItemViewType(position)) {
-            DisplayType.THREAD.layout -> if ((item as Thread).unseenMessagesCount > 0) R.layout.view_behind_swipe_read else R.layout.view_behind_swipe_unread
-            else -> null
+    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) {
+        parentRecycler?.apply {
+            behindSwipedItemIconSecondaryDrawableId = if ((item as Thread).unseenMessagesCount > 0) {
+                R.drawable.ic_envelope_open
+            } else {
+                R.drawable.ic_envelope
+            }
         }
     }
 
@@ -201,8 +207,9 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
         return ThreadListDiffCallback(oldList, newList)
     }
 
-    fun notifyAdapter(newList: MutableList<Any>) {
+    fun notifyAdapter(newList: MutableList<Any>, recyclerView: DragDropSwipeRecyclerView) {
         dataSet = newList
+        parentRecycler = recyclerView
     }
 
     fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {

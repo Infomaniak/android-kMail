@@ -357,7 +357,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
-        threadListAdapter.notifyAdapter(threadListAdapter.formatList(threads, binding.context))
+        threadListAdapter.notifyAdapter(threadListAdapter.formatList(threads, binding.context), binding.threadsList)
 
         if (currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
     }
