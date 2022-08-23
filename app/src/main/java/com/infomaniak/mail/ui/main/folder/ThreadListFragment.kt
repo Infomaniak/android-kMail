@@ -122,7 +122,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
             disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
             addItemDecoration(HeaderItemDecoration(this, false) { position ->
-                threadListAdapter.dataSet[position] is String
+                return@HeaderItemDecoration threadListAdapter.dataSet[position] is String
             })
         }
 

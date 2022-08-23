@@ -86,6 +86,20 @@
             </com.google.android.material.appbar.MaterialToolbar>
 
             <TextView
+                android:id="@+id/noNetwork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:drawablePadding="@dimen/marginStandardSmall"
+                android:text="@string/noNetworkTitle"
+                android:textColor="@color/orangeWarning"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_no_network"
+                app:drawableTint="@color/orangeWarning"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+            <TextView
                 android:id="@+id/updatedAt"
                 style="@style/Body.Secondary"
                 android:layout_width="wrap_content"
@@ -94,7 +108,7 @@
                 android:layout_marginBottom="@dimen/marginStandardMedium"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintTop_toBottomOf="@id/noNetwork"
                 tools:text="@string/noNetworkDescription" />
 
             <com.google.android.material.chip.Chip
