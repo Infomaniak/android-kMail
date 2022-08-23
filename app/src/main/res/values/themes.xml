@@ -86,9 +86,10 @@
 
     <!-- Login -->
 
-    <style name="AppTheme.LoginBase" parent="AppThemeBase">
+    <style name="AppTheme.LoginBase" parent="AppTheme.Pink">
+        <item name="waveColrr">?attr/colorPrimaryContainer</item>
         <item name="android:navigationBarColor">@color/backgroundOnBoardingColor</item>
-        <item name="android:statusBarColor">@color/backgroundOnBoardingColor</item>
+        <item name="android:statusBarColor">?attr/waveColrr</item>
         <item name="android:windowBackground">@color/backgroundOnBoardingColor</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="appBarLayoutStyle">@style/LoginAppBarTheme</item>

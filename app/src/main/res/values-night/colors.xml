@@ -18,9 +18,11 @@
 <resources>
     <color name="pinkMail">#E07FA3</color>
     <color name="pinkMailSecondary">#2A0F1B</color>
+    <color name="pinkBoardingSecondaryBackground">@color/black</color>
     <color name="pinkMailRipple">#1EE07FA3</color>
     <color name="blueMail">@color/blueTextLight</color>
     <color name="blueMailSecondary">#292E3D</color>
+    <color name="blueBoardingSecondaryBackground">@color/black</color>
     <color name="blueMailRipple">#1E4CB7FF</color>
 
     <!-- Context / errors -->
@@ -34,7 +36,7 @@
     <color name="backgroundHeaderColor">#1A1A1A</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundNotificationColor">@color/black</color>
-    <color name="backgroundOnBoardingColor">@color/black</color>
+    <color name="backgroundOnBoardingColor">#1A1A1A</color>
     <color name="backgroundSnackbarColor">@color/black</color>
     <color name="backgroundNewMailColor">@color/grey_title</color>
     <color name="selectedAccountCardviewColor">#1A1A1A</color>

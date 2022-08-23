@@ -15,15 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui
+package com.infomaniak.mail.ui.login
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
@@ -62,18 +67,44 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
 
         infomaniakLogin = InfomaniakLogin(
-            context = this,
+            context = this@LoginActivity,
             appUID = BuildConfig.APPLICATION_ID,
             clientID = BuildConfig.CLIENT_ID,
         )
 
-        binding.loginButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
+        introViewpager.apply {
+            offscreenPageLimit = 3
+            adapter = IntroPagerAdapter(supportFragmentManager, lifecycle)
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    val showConnectButton = position == 3
+                    nextButton.isInvisible = showConnectButton
+                    connectButton.isInvisible = !showConnectButton
+                    signInButton.isInvisible = !showConnectButton
+                }
+            })
+        }
+
+        dotsIndicator.attachTo(introViewpager)
+
+        nextButton.setOnClickListener { introViewpager.currentItem += 1 }
+
+        connectButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
+    }
+
+    override fun onBackPressed() = with(binding) {
+        if (introViewpager.currentItem == 0) {
+            super.onBackPressed()
+        } else {
+            introViewpager.currentItem -= 1
+        }
     }
 
     private fun authenticateUser(authCode: String) {
@@ -112,6 +143,15 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showError(error: String) {
         showSnackbar(error)
+    }
+
+    fun setUi(@ColorInt primary: Int) = with(binding) {
+        val singleColorStateList = ColorStateList.valueOf(primary)
+        dotsIndicator.selectedDotColor = primary
+        connectButton.setBackgroundColor(primary)
+        nextButton.backgroundTintList = singleColorStateList
+        signInButton.setTextColor(primary)
+        signInButton.rippleColor = singleColorStateList
     }
 
     private companion object {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Infomaniak kMail - Android
   ~ Copyright (C) 2022 Infomaniak Network SA
   ~
@@ -15,16 +15,13 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
-
-    <style name="AppTheme" parent="AppThemeBase">
-        <item name="android:navigationBarColor">@color/backgroundColor</item>
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
-
-    <style name="AppTheme.Login" parent="AppTheme.LoginBase">
-        <item name="waveColrr">@color/black</item>
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
-
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="426dp"
+    android:height="388dp"
+    android:viewportWidth="426"
+    android:viewportHeight="388">
+    <path
+        android:fillColor="?attr/waveColrr"
+        android:fillType="evenOdd"
+        android:pathData="M0,388C0,295.96 0,0 0,0H426C426,0 426,202.99 426,319.06C281.19,311.42 75.12,368.39 0,388Z" />
+</vector>

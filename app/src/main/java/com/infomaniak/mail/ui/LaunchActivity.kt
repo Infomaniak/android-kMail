@@ -22,6 +22,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers

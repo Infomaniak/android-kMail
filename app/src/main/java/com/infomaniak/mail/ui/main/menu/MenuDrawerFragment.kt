@@ -41,8 +41,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
-import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
