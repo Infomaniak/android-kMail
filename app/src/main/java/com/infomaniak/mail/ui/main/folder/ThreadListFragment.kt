@@ -46,7 +46,6 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
-import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
@@ -60,6 +59,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.LARGE
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.*
@@ -149,6 +149,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+            threadDensity = LARGE
 
             onThreadClicked = {
                 safeNavigate(
@@ -413,6 +415,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
+
+    enum class ThreadDensity {
+        COMPACT,
+        NORMAL,
+        LARGE
+    }
 
     private companion object {
         // This is approximately a little more than the number of Threads displayed at the same time on the screen.

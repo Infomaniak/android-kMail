@@ -36,27 +36,41 @@
         android:layout_marginVertical="@dimen/marginStandardSmall"
         android:paddingHorizontal="@dimen/marginStandardSmall">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/newMailBullet"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/marginStandardSmall"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
             android:contentDescription="@string/contentDescriptionIconNewMail"
-            android:src="@drawable/ic_bullet"
+            android:src="?android:attr/colorPrimary"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            tools:visibility="visible" />
+
+        <com.infomaniak.mail.views.AvatarView
+            android:id="@+id/expeditorAvatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars"
             tools:visibility="visible" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
+            android:layout_marginStart="@dimen/marginStandardSmall"
             android:orientation="vertical"
-            android:paddingEnd="@dimen/marginStandardVerySmall"
+            android:paddingHorizontal="@dimen/marginStandardVerySmall"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toEndOf="@id/expeditorAvatar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginStart="@dimen/marginStandardMedium">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
