@@ -81,7 +81,7 @@ class ThreadAdapter(
         val messageDate = message.date?.toDate()
 
         if (message.isDraft) {
-            userAvatarImage.loadAvatar(AccountUtils.currentUser!!)
+            userAvatar.loadAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
                 text = context.getString(R.string.messageIsDraftOption)
                 setTextColor(context.getColor(R.color.draftTextColor))
@@ -89,7 +89,7 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.from.first()
-            userAvatarImage.loadAvatar(firstSender)
+            userAvatar.loadAvatar(firstSender)
             expeditorName.apply {
                 fillInUserNameAndEmail(firstSender, this)
                 setTextColor(context.getColor(R.color.primaryTextColor))

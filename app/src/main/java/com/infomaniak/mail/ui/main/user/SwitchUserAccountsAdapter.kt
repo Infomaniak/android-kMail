@@ -61,7 +61,7 @@ class SwitchUserAccountsAdapter(
         if (!isCollapsed[position]) chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
         updateAccountCardUiState(position)
 
-        userAvatarImage.loadAvatar(account.user)
+        userAvatar.loadAvatar(account.user)
         userName.text = account.user.displayName
         userMailAddress.text = account.user.email
         accountCardview.setOnClickListener { toggleMailboxes(position) }
