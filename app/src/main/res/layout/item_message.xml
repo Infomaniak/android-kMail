@@ -261,6 +261,31 @@
         tools:itemCount="2"
         tools:listitem="@layout/item_detailed_contact" />
 
+    <TextView
+        android:id="@+id/bccPrefix"
+        style="@style/Callout.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:text="@string/bccTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ccRecyclerView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bccRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/bccPrefix"
+        tools:ignore="RtlSymmetry"
+        tools:itemCount="1"
+        tools:listitem="@layout/item_detailed_contact" />
+
     <ImageView
         android:id="@+id/detailedMessagePrefix"
         android:layout_width="18dp"
@@ -271,7 +296,7 @@
         android:src="@drawable/ic_calendar"
         app:layout_constraintBottom_toTopOf="@id/headerDivider"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ccRecyclerView"
+        app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -290,7 +315,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="right"
-        app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,detailedMessagePrefix" />
+        app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/headerDivider"
@@ -396,6 +421,14 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:constraint_referenced_ids="ccRecyclerView,ccPrefix"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/bccGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="bccRecyclerView,bccPrefix"
         tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Group

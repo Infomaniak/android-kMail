@@ -150,7 +150,8 @@ class ThreadAdapter(
             val isExpanded = message.detailsAreExpanded
             recipientChevron.toggleChevron(!isExpanded)
             detailedFieldsGroup.isVisible = isExpanded
-            ccGroup.isVisible = isExpanded && !message.cc.isEmpty()
+            ccGroup.isVisible = isExpanded && message.cc.isNotEmpty()
+            bccGroup.isVisible = isExpanded && message.bcc.isNotEmpty()
         }
     }
 
@@ -158,9 +159,13 @@ class ThreadAdapter(
         fromAdapter.updateList(message.from.toList())
         toAdapter.updateList(message.to.toList())
 
-        val ccIsNotEmpty = !message.cc.isEmpty()
+        val ccIsNotEmpty = message.cc.isNotEmpty()
         ccGroup.isVisible = ccIsNotEmpty
         if (ccIsNotEmpty) ccAdapter.updateList(message.cc.toList())
+
+        val bccIsNotEmpty = message.bcc.isNotEmpty()
+        bccGroup.isVisible = bccIsNotEmpty
+        if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
 
         val isDateNotNull = messageDate != null
         detailedMessageDate.isVisible = isDateNotNull
@@ -214,6 +219,7 @@ class ThreadAdapter(
     private fun ItemMessageBinding.collapseMessageDetails(message: Message) {
         message.detailsAreExpanded = false
         ccGroup.isGone = true
+        bccGroup.isGone = true
         detailedFieldsGroup.isGone = true
         recipientChevron.rotation = 0f
     }
@@ -319,6 +325,7 @@ class ThreadAdapter(
         val fromAdapter = DetailedRecipientAdapter(onContactClicked)
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
+        val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter(onAttachmentClicked)
 
         init {
@@ -326,6 +333,7 @@ class ThreadAdapter(
                 fromRecyclerView.adapter = fromAdapter
                 toRecyclerView.adapter = toAdapter
                 ccRecyclerView.adapter = ccAdapter
+                bccRecyclerView.adapter = bccAdapter
                 attachmentsRecyclerView.adapter = attachmentAdapter
             }
         }
