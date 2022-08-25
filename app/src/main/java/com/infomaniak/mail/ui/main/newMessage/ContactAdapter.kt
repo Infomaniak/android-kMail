@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newmessage
+package com.infomaniak.mail.ui.main.newMessage
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -23,9 +23,9 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.databinding.ItemContactBinding
-import com.infomaniak.mail.ui.main.newmessage.ContactAdapter.ContactViewHolder
-import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType
-import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.loadAvatar
 

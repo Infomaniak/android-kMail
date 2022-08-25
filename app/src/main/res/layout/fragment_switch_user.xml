@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="@color/backgroundHeaderColor"
-    tools:context=".ui.main.menu.user.SwitchUserFragment">
+    tools:context=".ui.main.user.SwitchUserFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"

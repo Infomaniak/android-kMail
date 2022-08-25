@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newmessage
+package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -41,9 +41,9 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
-import com.infomaniak.mail.ui.main.MainViewModel
-import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
-import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.*
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore

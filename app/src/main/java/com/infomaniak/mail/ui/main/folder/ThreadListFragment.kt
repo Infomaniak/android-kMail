@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread
+package com.infomaniak.mail.ui.main.folder
 
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -49,8 +49,8 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
-import com.infomaniak.mail.ui.main.MainActivity
-import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.MainActivity
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import kotlinx.coroutines.*
 import java.util.*

@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="@dimen/marginStandardMedium"
-        tools:context=".ui.main.thread.MessageActionsBottomSheetDialog">
+        tools:context=".ui.main.thread.actions.MessageActionsBottomSheetDialog">
 
         <include layout="@layout/view_bottom_sheet_separator" />
 
@@ -39,7 +39,7 @@
             android:fontFamily="@font/suisseintl_medium"
             android:text="@string/actionsMenuTitle" />
 
-        <com.infomaniak.mail.ui.main.thread.MainActionsView
+        <com.infomaniak.mail.ui.main.thread.actions.MainActionsView
             android:id="@+id/mainActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,84 +47,84 @@
             android:layout_marginBottom="@dimen/marginStandardMedium"
             app:menu="@menu/main_actions_thread_message_menu" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/archive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_archive_folder"
             app:text="@string/actionArchive" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/markAsRead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_envelope"
             app:text="@string/actionMarkAsRead" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/move"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_move"
             app:text="@string/actionMove" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/postpone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_alarm_clock"
             app:text="@string/actionPostpone" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/favorite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_star"
             app:text="@string/actionStar" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/spam"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_spam"
             app:text="@string/actionSpam" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/blockSender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_block_user"
             app:text="@string/actionBlockSender" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/phishing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_phishing"
             app:text="@string/actionPhishing" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/print"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_print"
             app:text="@string/actionPrint" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/saveAsPdf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_save_as_pdf"
             app:text="@string/actionSavePDF" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/rule"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_email_action_rule_filter"
             app:text="@string/actionCreateRule" />
 
-        <com.infomaniak.mail.ui.main.thread.ActionItemView
+        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/reportDisplayProblem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

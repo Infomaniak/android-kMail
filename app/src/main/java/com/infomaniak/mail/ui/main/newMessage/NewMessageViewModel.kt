@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newmessage
+package com.infomaniak.mail.ui.main.newMessage
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,7 +27,7 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
-import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList

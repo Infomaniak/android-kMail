@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread
+package com.infomaniak.mail.ui.main.thread.actions
 
 import android.content.Context
 import android.os.Bundle
@@ -29,7 +29,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
-import com.infomaniak.mail.ui.main.MainViewModel
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.getAttributeColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
