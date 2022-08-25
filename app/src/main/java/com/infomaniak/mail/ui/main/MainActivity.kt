@@ -31,7 +31,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.UiUtils
@@ -78,8 +77,6 @@ class MainActivity : ThemedActivity() {
 
         setupNavController()
         setupMenuDrawerCallbacks()
-
-        MailData.loadAddressBooksAndContacts()
     }
 
     private fun listenToNetworkStatus() {
@@ -92,7 +89,7 @@ class MainActivity : ThemedActivity() {
             })
             mainViewModel.isInternetAvailable.value = isAvailable
             if (isAvailable) {
-                // lifecycleScope.launch { AccountUtils.updateCurrentUserAndDrives(this@MainActivity) } // TODO?
+                // lifecycleScope.launch(Dispatchers.IO) { AccountUtils.updateCurrentUserAndDrives(this@MainActivity) } // TODO?
             }
         }
     }
@@ -156,4 +153,3 @@ class MainActivity : ThemedActivity() {
         super.onDestroy()
     }
 }
-

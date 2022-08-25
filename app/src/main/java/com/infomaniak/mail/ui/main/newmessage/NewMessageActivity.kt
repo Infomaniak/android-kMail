@@ -21,16 +21,23 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.ThemedActivity
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction.*
 import io.realm.kotlin.ext.realmListOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 class NewMessageActivity : ThemedActivity() {
 
@@ -51,11 +58,11 @@ class NewMessageActivity : ThemedActivity() {
             setContentView(root)
 
             toolbar.setNavigationOnClickListener {
-                sendMail(Draft.DraftAction.SAVE)
+                sendMail(DraftAction.SAVE)
                 onBackPressed()
             }
             toolbar.setOnMenuItemClickListener {
-                if (sendMail(Draft.DraftAction.SEND)) finish()
+                if (sendMail(DraftAction.SEND)) finish()
                 true
             }
 
@@ -109,9 +116,15 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    private fun sendMail(action: Draft.DraftAction): Boolean {
+    private fun sendMail(action: DraftAction): Boolean {
         if (viewModel.recipients.isEmpty()) return false
-        viewModel.sendMail(createDraft(), action)
+
+        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return false
+        lifecycleScope.launch(Dispatchers.IO) {
+            MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.let { mailbox ->
+                viewModel.sendMail(createDraft(), action, mailbox)
+            }
+        }
 
         return true
     }

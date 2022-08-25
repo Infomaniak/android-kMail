@@ -42,7 +42,9 @@ import io.realm.kotlin.ext.isValid
 import java.util.*
 
 // TODO: Use LoaderAdapter from Core instead?
-class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf()) : RecyclerView.Adapter<ViewHolder>() {
+class ThreadListAdapter(
+    private var itemsList: MutableList<Any> = mutableListOf(),
+) : RecyclerView.Adapter<ViewHolder>() {
 
     @StringRes
     var previousSectionName: Int = -1
@@ -53,12 +55,10 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
 
     override fun getItemCount(): Int = itemsList.size
 
-    override fun getItemViewType(position: Int): Int {
-        return when {
-            itemsList[position] is String -> DisplayType.DATE_SEPARATOR.layout
-            displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
-            else -> DisplayType.THREAD.layout
-        }
+    override fun getItemViewType(position: Int): Int = when {
+        itemsList[position] is String -> DisplayType.DATE_SEPARATOR.layout
+        displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
+        else -> DisplayType.THREAD.layout
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -104,7 +104,7 @@ class ThreadListAdapter(private var itemsList: MutableList<Any> = mutableListOf(
     private fun CardviewThreadItemBinding.displayThread(position: Int) = with(itemsList[position] as Thread) {
         if (!isValid()) return // TODO: remove this when realm management will be refactored and stable
 
-        expeditor.text = from.first().run { name.ifBlank { email } }
+        expeditor.text = from.first().getNameOrEmail()
         mailSubject.text = subject.getFormattedThreadSubject(context)
 
         mailDate.text = displayedDate

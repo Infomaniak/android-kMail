@@ -18,9 +18,9 @@
 package com.infomaniak.mail.data.models
 
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 @Serializable
@@ -41,6 +41,8 @@ class Recipient : RealmObject, Correspondent {
 
         return this
     }
+
+    fun getNameOrEmail() = name.ifBlank { email }
 
     override fun equals(other: Any?): Boolean = other is Recipient && other.objectId == objectId
 

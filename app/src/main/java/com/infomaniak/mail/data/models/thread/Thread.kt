@@ -80,8 +80,10 @@ class Thread : RealmObject {
      */
     @Transient
     var displayedDate: String = ""
+    @Transient
+    var mailboxUuid: String = ""
 
-    fun initLocalValues(): Thread {
+    fun initLocalValues(mailboxUuid: String): Thread {
         messages.removeIf { it.isDuplicate }
 
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
@@ -94,6 +96,8 @@ class Thread : RealmObject {
         // TODO: When do we want to update this value? This is a quick fix. The date will
         // TODO: only update when we get data from the API. We probably don't want that.
         displayedDate = formatDate(date?.toDate() ?: Date(0))
+
+        this.mailboxUuid = mailboxUuid
 
         return this
     }

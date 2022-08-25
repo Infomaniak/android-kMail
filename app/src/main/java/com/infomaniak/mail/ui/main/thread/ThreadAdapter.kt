@@ -46,7 +46,6 @@ import com.infomaniak.mail.utils.*
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
-
 class ThreadAdapter(
     private var messageList: MutableList<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<ThreadViewHolder>() {
@@ -63,7 +62,7 @@ class ThreadAdapter(
         return ThreadViewHolder(
             ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             onContactClicked,
-            onAttachmentClicked
+            onAttachmentClicked,
         )
     }
 
@@ -81,7 +80,6 @@ class ThreadAdapter(
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
     }
-
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date?.toDate()
@@ -174,7 +172,6 @@ class ThreadAdapter(
         if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
-
     private fun ThreadViewHolder.bindAttachment(attachments: List<Attachment>) = with(binding) {
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentsSizeText.text = context.resources.getQuantityString(
@@ -183,9 +180,7 @@ class ThreadAdapter(
             attachments.size,
         ) + " ($fileSize)"
         attachmentAdapter.setAttachments(attachments)
-        attachmentsDownloadAllButton.setOnClickListener {
-            onDownloadAllClicked?.invoke()
-        }
+        attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke() }
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
@@ -197,7 +192,6 @@ class ThreadAdapter(
 
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
-
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
         collapseMessageDetails(message)
@@ -289,10 +283,8 @@ class ThreadAdapter(
     fun lastIndex() = messageList.lastIndex
 
     private fun Recipient.displayedName(context: Context): String {
-        return if (AccountUtils.currentUser?.email == email) context.getString(R.string.contactMe) else getNameOrEmail()
+        return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
     }
-
-    private fun Recipient.getNameOrEmail() = name.ifBlank { email }
 
     private class MessageListDiffCallback(
         private val oldList: List<Message>,

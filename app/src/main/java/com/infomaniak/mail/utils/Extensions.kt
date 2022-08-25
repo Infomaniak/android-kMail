@@ -33,8 +33,13 @@ import com.infomaniak.lib.core.utils.day
 import com.infomaniak.lib.core.utils.month
 import com.infomaniak.lib.core.utils.year
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentType
 import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.types.RealmInstant
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import java.util.*
 
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
@@ -81,6 +86,14 @@ fun String.isMe(): Boolean = AccountUtils.currentUser?.email == this
 
 inline val ViewBinding.context: Context get() = root.context
 
+fun <T> Flow<T>.toSharedFlow(): SharedFlow<T> {
+    return distinctUntilChanged().shareIn(
+        scope = CoroutineScope(Dispatchers.IO),
+        started = SharingStarted.WhileSubscribed(),
+        replay = 1,
+    )
+}
+
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
 }
@@ -96,3 +109,16 @@ fun Fragment.notYetImplemented() {
 }
 
 fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }
+
+fun Attachment.getFileTypeFromExtension(): AttachmentType {
+    return when {
+        mimeType.contains(Regex("application/(zip|rar|x-tar|.*compressed|.*archive)")) -> AttachmentType.ARCHIVE
+        mimeType.contains(Regex("audio/")) -> AttachmentType.AUDIO
+        mimeType.contains(Regex("image/")) -> AttachmentType.IMAGE
+        mimeType.contains(Regex("/pdf")) -> AttachmentType.PDF
+        mimeType.contains(Regex("spreadsheet|excel|comma-separated-values")) -> AttachmentType.SPREADSHEET
+        mimeType.contains(Regex("document|text/plain|msword")) -> AttachmentType.TEXT
+        mimeType.contains(Regex("video/")) -> AttachmentType.VIDEO
+        else -> AttachmentType.UNKNOWN
+    }
+}

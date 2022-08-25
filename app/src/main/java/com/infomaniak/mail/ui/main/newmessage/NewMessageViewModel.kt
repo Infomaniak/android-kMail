@@ -20,11 +20,15 @@ package com.infomaniak.mail.ui.main.newmessage
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.MailData
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.Draft.DraftAction
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.ui.main.newmessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
@@ -32,31 +36,42 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
+
+    val allContacts = MutableLiveData<List<UiContact>?>()
     val recipients = mutableListOf<UiContact>()
     val newMessageCc = mutableListOf<UiContact>()
     val newMessageBcc = mutableListOf<UiContact>()
+
+    val mailboxes = MutableLiveData<List<Mailbox>?>()
+
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = MutableLiveData<EditorAction>()
 
-    fun getAllContacts(): List<UiContact> {
-        val contacts = mutableListOf<UiContact>()
-        MailData.contactsFlow.value?.forEach { contact ->
-            contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
+    fun listenToAllContacts() = viewModelScope.launch(Dispatchers.IO) {
+        ContactController.getContactsAsync().collect {
+            val contacts = mutableListOf<UiContact>()
+            it.list.forEach { contact ->
+                contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
+            }
+            allContacts.postValue(contacts)
         }
-
-        return contacts
     }
 
-    fun sendMail(draft: Draft, action: Draft.DraftAction) {
-        val mailbox = MailData.currentMailboxFlow.value ?: return
+    fun listenToMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
+            mailboxes.postValue(it.list)
+        }
+    }
+
+    fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
         fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
         fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
 
         viewModelScope.launch(Dispatchers.IO) {
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
             draft.identityId = signature.data?.defaultSignatureId
-            if (action == Draft.DraftAction.SEND) sendDraft() else saveDraft()
+            if (action == DraftAction.SEND) sendDraft() else saveDraft()
         }
     }
 
@@ -66,13 +81,13 @@ class NewMessageViewModel : ViewModel() {
         cc = newMessageCc.toRealmRecipients()
         bcc = newMessageBcc.toRealmRecipients()
 
-//        // TODO: manage advanced functionalities
-//        quote = ""
-//        references = ""
-//        delay = 0
-//        inReplyTo = ""
-//        inReplyToUid = ""
-//        replyTo = realmListOf()
+        // TODO: manage advanced functionalities
+        // quote = ""
+        // references = ""
+        // delay = 0
+        // inReplyTo = ""
+        // inReplyToUid = ""
+        // replyTo = realmListOf()
     }
 
     private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient>? {

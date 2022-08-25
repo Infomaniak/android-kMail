@@ -24,34 +24,39 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.MailData
+import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.sortMailboxes
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SwitchUserFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: SwitchUserViewModel by viewModels()
 
     private lateinit var binding: FragmentSwitchUserBinding
 
     private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
         if (selectedMailbox.userId == AccountUtils.currentUserId) {
-            MailData.selectMailbox(selectedMailbox)
+            mainViewModel.openMailbox(selectedMailbox)
             findNavController().popBackStack()
         } else {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
                 AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 
-                MailData.close()
+                mainViewModel.close()
 
                 AccountUtils.reloadApp?.invoke(bundleOf())
             }
@@ -71,16 +76,16 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun listenToAccounts() {
-        viewModel.accounts.observeNotNull(this) { accounts ->
+        viewModel.accounts.observeNotNull(this, ::onAccountsChange)
+        viewModel.listenToAccounts(viewLifecycleOwner)
+    }
 
-            val uiAccounts = accounts
-                .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
-                .sortAccounts()
+    private fun onAccountsChange(accounts: List<Pair<User, List<Mailbox>>>) {
+        val uiAccounts = accounts
+            .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
+            .sortAccounts()
 
-            accountsAdapter.notifyAdapter(uiAccounts)
-        }
-
-        viewModel.loadAccounts(viewLifecycleOwner)
+        accountsAdapter.notifyAdapter(uiAccounts, MainViewModel.currentMailboxObjectId.value)
     }
 
     private fun List<UiAccount>.sortAccounts(): List<UiAccount> {

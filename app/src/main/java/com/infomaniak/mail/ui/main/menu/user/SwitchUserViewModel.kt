@@ -26,7 +26,7 @@ import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.MailboxInfoController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
@@ -37,13 +37,13 @@ class SwitchUserViewModel : ViewModel() {
 
     val accounts = MutableLiveData<List<Pair<User, List<Mailbox>>>?>(null)
 
-    fun loadAccounts(lifecycleOwner: LifecycleOwner) {
+    fun listenToAccounts(lifecycleOwner: LifecycleOwner) {
 
         AccountUtils.getAllUsers().observeOnce(lifecycleOwner) { users ->
             viewModelScope.launch(Dispatchers.IO) {
 
                 users
-                    .map { user -> user to MailboxInfoController.getMailboxesSync(user.id) }
+                    .map { user -> user to MailboxController.getMailboxesSync(user.id) }
                     .also(accounts::postValue)
 
                 users
@@ -54,7 +54,10 @@ class SwitchUserViewModel : ViewModel() {
                                 val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
                                 it.initLocalValues(user.id, quotas)
                             }
-                            ?.let { user to it }
+                            ?.let {
+                                MailboxController.upsertMailboxes(it)
+                                user to it
+                            }
                     }
                     .also(accounts::postValue)
             }

@@ -40,7 +40,7 @@ object UiUtils {
     fun fillInUserNameAndEmail(
         nameTextView: TextView,
         emailTextView: TextView?,
-        correspondent: Correspondent
+        correspondent: Correspondent,
     ) = with(correspondent) {
         when {
             email.isMe() -> {

@@ -24,45 +24,46 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignatureEmail
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.user.UserInfos
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.notifications.ResultsChange
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
 
 @Suppress("ObjectPropertyName")
-object MailRealm {
+object RealmController {
+
+    const val TAG = "Controller"
 
     private var _appSettings: Realm? = null
-    private var _mailboxInfo: Realm? = null
+    private var _userInfos: Realm? = null
+    private var _mailboxInfos: Realm? = null
     private var _mailboxContent: Realm? = null
-    private var _contacts: Realm? = null
 
     val appSettings: Realm
         get() = _appSettings
             ?: Realm.open(RealmConfigurations.appSettings).also { _appSettings = it }
 
-    val mailboxInfo
-        get() = _mailboxInfo
-            ?: Realm.open(RealmConfigurations.mailboxInfo).also { _mailboxInfo = it }
+    val userInfos
+        get() = _userInfos
+            ?: Realm.open(RealmConfigurations.userInfos).also { _userInfos = it }
+
+    val mailboxInfos
+        get() = _mailboxInfos
+            ?: Realm.open(RealmConfigurations.mailboxInfos).also { _mailboxInfos = it }
 
     val mailboxContent
         get() = _mailboxContent
             ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
 
-    val contacts
-        get() = _contacts
-            ?: Realm.open(RealmConfigurations.contacts).also { _contacts = it }
+    fun deleteMailboxContent(mailboxId: Int) {
+        Realm.deleteRealm(RealmConfigurations.mailboxContent(mailboxId))
+    }
 
     fun close() {
-        closeContacts()
         closeMailboxContent()
-        closeMailboxInfo()
+        closeMailboxInfos()
+        closeUserInfos()
         closeAppSettings()
     }
 
@@ -71,9 +72,14 @@ object MailRealm {
         _appSettings = null
     }
 
-    private fun closeMailboxInfo() {
-        _mailboxInfo?.close()
-        _mailboxInfo = null
+    fun closeUserInfos() {
+        _userInfos?.close()
+        _userInfos = null
+    }
+
+    private fun closeMailboxInfos() {
+        _mailboxInfos?.close()
+        _mailboxInfos = null
     }
 
     fun closeMailboxContent() {
@@ -81,77 +87,39 @@ object MailRealm {
         _mailboxContent = null
     }
 
-    fun closeContacts() {
-        _contacts?.close()
-        _contacts = null
-    }
-
-    fun readAddressBooks(): SharedFlow<ResultsChange<AddressBook>> = ContactsController.getAddressBooks().toSharedFlow()
-
-    fun readContacts(): SharedFlow<ResultsChange<Contact>> = ContactsController.getContacts().toSharedFlow()
-
-    fun getMailboxConfiguration(mailboxId: Int): RealmConfiguration = RealmConfigurations.mailboxContent(mailboxId)
-
-    fun readMailboxes(): SharedFlow<ResultsChange<Mailbox>> {
-        return MailboxInfoController.getMailboxesAsync(AccountUtils.currentUserId).toSharedFlow()
-    }
-
-    fun readFolders(): SharedFlow<ResultsChange<Folder>> = MailboxContentController.getFoldersAsync().toSharedFlow()
-
-    fun readThreads(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): List<Thread> {
-        return MailboxContentController.getFolderThreads(folder.id, filter)
-    }
-
-    fun readMessages(thread: Thread): List<Message> = thread.messages
-
-    /**
-     * Utils
-     */
-    private fun <T> Flow<T>.toSharedFlow(): SharedFlow<T> {
-        return distinctUntilChanged().shareIn(
-            scope = CoroutineScope(Dispatchers.IO),
-            started = SharingStarted.Eagerly,
-            replay = 1,
-        )
-    }
-
-    /**
-     * Configurations
-     */
-    @Suppress("FunctionName")
     private object RealmConfigurations {
 
-        private const val APP_SETTINGS_DB_NAME = "AppSettings.realm"
-        private const val MAILBOX_INFO_DB_NAME = "MailboxInfo.realm"
-        private fun MAILBOX_CONTENT_DB_NAME(mailboxId: Int) = "${AccountUtils.currentUserId}-${mailboxId}.realm"
-        private val CONTACTS_DB_NAME get() = "${AccountUtils.currentUserId}.realm"
+        private const val appSettingsDbName = "AppSettings.realm"
+        private val userInfosDbName get() = "User-${AccountUtils.currentUserId}.realm"
+        private const val mailboxInfosDbName = "MailboxInfos.realm"
+        private fun mailboxContentDbName(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
 
         val appSettings =
             RealmConfiguration
                 .Builder(RealmSets.appSettings)
-                .name(APP_SETTINGS_DB_NAME)
-                .deleteRealmIfMigrationNeeded()
+                .name(appSettingsDbName)
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
-        val mailboxInfo =
+        val userInfos
+            get() = RealmConfiguration
+                .Builder(RealmSets.userInfos)
+                .name(userInfosDbName)
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                .build()
+
+        val mailboxInfos =
             RealmConfiguration
-                .Builder(RealmSets.mailboxInfo)
-                .name(MAILBOX_INFO_DB_NAME)
-                .deleteRealmIfMigrationNeeded()
+                .Builder(RealmSets.mailboxInfos)
+                .name(mailboxInfosDbName)
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         fun mailboxContent(mailboxId: Int) =
             RealmConfiguration
                 .Builder(RealmSets.mailboxContent)
-                .name(MAILBOX_CONTENT_DB_NAME(mailboxId))
-                .deleteRealmIfMigrationNeeded()
-                .build()
-
-        val contacts
-            get() = RealmConfiguration
-                .Builder(RealmSets.contacts)
-                .name(CONTACTS_DB_NAME)
-                .deleteRealmIfMigrationNeeded()
+                .name(mailboxContentDbName(mailboxId))
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         private object RealmSets {
@@ -160,7 +128,13 @@ object MailRealm {
                 AppSettings::class,
             )
 
-            val mailboxInfo = setOf(
+            val userInfos = setOf(
+                UserPreferences::class,
+                AddressBook::class,
+                Contact::class,
+            )
+
+            val mailboxInfos = setOf(
                 Mailbox::class,
                 Quotas::class,
             )
@@ -175,16 +149,10 @@ object MailRealm {
                 Attachment::class,
             )
 
-            val contacts = setOf(
-                AddressBook::class,
-                Contact::class,
-            )
-
             val miscellaneous = setOf(
                 Signature::class,
                 SignatureEmail::class,
                 UserInfos::class,
-                UserPreferences::class,
             )
         }
     }

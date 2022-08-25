@@ -35,23 +35,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.MailData
-import com.infomaniak.mail.data.api.MailApi
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
+import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
     private val navigationArgs: ThreadFragmentArgs by navArgs()
-    private val viewModel: ThreadViewModel by viewModels()
+
+    private val mainViewModel: MainViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadBinding
     private var threadAdapter = ThreadAdapter()
@@ -110,19 +115,23 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
             }
             onDraftClicked = { message ->
-                lifecycleScope.launch {
-                    val draft = MailApi.fetchDraft(message.draftResource, message.uid)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val parentUid = message.uid
+                    // TODO: There shouldn't be any Api call in fragments. Move this in the ViewModel.
+                    val draft = ApiRepository.getDraft(message.draftResource).data?.apply {
+                        initLocalValues(parentUid)
+                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
+                        attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
+                        DraftController.upsertDraft(this)
+                    }
                     message.setDraftId(draft?.uuid)
                     // TODO: Open the draft in draft editor
                 }
             }
             onDeleteDraftClicked = { message ->
                 // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
-                lifecycleScope.launch(Dispatchers.IO) {
-                    MailData.deleteDraft(message)
-                    // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
-                }
-                threadAdapter.removeMessage(message)
+                mainViewModel.deleteDraft(message)
+                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
             }
             onAttachmentClicked = { attachment ->
                 notYetImplemented()
@@ -133,9 +142,13 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun listenToMessages() {
-        viewModel.messages.observeNotNull(this, ::displayMessages)
-        viewModel.loadMessages(navigationArgs.threadUid)
+    private fun listenToMessages() = lifecycleScope.launch(Dispatchers.IO) {
+        ThreadController.getThreadAsync(navigationArgs.threadUid).firstOrNull()?.obj?.let { thread ->
+            mainViewModel.openThread(thread)
+            thread.messages.asFlow().toSharedFlow().collect {
+                withContext(Dispatchers.Main) { displayMessages(it.list) }
+            }
+        }
     }
 
     private fun displayMessages(messages: List<Message>) {
@@ -154,14 +167,5 @@ class ThreadFragment : Fragment() {
 
     companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
-    }
-
-    // Do not change the order of the enum, it's important that it represents the order of the buttons in the UI
-    enum class QuickActionButton {
-        ANSWER,
-        TRANSFER,
-        ARCHIVE,
-        DELETE,
-        PLUS,
     }
 }

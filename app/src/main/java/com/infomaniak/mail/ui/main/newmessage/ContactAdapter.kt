@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.databinding.ItemContactBinding
+import com.infomaniak.mail.ui.main.newmessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.main.newmessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.isEmail
@@ -36,7 +37,7 @@ class ContactAdapter(
     private val bccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val onItemClick: (item: UiContact, field: FieldType) -> Unit,
     private val addUnrecognizedContact: (field: FieldType) -> Unit,
-) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>(), Filterable {
+) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
 
     private var contacts = mutableListOf<UiContact>()
     private var currentField: FieldType = TO
