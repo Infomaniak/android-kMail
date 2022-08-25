@@ -38,7 +38,7 @@ class DetailedRecipientAdapter(
     override fun onBindViewHolder(holder: DetailedRecipientViewHolder, position: Int): Unit = with(holder.binding) {
         val recipient = recipients[position]
 
-        fillInUserNameAndEmail(name, emailAddress, recipient)
+        fillInUserNameAndEmail(recipient, name, emailAddress)
 
         name.setOnClickListener { onContactClicked?.invoke(recipient) }
     }

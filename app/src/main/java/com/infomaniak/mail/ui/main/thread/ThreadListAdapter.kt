@@ -36,6 +36,7 @@ import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.isValid
@@ -104,7 +105,7 @@ class ThreadListAdapter(
     private fun CardviewThreadItemBinding.displayThread(position: Int) = with(items[position] as Thread) {
         if (!isValid()) return // TODO: remove this when realm management will be refactored and stable
 
-        expeditor.text = from.first().getNameOrEmail()
+        fillInUserNameAndEmail(from.first(), expeditor)
         mailSubject.text = subject.getFormattedThreadSubject(context)
         mailBodyPreview.text = messages.last().preview.ifBlank { context.getString(R.string.noBodyTitle) }
 

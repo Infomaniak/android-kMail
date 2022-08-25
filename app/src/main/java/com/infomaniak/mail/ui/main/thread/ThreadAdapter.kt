@@ -31,7 +31,6 @@ import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.FormatterFileSize
-import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.views.ViewHolder
@@ -43,6 +42,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
@@ -93,13 +93,9 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.from.first()
-            userAvatarImage.loadAvatar(
-                firstSender.email.hashCode(),
-                null,
-                firstSender.getNameOrEmail().firstOrEmpty().uppercase(),
-            )
+            userAvatarImage.loadAvatar(firstSender)
             expeditorName.apply {
-                text = firstSender.displayedName(context)
+                fillInUserNameAndEmail(firstSender, this)
                 setTextColor(context.getColor(R.color.primaryTextColor))
             }
             shortMessageDate.text = messageDate?.let { context.mailFormattedDate(it) } ?: ""
@@ -281,10 +277,6 @@ class ThreadAdapter(
     }
 
     fun lastIndex() = messages.lastIndex
-
-    private fun Recipient.displayedName(context: Context): String {
-        return if (email.isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
-    }
 
     private class MessageListDiffCallback(
         private val oldList: List<Message>,
