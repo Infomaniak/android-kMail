@@ -26,4 +26,4 @@
     android:layout_marginBottom="@dimen/marginStandardSmall"
     android:minWidth="120dp"
     android:textColor="@color/sectionHeaderTextColor"
-    tools:text="Today" />
+    tools:text="@string/threadListSectionToday" />

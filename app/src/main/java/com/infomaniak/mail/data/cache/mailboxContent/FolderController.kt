@@ -35,7 +35,6 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.SharedFlow
 import java.util.*
-import kotlin.math.max
 
 object FolderController {
 

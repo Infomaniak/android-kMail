@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -79,11 +80,16 @@ class ThreadFragment : Fragment() {
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
-                R.id.quickActionReply -> notYetImplemented()
+                R.id.quickActionReply -> safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog())
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> notYetImplemented()
+                R.id.quickActionMenu -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                        isFavorite = navigationArgs.threadIsFavorite,
+                        unseenMessagesCount = navigationArgs.unseenMessagesCount,
+                    )
+                )
             }
         }
 
@@ -93,7 +99,9 @@ class ThreadFragment : Fragment() {
             messagesList.addItemDecoration(DividerItemDecorator(divider))
         }
 
-        toolbar.title = navigationArgs.threadSubject
+        // There is a space character at the end of the noSubjectTitle string because when displaying it in a MaterialToolbar
+        // (ThreadFragment) as the title, the last italic character is cut off. Adding an extra space character solves this issue.
+        toolbar.title = TextUtils.concat(navigationArgs.threadSubject.getFormattedThreadSubject(context), " ")
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -111,7 +119,7 @@ class ThreadFragment : Fragment() {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onContactClicked = { contact ->
-                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToContactFragment(contact.name, contact.email))
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -137,6 +145,17 @@ class ThreadFragment : Fragment() {
             }
             onDownloadAllClicked = {
                 notYetImplemented()
+            }
+            onReplyClicked = {
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog())
+            }
+            onMenuClicked = { message ->
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
+                        isFavorite = message.isFavorite,
+                        isSeen = message.seen
+                    )
+                )
             }
         }
     }

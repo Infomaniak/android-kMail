@@ -16,15 +16,30 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <declare-styleable name="CommonAttributes">
+        <attr name="icon" format="reference" />
+        <attr name="text" format="string" />
+    </declare-styleable>
+
     <declare-styleable name="MenuDrawerItemView">
         <attr name="badge" format="string" />
-        <attr name="icon" format="reference" />
+        <attr name="icon" />
         <attr name="indent" format="dimension" />
-        <attr name="text" format="string" />
+        <attr name="text" />
         <attr name="textSize" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="BottomQuickActionBarView">
         <attr name="menu" />
+    </declare-styleable>
+
+    <declare-styleable name="MainActionsView">
+        <attr name="menu" />
+    </declare-styleable>
+
+    <declare-styleable name="ActionItemView">
+        <attr name="icon" />
+        <attr name="text" />
+        <attr name="visibleDivider" format="boolean" />
     </declare-styleable>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Infomaniak kMail - Android
   ~ Copyright (C) 2022 Infomaniak Network SA
   ~
@@ -21,7 +21,21 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:pathData="M12,1.694L14.355,9.315L14.464,9.667H14.833H22.522L16.28,14.436L16.003,14.647L16.106,14.98L18.477,22.653L12.304,17.937L12,17.705L11.696,17.937L5.523,22.653L7.894,14.98L7.997,14.647L7.72,14.436L1.478,9.667H9.167H9.536L9.645,9.315L12,1.694Z"
+        android:pathData="M8.35,21.012L1,23.235L3.1,15.453L15.663,2.151C16.008,1.786 16.417,1.497 16.867,1.299C17.318,1.102 17.8,1 18.288,1C18.775,1 19.258,1.102 19.708,1.299C20.159,1.497 20.568,1.786 20.913,2.151C21.257,2.516 21.531,2.95 21.717,3.426C21.904,3.903 22,4.414 22,4.931C22,5.447 21.904,5.958 21.717,6.435C21.531,6.912 21.257,7.345 20.913,7.71L8.35,21.012Z"
         android:strokeWidth="1"
-        android:strokeColor="#000000" />
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M14.566,3.493L19.551,8.391"
+        android:strokeWidth="1"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M3.471,15.867L8.455,20.765"
+        android:strokeWidth="1"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 </vector>

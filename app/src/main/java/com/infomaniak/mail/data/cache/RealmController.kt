@@ -25,7 +25,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignatureEmail
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.user.UserInfos
+import com.infomaniak.mail.data.models.user.UserInfo
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.Realm
@@ -154,7 +154,7 @@ object RealmController {
             val miscellaneous = setOf(
                 Signature::class,
                 SignatureEmail::class,
-                UserInfos::class,
+                UserInfo::class,
             )
         }
     }

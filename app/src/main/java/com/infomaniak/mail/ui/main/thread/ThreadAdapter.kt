@@ -27,7 +27,6 @@ import androidx.core.text.color
 import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.FormatterFileSize
@@ -55,6 +54,8 @@ class ThreadAdapter(
     var onDraftClicked: ((message: Message) -> Unit)? = null
     var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
     var onDownloadAllClicked: (() -> Unit)? = null
+    var onReplyClicked: ((Message) -> Unit)? = null
+    var onMenuClicked: ((Message) -> Unit)? = null
 
     override fun getItemCount() = messages.size
 
@@ -231,11 +232,11 @@ class ThreadAdapter(
         }
         replyButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+            setOnClickListener { onReplyClicked?.invoke(message) }
         }
         menuButton.apply {
             isVisible = isExpanded
-            setOnClickListener { findFragment<ThreadFragment>().notYetImplemented() }
+            setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
         recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject

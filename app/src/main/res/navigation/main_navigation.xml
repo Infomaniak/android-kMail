@@ -76,8 +76,8 @@
         android:label="SearchFragment"
         tools:layout="@layout/fragment_search">
         <action
-            android:id="@+id/action_searchFragment_to_contactFragment"
-            app:destination="@id/contactFragment" />
+            android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
+            app:destination="@id/detailedContactBottomSheetDialog" />
     </fragment>
 
     <fragment
@@ -96,6 +96,9 @@
             android:name="threadIsFavorite"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="unseenMessagesCount"
+            app:argType="integer" />
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />
@@ -103,8 +106,14 @@
             android:id="@+id/action_threadFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
-            android:id="@+id/action_threadFragment_to_contactFragment"
-            app:destination="@id/contactFragment" />
+            android:id="@+id/action_threadFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadFragment_to_replyBottomSheetDialog"
+            app:destination="@id/replyBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadFragment_to_detailedContactBottomSheetDialog"
+            app:destination="@id/detailedContactBottomSheetDialog" />
     </fragment>
 
     <fragment
@@ -113,25 +122,47 @@
         android:label="SwitchUSerFragment"
         tools:layout="@layout/fragment_switch_user" />
 
-    <fragment
-        android:id="@+id/contactFragment"
-        android:name="com.infomaniak.mail.ui.main.ContactFragment"
-        android:label="ContactFragment"
-        tools:layout="@layout/fragment_contact">
+    <dialog
+        android:id="@+id/detailedContactBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.DetailedContactBottomSheetDialog"
+        android:label="DetailedContactBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_detailed_contact">
         <argument
-            android:name="contactName"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="contactEmail"
-            app:argType="string" />
-    </fragment>
+            android:name="correspondent"
+            app:argType="com.infomaniak.mail.data.models.Correspondent" />
+    </dialog>
 
     <dialog
         android:id="@+id/messageActionBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.MessageActionsBottomSheetDialog"
         android:label="MessageActionBottomSheetDialog"
-        tools:layout="@layout/fragment_bottom_sheet_message_actions" />
+        tools:layout="@layout/fragment_bottom_sheet_message_actions">
+        <argument
+            android:name="isFavorite"
+            app:argType="boolean" />
+        <argument
+            android:name="isSeen"
+            app:argType="boolean" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/threadActionsBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.ThreadActionsBottomSheetDialog"
+        android:label="ThreadActionsBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_actions_menu">
+        <argument
+            android:name="isFavorite"
+            app:argType="boolean" />
+        <argument
+            android:name="unseenMessagesCount"
+            app:argType="integer" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/replyBottomSheetDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.ReplyBottomSheetDialog"
+        android:label="ReplyBottomSheetDialog"
+        tools:layout="@layout/bottom_sheet_reply" />
 
     <fragment
         android:id="@+id/helpFragment"

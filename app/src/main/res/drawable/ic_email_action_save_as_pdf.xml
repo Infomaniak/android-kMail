@@ -1,0 +1,32 @@
+<!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M17.5,24C13.916,24 11,21.084 11,17.5C11,13.916 13.916,11 17.5,11C21.084,11 24,13.916 24,17.5C24,21.084 21.084,24 17.5,24ZM17.5,12C14.467,12 12,14.467 12,17.5C12,20.533 14.467,23 17.5,23C20.533,23 23,20.533 23,17.5C23,14.467 20.533,12 17.5,12Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M17.5,21C17.434,21 17.37,20.987 17.309,20.961C17.247,20.936 17.192,20.899 17.146,20.852L14.897,18.603C14.803,18.509 14.751,18.383 14.751,18.249C14.751,18.115 14.803,17.99 14.897,17.895C14.991,17.8 15.117,17.749 15.251,17.749C15.385,17.749 15.51,17.801 15.605,17.895L17,19.293V14.5C17,14.224 17.224,14 17.5,14C17.776,14 18,14.224 18,14.5V19.293L19.396,17.897C19.49,17.803 19.616,17.751 19.75,17.751C19.884,17.751 20.009,17.803 20.104,17.897C20.199,17.991 20.25,18.117 20.25,18.251C20.25,18.385 20.198,18.51 20.104,18.605L17.854,20.855C17.809,20.901 17.753,20.938 17.691,20.964C17.63,20.987 17.566,21 17.5,21Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M1.5,24C0.673,24 0,23.327 0,22.5V1.5C0,0.673 0.673,0 1.5,0H14.793C15.194,0 15.57,0.156 15.854,0.439L19.561,4.146C19.844,4.43 20,4.807 20,5.207V8.5C20,8.776 19.776,9 19.5,9C19.224,9 19,8.776 19,8.5V5.207C19,5.074 18.948,4.948 18.854,4.853L15.147,1.146C15.053,1.053 14.925,1 14.793,1H1.5C1.224,1 1,1.224 1,1.5V22.5C1,22.776 1.224,23 1.5,23H10.5C10.776,23 11,23.224 11,23.5C11,23.776 10.776,24 10.5,24H1.5Z" />
+</vector>

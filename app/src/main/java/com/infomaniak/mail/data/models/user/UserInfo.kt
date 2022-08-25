@@ -19,11 +19,14 @@ package com.infomaniak.mail.data.models.user
 
 import com.infomaniak.mail.data.models.Correspondent
 import io.realm.kotlin.types.RealmObject
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Suppress("PROPERTY_WONT_BE_SERIALIZED")
+@Parcelize
 @Serializable
-class UserInfos : RealmObject, Correspondent {
+class UserInfo : RealmObject, Correspondent {
     override var name: String = ""
     @SerialName("firstname")
     var firstName: String = ""

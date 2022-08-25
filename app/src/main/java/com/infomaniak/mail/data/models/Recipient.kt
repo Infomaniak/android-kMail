@@ -19,10 +19,13 @@ package com.infomaniak.mail.data.models
 
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 // @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
+@Suppress("PROPERTY_WONT_BE_SERIALIZED")
+@Parcelize
 @Serializable
 class Recipient : RealmObject, Correspondent {
     override var email: String = ""
