@@ -29,15 +29,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.main.MainViewModel
 import com.infomaniak.mail.ui.main.menu.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.observeNotNull
 import com.infomaniak.mail.utils.sortMailboxes
+import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -79,9 +81,31 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun listenToAccounts() {
-        viewModel.accounts.observeNotNull(this, ::onAccountsChange)
-        viewModel.listenToAccounts()
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            val users = AccountUtils.getAllUsersSync()
+            viewModel.fetchAccounts(users)
+
+            val flows = users.map { user -> MailboxController.getMailboxesAsync(user.id) }
+
+            combine(flows) { mailboxesFlows ->
+                transformMailboxesFlowsIntoAccounts(mailboxesFlows, users)
+            }.collect {
+                withContext(Dispatchers.Main) { onAccountsChange(it) }
+            }
+        }
     }
+
+    private fun transformMailboxesFlowsIntoAccounts(mailboxesFlows: Array<ResultsChange<Mailbox>>, users: List<User>) =
+        mutableListOf<Pair<User, List<Mailbox>>>().apply {
+            mailboxesFlows.forEach { flow ->
+                val mailboxes = flow.list
+                val userId = mailboxes.firstOrNull()?.userId
+                users.find { it.id == userId }?.let { user ->
+                    add(user to mailboxes)
+                }
+            }
+        }
 
     private fun onAccountsChange(accounts: List<Pair<User, List<Mailbox>>>) {
         val uiAccounts = accounts

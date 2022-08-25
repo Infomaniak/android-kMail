@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.main.menu.user
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.facebook.stetho.okhttp3.StethoInterceptor
@@ -29,7 +28,6 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,31 +35,15 @@ import okhttp3.OkHttpClient
 
 class SwitchUserViewModel : ViewModel() {
 
-    val accounts = MutableLiveData<List<Pair<User, List<Mailbox>>>?>(null)
-
-    fun listenToAccounts() {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            val users = AccountUtils.getAllUsersSync()
-
-            users
-                .map { user -> user to MailboxController.getMailboxesSync(user.id) }
-                .also(accounts::postValue)
-
-            users
-                .mapNotNull { user ->
-                    val okHttpClient = createOkHttpClientForSpecificUser(user)
-                    ApiRepository.getMailboxes(okHttpClient).data
-                        ?.map {
-                            val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
-                            it.initLocalValues(user.id, quotas)
-                        }
-                        ?.let {
-                            MailboxController.upsertMailboxes(it)
-                            user to it
-                        }
+    fun fetchAccounts(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
+        users.forEach { user ->
+            val okHttpClient = createOkHttpClientForSpecificUser(user)
+            ApiRepository.getMailboxes(okHttpClient).data
+                ?.map {
+                    val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
+                    it.initLocalValues(user.id, quotas)
                 }
-                .also(accounts::postValue)
+                ?.let(MailboxController::upsertMailboxes)
         }
     }
 
