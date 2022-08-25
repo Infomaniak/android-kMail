@@ -29,7 +29,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
@@ -44,9 +44,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.google.android.material.R as RMaterial
-
-// import com.infomaniak.lib.core.R as RCore
 
 
 class IntroFragment : Fragment() {
@@ -55,13 +52,10 @@ class IntroFragment : Fragment() {
 
     class IntroViewModel : ViewModel() {
         @ColorInt
-        var theme = MutableLiveData<ThemeColor>()
+        var theme = MutableLiveData(ThemeColor.BLUE)
     }
 
-    val isPink
-        get() = binding.pinkBlueTabLayout.selectedTabPosition == 0
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
@@ -86,53 +80,77 @@ class IntroFragment : Fragment() {
             }
         }
 
-        viewModel.theme.observe(viewLifecycleOwner) { themeColor ->
-            waveBackground.setColorFilter(themeColor.getWaveColor(requireContext()))
+        pinkBlueSwitch.isVisible = position == 0
 
-            val drawable: Drawable? = getThemedDrawable(themeColor.theme, R.drawable.ic_boarding_illu_1)
-            iconLayout.setImageDrawable(drawable)
-        }
+        val selectedTab = pinkBlueTabLayout.getTabAt(if (viewModel.theme.value == ThemeColor.PINK) 0 else 1)
+        pinkBlueTabLayout.selectTab(selectedTab)
+        setUi(viewModel.theme.value!!, position)
 
-        pinkBlueSwitch.isInvisible = position != 0
-        pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                setUi(if (isPink) ThemeColor.PINK else ThemeColor.BLUE)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
-
-            override fun onTabReselected(tab: TabLayout.Tab?) = Unit
-        })
+        setTabListener()
+        updateUiWhenThemeChanges(position)
     }
 
-    private fun setUi(themeColor: ThemeColor) = with(binding) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
-            delay(duration)
-            withContext(Dispatchers.Main) {
-                viewModel.theme.value = themeColor
+    private fun setUi(themeColor: ThemeColor, position: Int?) = with(binding) {
+        updateEachPageUi(themeColor)
+        if (position == 0) updateFirstPageUi(themeColor)
+    }
 
-                val context = requireContext()
-                val primary = themeColor.getPrimary(context)
-                val tabBackgroundRes =
-                    if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
-                val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
-                val opposedPrimary = ContextCompat.getColor(context, if (isPink) R.color.blueMail else R.color.pinkMail)
+    private fun updateEachPageUi(themeColor: ThemeColor) = with(binding) {
+        waveBackground.setColorFilter(themeColor.getWaveColor(requireContext()))
 
-                requireActivity().window.statusBarColor = themeColor.getWaveColor(context)
-
-                pinkBlueTabLayout.setTabTextColors(opposedPrimary, context.getAttributeColor(RMaterial.attr.colorOnPrimary))
-                pinkBlueTabLayout.setSelectedTabIndicatorColor(primary)
-                pinkBlueSwitch.setCardBackgroundColor(tabBackground)
-
-                (requireActivity() as LoginActivity).setUi(primary)
-            }
-        }
+        val drawable: Drawable? = getThemedDrawable(themeColor.theme, R.drawable.ic_boarding_illu_1)
+        iconLayout.setImageDrawable(drawable)
     }
 
     private fun getThemedDrawable(theme: Int, @DrawableRes drawableRes: Int): Drawable? {
         val wrapper = ContextThemeWrapper(context, theme)
         return VectorDrawableCompat.create(resources, drawableRes, wrapper.theme)
+    }
+
+    private fun updateFirstPageUi(themeColor: ThemeColor) = with(binding) {
+        val isPink = themeColor == ThemeColor.PINK
+        val context = requireContext()
+        val primary = themeColor.getPrimary(context)
+        val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
+        val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
+        val opposedPrimary = ContextCompat.getColor(context, if (isPink) R.color.blueMail else R.color.pinkMail)
+        val colorOnPrimary = context.getAttributeColor(com.google.android.material.R.attr.colorOnPrimary)
+
+        requireActivity().window.statusBarColor = themeColor.getWaveColor(context)
+
+        pinkBlueTabLayout.setTabTextColors(opposedPrimary, colorOnPrimary)
+        pinkBlueTabLayout.setSelectedTabIndicatorColor(primary)
+        pinkBlueSwitch.setCardBackgroundColor(tabBackground)
+
+        (requireActivity() as LoginActivity).updateUi(primary)
+    }
+
+    private fun setTabListener() = with(binding) {
+        pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val newSelectedTheme = if (pinkBlueTabLayout.selectedTabPosition == 0) ThemeColor.PINK else ThemeColor.BLUE
+                triggerUiUpdateWhenAnimationEnd(newSelectedTheme)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
+            override fun onTabReselected(tab: TabLayout.Tab?) = Unit
+        })
+    }
+
+    private fun triggerUiUpdateWhenAnimationEnd(themeColor: ThemeColor) = with(binding) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
+            delay(duration)
+            withContext(Dispatchers.Main) {
+                viewModel.theme.value = themeColor
+            }
+        }
+    }
+
+    private fun updateUiWhenThemeChanges(position: Int?) {
+        viewModel.theme.observe(viewLifecycleOwner) { themeColor ->
+            setUi(themeColor, position)
+        }
     }
 
     enum class ThemeColor(@StyleRes val theme: Int, @ColorRes private val primary: Int, @ColorRes private val waveColor: Int) {

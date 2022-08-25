@@ -145,7 +145,7 @@ class LoginActivity : AppCompatActivity() {
         showSnackbar(error)
     }
 
-    fun setUi(@ColorInt primary: Int) = with(binding) {
+    fun updateUi(@ColorInt primary: Int) = with(binding) {
         val singleColorStateList = ColorStateList.valueOf(primary)
         dotsIndicator.selectedDotColor = primary
         connectButton.setBackgroundColor(primary)
