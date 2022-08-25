@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 
 class NewMessageActivity : ThemedActivity() {
 
-    private val viewModel: NewMessageViewModel by viewModels()
+    private val newMessageViewModel: NewMessageViewModel by viewModels()
 
     private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
 
@@ -83,8 +83,8 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun ActivityNewMessageBinding.handleEditorToggle() {
         editorTextOptions.setOnClickListener {
-            viewModel.isEditorExpanded = !viewModel.isEditorExpanded
-            updateEditorVisibility(viewModel.isEditorExpanded)
+            newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
+            updateEditorVisibility(newMessageViewModel.isEditorExpanded)
         }
     }
 
@@ -102,7 +102,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun linkEditor(view: MaterialButton, action: EditorAction) {
-        view.setOnClickListener { viewModel.editorAction.value = action }
+        view.setOnClickListener { newMessageViewModel.editorAction.value = action }
     }
 
     private fun createDraft() = with(newMessageFragment) {
@@ -117,12 +117,12 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun sendMail(action: DraftAction): Boolean {
-        if (viewModel.recipients.isEmpty()) return false
+        if (newMessageViewModel.recipients.isEmpty()) return false
 
         val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return false
         lifecycleScope.launch(Dispatchers.IO) {
             MailboxController.getMailboxAsync(mailboxObjectId).firstOrNull()?.obj?.let { mailbox ->
-                viewModel.sendMail(createDraft(), action, mailbox)
+                newMessageViewModel.sendMail(createDraft(), action, mailbox)
             }
         }
 
@@ -132,7 +132,7 @@ class NewMessageActivity : ThemedActivity() {
     fun toggleEditor(isVisible: Boolean) {
         binding.editor.isVisible = isVisible
         if (!isVisible) {
-            viewModel.isEditorExpanded = false
+            newMessageViewModel.isEditorExpanded = false
             binding.updateEditorVisibility(false)
         }
     }
