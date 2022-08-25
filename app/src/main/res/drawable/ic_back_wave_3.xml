@@ -19,7 +19,7 @@
     android:width="426dp"
     android:height="388dp"
     android:viewportWidth="426"
-    android:viewportHeight="388">
+    android:viewportHeight="427">
     <path
         android:fillColor="?attr/waveColrr"
         android:fillType="evenOdd"

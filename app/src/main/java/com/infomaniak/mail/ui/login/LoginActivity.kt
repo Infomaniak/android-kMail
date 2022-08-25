@@ -41,7 +41,9 @@ import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -145,13 +147,16 @@ class LoginActivity : AppCompatActivity() {
         showSnackbar(error)
     }
 
-    fun updateUi(@ColorInt primary: Int) = with(binding) {
-        val singleColorStateList = ColorStateList.valueOf(primary)
-        dotsIndicator.selectedDotColor = primary
-        connectButton.setBackgroundColor(primary)
-        nextButton.backgroundTintList = singleColorStateList
-        signInButton.setTextColor(primary)
-        signInButton.rippleColor = singleColorStateList
+    fun updateUi(@ColorInt primary: Int, @ColorInt ripple: Int, animate: Boolean) = with(binding) {
+        val oldColor = dotsIndicator.selectedDotColor
+        animateColorChange(animate, oldColor, primary) { color ->
+            val singleColorStateList = ColorStateList.valueOf(color)
+            dotsIndicator.selectedDotColor = color
+            connectButton.setBackgroundColor(color)
+            nextButton.backgroundTintList = singleColorStateList
+            signInButton.setTextColor(color)
+            signInButton.rippleColor = ColorStateList.valueOf(ripple)
+        }
     }
 
     private companion object {
