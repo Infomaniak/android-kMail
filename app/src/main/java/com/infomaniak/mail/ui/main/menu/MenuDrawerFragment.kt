@@ -74,8 +74,8 @@ class MenuDrawerFragment : Fragment() {
         closeDrawer()
     }
 
-    private val defaultFoldersAdapter = FoldersAdapter(openFolder = { folderId -> openFolder(folderId) })
-    private val customFoldersAdapter = FoldersAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val defaultFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val customFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -95,8 +95,8 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupAdapters() = with(binding) {
         addressesList.adapter = addressAdapter
-        defaultFoldersList.adapter = defaultFoldersAdapter
-        customFoldersList.adapter = customFoldersAdapter
+        defaultFoldersList.adapter = defaultFolderAdapter
+        customFoldersList.adapter = customFolderAdapter
     }
 
     private fun setupListener() = with(binding) {
@@ -234,8 +234,8 @@ class MenuDrawerFragment : Fragment() {
         binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
 
         val currentFolderId = MainViewModel.currentFolderId.value
-        defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
-        customFoldersAdapter.setFolders(customFolders, currentFolderId)
+        defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
+        customFolderAdapter.setFolders(customFolders, currentFolderId)
 
         setCustomFoldersCollapsedState()
     }
@@ -243,8 +243,8 @@ class MenuDrawerFragment : Fragment() {
     private fun onCurrentFolderChange(folderRole: FolderRole) = with(binding) {
         currentFolderRole = folderRole
         inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
-        defaultFoldersAdapter.notifyItemRangeChanged(0, defaultFoldersAdapter.itemCount, Unit)
-        customFoldersAdapter.notifyItemRangeChanged(0, customFoldersAdapter.itemCount, Unit)
+        defaultFolderAdapter.notifyItemRangeChanged(0, defaultFolderAdapter.itemCount, Unit)
+        customFolderAdapter.notifyItemRangeChanged(0, customFolderAdapter.itemCount, Unit)
     }
 
     private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {
@@ -264,7 +264,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setCustomFoldersCollapsedState() = with(binding) {
         val folderId = MainViewModel.currentFolderId.value
-        val isExpanded = folderId != null && (currentFolderRole == null || customFoldersAdapter.itemCount == 0)
+        val isExpanded = folderId != null && (currentFolderRole == null || customFolderAdapter.itemCount == 0)
         val angleResource = if (isExpanded) R.dimen.angleViewRotated else R.dimen.angleViewNotRotated
         val angle = ResourcesCompat.getFloat(resources, angleResource)
         customFoldersList.isVisible = isExpanded
