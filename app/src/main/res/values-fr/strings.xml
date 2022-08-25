@@ -36,7 +36,12 @@
     <string name="actionReplyAll">Répondre à tous</string>
     <string name="actionReportDisplayProblem">Signaler un problème d’affichage</string>
     <string name="actionSavePDF">Enregistrer en PDF</string>
+    <string name="actionShortMarkAsRead">Lu</string>
+    <string name="actionShortMarkAsUnread">Non lu</string>
+    <string name="actionShortStar">Favoris</string>
     <string name="actionSpam">Spam</string>
+    <string name="actionStar">Ajouter aux favoris</string>
+    <string name="actionUnstar">Retirer des favoris</string>
     <string name="actionsMenuTitle">Que souhaitez-vous faire ?</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
@@ -101,6 +106,7 @@
     <string name="contactActionCopyEmailAddress">Copier l’adresse e-mail</string>
     <string name="contactActionWriteEmail">Écrire un e-mail</string>
     <string name="contactMe">Moi</string>
+    <string name="contactsSearch">Contacts</string>
     <string name="contentDescriptionButtonBack">Retour</string>
     <string name="contentDescriptionButtonDeleteDraft">Supprimer le brouillon</string>
     <string name="contentDescriptionButtonExpandAccountSelection">Déplier la sélection de compte</string>
@@ -137,13 +143,17 @@
     <string name="messageDetailsYesterday">Hier</string>
     <string name="messageForwardHeader">Message transféré</string>
     <string name="messageIsDraftOption">Brouillon</string>
-    <string name="messageNoSubject">Pas de sujet</string>
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="moreStorageText1">Votre boite est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse e-mail ik.me (stockage limite, envoi, redirection, ...)</string>
     <string name="moreStorageTitle">Votre boite est pleine ? Obtenez plus de stockage !</string>
     <string name="moveTitle">Dans quel dossier souhaitez-vous déplacer votre e-mail ?</string>
+    <plurals name="multipleSelectionCount">
+        <item quantity="one">%d sélectionné</item>
+        <item quantity="other">%d sélectionnés</item>
+    </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
+    <string name="noBodyTitle">Ce message est vide.</string>
     <string name="noEmailDescription">Composez un nouvel e-mail en cliquant sur \"Nouveau message\" en bas à droite</string>
     <string name="noEmailTitle">Vous n’avez pas d’e-mails</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse e-mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
@@ -160,6 +170,7 @@
     <string name="onBoardingTitle3">Restez appuyé quelques secondes sur un message pour activer la sélection multiple</string>
     <string name="onBoardingTitle4">Connectez-vous et commencez à utiliser l’app kMail dès maintenant !</string>
     <string name="pendingMessagesFolder">Messages en attente</string>
+    <string name="recentSearchesTitle">Recherches récentes</string>
     <string name="refreshTokenError">Vous avez été déconnecté en raison d’un problème. Veuillez vous reconnecter</string>
     <string name="reportDisplayProblemDescription">Acceptez-vous de partager vos données avec nos développeurs pour qu’ils puissent vous aider concernant votre problème ?</string>
     <string name="reportDisplayProblemTitle">Signaler un problème d’affichage</string>
