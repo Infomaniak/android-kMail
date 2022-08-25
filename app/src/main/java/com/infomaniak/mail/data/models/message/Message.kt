@@ -86,6 +86,7 @@ class Message : RealmObject {
     var safeDisplay: Boolean = false
     @SerialName("is_duplicate")
     var isDuplicate: Boolean = false
+    var duplicates: RealmList<Duplicate> = realmListOf()
 
     /**
      * Local
