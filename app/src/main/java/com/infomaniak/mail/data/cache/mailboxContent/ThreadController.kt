@@ -112,7 +112,7 @@ object ThreadController {
 
         return threadsResult?.let {
             val canContinueToPaginate = it.messagesCount >= ApiRepository.PER_PAGE
-            FolderController.updateFolderCounts(folderId, it)
+            FolderController.updateFolderUnreadCount(folderId, it.folderUnseenMessage)
             canContinueToPaginate
         } ?: false
     }

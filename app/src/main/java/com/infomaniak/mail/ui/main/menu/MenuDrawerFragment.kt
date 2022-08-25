@@ -237,7 +237,7 @@ class MenuDrawerFragment : Fragment() {
         defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
         customFoldersAdapter.setFolders(customFolders, currentFolderId)
 
-        setCustomFolderCollapsedState()
+        setCustomFoldersCollapsedState()
     }
 
     private fun onCurrentFolderChange(folderRole: FolderRole) = with(binding) {
@@ -262,7 +262,7 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun setCustomFolderCollapsedState() = with(binding) {
+    private fun setCustomFoldersCollapsedState() = with(binding) {
         val folderId = MainViewModel.currentFolderId.value
         val isExpanded = folderId != null && (currentFolderRole == null || customFoldersAdapter.itemCount == 0)
         val angleResource = if (isExpanded) R.dimen.angleViewRotated else R.dimen.angleViewNotRotated
@@ -284,7 +284,7 @@ class MenuDrawerFragment : Fragment() {
         customFoldersList.isGone = true
         createNewFolderButton.isGone = true
         expandCustomFolderButton.rotation = 0.0f
-        setCustomFolderCollapsedState()
+        setCustomFoldersCollapsedState()
     }
 
     private fun openFolder(folderId: String) {

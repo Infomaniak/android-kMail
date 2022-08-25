@@ -37,7 +37,7 @@ object ModelsUtils {
             return mutableListOf<Folder>().apply {
                 add(parent)
                 parent.children.forEach { child ->
-                    child.initLocalValues(parent)
+                    child.parentLink = parent
                     addAll(formatFolderWithAllChildren(child))
                 }
             }

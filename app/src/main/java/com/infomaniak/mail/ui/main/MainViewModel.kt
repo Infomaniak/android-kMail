@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.decrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getLatestThreadSync
@@ -171,6 +172,7 @@ class MainViewModel : ViewModel() {
                     val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, latestThread.messages.map { it.uid })
 
                     if (apiResponse.isSuccess()) {
+                        currentFolderId.value?.let { decrementFolderUnreadCount(it) }
                         latestThread.apply {
                             messages.forEach { it.seen = true }
                             unseenMessagesCount = 0

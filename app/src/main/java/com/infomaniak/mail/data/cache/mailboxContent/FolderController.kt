@@ -22,7 +22,6 @@ import com.infomaniak.mail.data.cache.RealmController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -36,6 +35,7 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.SharedFlow
 import java.util.*
+import kotlin.math.max
 
 object FolderController {
 
@@ -87,9 +87,14 @@ object FolderController {
             // Save new data
             Log.d(RealmController.TAG, "Folders: Save new data")
             apiFolders.forEach { apiFolder ->
-                realmFolders.find { it.id == apiFolder.id }?.threads
-                    ?.mapNotNull(::findLatest)
-                    ?.let { apiFolder.threads = it.toRealmList() }
+                realmFolders.find { it.id == apiFolder.id }?.let { realmFolder ->
+                    apiFolder.initLocalValues(
+                        threads = realmFolder.threads.mapNotNull(::findLatest).toRealmList(),
+                        parentLink = realmFolder.parentLink?.let(::findLatest),
+                        lastUpdatedAt = realmFolder.lastUpdatedAt,
+                    )
+                }
+
                 copyToRealm(apiFolder, UpdatePolicy.ALL)
             }
 
@@ -114,11 +119,17 @@ object FolderController {
         }
     }
 
-    fun updateFolderCounts(id: String, threadsResult: ThreadsResult) {
+    fun updateFolderUnreadCount(id: String, unreadCount: Int) {
         updateFolder(id) {
-            it.unreadCount = threadsResult.folderUnseenMessage
+            it.unreadCount = unreadCount
             // it.totalCount = threadsResult.totalMessagesCount // TODO: We don't use this for now.
             it.lastUpdatedAt = Date().toRealmInstant()
+        }
+    }
+
+    fun MutableRealm.decrementFolderUnreadCount(folderId: String) {
+        getLatestFolderSync(folderId)?.let { latestFolder ->
+            if (latestFolder.unreadCount > 0) latestFolder.unreadCount = max(latestFolder.unreadCount - 1, 0)
         }
     }
 
