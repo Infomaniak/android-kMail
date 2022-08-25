@@ -57,7 +57,7 @@ class MainViewModel : ViewModel() {
     val isInternetAvailable = MutableLiveData(false)
     var canContinueToPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
-    var isDownloadingChanges = false
+    var isDownloadingChanges = MutableLiveData(false)
 
     fun close() {
         Log.i(TAG, "close")
@@ -167,7 +167,7 @@ class MainViewModel : ViewModel() {
         val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
-        isDownloadingChanges = true
+        withContext(Dispatchers.Main) { isDownloadingChanges.value = true }
         loadThreads(mailboxUuid, folderId, currentOffset, filter)
     }
 
@@ -178,7 +178,7 @@ class MainViewModel : ViewModel() {
         filter: ThreadFilter,
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
-        isDownloadingChanges = true
+        withContext(Dispatchers.Main) { isDownloadingChanges.value = true }
         loadThreads(mailboxUuid, folderId, offset, filter)
     }
 
@@ -236,6 +236,7 @@ class MainViewModel : ViewModel() {
         filter: ThreadFilter = ThreadFilter.ALL,
     ) {
         canContinueToPaginate = ThreadController.upsertApiData(mailboxUuid, folderId, offset, filter)
+        isDownloadingChanges.postValue(false)
     }
 
     private fun loadMessages(thread: Thread) {
