@@ -236,6 +236,7 @@ class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
     private fun Thread.getSectionTitle(context: Context): String = with(date) {
         return when {
             isToday() -> context.getString(R.string.threadListSectionToday)
+            isYesterday() -> context.getString(R.string.messageDetailsYesterday)
             isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)
             isLastWeek() -> context.getString(R.string.threadListSectionLastWeek)
             isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
