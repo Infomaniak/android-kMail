@@ -54,7 +54,7 @@ class IntroFragment : Fragment() {
 
     class IntroViewModel : ViewModel() {
         @ColorInt
-        var theme = MutableLiveData(ThemeColor.BLUE to false)
+        var theme = MutableLiveData(ThemeColor.PINK to false)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
