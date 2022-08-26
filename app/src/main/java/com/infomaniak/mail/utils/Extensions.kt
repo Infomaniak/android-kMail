@@ -61,7 +61,7 @@ fun Date.isSmallerThanDays(daysAgo: Int): Boolean {
     val lastDay = Calendar.getInstance().apply {
         add(Calendar.DATE, -daysAgo)
         startOfTheDay()
-    }.time
+    }.time.startOfTheDay()
     return lastDay <= this
 }
 

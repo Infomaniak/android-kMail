@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.folder
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.format.DateUtils
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -122,14 +123,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
             disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
             addItemDecoration(HeaderItemDecoration(this, false) { position ->
-                return@HeaderItemDecoration threadListAdapter.dataSet[position] is String
+                return@HeaderItemDecoration position >= 0 && threadListAdapter.dataSet[position] is String
             })
         }
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
             // TODO: Manage no Internet screen
             // threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
-            // binding.noNetwork.isGone = isInternetAvailable
+            TransitionManager.beginDelayedTransition(binding.root)
+            binding.noNetwork.isGone = it
         }
 
         threadListAdapter.apply {

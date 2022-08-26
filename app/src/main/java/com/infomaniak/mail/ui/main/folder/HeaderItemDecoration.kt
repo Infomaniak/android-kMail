@@ -15,18 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.folder/*
-
-solution based on - based on Sevastyan answer on StackOverflow
-changes:
-- take to account views offsets
-- transformed to Kotlin
-- now works on viewHolders
-- try to cache viewHolders between draw's
-- support for clipToPadding=false
-Source:
-https://stackoverflow.com/questions/32949971/how-can-i-make-sticky-headers-in-recyclerview-without-external-lib/44327350#44327350
-*/
+package com.infomaniak.mail.ui.main.folder
 
 import android.graphics.Canvas
 import android.graphics.Rect
@@ -34,6 +23,7 @@ import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.forEach
 import androidx.recyclerview.widget.RecyclerView
 
 class HeaderItemDecoration(
@@ -56,30 +46,24 @@ class HeaderItemDecoration(
             // clear saved layout as it may need layout update
             currentHeader = null
         }
+
         // handle click on sticky header
         parent.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
-            override fun onInterceptTouchEvent(
-                recyclerView: RecyclerView,
-                motionEvent: MotionEvent
-            ): Boolean {
+            override fun onInterceptTouchEvent(recyclerView: RecyclerView, motionEvent: MotionEvent): Boolean {
                 return if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                     motionEvent.y <= (currentHeader?.second?.itemView?.bottom ?: 0)
-                } else false
+                } else {
+                    false
+                }
             }
         })
     }
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDrawOver(c, parent, state)
-        // val topChild = parent.getChildAt(0) ?: return
-        val topChild = parent.findChildViewUnder(
-            parent.paddingLeft.toFloat(),
-            parent.paddingTop.toFloat() /*+ (currentHeader?.second?.itemView?.height ?: 0 )*/
-        ) ?: return
+        val topChild = parent.findChildViewUnder(parent.paddingLeft.toFloat(), parent.paddingTop.toFloat()) ?: return
         val topChildPosition = parent.getChildAdapterPosition(topChild)
-        if (topChildPosition == RecyclerView.NO_POSITION) {
-            return
-        }
+        if (topChildPosition == RecyclerView.NO_POSITION) return
 
         val headerView = getHeaderViewForItem(topChildPosition, parent) ?: return
 
@@ -116,43 +100,42 @@ class HeaderItemDecoration(
         return headerHolder?.itemView
     }
 
-    private fun drawHeader(c: Canvas, header: View, paddingTop: Int) {
-        c.save()
-        c.translate(0f, paddingTop.toFloat())
-        header.draw(c)
-        c.restore()
+    private fun drawHeader(c: Canvas, header: View, paddingTop: Int) = with(c) {
+        save()
+        translate(0f, paddingTop.toFloat())
+        header.draw(this)
+        restore()
     }
 
-    private fun moveHeader(c: Canvas, currentHeader: View, nextHeader: View, paddingTop: Int) {
-        c.save()
+    private fun moveHeader(c: Canvas, currentHeader: View, nextHeader: View, paddingTop: Int) = with(c) {
+        save()
         if (!shouldFadeOutHeader) {
-            c.clipRect(0, paddingTop, c.width, paddingTop + currentHeader.height)
+            clipRect(0, paddingTop, width, paddingTop + currentHeader.height)
         } else {
-            c.saveLayerAlpha(
-                RectF(0f, 0f, c.width.toFloat(), c.height.toFloat()),
+            saveLayerAlpha(
+                RectF(0f, 0f, width.toFloat(), height.toFloat()),
                 (((nextHeader.top - paddingTop) / nextHeader.height.toFloat()) * 255).toInt()
             )
         }
-        c.translate(0f, (nextHeader.top - currentHeader.height).toFloat() /*+ paddingTop*/)
+        translate(0f, (nextHeader.top - currentHeader.height).toFloat())
 
-        currentHeader.draw(c)
+        currentHeader.draw(this)
         if (shouldFadeOutHeader) {
-            c.restore()
+            restore()
         }
-        c.restore()
+        restore()
     }
 
     private fun getChildInContact(parent: RecyclerView, contactPoint: Int): View? {
         var childInContact: View? = null
-        for (i in 0 until parent.childCount) {
-            val child = parent.getChildAt(i)
+        parent.forEach { child ->
             val mBounds = Rect()
             parent.getDecoratedBoundsWithMargins(child, mBounds)
             if (mBounds.bottom > contactPoint) {
                 if (mBounds.top <= contactPoint) {
                     // This child overlaps the contactPoint
                     childInContact = child
-                    break
+                    return@forEach
                 }
             }
         }
@@ -168,8 +151,7 @@ class HeaderItemDecoration(
 
         // Specs for parent (RecyclerView)
         val widthSpec = View.MeasureSpec.makeMeasureSpec(parent.width, View.MeasureSpec.EXACTLY)
-        val heightSpec =
-            View.MeasureSpec.makeMeasureSpec(parent.height, View.MeasureSpec.UNSPECIFIED)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(parent.height, View.MeasureSpec.UNSPECIFIED)
 
         // Specs for children (headers)
         val childWidthSpec = ViewGroup.getChildMeasureSpec(
@@ -203,8 +185,6 @@ class HeaderItemDecoration(
 
 inline fun View.doOnEachNextLayout(crossinline action: (view: View) -> Unit) {
     addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
-        action(
-            view
-        )
+        action(view)
     }
 }
