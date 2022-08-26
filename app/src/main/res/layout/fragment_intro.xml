@@ -141,6 +141,7 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:paddingHorizontal="0dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/blueBoardingSecondaryBackground"
         app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -148,7 +149,8 @@
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintWidth_percent="0.6"
-        app:rippleColor="@android:color/transparent">
+        app:rippleColor="@android:color/transparent"
+        tools:visibility="visible">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/pinkBlueTabLayout"

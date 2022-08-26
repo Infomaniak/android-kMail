@@ -18,14 +18,12 @@
 package com.infomaniak.mail.ui.login
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -82,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
 
         introViewpager.apply {
             offscreenPageLimit = 3
-            adapter = IntroPagerAdapter(supportFragmentManager, lifecycle)
+            adapter = IntroPagerAdapter(supportFragmentManager, lifecycle, intent.extras?.getBoolean(IS_FIRST_ACCOUNT) ?: false)
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
@@ -147,9 +145,14 @@ class LoginActivity : AppCompatActivity() {
         showSnackbar(error)
     }
 
-    fun updateUi(@ColorInt primary: Int, @ColorInt ripple: Int, animate: Boolean) = with(binding) {
-        val oldColor = dotsIndicator.selectedDotColor
-        animateColorChange(animate, oldColor, primary) { color ->
+    fun updateUi(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
+        val newPrimary = themeColor.getPrimary(this@LoginActivity)
+        val oldPrimary = dotsIndicator.selectedDotColor
+        val newSecondaryColor = themeColor.getWaveColor(this@LoginActivity)
+        val oldSecondaryColor = window.statusBarColor
+        val ripple = themeColor.getRipple(this@LoginActivity)
+
+        animateColorChange(animate, oldPrimary, newPrimary) { color ->
             val singleColorStateList = ColorStateList.valueOf(color)
             dotsIndicator.selectedDotColor = color
             connectButton.setBackgroundColor(color)
@@ -157,9 +160,15 @@ class LoginActivity : AppCompatActivity() {
             signInButton.setTextColor(color)
             signInButton.rippleColor = ColorStateList.valueOf(ripple)
         }
+
+        animateColorChange(animate, oldSecondaryColor, newSecondaryColor) { color ->
+            window.statusBarColor = color
+        }
     }
 
-    private companion object {
+    companion object {
+        const val IS_FIRST_ACCOUNT = "isFirstAccount"
+
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {

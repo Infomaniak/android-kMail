@@ -21,8 +21,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.ui.login.LoginActivity
+import com.infomaniak.mail.ui.login.LoginActivity.Companion.IS_FIRST_ACCOUNT
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +43,9 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun loginUser() {
-        launchActivity(LoginActivity::class.java)
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.putExtras(bundleOf(IS_FIRST_ACCOUNT to true))
+        startActivity(intent)
     }
 
     private suspend fun startApp() {

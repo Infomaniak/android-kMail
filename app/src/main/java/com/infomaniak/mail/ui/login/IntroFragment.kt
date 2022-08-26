@@ -82,24 +82,25 @@ class IntroFragment : Fragment() {
             }
         }
 
-        pinkBlueSwitch.isVisible = position == 0
+        if (position == 0) {
+            pinkBlueSwitch.isVisible = true
+            val selectedTab = pinkBlueTabLayout.getTabAt(if (viewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
+            pinkBlueTabLayout.selectTab(selectedTab)
+            setTabListener()
+        }
 
-        val selectedTab = pinkBlueTabLayout.getTabAt(if (viewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
-        pinkBlueTabLayout.selectTab(selectedTab)
-
-        setTabListener()
         updateUiWhenThemeChanges(position)
     }
 
     private fun setUi(themeColor: ThemeColor, position: Int?, animate: Boolean = true) = with(binding) {
         updateEachPageUi(themeColor, animate)
         if (position == 0) updateFirstPageUi(themeColor, animate)
+        if (position == 3) updateActivityUi(themeColor, animate)
     }
 
     private fun updateEachPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
         val newColor = themeColor.getWaveColor(requireContext())
-        val oldColor =
-            requireActivity().window.statusBarColor // waveBackground.imageTintList!!.defaultColor//requireActivity().window.statusBarColor
+        val oldColor = requireActivity().window.statusBarColor
         animateColorChange(animate, oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
@@ -117,16 +118,9 @@ class IntroFragment : Fragment() {
         val isPink = themeColor == ThemeColor.PINK
         val context = requireContext()
         val primary = themeColor.getPrimary(context)
-        val ripple = themeColor.getRipple(context)
         val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
         val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
         val colorOnPrimary = context.getAttributeColor(com.google.android.material.R.attr.colorOnPrimary)
-
-        val newSecondaryColor = themeColor.getWaveColor(context)
-        val oldSecondaryColor = requireActivity().window.statusBarColor
-        animateColorChange(animate, oldSecondaryColor, newSecondaryColor) { color ->
-            requireActivity().window.statusBarColor = color
-        }
 
         val bluePrimary = ThemeColor.BLUE.getPrimary(context)
         val pinkPrimary = ThemeColor.PINK.getPrimary(context)
@@ -142,8 +136,10 @@ class IntroFragment : Fragment() {
         animateColorChange(animate, oldBackgroundColor, tabBackground) { color ->
             pinkBlueSwitch.setCardBackgroundColor(color)
         }
+    }
 
-        (requireActivity() as LoginActivity).updateUi(primary, ripple, animate)
+    private fun updateActivityUi(themeColor: ThemeColor, animate: Boolean) {
+        (requireActivity() as LoginActivity).updateUi(themeColor, animate)
     }
 
     private fun setTabListener() = with(binding) {

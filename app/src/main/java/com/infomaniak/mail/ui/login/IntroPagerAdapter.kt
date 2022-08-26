@@ -23,11 +23,14 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class IntroPagerAdapter(manager: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(manager, lifecycle) {
+class IntroPagerAdapter(manager: FragmentManager, lifecycle: Lifecycle, private val isFirstAccount: Boolean) :
+    FragmentStateAdapter(manager, lifecycle) {
 
-    override fun getItemCount() = 4
+    override fun getItemCount() = if (isFirstAccount) 4 else 3
 
     override fun createFragment(position: Int): Fragment {
-        return IntroFragment().apply { arguments = bundleOf(IntroFragment.POSITION_KEY to position) }
+        return IntroFragment().apply {
+            arguments = bundleOf(IntroFragment.POSITION_KEY to if (isFirstAccount) position else position + 1)
+        }
     }
 }
