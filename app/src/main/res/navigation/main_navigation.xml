@@ -301,4 +301,25 @@
         android:label="MainActivity"
         tools:layout="@layout/activity_main" />
 
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.infomaniak.mail.ui.login.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login">
+        <argument
+            android:name="isFirstAccount"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </activity>
+
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.infomaniak.mail.ui.login.IntroFragment"
+        android:label="fragment_intro"
+        tools:layout="@layout/fragment_intro">
+        <argument
+            android:name="position"
+            app:argType="integer" />
+    </fragment>
+
 </navigation>

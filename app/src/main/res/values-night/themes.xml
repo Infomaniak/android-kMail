@@ -23,7 +23,6 @@
     </style>
 
     <style name="AppTheme.Login" parent="AppTheme.LoginBase">
-        <item name="loginWaveColor">@color/black</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 

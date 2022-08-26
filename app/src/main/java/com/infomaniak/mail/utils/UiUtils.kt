@@ -65,7 +65,7 @@ object UiUtils {
         animate: Boolean,
         @ColorInt oldColor: Int,
         @ColorInt newColor: Int,
-        duration: Long = 300,
+        duration: Long = 150,
         setColor: (Int) -> Unit
     ) {
         if (animate) {

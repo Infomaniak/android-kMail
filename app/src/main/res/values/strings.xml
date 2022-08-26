@@ -96,7 +96,7 @@
     <string name="buttonRestoreEmails">Restore emails</string>
     <string name="buttonSchedule">Schedule email to send later</string>
     <string name="buttonSeeAll">See all</string>
-    <string name="buttonSelectAll">Select all</string>
+    <string name="buttonSelectAll">All</string>
     <string name="buttonShare">Share</string>
     <string name="buttonStrikedThrough">Strike through</string>
     <string name="buttonTextOptionsClose">Close text formatting</string>
@@ -119,6 +119,7 @@
     <string name="contentDescriptionButtonExpandHeader">Expand header</string>
     <string name="contentDescriptionButtonFilterSearch">Filter search</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
+    <string name="contentDescriptionButtonNext">Next</string>
     <string name="contentDescriptionButtonSettings">Settings</string>
     <string name="contentDescriptionIconAttachments">Has attachments</string>
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
@@ -186,6 +187,7 @@
     <string name="restoreEmailsTitle">Restore your emails</string>
     <string name="scheduledMessagesFolder">Scheduled messages</string>
     <string name="searchAllMessages">All messages</string>
+    <string name="searchFieldPlaceholder">Search an email</string>
     <string name="searchFilterAttachment">Attachments</string>
     <string name="searchFilterFolder">Folder</string>
     <string name="searchFilterRead">Read</string>

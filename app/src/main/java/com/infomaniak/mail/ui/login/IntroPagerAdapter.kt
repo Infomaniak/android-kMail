@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui.login
 
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -30,7 +29,7 @@ class IntroPagerAdapter(manager: FragmentManager, lifecycle: Lifecycle, private 
 
     override fun createFragment(position: Int): Fragment {
         return IntroFragment().apply {
-            arguments = bundleOf(IntroFragment.POSITION_KEY to if (isFirstAccount) position else position + 1)
+            arguments = IntroFragmentArgs(if (isFirstAccount) position else position + 1).toBundle()
         }
     }
 }

@@ -33,7 +33,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        tools:tint="?attr/colorPrimaryContainer" />
 
     <View
         android:id="@+id/bottomWave"
@@ -136,7 +137,6 @@
             app:tabIndicatorAnimationDuration="@integer/loginLayoutAnimationDuration"
             app:tabIndicatorFullWidth="true"
             app:tabIndicatorGravity="stretch"
-            app:tabMaxWidth="0dp"
             app:tabMode="fixed"
             app:tabRippleColor="@android:color/transparent"
             tools:tabBackground="@color/blueBoardingSecondaryBackground"

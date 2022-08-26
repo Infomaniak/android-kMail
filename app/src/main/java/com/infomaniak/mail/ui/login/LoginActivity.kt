@@ -25,6 +25,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -53,6 +54,7 @@ import com.infomaniak.lib.core.R as RCore
 class LoginActivity : AppCompatActivity() {
 
     private val binding: ActivityLoginBinding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
+    private val navigationArgs by lazy { LoginActivityArgs.fromBundle(intent.extras ?: bundleOf()) }
 
     private lateinit var infomaniakLogin: InfomaniakLogin
 
@@ -82,8 +84,7 @@ class LoginActivity : AppCompatActivity() {
             clientID = BuildConfig.CLIENT_ID,
         )
 
-        val isFirstAccount = intent.extras?.getBoolean(IS_FIRST_ACCOUNT_KEY) ?: false
-        val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, isFirstAccount)
+        val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, navigationArgs.isFirstAccount)
         introViewpager.apply {
             offscreenPageLimit = 3
             adapter = introPagerAdapter
@@ -107,11 +108,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() = with(binding) {
-        if (introViewpager.currentItem == 0) {
-            super.onBackPressed()
-        } else {
-            introViewpager.currentItem -= 1
-        }
+        if (introViewpager.currentItem == 0) super.onBackPressed() else introViewpager.currentItem -= 1
     }
 
     private fun authenticateUser(authCode: String) {
@@ -154,10 +151,13 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun updateUi(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
+        animatePrimaryColorElements(themeColor, animate)
+        animateSecondaryColorElements(themeColor, animate)
+    }
+
+    private fun animatePrimaryColorElements(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
         val newPrimary = themeColor.getPrimary(this@LoginActivity)
         val oldPrimary = dotsIndicator.selectedDotColor
-        val newSecondaryBackground = themeColor.getSecondaryBackground(this@LoginActivity)
-        val oldSecondaryBackground = window.statusBarColor
         val ripple = themeColor.getRipple(this@LoginActivity)
 
         animateColorChange(animate, oldPrimary, newPrimary) { color ->
@@ -168,7 +168,11 @@ class LoginActivity : AppCompatActivity() {
             signInButton.setTextColor(color)
             signInButton.rippleColor = ColorStateList.valueOf(ripple)
         }
+    }
 
+    private fun animateSecondaryColorElements(themeColor: IntroFragment.ThemeColor, animate: Boolean) {
+        val newSecondaryBackground = themeColor.getSecondaryBackground(this@LoginActivity)
+        val oldSecondaryBackground = window.statusBarColor
         animateColorChange(animate, oldSecondaryBackground, newSecondaryBackground) { color ->
             window.statusBarColor = color
         }
@@ -179,8 +183,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val IS_FIRST_ACCOUNT_KEY = "isFirstAccount"
-
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {

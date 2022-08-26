@@ -21,6 +21,6 @@
     android:viewportWidth="426"
     android:viewportHeight="427">
     <path
-        android:fillColor="?attr/loginWaveColor"
+        android:fillColor="#F7E8EF"
         android:pathData="M0,388C0,295.96 0,0 0,0H426C426,0 426,202.99 426,319.06C281.19,311.42 75.12,368.39 0,388Z" />
 </vector>

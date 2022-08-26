@@ -19,7 +19,6 @@
     <declare-styleable name="CommonAttributes">
         <attr name="icon" format="reference" />
         <attr name="text" format="string" />
-        <attr name="loginWaveColor" format="color" />
     </declare-styleable>
 
     <declare-styleable name="MenuDrawerItemView">

@@ -36,6 +36,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.mail.R
@@ -51,6 +52,7 @@ import com.google.android.material.R as RMaterial
 class IntroFragment : Fragment() {
     private lateinit var binding: FragmentIntroBinding
     private val viewModel: IntroViewModel by activityViewModels()
+    private val navigationArgs: IntroFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -58,8 +60,7 @@ class IntroFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        val position = arguments?.getInt(POSITION_KEY)
-        when (position) {
+        when (navigationArgs.position) {
             0 -> {
                 pinkBlueSwitch.isVisible = true
                 val selectedTab = pinkBlueTabLayout.getTabAt(if (viewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
@@ -83,7 +84,7 @@ class IntroFragment : Fragment() {
             }
         }
 
-        updateUiWhenThemeChanges(position)
+        updateUiWhenThemeChanges(navigationArgs.position)
     }
 
     private fun setTabSelectedListener() = with(binding) {
@@ -130,23 +131,19 @@ class IntroFragment : Fragment() {
     }
 
     private fun getThemedDrawable(theme: Int, @DrawableRes drawableRes: Int): Drawable? {
-        val wrapper = ContextThemeWrapper(context, theme)
-        return VectorDrawableCompat.create(resources, drawableRes, wrapper.theme)
+        return VectorDrawableCompat.create(resources, drawableRes, ContextThemeWrapper(context, theme).theme)
     }
 
     private fun updateFirstPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
+        animateTabIndicatorAndTextColor(themeColor, requireContext(), animate)
+        animateTabBackgroundColor(themeColor, requireContext(), animate)
+    }
+
+    private fun animateTabIndicatorAndTextColor(themeColor: ThemeColor, context: Context, animate: Boolean) = with(binding) {
         val isPink = themeColor == ThemeColor.PINK
-        val context = requireContext()
         val newPrimary = themeColor.getPrimary(context)
-        val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
-        val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
         val colorOnPrimary = context.getAttributeColor(RMaterial.attr.colorOnPrimary)
         val oldPrimary = if (isPink) ThemeColor.BLUE.getPrimary(context) else ThemeColor.PINK.getPrimary(context)
-        val oldBackground = if (isPink) {
-            ThemeColor.BLUE.getSecondaryBackground(context)
-        } else {
-            ThemeColor.PINK.getSecondaryBackground(context)
-        }
 
         animateColorChange(animate, oldPrimary, newPrimary) { color ->
             pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
@@ -154,6 +151,18 @@ class IntroFragment : Fragment() {
         animateColorChange(animate, newPrimary, oldPrimary) { color ->
             pinkBlueTabLayout.setTabTextColors(color, colorOnPrimary)
         }
+    }
+
+    private fun animateTabBackgroundColor(themeColor: ThemeColor, context: Context, animate: Boolean) = with(binding) {
+        val isPink = themeColor == ThemeColor.PINK
+        val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
+        val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
+        val oldBackground = if (isPink) {
+            ThemeColor.BLUE.getSecondaryBackground(context)
+        } else {
+            ThemeColor.PINK.getSecondaryBackground(context)
+        }
+
         animateColorChange(animate, oldBackground, tabBackground) { color ->
             pinkBlueTabLayout.setBackgroundColor(color)
         }
@@ -172,21 +181,11 @@ class IntroFragment : Fragment() {
         PINK(R.style.AppTheme_Pink, R.color.pinkMail, R.color.pinkBoardingSecondaryBackground, R.color.pinkMailRipple),
         BLUE(R.style.AppTheme_Blue, R.color.blueMail, R.color.blueBoardingSecondaryBackground, R.color.blueMailRipple);
 
-        fun getPrimary(context: Context): Int = with(context) {
-            return getColor(primary)
-        }
+        fun getPrimary(context: Context): Int = context.getColor(primary)
 
-        fun getSecondaryBackground(context: Context): Int = with(context) {
-            return getColor(secondaryBackground)
-        }
+        fun getSecondaryBackground(context: Context): Int = context.getColor(secondaryBackground)
 
-        fun getRipple(context: Context): Int = with(context) {
-            return getColor(ripple)
-        }
-    }
-
-    companion object {
-        const val POSITION_KEY = "position"
+        fun getRipple(context: Context): Int = context.getColor(ripple)
     }
 
     class IntroViewModel : ViewModel() {
