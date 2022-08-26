@@ -104,12 +104,14 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">?android:attr/colorPrimary</item>
         <item name="android:textSize">@dimen/textHintSize</item>
+        <item name="cornerRadius">10dp</item>
     </style>
 
     <style name="TextButtonPrimary" parent="Widget.Material3.Button">
         <item name="android:layout_height">56dp</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:letterSpacing">0</item>
+        <item name="android:maxWidth">500dp</item>
         <item name="android:minWidth">130dp</item>
         <item name="android:paddingLeft">@dimen/marginStandard</item>
         <item name="android:paddingRight">@dimen/marginStandard</item>
@@ -118,6 +120,7 @@
         <item name="backgroundTint">@color/primary_button_background_color</item>
         <item name="cornerRadius">10dp</item>
         <item name="fontFamily">@font/suisseintl_medium</item>
+        <item name="layout_constraintWidth_max">500dp</item>
     </style>
 
     <style name="TextButtonPrimary.Error">

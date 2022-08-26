@@ -148,6 +148,7 @@
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintWidth_max="300dp"
         app:layout_constraintWidth_percent="0.6"
         app:rippleColor="@android:color/transparent"
         tools:visibility="visible">
@@ -160,10 +161,13 @@
             android:background="@android:color/transparent"
             android:orientation="horizontal"
             app:tabBackground="@android:color/transparent"
+            app:tabGravity="fill"
             app:tabIndicator="@color/white"
             app:tabIndicatorAnimationDuration="@integer/loginLayoutAnimationDuration"
             app:tabIndicatorFullWidth="true"
             app:tabIndicatorGravity="stretch"
+            app:tabMaxWidth="0dp"
+            app:tabMode="fixed"
             app:tabRippleColor="@android:color/transparent"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/blueMail">

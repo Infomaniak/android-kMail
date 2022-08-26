@@ -21,11 +21,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
@@ -78,18 +80,21 @@ class LoginActivity : AppCompatActivity() {
             clientID = BuildConfig.CLIENT_ID,
         )
 
+        val isFirstAccount = intent.extras?.getBoolean(IS_FIRST_ACCOUNT) ?: false
+        val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, isFirstAccount)
         introViewpager.apply {
             offscreenPageLimit = 3
-            adapter = IntroPagerAdapter(supportFragmentManager, lifecycle, intent.extras?.getBoolean(IS_FIRST_ACCOUNT) ?: false)
+            adapter = introPagerAdapter
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    val showConnectButton = position == 3
+                    val showConnectButton = position == introPagerAdapter.itemCount - 1
                     nextButton.isInvisible = showConnectButton
                     connectButton.isInvisible = !showConnectButton
                     signInButton.isInvisible = !showConnectButton
                 }
             })
+            removeOverScroll()
         }
 
         dotsIndicator.attachTo(introViewpager)
@@ -164,6 +169,10 @@ class LoginActivity : AppCompatActivity() {
         animateColorChange(animate, oldSecondaryColor, newSecondaryColor) { color ->
             window.statusBarColor = color
         }
+    }
+
+    private fun ViewPager2.removeOverScroll() {
+        (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 
     companion object {
