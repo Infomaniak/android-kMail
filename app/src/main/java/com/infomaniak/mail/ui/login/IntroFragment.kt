@@ -45,7 +45,6 @@ import com.infomaniak.mail.utils.getAttributeColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class IntroFragment : Fragment() {
@@ -121,20 +120,19 @@ class IntroFragment : Fragment() {
         val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
         val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
         val colorOnPrimary = context.getAttributeColor(com.google.android.material.R.attr.colorOnPrimary)
-
         val bluePrimary = ThemeColor.BLUE.getPrimary(context)
         val pinkPrimary = ThemeColor.PINK.getPrimary(context)
-        val oldPrimaryColor = if (themeColor == ThemeColor.PINK) bluePrimary else pinkPrimary
+        val oldPrimaryColor = if (isPink) bluePrimary else pinkPrimary
+        val oldBackgroundColor = if (isPink) ThemeColor.BLUE.getWaveColor(context) else ThemeColor.PINK.getWaveColor(context)
+
         animateColorChange(animate, oldPrimaryColor, primary) { color ->
             pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
         }
         animateColorChange(animate, primary, oldPrimaryColor) { color ->
             pinkBlueTabLayout.setTabTextColors(color, colorOnPrimary)
         }
-
-        val oldBackgroundColor = pinkBlueSwitch.cardBackgroundColor.defaultColor
         animateColorChange(animate, oldBackgroundColor, tabBackground) { color ->
-            pinkBlueSwitch.setCardBackgroundColor(color)
+            pinkBlueTabLayout.setBackgroundColor(color)
         }
     }
 
@@ -158,9 +156,7 @@ class IntroFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
             delay(duration)
-            withContext(Dispatchers.Main) {
-                viewModel.theme.value = themeColor to true
-            }
+            viewModel.theme.postValue(themeColor to true)
         }
     }
 

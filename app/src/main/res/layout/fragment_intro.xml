@@ -109,32 +109,6 @@
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
-    <!--<LinearLayout-->
-    <!--    android:gravity="center"-->
-    <!--    app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--    app:layout_constraintEnd_toStartOf="@id/end"-->
-    <!--    app:layout_constraintStart_toEndOf="@id/start"-->
-    <!--    app:layout_constraintTop_toBottomOf="@id/title"-->
-    <!--    android:layout_width="0dp"-->
-    <!--    app:layout_constraintWidth_percent="0.5"-->
-    <!--    android:layout_height="wrap_content">-->
-
-    <!--    <com.google.android.material.button.MaterialButton-->
-    <!--        style="@style/TextButtonPrimary"-->
-    <!--        android:text="@string/accentColorPinkTitle"-->
-    <!--        android:layout_weight="1"-->
-    <!--        android:layout_width="0dp"-->
-    <!--        android:layout_height="wrap_content" />-->
-
-    <!--    <com.google.android.material.button.MaterialButton-->
-    <!--        style="@style/TextButtonPrimary"-->
-    <!--        android:text="@string/accentColorBlueTitle"-->
-    <!--        android:layout_weight="1"-->
-    <!--        android:layout_width="0dp"-->
-    <!--        android:layout_height="wrap_content" />-->
-
-    <!--</LinearLayout>-->
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/pinkBlueSwitch"
         style="@style/CardViewMail"
@@ -142,7 +116,6 @@
         android:layout_height="40dp"
         android:paddingHorizontal="0dp"
         android:visibility="gone"
-        app:cardBackgroundColor="@color/blueBoardingSecondaryBackground"
         app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/end"
@@ -150,7 +123,6 @@
         app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintWidth_max="300dp"
         app:layout_constraintWidth_percent="0.6"
-        app:rippleColor="@android:color/transparent"
         tools:visibility="visible">
 
         <com.google.android.material.tabs.TabLayout
@@ -158,31 +130,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="0dp"
-            android:background="@android:color/transparent"
             android:orientation="horizontal"
-            app:tabBackground="@android:color/transparent"
             app:tabGravity="fill"
-            app:tabIndicator="@color/white"
+            app:tabIndicator="@drawable/indicator_full_tab"
             app:tabIndicatorAnimationDuration="@integer/loginLayoutAnimationDuration"
             app:tabIndicatorFullWidth="true"
             app:tabIndicatorGravity="stretch"
             app:tabMaxWidth="0dp"
             app:tabMode="fixed"
-            app:tabRippleColor="@android:color/transparent"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="@color/blueMail">
+            tools:tabBackground="@color/blueBoardingSecondaryBackground"
+            tools:tabSelectedTextColor="@color/white"
+            tools:tabTextColor="@color/blueMail">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Pink" />
+                android:text="@string/accentColorPinkTitle" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Blue" />
+                android:text="@string/accentColorBlueTitle" />
 
         </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.card.MaterialCardView>
