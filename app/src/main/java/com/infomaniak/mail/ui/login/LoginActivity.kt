@@ -80,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
             clientID = BuildConfig.CLIENT_ID,
         )
 
-        val isFirstAccount = intent.extras?.getBoolean(IS_FIRST_ACCOUNT) ?: false
+        val isFirstAccount = intent.extras?.getBoolean(IS_FIRST_ACCOUNT_KEY) ?: false
         val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, isFirstAccount)
         introViewpager.apply {
             offscreenPageLimit = 3
@@ -154,8 +154,8 @@ class LoginActivity : AppCompatActivity() {
     fun updateUi(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
         val newPrimary = themeColor.getPrimary(this@LoginActivity)
         val oldPrimary = dotsIndicator.selectedDotColor
-        val newSecondaryColor = themeColor.getWaveColor(this@LoginActivity)
-        val oldSecondaryColor = window.statusBarColor
+        val newSecondaryBackground = themeColor.getSecondaryBackground(this@LoginActivity)
+        val oldSecondaryBackground = window.statusBarColor
         val ripple = themeColor.getRipple(this@LoginActivity)
 
         animateColorChange(animate, oldPrimary, newPrimary) { color ->
@@ -167,7 +167,7 @@ class LoginActivity : AppCompatActivity() {
             signInButton.rippleColor = ColorStateList.valueOf(ripple)
         }
 
-        animateColorChange(animate, oldSecondaryColor, newSecondaryColor) { color ->
+        animateColorChange(animate, oldSecondaryBackground, newSecondaryBackground) { color ->
             window.statusBarColor = color
         }
     }
@@ -177,7 +177,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val IS_FIRST_ACCOUNT = "isFirstAccount"
+        const val IS_FIRST_ACCOUNT_KEY = "isFirstAccount"
 
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 

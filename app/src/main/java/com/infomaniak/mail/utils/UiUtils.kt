@@ -69,10 +69,11 @@ object UiUtils {
         setColor: (Int) -> Unit
     ) {
         if (animate) {
-            val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor)
-            colorAnimation.duration = duration
-            colorAnimation.addUpdateListener { animator -> setColor(animator.animatedValue as Int) }
-            colorAnimation.start()
+            ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
+                setDuration(duration)
+                addUpdateListener { animator -> setColor(animator.animatedValue as Int) }
+                start()
+            }
         } else {
             setColor(newColor)
         }

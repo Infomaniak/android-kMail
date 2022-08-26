@@ -20,8 +20,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundOnBoardingColor"
-    android:backgroundTint="@color/backgroundOnBoardingColor"
     tools:context=".ui.login.IntroFragment">
 
     <ImageView
@@ -88,6 +86,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        android:fontFamily="@font/suisseintl_medium"
         android:gravity="center"
         android:text="@string/onBoardingTitle1"
         app:layout_constraintBottom_toTopOf="@id/description"
@@ -99,6 +98,7 @@
 
     <TextView
         android:id="@+id/description"
+        style="@style/Body.Secondary"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -138,6 +138,7 @@
             app:tabIndicatorGravity="stretch"
             app:tabMaxWidth="0dp"
             app:tabMode="fixed"
+            app:tabRippleColor="@android:color/transparent"
             tools:tabBackground="@color/blueBoardingSecondaryBackground"
             tools:tabSelectedTextColor="@color/white"
             tools:tabTextColor="@color/blueMail">

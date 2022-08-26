@@ -45,16 +45,12 @@ import com.infomaniak.mail.utils.getAttributeColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.google.android.material.R as RMaterial
 
 
 class IntroFragment : Fragment() {
     private lateinit var binding: FragmentIntroBinding
     private val viewModel: IntroViewModel by activityViewModels()
-
-    class IntroViewModel : ViewModel() {
-        @ColorInt
-        var theme = MutableLiveData(ThemeColor.PINK to false)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -64,6 +60,12 @@ class IntroFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val position = arguments?.getInt(POSITION_KEY)
         when (position) {
+            0 -> {
+                pinkBlueSwitch.isVisible = true
+                val selectedTab = pinkBlueTabLayout.getTabAt(if (viewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
+                pinkBlueTabLayout.selectTab(selectedTab)
+                setTabSelectedListener()
+            }
             1 -> {
                 waveBackground.setImageResource(R.drawable.ic_back_wave_2)
                 title.setText(R.string.onBoardingTitle2)
@@ -81,66 +83,10 @@ class IntroFragment : Fragment() {
             }
         }
 
-        if (position == 0) {
-            pinkBlueSwitch.isVisible = true
-            val selectedTab = pinkBlueTabLayout.getTabAt(if (viewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
-            pinkBlueTabLayout.selectTab(selectedTab)
-            setTabListener()
-        }
-
         updateUiWhenThemeChanges(position)
     }
 
-    private fun setUi(themeColor: ThemeColor, position: Int?, animate: Boolean = true) = with(binding) {
-        updateEachPageUi(themeColor, animate)
-        if (position == 0) updateFirstPageUi(themeColor, animate)
-        if (position == 3) updateActivityUi(themeColor, animate)
-    }
-
-    private fun updateEachPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
-        val newColor = themeColor.getWaveColor(requireContext())
-        val oldColor = requireActivity().window.statusBarColor
-        animateColorChange(animate, oldColor, newColor) { color ->
-            waveBackground.imageTintList = ColorStateList.valueOf(color)
-        }
-
-        val drawable: Drawable? = getThemedDrawable(themeColor.theme, R.drawable.ic_boarding_illu_1)
-        iconLayout.setImageDrawable(drawable)
-    }
-
-    private fun getThemedDrawable(theme: Int, @DrawableRes drawableRes: Int): Drawable? {
-        val wrapper = ContextThemeWrapper(context, theme)
-        return VectorDrawableCompat.create(resources, drawableRes, wrapper.theme)
-    }
-
-    private fun updateFirstPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
-        val isPink = themeColor == ThemeColor.PINK
-        val context = requireContext()
-        val primary = themeColor.getPrimary(context)
-        val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
-        val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
-        val colorOnPrimary = context.getAttributeColor(com.google.android.material.R.attr.colorOnPrimary)
-        val bluePrimary = ThemeColor.BLUE.getPrimary(context)
-        val pinkPrimary = ThemeColor.PINK.getPrimary(context)
-        val oldPrimaryColor = if (isPink) bluePrimary else pinkPrimary
-        val oldBackgroundColor = if (isPink) ThemeColor.BLUE.getWaveColor(context) else ThemeColor.PINK.getWaveColor(context)
-
-        animateColorChange(animate, oldPrimaryColor, primary) { color ->
-            pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
-        }
-        animateColorChange(animate, primary, oldPrimaryColor) { color ->
-            pinkBlueTabLayout.setTabTextColors(color, colorOnPrimary)
-        }
-        animateColorChange(animate, oldBackgroundColor, tabBackground) { color ->
-            pinkBlueTabLayout.setBackgroundColor(color)
-        }
-    }
-
-    private fun updateActivityUi(themeColor: ThemeColor, animate: Boolean) {
-        (requireActivity() as LoginActivity).updateUi(themeColor, animate)
-    }
-
-    private fun setTabListener() = with(binding) {
+    private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val newSelectedTheme = if (pinkBlueTabLayout.selectedTabPosition == 0) ThemeColor.PINK else ThemeColor.BLUE
@@ -166,10 +112,61 @@ class IntroFragment : Fragment() {
         }
     }
 
+    private fun setUi(themeColor: ThemeColor, position: Int?, animate: Boolean = true) = with(binding) {
+        updateEachPageUi(themeColor, animate)
+        if (position == 0) updateFirstPageUi(themeColor, animate)
+        if (position == 3) updateActivityUi(themeColor, animate)
+    }
+
+    private fun updateEachPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
+        val newColor = themeColor.getSecondaryBackground(requireContext())
+        val oldColor = requireActivity().window.statusBarColor
+        animateColorChange(animate, oldColor, newColor) { color ->
+            waveBackground.imageTintList = ColorStateList.valueOf(color)
+        }
+
+        val drawable: Drawable? = getThemedDrawable(themeColor.theme, R.drawable.ic_boarding_illu_1)
+        iconLayout.setImageDrawable(drawable)
+    }
+
+    private fun getThemedDrawable(theme: Int, @DrawableRes drawableRes: Int): Drawable? {
+        val wrapper = ContextThemeWrapper(context, theme)
+        return VectorDrawableCompat.create(resources, drawableRes, wrapper.theme)
+    }
+
+    private fun updateFirstPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
+        val isPink = themeColor == ThemeColor.PINK
+        val context = requireContext()
+        val newPrimary = themeColor.getPrimary(context)
+        val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
+        val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
+        val colorOnPrimary = context.getAttributeColor(RMaterial.attr.colorOnPrimary)
+        val oldPrimary = if (isPink) ThemeColor.BLUE.getPrimary(context) else ThemeColor.PINK.getPrimary(context)
+        val oldBackground = if (isPink) {
+            ThemeColor.BLUE.getSecondaryBackground(context)
+        } else {
+            ThemeColor.PINK.getSecondaryBackground(context)
+        }
+
+        animateColorChange(animate, oldPrimary, newPrimary) { color ->
+            pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
+        }
+        animateColorChange(animate, newPrimary, oldPrimary) { color ->
+            pinkBlueTabLayout.setTabTextColors(color, colorOnPrimary)
+        }
+        animateColorChange(animate, oldBackground, tabBackground) { color ->
+            pinkBlueTabLayout.setBackgroundColor(color)
+        }
+    }
+
+    private fun updateActivityUi(themeColor: ThemeColor, animate: Boolean) {
+        (requireActivity() as LoginActivity).updateUi(themeColor, animate)
+    }
+
     enum class ThemeColor(
         @StyleRes val theme: Int,
         @ColorRes private val primary: Int,
-        @ColorRes private val waveColor: Int,
+        @ColorRes private val secondaryBackground: Int,
         @ColorRes private val ripple: Int
     ) {
         PINK(R.style.AppTheme_Pink, R.color.pinkMail, R.color.pinkBoardingSecondaryBackground, R.color.pinkMailRipple),
@@ -179,8 +176,8 @@ class IntroFragment : Fragment() {
             return getColor(primary)
         }
 
-        fun getWaveColor(context: Context): Int = with(context) {
-            return getColor(waveColor)
+        fun getSecondaryBackground(context: Context): Int = with(context) {
+            return getColor(secondaryBackground)
         }
 
         fun getRipple(context: Context): Int = with(context) {
@@ -190,5 +187,10 @@ class IntroFragment : Fragment() {
 
     companion object {
         const val POSITION_KEY = "position"
+    }
+
+    class IntroViewModel : ViewModel() {
+        @ColorInt
+        var theme = MutableLiveData(ThemeColor.PINK to false)
     }
 }
