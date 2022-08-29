@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
 class MainViewModel : ViewModel() {
 
     companion object {
-        private val TAG = "MainViewModel"
+        private const val TAG = "MainViewModel"
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
 
         val currentMailboxObjectId = MutableLiveData<String?>()

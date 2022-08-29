@@ -67,14 +67,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var updatedAtRefreshJob: Job? = null
 
     private var threadListAdapter = ThreadListAdapter()
-    var lastUpdatedDate: Date? = null
+    private var lastUpdatedDate: Date? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(milliseconds = 600L) { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
     var filter: ThreadFilter = ThreadFilter.ALL
-    var lastUnreadCount = 0
+    private var lastUnreadCount = 0
     private var mailboxUuid: String? = null
     private val offsetTrigger = max(1, PER_PAGE - 13)
 
