@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.userInfos
 
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.user.UserPreferences
 import io.realm.kotlin.ext.query
 
@@ -25,15 +25,15 @@ import io.realm.kotlin.ext.query
 // TODO: Refactor this Controller so it matches other Controllers format. This is still the old format.
 object UserPreferencesController {
 
-    fun getUserPreferences(): UserPreferences = with(RealmController.userInfos) {
+    fun getUserPreferences(): UserPreferences = with(RealmDatabase.userInfos) {
         query<UserPreferences>().first().find() ?: writeBlocking { copyToRealm(UserPreferences()) }
     }
 
     fun updateUserPreferences(onUpdate: (userPreferences: UserPreferences) -> Unit): UserPreferences? {
-        return RealmController.userInfos.writeBlocking { findLatest(getUserPreferences())?.also(onUpdate) }
+        return RealmDatabase.userInfos.writeBlocking { findLatest(getUserPreferences())?.also(onUpdate) }
     }
 
     fun removeUserPreferences() {
-        RealmController.userInfos.writeBlocking { findLatest(getUserPreferences())?.let(::delete) }
+        RealmDatabase.userInfos.writeBlocking { findLatest(getUserPreferences())?.let(::delete) }
     }
 }

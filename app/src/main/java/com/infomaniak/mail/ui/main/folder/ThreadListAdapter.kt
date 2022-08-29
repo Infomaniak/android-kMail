@@ -296,7 +296,7 @@ class ThreadListAdapter(
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()
 
-            // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
+            // TODO: Use realm to directly get the sorted list instead of sortedByDescending()
             threads.sortedByDescending { it.date }.forEachIndexed { _, thread ->
                 val sectionTitle = thread.getSectionTitle(context)
                 when {

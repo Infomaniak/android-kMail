@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.UiSettings
+import com.infomaniak.mail.data.models.UiSettings.ColorTheme
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
 
 class AccentColorSettingFragment : Fragment() {
@@ -51,7 +52,7 @@ class AccentColorSettingFragment : Fragment() {
 
     private fun setUpCheckMarks() = with(binding) {
         UiSettings(requireContext()).colorTheme.let { colorTheme ->
-            if (colorTheme == UiSettings.ColorTheme.PINK) {
+            if (colorTheme == ColorTheme.PINK) {
                 settingsOptionPinkAccentColorCheck
             } else {
                 settingsOptionBlueAccentColorCheck
@@ -61,22 +62,22 @@ class AccentColorSettingFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         settingsOptionPinkAccentColor.setOnClickListener {
-            chooseColor(UiSettings.ColorTheme.PINK, settingsOptionPinkAccentColorCheck)
+            chooseColor(ColorTheme.PINK, settingsOptionPinkAccentColorCheck)
         }
         settingsOptionBlueAccentColor.setOnClickListener {
-            chooseColor(UiSettings.ColorTheme.BLUE, settingsOptionBlueAccentColorCheck)
+            chooseColor(ColorTheme.BLUE, settingsOptionBlueAccentColorCheck)
         }
     }
 
-    private fun chooseColor(color: UiSettings.ColorTheme, selectedImageView: ImageView) {
-        activity?.setTheme(if (color == UiSettings.ColorTheme.PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
+    private fun chooseColor(color: ColorTheme, selectedImageView: ImageView) {
+        activity?.setTheme(if (color == ColorTheme.PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
         UiSettings(requireContext()).colorTheme = color
         selectedImageView.selectColor(color)
         activity?.recreate()
     }
 
-    private fun ImageView.selectColor(color: UiSettings.ColorTheme) {
-        val colorRes = if (color == UiSettings.ColorTheme.PINK) {
+    private fun ImageView.selectColor(color: ColorTheme) {
+        val colorRes = if (color == ColorTheme.PINK) {
             binding.settingsOptionBlueAccentColorCheck.setCheckMarkGone(this)
             R.color.pinkMail
         } else {
