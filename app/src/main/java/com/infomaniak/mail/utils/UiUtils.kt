@@ -17,8 +17,11 @@
  */
 package com.infomaniak.mail.utils
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.graphics.Color
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Correspondent
@@ -55,6 +58,24 @@ object UiUtils {
                 nameTextView.text = name
                 emailTextView?.text = email
             }
+        }
+    }
+
+    fun animateColorChange(
+        animate: Boolean,
+        @ColorInt oldColor: Int,
+        @ColorInt newColor: Int,
+        duration: Long = 150,
+        setColor: (Int) -> Unit
+    ) {
+        if (animate) {
+            ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
+                setDuration(duration)
+                addUpdateListener { animator -> setColor(animator.animatedValue as Int) }
+                start()
+            }
+        } else {
+            setColor(newColor)
         }
     }
 }

@@ -43,5 +43,6 @@
     <dimen name="roundCornerRadius">100dp</dimen>
     <dimen name="angleViewNotRotated">0.0</dimen>
     <dimen name="angleViewRotated">180.0</dimen>
+    <integer name="loginLayoutAnimationDuration">300</integer>
 
 </resources>

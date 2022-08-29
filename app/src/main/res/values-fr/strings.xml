@@ -91,7 +91,7 @@
     <string name="buttonRestoreEmails">Restaurer des e-mails</string>
     <string name="buttonSchedule">Programmer l’envoi de l’e-mail</string>
     <string name="buttonSeeAll">Voir tout</string>
-    <string name="buttonSelectAll">Tout sélectionner</string>
+    <string name="buttonSelectAll">Tout</string>
     <string name="buttonShare">Partager</string>
     <string name="buttonStrikedThrough">Barrer</string>
     <string name="buttonTextOptionsClose">Fermer le formatage de texte</string>
@@ -114,6 +114,7 @@
     <string name="contentDescriptionButtonExpandHeader">Déplier l’entête</string>
     <string name="contentDescriptionButtonFilterSearch">Filtrer la recherche</string>
     <string name="contentDescriptionButtonMenu">Menu</string>
+    <string name="contentDescriptionButtonNext">Suivant</string>
     <string name="contentDescriptionButtonSettings">Paramètres</string>
     <string name="contentDescriptionIconAttachments">Contient des pièces jointes</string>
     <string name="contentDescriptionIconCalendar">Contient un évènement Calendar</string>
@@ -181,6 +182,7 @@
     <string name="restoreEmailsTitle">Restaurer vos e-mails</string>
     <string name="scheduledMessagesFolder">Messages programmés</string>
     <string name="searchAllMessages">Tous les messages</string>
+    <string name="searchFieldPlaceholder">Rechercher un message</string>
     <string name="searchFilterAttachment">Pièces-jointes</string>
     <string name="searchFilterFolder">Dossier</string>
     <string name="searchFilterRead">Lus</string>

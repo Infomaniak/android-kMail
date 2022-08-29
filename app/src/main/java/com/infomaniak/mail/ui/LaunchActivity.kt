@@ -22,6 +22,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.mail.ui.login.LoginActivity
+import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +42,10 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun loginUser() {
-        launchActivity(LoginActivity::class.java)
+        Intent(this, LoginActivity::class.java).apply {
+            putExtras(LoginActivityArgs(isFirstAccount = true).toBundle())
+            startActivity(this)
+        }
     }
 
     private suspend fun startApp() {
@@ -49,13 +54,10 @@ class LaunchActivity : AppCompatActivity() {
 
         withContext(Dispatchers.Main) {
             MainViewModel.currentMailboxObjectId.observeNotNull(this@LaunchActivity) {
-                launchActivity(MainActivity::class.java) // TODO: If there is no Internet, the app won't be able to start.
+                // TODO: If there is no Internet, the app won't be able to start.
+                startActivity(Intent(this@LaunchActivity, MainActivity::class.java))
             }
         }
-    }
-
-    private fun launchActivity(destinationClass: Class<out AppCompatActivity>) {
-        startActivity(Intent(this, destinationClass))
     }
 
     override fun onDestroy() {

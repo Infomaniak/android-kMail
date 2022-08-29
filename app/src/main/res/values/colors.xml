@@ -20,9 +20,11 @@
     <!-- Primary colors -->
     <color name="pinkMail">#BC0055</color>
     <color name="pinkMailSecondary">#F7E8EF</color>
+    <color name="pinkBoardingSecondaryBackground">@color/pinkMailSecondary</color>
     <color name="pinkMailRipple">#1EBC0055</color>
     <color name="blueMail">@color/primary</color>
     <color name="blueMailSecondary">#F4F6FD</color>
+    <color name="blueBoardingSecondaryBackground">@color/blueMailSecondary</color>
     <color name="blueMailRipple">#1E0098FF</color>
 
     <!-- Context / errors -->

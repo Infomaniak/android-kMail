@@ -15,20 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui
+package com.infomaniak.mail.ui.login
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.Utils.lockLandscapeForSmallScreens
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
@@ -36,7 +44,9 @@ import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
+import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,6 +55,7 @@ import com.infomaniak.lib.core.R as RCore
 class LoginActivity : AppCompatActivity() {
 
     private val binding: ActivityLoginBinding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
+    private val navigationArgs by lazy { LoginActivityArgs.fromBundle(intent.extras ?: bundleOf()) }
 
     private lateinit var infomaniakLogin: InfomaniakLogin
 
@@ -62,18 +73,46 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
+        lockLandscapeForSmallScreens()
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
 
         infomaniakLogin = InfomaniakLogin(
-            context = this,
+            context = this@LoginActivity,
             appUID = BuildConfig.APPLICATION_ID,
             clientID = BuildConfig.CLIENT_ID,
         )
 
-        binding.loginButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
+        val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, navigationArgs.isFirstAccount)
+        introViewpager.apply {
+            offscreenPageLimit = 3
+            adapter = introPagerAdapter
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    val showConnectButton = position == introPagerAdapter.itemCount - 1
+                    nextButton.isInvisible = showConnectButton
+                    connectButton.isInvisible = !showConnectButton
+                    signInButton.isInvisible = !showConnectButton
+                }
+            })
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                removeOverScroll()
+            }
+        }
+
+        dotsIndicator.attachTo(introViewpager)
+
+        nextButton.setOnClickListener { introViewpager.currentItem += 1 }
+
+        connectButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
+    }
+
+    override fun onBackPressed() = with(binding) {
+        if (introViewpager.currentItem == 0) super.onBackPressed() else introViewpager.currentItem -= 1
     }
 
     private fun authenticateUser(authCode: String) {
@@ -87,6 +126,7 @@ class LoginActivity : AppCompatActivity() {
                             is User -> {
                                 // application.trackCurrentUserId() // TODO: Matomo
                                 // trackAccountEvent("loggedIn") // TODO: Matomo
+                                // TODO : When successfully logged in, set theme color setting to the theme selected during the onBoarding
                                 launchMainActivity()
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
@@ -114,7 +154,39 @@ class LoginActivity : AppCompatActivity() {
         showSnackbar(error)
     }
 
-    private companion object {
+    fun updateUi(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
+        animatePrimaryColorElements(themeColor, animate)
+        animateSecondaryColorElements(themeColor, animate)
+    }
+
+    private fun animatePrimaryColorElements(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
+        val newPrimary = themeColor.getPrimary(this@LoginActivity)
+        val oldPrimary = dotsIndicator.selectedDotColor
+        val ripple = themeColor.getRipple(this@LoginActivity)
+
+        animateColorChange(animate, oldPrimary, newPrimary) { color ->
+            val singleColorStateList = ColorStateList.valueOf(color)
+            dotsIndicator.selectedDotColor = color
+            connectButton.setBackgroundColor(color)
+            nextButton.backgroundTintList = singleColorStateList
+            signInButton.setTextColor(color)
+            signInButton.rippleColor = ColorStateList.valueOf(ripple)
+        }
+    }
+
+    private fun animateSecondaryColorElements(themeColor: IntroFragment.ThemeColor, animate: Boolean) {
+        val newSecondaryBackground = themeColor.getSecondaryBackground(this@LoginActivity)
+        val oldSecondaryBackground = window.statusBarColor
+        animateColorChange(animate, oldSecondaryBackground, newSecondaryBackground) { color ->
+            window.statusBarColor = color
+        }
+    }
+
+    private fun ViewPager2.removeOverScroll() {
+        (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
+    }
+
+    companion object {
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {

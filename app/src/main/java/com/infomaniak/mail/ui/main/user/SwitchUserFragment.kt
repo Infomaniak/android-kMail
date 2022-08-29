@@ -32,8 +32,8 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
-import com.infomaniak.mail.ui.LoginActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.sortMailboxes
