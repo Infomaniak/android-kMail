@@ -73,8 +73,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Utils.createRefreshTimer(milliseconds = 600L) { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    var filter: ThreadFilter = ThreadFilter.ALL // TODO: Do we need this? Here?
-    var lastUnreadCount = 0 // TODO: Do we need this?
+    var filter: ThreadFilter = ThreadFilter.ALL
+    var lastUnreadCount = 0
     private var mailboxUuid: String? = null
     private val offsetTrigger = max(1, PER_PAGE - 13)
 
