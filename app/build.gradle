@@ -55,8 +55,9 @@ dependencies {
     // Realm Kotlin - END /!\
 
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
-    implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'com.tbuonomo:dotsindicator:4.3'
+
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
