@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.login
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -97,7 +98,10 @@ class LoginActivity : AppCompatActivity() {
                     signInButton.isInvisible = !showConnectButton
                 }
             })
-            removeOverScroll()
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                removeOverScroll()
+            }
         }
 
         dotsIndicator.attachTo(introViewpager)

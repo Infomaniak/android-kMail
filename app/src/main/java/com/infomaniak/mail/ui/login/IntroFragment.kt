@@ -113,6 +113,9 @@ class IntroFragment : Fragment() {
         }
     }
 
+    /**
+     * animate is necessary because when the activity is started we want to avoid animating the color change the first time
+     */
     private fun setUi(themeColor: ThemeColor, position: Int?, animate: Boolean = true) = with(binding) {
         updateEachPageUi(themeColor, animate)
         if (position == 0) updateFirstPageUi(themeColor, animate)
