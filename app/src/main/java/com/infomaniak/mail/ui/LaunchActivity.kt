@@ -54,13 +54,10 @@ class LaunchActivity : AppCompatActivity() {
 
         withContext(Dispatchers.Main) {
             MainViewModel.currentMailboxObjectId.observeNotNull(this@LaunchActivity) {
-                launchActivity(MainActivity::class.java) // TODO: If there is no Internet, the app won't be able to start.
+                // TODO: If there is no Internet, the app won't be able to start.
+                startActivity(Intent(this@LaunchActivity, MainActivity::class.java))
             }
         }
-    }
-
-    private fun launchActivity(destinationClass: Class<out AppCompatActivity>) {
-        startActivity(Intent(this, destinationClass))
     }
 
     override fun onDestroy() {
