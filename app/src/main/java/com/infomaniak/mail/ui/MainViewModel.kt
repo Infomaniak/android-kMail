@@ -167,7 +167,7 @@ class MainViewModel : ViewModel() {
         val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
-        withContext(Dispatchers.Main) { isDownloadingChanges.value = true }
+        isDownloadingChanges.postValue(true)
         loadThreads(mailboxUuid, folderId, currentOffset, filter)
     }
 
@@ -178,7 +178,7 @@ class MainViewModel : ViewModel() {
         filter: ThreadFilter,
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
-        withContext(Dispatchers.Main) { isDownloadingChanges.value = true }
+        isDownloadingChanges.postValue(true)
         loadThreads(mailboxUuid, folderId, offset, filter)
     }
 
