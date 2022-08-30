@@ -22,6 +22,7 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
+        android:layout_marginTop="@dimen/messageDividerHeight"
         android:id="@+id/messageHeader"
         style="@style/CardViewMail"
         android:layout_width="match_parent"

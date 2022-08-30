@@ -19,14 +19,12 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -50,7 +48,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
-import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
@@ -76,7 +73,11 @@ class ThreadFragment : Fragment() {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
-        iconFavorite.isVisible = navigationArgs.threadIsFavorite
+        iconFavorite.apply {
+            setIconResource(if (navigationArgs.threadIsFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
+            setIconTintResource(if (navigationArgs.threadIsFavorite) R.color.favoriteYellow else R.color.iconColor)
+            setOnClickListener { notYetImplemented() }
+        }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
@@ -94,14 +95,10 @@ class ThreadFragment : Fragment() {
         }
 
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
-            val margin = resources.getDimensionPixelSize(RCore.dimen.marginStandardSmall)
-            val divider = InsetDrawable(it, margin, 0, margin, 0)
-            messagesList.addItemDecoration(DividerItemDecorator(divider))
+            messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
         }
 
-        // There is a space character at the end of the noSubjectTitle string because when displaying it in a MaterialToolbar
-        // (ThreadFragment) as the title, the last italic character is cut off. Adding an extra space character solves this issue.
-        toolbar.title = TextUtils.concat(navigationArgs.threadSubject.getFormattedThreadSubject(context), " ")
+        toolbarSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(context)
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -111,7 +108,7 @@ class ThreadFragment : Fragment() {
             val opacity = ((progress / total) * 255).roundToInt()
 
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
-            toolbar.setTitleTextColor(textColor)
+            toolbarSubject.setTextColor(textColor)
         }
     }
 
