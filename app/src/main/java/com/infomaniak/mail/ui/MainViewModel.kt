@@ -116,6 +116,14 @@ class MainViewModel : ViewModel() {
         loadContacts()
     }
 
+    fun loadCurrentMailbox() {
+        Log.i(TAG, "loadCurrentMailbox")
+        val mailboxes = loadMailboxes()
+        computeMailboxToSelect(mailboxes)?.let { mailbox ->
+            openMailbox(mailbox)
+        }
+    }
+
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
@@ -123,19 +131,6 @@ class MainViewModel : ViewModel() {
         computeFolderToSelect(folders)?.let { folder ->
             selectFolder(folder.id)
             loadThreads(mailbox.uuid, folder.id)
-        }
-    }
-
-    suspend fun loadCurrentMailbox() {
-        Log.i(TAG, "loadCurrentMailbox")
-        val mailboxes = loadMailboxes()
-        computeMailboxToSelect(mailboxes)?.let { mailbox ->
-            selectMailbox(mailbox)
-            val folders = loadFolders(mailbox)
-            computeFolderToSelect(folders)?.let { folder ->
-                selectFolder(folder.id)
-                loadThreads(mailbox.uuid, folder.id)
-            }
         }
     }
 
