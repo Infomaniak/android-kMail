@@ -32,7 +32,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
@@ -70,14 +70,14 @@ object AccountUtils : CredentialManager {
     var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
-            RealmController.closeUserInfos()
+            RealmDatabase.closeUserInfos()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentUserId = userId }
         }
 
     var currentMailboxId: Int = AppSettingsController.getAppSettings().currentMailboxId
         set(mailboxId) {
             field = mailboxId
-            RealmController.closeMailboxContent()
+            RealmDatabase.closeMailboxContent()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMailboxId = mailboxId }
         }
 

@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -61,7 +61,7 @@ class MainViewModel : ViewModel() {
 
     fun close() {
         Log.i(TAG, "close")
-        RealmController.close()
+        RealmDatabase.close()
 
         currentMessageUid.value = null
         currentThreadUid.value = null

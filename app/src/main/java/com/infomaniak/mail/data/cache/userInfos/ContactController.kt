@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.cache.userInfos
 
 import android.util.Log
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -66,46 +66,46 @@ object ContactController {
     fun upsertApiData(apiContacts: List<Contact>) {
 
         // Get current data
-        Log.d(RealmController.TAG, "Contacts: Get current data")
+        Log.d(RealmDatabase.TAG, "Contacts: Get current data")
         val realmContacts = getContactsSync()
 
         // Get outdated data
-        Log.d(RealmController.TAG, "Contacts: Get outdated data")
+        Log.d(RealmDatabase.TAG, "Contacts: Get outdated data")
         // val deletableContacts = ContactsController.getDeletableContacts(apiContacts)
         val deletableContacts = realmContacts.filter { realmContact ->
             apiContacts.none { it.id == realmContact.id }
         }
 
         // Save new data
-        Log.d(RealmController.TAG, "Contacts: Save new data")
+        Log.d(RealmDatabase.TAG, "Contacts: Save new data")
         upsertContacts(apiContacts)
 
         // Delete outdated data
-        Log.d(RealmController.TAG, "Contacts: Delete outdated data")
+        Log.d(RealmDatabase.TAG, "Contacts: Delete outdated data")
         deleteContacts(deletableContacts)
     }
 
     fun upsertContacts(contacts: List<Contact>) {
-        RealmController.userInfos.writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+        RealmDatabase.userInfos.writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     fun deleteContacts(contacts: List<Contact>) {
-        RealmController.userInfos.writeBlocking { contacts.forEach { getLatestContact(it.id)?.let(::delete) } }
+        RealmDatabase.userInfos.writeBlocking { contacts.forEach { getLatestContact(it.id)?.let(::delete) } }
     }
 
     /**
      * Utils
      */
     private fun getContacts(): RealmQuery<Contact> {
-        return RealmController.userInfos.query()
+        return RealmDatabase.userInfos.query()
     }
 
     private fun getContacts(addressBookId: Int): RealmQuery<Contact> {
-        return RealmController.userInfos.query("${Contact::addressBookId.name} == '$addressBookId'")
+        return RealmDatabase.userInfos.query("${Contact::addressBookId.name} == '$addressBookId'")
     }
 
     private fun getContact(id: String): RealmSingleQuery<Contact> {
-        return RealmController.userInfos.query<Contact>("${Contact::id.name} == '$id'").first()
+        return RealmDatabase.userInfos.query<Contact>("${Contact::id.name} == '$id'").first()
     }
 
     private fun MutableRealm.getLatestContact(id: String): Contact? {

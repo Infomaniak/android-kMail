@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -48,13 +48,13 @@ object DraftController {
      * Edit data
      */
     fun upsertDraft(draft: Draft) {
-        RealmController.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
+        RealmDatabase.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
     }
 
     /**
      * Utils
      */
     private fun getDraft(uuid: String): RealmSingleQuery<Draft> {
-        return RealmController.mailboxContent.query<Draft>("${Draft::uuid.name} == '$uuid'").first()
+        return RealmDatabase.mailboxContent.query<Draft>("${Draft::uuid.name} == '$uuid'").first()
     }
 }

@@ -24,7 +24,7 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
 import io.realm.kotlin.UpdatePolicy
@@ -125,7 +125,7 @@ class Attachment : RealmObject {
 
         saveAttachmentData(response, file) {
             attachment.localUri = file.toURI().toString()
-            RealmController.mailboxContent.writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
+            RealmDatabase.mailboxContent.writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
         }
     }
 }
