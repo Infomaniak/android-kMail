@@ -31,9 +31,6 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.AttachmentType
-import com.infomaniak.mail.data.models.Correspondent
 import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.CoroutineScope

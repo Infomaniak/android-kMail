@@ -59,7 +59,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.LARGE
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.*
@@ -150,7 +149,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            threadDensity = LARGE
+            threadDensity = ThreadDensity.LARGE
 
             onThreadClicked = {
                 safeNavigate(
