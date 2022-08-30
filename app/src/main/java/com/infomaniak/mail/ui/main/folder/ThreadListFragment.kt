@@ -70,7 +70,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     var lastUpdatedDate: Date? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
-        Utils.createRefreshTimer(milliseconds = 600L) { binding.swipeRefreshLayout.isRefreshing = true }
+        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
     var filter: ThreadFilter = ThreadFilter.ALL // TODO: Do we need this? Here?
@@ -206,7 +206,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 showLoadingTimer.start()
             } else {
                 showLoadingTimer.cancel()
-                binding.swipeRefreshLayout.isRefreshing = false
+                if (binding.swipeRefreshLayout.isRefreshing) binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }
