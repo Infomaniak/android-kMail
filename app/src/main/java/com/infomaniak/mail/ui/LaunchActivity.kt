@@ -59,9 +59,4 @@ class LaunchActivity : AppCompatActivity() {
             }
         }
     }
-
-    override fun onDestroy() {
-        MainViewModel.currentMailboxObjectId.removeObservers(this)
-        super.onDestroy()
-    }
 }

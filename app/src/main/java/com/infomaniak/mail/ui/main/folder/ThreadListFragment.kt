@@ -185,13 +185,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
     }
 
-    override fun onDestroyView() {
-        mainViewModel.isDownloadingChanges.removeObservers(this)
-        MainViewModel.currentFolderId.removeObservers(this)
-        MainViewModel.currentMailboxObjectId.removeObservers(this)
-        super.onDestroyView()
-    }
-
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
             lifecycleScope.launch(Dispatchers.IO) {

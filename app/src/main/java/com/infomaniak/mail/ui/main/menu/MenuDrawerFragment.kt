@@ -198,12 +198,6 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        MainViewModel.currentMailboxObjectId.removeObservers(this)
-        MainViewModel.currentFolderId.removeObservers(this)
-        super.onDestroyView()
-    }
-
     private fun onMailboxesChange(mailboxes: List<Mailbox>) = with(binding) {
         val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
         addressAdapter.setMailboxes(sortedMailboxes)
