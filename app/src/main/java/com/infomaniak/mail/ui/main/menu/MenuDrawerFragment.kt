@@ -254,7 +254,7 @@ class MenuDrawerFragment : Fragment() {
             val formattedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
             val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, maxSize)
 
-            storageText.text = context.resources.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+            storageText.text = getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
             storageIndicator.progress = ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
         }
     }
