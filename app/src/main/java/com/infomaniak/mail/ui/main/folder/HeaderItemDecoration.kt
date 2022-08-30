@@ -131,12 +131,10 @@ class HeaderItemDecoration(
         parent.forEach { child ->
             val mBounds = Rect()
             parent.getDecoratedBoundsWithMargins(child, mBounds)
-            if (mBounds.bottom > contactPoint) {
-                if (mBounds.top <= contactPoint) {
-                    // This child overlaps the contactPoint
-                    childInContact = child
-                    return@forEach
-                }
+            if (mBounds.bottom > contactPoint && mBounds.top <= contactPoint) {
+                // This child overlaps the contactPoint
+                childInContact = child
+                return@forEach
             }
         }
         return childInContact

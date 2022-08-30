@@ -54,7 +54,7 @@ class MainViewModel : ViewModel() {
         val currentMessageUid = MutableLiveData<String?>()
     }
 
-    val isInternetAvailable = MutableLiveData(false)
+    val isInternetAvailable = MutableLiveData(true)
     var canContinueToPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = MutableLiveData(false)
