@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.login
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -37,14 +36,12 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
-import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
-import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import kotlinx.coroutines.Dispatchers
@@ -127,7 +124,7 @@ class LoginActivity : AppCompatActivity() {
                                 // application.trackCurrentUserId() // TODO: Matomo
                                 // trackAccountEvent("loggedIn") // TODO: Matomo
                                 // TODO : When successfully logged in, set theme color setting to the theme selected during the onBoarding
-                                launchMainActivity()
+                                AccountUtils.reloadApp?.invoke()
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
                             else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
@@ -144,10 +141,6 @@ class LoginActivity : AppCompatActivity() {
                 },
             )
         }
-    }
-
-    private fun launchMainActivity() {
-        startActivity(Intent(this, MainActivity::class.java).clearStack())
     }
 
     private fun showError(error: String) {
