@@ -18,9 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
-import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
@@ -48,7 +46,7 @@ object AccountUtils : CredentialManager {
 
     private lateinit var userDatabase: UserDatabase
 
-    var reloadApp: ((bundle: Bundle) -> Unit)? = null
+    var reloadApp: (() -> Unit)? = null
 
     fun init(context: Context) {
         userDatabase = UserDatabase.getDatabase(context)
@@ -96,7 +94,7 @@ object AccountUtils : CredentialManager {
     }
 
     fun reloadApp() {
-        CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke(bundleOf()) }
+        CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke() }
     }
 
     private suspend fun requestUser(user: User) {
@@ -121,7 +119,7 @@ object AccountUtils : CredentialManager {
             requestCurrentUser()
 
             resetApp(context)
-            CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke(bundleOf()) }
+            CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke() }
 
             // CloudStorageProvider.notifyRootsChanged(context) // TODO?
         }
