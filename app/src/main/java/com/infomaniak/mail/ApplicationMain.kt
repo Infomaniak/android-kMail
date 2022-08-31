@@ -95,12 +95,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     private fun configureAppReloading() {
-        AccountUtils.reloadApp = { bundle ->
-            val intent = Intent(this, LaunchActivity::class.java)
-                .apply { putExtras(bundle) }
-                .clearStack()
-            startActivity(intent)
-        }
+        AccountUtils.reloadApp = { startActivity(Intent(this, LaunchActivity::class.java).clearStack()) }
     }
 
     private fun configureInfomaniakCore() {

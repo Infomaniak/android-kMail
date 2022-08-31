@@ -22,7 +22,7 @@ package com.infomaniak.mail.data.models.message
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
@@ -114,7 +114,7 @@ class Message : RealmObject {
     }
 
     fun setDraftId(draftUuid: String?) {
-        RealmController.mailboxContent.writeBlocking { getLatestMessageSync(uid)?.draftUuid = draftUuid }
+        RealmDatabase.mailboxContent.writeBlocking { getLatestMessageSync(uid)?.draftUuid = draftUuid }
     }
 
     fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)

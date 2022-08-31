@@ -17,13 +17,13 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.message.Duplicate
 import io.realm.kotlin.ext.query
 
 object DuplicateController {
 
-    fun removeDuplicates() = with(RealmController.mailboxContent) {
+    fun removeDuplicates() = with(RealmDatabase.mailboxContent) {
         writeBlocking { query<Duplicate>().find().forEach { findLatest(it)?.let(::delete) } }
     }
 }

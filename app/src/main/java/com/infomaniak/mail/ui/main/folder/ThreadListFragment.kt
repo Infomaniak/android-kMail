@@ -67,14 +67,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var updatedAtRefreshJob: Job? = null
 
     private var threadListAdapter = ThreadListAdapter()
-    var lastUpdatedDate: Date? = null
+    private var lastUpdatedDate: Date? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer(milliseconds = 600L) { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    var filter: ThreadFilter = ThreadFilter.ALL // TODO: Do we need this? Here?
-    var lastUnreadCount = 0 // TODO: Do we need this?
+    var filter: ThreadFilter = ThreadFilter.ALL
+    private var lastUnreadCount = 0
     private var mailboxUuid: String? = null
     private val offsetTrigger = max(1, PER_PAGE - 13)
 
@@ -183,13 +183,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onResume() {
         super.onResume()
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
-    }
-
-    override fun onDestroyView() {
-        mainViewModel.isDownloadingChanges.removeObservers(this)
-        MainViewModel.currentFolderId.removeObservers(this)
-        MainViewModel.currentMailboxObjectId.removeObservers(this)
-        super.onDestroyView()
     }
 
     private fun listenToCurrentMailbox() {

@@ -18,9 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
-import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
@@ -32,7 +30,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
@@ -40,6 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 import io.sentry.protocol.User as SentryUser
@@ -48,7 +47,7 @@ object AccountUtils : CredentialManager {
 
     private lateinit var userDatabase: UserDatabase
 
-    var reloadApp: ((bundle: Bundle) -> Unit)? = null
+    var reloadApp: (() -> Unit)? = null
 
     fun init(context: Context) {
         userDatabase = UserDatabase.getDatabase(context)
@@ -70,14 +69,14 @@ object AccountUtils : CredentialManager {
     var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
-            RealmController.closeUserInfos()
+            RealmDatabase.closeUserInfos()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentUserId = userId }
         }
 
     var currentMailboxId: Int = AppSettingsController.getAppSettings().currentMailboxId
         set(mailboxId) {
             field = mailboxId
-            RealmController.closeMailboxContent()
+            RealmDatabase.closeMailboxContent()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMailboxId = mailboxId }
         }
 
@@ -96,7 +95,7 @@ object AccountUtils : CredentialManager {
     }
 
     fun reloadApp() {
-        CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke(bundleOf()) }
+        CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke() }
     }
 
     private suspend fun requestUser(user: User) {
@@ -121,7 +120,7 @@ object AccountUtils : CredentialManager {
             requestCurrentUser()
 
             resetApp(context)
-            CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke(bundleOf()) }
+            withContext(Dispatchers.Main) { reloadApp?.invoke() }
 
             // CloudStorageProvider.notifyRootsChanged(context) // TODO?
         }

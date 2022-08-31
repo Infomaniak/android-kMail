@@ -16,7 +16,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+
     <solid android:color="@color/backgroundCardview" />
+
     <corners
         android:bottomLeftRadius="@dimen/cardViewRadius"
         android:bottomRightRadius="@dimen/cardViewRadius"

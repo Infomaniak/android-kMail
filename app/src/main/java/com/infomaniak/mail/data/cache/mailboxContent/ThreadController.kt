@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.getLatestFolderSync
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
@@ -60,7 +60,7 @@ object ThreadController {
     fun upsertApiData(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): Boolean {
 
         // Get current data
-        Log.d(RealmController.TAG, "Threads: Get current data")
+        Log.d(RealmDatabase.TAG, "Threads: Get current data")
         val realmThreads = FolderController.getFolderSync(folderId)?.threads?.filter {
             when (filter) {
                 ThreadFilter.SEEN -> it.unseenMessagesCount == 0
@@ -81,7 +81,7 @@ object ThreadController {
         }
 
         // Get outdated data
-        Log.d(RealmController.TAG, "Threads: Get outdated data")
+        Log.d(RealmDatabase.TAG, "Threads: Get outdated data")
         // val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
         val deletableThreads = if (offset == ApiRepository.OFFSET_FIRST_PAGE) {
             realmThreads.filter { realmThread ->
@@ -92,9 +92,9 @@ object ThreadController {
         }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folderId } }
 
-        RealmController.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent.writeBlocking {
             // Save new data
-            Log.d(RealmController.TAG, "Threads: Save new data")
+            Log.d(RealmDatabase.TAG, "Threads: Save new data")
             val newPageSize = apiThreads.size - offset
             if (newPageSize > 0) {
                 apiThreads.takeLast(newPageSize).forEach { apiThread ->
@@ -106,7 +106,7 @@ object ThreadController {
             }
 
             // Delete outdated data
-            Log.d(RealmController.TAG, "Threads: Delete outdated data")
+            Log.d(RealmDatabase.TAG, "Threads: Delete outdated data")
             deleteMessages(deletableMessages)
             deleteThreads(deletableThreads)
         }
@@ -121,7 +121,7 @@ object ThreadController {
     fun markAsSeen(thread: Thread) {
         if (thread.unseenMessagesCount != 0) {
 
-            RealmController.mailboxContent.writeBlocking {
+            RealmDatabase.mailboxContent.writeBlocking {
                 val latestThread = getLatestThreadSync(thread.uid) ?: return@writeBlocking
 
                 val uids = mutableListOf<String>().apply {
@@ -154,7 +154,7 @@ object ThreadController {
      * Utils
      */
     private fun getThread(uid: String): RealmSingleQuery<Thread> {
-        return RealmController.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first()
+        return RealmDatabase.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first()
     }
 
     private fun MutableRealm.deleteLatestThread(uid: String) {

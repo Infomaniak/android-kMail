@@ -32,9 +32,9 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 
 @Suppress("ObjectPropertyName")
-object RealmController {
+object RealmDatabase {
 
-    const val TAG = "Controller"
+    val TAG: String = RealmDatabase::class.java.simpleName
 
     private var _appSettings: Realm? = null
     private var _userInfos: Realm? = null

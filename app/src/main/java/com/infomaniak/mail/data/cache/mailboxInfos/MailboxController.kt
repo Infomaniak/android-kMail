@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxInfos
 
 import android.util.Log
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
@@ -60,29 +60,29 @@ object MailboxController {
     fun upsertApiData(apiMailboxes: List<Mailbox>): List<Mailbox> {
 
         // Get current data
-        Log.d(RealmController.TAG, "Mailboxes: Get current data")
+        Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
         val realmMailboxes = getMailboxesSync(AccountUtils.currentUserId)
 
         // Get outdated data
-        Log.d(RealmController.TAG, "Mailboxes: Get outdated data")
+        Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
         // val deletableMailboxes = MailboxInfoController.getDeletableMailboxes(apiMailboxes)
         val deletableMailboxes = realmMailboxes.filter { realmMailbox ->
             apiMailboxes.none { apiMailbox -> apiMailbox.mailboxId == realmMailbox.mailboxId }
         }
 
         // Save new data
-        Log.d(RealmController.TAG, "Mailboxes: Save new data")
+        Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
         upsertMailboxes(apiMailboxes)
 
         // Delete outdated data
-        Log.d(RealmController.TAG, "Mailboxes: Delete outdated data")
+        Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
         val isCurrentMailboxDeleted = deletableMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
-            RealmController.closeMailboxContent()
+            RealmDatabase.closeMailboxContent()
             AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
         }
         deleteMailboxes(deletableMailboxes)
-        deletableMailboxes.forEach { RealmController.deleteMailboxContent(it.mailboxId) }
+        deletableMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
 
         return if (isCurrentMailboxDeleted) {
             AccountUtils.reloadApp()
@@ -93,22 +93,22 @@ object MailboxController {
     }
 
     fun upsertMailboxes(mailboxes: List<Mailbox>) {
-        RealmController.mailboxInfos.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+        RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     fun deleteMailboxes(mailboxes: List<Mailbox>) {
-        RealmController.mailboxInfos.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
+        RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
     }
 
     /**
      * Utils
      */
     private fun getMailboxes(userId: Int): RealmQuery<Mailbox> {
-        return RealmController.mailboxInfos.query("${Mailbox::userId.name} == '$userId'")
+        return RealmDatabase.mailboxInfos.query("${Mailbox::userId.name} == '$userId'")
     }
 
     private fun getMailbox(objectId: String): RealmSingleQuery<Mailbox> {
-        return RealmController.mailboxInfos.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
+        return RealmDatabase.mailboxInfos.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
 
     private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? {

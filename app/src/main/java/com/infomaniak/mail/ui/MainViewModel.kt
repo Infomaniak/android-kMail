@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
 class MainViewModel : ViewModel() {
 
     companion object {
-        private val TAG = "MainViewModel"
+        private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
 
         val currentMailboxObjectId = MutableLiveData<String?>()
@@ -61,7 +61,7 @@ class MainViewModel : ViewModel() {
 
     fun close() {
         Log.i(TAG, "close")
-        RealmController.close()
+        RealmDatabase.close()
 
         currentMessageUid.value = null
         currentThreadUid.value = null
@@ -167,7 +167,7 @@ class MainViewModel : ViewModel() {
         val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
-        withContext(Dispatchers.Main) { isDownloadingChanges.value = true }
+        isDownloadingChanges.postValue(true)
         loadThreads(mailboxUuid, folderId, currentOffset, filter)
     }
 
@@ -178,7 +178,7 @@ class MainViewModel : ViewModel() {
         filter: ThreadFilter,
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
-        withContext(Dispatchers.Main) { isDownloadingChanges.value = true }
+        isDownloadingChanges.postValue(true)
         loadThreads(mailboxUuid, folderId, offset, filter)
     }
 

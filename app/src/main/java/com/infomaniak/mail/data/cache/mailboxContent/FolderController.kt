@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
 import com.infomaniak.mail.data.models.Folder
@@ -65,11 +65,11 @@ object FolderController {
     fun upsertApiData(apiFolders: List<Folder>): List<Folder> {
 
         // Get current data
-        Log.d(RealmController.TAG, "Folders: Get current data")
+        Log.d(RealmDatabase.TAG, "Folders: Get current data")
         val realmFolders = getFoldersSync()
 
         // Get outdated data
-        Log.d(RealmController.TAG, "Folders: Get outdated data")
+        Log.d(RealmDatabase.TAG, "Folders: Get outdated data")
         // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
         val deletableFolders = realmFolders.filter { realmFolder ->
             apiFolders.none { apiFolder -> apiFolder.id == realmFolder.id }
@@ -82,9 +82,9 @@ object FolderController {
             thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
         }
 
-        RealmController.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent.writeBlocking {
             // Save new data
-            Log.d(RealmController.TAG, "Folders: Save new data")
+            Log.d(RealmDatabase.TAG, "Folders: Save new data")
             apiFolders.forEach { apiFolder ->
                 realmFolders.find { it.id == apiFolder.id }?.let { realmFolder ->
                     apiFolder.initLocalValues(
@@ -98,7 +98,7 @@ object FolderController {
             }
 
             // Delete outdated data
-            Log.d(RealmController.TAG, "Folders: Delete outdated data")
+            Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
             deleteMessages(deletableMessages)
             deleteThreads(deletableThreads)
             deleteFolders(deletableFolders)
@@ -108,11 +108,11 @@ object FolderController {
     }
 
     fun upsertFolder(folder: Folder): Folder {
-        return RealmController.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
+        return RealmDatabase.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
     }
 
     fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-        RealmController.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent.writeBlocking {
             getLatestFolderSync(id)
                 ?.let(onUpdate)
         }
@@ -140,11 +140,11 @@ object FolderController {
      * Utils
      */
     private fun getFolders(): RealmQuery<Folder> {
-        return RealmController.mailboxContent.query()
+        return RealmDatabase.mailboxContent.query()
     }
 
     private fun getFolder(id: String): RealmSingleQuery<Folder> {
-        return RealmController.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first()
+        return RealmDatabase.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first()
     }
 
     private fun MutableRealm.deleteLatestFolder(id: String) {

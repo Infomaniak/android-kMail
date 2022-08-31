@@ -198,12 +198,6 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        MainViewModel.currentMailboxObjectId.removeObservers(this)
-        MainViewModel.currentFolderId.removeObservers(this)
-        super.onDestroyView()
-    }
-
     private fun onMailboxesChange(mailboxes: List<Mailbox>) = with(binding) {
         val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
         addressAdapter.setMailboxes(sortedMailboxes)
@@ -254,7 +248,7 @@ class MenuDrawerFragment : Fragment() {
             val formattedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
             val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, maxSize)
 
-            storageText.text = context.resources.getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+            storageText.text = getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
             storageIndicator.progress = ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
         }
     }

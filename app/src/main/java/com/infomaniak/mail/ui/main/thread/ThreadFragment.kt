@@ -171,14 +171,6 @@ class ThreadFragment : Fragment() {
 
     private fun displayMessages(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
-
-        // messages.forEach {
-        //     val displayedBody = with(it.body?.value) {
-        //         this?.length?.let { length -> if (length > 42) this.substring(0, 42) else this } ?: this
-        //     }
-        //     Log.v("UI", "Message: ${it.from.firstOrNull()?.email} | ${it.attachments.size}")// | $displayedBody")
-        // }
-
         threadAdapter.notifyAdapter(messages.toMutableList())
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
     }

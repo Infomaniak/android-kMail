@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.cache.userInfos
 
 import android.util.Log
-import com.infomaniak.mail.data.cache.RealmController
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -58,42 +58,42 @@ object AddressBookController {
     fun upsertApiData(apiAddressBooks: List<AddressBook>) {
 
         // Get current data
-        Log.d(RealmController.TAG, "AddressBooks: Get current data")
+        Log.d(RealmDatabase.TAG, "AddressBooks: Get current data")
         val realmAddressBooks = getAddressBooksSync()
 
         // Get outdated data
-        Log.d(RealmController.TAG, "AddressBooks: Get outdated data")
+        Log.d(RealmDatabase.TAG, "AddressBooks: Get outdated data")
         // val deletableAddressBooks = ContactsController.getDeletableAddressBooks(apiAddressBooks)
         val deletableAddressBooks = realmAddressBooks.filter { realmContact ->
             apiAddressBooks.none { it.id == realmContact.id }
         }
 
         // Save new data
-        Log.d(RealmController.TAG, "AddressBooks: Save new data")
+        Log.d(RealmDatabase.TAG, "AddressBooks: Save new data")
         upsertAddressBooks(apiAddressBooks)
 
         // Delete outdated data
-        Log.d(RealmController.TAG, "AddressBooks: Delete outdated data")
+        Log.d(RealmDatabase.TAG, "AddressBooks: Delete outdated data")
         deleteAddressBooks(deletableAddressBooks)
     }
 
     fun upsertAddressBooks(addressBooks: List<AddressBook>) {
-        RealmController.userInfos.writeBlocking { addressBooks.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+        RealmDatabase.userInfos.writeBlocking { addressBooks.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     fun deleteAddressBooks(addressBooks: List<AddressBook>) {
-        RealmController.userInfos.writeBlocking { addressBooks.forEach { getLatestAddressBook(it.id)?.let(::delete) } }
+        RealmDatabase.userInfos.writeBlocking { addressBooks.forEach { getLatestAddressBook(it.id)?.let(::delete) } }
     }
 
     /**
      * Utils
      */
     private fun getAddressBooks(): RealmQuery<AddressBook> {
-        return RealmController.userInfos.query()
+        return RealmDatabase.userInfos.query()
     }
 
     private fun getAddressBook(id: Int): RealmSingleQuery<AddressBook> {
-        return RealmController.userInfos.query<AddressBook>("${AddressBook::id.name} == '$id'").first()
+        return RealmDatabase.userInfos.query<AddressBook>("${AddressBook::id.name} == '$id'").first()
     }
 
     private fun MutableRealm.getLatestAddressBook(id: Int): AddressBook? {
