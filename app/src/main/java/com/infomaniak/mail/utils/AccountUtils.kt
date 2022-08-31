@@ -38,6 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 import io.sentry.protocol.User as SentryUser
@@ -119,7 +120,7 @@ object AccountUtils : CredentialManager {
             requestCurrentUser()
 
             resetApp(context)
-            CoroutineScope(Dispatchers.Main).launch { reloadApp?.invoke() }
+            withContext(Dispatchers.Main) { reloadApp?.invoke() }
 
             // CloudStorageProvider.notifyRootsChanged(context) // TODO?
         }
