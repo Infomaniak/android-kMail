@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -68,6 +69,14 @@ class MainViewModel : ViewModel() {
         currentThreadUid.value = null
         currentFolderId.value = null
         currentMailboxObjectId.value = null
+    }
+
+    fun mailboxes(): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+        emitSource(
+            MailboxController.getMailboxesAsync(AccountUtils.currentUserId)
+                .map { it.list }
+                .asLiveData()
+        )
     }
 
     private fun selectMailbox(mailbox: Mailbox) {

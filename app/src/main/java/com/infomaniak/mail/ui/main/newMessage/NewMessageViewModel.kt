@@ -22,47 +22,43 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
-import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    val allContacts = MutableLiveData<List<UiContact>?>()
     val recipients = mutableListOf<UiContact>()
     val newMessageCc = mutableListOf<UiContact>()
     val newMessageBcc = mutableListOf<UiContact>()
-
-    val mailboxes = MutableLiveData<List<Mailbox>?>()
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = SingleLiveEvent<EditorAction>()
 
-    fun listenToAllContacts() = viewModelScope.launch(Dispatchers.IO) {
-        ContactController.getContactsAsync().collect {
-            val contacts = mutableListOf<UiContact>()
-            it.list.forEach { contact ->
-                contacts.addAll(contact.emails.map { email -> UiContact(email, contact.name) })
-            }
-            allContacts.postValue(contacts)
-        }
-    }
-
-    fun listenToMailboxes() = viewModelScope.launch(Dispatchers.IO) {
-        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
-            mailboxes.postValue(it.list)
-        }
+    fun allContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
+        emitSource(
+            ContactController.getContactsAsync()
+                .map {
+                    mutableListOf<UiContact>().apply {
+                        it.list.forEach { contact ->
+                            contact.emails.forEach { email ->
+                                add(UiContact(email, contact.name))
+                            }
+                        }
+                    }
+                }
+                .asLiveData()
+        )
     }
 
     fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
