@@ -32,8 +32,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -68,11 +66,7 @@ import kotlin.math.max
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val viewModel: ThreadListViewModel2 by viewModels()
-
-    class ThreadListViewModel2 : ViewModel() {
-        var isRecovering = MutableLiveData(false)
-    }
+    private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
 
@@ -124,7 +118,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter = ThreadListAdapter(
             threadDensity = ThreadDensity.LARGE, // TODO : Take this value from the settings when available
             parentRecycler = binding.threadsList,
-            onSwipeFinished = { viewModel.isRecovering.value = false },
+            onSwipeFinished = { threadListViewModel.isRecovering.value = false },
         )
         binding.threadsList.apply {
             adapter = threadListAdapter
@@ -201,7 +195,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     blockOtherSwipes()
                     notifyItemChanged(position) // Animate the swiped element back to its original position
                 }
-                viewModel.isRecovering.value = true
+                threadListViewModel.isRecovering.value = true
 
                 return true
             }
@@ -282,15 +276,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     }
                 }
 
-                FolderController.getFolderAsync(folderId).collect {
-                    startPeriodicUpdatedAtRefreshJob()
-                    withContext(Dispatchers.Main) {
-                        updateUpdatedAt(it.obj?.lastUpdatedAt?.toDate())
-                        it.obj?.unreadCount?.let(::updateUnreadCount)
-                    }
-                }
+                withContext(Dispatchers.Main) { observeFolder(folderId) }
             }
         }
+    }
+
+    private fun observeFolder(folderId: String) {
+        threadListViewModel.folder(folderId).observe(viewLifecycleOwner, ::onFolderChange)
+    }
+
+    private fun onFolderChange(folder: Folder) = with(folder) {
+        startPeriodicUpdatedAtRefreshJob()
+        updateUpdatedAt(lastUpdatedAt?.toDate())
+        updateUnreadCount(unreadCount)
     }
 
     private fun startPeriodicUpdatedAtRefreshJob() {
@@ -359,7 +357,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun onThreadsUpdate(it: ListChange<Thread>) = with(viewModel) {
+    private fun onThreadsUpdate(it: ListChange<Thread>) = with(threadListViewModel) {
         if (it.list.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
 
         if (isRecovering.value == true) {
