@@ -265,6 +265,15 @@ class ThreadListAdapter(
 
         override fun getNewListSize(): Int = newList.size
 
+        override fun isSameItem(oldItem: Any, newItem: Any): Boolean {
+            return when {
+                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
+                oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
+                oldItem.isValid() && newItem.isValid() -> oldItem.uid == newItem.uid // Both are valid
+                else -> false
+            }
+        }
+
         override fun isSameContent(oldItem: Any, newItem: Any): Boolean {
             return when {
                 oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
@@ -280,15 +289,6 @@ class ThreadListAdapter(
                         false
                     }
                 }
-            }
-        }
-
-        override fun isSameItem(oldItem: Any, newItem: Any): Boolean {
-            return when {
-                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
-                oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
-                oldItem.isValid() && newItem.isValid() -> oldItem.uid == newItem.uid // Both are valid
-                else -> false
             }
         }
     }
