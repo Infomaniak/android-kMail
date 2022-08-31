@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
+import android.widget.PopupWindow
 import androidx.activity.addCallback
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintSet
@@ -59,6 +60,7 @@ class NewMessageFragment : Fragment() {
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private var isAutocompletionOpened = false
+    private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -90,7 +92,7 @@ class NewMessageFragment : Fragment() {
 
         newMessageViewModel.editorAction.observe(requireActivity()) {
 
-            val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) ?: "" }
+            val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) }
             // TODO: Do stuff here with this `selectedText`?
 
             when (it) {
@@ -169,27 +171,28 @@ class NewMessageFragment : Fragment() {
         val mails = mailboxes.map { it.email }
 
         fromMailAddress.text = mailboxes[selectedMailboxIndex].email
-        if (mails.count() > 1) {
-            fromMailAddress.apply {
-                setOnClickListener { view -> chooseFromAddress(view, mails) }
-                isClickable = true
-                isFocusable = true
-            }
-        }
-    }
 
-    private fun chooseFromAddress(view: View, mails: List<String>) = with(binding) {
         val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
-        ListPopupWindow(context).apply {
+        addressListPopupWindow.apply {
             setAdapter(adapter)
-            anchorView = view
-            width = view.width
+            isModal = true
+            inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
+            anchorView = fromMailAddress
+            width = fromMailAddress.width
             setOnItemClickListener { _, _, position, _ ->
                 fromMailAddress.text = mails[position]
                 selectedMailboxIndex = position
                 dismiss()
             }
-        }.show()
+        }
+
+        if (mails.count() > 1) {
+            fromMailAddress.apply {
+                setOnClickListener { _ -> addressListPopupWindow.show() }
+                isClickable = true
+                isFocusable = true
+            }
+        }
     }
 
     private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {

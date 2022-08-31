@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.newMessage
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
@@ -46,7 +47,7 @@ class NewMessageViewModel : ViewModel() {
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
-    val editorAction = MutableLiveData<EditorAction>()
+    val editorAction = SingleLiveEvent<EditorAction>()
 
     fun listenToAllContacts() = viewModelScope.launch(Dispatchers.IO) {
         ContactController.getContactsAsync().collect {
