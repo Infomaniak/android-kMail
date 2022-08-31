@@ -29,17 +29,17 @@ import kotlinx.serialization.encoding.Encoder
 import java.text.SimpleDateFormat
 import java.util.*
 
-object RealmInstantSerializer : KSerializer<RealmInstant?> {
+object RealmInstantSerializer : KSerializer<RealmInstant> {
 
     private val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ROOT)
 
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("RealmInstant", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: RealmInstant?) {
-        value?.toDate()?.let(simpleDateFormat::format)?.let(encoder::encodeString)
+    override fun serialize(encoder: Encoder, value: RealmInstant) {
+        value.toDate().let(simpleDateFormat::format).let(encoder::encodeString)
     }
 
-    override fun deserialize(decoder: Decoder): RealmInstant? {
-        return simpleDateFormat.parse(decoder.decodeString())?.toRealmInstant()
+    override fun deserialize(decoder: Decoder): RealmInstant {
+        return simpleDateFormat.parse(decoder.decodeString())?.toRealmInstant() ?: RealmInstant.MAX
     }
 }

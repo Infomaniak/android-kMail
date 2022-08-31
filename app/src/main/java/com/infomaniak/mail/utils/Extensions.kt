@@ -60,7 +60,6 @@ fun Date.isYesterday(): Boolean {
 fun Date.isSmallerThanDays(daysAgo: Int): Boolean {
     val lastDay = Calendar.getInstance().apply {
         add(Calendar.DATE, -daysAgo)
-        startOfTheDay()
     }.time.startOfTheDay()
     return lastDay <= this
 }
@@ -71,9 +70,7 @@ fun Date.isThisWeek(): Boolean {
 }
 
 fun Date.isLastWeek(): Boolean {
-    val lastWeek = Calendar.getInstance().apply {
-        add(Calendar.WEEK_OF_YEAR, -1)
-    }.time
+    val lastWeek = Calendar.getInstance().apply { add(Calendar.WEEK_OF_YEAR, -1) }.time
     return this in lastWeek.startOfTheWeek()..lastWeek.endOfTheWeek()
 }
 

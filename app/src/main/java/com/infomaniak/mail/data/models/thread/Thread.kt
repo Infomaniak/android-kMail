@@ -62,7 +62,7 @@ class Thread : RealmObject {
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     @SerialName("date")
-    private var _date: RealmInstant? = null
+    private var _date: RealmInstant = RealmInstant.MAX
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
     @SerialName("has_st_attachments")
@@ -81,7 +81,7 @@ class Thread : RealmObject {
     @Transient
     var mailboxUuid: String = ""
 
-    val date: Date get() = _date?.toDate() ?: Date(0)
+    val date: Date get() = _date.toDate()
 
     fun initLocalValues(mailboxUuid: String): Thread {
         messages.removeIf { it.isDuplicate }

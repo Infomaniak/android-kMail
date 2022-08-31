@@ -95,7 +95,6 @@
                 android:textColor="@color/orangeWarning"
                 android:visibility="gone"
                 app:drawableStartCompat="@drawable/ic_no_network"
-                app:drawableTint="@color/orangeWarning"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/toolbar" />
 

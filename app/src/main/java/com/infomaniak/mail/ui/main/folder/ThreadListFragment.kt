@@ -34,7 +34,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.imageLoader
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
@@ -73,7 +73,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var threadsJob: Job? = null
     private var updatedAtRefreshJob: Job? = null
 
-    private var threadListAdapter = ThreadListAdapter()
+    private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
@@ -114,6 +114,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun setupAdapter() {
+        threadListAdapter = ThreadListAdapter(binding.threadsList)
         binding.threadsList.apply {
             adapter = threadListAdapter
             layoutManager = LinearLayoutManager(context)
@@ -135,9 +136,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         threadListAdapter.apply {
-            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-            // onEmptyList = { checkIfNoFiles() }
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
             onThreadClicked = {
                 safeNavigate(
@@ -173,12 +172,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             override fun onListScrolled(scrollDirection: ScrollDirection, distance: Int) {
                 val layoutManager = threadsList.layoutManager as LinearLayoutManager
-                handlePagination(
-                    layoutManager,
-                    scrollDirection,
-                    whenLoadMoreIsPossible = { if (mainViewModel.isDownloadingChanges.value == false) downloadThreads() },
-                    triggerOffset = offsetTrigger,
-                )
+                layoutManager.handlePagination(scrollDirection)
                 extendCollapseFab(layoutManager, scrollDirection)
             }
         }
@@ -197,18 +191,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    fun handlePagination(
-        layoutManager: LinearLayoutManager,
-        scrollDirection: ScrollDirection,
-        whenLoadMoreIsPossible: () -> Unit,
-        triggerOffset: Int = 3
-    ) = with(layoutManager) {
+    fun LinearLayoutManager.handlePagination(scrollDirection: ScrollDirection) {
         if (scrollDirection == ScrollDirection.DOWN) {
-            val visibleItemCount = childCount
-            val totalItemCount = itemCount
-            val pastVisibleItems = findFirstVisibleItemPosition().plus(triggerOffset)
-            val isLastElement = (visibleItemCount + pastVisibleItems) >= totalItemCount
-            if (isLastElement) whenLoadMoreIsPossible()
+            val pastVisibleItems = findFirstVisibleItemPosition().plus(offsetTrigger)
+            val isLastElement = (childCount + pastVisibleItems) >= itemCount
+            if (isLastElement && mainViewModel.isDownloadingChanges.value == false) downloadThreads()
         }
     }
 
@@ -359,7 +346,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
-        threadListAdapter.notifyAdapter(threadListAdapter.formatList(threads, binding.context), binding.threadsList)
+        threadListAdapter.notifyAdapter(threads, binding.root.context)
 
         if (currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
     }

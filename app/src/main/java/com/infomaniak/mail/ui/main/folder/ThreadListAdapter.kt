@@ -50,16 +50,11 @@ import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
-class ThreadListAdapter(
-    dataSet: MutableList<Any> = mutableListOf(),
-) : DragDropSwipeAdapter<Any, ThreadViewHolder>(dataSet) {
+class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
+    DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()) {
 
-    private var parentRecycler: DragDropSwipeRecyclerView? = null
-
-    private var previousSectionTitle: String = ""
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
 
-    var onEmptyList: (() -> Unit)? = null
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
     override fun getItemViewType(position: Int): Int = when {
@@ -81,7 +76,7 @@ class ThreadListAdapter(
         return ThreadViewHolder(binding)
     }
 
-    override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding!!) {
+    override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding) {
         when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
@@ -107,9 +102,7 @@ class ThreadListAdapter(
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
-        root.setOnClickListener {
-            onThreadClicked?.invoke(this@with)
-        }
+        root.setOnClickListener { onThreadClicked?.invoke(this@with) }
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
@@ -147,7 +140,7 @@ class ThreadListAdapter(
     }
 
     override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) {
-        parentRecycler?.apply {
+        parentRecycler.apply {
             behindSwipedItemIconSecondaryDrawableId = if ((item as Thread).unseenMessagesCount > 0) {
                 R.drawable.ic_envelope_open
             } else {
@@ -164,7 +157,7 @@ class ThreadListAdapter(
         canvasUnder: Canvas?,
         canvasOver: Canvas?,
         isUserControlled: Boolean
-    ): Unit = with(viewHolder.binding!!)
+    ): Unit = with(viewHolder.binding)
     {
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width
@@ -194,7 +187,7 @@ class ThreadListAdapter(
         viewHolder.isSwippedOverHalf = false
     }
 
-    override fun getViewHolder(itemView: View): ThreadViewHolder = ThreadViewHolder(null)
+    override fun getViewHolder(itemView: View): ThreadViewHolder = ThreadViewHolder { itemView }
 
     override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadViewHolder, position: Int): View? {
         return when (getItemViewType(position)) {
@@ -211,42 +204,8 @@ class ThreadListAdapter(
         return ThreadListDiffCallback(oldList, newList)
     }
 
-    fun notifyAdapter(newList: MutableList<Any>, recyclerView: DragDropSwipeRecyclerView) {
-        dataSet = newList
-        parentRecycler = recyclerView
-    }
-
-    fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
-        previousSectionTitle = ""
-        val formattedList = mutableListOf<Any>()
-
-        // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
-        threads.sortedByDescending { it.date }.forEachIndexed { index, thread ->
-            val sectionTitle = thread.getSectionTitle(context)
-            when {
-                sectionTitle != previousSectionTitle -> {
-                    if (index != 0) formattedList.add(Unit) // Adds a space before the next date separator
-                    formattedList.add(sectionTitle)
-                    previousSectionTitle = sectionTitle
-                }
-                // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
-            }
-            formattedList.add(thread)
-        }
-
-        return formattedList
-    }
-
-    private fun Thread.getSectionTitle(context: Context): String = with(date) {
-        return when {
-            isToday() -> context.getString(R.string.threadListSectionToday)
-            isYesterday() -> context.getString(R.string.messageDetailsYesterday)
-            isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)
-            isLastWeek() -> context.getString(R.string.threadListSectionLastWeek)
-            isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
-            isThisYear() -> format(FULL_MONTH).capitalizeFirstChar()
-            else -> format(MONTH_AND_YEAR).capitalizeFirstChar()
-        }
+    fun notifyAdapter(newList: List<Thread>, context: Context) {
+        dataSet = formatList(newList, context)
     }
 
     private enum class DisplayType(val layout: Int) {
@@ -300,9 +259,43 @@ class ThreadListAdapter(
 
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
+
+
+        fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
+            var previousSectionTitle = ""
+            val formattedList = mutableListOf<Any>()
+
+            // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
+            threads.sortedByDescending { it.date }.forEachIndexed { index, thread ->
+                val sectionTitle = thread.getSectionTitle(context)
+                when {
+                    sectionTitle != previousSectionTitle -> {
+                        if (index != 0) formattedList.add(Unit) // Adds a space before the next date separator
+                        formattedList.add(sectionTitle)
+                        previousSectionTitle = sectionTitle
+                    }
+                    // displaySeeAllButton -> formattedList.add(folder.threadCount - 3) // TODO: Handle Intelligent Mailbox
+                }
+                formattedList.add(thread)
+            }
+
+            return formattedList
+        }
+
+        private fun Thread.getSectionTitle(context: Context): String = with(date) {
+            return when {
+                isToday() -> context.getString(R.string.threadListSectionToday)
+                isYesterday() -> context.getString(R.string.messageDetailsYesterday)
+                isThisWeek() -> context.getString(R.string.threadListSectionThisWeek)
+                isLastWeek() -> context.getString(R.string.threadListSectionLastWeek)
+                isThisMonth() -> context.getString(R.string.threadListSectionThisMonth)
+                isThisYear() -> format(FULL_MONTH).capitalizeFirstChar()
+                else -> format(MONTH_AND_YEAR).capitalizeFirstChar()
+            }
+        }
     }
 
-    class ThreadViewHolder(val binding: ViewBinding?) : DragDropSwipeAdapter.ViewHolder(binding!!.root) {
+    class ThreadViewHolder(val binding: ViewBinding) : DragDropSwipeAdapter.ViewHolder(binding.root) {
         var isSwippedOverHalf = false
     }
 }
