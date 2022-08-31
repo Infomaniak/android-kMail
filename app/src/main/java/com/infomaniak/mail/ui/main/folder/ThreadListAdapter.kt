@@ -41,14 +41,18 @@ import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadEmptySpaceBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import io.realm.kotlin.ext.isValid
 import kotlin.math.abs
 
-class ThreadListAdapter(dataSet: MutableList<Any> = mutableListOf()) :
-    DragDropSwipeAdapter<Any, ThreadListAdapter.ThreadViewHolder>(dataSet) {
+// TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
+// TODO: Same for all adapters in the app?
+class ThreadListAdapter(
+    dataSet: MutableList<Any> = mutableListOf(),
+) : DragDropSwipeAdapter<Any, ThreadViewHolder>(dataSet) {
 
     private var parentRecycler: DragDropSwipeRecyclerView? = null
 
