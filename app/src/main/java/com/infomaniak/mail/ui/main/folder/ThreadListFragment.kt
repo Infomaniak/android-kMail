@@ -76,7 +76,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     var filter: ThreadFilter = ThreadFilter.ALL
     private var lastUnreadCount = 0
     private var mailboxUuid: String? = null
-    private val offsetTrigger = max(1, PER_PAGE - 13)
+    // We want to trigger the next page loading as soon as possible so there is as little wait time as possible;
+    // but not before we do any scrolling, so we don't immediately load the 2nd page when opening the Folder.
+    private val offsetTrigger = max(1, PER_PAGE - ESTIMATED_PAGE_SIZE)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -335,4 +337,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
+
+    private companion object {
+        // This is approximately a little more than the number of Threads displayed at the same time on the screen.
+        const val ESTIMATED_PAGE_SIZE = 13
+    }
 }
