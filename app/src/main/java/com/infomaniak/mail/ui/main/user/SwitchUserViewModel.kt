@@ -17,8 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.user
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.BuildConfig
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -28,8 +27,11 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
+import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
@@ -45,6 +47,15 @@ class SwitchUserViewModel : ViewModel() {
                 }
                 ?.let(MailboxController::upsertMailboxes)
         }
+    }
+
+    fun accounts(users: List<User>): LiveData<List<Pair<User, List<Mailbox>>>> = liveData(Dispatchers.IO) {
+        val flows = users.map { user -> MailboxController.getMailboxesAsync(user.id) }
+        emitSource(
+            combine(flows) { mailboxesFlows ->
+                transformMailboxesFlowsIntoAccounts(mailboxesFlows, users).toList()
+            }.asLiveData()
+        )
     }
 
     private fun createOkHttpClientForSpecificUser(user: User): OkHttpClient {
@@ -68,4 +79,15 @@ class SwitchUserViewModel : ViewModel() {
                 authenticator(TokenAuthenticator(tokenInterceptorListener))
             }.build()
     }
+
+    private fun transformMailboxesFlowsIntoAccounts(mailboxesFlows: Array<ResultsChange<Mailbox>>, users: List<User>) =
+        mutableListOf<Pair<User, List<Mailbox>>>().apply {
+            mailboxesFlows.forEach { flow ->
+                val mailboxes = flow.list
+                val userId = mailboxes.firstOrNull()?.userId
+                users.find { it.id == userId }?.let { user ->
+                    add(user to mailboxes)
+                }
+            }
+        }
 }
