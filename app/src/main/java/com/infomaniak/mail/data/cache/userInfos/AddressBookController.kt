@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.userInfos
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.RealmDatabase.update
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
@@ -49,25 +50,8 @@ object AddressBookController {
 
     //region Edit data
     fun update(apiAddressBooks: List<AddressBook>) {
-
-        // Get current data
-        Log.d(RealmDatabase.TAG, "AddressBooks: Get current data")
-        val realmAddressBooks = getAddressBooks()
-
-        // Get outdated data
-        Log.d(RealmDatabase.TAG, "AddressBooks: Get outdated data")
-        // val deletableAddressBooks = ContactsController.getDeletableAddressBooks(apiAddressBooks)
-        val deletableAddressBooks = realmAddressBooks.filter { realmContact ->
-            apiAddressBooks.none { it.id == realmContact.id }
-        }
-
-        // Save new data
         Log.d(RealmDatabase.TAG, "AddressBooks: Save new data")
-        upsertAddressBooks(apiAddressBooks)
-
-        // Delete outdated data
-        Log.d(RealmDatabase.TAG, "AddressBooks: Delete outdated data")
-        deleteAddressBooks(deletableAddressBooks)
+        RealmDatabase.userInfos.update<AddressBook>(apiAddressBooks)
     }
 
     private fun upsertAddressBooks(addressBooks: List<AddressBook>) {
