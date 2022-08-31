@@ -33,9 +33,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 object ContactController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getContactsSync(): RealmResults<Contact> {
         return getContacts().find()
     }
@@ -59,10 +57,9 @@ object ContactController {
     fun getContactAsync(id: String): SharedFlow<SingleQueryChange<Contact>> {
         return getContact(id).asFlow().toSharedFlow()
     }
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun upsertApiData(apiContacts: List<Contact>) {
 
         // Get current data
@@ -92,10 +89,9 @@ object ContactController {
     fun deleteContacts(contacts: List<Contact>) {
         RealmDatabase.userInfos.writeBlocking { contacts.forEach { getLatestContact(it.id)?.let(::delete) } }
     }
+    //endregion
 
-    /**
-     * Utils
-     */
+    //region Utils
     private fun getContacts(): RealmQuery<Contact> {
         return RealmDatabase.userInfos.query()
     }
@@ -111,4 +107,5 @@ object ContactController {
     private fun MutableRealm.getLatestContact(id: String): Contact? {
         return getContactSync(id)?.let(::findLatest)
     }
+    //endregion
 }

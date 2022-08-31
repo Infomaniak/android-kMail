@@ -33,9 +33,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 object AddressBookController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getAddressBooksSync(): RealmResults<AddressBook> {
         return getAddressBooks().find()
     }
@@ -51,10 +49,9 @@ object AddressBookController {
     fun getAddressBookAsync(id: Int): SharedFlow<SingleQueryChange<AddressBook>> {
         return getAddressBook(id).asFlow().toSharedFlow()
     }
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun upsertApiData(apiAddressBooks: List<AddressBook>) {
 
         // Get current data
@@ -84,10 +81,9 @@ object AddressBookController {
     fun deleteAddressBooks(addressBooks: List<AddressBook>) {
         RealmDatabase.userInfos.writeBlocking { addressBooks.forEach { getLatestAddressBook(it.id)?.let(::delete) } }
     }
+    //endregion
 
-    /**
-     * Utils
-     */
+    //region Utils
     private fun getAddressBooks(): RealmQuery<AddressBook> {
         return RealmDatabase.userInfos.query()
     }
@@ -99,4 +95,5 @@ object AddressBookController {
     private fun MutableRealm.getLatestAddressBook(id: Int): AddressBook? {
         return getAddressBookSync(id)?.let(::findLatest)
     }
+    //endregion
 }

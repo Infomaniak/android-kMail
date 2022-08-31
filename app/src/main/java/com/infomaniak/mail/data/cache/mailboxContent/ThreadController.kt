@@ -39,9 +39,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 object ThreadController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getThreadSync(uid: String): Thread? {
         return getThread(uid).find()
     }
@@ -53,10 +51,9 @@ object ThreadController {
     fun MutableRealm.getLatestThreadSync(uid: String): Thread? {
         return getThreadSync(uid)?.let(::findLatest)
     }
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun upsertApiData(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): Boolean {
 
         // Get current data
@@ -149,10 +146,9 @@ object ThreadController {
     fun MutableRealm.deleteThreads(threads: List<Thread>) {
         threads.forEach { deleteLatestThread(it.uid) }
     }
+    //endregion
 
-    /**
-     * Utils
-     */
+    //region Utils
     private fun getThread(uid: String): RealmSingleQuery<Thread> {
         return RealmDatabase.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first()
     }
@@ -194,6 +190,7 @@ object ThreadController {
             copyToRealm(latestFolder, UpdatePolicy.ALL)
         }
     }
+    //endregion
 
     /**
      * TODO?

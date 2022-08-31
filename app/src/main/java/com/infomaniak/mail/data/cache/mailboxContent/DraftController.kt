@@ -29,9 +29,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 object DraftController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getDraftSync(uuid: String): Draft? {
         return getDraft(uuid).find()
     }
@@ -43,18 +41,17 @@ object DraftController {
     fun MutableRealm.getLatestDraftSync(uuid: String): Draft? {
         return getDraftSync(uuid)?.let(::findLatest)
     }
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun upsertDraft(draft: Draft) {
         RealmDatabase.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
     }
+    //endregion
 
-    /**
-     * Utils
-     */
+    //region Utils
     private fun getDraft(uuid: String): RealmSingleQuery<Draft> {
         return RealmDatabase.mailboxContent.query<Draft>("${Draft::uuid.name} == '$uuid'").first()
     }
+    //endregion
 }
