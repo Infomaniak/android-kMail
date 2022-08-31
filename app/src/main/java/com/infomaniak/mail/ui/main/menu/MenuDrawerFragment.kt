@@ -27,6 +27,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FormatterFileSize
@@ -58,6 +59,7 @@ class MenuDrawerFragment : Fragment() {
     var isDrawerOpen: (() -> Boolean)? = null
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
@@ -86,7 +88,7 @@ class MenuDrawerFragment : Fragment() {
         setupAdapters()
         setupListener()
 
-        listenToMailboxes()
+        observeMailboxes()
         listenToCurrentMailbox()
         listenToCurrentFolder()
     }
@@ -167,25 +169,21 @@ class MenuDrawerFragment : Fragment() {
         mainViewModel.forceRefreshMailboxes()
     }
 
-    private fun listenToMailboxes() = lifecycleScope.launch(Dispatchers.IO) {
-        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
-            withContext(Dispatchers.Main) { onMailboxesChange(it.list) }
-        }
+    private fun observeMailboxes() {
+        mainViewModel.mailboxes().observe(viewLifecycleOwner, ::onMailboxesChange)
     }
 
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
-            listenToFolders()
+            observeFolders()
             onCurrentMailboxChange(mailboxObjectId)
         }
     }
 
-    private fun listenToFolders() {
+    private fun observeFolders() {
         foldersJob?.cancel()
-        foldersJob = lifecycleScope.launch(Dispatchers.IO) {
-            FolderController.getFoldersAsync().collect {
-                withContext(Dispatchers.Main) { onFoldersChange(it.list) }
-            }
+        foldersJob = lifecycleScope.launch(Dispatchers.Main) {
+            menuDrawerViewModel.folders().observe(viewLifecycleOwner, ::onFoldersChange)
         }
     }
 
