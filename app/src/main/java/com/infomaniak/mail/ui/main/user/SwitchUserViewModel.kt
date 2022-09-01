@@ -80,8 +80,11 @@ class SwitchUserViewModel : ViewModel() {
             }.build()
     }
 
-    private fun transformMailboxesFlowsIntoAccounts(mailboxesFlows: Array<ResultsChange<Mailbox>>, users: List<User>) =
-        mutableListOf<Pair<User, List<Mailbox>>>().apply {
+    private fun transformMailboxesFlowsIntoAccounts(
+        mailboxesFlows: Array<ResultsChange<Mailbox>>,
+        users: List<User>,
+    ): MutableList<Pair<User, List<Mailbox>>> {
+        return mutableListOf<Pair<User, List<Mailbox>>>().apply {
             mailboxesFlows.forEach { flow ->
                 val mailboxes = flow.list
                 val userId = mailboxes.firstOrNull()?.userId
@@ -90,4 +93,5 @@ class SwitchUserViewModel : ViewModel() {
                 }
             }
         }
+    }
 }

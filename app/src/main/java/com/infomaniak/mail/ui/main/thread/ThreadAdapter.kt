@@ -120,8 +120,13 @@ class ThreadAdapter(
         }
     }
 
-    private fun Context.mostDetailedDate(date: Date) =
-        getString(R.string.messageDetailsDateAt, date.format(FORMAT_EMAIL_DATE_LONG_DATE), date.format(FORMAT_EMAIL_DATE_HOUR))
+    private fun Context.mostDetailedDate(date: Date): String {
+        return getString(
+            R.string.messageDetailsDateAt,
+            date.format(FORMAT_EMAIL_DATE_LONG_DATE),
+            date.format(FORMAT_EMAIL_DATE_HOUR),
+        )
+    }
 
     private fun ItemMessageBinding.handleHeaderClick(message: Message) = with(message) {
         messageHeader.setOnClickListener {
