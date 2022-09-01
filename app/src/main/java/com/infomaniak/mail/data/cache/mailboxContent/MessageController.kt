@@ -33,9 +33,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 object MessageController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getMessageSync(id: String): Message? {
         return getMessage(id).find()
     }
@@ -47,10 +45,9 @@ object MessageController {
     fun MutableRealm.getLatestMessageSync(uid: String): Message? {
         return getMessageSync(uid)?.let(::findLatest)
     }
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun MutableRealm.deleteMessages(messages: List<Message>) {
         messages.forEach { deleteLatestMessage(it.uid) }
     }
@@ -58,10 +55,9 @@ object MessageController {
     fun deleteMessage(uid: String) {
         RealmDatabase.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
     }
+    //endregion
 
-    /**
-     * Utils
-     */
+    //region Utils
     fun upsertApiData(apiMessages: List<Message>, thread: Thread) {
 
         // Get current data
@@ -97,6 +93,7 @@ object MessageController {
             message.draftUuid?.let { getLatestDraftSync(it) }?.let(::delete)
         }?.let(::delete)
     }
+    //endregion
 
     /**
      * TODO?

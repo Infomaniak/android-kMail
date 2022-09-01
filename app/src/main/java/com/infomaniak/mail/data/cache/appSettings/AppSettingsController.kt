@@ -23,16 +23,13 @@ import io.realm.kotlin.ext.query
 
 object AppSettingsController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getAppSettings(): AppSettings = with(RealmDatabase.appSettings) {
         query<AppSettings>().first().find() ?: writeBlocking { copyToRealm(AppSettings()) }
     }
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
         RealmDatabase.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
     }
@@ -40,4 +37,5 @@ object AppSettingsController {
     fun removeAppSettings() {
         RealmDatabase.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
     }
+    //endregion
 }

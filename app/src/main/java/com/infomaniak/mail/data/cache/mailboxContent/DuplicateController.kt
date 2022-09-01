@@ -23,7 +23,9 @@ import io.realm.kotlin.ext.query
 
 object DuplicateController {
 
+    //region Edit data
     fun removeDuplicates() = with(RealmDatabase.mailboxContent) {
         writeBlocking { query<Duplicate>().find().forEach { findLatest(it)?.let(::delete) } }
     }
+    //endregion
 }

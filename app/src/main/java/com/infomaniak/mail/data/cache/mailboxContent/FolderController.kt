@@ -38,9 +38,7 @@ import java.util.*
 
 object FolderController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getFoldersSync(): RealmResults<Folder> {
         return getFolders().find()
     }
@@ -58,10 +56,9 @@ object FolderController {
     }
 
     fun MutableRealm.getLatestFolderSync(id: String): Folder? = getFolderSync(id)?.let(::findLatest)
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun upsertApiData(apiFolders: List<Folder>): List<Folder> {
 
         // Get current data
@@ -135,10 +132,9 @@ object FolderController {
     fun MutableRealm.deleteFolders(folders: List<Folder>) {
         folders.forEach { deleteLatestFolder(it.id) }
     }
+    //endregion
 
-    /**
-     * Utils
-     */
+    //region Utils
     private fun getFolders(): RealmQuery<Folder> {
         return RealmDatabase.mailboxContent.query()
     }
@@ -150,6 +146,7 @@ object FolderController {
     private fun MutableRealm.deleteLatestFolder(id: String) {
         getLatestFolderSync(id)?.let(::delete)
     }
+    //endregion
 
     /**
      * TODO?

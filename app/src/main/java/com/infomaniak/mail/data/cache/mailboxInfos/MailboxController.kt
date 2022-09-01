@@ -35,9 +35,7 @@ import kotlinx.coroutines.flow.SharedFlow
 
 object MailboxController {
 
-    /**
-     * Get data
-     */
+    //region Get data
     fun getMailboxesSync(userId: Int): RealmResults<Mailbox> {
         return getMailboxes(userId).find()
     }
@@ -53,10 +51,9 @@ object MailboxController {
     fun getMailboxAsync(objectId: String): SharedFlow<SingleQueryChange<Mailbox>> {
         return getMailbox(objectId).asFlow().toSharedFlow()
     }
+    //endregion
 
-    /**
-     * Edit data
-     */
+    //region Edit data
     fun upsertApiData(apiMailboxes: List<Mailbox>): List<Mailbox> {
 
         // Get current data
@@ -99,10 +96,9 @@ object MailboxController {
     fun deleteMailboxes(mailboxes: List<Mailbox>) {
         RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
     }
+    //endregion
 
-    /**
-     * Utils
-     */
+    //region Utils
     private fun getMailboxes(userId: Int): RealmQuery<Mailbox> {
         return RealmDatabase.mailboxInfos.query("${Mailbox::userId.name} == '$userId'")
     }
@@ -114,6 +110,7 @@ object MailboxController {
     private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? {
         return getMailboxSync(objectId)?.let(::findLatest)
     }
+    //endregion
 
     /**
      * TODO?
