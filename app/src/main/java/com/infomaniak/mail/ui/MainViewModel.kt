@@ -68,7 +68,7 @@ class MainViewModel : ViewModel() {
         currentMailboxObjectId.value = null
     }
 
-    fun getMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+    fun listenToMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
         emitSource(
             MailboxController.getMailboxesAsync(userId)
                 .map { it.list }
@@ -78,6 +78,10 @@ class MainViewModel : ViewModel() {
 
     fun getMailbox(objectId: String): LiveData<Mailbox?> = liveData(Dispatchers.IO) {
         emit(MailboxController.getMailboxSync(objectId))
+    }
+
+    fun getFolder(folderId: String): LiveData<Folder?> = liveData(Dispatchers.IO) {
+        emit(FolderController.getFolderSync(folderId))
     }
 
     private fun selectMailbox(mailbox: Mailbox) {

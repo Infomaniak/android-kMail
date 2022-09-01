@@ -83,7 +83,7 @@ class SwitchUserFragment : Fragment() {
                 fetchUsersMailboxes(users)
                 users.forEach { user ->
                     withContext(Dispatchers.Main) {
-                        mainViewModel.getMailboxes(user.id).observe(viewLifecycleOwner) { mailboxes ->
+                        mainViewModel.listenToMailboxes(user.id).observe(viewLifecycleOwner) { mailboxes ->
                             onMailboxesChange(user, mailboxes)
                         }
                     }

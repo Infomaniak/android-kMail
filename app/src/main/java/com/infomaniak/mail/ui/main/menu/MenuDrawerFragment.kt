@@ -171,7 +171,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeMailboxes() {
-        mainViewModel.getMailboxes().observe(viewLifecycleOwner, ::onMailboxesChange)
+        mainViewModel.listenToMailboxes().observe(viewLifecycleOwner, ::onMailboxesChange)
     }
 
     private fun listenToCurrentMailbox() {
@@ -185,7 +185,7 @@ class MenuDrawerFragment : Fragment() {
     private fun observeFolders() {
         foldersJob?.cancel()
         foldersJob = lifecycleScope.launch(Dispatchers.Main) {
-            menuDrawerViewModel.getFolders().observe(viewLifecycleOwner, ::onFoldersChange)
+            menuDrawerViewModel.listenToFolders().observe(viewLifecycleOwner, ::onFoldersChange)
         }
     }
 
@@ -218,7 +218,7 @@ class MenuDrawerFragment : Fragment() {
     private fun observeQuotas(mailboxObjectId: String) {
         quotasJob?.cancel()
         quotasJob = lifecycleScope.launch(Dispatchers.Main) {
-            menuDrawerViewModel.getQuotas(mailboxObjectId).observe(viewLifecycleOwner, ::onQuotasChange)
+            menuDrawerViewModel.listenToQuotas(mailboxObjectId).observe(viewLifecycleOwner, ::onQuotasChange)
         }
     }
 

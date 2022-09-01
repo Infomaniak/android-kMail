@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.map
 
 class MenuDrawerViewModel : ViewModel() {
 
-    fun getFolders(): LiveData<List<Folder>> = liveData(Dispatchers.IO) {
+    fun listenToFolders(): LiveData<List<Folder>> = liveData(Dispatchers.IO) {
         emitSource(
             FolderController.getFoldersAsync()
                 .map { it.list }
@@ -38,7 +38,7 @@ class MenuDrawerViewModel : ViewModel() {
         )
     }
 
-    fun getQuotas(mailboxObjectId: String): LiveData<Quotas?> = liveData(Dispatchers.IO) {
+    fun listenToQuotas(mailboxObjectId: String): LiveData<Quotas?> = liveData(Dispatchers.IO) {
         emitSource(
             QuotasController.getQuotasAsync(mailboxObjectId)
                 .map { it.obj }

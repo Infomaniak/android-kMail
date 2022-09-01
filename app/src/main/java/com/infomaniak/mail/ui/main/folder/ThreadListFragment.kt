@@ -48,7 +48,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
@@ -272,23 +271,25 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             updateUpdatedAt()
 
             folderJob?.cancel()
-            folderJob = lifecycleScope.launch(Dispatchers.IO) {
-
-                FolderController.getFolderSync(folderId)?.let { folder ->
-                    withContext(Dispatchers.Main) {
-                        displayFolderName(folder)
-                        listenToThreads(folder)
-                        updateUpdatedAt(folder.lastUpdatedAt?.toDate())
-                    }
-                }
-
-                withContext(Dispatchers.Main) { observeFolder(folderId) }
+            folderJob = lifecycleScope.launch(Dispatchers.Main) {
+                getFolder(folderId)
+                listenToFolder(folderId)
             }
         }
     }
 
-    private fun observeFolder(folderId: String) {
-        threadListViewModel.getFolder(folderId).observe(viewLifecycleOwner, ::onFolderChange)
+    private fun getFolder(folderId: String) {
+        mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner, ::onFolder)
+    }
+
+    private fun onFolder(folder: Folder) {
+        displayFolderName(folder)
+        listenToThreads(folder)
+        updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+    }
+
+    private fun listenToFolder(folderId: String) {
+        threadListViewModel.listenToFolder(folderId).observe(viewLifecycleOwner, ::onFolderChange)
     }
 
     private fun onFolderChange(folder: Folder) = with(folder) {

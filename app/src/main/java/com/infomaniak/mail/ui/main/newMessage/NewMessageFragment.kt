@@ -163,7 +163,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeMailboxes() {
-        mainViewModel.getMailboxes().observe(viewLifecycleOwner, ::setupFromField)
+        mainViewModel.listenToMailboxes().observe(viewLifecycleOwner, ::setupFromField)
     }
 
     private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {
