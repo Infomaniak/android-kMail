@@ -80,23 +80,20 @@ class SwitchUserFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val users = AccountUtils.getAllUsersSync()
             with(switchUserViewModel) {
-                fetchAccounts(users)
-                withContext(Dispatchers.Main) { accounts(users).observe(viewLifecycleOwner, ::onAccountsChange) }
+                fetchUsersMailboxes(users)
+                users.forEach { user ->
+                    withContext(Dispatchers.Main) {
+                        mainViewModel.mailboxes(user.id).observe(viewLifecycleOwner) { mailboxes ->
+                            onMailboxesChange(user, mailboxes)
+                        }
+                    }
+                }
             }
         }
     }
 
-    private fun onAccountsChange(accounts: List<Pair<User, List<Mailbox>>>) {
-        val uiAccounts = accounts
-            .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
-            .sortAccounts()
-
-        accountsAdapter.notifyAdapter(uiAccounts, MainViewModel.currentMailboxObjectId.value)
-    }
-
-    private fun List<UiAccount>.sortAccounts(): List<UiAccount> {
-        return filter { it.user.id != AccountUtils.currentUserId }
-            .toMutableList()
-            .apply { this@sortAccounts.find { it.user.id == AccountUtils.currentUserId }?.let { add(0, it) } }
+    private fun onMailboxesChange(user: User, mailboxes: List<Mailbox>) {
+        val uiAccount = UiAccount(user, mailboxes.sortMailboxes())
+        accountsAdapter.upsertAccount(uiAccount, MainViewModel.currentMailboxObjectId.value)
     }
 }

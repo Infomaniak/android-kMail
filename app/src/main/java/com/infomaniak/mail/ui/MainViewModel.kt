@@ -68,9 +68,9 @@ class MainViewModel : ViewModel() {
         currentMailboxObjectId.value = null
     }
 
-    fun mailboxes(): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+    fun mailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
         emitSource(
-            MailboxController.getMailboxesAsync(AccountUtils.currentUserId)
+            MailboxController.getMailboxesAsync(userId)
                 .map { it.list }
                 .asLiveData()
         )
