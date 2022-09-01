@@ -19,11 +19,9 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -55,7 +53,7 @@ class Message : RealmObject {
     var references: String? = null
     var priority: String? = null
     @SerialName("dkim_status")
-    private var dkimStatus: String? = null
+    private var _dkimStatus: String? = null
     @SerialName("folder_id")
     var folderId: String = ""
     var folder: String = ""
@@ -91,17 +89,22 @@ class Message : RealmObject {
     /**
      * Local
      */
+    @Ignore
     var draftUuid: String? = null
+    @Ignore
     var fullyDownloaded: Boolean = false
+    @Ignore
     var hasUnsubscribeLink: Boolean = false
+    @Ignore
     var parentLink: Thread? = null // TODO
-
     @Ignore
     var isExpanded = false
     @Ignore
     var isExpandedHeaderMode = false
     @Ignore
     var detailsAreExpanded = false
+
+    val dkimStatus: MessageDKIM get() = Utils.enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 
     fun initLocalValues(): Message {
         from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
@@ -113,15 +116,9 @@ class Message : RealmObject {
         return this
     }
 
-    fun setDraftId(draftUuid: String?) {
-        RealmDatabase.mailboxContent.writeBlocking { getLatestMessageSync(uid)?.draftUuid = draftUuid }
-    }
-
-    fun getDkimStatus(): MessageDKIM? = enumValueOfOrNull<MessageDKIM>(dkimStatus)
-
-    enum class MessageDKIM(val value: String?) {
-        VALID(null),
-        NOT_VALID("not_valid"),
-        NOT_SIGNED("not_signed"),
+    enum class MessageDKIM {
+        VALID,
+        NOT_VALID,
+        NOT_SIGNED,
     }
 }

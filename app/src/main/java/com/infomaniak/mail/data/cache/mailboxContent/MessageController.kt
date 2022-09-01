@@ -48,16 +48,6 @@ object MessageController {
     //endregion
 
     //region Edit data
-    fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.forEach { deleteLatestMessage(it.uid) }
-    }
-
-    fun deleteMessage(uid: String) {
-        RealmDatabase.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
-    }
-    //endregion
-
-    //region Utils
     fun upsertApiData(apiMessages: List<Message>, thread: Thread) {
 
         // Get current data
@@ -84,6 +74,20 @@ object MessageController {
         }
     }
 
+    fun MutableRealm.deleteMessages(messages: List<Message>) {
+        messages.forEach { deleteLatestMessage(it.uid) }
+    }
+
+    fun deleteMessage(uid: String) {
+        RealmDatabase.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
+    }
+
+    fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
+        RealmDatabase.mailboxContent.writeBlocking { getLatestMessageSync(uid)?.let(onUpdate) }
+    }
+    //endregion
+
+    //region Utils
     private fun getMessage(uid: String): RealmSingleQuery<Message> {
         return RealmDatabase.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first()
     }
@@ -110,10 +114,6 @@ object MessageController {
 
     // fun upsertMessage(message: Message) {
     //     MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
-    // }
-
-    // fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestMessage(uid)?.let(onUpdate) }
     // }
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
