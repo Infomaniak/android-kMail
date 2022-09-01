@@ -19,14 +19,22 @@ package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 
 class ThreadViewModel : ViewModel() {
 
     fun getThread(uid: String): LiveData<Thread?> = liveData(Dispatchers.IO) {
         emit(ThreadController.getThreadSync(uid))
+    }
+
+    fun listenToMessages(thread: Thread): LiveData<List<Message>> = liveData(Dispatchers.IO) {
+        emitSource(thread.messages.asFlow().toSharedFlow().map { it.list }.asLiveData())
     }
 }
