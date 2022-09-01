@@ -31,7 +31,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -57,7 +57,6 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
-import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.math.max
@@ -301,7 +300,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun startPeriodicUpdatedAtRefreshJob() {
         updatedAtRefreshJob?.cancel()
         updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            lifecycle.repeatOnLifecycle(State.RESUMED) {
                 while (true) {
                     delay(DateUtils.MINUTE_IN_MILLIS)
                     withContext(Dispatchers.Main) { updateUpdatedAt() }
@@ -355,28 +354,26 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun listenToThreads(folder: Folder) {
         threadsJob?.cancel()
-        threadsJob = lifecycleScope.launch(Dispatchers.IO) {
-            folder.threads.asFlow().toSharedFlow().collect {
-                if (isResumed) withContext(Dispatchers.Main) {
-                    onThreadsUpdate(it)
-                }
-            }
+        threadsJob = lifecycleScope.launch(Dispatchers.Main) {
+            threadListViewModel.listenToThreads(folder).observe(viewLifecycleOwner, ::onThreadsUpdate)
         }
     }
 
-    private fun onThreadsUpdate(it: ListChange<Thread>) = with(threadListViewModel) {
-        if (it.list.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
+    private fun onThreadsUpdate(threads: List<Thread>) = with(threadListViewModel) {
+        if (!isResumed) return@with
+
+        if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
 
         if (isRecovering.value == true) {
             Log.i("UI", "Displaying threads got delayed because of swipe recovering animation")
             isRecovering.observe(viewLifecycleOwner) { value ->
                 if (value == false) {
-                    binding.threadsList.postOnAnimation { displayThreads(it.list) }
+                    binding.threadsList.postOnAnimation { displayThreads(threads) }
                     isRecovering.removeObservers(viewLifecycleOwner)
                 }
             }
         } else {
-            displayThreads(it.list)
+            displayThreads(threads)
         }
     }
 
