@@ -19,12 +19,8 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.SpannedString
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.text.buildSpannedString
-import androidx.core.text.color
-import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -43,7 +39,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
-import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter(
     private var messages: MutableList<Message> = mutableListOf(),
@@ -239,34 +234,13 @@ class ThreadAdapter(
             setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
-        recipient.text = if (isExpanded) formatRecipientsName(this@with) else subject
+        recipient.text = if (isExpanded) getAllRecipientFormatted(this@with) else subject
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
     }
 
-    private fun ItemMessageBinding.formatRecipientsName(message: Message): SpannedString = with(message) {
-        val to = recipientsToSpannedString(context, to)
-        val cc = recipientsToSpannedString(context, cc)
-
-        // TODO : Rewrite properly this part
-        return buildSpannedString {
-            if (isExpandedHeaderMode) scale(RECIPIENT_TEXT_SCALE_FACTOR) { append("${context.getString(R.string.toTitle)} ") }
-            append(to)
-            if (cc.isNotBlank()) append(cc)
-        }.dropLast(2) as SpannedString
-    }
-
-    // TODO : Rewrite properly this part
-    private fun Message.recipientsToSpannedString(context: Context, recipientsList: List<Recipient>) = buildSpannedString {
-        recipientsList.forEach {
-            if (isExpandedHeaderMode) {
-                color(context.getColor(RCore.color.accent)) { append(it.displayedName(context)) }
-                    .scale(RECIPIENT_TEXT_SCALE_FACTOR) { if (it.name.isNotBlank()) append(" (${it.email})") }
-                    .append(",\n")
-            } else {
-                append("${it.displayedName(context)}, ")
-            }
-        }
+    private fun ItemMessageBinding.getAllRecipientFormatted(message: Message): String = with(message) {
+        return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
     }
 
     fun notifyAdapter(newList: MutableList<Message>) {
@@ -307,8 +281,6 @@ class ThreadAdapter(
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
-
-        const val RECIPIENT_TEXT_SCALE_FACTOR = 0.9f
     }
 
     class ThreadViewHolder(
