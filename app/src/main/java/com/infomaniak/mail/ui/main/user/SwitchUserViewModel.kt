@@ -41,10 +41,7 @@ class SwitchUserViewModel : ViewModel() {
         users.forEach { user ->
             val okHttpClient = createOkHttpClientForSpecificUser(user)
             ApiRepository.getMailboxes(okHttpClient).data
-                ?.map {
-                    val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
-                    it.initLocalValues(user.id, quotas)
-                }
+                ?.map { it.initLocalValues(user.id) }
                 ?.let(MailboxController::upsertMailboxes)
         }
     }

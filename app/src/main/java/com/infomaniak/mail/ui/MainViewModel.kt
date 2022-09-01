@@ -128,10 +128,22 @@ class MainViewModel : ViewModel() {
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
+        updateMailboxQuotas(mailbox)
         val folders = updateFolders(mailbox)
         getCurrentFolder(folders)?.let { folder ->
             selectFolder(folder.id)
             updateThreads(mailbox.uuid, folder.id)
+        }
+    }
+
+    private fun updateMailboxQuotas(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+        if (mailbox.isLimited) {
+            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.let { quotas ->
+                quotas.mailboxObjectId = mailbox.objectId
+                MailboxController.updateMailbox(mailbox.objectId) {
+                    it.quotas = quotas
+                }
+            }
         }
     }
 
@@ -212,8 +224,7 @@ class MainViewModel : ViewModel() {
 
     private fun updateMailboxes(): List<Mailbox> {
         val apiMailboxes = ApiRepository.getMailboxes().data?.map {
-            val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
-            it.initLocalValues(AccountUtils.currentUserId, quotas)
+            it.initLocalValues(AccountUtils.currentUserId)
         } ?: emptyList()
 
         return MailboxController.upsertApiData(apiMailboxes)

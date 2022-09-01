@@ -22,9 +22,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfos.QuotasController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.Quotas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class MenuDrawerViewModel : ViewModel() {
 
@@ -32,6 +37,22 @@ class MenuDrawerViewModel : ViewModel() {
         emitSource(
             FolderController.getFoldersAsync()
                 .map { it.list }
+                .asLiveData()
+        )
+    }
+
+    fun mailbox(objectId: String): LiveData<Mailbox> = liveData(Dispatchers.IO) {
+        emitSource(
+            MailboxController.getMailboxAsync(objectId)
+                .mapNotNull { it.obj }
+                .asLiveData()
+        )
+    }
+
+    fun quotas(mailboxObjectId: String): LiveData<Quotas?> = liveData(Dispatchers.IO) {
+        emitSource(
+            QuotasController.getQuotasAsync(mailboxObjectId)
+                .map { it.obj }
                 .asLiveData()
         )
     }

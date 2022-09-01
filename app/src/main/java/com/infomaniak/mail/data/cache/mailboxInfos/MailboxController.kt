@@ -96,6 +96,10 @@ object MailboxController {
     fun deleteMailboxes(mailboxes: List<Mailbox>) {
         RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
     }
+
+    fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
+        RealmDatabase.mailboxInfos.writeBlocking { getLatestMailbox(objectId)?.let(onUpdate) }
+    }
     //endregion
 
     //region Utils
@@ -130,10 +134,6 @@ object MailboxController {
 
     // fun getMailboxInfoByEmail(email: String): Mailbox? {
     //     return RealmController.mailboxInfos.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
-    // }
-
-    // private fun updateMailboxInfo(id: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-    //     RealmController.mailboxInfos.writeBlocking { getLatestMailboxInfoById(id)?.let(onUpdate) }
     // }
 
     // private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {

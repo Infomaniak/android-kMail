@@ -41,6 +41,7 @@ import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.LoginActivity
@@ -64,6 +65,7 @@ class MenuDrawerFragment : Fragment() {
     private lateinit var binding: FragmentMenuDrawerBinding
 
     private var foldersJob: Job? = null
+    private var quotasJob: Job? = null
 
     private var currentFolderRole: FolderRole? = null
     private var inboxFolderId: String? = null
@@ -176,7 +178,8 @@ class MenuDrawerFragment : Fragment() {
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
             observeFolders()
-            onCurrentMailboxChange(mailboxObjectId)
+            MailboxController.getMailboxSync(mailboxObjectId)?.email?.let { binding.mailboxSwitcherText.text = it }
+            observeQuotas(mailboxObjectId)
         }
     }
 
@@ -205,14 +208,10 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun onCurrentMailboxChange(mailboxObjectId: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            MailboxController.getMailboxSync(mailboxObjectId)?.let { mailbox ->
-                withContext(Dispatchers.Main) {
-                    binding.mailboxSwitcherText.text = mailbox.email
-                    displayMailboxQuotas(mailbox)
-                }
-            }
+    private fun observeQuotas(mailboxObjectId: String) {
+        quotasJob?.cancel()
+        quotasJob = lifecycleScope.launch(Dispatchers.Main) {
+            menuDrawerViewModel.quotas(mailboxObjectId).observe(viewLifecycleOwner, ::onQuotasChange)
         }
     }
 
@@ -236,13 +235,15 @@ class MenuDrawerFragment : Fragment() {
         customFolderAdapter.notifyItemRangeChanged(0, customFolderAdapter.itemCount, Unit)
     }
 
-    private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {
-        getMoreStorageCardview.isVisible = mailbox.isLimited
-        storageDivider.isVisible = mailbox.isLimited
+    private fun onQuotasChange(quotas: Quotas?) = with(binding) {
+        val isLimited = quotas != null
 
-        if (mailbox.isLimited) {
-            val usedSize = (mailbox.quotas?.size ?: 0).toLong()
-            val maxSize = mailbox.quotas?.maxSize ?: 0L
+        getMoreStorageCardview.isVisible = isLimited
+        storageDivider.isVisible = isLimited
+
+        if (isLimited) {
+            val usedSize = (quotas?.size ?: 0).toLong()
+            val maxSize = quotas?.maxSize ?: 0L
             val formattedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
             val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, maxSize)
 
