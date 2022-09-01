@@ -68,12 +68,16 @@ class MainViewModel : ViewModel() {
         currentMailboxObjectId.value = null
     }
 
-    fun mailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+    fun getMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
         emitSource(
             MailboxController.getMailboxesAsync(userId)
                 .map { it.list }
                 .asLiveData()
         )
+    }
+
+    fun getMailbox(objectId: String): LiveData<Mailbox?> = liveData(Dispatchers.IO) {
+        emit(MailboxController.getMailboxSync(objectId))
     }
 
     private fun selectMailbox(mailbox: Mailbox) {

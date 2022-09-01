@@ -50,8 +50,8 @@ import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -242,10 +242,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid
-            }
+            observeMailbox(mailboxObjectId)
         }
+    }
+
+    private fun observeMailbox(objectId: String) {
+        mainViewModel.getMailbox(objectId).observe(viewLifecycleOwner, ::onMailboxChange)
+    }
+
+    private fun onMailboxChange(mailbox: Mailbox?) {
+        mailboxUuid = mailbox?.uuid
     }
 
     private fun listenToDownloadState() {
@@ -282,7 +288,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeFolder(folderId: String) {
-        threadListViewModel.folder(folderId).observe(viewLifecycleOwner, ::onFolderChange)
+        threadListViewModel.getFolder(folderId).observe(viewLifecycleOwner, ::onFolderChange)
     }
 
     private fun onFolderChange(folder: Folder) = with(folder) {

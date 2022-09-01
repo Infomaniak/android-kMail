@@ -171,7 +171,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeMailboxes() {
-        mainViewModel.mailboxes().observe(viewLifecycleOwner, ::onMailboxesChange)
+        mainViewModel.getMailboxes().observe(viewLifecycleOwner, ::onMailboxesChange)
     }
 
     private fun listenToCurrentMailbox() {
@@ -190,7 +190,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeMailbox(objectId: String) {
-        menuDrawerViewModel.getMailbox(objectId).observeNotNull(viewLifecycleOwner, ::onMailboxChange)
+        mainViewModel.getMailbox(objectId).observeNotNull(viewLifecycleOwner, ::onMailboxChange)
     }
 
     private fun onMailboxChange(mailbox: Mailbox) {

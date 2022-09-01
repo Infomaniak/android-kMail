@@ -22,10 +22,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfos.QuotasController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -38,10 +36,6 @@ class MenuDrawerViewModel : ViewModel() {
                 .map { it.list }
                 .asLiveData()
         )
-    }
-
-    fun getMailbox(objectId: String): LiveData<Mailbox?> = liveData(Dispatchers.IO) {
-        emit(MailboxController.getMailboxSync(objectId))
     }
 
     fun getQuotas(mailboxObjectId: String): LiveData<Quotas?> = liveData(Dispatchers.IO) {

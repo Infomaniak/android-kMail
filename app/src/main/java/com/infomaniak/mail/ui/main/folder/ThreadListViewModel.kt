@@ -27,7 +27,7 @@ class ThreadListViewModel : ViewModel() {
 
     var isRecovering = MutableLiveData(false)
 
-    fun folder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
+    fun getFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
         emitSource(
             FolderController.getFolderAsync(folderId)
                 .mapNotNull { it.obj }
