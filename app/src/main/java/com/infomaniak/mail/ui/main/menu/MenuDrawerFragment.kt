@@ -37,7 +37,6 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -178,7 +177,7 @@ class MenuDrawerFragment : Fragment() {
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
             observeFolders()
-            MailboxController.getMailboxSync(mailboxObjectId)?.email?.let { binding.mailboxSwitcherText.text = it }
+            observeMailbox(mailboxObjectId)
             observeQuotas(mailboxObjectId)
         }
     }
@@ -186,8 +185,16 @@ class MenuDrawerFragment : Fragment() {
     private fun observeFolders() {
         foldersJob?.cancel()
         foldersJob = lifecycleScope.launch(Dispatchers.Main) {
-            menuDrawerViewModel.folders().observe(viewLifecycleOwner, ::onFoldersChange)
+            menuDrawerViewModel.getFolders().observe(viewLifecycleOwner, ::onFoldersChange)
         }
+    }
+
+    private fun observeMailbox(objectId: String) {
+        menuDrawerViewModel.getMailbox(objectId).observeNotNull(viewLifecycleOwner, ::onMailboxChange)
+    }
+
+    private fun onMailboxChange(mailbox: Mailbox) {
+        binding.mailboxSwitcherText.text = mailbox.email
     }
 
     private fun listenToCurrentFolder() {
@@ -211,7 +218,7 @@ class MenuDrawerFragment : Fragment() {
     private fun observeQuotas(mailboxObjectId: String) {
         quotasJob?.cancel()
         quotasJob = lifecycleScope.launch(Dispatchers.Main) {
-            menuDrawerViewModel.quotas(mailboxObjectId).observe(viewLifecycleOwner, ::onQuotasChange)
+            menuDrawerViewModel.getQuotas(mailboxObjectId).observe(viewLifecycleOwner, ::onQuotasChange)
         }
     }
 
