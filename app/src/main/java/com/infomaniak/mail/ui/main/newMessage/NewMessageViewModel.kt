@@ -17,7 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.userInfos.ContactController
@@ -30,7 +33,6 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
@@ -43,20 +45,14 @@ class NewMessageViewModel : ViewModel() {
     var isEditorExpanded = false
     val editorAction = SingleLiveEvent<EditorAction>()
 
-    fun allContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
-        emitSource(
-            ContactController.getContactsAsync()
-                .map {
-                    mutableListOf<UiContact>().apply {
-                        it.list.forEach { contact ->
-                            contact.emails.forEach { email ->
-                                add(UiContact(email, contact.name))
-                            }
-                        }
-                    }
+    fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
+        emit(mutableListOf<UiContact>().apply {
+            ContactController.getContactsSync().forEach { contact ->
+                contact.emails.forEach { email ->
+                    add(UiContact(email, contact.name))
                 }
-                .asLiveData()
-        )
+            }
+        })
     }
 
     fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {

@@ -121,7 +121,7 @@ class NewMessageFragment : Fragment() {
             }
         })
 
-        observeAllContacts()
+        observeContacts()
         observeMailboxes()
     }
 
@@ -158,8 +158,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun observeAllContacts() {
-        newMessageViewModel.allContacts().observe(viewLifecycleOwner, ::setupContactsAdapter)
+    private fun observeContacts() {
+        newMessageViewModel.getContacts().observe(viewLifecycleOwner, ::setupContactsAdapter)
     }
 
     private fun observeMailboxes() {
