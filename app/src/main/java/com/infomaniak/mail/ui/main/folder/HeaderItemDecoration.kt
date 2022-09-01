@@ -17,21 +17,21 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
-import android.graphics.Canvas
-import android.graphics.Rect
-import android.graphics.RectF
+import android.graphics.*
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.forEach
+import android.widget.TextView
+import androidx.core.view.forEachIndexed
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration.Intersection.*
 
 class HeaderItemDecoration(
     parent: RecyclerView,
     private val shouldFadeOutHeader: Boolean = false,
     private val isHeader: (itemPosition: Int) -> Boolean
 ) : RecyclerView.ItemDecoration() {
-
     private var currentHeader: Pair<Int, RecyclerView.ViewHolder>? = null
 
     init {
@@ -61,21 +61,109 @@ class HeaderItemDecoration(
 
     override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         super.onDrawOver(c, parent, state)
-        val topChild = parent.findChildViewUnder(parent.paddingLeft.toFloat(), parent.paddingTop.toFloat()) ?: return
-        val topChildPosition = parent.getChildAdapterPosition(topChild)
-        if (topChildPosition == RecyclerView.NO_POSITION) return
+        // val topChild = parent.findChildViewUnder(parent.paddingLeft.toFloat(), parent.paddingTop.toFloat()) ?: run {
+        //     // currentHeader?.second?.let {
+        //     //     drawHeader(c, it.itemView, parent.paddingTop)
+        //     // }
+        //     Log.e("gibran", "onDrawOver: can't find view at the start of the recyclerview and returned", );
+        //     return
+        // }
+        // val topChild = parent.getChildAt(0)
+        // // val topChild = getChildInContact(parent, parent.paddingTop) ?: run {
+        // //     Log.e("gibran", "onDrawOver: getChildInContact can't find view at the start of the recyclerview and returned");
+        // //     return
+        // // }
+        //
+        //
+        // // if (topChild == null) { // continuer de redraw le header sauvegardé et ne rien faire d'autre // TODO
+        // //     Log.e("gibran", "onDrawOver: AUCUNE vue dessous");
+        // //     currentHeader?.second?.let {
+        // //         Log.e("gibran", "onDrawOver: on draw ce qu'il y avait avant", );
+        // //         drawHeader(c, it.itemView, parent.paddingTop)
+        // //     } ?: run {
+        // //         Log.e("gibran", "onDrawOver: ce qu'il y avait avant est null", );
+        // //     }
+        // //     return
+        // // }
+        //
+        // // top child position *in the adapter* !!
+        // val topChildPosition = parent.getChildAdapterPosition(topChild)
+        // // Log.e("gibran", "onDrawOver - topChildPosition: ${topChildPosition}")
+        // if (topChildPosition == RecyclerView.NO_POSITION) run {
+        //     Log.e("gibran", "onDrawOver: topChildPosition is NO_POSITION and returned");
+        //     return
+        // }
 
-        val headerView = getHeaderViewForItem(topChildPosition, parent) ?: return
+        // top child position *in the adapter* !!
+        val topChildPosition = getPositionInAdapterOfFirstChild(parent) ?: return
+
+        // val topChildPosition = 0
+
+        val headerView = getHeaderViewForItem(topChildPosition, parent) ?: run {
+            Log.e("gibran", "onDrawOver: headerView returned because is null");
+            return
+        }
+        Log.e("gibran", "onDrawOver - headerView for item #$topChildPosition: ${(headerView as TextView).text}")
 
         val contactPoint = headerView.bottom + parent.paddingTop
-        val childInContact = getChildInContact(parent, contactPoint) ?: return
+        // drawLines(c, contactPoint, parent)
+        val childInContact = getChildInContact(parent, contactPoint) ?: run {
+            Log.e("gibran", "onDrawOver: child in contact return");
+            return
+        }
+        // Log.e("gibran", "onDrawOver - childInContact: ${childInContact}")
+        Log.e("gibran", "onDrawOver - parent.getChildItemId(childInContact): ${parent.getChildItemId(childInContact)}")
+        // Log.e("gibran", "onDrawOver - childInContact: ${(childInContact as? TextView)?.text}")
 
         if (isHeader(parent.getChildAdapterPosition(childInContact))) {
             moveHeader(c, headerView, childInContact, parent.paddingTop)
+            Log.e("gibran", "onDrawOver: moveHeader returned");
             return
         }
 
         drawHeader(c, headerView, parent.paddingTop)
+        // drawLines(c, contactPoint, parent)
+        Log.e("gibran", "onDrawOver: drawing header and returning normally");
+    }
+
+    private fun getPositionInAdapterOfFirstChild(parent: RecyclerView): Int? {
+        val topMostChild = parent.getChildAt(0)
+        val adapterIndex = parent.getChildAdapterPosition(topMostChild)
+        return when (topMostChild.intersects(parent, parent.paddingTop)) {
+            INSET_TOP -> adapterIndex - 1
+            CENTER -> adapterIndex
+            INSET_BOTTOM -> adapterIndex + 1
+            null -> {
+                Log.wtf(TAG, "getPositionInAdapterOfFirstChild: The top most view in the recyclerview does not intersects parent.paddingTop (${parent.paddingTop})", )
+                null
+            }
+        }
+    }
+
+    private fun drawLines(c: Canvas, contactPoint: Int, parent: RecyclerView) {
+        c.save()
+        val paint = Paint().apply {
+            color = Color.RED
+            strokeWidth = 1F
+        }
+        val paintChild = Paint().apply {
+            color = Color.GREEN
+            strokeWidth = 1F
+        }
+        val startx = 0f
+        val starty = contactPoint.toFloat()
+        val endx = parent.width.toFloat()
+        val endy = contactPoint.toFloat()
+        parent.forEachIndexed { index, child ->
+            if (index <= 2) {
+                val mBounds = Rect()
+                parent.getDecoratedBoundsWithMargins(child, mBounds)
+                c.drawLine(startx, child.top.toFloat(), endx, child.bottom.toFloat(), paintChild)
+                c.drawLine(startx, mBounds.bottom.toFloat(), endx, mBounds.top.toFloat(), paint)
+            }
+        }
+        c.drawLine(startx, starty, endx, endy, paint)
+        c.restore()
     }
 
     private fun getHeaderViewForItem(itemPosition: Int, parent: RecyclerView): View? {
@@ -83,6 +171,7 @@ class HeaderItemDecoration(
             return null
         }
         val headerPosition = getHeaderPositionForItem(itemPosition)
+        Log.e("gibran", "getHeaderViewForItem - headerPosition($itemPosition): ${headerPosition}")
         if (headerPosition == RecyclerView.NO_POSITION) return null
         val headerType = parent.adapter?.getItemViewType(headerPosition) ?: return null
         // if match reuse viewHolder
@@ -93,6 +182,7 @@ class HeaderItemDecoration(
         val headerHolder = parent.adapter?.createViewHolder(parent, headerType)
         if (headerHolder != null) {
             parent.adapter?.onBindViewHolder(headerHolder, headerPosition)
+            // Log.e("gibran", "getHeaderViewForItem: binding a new headerHolder ${(headerHolder.itemView as TextView).text}", );
             fixLayoutSize(parent, headerHolder.itemView)
             // save for next draw
             currentHeader = headerPosition to headerHolder
@@ -127,17 +217,88 @@ class HeaderItemDecoration(
     }
 
     private fun getChildInContact(parent: RecyclerView, contactPoint: Int): View? {
+
+        /**
+         * Retourne la cardview précédante si on est dans l'inset top d'un header
+         * Retourne le header si on est dans le  top..bottom de la view du header (sans compter les insets)
+         * Retourne la prochaine cardview si on est dans l'inset bottom d'un header
+         */
+
+        // parent.addOnChildAttachStateChangeListener(
+        //     object : View.OnAttachStateChangeListener, RecyclerView.OnChildAttachStateChangeListener {
+        //         override fun onViewAttachedToWindow(v: View?) {}
+        //         override fun onViewDetachedFromWindow(v: View?) {}
+        //         override fun onChildViewAttachedToWindow(view: View) {}
+        //
+        //         override fun onChildViewDetachedFromWindow(view: View) {
+        //             lastDetachedView = view
+        //         }
+        //     }
+        // )
+
         var childInContact: View? = null
-        parent.forEach { child ->
+        parent.forEachIndexed { index, child ->
             val mBounds = Rect()
             parent.getDecoratedBoundsWithMargins(child, mBounds)
-            if (mBounds.bottom > contactPoint && mBounds.top <= contactPoint) {
-                // This child overlaps the contactPoint
-                childInContact = child
-                return@forEach
+
+            childInContact = when (child.intersects(parent, contactPoint)) {
+                INSET_TOP -> {
+                    Log.e("gibran", "getChildInContact:       intersecting top inset of index $index");
+                    if (index - 1 >= 0) parent.getChildAt(index - 1)
+                    else null
+                }
+                CENTER -> {
+                    Log.e("gibran", "getChildInContact:       intersecting center content of index $index");
+                    child
+                }
+                INSET_BOTTOM -> {
+                    Log.e("gibran", "getChildInContact:       intersecting bottom inset of index $index");
+                    if (index + 1 < parent.childCount) parent.getChildAt(index + 1)
+                    else null
+                }
+                null -> null
+            }
+
+            // childInContact = when {
+            //     child.top > contactPoint && mBounds.top <= contactPoint -> {
+            //         Log.e("gibran", "getChildInContact:       intersecting top inset of index $index");
+            //         if (index - 1 >= 0) parent.getChildAt(index - 1)
+            //         else null
+            //     }
+            //     child.bottom > contactPoint && child.top <= contactPoint -> {
+            //         Log.e("gibran", "getChildInContact:       intersecting center content of index $index");
+            //         child
+            //     }
+            //     child.bottom <= contactPoint && mBounds.bottom > contactPoint -> {
+            //         Log.e("gibran", "getChildInContact:       intersecting bottom inset of index $index");
+            //         if (index + 1 < parent.childCount) parent.getChildAt(index + 1)
+            //         else null
+            //     }
+            //     else -> null
+            // }
+
+            if (childInContact != null) {
+                return childInContact
             }
         }
-        return childInContact
+        return null
+    }
+
+    fun View.intersects(parent: RecyclerView, height: Int): Intersection? {
+        val boundsWithInsets = Rect()
+        parent.getDecoratedBoundsWithMargins(this, boundsWithInsets)
+        return when {
+            top > height && boundsWithInsets.top <= height -> INSET_TOP
+            height in top until bottom -> CENTER
+            bottom <= height && boundsWithInsets.bottom > height -> INSET_BOTTOM
+            else -> null
+        }
+    }
+
+    enum class Intersection {
+        INSET_TOP,
+        CENTER,
+        INSET_BOTTOM
     }
 
     /**
@@ -178,6 +339,10 @@ class HeaderItemDecoration(
             currentPosition -= 1
         } while (currentPosition >= 0)
         return headerPosition
+    }
+
+    companion object {
+        private const val TAG = "HeaderItemDecoration"
     }
 }
 

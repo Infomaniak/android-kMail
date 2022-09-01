@@ -270,7 +270,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
                 val sectionTitle = thread.getSectionTitle(context)
                 when {
                     sectionTitle != previousSectionTitle -> {
-                        if (index != 0) formattedList.add(Unit) // Adds a space before the next date separator
+                        // if (index != 0) formattedList.add(Unit) // Adds a space before the next date separator
                         formattedList.add(sectionTitle)
                         previousSectionTitle = sectionTitle
                     }
