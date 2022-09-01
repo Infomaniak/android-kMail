@@ -21,10 +21,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.MessagePriority
@@ -34,12 +32,12 @@ import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction.*
+import com.infomaniak.mail.utils.observeNotNull
 import io.realm.kotlin.ext.realmListOf
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class NewMessageActivity : ThemedActivity() {
 
+    private val mainViewModel: MainViewModel by viewModels()
     private val newMessageViewModel: NewMessageViewModel by viewModels()
 
     private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
@@ -119,10 +117,9 @@ class NewMessageActivity : ThemedActivity() {
         if (newMessageViewModel.recipients.isEmpty()) return false
 
         val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return false
-        lifecycleScope.launch(Dispatchers.IO) {
-            MailboxController.getMailboxSync(mailboxObjectId)?.let { mailbox ->
-                newMessageViewModel.sendMail(createDraft(), action, mailbox)
-            }
+
+        mainViewModel.getMailbox(mailboxObjectId).observeNotNull(this) { mailbox ->
+            newMessageViewModel.sendMail(createDraft(), action, mailbox)
         }
 
         return true
