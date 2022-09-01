@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
 import com.infomaniak.mail.data.models.*
@@ -42,13 +43,9 @@ object ApiRepository : ApiRepositoryCore() {
         url: String,
         method: ApiController.ApiMethod,
         body: Any? = null,
-        okHttpClient: OkHttpClient? = null,
+        okHttpClient: OkHttpClient = HttpClient.okHttpClient,
     ): T {
-        return if (okHttpClient == null) {
-            ApiController.callApi(url, method, body, useKotlinxSerialization = true)
-        } else {
-            ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
-        }
+        return ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
     }
 
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
@@ -63,7 +60,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxMailbox), GET)
     }
 
-    fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
+    fun getMailboxes(okHttpClient: OkHttpClient = HttpClient.okHttpClient): ApiResponse<List<Mailbox>> {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient)
     }
 
