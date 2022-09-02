@@ -127,9 +127,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 return@HeaderItemDecoration position >= 0 && threadListAdapter.dataSet[position] is String
             })
             addItemDecoration(DateSeparatorItemDecoration())
-            // addItemDecoration(CustomHeaderItemDecoration(this) { position ->
-            //     return@CustomHeaderItemDecoration position >= 0 && threadListAdapter.dataSet[position] is String
-            // })
         }
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
