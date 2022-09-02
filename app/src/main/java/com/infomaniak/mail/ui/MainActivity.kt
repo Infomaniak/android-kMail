@@ -71,7 +71,7 @@ class MainActivity : ThemedActivity() {
         backgroundColor = getColor(R.color.backgroundColor).toColor()
         backgroundHeaderColor = getColor(R.color.backgroundHeaderColor).toColor()
 
-        // TODO: This was removed because it makes the NewMessageActivity crash when there is too much recipients.
+        // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         listenToNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
 

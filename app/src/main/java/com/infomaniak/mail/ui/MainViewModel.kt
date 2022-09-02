@@ -21,6 +21,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -54,7 +55,7 @@ class MainViewModel : ViewModel() {
         val currentMessageUid = MutableLiveData<String?>()
     }
 
-    val isInternetAvailable = MutableLiveData(true)
+    val isInternetAvailable = SingleLiveEvent<Boolean>()
     var canContinueToPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = MutableLiveData(false)

@@ -180,12 +180,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadsList.swipeListener = object : OnItemSwipeListener<Any> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Any): Boolean {
-                if (direction == SwipeDirection.LEFT_TO_RIGHT) {
-                    // TODO : Toggle between seen and unseen
-                    ThreadController.markAsSeen(item as Thread)
-                } else if (direction == SwipeDirection.RIGHT_TO_LEFT) {
-                    // TODO : Delete thread
-                    notYetImplemented()
+                when (direction) {
+                    SwipeDirection.LEFT_TO_RIGHT -> ThreadController.markAsSeen(item as Thread) // TODO: Toggle between seen and unseen
+                    SwipeDirection.RIGHT_TO_LEFT -> notYetImplemented() // TODO: Delete thread
+                    else -> Unit
                 }
                 return true
             }
@@ -194,7 +192,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     fun LinearLayoutManager.handlePagination(scrollDirection: ScrollDirection) {
         if (scrollDirection == ScrollDirection.DOWN) {
-            val pastVisibleItems = findFirstVisibleItemPosition().plus(offsetTrigger)
+            val pastVisibleItems = findFirstVisibleItemPosition() + offsetTrigger
             val isLastElement = (childCount + pastVisibleItems) >= itemCount
             if (isLastElement && mainViewModel.isDownloadingChanges.value == false) downloadThreads()
         }
@@ -202,7 +200,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun FragmentThreadListBinding.extendCollapseFab(
         layoutManager: LinearLayoutManager,
-        scrollDirection: ScrollDirection
+        scrollDirection: ScrollDirection,
     ) {
         if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 || scrollDirection == ScrollDirection.UP) {
             newMessageFab.extend()

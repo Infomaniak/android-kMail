@@ -31,7 +31,7 @@ import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration.Intersection.*
 class HeaderItemDecoration(
     parent: RecyclerView,
     private val shouldFadeOutHeader: Boolean = false,
-    private val isHeader: (itemPosition: Int) -> Boolean
+    private val isHeader: (itemPosition: Int) -> Boolean,
 ) : RecyclerView.ItemDecoration() {
     private var currentHeader: Pair<Int, RecyclerView.ViewHolder>? = null
 
@@ -44,17 +44,17 @@ class HeaderItemDecoration(
     init {
         parent.adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
-                // clear saved header as it can be outdated now
+                // Clear saved header as it can be outdated now
                 currentHeader = null
             }
         })
 
         parent.doOnEachNextLayout {
-            // clear saved layout as it may need layout update
+            // Clear saved layout as it may need layout update
             currentHeader = null
         }
 
-        // handle click on sticky header
+        // Handle click on sticky header
         parent.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(recyclerView: RecyclerView, motionEvent: MotionEvent): Boolean {
                 return if (motionEvent.action == MotionEvent.ACTION_DOWN) {
@@ -119,7 +119,7 @@ class HeaderItemDecoration(
         val headerPosition = getHeaderPositionForItem(itemPosition)
         if (headerPosition == RecyclerView.NO_POSITION) return null
         val headerType = parent.adapter?.getItemViewType(headerPosition) ?: return null
-        // if match reuse viewHolder
+        // If match, reuse viewHolder
         if (currentHeader?.first == headerPosition && currentHeader?.second?.itemViewType == headerType) {
             return currentHeader?.second?.itemView
         }
@@ -128,7 +128,7 @@ class HeaderItemDecoration(
         if (headerHolder != null) {
             parent.adapter?.onBindViewHolder(headerHolder, headerPosition)
             fixLayoutSize(parent, headerHolder.itemView)
-            // save for next draw
+            // Save for next draw
             currentHeader = headerPosition to headerHolder
         }
         return headerHolder?.itemView

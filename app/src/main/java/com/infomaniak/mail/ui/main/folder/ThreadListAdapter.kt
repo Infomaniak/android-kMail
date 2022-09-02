@@ -154,8 +154,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
         canvasUnder: Canvas?,
         canvasOver: Canvas?,
         isUserControlled: Boolean
-    ): Unit = with(viewHolder.binding)
-    {
+    ): Unit = with(viewHolder.binding) {
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width
 
@@ -173,11 +172,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
     }
 
     private fun cappedLinearInterpolator(max: Float, progress: Float): Float {
-        return if (progress < SWIPE_ANIMATION_THRESHOLD) {
-            max * progress / SWIPE_ANIMATION_THRESHOLD
-        } else {
-            max
-        }
+        return if (progress < SWIPE_ANIMATION_THRESHOLD) max * progress / SWIPE_ANIMATION_THRESHOLD else max
     }
 
     override fun onSwipeAnimationFinished(viewHolder: ThreadViewHolder) {
