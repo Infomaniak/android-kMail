@@ -28,7 +28,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -46,9 +45,6 @@ import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -60,9 +56,6 @@ class MenuDrawerFragment : Fragment() {
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
-
-    private var foldersJob: Job? = null
-    private var quotasJob: Job? = null
 
     private var currentFolderRole: FolderRole? = null
     private var inboxFolderId: String? = null
@@ -90,6 +83,8 @@ class MenuDrawerFragment : Fragment() {
         observeMailboxes()
         listenToCurrentMailbox()
         listenToCurrentFolder()
+        observeFolders()
+        observeQuotas()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -174,17 +169,13 @@ class MenuDrawerFragment : Fragment() {
 
     private fun listenToCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
-            observeFolders()
+            menuDrawerViewModel.currentMailboxObjectId.value = mailboxObjectId
             observeMailbox(mailboxObjectId)
-            observeQuotas(mailboxObjectId)
         }
     }
 
     private fun observeFolders() {
-        foldersJob?.cancel()
-        foldersJob = lifecycleScope.launch(Dispatchers.Main) {
-            menuDrawerViewModel.listenToFolders().observe(viewLifecycleOwner, ::onFoldersChange)
-        }
+        menuDrawerViewModel.folders.observe(viewLifecycleOwner, ::onFoldersChange)
     }
 
     private fun observeMailbox(objectId: String) {
@@ -214,11 +205,8 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun observeQuotas(mailboxObjectId: String) {
-        quotasJob?.cancel()
-        quotasJob = lifecycleScope.launch(Dispatchers.Main) {
-            menuDrawerViewModel.listenToQuotas(mailboxObjectId).observe(viewLifecycleOwner, ::onQuotasChange)
-        }
+    private fun observeQuotas() {
+        menuDrawerViewModel.quotas.observe(viewLifecycleOwner, ::onQuotasChange)
     }
 
     private fun onFoldersChange(folders: List<Folder>) {

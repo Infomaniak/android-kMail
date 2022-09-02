@@ -17,32 +17,21 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
+import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfos.QuotasController
-import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Quotas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 
 class MenuDrawerViewModel : ViewModel() {
 
-    fun listenToFolders(): LiveData<List<Folder>> = liveData(Dispatchers.IO) {
-        emitSource(
-            FolderController.getFoldersAsync()
-                .map { it.list }
-                .asLiveData()
-        )
+    val currentMailboxObjectId = MutableLiveData<String>()
+
+    val folders = Transformations.switchMap(currentMailboxObjectId) {
+        liveData(Dispatchers.IO) { emitSource(FolderController.getFoldersAsync().map { it.list }.asLiveData()) }
     }
 
-    fun listenToQuotas(mailboxObjectId: String): LiveData<Quotas?> = liveData(Dispatchers.IO) {
-        emitSource(
-            QuotasController.getQuotasAsync(mailboxObjectId)
-                .map { it.obj }
-                .asLiveData()
-        )
+    val quotas = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        liveData(Dispatchers.IO) { emitSource(QuotasController.getQuotasAsync(mailboxObjectId).map { it.obj }.asLiveData()) }
     }
 }

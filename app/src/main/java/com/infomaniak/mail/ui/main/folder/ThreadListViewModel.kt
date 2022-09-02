@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.folder
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -30,15 +29,16 @@ class ThreadListViewModel : ViewModel() {
 
     var isRecovering = MutableLiveData(false)
 
+    val currentFolder = MutableLiveData<Folder>()
+    val currentFolderThreads = Transformations.switchMap(currentFolder) { folder ->
+        liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().toSharedFlow().map { it.list }.asLiveData()) }
+    }
+
     fun listenToFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
         emitSource(
             FolderController.getFolderAsync(folderId)
                 .mapNotNull { it.obj }
                 .asLiveData()
         )
-    }
-
-    fun listenToThreads(folder: Folder): LiveData<List<Thread>> = liveData(Dispatchers.IO) {
-        emitSource(folder.threads.asFlow().toSharedFlow().map { it.list }.asLiveData())
     }
 }

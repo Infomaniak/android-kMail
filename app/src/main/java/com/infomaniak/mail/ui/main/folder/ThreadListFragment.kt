@@ -69,7 +69,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
 
     private var folderJob: Job? = null
-    private var threadsJob: Job? = null
     private var updatedAtRefreshJob: Job? = null
 
     private lateinit var threadListAdapter: ThreadListAdapter
@@ -102,6 +101,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         listenToCurrentMailbox()
         listenToCurrentFolder()
         listenToDownloadState()
+        observeCurrentFolderThreads()
     }
 
     private fun setupOnRefresh() {
@@ -352,11 +352,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
+    private fun observeCurrentFolderThreads() {
+        threadListViewModel.currentFolderThreads.observe(viewLifecycleOwner, ::onThreadsUpdate)
+    }
+
     private fun listenToThreads(folder: Folder) {
-        threadsJob?.cancel()
-        threadsJob = lifecycleScope.launch(Dispatchers.Main) {
-            threadListViewModel.listenToThreads(folder).observe(viewLifecycleOwner, ::onThreadsUpdate)
-        }
+        threadListViewModel.currentFolder.value = folder
     }
 
     private fun onThreadsUpdate(threads: List<Thread>) = with(threadListViewModel) {
