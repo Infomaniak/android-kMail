@@ -19,23 +19,27 @@ package com.infomaniak.mail.data.cache.appSettings
 
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 
 object AppSettingsController {
 
     //region Get data
-    fun getAppSettings(): AppSettings = with(RealmDatabase.appSettings) {
-        query<AppSettings>().first().find() ?: writeBlocking { copyToRealm(AppSettings()) }
+    fun getAppSettings(realm: MutableRealm? = null): AppSettings {
+        fun MutableRealm.copyAppSettingsToRealm() = copyToRealm(AppSettings())
+        return (realm ?: RealmDatabase.appSettings).query<AppSettings>().first().find()
+            ?: realm?.run { copyAppSettingsToRealm() }
+            ?: RealmDatabase.appSettings.writeBlocking { copyAppSettingsToRealm() }
     }
     //endregion
 
     //region Edit data
     fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
-        RealmDatabase.appSettings.writeBlocking { findLatest(getAppSettings())?.let(onUpdate) }
+        RealmDatabase.appSettings.writeBlocking { onUpdate(getAppSettings(this)) }
     }
 
     fun removeAppSettings() {
-        RealmDatabase.appSettings.writeBlocking { findLatest(getAppSettings())?.let(::delete) }
+        RealmDatabase.appSettings.writeBlocking { getAppSettings(this).let(::delete) }
     }
     //endregion
 }
