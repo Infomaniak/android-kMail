@@ -56,6 +56,7 @@
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 app:icon="@drawable/ic_star"
                 app:iconSize="18dp"
+                app:iconTint="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
