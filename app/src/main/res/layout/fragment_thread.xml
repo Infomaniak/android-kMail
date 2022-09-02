@@ -32,17 +32,36 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextAppearance="@style/H2">
 
-        <ImageView
-            android:id="@+id/iconFavorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/marginStandardMedium"
-            android:contentDescription="@string/contentDescriptionIconFavorite"
-            android:src="@drawable/ic_star"
-            android:visibility="gone"
-            tools:visibility="visible" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical">
 
+            <TextView
+                android:id="@+id/toolbarSubject"
+                style="@style/H2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iconFavorite"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/iconFavorite"
+                style="@style/IconButton"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="@dimen/marginStandardMedium"
+                app:icon="@drawable/ic_star"
+                app:iconSize="18dp"
+                app:iconTint="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

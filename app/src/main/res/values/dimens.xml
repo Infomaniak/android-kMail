@@ -33,6 +33,7 @@
     <dimen name="searchViewHeight">40dp</dimen>
     <dimen name="smallCornerRadius">6dp</dimen>
     <dimen name="userAvatarSizeLarge">42dp</dimen>
+    <dimen name="messageDividerHeight">6dp</dimen>
 
     <!-- Menu Drawer -->
 
