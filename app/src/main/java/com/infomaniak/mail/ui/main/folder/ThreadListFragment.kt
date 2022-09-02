@@ -50,7 +50,6 @@ import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -98,10 +97,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUserAvatar()
         setupUnreadCountChip()
 
-        listenToCurrentMailbox()
-        listenToCurrentFolder()
-        listenToDownloadState()
         observeCurrentFolderThreads()
+        observeCurrentMailbox()
+        listenToDownloadState()
+        listenToCurrentFolder()
     }
 
     private fun setupOnRefresh() {
@@ -238,18 +237,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
     }
 
-    private fun listenToCurrentMailbox() {
-        MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
-            observeMailbox(mailboxObjectId)
+    private fun observeCurrentFolderThreads() {
+        threadListViewModel.currentFolderThreads.observe(viewLifecycleOwner, ::onThreadsUpdate)
+    }
+
+    private fun observeCurrentMailbox() {
+        MainViewModel.currentMailboxObjectId.observeNotNull(this) { objectId ->
+            mainViewModel.getMailbox(objectId).observe(viewLifecycleOwner) { mailbox ->
+                mailboxUuid = mailbox?.uuid
+            }
         }
-    }
-
-    private fun observeMailbox(objectId: String) {
-        mainViewModel.getMailbox(objectId).observe(viewLifecycleOwner, ::onMailboxChange)
-    }
-
-    private fun onMailboxChange(mailbox: Mailbox?) {
-        mailboxUuid = mailbox?.uuid
     }
 
     private fun listenToDownloadState() {
@@ -278,23 +275,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun getFolder(folderId: String) {
-        mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner, ::onFolder)
-    }
-
-    private fun onFolder(folder: Folder) {
-        displayFolderName(folder)
-        listenToThreads(folder)
-        updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+        mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+            threadListViewModel.currentFolder.value = folder
+            displayFolderName(folder)
+            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+        }
     }
 
     private fun listenToFolder(folderId: String) {
-        threadListViewModel.listenToFolder(folderId).observe(viewLifecycleOwner, ::onFolderChange)
-    }
-
-    private fun onFolderChange(folder: Folder) = with(folder) {
-        startPeriodicUpdatedAtRefreshJob()
-        updateUpdatedAt(lastUpdatedAt?.toDate())
-        updateUnreadCount(unreadCount)
+        threadListViewModel.listenToFolder(folderId).observe(viewLifecycleOwner) { folder ->
+            startPeriodicUpdatedAtRefreshJob()
+            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+            updateUnreadCount(folder.unreadCount)
+        }
     }
 
     private fun startPeriodicUpdatedAtRefreshJob() {
@@ -350,14 +343,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val folderName = folder.getLocalizedName(binding.context)
         Log.i("UI", "Received folder name (${folderName})")
         binding.toolbar.title = folderName
-    }
-
-    private fun observeCurrentFolderThreads() {
-        threadListViewModel.currentFolderThreads.observe(viewLifecycleOwner, ::onThreadsUpdate)
-    }
-
-    private fun listenToThreads(folder: Folder) {
-        threadListViewModel.currentFolder.value = folder
     }
 
     private fun onThreadsUpdate(threads: List<Thread>) = with(threadListViewModel) {

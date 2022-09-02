@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.mapNotNull
 
 class ThreadListViewModel : ViewModel() {
 
-    var isRecovering = MutableLiveData(false)
+    val isRecovering = MutableLiveData(false)
 
     val currentFolder = MutableLiveData<Folder>()
     val currentFolderThreads = Transformations.switchMap(currentFolder) { folder ->
