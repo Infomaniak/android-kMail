@@ -39,7 +39,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
-import com.infomaniak.mail.databinding.ItemThreadEmptySpaceBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
@@ -59,7 +58,6 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
 
     override fun getItemViewType(position: Int): Int = when {
         dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
-        dataSet[position] is Unit -> DisplayType.EMPTY_SPACE.layout
         displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
         else -> DisplayType.THREAD.layout
     }
@@ -68,7 +66,6 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
-            R.layout.item_thread_empty_space -> ItemThreadEmptySpaceBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
@@ -162,11 +159,11 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width
 
-        if (progress < 0.5 && !viewHolder.isSwippedOverHalf) {
-            viewHolder.isSwippedOverHalf = true
+        if (progress < 0.5 && !viewHolder.isSwipedOverHalf) {
+            viewHolder.isSwipedOverHalf = true
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-        } else if (progress > 0.5 && viewHolder.isSwippedOverHalf) {
-            viewHolder.isSwippedOverHalf = false
+        } else if (progress > 0.5 && viewHolder.isSwipedOverHalf) {
+            viewHolder.isSwipedOverHalf = false
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
         }
 
@@ -184,7 +181,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
     }
 
     override fun onSwipeAnimationFinished(viewHolder: ThreadViewHolder) {
-        viewHolder.isSwippedOverHalf = false
+        viewHolder.isSwipedOverHalf = false
     }
 
     override fun getViewHolder(itemView: View): ThreadViewHolder = ThreadViewHolder { itemView }
@@ -211,7 +208,6 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
-        EMPTY_SPACE(R.layout.item_thread_empty_space),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
@@ -266,11 +262,10 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
             val formattedList = mutableListOf<Any>()
 
             // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
-            threads.sortedByDescending { it.date }.forEachIndexed { index, thread ->
+            threads.sortedByDescending { it.date }.forEachIndexed { _, thread ->
                 val sectionTitle = thread.getSectionTitle(context)
                 when {
                     sectionTitle != previousSectionTitle -> {
-                        // if (index != 0) formattedList.add(Unit) // Adds a space before the next date separator
                         formattedList.add(sectionTitle)
                         previousSectionTitle = sectionTitle
                     }
@@ -296,6 +291,6 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
     }
 
     class ThreadViewHolder(val binding: ViewBinding) : DragDropSwipeAdapter.ViewHolder(binding.root) {
-        var isSwippedOverHalf = false
+        var isSwipedOverHalf = false
     }
 }
