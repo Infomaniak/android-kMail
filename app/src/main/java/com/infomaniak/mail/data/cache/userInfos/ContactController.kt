@@ -34,43 +34,40 @@ import kotlinx.coroutines.flow.SharedFlow
 object ContactController {
 
     //region Get data
-    private fun getContacts(realm: MutableRealm? = null): RealmQuery<Contact> {
-        return (realm ?: RealmDatabase.userInfos).query()
-    }
-
-    fun getContactsSync(realm: MutableRealm? = null): RealmResults<Contact> {
-        return getContacts(realm).find()
+    fun getContacts(realm: MutableRealm? = null): RealmResults<Contact> {
+        return getContactsQuery(realm).find()
     }
 
     private fun getContactsAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Contact>> {
-        return getContacts(realm).asFlow().toSharedFlow()
+        return getContactsQuery(realm).asFlow().toSharedFlow()
     }
 
-    private fun getContactById(id: String, realm: MutableRealm? = null): RealmSingleQuery<Contact> {
+    private fun getContactsQuery(realm: MutableRealm? = null): RealmQuery<Contact> {
+        return (realm ?: RealmDatabase.userInfos).query()
+    }
+
+    private fun getContact(id: String, realm: MutableRealm? = null): Contact? {
+        return getContactQuery(id, realm).find()
+    }
+
+    private fun getContactAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Contact>> {
+        return getContactQuery(id, realm).asFlow().toSharedFlow()
+    }
+
+    private fun getContactQuery(id: String, realm: MutableRealm? = null): RealmSingleQuery<Contact> {
         return (realm ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} == '$id'").first()
     }
 
-    private fun getContactByIdSync(id: String, realm: MutableRealm? = null): Contact? {
-        return getContactById(id, realm).find()
+    private fun getContacts(addressBookId: Int, realm: MutableRealm? = null): RealmResults<Contact> {
+        return getContactsQuery(addressBookId, realm).find()
     }
 
-    private fun getContactByIdAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Contact>> {
-        return getContactById(id, realm).asFlow().toSharedFlow()
+    private fun getContactsAsync(addressBookId: Int, realm: MutableRealm? = null): SharedFlow<ResultsChange<Contact>> {
+        return getContactsQuery(addressBookId, realm).asFlow().toSharedFlow()
     }
 
-    private fun getContactsByAddressBookId(addressBookId: Int, realm: MutableRealm? = null): RealmQuery<Contact> {
+    private fun getContactsQuery(addressBookId: Int, realm: MutableRealm? = null): RealmQuery<Contact> {
         return (realm ?: RealmDatabase.userInfos).query("${Contact::addressBookId.name} == '$addressBookId'")
-    }
-
-    private fun getContactsByAddressBookIdSync(addressBookId: Int, realm: MutableRealm? = null): RealmResults<Contact> {
-        return getContactsByAddressBookId(addressBookId, realm).find()
-    }
-
-    private fun getContactsByAddressBookIdAsync(
-        addressBookId: Int,
-        realm: MutableRealm? = null,
-    ): SharedFlow<ResultsChange<Contact>> {
-        return getContactsByAddressBookId(addressBookId, realm).asFlow().toSharedFlow()
     }
     //endregion
 
@@ -79,7 +76,7 @@ object ContactController {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Contacts: Get current data")
-        val realmContacts = getContactsSync()
+        val realmContacts = getContacts()
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Contacts: Get outdated data")
@@ -102,7 +99,7 @@ object ContactController {
     }
 
     private fun deleteContacts(contacts: List<Contact>) {
-        RealmDatabase.userInfos.writeBlocking { contacts.forEach { getContactByIdSync(it.id)?.let(::delete) } }
+        RealmDatabase.userInfos.writeBlocking { contacts.forEach { getContact(it.id)?.let(::delete) } }
     }
     //endregion
 }

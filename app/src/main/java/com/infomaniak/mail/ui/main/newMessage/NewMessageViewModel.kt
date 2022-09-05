@@ -47,7 +47,7 @@ class NewMessageViewModel : ViewModel() {
 
     fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
         emit(mutableListOf<UiContact>().apply {
-            ContactController.getContactsSync().forEach { contact ->
+            ContactController.getContacts().forEach { contact ->
                 contact.emails.forEach { email ->
                     add(UiContact(email, contact.name))
                 }
