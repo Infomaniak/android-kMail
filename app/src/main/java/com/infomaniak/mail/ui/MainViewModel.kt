@@ -81,7 +81,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun getFolder(folderId: String): LiveData<Folder?> = liveData(Dispatchers.IO) {
-        emit(FolderController.getFolderByIdSync(folderId))
+        emit(FolderController.getFolder(folderId))
     }
 
     private fun selectMailbox(mailbox: Mailbox) {

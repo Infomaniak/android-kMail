@@ -39,28 +39,28 @@ import java.util.*
 object FolderController {
 
     //region Get data
-    private fun getFolders(realm: MutableRealm? = null): RealmQuery<Folder> {
-        return (realm ?: RealmDatabase.mailboxContent).query()
-    }
-
-    private fun getFoldersSync(realm: MutableRealm? = null): RealmResults<Folder> {
-        return getFolders(realm).find()
+    private fun getFolders(realm: MutableRealm? = null): RealmResults<Folder> {
+        return getFoldersQuery(realm).find()
     }
 
     fun getFoldersAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Folder>> {
-        return getFolders(realm).asFlow().toSharedFlow()
+        return getFoldersQuery(realm).asFlow().toSharedFlow()
     }
 
-    private fun getFolderById(id: String, realm: MutableRealm? = null): RealmSingleQuery<Folder> {
+    private fun getFoldersQuery(realm: MutableRealm? = null): RealmQuery<Folder> {
+        return (realm ?: RealmDatabase.mailboxContent).query()
+    }
+
+    fun getFolder(id: String, realm: MutableRealm? = null): Folder? {
+        return getFolderQuery(id, realm).find()
+    }
+
+    fun getFolderAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Folder>> {
+        return getFolderQuery(id, realm).asFlow().toSharedFlow()
+    }
+
+    private fun getFolderQuery(id: String, realm: MutableRealm? = null): RealmSingleQuery<Folder> {
         return (realm ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} == '$id'").first()
-    }
-
-    fun getFolderByIdSync(id: String, realm: MutableRealm? = null): Folder? {
-        return getFolderById(id, realm).find()
-    }
-
-    fun getFolderByIdAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Folder>> {
-        return getFolderById(id, realm).asFlow().toSharedFlow()
     }
     //endregion
 
@@ -70,7 +70,7 @@ object FolderController {
         RealmDatabase.mailboxContent.writeBlocking {
             // Get current data
             Log.d(RealmDatabase.TAG, "Folders: Get current data")
-            val realmFolders = getFoldersSync(this)
+            val realmFolders = getFolders(this)
 
             // Get outdated data
             Log.d(RealmDatabase.TAG, "Folders: Get outdated data")
@@ -115,7 +115,7 @@ object FolderController {
     }
 
     private fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-        RealmDatabase.mailboxContent.writeBlocking { getFolderByIdSync(id, this)?.let(onUpdate) }
+        RealmDatabase.mailboxContent.writeBlocking { getFolder(id, this)?.let(onUpdate) }
     }
 
     fun updateFolderUnreadCount(id: String, unreadCount: Int) {
@@ -127,7 +127,7 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteFolders(folders: List<Folder>) {
-        folders.forEach { getFolderByIdSync(it.id, this)?.let(::delete) }
+        folders.forEach { getFolder(it.id, this)?.let(::delete) }
     }
     //endregion
 

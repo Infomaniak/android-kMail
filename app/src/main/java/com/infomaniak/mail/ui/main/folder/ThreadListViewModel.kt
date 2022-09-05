@@ -36,7 +36,7 @@ class ThreadListViewModel : ViewModel() {
 
     fun listenToFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
         emitSource(
-            FolderController.getFolderByIdAsync(folderId)
+            FolderController.getFolderAsync(folderId)
                 .mapNotNull { it.obj }
                 .asLiveData()
         )
