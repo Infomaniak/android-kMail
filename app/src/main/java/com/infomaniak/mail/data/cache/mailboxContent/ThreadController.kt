@@ -21,7 +21,7 @@ import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessageByUidSync
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -56,7 +56,7 @@ object ThreadController {
             if (realmThread != null) {
                 messages.forEach { apiMessage ->
                     realmThread.messages.find { realmMessage -> realmMessage.uid == apiMessage.uid }
-                        ?.let { realmMessage -> getLatestMessageSync(realmMessage.uid) }
+                        ?.let { realmMessage -> getMessageByUidSync(realmMessage.uid, this@getMergedThread) }
                         ?.let { realmMessage -> saveMessageWithBackedUpData(apiMessage, realmMessage) }
                 }
             }

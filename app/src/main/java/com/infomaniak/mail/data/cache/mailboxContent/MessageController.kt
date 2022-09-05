@@ -34,16 +34,16 @@ import kotlinx.coroutines.flow.SharedFlow
 object MessageController {
 
     //region Get data
-    fun getMessageSync(id: String): Message? {
-        return getMessage(id).find()
+    private fun getMessageByUid(uid: String, realm: MutableRealm? = null): RealmSingleQuery<Message> {
+        return (realm ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} == '$uid'").first()
     }
 
-    fun getMessageAsync(id: String): SharedFlow<SingleQueryChange<Message>> {
-        return getMessage(id).asFlow().toSharedFlow()
+    fun getMessageByUidSync(id: String, realm: MutableRealm? = null): Message? {
+        return getMessageByUid(id, realm).find()
     }
 
-    fun MutableRealm.getLatestMessageSync(uid: String): Message? {
-        return getMessageSync(uid)?.let(::findLatest)
+    private fun getMessageByUidAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Message>> {
+        return getMessageByUid(id, realm).asFlow().toSharedFlow()
     }
     //endregion
 
@@ -74,28 +74,22 @@ object MessageController {
         }
     }
 
-    fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.forEach { deleteLatestMessage(it.uid) }
-    }
-
-    fun deleteMessage(uid: String) {
-        RealmDatabase.mailboxContent.writeBlocking { deleteLatestMessage(uid) }
-    }
-
     fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
-        RealmDatabase.mailboxContent.writeBlocking { getLatestMessageSync(uid)?.let(onUpdate) }
-    }
-    //endregion
-
-    //region Utils
-    private fun getMessage(uid: String): RealmSingleQuery<Message> {
-        return RealmDatabase.mailboxContent.query<Message>("${Message::uid.name} == '$uid'").first()
+        RealmDatabase.mailboxContent.writeBlocking { getMessageByUidSync(uid, this)?.let(onUpdate) }
     }
 
-    private fun MutableRealm.deleteLatestMessage(uid: String) {
-        getLatestMessageSync(uid)?.also { message ->
-            message.draftUuid?.let { getLatestDraftSync(it) }?.let(::delete)
-        }?.let(::delete)
+    fun MutableRealm.deleteMessages(messages: List<Message>) {
+        messages.forEach { deleteMessage(it.uid, this) }
+    }
+
+    fun deleteMessage(uid: String, realm: MutableRealm? = null) {
+        if (realm == null) {
+            RealmDatabase.mailboxContent.writeBlocking { deleteMessage(uid, this) }
+        } else {
+            getMessageByUidSync(uid, realm)
+                ?.also { message -> message.draftUuid?.let { realm.getLatestDraftSync(it) }?.let(realm::delete) }
+                ?.let(realm::delete)
+        }
     }
     //endregion
 
