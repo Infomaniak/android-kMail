@@ -34,28 +34,28 @@ import kotlinx.coroutines.flow.SharedFlow
 object AddressBookController {
 
     //region Get data
-    private fun getAddressBooks(realm: MutableRealm? = null): RealmQuery<AddressBook> {
-        return (realm ?: RealmDatabase.userInfos).query()
-    }
-
-    private fun getAddressBooksSync(realm: MutableRealm? = null): RealmResults<AddressBook> {
-        return getAddressBooks(realm).find()
+    private fun getAddressBooks(realm: MutableRealm? = null): RealmResults<AddressBook> {
+        return getAddressBooksQuery(realm).find()
     }
 
     private fun getAddressBooksAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<AddressBook>> {
-        return getAddressBooks(realm).asFlow().toSharedFlow()
+        return getAddressBooksQuery(realm).asFlow().toSharedFlow()
     }
 
-    private fun getAddressBookById(id: Int, realm: MutableRealm? = null): RealmSingleQuery<AddressBook> {
+    private fun getAddressBooksQuery(realm: MutableRealm? = null): RealmQuery<AddressBook> {
+        return (realm ?: RealmDatabase.userInfos).query()
+    }
+
+    private fun getAddressBook(id: Int, realm: MutableRealm? = null): AddressBook? {
+        return getAddressBookQuery(id, realm).find()
+    }
+
+    private fun getAddressBookAsync(id: Int, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<AddressBook>> {
+        return getAddressBookQuery(id, realm).asFlow().toSharedFlow()
+    }
+
+    private fun getAddressBookQuery(id: Int, realm: MutableRealm? = null): RealmSingleQuery<AddressBook> {
         return (realm ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} == '$id'").first()
-    }
-
-    private fun getAddressBookByIdSync(id: Int, realm: MutableRealm? = null): AddressBook? {
-        return getAddressBookById(id, realm).find()
-    }
-
-    private fun getAddressBookByIdAsync(id: Int, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<AddressBook>> {
-        return getAddressBookById(id, realm).asFlow().toSharedFlow()
     }
     //endregion
 
@@ -64,7 +64,7 @@ object AddressBookController {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "AddressBooks: Get current data")
-        val realmAddressBooks = getAddressBooksSync()
+        val realmAddressBooks = getAddressBooks()
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "AddressBooks: Get outdated data")
@@ -87,7 +87,7 @@ object AddressBookController {
     }
 
     private fun deleteAddressBooks(addressBooks: List<AddressBook>) {
-        RealmDatabase.userInfos.writeBlocking { addressBooks.forEach { getAddressBookByIdSync(it.id, this)?.let(::delete) } }
+        RealmDatabase.userInfos.writeBlocking { addressBooks.forEach { getAddressBook(it.id, this)?.let(::delete) } }
     }
     //endregion
 }
