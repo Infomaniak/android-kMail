@@ -49,9 +49,10 @@ import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
-class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
+class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, private val onSwipeFinished: () -> Unit) :
     DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()) {
 
+    private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
@@ -177,6 +178,16 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
 
     override fun onSwipeAnimationFinished(viewHolder: ThreadViewHolder) {
         viewHolder.isSwipedOverHalf = false
+        onSwipeFinished()
+        unblockOtherSwipes()
+    }
+
+    fun blockOtherSwipes() {
+        swipingIsAuthorized = false
+    }
+
+    private fun unblockOtherSwipes() {
+        swipingIsAuthorized = true
     }
 
     override fun getViewHolder(itemView: View): ThreadViewHolder = ThreadViewHolder { itemView }
@@ -189,7 +200,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView) :
     }
 
     override fun canBeSwiped(item: Any, viewHolder: ThreadViewHolder, position: Int): Boolean {
-        return getItemViewType(position) == DisplayType.THREAD.layout
+        return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
 
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any> {

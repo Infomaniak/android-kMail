@@ -100,7 +100,8 @@ class HeaderItemDecoration(
         }
     }
 
-    private fun View.intersects(parent: RecyclerView, height: Int): Intersection? {
+    private fun View?.intersects(parent: RecyclerView, height: Int): Intersection? {
+        if (this == null) return null
         val boundsWithInsets = Rect()
         parent.getDecoratedBoundsWithMargins(this, boundsWithInsets)
         return when {
