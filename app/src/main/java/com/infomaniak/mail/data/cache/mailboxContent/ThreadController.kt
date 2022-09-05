@@ -21,7 +21,7 @@ import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessageByUidSync
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -39,16 +39,16 @@ import kotlinx.coroutines.flow.SharedFlow
 object ThreadController {
 
     //region Get data
-    private fun getThreadByUid(uid: String, realm: MutableRealm? = null): RealmSingleQuery<Thread> {
+    fun getThread(uid: String, realm: MutableRealm? = null): Thread? {
+        return getThreadQuery(uid, realm).find()
+    }
+
+    private fun getThreadAsync(uid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Thread>> {
+        return getThreadQuery(uid, realm).asFlow().toSharedFlow()
+    }
+
+    private fun getThreadQuery(uid: String, realm: MutableRealm? = null): RealmSingleQuery<Thread> {
         return (realm ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} == '$uid'").first()
-    }
-
-    fun getThreadByUidSync(uid: String, realm: MutableRealm? = null): Thread? {
-        return getThreadByUid(uid, realm).find()
-    }
-
-    private fun getThreadByUidAsync(uid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Thread>> {
-        return getThreadByUid(uid, realm).asFlow().toSharedFlow()
     }
 
     private fun MutableRealm.getMergedThread(apiThread: Thread, realmThread: Thread?): Thread {
@@ -56,7 +56,7 @@ object ThreadController {
             if (realmThread != null) {
                 messages.forEach { apiMessage ->
                     realmThread.messages.find { realmMessage -> realmMessage.uid == apiMessage.uid }
-                        ?.let { realmMessage -> getMessageByUidSync(realmMessage.uid, this@getMergedThread) }
+                        ?.let { realmMessage -> getMessage(realmMessage.uid, this@getMergedThread) }
                         ?.let { realmMessage -> saveMessageWithBackedUpData(apiMessage, realmMessage) }
                 }
             }
@@ -69,7 +69,7 @@ object ThreadController {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Threads: Get current data")
-        val realmThreads = FolderController.getFolderByIdSync(folderId)?.threads?.filter {
+        val realmThreads = FolderController.getFolder(folderId)?.threads?.filter {
             when (filter) {
                 ThreadFilter.SEEN -> it.unseenMessagesCount == 0
                 ThreadFilter.UNSEEN -> it.unseenMessagesCount > 0
@@ -130,7 +130,7 @@ object ThreadController {
         if (thread.unseenMessagesCount != 0) {
 
             RealmDatabase.mailboxContent.writeBlocking {
-                val latestThread = getThreadByUidSync(thread.uid, this) ?: return@writeBlocking
+                val latestThread = getThread(thread.uid, this) ?: return@writeBlocking
 
                 val uids = mutableListOf<String>().apply {
                     latestThread.messages.forEach {
@@ -169,14 +169,14 @@ object ThreadController {
     }
 
     private fun MutableRealm.updateFolder(folderId: String, apiThreads: List<Thread>) {
-        FolderController.getFolderByIdSync(folderId, this)?.let { latestFolder ->
+        FolderController.getFolder(folderId, this)?.let { latestFolder ->
             latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
             copyToRealm(latestFolder, UpdatePolicy.ALL)
         }
     }
 
     fun MutableRealm.deleteThreads(threads: List<Thread>) {
-        threads.forEach { getThreadByUidSync(it.uid, this)?.let(::delete) }
+        threads.forEach { getThread(it.uid, this)?.let(::delete) }
     }
     //endregion
 
