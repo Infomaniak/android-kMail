@@ -39,16 +39,28 @@ import kotlinx.coroutines.flow.SharedFlow
 object ThreadController {
 
     //region Get data
-    fun getThreadSync(uid: String): Thread? {
-        return getThread(uid).find()
+    private fun getThreadByUid(uid: String, realm: MutableRealm? = null): RealmSingleQuery<Thread> {
+        return (realm ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} == '$uid'").first()
     }
 
-    fun getThreadAsync(uid: String): SharedFlow<SingleQueryChange<Thread>> {
-        return getThread(uid).asFlow().toSharedFlow()
+    fun getThreadByUidSync(uid: String, realm: MutableRealm? = null): Thread? {
+        return getThreadByUid(uid, realm).find()
     }
 
-    fun MutableRealm.getLatestThreadSync(uid: String): Thread? {
-        return getThreadSync(uid)?.let(::findLatest)
+    private fun getThreadByUidAsync(uid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Thread>> {
+        return getThreadByUid(uid, realm).asFlow().toSharedFlow()
+    }
+
+    private fun MutableRealm.getMergedThread(apiThread: Thread, realmThread: Thread?): Thread {
+        return apiThread.apply {
+            if (realmThread != null) {
+                messages.forEach { apiMessage ->
+                    realmThread.messages.find { realmMessage -> realmMessage.uid == apiMessage.uid }
+                        ?.let { realmMessage -> getLatestMessageSync(realmMessage.uid) }
+                        ?.let { realmMessage -> saveMessageWithBackedUpData(apiMessage, realmMessage) }
+                }
+            }
+        }
     }
     //endregion
 
@@ -118,7 +130,7 @@ object ThreadController {
         if (thread.unseenMessagesCount != 0) {
 
             RealmDatabase.mailboxContent.writeBlocking {
-                val latestThread = getLatestThreadSync(thread.uid) ?: return@writeBlocking
+                val latestThread = getThreadByUidSync(thread.uid, this) ?: return@writeBlocking
 
                 val uids = mutableListOf<String>().apply {
                     latestThread.messages.forEach {
@@ -136,32 +148,6 @@ object ThreadController {
                         messages.forEach { it.seen = true }
                         unseenMessagesCount = 0
                     }
-                }
-            }
-        }
-    }
-
-    fun MutableRealm.deleteThreads(threads: List<Thread>) {
-        threads.forEach { deleteLatestThread(it.uid) }
-    }
-    //endregion
-
-    //region Utils
-    private fun getThread(uid: String): RealmSingleQuery<Thread> {
-        return RealmDatabase.mailboxContent.query<Thread>("${Thread::uid.name} == '$uid'").first()
-    }
-
-    private fun MutableRealm.deleteLatestThread(uid: String) {
-        getLatestThreadSync(uid)?.let(::delete)
-    }
-
-    private fun MutableRealm.getMergedThread(apiThread: Thread, realmThread: Thread?): Thread {
-        return apiThread.apply {
-            if (realmThread != null) {
-                messages.forEach { apiMessage ->
-                    realmThread.messages.find { realmMessage -> realmMessage.uid == apiMessage.uid }
-                        ?.let { realmMessage -> getLatestMessageSync(realmMessage.uid) }
-                        ?.let { realmMessage -> saveMessageWithBackedUpData(apiMessage, realmMessage) }
                 }
             }
         }
@@ -187,6 +173,10 @@ object ThreadController {
             latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
             copyToRealm(latestFolder, UpdatePolicy.ALL)
         }
+    }
+
+    fun MutableRealm.deleteThreads(threads: List<Thread>) {
+        threads.forEach { getThreadByUidSync(it.uid, this)?.let(::delete) }
     }
     //endregion
 
