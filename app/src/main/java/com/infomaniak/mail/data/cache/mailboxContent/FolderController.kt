@@ -39,54 +39,60 @@ import java.util.*
 object FolderController {
 
     //region Get data
-    fun getFoldersSync(): RealmResults<Folder> {
-        return getFolders().find()
+    private fun getFolders(realm: MutableRealm? = null): RealmQuery<Folder> {
+        return (realm ?: RealmDatabase.mailboxContent).query()
     }
 
-    fun getFoldersAsync(): SharedFlow<ResultsChange<Folder>> {
-        return getFolders().asFlow().toSharedFlow()
+    private fun getFoldersSync(realm: MutableRealm? = null): RealmResults<Folder> {
+        return getFolders(realm).find()
     }
 
-    fun getFolderSync(id: String): Folder? {
-        return getFolder(id).find()
+    fun getFoldersAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Folder>> {
+        return getFolders(realm).asFlow().toSharedFlow()
     }
 
-    fun getFolderAsync(id: String): SharedFlow<SingleQueryChange<Folder>> {
-        return getFolder(id).asFlow().toSharedFlow()
+    private fun getFolderById(id: String, realm: MutableRealm? = null): RealmSingleQuery<Folder> {
+        return (realm ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} == '$id'").first()
     }
 
-    fun MutableRealm.getLatestFolderSync(id: String): Folder? = getFolderSync(id)?.let(::findLatest)
+    fun getFolderByIdSync(id: String, realm: MutableRealm? = null): Folder? {
+        return getFolderById(id, realm).find()
+    }
+
+    fun getFolderByIdAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Folder>> {
+        return getFolderById(id, realm).asFlow().toSharedFlow()
+    }
     //endregion
 
     //region Edit data
     fun upsertApiData(apiFolders: List<Folder>): List<Folder> {
 
-        // Get current data
-        Log.d(RealmDatabase.TAG, "Folders: Get current data")
-        val realmFolders = getFoldersSync()
-
-        // Get outdated data
-        Log.d(RealmDatabase.TAG, "Folders: Get outdated data")
-        // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
-        val deletableFolders = realmFolders.filter { realmFolder ->
-            apiFolders.none { apiFolder -> apiFolder.id == realmFolder.id }
-        }
-        val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
-        val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
-            deletableFolders.any { folder -> folder.id == message.folderId }
-        }
-        val deletableThreads = possiblyDeletableThreads.filter { thread ->
-            thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
-        }
-
         RealmDatabase.mailboxContent.writeBlocking {
+            // Get current data
+            Log.d(RealmDatabase.TAG, "Folders: Get current data")
+            val realmFolders = getFoldersSync(this)
+
+            // Get outdated data
+            Log.d(RealmDatabase.TAG, "Folders: Get outdated data")
+            // val deletableFolders = MailboxContentController.getDeletableFolders(foldersFromApi)
+            val deletableFolders = realmFolders.filter { realmFolder ->
+                apiFolders.none { apiFolder -> apiFolder.id == realmFolder.id }
+            }
+            val possiblyDeletableThreads = deletableFolders.flatMap { it.threads }
+            val deletableMessages = possiblyDeletableThreads.flatMap { it.messages }.filter { message ->
+                deletableFolders.any { folder -> folder.id == message.folderId }
+            }
+            val deletableThreads = possiblyDeletableThreads.filter { thread ->
+                thread.messages.all { message -> deletableMessages.any { it.uid == message.uid } }
+            }
+
             // Save new data
             Log.d(RealmDatabase.TAG, "Folders: Save new data")
             apiFolders.forEach { apiFolder ->
                 realmFolders.find { it.id == apiFolder.id }?.let { realmFolder ->
                     apiFolder.initLocalValues(
-                        threads = realmFolder.threads.mapNotNull(::findLatest).toRealmList(),
-                        parentLink = realmFolder.parentLink?.let(::findLatest),
+                        threads = realmFolder.threads.toRealmList(),
+                        parentLink = realmFolder.parentLink,
                         lastUpdatedAt = realmFolder.lastUpdatedAt,
                     )
                 }
@@ -104,12 +110,12 @@ object FolderController {
         return apiFolders
     }
 
-    fun upsertFolder(folder: Folder): Folder {
+    private fun upsertFolder(folder: Folder): Folder {
         return RealmDatabase.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
     }
 
-    fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
-        RealmDatabase.mailboxContent.writeBlocking { getLatestFolderSync(id)?.let(onUpdate) }
+    private fun updateFolder(id: String, onUpdate: (folder: Folder) -> Unit) {
+        RealmDatabase.mailboxContent.writeBlocking { getFolderByIdSync(id, this)?.let(onUpdate) }
     }
 
     fun updateFolderUnreadCount(id: String, unreadCount: Int) {
@@ -120,28 +126,8 @@ object FolderController {
         }
     }
 
-    // fun MutableRealm.decrementFolderUnreadCount(folderId: String, nbUnseenMessages: Int) {
-    //     getLatestFolderSync(folderId)?.let { latestFolder ->
-    //         if (latestFolder.unreadCount > 0) latestFolder.unreadCount = max(latestFolder.unreadCount - nbUnseenMessages, 0)
-    //     }
-    // }
-
-    fun MutableRealm.deleteFolders(folders: List<Folder>) {
-        folders.forEach { deleteLatestFolder(it.id) }
-    }
-    //endregion
-
-    //region Utils
-    private fun getFolders(): RealmQuery<Folder> {
-        return RealmDatabase.mailboxContent.query()
-    }
-
-    private fun getFolder(id: String): RealmSingleQuery<Folder> {
-        return RealmDatabase.mailboxContent.query<Folder>("${Folder::id.name} == '$id'").first()
-    }
-
-    private fun MutableRealm.deleteLatestFolder(id: String) {
-        getLatestFolderSync(id)?.let(::delete)
+    private fun MutableRealm.deleteFolders(folders: List<Folder>) {
+        folders.forEach { getFolderByIdSync(it.id, this)?.let(::delete) }
     }
     //endregion
 

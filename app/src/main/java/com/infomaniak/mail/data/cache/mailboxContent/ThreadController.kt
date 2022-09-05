@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController.getLatestFolderSync
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getLatestMessageSync
 import com.infomaniak.mail.data.models.message.Message
@@ -58,7 +57,7 @@ object ThreadController {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Threads: Get current data")
-        val realmThreads = FolderController.getFolderSync(folderId)?.threads?.filter {
+        val realmThreads = FolderController.getFolderByIdSync(folderId)?.threads?.filter {
             when (filter) {
                 ThreadFilter.SEEN -> it.unseenMessagesCount == 0
                 ThreadFilter.UNSEEN -> it.unseenMessagesCount > 0
@@ -133,7 +132,6 @@ object ThreadController {
                 val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, uids)
 
                 if (apiResponse.isSuccess()) {
-                    // MainViewModel.currentFolderId.value?.let { decrementFolderUnreadCount(it, nbUnseenMessages) }
                     latestThread.apply {
                         messages.forEach { it.seen = true }
                         unseenMessagesCount = 0
@@ -185,7 +183,7 @@ object ThreadController {
     }
 
     private fun MutableRealm.updateFolder(folderId: String, apiThreads: List<Thread>) {
-        getLatestFolderSync(folderId)?.let { latestFolder ->
+        FolderController.getFolderByIdSync(folderId, this)?.let { latestFolder ->
             latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
             copyToRealm(latestFolder, UpdatePolicy.ALL)
         }
