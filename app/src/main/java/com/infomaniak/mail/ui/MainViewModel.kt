@@ -70,14 +70,14 @@ class MainViewModel : ViewModel() {
 
     fun listenToMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
         emitSource(
-            MailboxController.getMailboxesAsync(userId)
+            MailboxController.getMailboxesByUserIdAsync(userId)
                 .map { it.list }
                 .asLiveData()
         )
     }
 
     fun getMailbox(objectId: String): LiveData<Mailbox?> = liveData(Dispatchers.IO) {
-        emit(MailboxController.getMailboxSync(objectId))
+        emit(MailboxController.getMailboxByObjectIdSync(objectId))
     }
 
     fun getFolder(folderId: String): LiveData<Folder?> = liveData(Dispatchers.IO) {
@@ -162,7 +162,7 @@ class MainViewModel : ViewModel() {
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-        val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
+        val mailboxUuid = MailboxController.getMailboxByObjectIdSync(mailboxObjectId)?.uuid ?: return@launch
         if (folderId == currentFolderId.value) return@launch
 
         Log.i(TAG, "openFolder: $folderId")
@@ -180,7 +180,7 @@ class MainViewModel : ViewModel() {
     fun forceRefreshThreads(filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshThreads")
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-        val mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid ?: return@launch
+        val mailboxUuid = MailboxController.getMailboxByObjectIdSync(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges.postValue(true)
