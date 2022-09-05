@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
@@ -127,7 +128,9 @@ class ThreadFragment : Fragment() {
                         attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
                         DraftController.upsertDraft(this)
                     }
-                    message.setDraftId(draft?.uuid)
+                    MessageController.updateMessage(message.uid) {
+                        it.draftUuid = draft?.uuid
+                    }
                     // TODO: Open the draft in draft editor
                 }
             }
