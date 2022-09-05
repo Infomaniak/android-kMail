@@ -72,7 +72,7 @@ object ContactController {
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiContacts: List<Contact>) {
+    fun update(apiContacts: List<Contact>) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Contacts: Get current data")

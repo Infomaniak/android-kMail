@@ -62,7 +62,7 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiMailboxes: List<Mailbox>): List<Mailbox> {
+    fun update(apiMailboxes: List<Mailbox>): List<Mailbox> {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")

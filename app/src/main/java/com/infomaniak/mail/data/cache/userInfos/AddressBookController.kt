@@ -60,7 +60,7 @@ object AddressBookController {
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiAddressBooks: List<AddressBook>) {
+    fun update(apiAddressBooks: List<AddressBook>) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "AddressBooks: Get current data")

@@ -65,7 +65,7 @@ object ThreadController {
     //endregion
 
     //region Edit data
-    fun upsertApiData(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): Boolean {
+    fun update(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): Boolean {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Threads: Get current data")

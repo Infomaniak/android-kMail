@@ -48,7 +48,7 @@ object MessageController {
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiMessages: List<Message>, thread: Thread) {
+    fun update(apiMessages: List<Message>, thread: Thread) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Messages: Get current data")

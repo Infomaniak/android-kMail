@@ -65,7 +65,7 @@ object FolderController {
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiFolders: List<Folder>): List<Folder> {
+    fun update(apiFolders: List<Folder>): List<Folder> {
 
         RealmDatabase.mailboxContent.writeBlocking {
             // Get current data

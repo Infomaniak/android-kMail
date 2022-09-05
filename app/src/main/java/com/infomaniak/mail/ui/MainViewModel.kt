@@ -221,13 +221,13 @@ class MainViewModel : ViewModel() {
     private fun updateAddressBooks() {
         val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
 
-        AddressBookController.upsertApiData(apiAddressBooks)
+        AddressBookController.update(apiAddressBooks)
     }
 
     private fun updateContacts() {
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
 
-        ContactController.upsertApiData(apiContacts)
+        ContactController.update(apiContacts)
     }
 
     private fun updateMailboxes(): List<Mailbox> {
@@ -235,13 +235,13 @@ class MainViewModel : ViewModel() {
             it.initLocalValues(AccountUtils.currentUserId)
         } ?: emptyList()
 
-        return MailboxController.upsertApiData(apiMailboxes)
+        return MailboxController.update(apiMailboxes)
     }
 
     private fun updateFolders(mailbox: Mailbox): List<Folder> {
         val apiFolders = ApiRepository.getFolders(mailbox.uuid).data?.formatFoldersListWithAllChildren() ?: emptyList()
 
-        return FolderController.upsertApiData(apiFolders)
+        return FolderController.update(apiFolders)
     }
 
     private fun updateThreads(
@@ -250,14 +250,14 @@ class MainViewModel : ViewModel() {
         offset: Int = OFFSET_FIRST_PAGE,
         filter: ThreadFilter = ThreadFilter.ALL,
     ) {
-        canContinueToPaginate = ThreadController.upsertApiData(mailboxUuid, folderId, offset, filter)
+        canContinueToPaginate = ThreadController.update(mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
     }
 
     private fun updateMessages(thread: Thread) {
         val apiMessages = fetchMessages(thread)
 
-        MessageController.upsertApiData(apiMessages, thread)
+        MessageController.update(apiMessages, thread)
     }
 
     private fun fetchMessages(thread: Thread): List<Message> {
