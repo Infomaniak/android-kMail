@@ -49,7 +49,7 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private suspend fun startApp() {
-        mainViewModel.loadAddressBooksAndContacts()
+        mainViewModel.updateAddressBooksAndContacts()
         mainViewModel.loadCurrentMailbox()
 
         withContext(Dispatchers.Main) {
