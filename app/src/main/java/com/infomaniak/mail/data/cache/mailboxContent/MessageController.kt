@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getLatestDraftSync
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraftByUuidSync
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toSharedFlow
@@ -87,7 +87,7 @@ object MessageController {
             RealmDatabase.mailboxContent.writeBlocking { deleteMessage(uid, this) }
         } else {
             getMessageByUidSync(uid, realm)
-                ?.also { message -> message.draftUuid?.let { realm.getLatestDraftSync(it) }?.let(realm::delete) }
+                ?.also { message -> message.draftUuid?.let { getDraftByUuidSync(it, realm) }?.let(realm::delete) }
                 ?.let(realm::delete)
         }
     }

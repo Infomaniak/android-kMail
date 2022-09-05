@@ -30,28 +30,22 @@ import kotlinx.coroutines.flow.SharedFlow
 object DraftController {
 
     //region Get data
-    fun getDraftSync(uuid: String): Draft? {
-        return getDraft(uuid).find()
+    private fun getDraftByUuid(uuid: String, realm: MutableRealm? = null): RealmSingleQuery<Draft> {
+        return (realm ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} == '$uuid'").first()
     }
 
-    fun getDraftAsync(uuid: String): SharedFlow<SingleQueryChange<Draft>> {
-        return getDraft(uuid).asFlow().toSharedFlow()
+    fun getDraftByUuidSync(uuid: String, realm: MutableRealm? = null): Draft? {
+        return getDraftByUuid(uuid, realm).find()
     }
 
-    fun MutableRealm.getLatestDraftSync(uuid: String): Draft? {
-        return getDraftSync(uuid)?.let(::findLatest)
+    private fun getDraftByUuidAsync(uuid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Draft>> {
+        return getDraftByUuid(uuid, realm).asFlow().toSharedFlow()
     }
     //endregion
 
     //region Edit data
     fun upsertDraft(draft: Draft) {
         RealmDatabase.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
-    }
-    //endregion
-
-    //region Utils
-    private fun getDraft(uuid: String): RealmSingleQuery<Draft> {
-        return RealmDatabase.mailboxContent.query<Draft>("${Draft::uuid.name} == '$uuid'").first()
     }
     //endregion
 }
