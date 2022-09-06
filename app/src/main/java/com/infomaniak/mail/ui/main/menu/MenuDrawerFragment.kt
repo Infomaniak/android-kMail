@@ -26,10 +26,11 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.bugtracker.BugTrackerActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.bugtracker.BugTrackerActivity
+import com.infomaniak.lib.core.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
@@ -127,7 +128,17 @@ class MenuDrawerFragment : Fragment() {
         feedbacks.setOnClickListener {
             closeDrawer()
             if (AccountUtils.currentUser?.isStaff == true) {
-                startActivity(Intent(context, BugTrackerActivity::class.java))
+                Intent(context, BugTrackerActivity::class.java).apply {
+                    putExtras(
+                        BugTrackerActivityArgs(
+                            user = AccountUtils.currentUser!!,
+                            appBuildNumber = BuildConfig.VERSION_NAME,
+                            bucketIdentifier = BugTrackerActivity.MAIL_BUCKET_ID,
+                            projectName = "mail" // TODO : In a constant
+                        ).toBundle()
+                    )
+                    startActivity(this)
+                }
             } else {
                 context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
             }
