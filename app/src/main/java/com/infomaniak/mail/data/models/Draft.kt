@@ -69,7 +69,7 @@ class Draft : RealmObject {
 
     //region Local data (Transient)
     @Transient
-    var parentMessageUid: String = ""
+    var parentMessageUid: String = "" // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
     fun initLocalValues(messageUid: String) {

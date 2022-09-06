@@ -98,7 +98,7 @@ class Message : RealmObject {
     @Transient
     var hasUnsubscribeLink: Boolean = false
     @Transient
-    var parentLink: Thread? = null // TODO
+    var parentLink: Thread? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
     //region UI data (Ignore & Transient)
