@@ -126,10 +126,11 @@ object ThreadController {
         } ?: false
     }
 
-    fun markAsSeen(thread: Thread) {
+    fun markAsSeen(thread: Thread, folderId: String?) {
         if (thread.unseenMessagesCount != 0) {
 
             RealmDatabase.mailboxContent.writeBlocking {
+
                 val latestThread = getThread(thread.uid, this) ?: return@writeBlocking
 
                 val uids = mutableListOf<String>().apply {
@@ -144,6 +145,7 @@ object ThreadController {
                 val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, uids)
 
                 if (apiResponse.isSuccess()) {
+                    updateFolderUnreadCount(folderId, latestThread)
                     latestThread.apply {
                         messages.forEach { it.seen = true }
                         unseenMessagesCount = 0
@@ -151,6 +153,12 @@ object ThreadController {
                 }
             }
         }
+    }
+
+    private fun MutableRealm.updateFolderUnreadCount(folderId: String?, latestThread: Thread) {
+        val folder = folderId?.let { FolderController.getFolder(folderId, this) } ?: return
+        val newUnreadCount = folder.unreadCount - latestThread.unseenMessagesCount
+        FolderController.updateFolderUnreadCount(folderId, newUnreadCount, this)
     }
 
     private fun MutableRealm.saveMessageWithBackedUpData(apiMessage: Message, realmMessage: Message) {
