@@ -122,6 +122,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
+            threadDensity = ThreadDensity.LARGE, // TODO : Take this value from the settings when available
             parentRecycler = binding.threadsList,
             onSwipeFinished = { viewModel.isRecovering.value = false },
         )
@@ -148,8 +149,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-            threadDensity = ThreadDensity.LARGE
 
             onThreadClicked = {
                 safeNavigate(
@@ -418,7 +417,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     enum class ThreadDensity {
         COMPACT,
         NORMAL,
-        LARGE
+        LARGE,
     }
 
     private companion object {

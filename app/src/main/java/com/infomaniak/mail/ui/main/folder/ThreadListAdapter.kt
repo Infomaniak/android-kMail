@@ -51,12 +51,15 @@ import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
-class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, private val onSwipeFinished: () -> Unit) :
+class ThreadListAdapter(
+    private val threadDensity: ThreadDensity,
+    private val parentRecycler: DragDropSwipeRecyclerView,
+    private val onSwipeFinished: () -> Unit
+) :
     DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()) {
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
-    var threadDensity = ThreadDensity.NORMAL
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 

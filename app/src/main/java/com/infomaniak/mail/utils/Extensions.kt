@@ -93,9 +93,9 @@ fun View.setMargins(left: Int? = null, top: Int? = null, right: Int? = null, bot
         (layoutParams as ViewGroup.MarginLayoutParams).apply {
             setMargins(
                 left ?: leftMargin,
-                top ?: leftMargin,
+                top ?: topMargin,
                 right ?: rightMargin,
-                bottom ?: bottomMargin
+                bottom ?: bottomMargin,
             )
         }
         requestLayout()

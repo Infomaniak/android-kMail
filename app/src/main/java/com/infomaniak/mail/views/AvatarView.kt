@@ -33,7 +33,7 @@ import com.infomaniak.mail.databinding.ViewAvatarBinding
 class AvatarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewAvatarBinding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
