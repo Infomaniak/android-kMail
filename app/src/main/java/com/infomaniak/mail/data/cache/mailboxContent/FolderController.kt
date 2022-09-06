@@ -40,27 +40,27 @@ object FolderController {
 
     //region Get data
     private fun getFolders(realm: MutableRealm? = null): RealmResults<Folder> {
-        return getFoldersQuery(realm).find()
+        return realm.getFoldersQuery().find()
     }
 
     fun getFoldersAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Folder>> {
-        return getFoldersQuery(realm).asFlow().toSharedFlow()
+        return realm.getFoldersQuery().asFlow().toSharedFlow()
     }
 
-    private fun getFoldersQuery(realm: MutableRealm? = null): RealmQuery<Folder> {
-        return (realm ?: RealmDatabase.mailboxContent).query()
+    private fun MutableRealm?.getFoldersQuery(): RealmQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query()
     }
 
     fun getFolder(id: String, realm: MutableRealm? = null): Folder? {
-        return getFolderQuery(id, realm).find()
+        return realm.getFolderQuery(id).find()
     }
 
     fun getFolderAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Folder>> {
-        return getFolderQuery(id, realm).asFlow().toSharedFlow()
+        return realm.getFolderQuery(id).asFlow().toSharedFlow()
     }
 
-    private fun getFolderQuery(id: String, realm: MutableRealm? = null): RealmSingleQuery<Folder> {
-        return (realm ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} == '$id'").first()
+    private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} == '$id'").first()
     }
     //endregion
 
