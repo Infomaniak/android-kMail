@@ -26,10 +26,8 @@ object AppSettingsController {
 
     //region Get data
     fun getAppSettings(realm: MutableRealm? = null): AppSettings {
-        fun MutableRealm.copyAppSettingsToRealm() = copyToRealm(AppSettings())
-        return (realm ?: RealmDatabase.appSettings).query<AppSettings>().first().find()
-            ?: realm?.run { copyAppSettingsToRealm() }
-            ?: RealmDatabase.appSettings.writeBlocking { copyAppSettingsToRealm() }
+        val block: (MutableRealm) -> AppSettings = { it.query<AppSettings>().first().find() ?: it.copyToRealm(AppSettings()) }
+        return realm?.let(block) ?: RealmDatabase.appSettings.writeBlocking(block)
     }
     //endregion
 
