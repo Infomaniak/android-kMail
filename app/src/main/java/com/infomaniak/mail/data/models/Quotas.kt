@@ -21,17 +21,22 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 class Quotas : RealmObject {
+
+    //region API data
     var size: Int = 0
     @SerialName("size_checked_at")
     var sizeCheckedAt: Long = 0L
+    //endregion
 
-    /**
-     * Local
-     */
+    //region Local data (Transient)
+    @Transient
     @PrimaryKey
     var mailboxObjectId: String = ""
+    @Transient
     var maxSize: Long = 20L * 1 shl 30 // TODO: Get this value from API?
+    //endregion
 }

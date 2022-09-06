@@ -25,6 +25,8 @@ import kotlinx.serialization.Transient
 
 @Serializable
 class Mailbox : RealmObject {
+
+    //region API data
     var uuid: String = ""
     var email: String = ""
     @SerialName("email_idn")
@@ -64,15 +66,17 @@ class Mailbox : RealmObject {
     var dailyLimit: Int = 0
     @SerialName("unseen_messages")
     var unseenMessages: Int = 0
+    //endregion
 
-    /**
-     * Local
-     */
+    //region Local data (Transient)
+    @Transient
     @PrimaryKey
     var objectId: String = ""
+    @Transient
     var userId: Int = -1
     @Transient
     var quotas: Quotas? = null
+    //endregion
 
     fun initLocalValues(userId: Int): Mailbox {
         this.objectId = "${userId}_${mailboxId}"

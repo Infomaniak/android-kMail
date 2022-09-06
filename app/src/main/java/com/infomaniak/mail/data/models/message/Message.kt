@@ -34,10 +34,13 @@ import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 class Message : RealmObject {
+
+    //region API data
     @PrimaryKey
     var uid: String = ""
     @SerialName("msg_id")
@@ -85,24 +88,30 @@ class Message : RealmObject {
     @SerialName("is_duplicate")
     var isDuplicate: Boolean = false
     var duplicates: RealmList<Duplicate> = realmListOf()
+    //endregion
 
-    /**
-     * Local
-     */
-    @Ignore
+    //region Local data (Transient)
+    @Transient
     var draftUuid: String? = null
-    @Ignore
+    @Transient
     var fullyDownloaded: Boolean = false
-    @Ignore
+    @Transient
     var hasUnsubscribeLink: Boolean = false
-    @Ignore
+    @Transient
     var parentLink: Thread? = null // TODO
+    //endregion
+
+    //region UI data (Ignore & Transient)
     @Ignore
+    @Transient
     var isExpanded = false
     @Ignore
+    @Transient
     var isExpandedHeaderMode = false
     @Ignore
+    @Transient
     var detailsAreExpanded = false
+    //endregion
 
     val dkimStatus: MessageDKIM get() = Utils.enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 

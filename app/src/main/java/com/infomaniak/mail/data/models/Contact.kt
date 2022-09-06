@@ -28,12 +28,15 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
 @Parcelize
 @Serializable
 class Contact : RealmObject, Correspondent {
+
+    //region API data
     @PrimaryKey
     var id: String = ""
     override var name: String = ""
@@ -49,8 +52,11 @@ class Contact : RealmObject, Correspondent {
     @SerialName("addressbook_id")
     var addressBookId: Int = 0
 
+    //region UI data (Ignore & Transient)
     @Ignore
+    @Transient
     override var email: String = emails.firstOrNull() ?: ""
+    //endregion
 
     fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 

@@ -28,15 +28,17 @@ import kotlinx.serialization.Transient
 @Parcelize
 @Serializable
 class Recipient : RealmObject, Correspondent {
+
+    //region API data
     override var email: String = ""
     override var name: String = ""
+    //endregion
 
-    /**
-     * Local
-     */
+    //region Local data (Transient)
     @Transient
     @PrimaryKey
     var objectId: String = "" // TODO: Remove this variable when we have EmbeddedObjects
+    //endregion
 
     // TODO: Remove this method when we have EmbeddedObjects
     fun initLocalValues(): Recipient {
