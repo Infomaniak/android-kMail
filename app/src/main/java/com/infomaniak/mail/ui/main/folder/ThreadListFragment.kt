@@ -31,8 +31,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -362,14 +365,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (isRecovering.value == true) {
             Log.i("UI", "Displaying threads got delayed because of swipe recovering animation")
-            isRecovering.observe(viewLifecycleOwner, object : Observer<Boolean> {
-                override fun onChanged(isSwipping: Boolean?) {
-                    if (isSwipping == false) {
-                        binding.threadsList.postOnAnimation { displayThreads(it.list) }
-                        isRecovering.removeObserver(this)
-                    }
+            isRecovering.observe(viewLifecycleOwner) { value ->
+                if (value == false) {
+                    binding.threadsList.postOnAnimation { displayThreads(it.list) }
+                    isRecovering.removeObservers(viewLifecycleOwner)
                 }
-            })
+            }
         } else {
             displayThreads(it.list)
         }

@@ -262,7 +262,6 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, p
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
 
-
         fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()

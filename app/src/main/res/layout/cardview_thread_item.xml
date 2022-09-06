@@ -140,7 +140,6 @@
                     app:layout_constraintTop_toBottomOf="@id/mailDate"
                     tools:visibility="visible" />
 
-
                 <TextView
                     android:id="@+id/mailBodyPreview"
                     style="@style/Body.Secondary"
