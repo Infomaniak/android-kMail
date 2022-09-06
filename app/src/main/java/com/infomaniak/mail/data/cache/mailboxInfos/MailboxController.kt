@@ -37,27 +37,27 @@ object MailboxController {
 
     //region Get data
     private fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
-        return getMailboxesQuery(userId, realm).find()
+        return realm.getMailboxesQuery(userId).find()
     }
 
     fun getMailboxesAsync(userId: Int, realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
-        return getMailboxesQuery(userId, realm).asFlow().toSharedFlow()
+        return realm.getMailboxesQuery(userId).asFlow().toSharedFlow()
     }
 
-    private fun getMailboxesQuery(userId: Int, realm: MutableRealm? = null): RealmQuery<Mailbox> {
-        return (realm ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} == '$userId'")
+    private fun MutableRealm?.getMailboxesQuery(userId: Int): RealmQuery<Mailbox> {
+        return (this ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} == '$userId'")
     }
 
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
-        return getMailboxQuery(objectId, realm).find()
+        return realm.getMailboxQuery(objectId).find()
     }
 
     private fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Mailbox>> {
-        return getMailboxQuery(objectId, realm).asFlow().toSharedFlow()
+        return realm.getMailboxQuery(objectId).asFlow().toSharedFlow()
     }
 
-    private fun getMailboxQuery(objectId: String, realm: MutableRealm? = null): RealmSingleQuery<Mailbox> {
-        return (realm ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
+    private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
     //endregion
 
