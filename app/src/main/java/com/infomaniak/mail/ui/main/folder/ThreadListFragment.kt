@@ -31,9 +31,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -55,7 +53,9 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.max
 
@@ -67,7 +67,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
 
     private var folderJob: Job? = null
-    private var updatedAtRefreshJob: Job? = null
 
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
@@ -284,21 +283,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun listenToFolder(folderId: String) {
         threadListViewModel.listenToFolder(folderId).observe(viewLifecycleOwner) { folder ->
-            startPeriodicUpdatedAtRefreshJob()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
-        }
-    }
-
-    private fun startPeriodicUpdatedAtRefreshJob() {
-        updatedAtRefreshJob?.cancel()
-        updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
-            lifecycle.repeatOnLifecycle(State.RESUMED) {
-                while (true) {
-                    delay(DateUtils.MINUTE_IN_MILLIS)
-                    withContext(Dispatchers.Main) { updateUpdatedAt() }
-                }
-            }
+            threadListViewModel.startUpdatedAtJob { updateUpdatedAt() }
         }
     }
 

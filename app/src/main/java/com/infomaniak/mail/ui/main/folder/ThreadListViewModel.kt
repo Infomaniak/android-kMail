@@ -17,15 +17,18 @@
  */
 package com.infomaniak.mail.ui.main.folder
 
+import android.text.format.DateUtils
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.toSharedFlow
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 class ThreadListViewModel : ViewModel() {
+
+    private var updatedAtJob: Job? = null
 
     val isRecovering = MutableLiveData(false)
 
@@ -40,5 +43,15 @@ class ThreadListViewModel : ViewModel() {
                 .mapNotNull { it.obj }
                 .asLiveData()
         )
+    }
+
+    fun startUpdatedAtJob(callback: () -> Unit) {
+        updatedAtJob?.cancel()
+        updatedAtJob = viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                delay(DateUtils.MINUTE_IN_MILLIS)
+                withContext(Dispatchers.Main) { callback() }
+            }
+        }
     }
 }
