@@ -31,15 +31,15 @@ object DraftController {
 
     //region Get data
     fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
-        return getDraftQuery(uuid, realm).find()
+        return realm.getDraftQuery(uuid).find()
     }
 
     private fun getDraftAsync(uuid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Draft>> {
-        return getDraftQuery(uuid, realm).asFlow().toSharedFlow()
+        return realm.getDraftQuery(uuid).asFlow().toSharedFlow()
     }
 
-    private fun getDraftQuery(uuid: String, realm: MutableRealm? = null): RealmSingleQuery<Draft> {
-        return (realm ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} == '$uuid'").first()
+    private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} == '$uuid'").first()
     }
     //endregion
 
