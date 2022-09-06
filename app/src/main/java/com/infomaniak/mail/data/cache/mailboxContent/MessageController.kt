@@ -35,15 +35,15 @@ object MessageController {
 
     //region Get data
     fun getMessage(id: String, realm: MutableRealm? = null): Message? {
-        return getMessageQuery(id, realm).find()
+        return realm.getMessageQuery(id).find()
     }
 
     private fun getMessageAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Message>> {
-        return getMessageQuery(id, realm).asFlow().toSharedFlow()
+        return realm.getMessageQuery(id).asFlow().toSharedFlow()
     }
 
-    private fun getMessageQuery(uid: String, realm: MutableRealm? = null): RealmSingleQuery<Message> {
-        return (realm ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} == '$uid'").first()
+    private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
+        return (this ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} == '$uid'").first()
     }
     //endregion
 
