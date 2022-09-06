@@ -35,27 +35,27 @@ object AddressBookController {
 
     //region Get data
     private fun getAddressBooks(realm: MutableRealm? = null): RealmResults<AddressBook> {
-        return getAddressBooksQuery(realm).find()
+        return realm.getAddressBooksQuery().find()
     }
 
     private fun getAddressBooksAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<AddressBook>> {
-        return getAddressBooksQuery(realm).asFlow().toSharedFlow()
+        return realm.getAddressBooksQuery().asFlow().toSharedFlow()
     }
 
-    private fun getAddressBooksQuery(realm: MutableRealm? = null): RealmQuery<AddressBook> {
-        return (realm ?: RealmDatabase.userInfos).query()
+    private fun MutableRealm?.getAddressBooksQuery(): RealmQuery<AddressBook> {
+        return (this ?: RealmDatabase.userInfos).query()
     }
 
     private fun getAddressBook(id: Int, realm: MutableRealm? = null): AddressBook? {
-        return getAddressBookQuery(id, realm).find()
+        return realm.getAddressBookQuery(id).find()
     }
 
     private fun getAddressBookAsync(id: Int, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<AddressBook>> {
-        return getAddressBookQuery(id, realm).asFlow().toSharedFlow()
+        return realm.getAddressBookQuery(id).asFlow().toSharedFlow()
     }
 
-    private fun getAddressBookQuery(id: Int, realm: MutableRealm? = null): RealmSingleQuery<AddressBook> {
-        return (realm ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} == '$id'").first()
+    private fun MutableRealm?.getAddressBookQuery(id: Int): RealmSingleQuery<AddressBook> {
+        return (this ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} == '$id'").first()
     }
     //endregion
 
