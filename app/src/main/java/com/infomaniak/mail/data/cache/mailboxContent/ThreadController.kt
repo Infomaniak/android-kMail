@@ -40,15 +40,15 @@ object ThreadController {
 
     //region Get data
     fun getThread(uid: String, realm: MutableRealm? = null): Thread? {
-        return getThreadQuery(uid, realm).find()
+        return realm.getThreadQuery(uid).find()
     }
 
     private fun getThreadAsync(uid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Thread>> {
-        return getThreadQuery(uid, realm).asFlow().toSharedFlow()
+        return realm.getThreadQuery(uid).asFlow().toSharedFlow()
     }
 
-    private fun getThreadQuery(uid: String, realm: MutableRealm? = null): RealmSingleQuery<Thread> {
-        return (realm ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} == '$uid'").first()
+    private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
+        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} == '$uid'").first()
     }
 
     private fun MutableRealm.getMergedThread(apiThread: Thread, realmThread: Thread?): Thread {
