@@ -207,7 +207,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, p
         return ThreadListDiffCallback(oldList, newList)
     }
 
-    fun notifyAdapter(newList: List<Thread>, context: Context) {
+    fun updateAdapterList(newList: List<Thread>, context: Context) {
         dataSet = formatList(newList, context)
     }
 
