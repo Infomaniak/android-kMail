@@ -48,7 +48,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
 
-
 class IntroFragment : Fragment() {
     private lateinit var binding: FragmentIntroBinding
     private val viewModel: IntroViewModel by activityViewModels()

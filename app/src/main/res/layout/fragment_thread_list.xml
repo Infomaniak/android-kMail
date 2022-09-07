@@ -86,6 +86,19 @@
             </com.google.android.material.appbar.MaterialToolbar>
 
             <TextView
+                android:id="@+id/noNetwork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:drawablePadding="@dimen/marginStandardSmall"
+                android:text="@string/noNetworkTitle"
+                android:textColor="@color/orangeWarning"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_no_network"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+            <TextView
                 android:id="@+id/updatedAt"
                 style="@style/Body.Secondary"
                 android:layout_width="wrap_content"
@@ -94,7 +107,7 @@
                 android:layout_marginBottom="@dimen/marginStandardMedium"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintTop_toBottomOf="@id/noNetwork"
                 tools:text="@string/noNetworkDescription" />
 
             <com.google.android.material.chip.Chip
@@ -104,6 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 android:textColor="@color/chip_unread_text_color"
+                android:visibility="gone"
                 app:checkedIcon="@null"
                 app:checkedIconEnabled="false"
                 app:chipBackgroundColor="@color/chip_unread_background"
@@ -114,7 +128,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/updatedAt"
                 tools:closeIcon="@null"
-                tools:text="2 non lus" />
+                tools:text="2 non lus"
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -136,17 +151,20 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="true">
 
-                <androidx.recyclerview.widget.RecyclerView
+                <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
                     android:id="@+id/threadsList"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/backgroundColor"
                     android:clipToPadding="false"
                     android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                     android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:behind_swiped_item_bg_color="@color/redDestructiveAction"
+                    app:behind_swiped_item_bg_color_secondary="@color/swipeActionReadBackground"
+                    app:behind_swiped_item_icon="@drawable/ic_bin"
+                    app:behind_swiped_item_icon_margin="@dimen/marginStandard"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:listitem="@layout/cardview_thread_item"
