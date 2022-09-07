@@ -46,7 +46,6 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
@@ -276,6 +275,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun getFolder(folderId: String) {
         mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+            scrollToTop()
             threadListViewModel.currentFolder.value = folder
             displayFolderName(folder)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
@@ -369,8 +369,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
         threadListAdapter.updateAdapterList(threads, binding.root.context)
-
-        if (mainViewModel.currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
     }
 
     private fun displayNoEmailView() = with(binding) {
