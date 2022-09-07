@@ -69,44 +69,38 @@ class MainViewModel : ViewModel() {
         currentMailboxObjectId.value = null
     }
 
-    private suspend fun selectMailbox(mailbox: Mailbox) {
+    private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != currentMailboxObjectId.value) {
             Log.i(TAG, "selectMailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
 
-            withContext(Dispatchers.Main) {
-                currentMailboxObjectId.value = mailbox.objectId
+            currentMailboxObjectId.postValue(mailbox.objectId)
 
-                currentMessageUid.value = null
-                currentThreadUid.value = null
-                currentFolderId.value = null
-            }
+            currentMessageUid.postValue(null)
+            currentThreadUid.postValue(null)
+            currentFolderId.postValue(null)
         }
     }
 
-    private suspend fun selectFolder(folderId: String) {
+    private fun selectFolder(folderId: String) {
         if (folderId != currentFolderId.value) {
             Log.i(TAG, "selectFolder: $folderId")
             currentOffset = OFFSET_FIRST_PAGE
 
-            withContext(Dispatchers.Main) {
-                currentFolderId.value = folderId
+            currentFolderId.postValue(folderId)
 
-                currentMessageUid.value = null
-                currentThreadUid.value = null
-            }
+            currentMessageUid.postValue(null)
+            currentThreadUid.postValue(null)
         }
     }
 
-    private suspend fun selectThread(thread: Thread) {
+    private fun selectThread(thread: Thread) {
         if (thread.uid != currentThreadUid.value) {
             Log.i(TAG, "selectThread: ${thread.subject}")
 
-            withContext(Dispatchers.Main) {
-                currentThreadUid.value = thread.uid
+            currentThreadUid.postValue(thread.uid)
 
-                currentMessageUid.value = null
-            }
+            currentMessageUid.postValue(null)
         }
     }
 
