@@ -127,10 +127,8 @@ class MainViewModel : ViewModel() {
 
     fun loadCurrentMailbox() {
         Log.i(TAG, "loadCurrentMailbox")
-        val mailboxes = updateMailboxes()
-        getCurrentMailbox(mailboxes)?.let { mailbox ->
-            openMailbox(mailbox)
-        }
+        updateMailboxes()
+        MailboxController.getCurrentMailbox()?.let(::openMailbox)
     }
 
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
@@ -230,12 +228,12 @@ class MainViewModel : ViewModel() {
         ContactController.update(apiContacts)
     }
 
-    private fun updateMailboxes(): List<Mailbox> {
+    private fun updateMailboxes() {
         val apiMailboxes = ApiRepository.getMailboxes().data?.map {
             it.initLocalValues(AccountUtils.currentUserId)
         } ?: emptyList()
 
-        return MailboxController.update(apiMailboxes)
+        MailboxController.update(apiMailboxes)
     }
 
     private fun updateFolders(mailbox: Mailbox): List<Folder> {

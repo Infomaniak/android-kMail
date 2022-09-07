@@ -59,10 +59,17 @@ object MailboxController {
     private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
         return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
+
+    fun getCurrentMailbox(): Mailbox? = with(RealmDatabase.mailboxInfos) {
+        val checkUserId = "${Mailbox::userId.name} = '${AccountUtils.currentUserId}'"
+        val checkMailboxId = "${Mailbox::mailboxId.name} = '${AccountUtils.currentMailboxId}'"
+        val mailbox = query<Mailbox>("$checkUserId AND $checkMailboxId").first().find()
+        return mailbox ?: query<Mailbox>(checkUserId).first().find()
+    }
     //endregion
 
     //region Edit data
-    fun update(apiMailboxes: List<Mailbox>): List<Mailbox> {
+    fun update(apiMailboxes: List<Mailbox>) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
@@ -70,7 +77,6 @@ object MailboxController {
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
-        // val deletableMailboxes = MailboxInfoController.getDeletableMailboxes(apiMailboxes)
         val deletableMailboxes = realmMailboxes.filter { realmMailbox ->
             apiMailboxes.none { apiMailbox -> apiMailbox.mailboxId == realmMailbox.mailboxId }
         }
@@ -89,12 +95,7 @@ object MailboxController {
         deleteMailboxes(deletableMailboxes)
         deletableMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
 
-        return if (isCurrentMailboxDeleted) {
-            AccountUtils.reloadApp()
-            emptyList()
-        } else {
-            apiMailboxes
-        }
+        if (isCurrentMailboxDeleted) AccountUtils.reloadApp()
     }
 
     fun upsertMailboxes(mailboxes: List<Mailbox>) {
