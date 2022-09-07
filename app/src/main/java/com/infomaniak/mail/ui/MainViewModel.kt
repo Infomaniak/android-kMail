@@ -135,8 +135,8 @@ class MainViewModel : ViewModel() {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
         updateMailboxQuotas(mailbox)
-        val folders = updateFolders(mailbox)
-        getCurrentFolder(folders)?.let { folder ->
+        updateFolders(mailbox)
+        FolderController.getCurrentFolder(currentFolderId.value, DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
             updateThreads(mailbox.uuid, folder.id)
         }
@@ -236,10 +236,10 @@ class MainViewModel : ViewModel() {
         MailboxController.update(apiMailboxes)
     }
 
-    private fun updateFolders(mailbox: Mailbox): List<Folder> {
+    private fun updateFolders(mailbox: Mailbox) {
         val apiFolders = ApiRepository.getFolders(mailbox.uuid).data?.formatFoldersListWithAllChildren() ?: emptyList()
 
-        return FolderController.update(apiFolders)
+        FolderController.update(apiFolders)
     }
 
     private fun updateThreads(

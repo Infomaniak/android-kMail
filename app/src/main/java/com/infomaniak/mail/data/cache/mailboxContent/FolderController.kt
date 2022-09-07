@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -62,12 +63,19 @@ object FolderController {
     private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
         return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} == '$id'").first()
     }
+
+    fun getCurrentFolder(currentFolderId: String?, defaultRole: FolderRole): Folder? = with(RealmDatabase.mailboxContent) {
+        val folderById = currentFolderId?.let(::getFolder)
+        val folderByRole = query<Folder>("${Folder::_role.name} = '${defaultRole.name}'").first().find()
+        val firstFolder = getFolders().firstOrNull()
+        return folderById ?: folderByRole ?: firstFolder
+    }
     //endregion
 
     //region Edit data
-    fun update(apiFolders: List<Folder>): List<Folder> {
-
+    fun update(apiFolders: List<Folder>) {
         RealmDatabase.mailboxContent.writeBlocking {
+
             // Get current data
             Log.d(RealmDatabase.TAG, "Folders: Get current data")
             val realmFolders = getFolders(this)
@@ -106,8 +114,6 @@ object FolderController {
             deleteThreads(deletableThreads)
             deleteFolders(deletableFolders)
         }
-
-        return apiFolders
     }
 
     private fun upsertFolder(folder: Folder): Folder {
