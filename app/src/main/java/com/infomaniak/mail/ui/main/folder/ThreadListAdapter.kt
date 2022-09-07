@@ -38,12 +38,11 @@ import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.user.UserPreferences.ListDensityMode
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.COMPACT
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
@@ -127,9 +126,9 @@ class ThreadListAdapter(
 
         root.setOnClickListener { onThreadClicked?.invoke(this@with) }
 
-        expeditorAvatar.isVisible = threadDensity == ThreadDensity.LARGE
-        mailBodyPreview.isGone = threadDensity == COMPACT
-        mailSubject.setMargins(top = if (threadDensity == COMPACT) 0 else 4.toPx())
+        expeditorAvatar.isVisible = threadDensity == ListDensityMode.LARGE
+        mailBodyPreview.isGone = threadDensity == ListDensityMode.COMPACT
+        mailSubject.setMargins(top = if (threadDensity == ListDensityMode.COMPACT) 0 else 4.toPx())
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
@@ -290,8 +289,8 @@ class ThreadListAdapter(
         private const val MONTH_AND_YEAR = "MMMM yyyy"
 
 
-        fun formatList(threads: List<Thread>, context: Context, threadDensity: ThreadDensity): MutableList<Any> {
-            if (threadDensity == COMPACT) return threads.toMutableList()
+        fun formatList(threads: List<Thread>, context: Context, threadDensity: ListDensityMode): MutableList<Any> {
+            if (threadDensity == ListDensityMode.COMPACT) return threads.toMutableList()
 
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()
