@@ -29,14 +29,18 @@ import kotlinx.coroutines.flow.SharedFlow
 object QuotasController {
 
     //region Get data
-    private fun getQuotas(mailboxObjectId: String, realm: MutableRealm? = null): RealmSingleQuery<Quotas> {
-        return (realm ?: RealmDatabase.mailboxInfos)
-            .query<Quotas>("${Quotas::mailboxObjectId.name} == '$mailboxObjectId'")
-            .first()
+    fun getQuotas(mailboxObjectId: String, realm: MutableRealm? = null): Quotas? {
+        return realm.getQuotasQuery(mailboxObjectId).find()
     }
 
     fun getQuotasAsync(mailboxObjectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Quotas>> {
-        return getQuotas(mailboxObjectId, realm).asFlow().toSharedFlow()
+        return realm.getQuotasQuery(mailboxObjectId).asFlow().toSharedFlow()
+    }
+
+    private fun MutableRealm?.getQuotasQuery(mailboxObjectId: String): RealmSingleQuery<Quotas> {
+        return (this ?: RealmDatabase.mailboxInfos)
+            .query<Quotas>("${Quotas::mailboxObjectId.name} == '$mailboxObjectId'")
+            .first()
     }
     //endregion
 }

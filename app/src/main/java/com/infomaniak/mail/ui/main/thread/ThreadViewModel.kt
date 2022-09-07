@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.map
 class ThreadViewModel : ViewModel() {
 
     fun getThread(uid: String): LiveData<Thread?> = liveData(Dispatchers.IO) {
-        emit(ThreadController.getThreadByUidSync(uid))
+        emit(ThreadController.getThread(uid))
     }
 
     fun listenToMessages(thread: Thread): LiveData<List<Message>> = liveData(Dispatchers.IO) {

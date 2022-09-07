@@ -70,18 +70,18 @@ class MainViewModel : ViewModel() {
 
     fun listenToMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
         emitSource(
-            MailboxController.getMailboxesByUserIdAsync(userId)
+            MailboxController.getMailboxesAsync(userId)
                 .map { it.list }
                 .asLiveData()
         )
     }
 
     fun getMailbox(objectId: String): LiveData<Mailbox?> = liveData(Dispatchers.IO) {
-        emit(MailboxController.getMailboxByObjectIdSync(objectId))
+        emit(MailboxController.getMailbox(objectId))
     }
 
     fun getFolder(folderId: String): LiveData<Folder?> = liveData(Dispatchers.IO) {
-        emit(FolderController.getFolderByIdSync(folderId))
+        emit(FolderController.getFolder(folderId))
     }
 
     private fun selectMailbox(mailbox: Mailbox) {
@@ -162,7 +162,7 @@ class MainViewModel : ViewModel() {
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-        val mailboxUuid = MailboxController.getMailboxByObjectIdSync(mailboxObjectId)?.uuid ?: return@launch
+        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
         if (folderId == currentFolderId.value) return@launch
 
         Log.i(TAG, "openFolder: $folderId")
@@ -180,7 +180,7 @@ class MainViewModel : ViewModel() {
     fun forceRefreshThreads(filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshThreads")
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-        val mailboxUuid = MailboxController.getMailboxByObjectIdSync(mailboxObjectId)?.uuid ?: return@launch
+        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges.postValue(true)
@@ -221,13 +221,13 @@ class MainViewModel : ViewModel() {
     private fun updateAddressBooks() {
         val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
 
-        AddressBookController.upsertApiData(apiAddressBooks)
+        AddressBookController.update(apiAddressBooks)
     }
 
     private fun updateContacts() {
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
 
-        ContactController.upsertApiData(apiContacts)
+        ContactController.update(apiContacts)
     }
 
     private fun updateMailboxes(): List<Mailbox> {
@@ -235,13 +235,13 @@ class MainViewModel : ViewModel() {
             it.initLocalValues(AccountUtils.currentUserId)
         } ?: emptyList()
 
-        return MailboxController.upsertApiData(apiMailboxes)
+        return MailboxController.update(apiMailboxes)
     }
 
     private fun updateFolders(mailbox: Mailbox): List<Folder> {
         val apiFolders = ApiRepository.getFolders(mailbox.uuid).data?.formatFoldersListWithAllChildren() ?: emptyList()
 
-        return FolderController.upsertApiData(apiFolders)
+        return FolderController.update(apiFolders)
     }
 
     private fun updateThreads(
@@ -250,14 +250,14 @@ class MainViewModel : ViewModel() {
         offset: Int = OFFSET_FIRST_PAGE,
         filter: ThreadFilter = ThreadFilter.ALL,
     ) {
-        canContinueToPaginate = ThreadController.upsertApiData(mailboxUuid, folderId, offset, filter)
+        canContinueToPaginate = ThreadController.update(mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
     }
 
     private fun updateMessages(thread: Thread) {
         val apiMessages = fetchMessages(thread)
 
-        MessageController.upsertApiData(apiMessages, thread)
+        MessageController.update(apiMessages, thread)
     }
 
     private fun fetchMessages(thread: Thread): List<Message> {

@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraftByUuidSync
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toSharedFlow
@@ -34,21 +34,21 @@ import kotlinx.coroutines.flow.SharedFlow
 object MessageController {
 
     //region Get data
-    private fun getMessageByUid(uid: String, realm: MutableRealm? = null): RealmSingleQuery<Message> {
-        return (realm ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} == '$uid'").first()
+    fun getMessage(id: String, realm: MutableRealm? = null): Message? {
+        return realm.getMessageQuery(id).find()
     }
 
-    fun getMessageByUidSync(id: String, realm: MutableRealm? = null): Message? {
-        return getMessageByUid(id, realm).find()
+    private fun getMessageAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Message>> {
+        return realm.getMessageQuery(id).asFlow().toSharedFlow()
     }
 
-    private fun getMessageByUidAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Message>> {
-        return getMessageByUid(id, realm).asFlow().toSharedFlow()
+    private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
+        return (this ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} == '$uid'").first()
     }
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiMessages: List<Message>, thread: Thread) {
+    fun update(apiMessages: List<Message>, thread: Thread) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Messages: Get current data")
@@ -75,7 +75,7 @@ object MessageController {
     }
 
     fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
-        RealmDatabase.mailboxContent.writeBlocking { getMessageByUidSync(uid, this)?.let(onUpdate) }
+        RealmDatabase.mailboxContent.writeBlocking { getMessage(uid, this)?.let(onUpdate) }
     }
 
     fun MutableRealm.deleteMessages(messages: List<Message>) {
@@ -86,8 +86,8 @@ object MessageController {
         if (realm == null) {
             RealmDatabase.mailboxContent.writeBlocking { deleteMessage(uid, this) }
         } else {
-            getMessageByUidSync(uid, realm)
-                ?.also { message -> message.draftUuid?.let { getDraftByUuidSync(it, realm) }?.let(realm::delete) }
+            getMessage(uid, realm)
+                ?.also { message -> message.draftUuid?.let { getDraft(it, realm) }?.let(realm::delete) }
                 ?.let(realm::delete)
         }
     }

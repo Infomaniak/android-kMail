@@ -34,37 +34,37 @@ import kotlinx.coroutines.flow.SharedFlow
 object AddressBookController {
 
     //region Get data
-    private fun getAddressBooks(realm: MutableRealm? = null): RealmQuery<AddressBook> {
-        return (realm ?: RealmDatabase.userInfos).query()
-    }
-
-    private fun getAddressBooksSync(realm: MutableRealm? = null): RealmResults<AddressBook> {
-        return getAddressBooks(realm).find()
+    private fun getAddressBooks(realm: MutableRealm? = null): RealmResults<AddressBook> {
+        return realm.getAddressBooksQuery().find()
     }
 
     private fun getAddressBooksAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<AddressBook>> {
-        return getAddressBooks(realm).asFlow().toSharedFlow()
+        return realm.getAddressBooksQuery().asFlow().toSharedFlow()
     }
 
-    private fun getAddressBookById(id: Int, realm: MutableRealm? = null): RealmSingleQuery<AddressBook> {
-        return (realm ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} == '$id'").first()
+    private fun MutableRealm?.getAddressBooksQuery(): RealmQuery<AddressBook> {
+        return (this ?: RealmDatabase.userInfos).query()
     }
 
-    private fun getAddressBookByIdSync(id: Int, realm: MutableRealm? = null): AddressBook? {
-        return getAddressBookById(id, realm).find()
+    private fun getAddressBook(id: Int, realm: MutableRealm? = null): AddressBook? {
+        return realm.getAddressBookQuery(id).find()
     }
 
-    private fun getAddressBookByIdAsync(id: Int, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<AddressBook>> {
-        return getAddressBookById(id, realm).asFlow().toSharedFlow()
+    private fun getAddressBookAsync(id: Int, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<AddressBook>> {
+        return realm.getAddressBookQuery(id).asFlow().toSharedFlow()
+    }
+
+    private fun MutableRealm?.getAddressBookQuery(id: Int): RealmSingleQuery<AddressBook> {
+        return (this ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} == '$id'").first()
     }
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiAddressBooks: List<AddressBook>) {
+    fun update(apiAddressBooks: List<AddressBook>) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "AddressBooks: Get current data")
-        val realmAddressBooks = getAddressBooksSync()
+        val realmAddressBooks = getAddressBooks()
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "AddressBooks: Get outdated data")
@@ -87,7 +87,7 @@ object AddressBookController {
     }
 
     private fun deleteAddressBooks(addressBooks: List<AddressBook>) {
-        RealmDatabase.userInfos.writeBlocking { addressBooks.forEach { getAddressBookByIdSync(it.id, this)?.let(::delete) } }
+        RealmDatabase.userInfos.writeBlocking { addressBooks.forEach { getAddressBook(it.id, this)?.let(::delete) } }
     }
     //endregion
 }

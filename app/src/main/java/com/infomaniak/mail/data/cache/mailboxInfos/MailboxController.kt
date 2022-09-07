@@ -36,37 +36,37 @@ import kotlinx.coroutines.flow.SharedFlow
 object MailboxController {
 
     //region Get data
-    private fun getMailboxesByUserId(userId: Int, realm: MutableRealm? = null): RealmQuery<Mailbox> {
-        return (realm ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} == '$userId'")
+    private fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
+        return realm.getMailboxesQuery(userId).find()
     }
 
-    private fun getMailboxesByUserIdSync(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
-        return getMailboxesByUserId(userId, realm).find()
+    fun getMailboxesAsync(userId: Int, realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
+        return realm.getMailboxesQuery(userId).asFlow().toSharedFlow()
     }
 
-    fun getMailboxesByUserIdAsync(userId: Int, realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
-        return getMailboxesByUserId(userId, realm).asFlow().toSharedFlow()
+    private fun MutableRealm?.getMailboxesQuery(userId: Int): RealmQuery<Mailbox> {
+        return (this ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} == '$userId'")
     }
 
-    private fun getMailboxByObjectId(objectId: String, realm: MutableRealm? = null): RealmSingleQuery<Mailbox> {
-        return (realm ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
+    fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
+        return realm.getMailboxQuery(objectId).find()
     }
 
-    fun getMailboxByObjectIdSync(objectId: String, realm: MutableRealm? = null): Mailbox? {
-        return getMailboxByObjectId(objectId, realm).find()
+    private fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Mailbox>> {
+        return realm.getMailboxQuery(objectId).asFlow().toSharedFlow()
     }
 
-    private fun getMailboxByObjectIdAsync(objectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Mailbox>> {
-        return getMailboxByObjectId(objectId, realm).asFlow().toSharedFlow()
+    private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
     //endregion
 
     //region Edit data
-    fun upsertApiData(apiMailboxes: List<Mailbox>): List<Mailbox> {
+    fun update(apiMailboxes: List<Mailbox>): List<Mailbox> {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-        val realmMailboxes = getMailboxesByUserIdSync(AccountUtils.currentUserId)
+        val realmMailboxes = getMailboxes(AccountUtils.currentUserId)
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
@@ -102,12 +102,12 @@ object MailboxController {
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-        RealmDatabase.mailboxInfos.writeBlocking { getMailboxByObjectIdSync(objectId, this)?.let(onUpdate) }
+        RealmDatabase.mailboxInfos.writeBlocking { getMailbox(objectId, this)?.let(onUpdate) }
     }
 
     private fun deleteMailboxes(mailboxes: List<Mailbox>) {
         RealmDatabase.mailboxInfos.writeBlocking {
-            mailboxes.forEach { getMailboxByObjectIdSync(it.objectId, this)?.let(::delete) }
+            mailboxes.forEach { getMailbox(it.objectId, this)?.let(::delete) }
         }
     }
     //endregion
