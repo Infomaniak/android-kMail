@@ -27,7 +27,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -35,21 +35,14 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
@@ -58,10 +51,9 @@ class MenuDrawerFragment : Fragment() {
     var isDrawerOpen: (() -> Boolean)? = null
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
-
-    private var foldersJob: Job? = null
 
     private var currentFolderRole: FolderRole? = null
     private var inboxFolderId: String? = null
@@ -86,9 +78,11 @@ class MenuDrawerFragment : Fragment() {
         setupAdapters()
         setupListener()
 
-        listenToMailboxes()
-        listenToCurrentMailbox()
-        listenToCurrentFolder()
+        observeMailboxes()
+        observeCurrentMailbox()
+        observeFolders()
+        observeCurrentFolder()
+        observeQuotas()
     }
 
     private fun setupAdapters() = with(binding) {
@@ -162,95 +156,74 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
+    private fun observeMailboxes() = with(binding) {
+        mainViewModel.listenToMailboxes().observe(viewLifecycleOwner) { mailboxes ->
+            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
+            addressAdapter.setMailboxes(sortedMailboxes)
+            if (sortedMailboxes.isEmpty()) {
+                addressesList.isGone = true
+                addressesListDivider.isGone = true
+            }
+        }
+    }
+
+    private fun observeCurrentMailbox() {
+        MainViewModel.currentMailboxObjectId.observeNotNull(this) { objectId ->
+            menuDrawerViewModel.currentMailboxObjectId.value = objectId
+            mainViewModel.getMailbox(objectId).observeNotNull(viewLifecycleOwner) { mailbox ->
+                binding.mailboxSwitcherText.text = mailbox.email
+            }
+        }
+    }
+
+    private fun observeFolders() {
+        menuDrawerViewModel.folders.observe(viewLifecycleOwner) { folders ->
+            val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
+
+            inboxFolderId = inbox?.id
+            binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
+
+            val currentFolderId = MainViewModel.currentFolderId.value
+            defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
+            customFolderAdapter.setFolders(customFolders, currentFolderId)
+
+            setCustomFoldersCollapsedState()
+        }
+    }
+
+    private fun observeCurrentFolder() {
+        MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
+            mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+                currentFolderRole = folder.role
+                binding.inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
+                defaultFolderAdapter.notifyItemRangeChanged(0, defaultFolderAdapter.itemCount, Unit)
+                customFolderAdapter.notifyItemRangeChanged(0, customFolderAdapter.itemCount, Unit)
+            }
+        }
+    }
+
+    private fun observeQuotas() = with(binding) {
+        menuDrawerViewModel.quotas.observe(viewLifecycleOwner) { quotas ->
+            val isLimited = quotas != null
+
+            getMoreStorageCardview.isVisible = isLimited
+            storageDivider.isVisible = isLimited
+
+            if (isLimited) {
+                val usedSize = (quotas?.size ?: 0).toLong()
+                val maxSize = quotas?.maxSize ?: 0L
+                val formattedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
+                val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, maxSize)
+
+                storageText.text = getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
+                storageIndicator.progress = ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
+            }
+        }
+    }
+
     fun onDrawerOpened() {
         canNavigate = true
         mainViewModel.forceRefreshMailboxes()
-    }
-
-    private fun listenToMailboxes() = lifecycleScope.launch(Dispatchers.IO) {
-        MailboxController.getMailboxesAsync(AccountUtils.currentUserId).collect {
-            withContext(Dispatchers.Main) { onMailboxesChange(it.list) }
-        }
-    }
-
-    private fun listenToCurrentMailbox() {
-        MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
-            listenToFolders()
-            onCurrentMailboxChange(mailboxObjectId)
-        }
-    }
-
-    private fun listenToFolders() {
-        foldersJob?.cancel()
-        foldersJob = lifecycleScope.launch(Dispatchers.IO) {
-            FolderController.getFoldersAsync().collect {
-                withContext(Dispatchers.Main) { onFoldersChange(it.list) }
-            }
-        }
-    }
-
-    private fun listenToCurrentFolder() {
-        MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                val folderRole = FolderController.getFolderSync(folderId)?.role
-                withContext(Dispatchers.Main) { onCurrentFolderChange(folderRole) }
-            }
-        }
-    }
-
-    private fun onMailboxesChange(mailboxes: List<Mailbox>) = with(binding) {
-        val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
-        addressAdapter.setMailboxes(sortedMailboxes)
-        if (sortedMailboxes.isEmpty()) {
-            addressesList.isGone = true
-            addressesListDivider.isGone = true
-        }
-    }
-
-    private fun onCurrentMailboxChange(mailboxObjectId: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            MailboxController.getMailboxSync(mailboxObjectId)?.let { mailbox ->
-                withContext(Dispatchers.Main) {
-                    binding.mailboxSwitcherText.text = mailbox.email
-                    displayMailboxQuotas(mailbox)
-                }
-            }
-        }
-    }
-
-    private fun onFoldersChange(folders: List<Folder>) {
-        val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
-
-        inboxFolderId = inbox?.id
-        binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
-
-        val currentFolderId = MainViewModel.currentFolderId.value
-        defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
-        customFolderAdapter.setFolders(customFolders, currentFolderId)
-
-        setCustomFoldersCollapsedState()
-    }
-
-    private fun onCurrentFolderChange(folderRole: FolderRole?) = with(binding) {
-        currentFolderRole = folderRole
-        inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
-        defaultFolderAdapter.notifyItemRangeChanged(0, defaultFolderAdapter.itemCount, Unit)
-        customFolderAdapter.notifyItemRangeChanged(0, customFolderAdapter.itemCount, Unit)
-    }
-
-    private fun displayMailboxQuotas(mailbox: Mailbox) = with(binding) {
-        getMoreStorageCardview.isVisible = mailbox.isLimited
-        storageDivider.isVisible = mailbox.isLimited
-
-        if (mailbox.isLimited) {
-            val usedSize = (mailbox.quotas?.size ?: 0).toLong()
-            val maxSize = mailbox.quotas?.maxSize ?: 0L
-            val formattedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
-            val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, maxSize)
-
-            storageText.text = getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
-            storageIndicator.progress = ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
-        }
     }
 
     private fun setCustomFoldersCollapsedState() = with(binding) {

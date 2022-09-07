@@ -18,9 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
@@ -40,8 +38,8 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
 
@@ -68,6 +66,22 @@ class MainViewModel : ViewModel() {
         currentThreadUid.value = null
         currentFolderId.value = null
         currentMailboxObjectId.value = null
+    }
+
+    fun listenToMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+        emitSource(
+            MailboxController.getMailboxesAsync(userId)
+                .map { it.list }
+                .asLiveData()
+        )
+    }
+
+    fun getMailbox(objectId: String): LiveData<Mailbox?> = liveData(Dispatchers.IO) {
+        emit(MailboxController.getMailboxSync(objectId))
+    }
+
+    fun getFolder(folderId: String): LiveData<Folder?> = liveData(Dispatchers.IO) {
+        emit(FolderController.getFolderSync(folderId))
     }
 
     private fun selectMailbox(mailbox: Mailbox) {
@@ -122,10 +136,22 @@ class MainViewModel : ViewModel() {
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
+        updateMailboxQuotas(mailbox)
         val folders = updateFolders(mailbox)
         getCurrentFolder(folders)?.let { folder ->
             selectFolder(folder.id)
             updateThreads(mailbox.uuid, folder.id)
+        }
+    }
+
+    private fun updateMailboxQuotas(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+        if (mailbox.isLimited) {
+            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.let { quotas ->
+                quotas.mailboxObjectId = mailbox.objectId
+                MailboxController.updateMailbox(mailbox.objectId) {
+                    it.quotas = quotas
+                }
+            }
         }
     }
 
@@ -206,8 +232,7 @@ class MainViewModel : ViewModel() {
 
     private fun updateMailboxes(): List<Mailbox> {
         val apiMailboxes = ApiRepository.getMailboxes().data?.map {
-            val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
-            it.initLocalValues(AccountUtils.currentUserId, quotas)
+            it.initLocalValues(AccountUtils.currentUserId)
         } ?: emptyList()
 
         return MailboxController.upsertApiData(apiMailboxes)

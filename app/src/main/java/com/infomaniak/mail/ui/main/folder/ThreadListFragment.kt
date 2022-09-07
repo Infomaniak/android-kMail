@@ -31,9 +31,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,11 +46,8 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -60,7 +55,6 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
-import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.math.max
@@ -68,16 +62,11 @@ import kotlin.math.max
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val viewModel: ThreadListViewModel2 by viewModels()
-
-    class ThreadListViewModel2 : ViewModel() {
-        var isRecovering = MutableLiveData(false)
-    }
+    private val threadListViewModel: ThreadListViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadListBinding
 
     private var folderJob: Job? = null
-    private var threadsJob: Job? = null
     private var updatedAtRefreshJob: Job? = null
 
     private lateinit var threadListAdapter: ThreadListAdapter
@@ -107,9 +96,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUserAvatar()
         setupUnreadCountChip()
 
-        listenToCurrentMailbox()
-        listenToCurrentFolder()
+        observeCurrentFolderThreads()
+        observeCurrentMailbox()
         listenToDownloadState()
+        listenToCurrentFolder()
     }
 
     private fun setupOnRefresh() {
@@ -124,7 +114,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter = ThreadListAdapter(
             threadDensity = ThreadDensity.LARGE, // TODO : Take this value from the settings when available
             parentRecycler = binding.threadsList,
-            onSwipeFinished = { viewModel.isRecovering.value = false },
+            onSwipeFinished = { threadListViewModel.isRecovering.value = false },
         )
         binding.threadsList.apply {
             adapter = threadListAdapter
@@ -201,7 +191,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     blockOtherSwipes()
                     notifyItemChanged(position) // Animate the swiped element back to its original position
                 }
-                viewModel.isRecovering.value = true
+                threadListViewModel.isRecovering.value = true
 
                 return true
             }
@@ -246,10 +236,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
     }
 
-    private fun listenToCurrentMailbox() {
-        MainViewModel.currentMailboxObjectId.observeNotNull(this) { mailboxObjectId ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                mailboxUuid = MailboxController.getMailboxSync(mailboxObjectId)?.uuid
+    private fun observeCurrentFolderThreads() {
+        threadListViewModel.currentFolderThreads.observe(viewLifecycleOwner, ::onThreadsUpdate)
+    }
+
+    private fun observeCurrentMailbox() {
+        MainViewModel.currentMailboxObjectId.observeNotNull(this) { objectId ->
+            mainViewModel.getMailbox(objectId).observe(viewLifecycleOwner) { mailbox ->
+                mailboxUuid = mailbox?.uuid
             }
         }
     }
@@ -272,31 +266,34 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             updateUpdatedAt()
 
             folderJob?.cancel()
-            folderJob = lifecycleScope.launch(Dispatchers.IO) {
-
-                FolderController.getFolderSync(folderId)?.let { folder ->
-                    withContext(Dispatchers.Main) {
-                        displayFolderName(folder)
-                        listenToThreads(folder)
-                        updateUpdatedAt(folder.lastUpdatedAt?.toDate())
-                    }
-                }
-
-                FolderController.getFolderAsync(folderId).collect {
-                    startPeriodicUpdatedAtRefreshJob()
-                    withContext(Dispatchers.Main) {
-                        updateUpdatedAt(it.obj?.lastUpdatedAt?.toDate())
-                        it.obj?.unreadCount?.let(::updateUnreadCount)
-                    }
-                }
+            folderJob = lifecycleScope.launch(Dispatchers.Main) {
+                getFolder(folderId)
+                listenToFolder(folderId)
             }
+        }
+    }
+
+    private fun getFolder(folderId: String) {
+        mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+            scrollToTop()
+            threadListViewModel.currentFolder.value = folder
+            displayFolderName(folder)
+            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+        }
+    }
+
+    private fun listenToFolder(folderId: String) {
+        threadListViewModel.listenToFolder(folderId).observe(viewLifecycleOwner) { folder ->
+            startPeriodicUpdatedAtRefreshJob()
+            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+            updateUnreadCount(folder.unreadCount)
         }
     }
 
     private fun startPeriodicUpdatedAtRefreshJob() {
         updatedAtRefreshJob?.cancel()
         updatedAtRefreshJob = lifecycleScope.launch(Dispatchers.IO) {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            lifecycle.repeatOnLifecycle(State.RESUMED) {
                 while (true) {
                     delay(DateUtils.MINUTE_IN_MILLIS)
                     withContext(Dispatchers.Main) { updateUpdatedAt() }
@@ -348,30 +345,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun listenToThreads(folder: Folder) {
-        threadsJob?.cancel()
-        threadsJob = lifecycleScope.launch(Dispatchers.IO) {
-            folder.threads.asFlow().toSharedFlow().collect {
-                if (isResumed) withContext(Dispatchers.Main) {
-                    onThreadsUpdate(it)
-                }
-            }
-        }
-    }
+    private fun onThreadsUpdate(threads: List<Thread>) = with(threadListViewModel) {
+        if (!isResumed) return@with
 
-    private fun onThreadsUpdate(it: ListChange<Thread>) = with(viewModel) {
-        if (it.list.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
+        if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
 
         if (isRecovering.value == true) {
             Log.i("UI", "Displaying threads got delayed because of swipe recovering animation")
             isRecovering.observe(viewLifecycleOwner) { value ->
                 if (value == false) {
-                    binding.threadsList.postOnAnimation { displayThreads(it.list) }
+                    binding.threadsList.postOnAnimation { displayThreads(threads) }
                     isRecovering.removeObservers(viewLifecycleOwner)
                 }
             }
         } else {
-            displayThreads(it.list)
+            displayThreads(threads)
         }
     }
 
@@ -381,8 +369,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
         threadListAdapter.updateAdapterList(threads, binding.root.context)
-
-        if (mainViewModel.currentOffset == OFFSET_FIRST_PAGE) scrollToTop()
     }
 
     private fun displayNoEmailView() = with(binding) {

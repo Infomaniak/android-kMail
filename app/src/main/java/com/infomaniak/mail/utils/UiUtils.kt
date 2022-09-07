@@ -27,16 +27,17 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Correspondent
 
 object UiUtils {
-    fun pointBetweenColors(from: Color, to: Color, percent: Float) =
-        Color.pack(
+
+    fun pointBetweenColors(from: Color, to: Color, percent: Float): Long {
+        return Color.pack(
             pointBetweenColors(from.red(), to.red(), percent),
             pointBetweenColors(from.green(), to.green(), percent),
             pointBetweenColors(from.blue(), to.blue(), percent),
             pointBetweenColors(from.alpha(), to.alpha(), percent),
         )
+    }
 
-    private fun pointBetweenColors(from: Float, to: Float, percent: Float): Float =
-        from + percent * (to - from)
+    private fun pointBetweenColors(from: Float, to: Float, percent: Float): Float = from + percent * (to - from)
 
     fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 

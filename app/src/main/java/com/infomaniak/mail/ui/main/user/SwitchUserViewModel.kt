@@ -35,14 +35,11 @@ import okhttp3.OkHttpClient
 
 class SwitchUserViewModel : ViewModel() {
 
-    fun fetchAccounts(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
+    fun fetchUsersMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
         users.forEach { user ->
             val okHttpClient = createOkHttpClientForSpecificUser(user)
             ApiRepository.getMailboxes(okHttpClient).data
-                ?.map {
-                    val quotas = if (it.isLimited) ApiRepository.getQuotas(it.hostingId, it.mailbox).data else null
-                    it.initLocalValues(user.id, quotas)
-                }
+                ?.map { it.initLocalValues(user.id) }
                 ?.let(MailboxController::upsertMailboxes)
         }
     }

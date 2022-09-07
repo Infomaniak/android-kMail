@@ -28,7 +28,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -36,9 +35,7 @@ import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.sortMailboxes
-import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -76,47 +73,27 @@ class SwitchUserFragment : Fragment() {
         recyclerViewAccount.adapter = accountsAdapter
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
-        listenToAccounts()
+        observeAccounts()
     }
 
-    private fun listenToAccounts() {
+    private fun observeAccounts() {
         lifecycleScope.launch(Dispatchers.IO) {
-
             val users = AccountUtils.getAllUsersSync()
-            switchUserViewModel.fetchAccounts(users)
-
-            val flows = users.map { user -> MailboxController.getMailboxesAsync(user.id) }
-
-            combine(flows) { mailboxesFlows ->
-                transformMailboxesFlowsIntoAccounts(mailboxesFlows, users)
-            }.collect {
-                withContext(Dispatchers.Main) { onAccountsChange(it) }
-            }
-        }
-    }
-
-    private fun transformMailboxesFlowsIntoAccounts(mailboxesFlows: Array<ResultsChange<Mailbox>>, users: List<User>) =
-        mutableListOf<Pair<User, List<Mailbox>>>().apply {
-            mailboxesFlows.forEach { flow ->
-                val mailboxes = flow.list
-                val userId = mailboxes.firstOrNull()?.userId
-                users.find { it.id == userId }?.let { user ->
-                    add(user to mailboxes)
+            with(switchUserViewModel) {
+                fetchUsersMailboxes(users)
+                users.forEach { user ->
+                    withContext(Dispatchers.Main) {
+                        mainViewModel.listenToMailboxes(user.id).observe(viewLifecycleOwner) { mailboxes ->
+                            onMailboxesChange(user, mailboxes)
+                        }
+                    }
                 }
             }
         }
-
-    private fun onAccountsChange(accounts: List<Pair<User, List<Mailbox>>>) {
-        val uiAccounts = accounts
-            .map { (user, mailboxes) -> UiAccount(user, mailboxes.sortMailboxes()) }
-            .sortAccounts()
-
-        accountsAdapter.notifyAdapter(uiAccounts, MainViewModel.currentMailboxObjectId.value)
     }
 
-    private fun List<UiAccount>.sortAccounts(): List<UiAccount> {
-        return filter { it.user.id != AccountUtils.currentUserId }
-            .toMutableList()
-            .apply { this@sortAccounts.find { it.user.id == AccountUtils.currentUserId }?.let { add(0, it) } }
+    private fun onMailboxesChange(user: User, mailboxes: List<Mailbox>) {
+        val uiAccount = UiAccount(user, mailboxes.sortMailboxes())
+        accountsAdapter.upsertAccount(uiAccount, MainViewModel.currentMailboxObjectId.value)
     }
 }

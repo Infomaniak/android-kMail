@@ -37,17 +37,16 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.toSharedFlow
+import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
@@ -55,6 +54,7 @@ class ThreadFragment : Fragment() {
     private val navigationArgs: ThreadFragmentArgs by navArgs()
 
     private val mainViewModel: MainViewModel by viewModels()
+    private val threadViewModel: ThreadViewModel by viewModels()
 
     private lateinit var binding: FragmentThreadBinding
     private var threadAdapter = ThreadAdapter()
@@ -67,7 +67,7 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        listenToMessages()
+        getThread()
     }
 
     private fun setupUi() = with(binding) {
@@ -159,13 +159,13 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun listenToMessages() = lifecycleScope.launch(Dispatchers.IO) {
-        ThreadController.getThreadSync(navigationArgs.threadUid)?.let { thread ->
-            mainViewModel.openThread(thread)
-            thread.messages.asFlow().toSharedFlow().collect {
-                withContext(Dispatchers.Main) { displayMessages(it.list) }
-            }
-        }
+    private fun getThread() {
+        threadViewModel.getThread(navigationArgs.threadUid).observeNotNull(viewLifecycleOwner, ::listenToMessages)
+    }
+
+    private fun listenToMessages(thread: Thread) {
+        mainViewModel.openThread(thread)
+        threadViewModel.listenToMessages(thread).observe(viewLifecycleOwner, ::displayMessages)
     }
 
     private fun displayMessages(messages: List<Message>) {
@@ -174,7 +174,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
     }
 
-    companion object {
+    private companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
     }
 }

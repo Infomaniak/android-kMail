@@ -45,12 +45,16 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.setMargins
+import com.infomaniak.mail.utils.toggleChevron
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 class NewMessageFragment : Fragment() {
 
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private lateinit var binding: FragmentNewMessageBinding
@@ -117,8 +121,8 @@ class NewMessageFragment : Fragment() {
             }
         })
 
-        listenToAllContacts()
-        listenToMailboxes()
+        observeContacts()
+        observeMailboxes()
     }
 
     private fun handleOnBackPressed() {
@@ -154,14 +158,12 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun listenToAllContacts() {
-        newMessageViewModel.allContacts.observeNotNull(this, ::setupContactsAdapter)
-        newMessageViewModel.listenToAllContacts()
+    private fun observeContacts() {
+        newMessageViewModel.getContacts().observe(viewLifecycleOwner, ::setupContactsAdapter)
     }
 
-    private fun listenToMailboxes() {
-        newMessageViewModel.mailboxes.observeNotNull(this, ::setupFromField)
-        newMessageViewModel.listenToMailboxes()
+    private fun observeMailboxes() {
+        mainViewModel.listenToMailboxes().observe(viewLifecycleOwner, ::setupFromField)
     }
 
     private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {

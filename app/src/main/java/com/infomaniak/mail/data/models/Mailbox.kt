@@ -74,10 +74,9 @@ class Mailbox : RealmObject {
     @Transient
     var quotas: Quotas? = null
 
-    fun initLocalValues(userId: Int, quotas: Quotas?): Mailbox {
+    fun initLocalValues(userId: Int): Mailbox {
         this.objectId = "${userId}_${mailboxId}"
         this.userId = userId
-        this.quotas = quotas?.apply { mailboxObjectId = this@Mailbox.objectId }
 
         return this
     }

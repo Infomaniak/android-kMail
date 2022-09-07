@@ -30,6 +30,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toggleChevron
 
@@ -100,12 +101,30 @@ class SwitchUserAccountsAdapter(
 
     override fun getItemCount(): Int = accounts.count()
 
-    fun notifyAdapter(newList: List<UiAccount>, newCurrentMailboxObjectId: String?) {
+    fun upsertAccount(uiAccount: UiAccount, newCurrentMailboxObjectId: String?) {
+        val newList = createNewAccountsList(uiAccount)
         isCollapsed = MutableList(newList.count()) { true }
         isCollapsed[0] = false
         currentMailboxObjectId = newCurrentMailboxObjectId
         DiffUtil.calculateDiff(UiAccountsListDiffCallback(accounts, newList)).dispatchUpdatesTo(this)
         accounts = newList
+    }
+
+    private fun createNewAccountsList(uiAccount: UiAccount): MutableList<UiAccount> {
+        val newList = accounts.toMutableList()
+        val existingAccount = newList.find { it.user.id == uiAccount.user.id }
+        if (existingAccount == null) {
+            newList.add(uiAccount)
+        } else {
+            existingAccount.mailboxes = uiAccount.mailboxes
+        }
+        return newList.sortAccounts()
+    }
+
+    private fun List<UiAccount>.sortAccounts(): MutableList<UiAccount> {
+        return filter { it.user.id != AccountUtils.currentUserId }
+            .toMutableList()
+            .apply { this@sortAccounts.find { it.user.id == AccountUtils.currentUserId }?.let { add(0, it) } }
     }
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : RecyclerView.ViewHolder(binding.root)
