@@ -36,6 +36,18 @@ import kotlinx.coroutines.flow.SharedFlow
 object MailboxController {
 
     //region Get data
+    private fun getAllMailboxes(realm: MutableRealm? = null): RealmResults<Mailbox> {
+        return realm.getAllMailboxesQuery().find()
+    }
+
+    fun getAllMailboxesAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
+        return realm.getAllMailboxesQuery().asFlow().toSharedFlow()
+    }
+
+    private fun MutableRealm?.getAllMailboxesQuery(): RealmQuery<Mailbox> {
+        return (this ?: RealmDatabase.mailboxInfos).query()
+    }
+
     private fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
         return realm.getMailboxesQuery(userId).find()
     }

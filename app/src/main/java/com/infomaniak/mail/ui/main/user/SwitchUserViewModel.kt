@@ -17,8 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.user
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.BuildConfig
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -28,14 +27,30 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.sortMailboxes
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
 class SwitchUserViewModel : ViewModel() {
 
-    fun fetchUsersMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
+    fun listenToAccounts(): LiveData<List<UiAccount>> = liveData(Dispatchers.IO) {
+
+        val users = AccountUtils.getAllUsersSync()
+
+        updateMailboxes(users)
+
+        emitSource(MailboxController.getAllMailboxesAsync().map { mailboxes ->
+            users.map { user ->
+                UiAccount(user, mailboxes.list.filter { it.userId == user.id }.sortMailboxes())
+            }.sortAccounts()
+        }.asLiveData())
+    }
+
+    private fun updateMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
         users.forEach { user ->
             val okHttpClient = createOkHttpClientForSpecificUser(user)
             ApiRepository.getMailboxes(okHttpClient).data
@@ -64,5 +79,11 @@ class SwitchUserViewModel : ViewModel() {
                 addInterceptor(TokenInterceptor(tokenInterceptorListener))
                 authenticator(TokenAuthenticator(tokenInterceptorListener))
             }.build()
+    }
+
+    private fun List<UiAccount>.sortAccounts(): MutableList<UiAccount> {
+        return filter { it.user.id != AccountUtils.currentUserId }
+            .toMutableList()
+            .apply { this@sortAccounts.find { it.user.id == AccountUtils.currentUserId }?.let { add(0, it) } }
     }
 }

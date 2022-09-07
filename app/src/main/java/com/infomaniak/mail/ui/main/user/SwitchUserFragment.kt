@@ -27,14 +27,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.LoginActivity
-import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.sortMailboxes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,30 +66,21 @@ class SwitchUserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerViewAccount.adapter = accountsAdapter
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
+        setAdapter()
+        setOnClickListeners()
         observeAccounts()
     }
 
-    private fun observeAccounts() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val users = AccountUtils.getAllUsersSync()
-            with(switchUserViewModel) {
-                fetchUsersMailboxes(users)
-                users.forEach { user ->
-                    withContext(Dispatchers.Main) {
-                        mainViewModel.listenToMailboxes(user.id).observe(viewLifecycleOwner) { mailboxes ->
-                            onMailboxesChange(user, mailboxes)
-                        }
-                    }
-                }
-            }
-        }
+    private fun setAdapter() {
+        binding.recyclerViewAccount.adapter = accountsAdapter
     }
 
-    private fun onMailboxesChange(user: User, mailboxes: List<Mailbox>) {
-        val uiAccount = UiAccount(user, mailboxes.sortMailboxes())
-        accountsAdapter.upsertAccount(uiAccount, MainViewModel.currentMailboxObjectId.value)
+    private fun setOnClickListeners() = with(binding) {
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
+    }
+
+    private fun observeAccounts() {
+        switchUserViewModel.listenToAccounts().observe(viewLifecycleOwner, accountsAdapter::notifyAdapter)
     }
 }
