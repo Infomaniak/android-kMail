@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.format
-import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
@@ -81,7 +80,7 @@ class ThreadAdapter(
         val messageDate = message.date?.toDate()
 
         if (message.isDraft) {
-            userAvatarImage.loadAvatar(AccountUtils.currentUser!!)
+            userAvatar.loadAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
                 text = context.getString(R.string.messageIsDraftOption)
                 setTextColor(context.getColor(R.color.draftTextColor))
@@ -89,7 +88,7 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.from.first()
-            userAvatarImage.loadAvatar(firstSender)
+            userAvatar.loadAvatar(firstSender)
             expeditorName.apply {
                 fillInUserNameAndEmail(firstSender, this)
                 setTextColor(context.getColor(R.color.primaryTextColor))

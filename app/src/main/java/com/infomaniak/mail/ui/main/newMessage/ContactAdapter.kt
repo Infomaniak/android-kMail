@@ -27,7 +27,6 @@ import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.loadAvatar
 
 class ContactAdapter(
     private val allContacts: List<UiContact> = emptyList(),

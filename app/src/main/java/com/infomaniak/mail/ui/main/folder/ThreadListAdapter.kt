@@ -41,6 +41,8 @@ import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity
+import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.COMPACT
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
@@ -49,7 +51,11 @@ import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
-class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, private val onSwipeFinished: () -> Unit) :
+class ThreadListAdapter(
+    private val threadDensity: ThreadDensity,
+    private val parentRecycler: DragDropSwipeRecyclerView,
+    private val onSwipeFinished: () -> Unit
+) :
     DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()) {
 
     private var swipingIsAuthorized: Boolean = true
@@ -88,6 +94,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, p
         fillInUserNameAndEmail(from.first(), expeditor)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
         mailBodyPreview.text = messages.last().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
+        expeditorAvatar.loadAvatar(from.first())
 
         mailDate.text = formatDate(root.context)
 
@@ -101,6 +108,10 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, p
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
         root.setOnClickListener { onThreadClicked?.invoke(this@with) }
+
+        expeditorAvatar.isVisible = threadDensity == ThreadDensity.LARGE
+        mailBodyPreview.isGone = threadDensity == COMPACT
+        mailSubject.setMargins(top = if (threadDensity == COMPACT) 0 else 4.toPx())
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
@@ -208,7 +219,7 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, p
     }
 
     fun updateAdapterList(newList: List<Thread>, context: Context) {
-        dataSet = formatList(newList, context)
+        dataSet = formatList(newList, context, threadDensity)
     }
 
     private enum class DisplayType(val layout: Int) {
@@ -262,7 +273,10 @@ class ThreadListAdapter(private val parentRecycler: DragDropSwipeRecyclerView, p
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
 
-        fun formatList(threads: List<Thread>, context: Context): MutableList<Any> {
+
+        fun formatList(threads: List<Thread>, context: Context, threadDensity: ThreadDensity): MutableList<Any> {
+            if (threadDensity == COMPACT) return threads.toMutableList()
+
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()
 

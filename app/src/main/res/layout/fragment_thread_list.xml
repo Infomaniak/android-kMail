@@ -62,24 +62,13 @@
                         app:iconSize="24dp"
                         app:iconTint="?android:attr/colorPrimary" />
 
-                    <com.google.android.material.card.MaterialCardView
+                    <com.infomaniak.mail.views.AvatarView
                         android:id="@+id/userAvatar"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/iconButtonSize"
                         android:layout_gravity="center"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                        app:cardCornerRadius="@dimen/roundCornerRadius"
-                        app:strokeWidth="0dp">
-
-                        <ImageView
-                            android:id="@+id/userAvatarImage"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@string/titleMyAccount"
-                            android:src="@drawable/placeholder"
-                            tools:src="@tools:sample/avatars" />
-
-                    </com.google.android.material.card.MaterialCardView>
+                        tools:src="@tools:sample/avatars[12]" />
 
                 </LinearLayout>
 
@@ -101,11 +90,14 @@
             <TextView
                 android:id="@+id/updatedAt"
                 style="@style/Body.Secondary"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardMedium"
+                android:ellipsize="end"
+                android:lines="1"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/unreadCountChip"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/noNetwork"
                 tools:text="@string/noNetworkDescription" />

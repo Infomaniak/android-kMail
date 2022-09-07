@@ -81,7 +81,7 @@ class MenuDrawerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AccountUtils.currentUser?.let(binding.userAvatarImage::loadAvatar)
+        AccountUtils.currentUser?.let(binding.userAvatar::loadAvatar)
 
         setupAdapters()
         setupListener()

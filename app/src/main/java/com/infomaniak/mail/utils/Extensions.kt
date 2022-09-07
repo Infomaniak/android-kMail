@@ -22,19 +22,15 @@ import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.annotation.IdRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
-import coil.imageLoader
-import coil.request.Disposable
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Correspondent
 import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.CoroutineScope
@@ -92,21 +88,21 @@ fun View.toggleChevron(
     animate().rotation(angle).setDuration(duration).start()
 }
 
-fun View.setMargins(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0) {
+fun View.setMargins(left: Int? = null, top: Int? = null, right: Int? = null, bottom: Int? = null) {
     if (layoutParams is ViewGroup.MarginLayoutParams) {
-        (layoutParams as ViewGroup.MarginLayoutParams).setMargins(left, top, right, bottom)
+        (layoutParams as ViewGroup.MarginLayoutParams).apply {
+            setMargins(
+                left ?: leftMargin,
+                top ?: topMargin,
+                right ?: rightMargin,
+                bottom ?: bottomMargin,
+            )
+        }
         requestLayout()
     }
 }
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
-
-fun ImageView.loadAvatar(
-    correspondent: Correspondent
-): Disposable = with(correspondent) {
-    val initials = getNameOrEmail().firstOrEmpty().toString().uppercase()
-    return loadAvatar(email.hashCode(), null, initials, context.imageLoader)
-}
 
 inline val ViewBinding.context: Context get() = root.context
 

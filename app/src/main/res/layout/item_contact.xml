@@ -22,18 +22,16 @@
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground">
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <com.infomaniak.mail.views.AvatarView
         android:id="@+id/userAvatar"
         android:layout_width="38dp"
         android:layout_height="38dp"
         android:layout_marginVertical="@dimen/marginStandardMedium"
         android:layout_marginStart="@dimen/marginStandardMedium"
-        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/CircleImageView"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:src="@tools:sample/avatars" />
 
     <LinearLayout
         android:layout_width="0dp"
