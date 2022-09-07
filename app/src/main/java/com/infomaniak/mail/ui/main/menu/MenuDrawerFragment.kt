@@ -29,7 +29,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
@@ -43,7 +42,6 @@ import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
-import kotlin.math.ceil
 
 class MenuDrawerFragment : Fragment() {
 
@@ -210,13 +208,8 @@ class MenuDrawerFragment : Fragment() {
             storageDivider.isVisible = isLimited
 
             if (isLimited) {
-                val usedSize = (quotas?.size ?: 0).toLong()
-                val maxSize = quotas?.maxSize ?: 0L
-                val formattedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
-                val formattedTotalSize = FormatterFileSize.formatShortFileSize(context, maxSize)
-
-                storageText.text = getString(R.string.menuDrawerMailboxStorage, formattedSize, formattedTotalSize)
-                storageIndicator.progress = ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
+                storageText.text = quotas?.getText(context, MenuDrawerViewModel.QUOTAS_MAX_SIZE) ?: return@observe
+                storageIndicator.progress = quotas.getProgress(MenuDrawerViewModel.QUOTAS_MAX_SIZE)
             }
         }
     }

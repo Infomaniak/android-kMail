@@ -17,11 +17,15 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.content.Context
+import com.infomaniak.lib.core.utils.FormatterFileSize
+import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.math.ceil
 
 @Serializable
 class Quotas : RealmObject {
@@ -36,7 +40,20 @@ class Quotas : RealmObject {
     @Transient
     @PrimaryKey
     var mailboxObjectId: String = ""
-    @Transient
-    var maxSize: Long = 20L * 1 shl 30 // TODO: Get this value from API?
     //endregion
+
+    fun getText(context: Context, maxSize: Long): String {
+        val usedSize = size.toLong()
+
+        val formattedUsedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
+        val formattedMaxSize = FormatterFileSize.formatShortFileSize(context, maxSize)
+
+        return context.getString(R.string.menuDrawerMailboxStorage, formattedUsedSize, formattedMaxSize)
+    }
+
+    fun getProgress(maxSize: Long): Int {
+        val usedSize = size.toLong()
+
+        return ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
+    }
 }
