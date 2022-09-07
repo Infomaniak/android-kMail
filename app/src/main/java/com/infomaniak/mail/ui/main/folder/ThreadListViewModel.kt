@@ -22,15 +22,19 @@ import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.utils.toSharedFlow
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
     private var updatedAtJob: Job? = null
 
     val isRecovering = MutableLiveData(false)
+    val updatedAtTrigger = MutableLiveData<Unit>()
 
     val currentFolder = MutableLiveData<Folder>()
     val currentFolderThreads = Transformations.switchMap(currentFolder) { folder ->
@@ -45,12 +49,12 @@ class ThreadListViewModel : ViewModel() {
         )
     }
 
-    fun startUpdatedAtJob(callback: () -> Unit) {
+    fun startUpdatedAtJob() {
         updatedAtJob?.cancel()
         updatedAtJob = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(DateUtils.MINUTE_IN_MILLIS)
-                withContext(Dispatchers.Main) { callback() }
+                updatedAtTrigger.postValue(Unit)
             }
         }
     }

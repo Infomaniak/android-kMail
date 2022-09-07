@@ -100,6 +100,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeCurrentMailbox()
         listenToDownloadState()
         listenToCurrentFolder()
+        listenToUpdatedAtTriggers()
     }
 
     private fun setupOnRefresh() {
@@ -277,7 +278,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
             threadListViewModel.currentFolder.value = folder
             displayFolderName(folder)
-            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
         }
     }
 
@@ -285,8 +285,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListViewModel.listenToFolder(folderId).observe(viewLifecycleOwner) { folder ->
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
-            threadListViewModel.startUpdatedAtJob { updateUpdatedAt() }
+            threadListViewModel.startUpdatedAtJob()
         }
+    }
+
+    private fun listenToUpdatedAtTriggers() {
+        threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
     }
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
