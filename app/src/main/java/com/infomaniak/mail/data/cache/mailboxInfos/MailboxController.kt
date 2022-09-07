@@ -36,20 +36,28 @@ import kotlinx.coroutines.flow.SharedFlow
 object MailboxController {
 
     //region Get data
-    fun getMailboxesSync(userId: Int): RealmResults<Mailbox> {
-        return getMailboxes(userId).find()
+    private fun getMailboxesByUserId(userId: Int, realm: MutableRealm? = null): RealmQuery<Mailbox> {
+        return (realm ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} == '$userId'")
     }
 
-    fun getMailboxesAsync(userId: Int): SharedFlow<ResultsChange<Mailbox>> {
-        return getMailboxes(userId).asFlow().toSharedFlow()
+    private fun getMailboxesByUserIdSync(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
+        return getMailboxesByUserId(userId, realm).find()
     }
 
-    fun getMailboxSync(objectId: String): Mailbox? {
-        return getMailbox(objectId).find()
+    fun getMailboxesByUserIdAsync(userId: Int, realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
+        return getMailboxesByUserId(userId, realm).asFlow().toSharedFlow()
     }
 
-    fun getMailboxAsync(objectId: String): SharedFlow<SingleQueryChange<Mailbox>> {
-        return getMailbox(objectId).asFlow().toSharedFlow()
+    private fun getMailboxByObjectId(objectId: String, realm: MutableRealm? = null): RealmSingleQuery<Mailbox> {
+        return (realm ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
+    }
+
+    fun getMailboxByObjectIdSync(objectId: String, realm: MutableRealm? = null): Mailbox? {
+        return getMailboxByObjectId(objectId, realm).find()
+    }
+
+    private fun getMailboxByObjectIdAsync(objectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Mailbox>> {
+        return getMailboxByObjectId(objectId, realm).asFlow().toSharedFlow()
     }
     //endregion
 
@@ -58,7 +66,7 @@ object MailboxController {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-        val realmMailboxes = getMailboxesSync(AccountUtils.currentUserId)
+        val realmMailboxes = getMailboxesByUserIdSync(AccountUtils.currentUserId)
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
@@ -93,26 +101,14 @@ object MailboxController {
         RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
-    fun deleteMailboxes(mailboxes: List<Mailbox>) {
-        RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { getLatestMailbox(it.objectId)?.let(::delete) } }
-    }
-
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-        RealmDatabase.mailboxInfos.writeBlocking { getLatestMailbox(objectId)?.let(onUpdate) }
-    }
-    //endregion
-
-    //region Utils
-    private fun getMailboxes(userId: Int): RealmQuery<Mailbox> {
-        return RealmDatabase.mailboxInfos.query("${Mailbox::userId.name} == '$userId'")
+        RealmDatabase.mailboxInfos.writeBlocking { getMailboxByObjectIdSync(objectId, this)?.let(onUpdate) }
     }
 
-    private fun getMailbox(objectId: String): RealmSingleQuery<Mailbox> {
-        return RealmDatabase.mailboxInfos.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
-    }
-
-    private fun MutableRealm.getLatestMailbox(objectId: String): Mailbox? {
-        return getMailboxSync(objectId)?.let(::findLatest)
+    private fun deleteMailboxes(mailboxes: List<Mailbox>) {
+        RealmDatabase.mailboxInfos.writeBlocking {
+            mailboxes.forEach { getMailboxByObjectIdSync(it.objectId, this)?.let(::delete) }
+        }
     }
     //endregion
 

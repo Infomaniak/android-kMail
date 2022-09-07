@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxInfos
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.utils.toSharedFlow
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
@@ -28,14 +29,14 @@ import kotlinx.coroutines.flow.SharedFlow
 object QuotasController {
 
     //region Get data
-    fun getQuotasAsync(mailboxObjectId: String): SharedFlow<SingleQueryChange<Quotas>> {
-        return getQuotas(mailboxObjectId).asFlow().toSharedFlow()
+    private fun getQuotas(mailboxObjectId: String, realm: MutableRealm? = null): RealmSingleQuery<Quotas> {
+        return (realm ?: RealmDatabase.mailboxInfos)
+            .query<Quotas>("${Quotas::mailboxObjectId.name} == '$mailboxObjectId'")
+            .first()
     }
-    //endregion
 
-    //region Utils
-    private fun getQuotas(mailboxObjectId: String): RealmSingleQuery<Quotas> {
-        return RealmDatabase.mailboxInfos.query<Quotas>("${Quotas::mailboxObjectId.name} == '$mailboxObjectId'").first()
+    fun getQuotasAsync(mailboxObjectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Quotas>> {
+        return getQuotas(mailboxObjectId, realm).asFlow().toSharedFlow()
     }
     //endregion
 }
