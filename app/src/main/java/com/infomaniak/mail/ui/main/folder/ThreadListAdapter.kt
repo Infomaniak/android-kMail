@@ -47,7 +47,6 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.COMPA
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import io.realm.kotlin.ext.isValid
 import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
@@ -107,7 +106,6 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
-        if (!isValid()) return // TODO: remove this when realm management will be refactored and stable
 
         fillInUserNameAndEmail(from.first(), expeditor)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
