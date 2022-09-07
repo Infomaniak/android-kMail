@@ -45,6 +45,8 @@ import java.util.*
 
 @Serializable
 class Thread : RealmObject {
+
+    //region API data
     @PrimaryKey
     var uid: String = ""
     @SerialName("messages_count")
@@ -74,12 +76,12 @@ class Thread : RealmObject {
     var answered: Boolean = false
     var forwarded: Boolean = false
     var size: Int = 0
+    //endregion
 
-    /**
-     * Local
-     */
+    //region Local data (Transient)
     @Transient
     var mailboxUuid: String = ""
+    //endregion
 
     val date: Date get() = _date.toDate()
 

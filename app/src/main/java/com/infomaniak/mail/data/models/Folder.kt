@@ -34,10 +34,13 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 class Folder : RealmObject {
+
+    //region API data
     @PrimaryKey
     var id: String = ""
     var path: String = ""
@@ -57,13 +60,16 @@ class Folder : RealmObject {
     var isFavorite: Boolean = false
     var separator: String = ""
     var children: RealmList<Folder> = realmListOf()
+    //endregion
 
-    /**
-     * Local
-     */
+    //region Local data (Transient)
+    @Transient
     var threads: RealmList<Thread> = realmListOf()
-    var parentLink: Folder? = null
+    @Transient
+    var parentLink: Folder? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
+    @Transient
     var lastUpdatedAt: RealmInstant? = null
+    //endregion
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)

@@ -27,10 +27,13 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 class Draft : RealmObject {
+
+    //region API data
     @PrimaryKey
     var uuid: String = ""
     @SerialName("identity_id")
@@ -62,11 +65,12 @@ class Draft : RealmObject {
     @SerialName("st_uuid")
     var stUuid: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
+    //endregion
 
-    /**
-     * Local
-     */
-    var parentMessageUid: String = ""
+    //region Local data (Transient)
+    @Transient
+    var parentMessageUid: String = "" // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
+    //endregion
 
     fun initLocalValues(messageUid: String) {
         if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"

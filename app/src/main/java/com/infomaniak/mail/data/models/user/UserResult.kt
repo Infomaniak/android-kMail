@@ -22,5 +22,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserResult(
     val infos: UserInfo,
-    val preferences: UserPreferences
+    val preferences: UserPreferences,
 )

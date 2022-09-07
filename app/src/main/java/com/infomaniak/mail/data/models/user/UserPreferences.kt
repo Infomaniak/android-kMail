@@ -21,20 +21,24 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 class UserPreferences : RealmObject {
+
+    //region API data
     @SerialName("thread_mode")
     private var threadMode: String? = null
     @SerialName("read_pos")
     var readPosition: String = ""
     var density: String = ""
     // TODO: Add other preferences.
+    //endregion
 
-    /**
-     * Local
-     */
+    //region Local data (Transient)
+    @Transient
     private var intelligentMode: String = IntelligentMode.DISABLED.name
+    //endregion
 
     fun getThreadMode(): ThreadMode? = enumValueOfOrNull<ThreadMode>(threadMode)
 
