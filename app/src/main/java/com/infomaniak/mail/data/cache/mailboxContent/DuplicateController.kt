@@ -19,13 +19,15 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.message.Duplicate
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 
 object DuplicateController {
 
     //region Edit data
-    fun removeDuplicates() {
-        RealmDatabase.mailboxContent.writeBlocking { delete(query<Duplicate>()) }
+    fun removeDuplicates(realm: MutableRealm? = null) {
+        val block: (MutableRealm) -> Unit = { it.delete(it.query<Duplicate>()) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }
     //endregion
 }

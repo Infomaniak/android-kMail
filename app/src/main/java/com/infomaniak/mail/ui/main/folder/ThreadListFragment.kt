@@ -345,7 +345,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun onThreadsUpdate(threads: List<Thread>) {
         Log.i("UI", "Received threads (${threads.size})")
-        if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
+        if (threads.size < PER_PAGE) mainViewModel.canPaginate = false
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
     }
 
@@ -371,7 +371,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         val uuid = mailboxUuid ?: return
         val folderId = MainViewModel.currentFolderId.value ?: return
 
-        if (canContinueToPaginate) {
+        if (canPaginate) {
             currentOffset += PER_PAGE
             loadMoreThreads(uuid, folderId, currentOffset, filter)
         }
