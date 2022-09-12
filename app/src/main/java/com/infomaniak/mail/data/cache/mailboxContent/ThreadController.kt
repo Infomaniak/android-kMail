@@ -110,7 +110,7 @@ object ThreadController {
                     val mergedThread = getMergedThread(apiThread, realmThread)
                     copyToRealm(mergedThread, UpdatePolicy.ALL)
                 }
-                updateFolder(folderId, apiThreads)
+                updateFolderThreads(folderId, apiThreads)
             }
 
             // Delete outdated data
@@ -176,10 +176,9 @@ object ThreadController {
         addAll(values)
     }
 
-    private fun MutableRealm.updateFolder(folderId: String, apiThreads: List<Thread>) {
-        FolderController.getFolder(folderId, this)?.let { latestFolder ->
-            latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
-            copyToRealm(latestFolder, UpdatePolicy.ALL)
+    private fun MutableRealm.updateFolderThreads(folderId: String, apiThreads: List<Thread>) {
+        FolderController.updateFolder(folderId, this) { folder ->
+            folder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
         }
     }
 

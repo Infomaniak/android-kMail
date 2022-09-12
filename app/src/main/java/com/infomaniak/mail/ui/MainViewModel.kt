@@ -195,7 +195,7 @@ class MainViewModel : ViewModel() {
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
         isDownloadingChanges.postValue(true)
-        updateThreads(mailboxUuid, folderId, offset, filter)
+        updateThreads(mailboxUuid, folderId, offset, filter, setFolderLastUpdatedAt = false)
     }
 
     fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
@@ -249,8 +249,10 @@ class MainViewModel : ViewModel() {
         folderId: String,
         offset: Int = OFFSET_FIRST_PAGE,
         filter: ThreadFilter = ThreadFilter.ALL,
+        setFolderLastUpdatedAt: Boolean = true,
     ) {
         canContinueToPaginate = ThreadController.update(mailboxUuid, folderId, offset, filter)
+        if (setFolderLastUpdatedAt) FolderController.updateFolderLastUpdatedAt(folderId)
         isDownloadingChanges.postValue(false)
     }
 
