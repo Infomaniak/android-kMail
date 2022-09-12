@@ -126,6 +126,37 @@ object ThreadController {
         }
     }
 
+    fun toggleSeenStatus(thread: Thread, folderId: String) {
+        if (thread.unseenMessagesCount == 0) {
+            markAsUnseen(thread, folderId)
+        } else {
+            markAsSeen(thread, folderId)
+        }
+    }
+
+    private fun markAsUnseen(thread: Thread, folderId: String) {
+        RealmDatabase.mailboxContent.writeBlocking {
+
+            val liveThread = getThread(thread.uid, this) ?: return@writeBlocking
+            val lastMessage = liveThread.messages.last()
+
+            val uids = mutableListOf<String>().apply {
+                add(lastMessage.uid)
+                addAll(lastMessage.duplicates.map { duplicate -> duplicate.uid })
+            }
+
+            val apiResponse = ApiRepository.markMessagesAsUnseen(liveThread.mailboxUuid, uids)
+
+            if (apiResponse.isSuccess()) {
+                liveThread.apply {
+                    lastMessage.seen = false
+                    unseenMessagesCount++
+                }
+                incrementFolderUnreadCount(folderId, liveThread.unseenMessagesCount, this)
+            }
+        }
+    }
+
     fun markAsSeen(thread: Thread, folderId: String) {
         if (thread.unseenMessagesCount != 0) {
 
@@ -158,6 +189,12 @@ object ThreadController {
     private fun setFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
         FolderController.updateFolder(folderId, realm) {
             it.unreadCount = unseenMessagesCount
+        }
+    }
+
+    private fun incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
+        FolderController.updateFolder(folderId, realm) {
+            it.unreadCount += unseenMessagesCount
         }
     }
 
