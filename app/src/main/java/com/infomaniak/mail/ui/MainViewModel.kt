@@ -173,7 +173,7 @@ class MainViewModel : ViewModel() {
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         selectThread(thread)
-        ThreadController.markAsSeen(thread, currentFolderId.value)
+        ThreadController.markAsSeen(thread, currentFolderId.value!!)
         updateMessages(thread)
     }
 

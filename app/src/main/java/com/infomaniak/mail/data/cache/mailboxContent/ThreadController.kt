@@ -100,7 +100,7 @@ object ThreadController {
         }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folderId } }
 
-        RealmDatabase.mailboxContent.writeBlocking {
+        return RealmDatabase.mailboxContent.writeBlocking {
             // Save new data
             Log.d(RealmDatabase.TAG, "Threads: Save new data")
             val newPageSize = apiThreads.size - offset
@@ -117,16 +117,16 @@ object ThreadController {
             Log.d(RealmDatabase.TAG, "Threads: Delete outdated data")
             deleteMessages(deletableMessages)
             deleteThreads(deletableThreads)
-        }
 
-        return threadsResult?.let {
-            val canContinueToPaginate = it.messagesCount >= ApiRepository.PER_PAGE
-            FolderController.updateFolderUnreadCount(folderId, it.folderUnseenMessage)
-            canContinueToPaginate
-        } ?: false
+            threadsResult?.let {
+                val canContinueToPaginate = it.messagesCount >= ApiRepository.PER_PAGE
+                setFolderUnreadCount(folderId, it.folderUnseenMessage, this)
+                canContinueToPaginate
+            } ?: false
+        }
     }
 
-    fun markAsSeen(thread: Thread, folderId: String?) {
+    fun markAsSeen(thread: Thread, folderId: String) {
         if (thread.unseenMessagesCount != 0) {
 
             RealmDatabase.mailboxContent.writeBlocking {
@@ -145,7 +145,7 @@ object ThreadController {
                 val apiResponse = ApiRepository.markMessagesAsSeen(liveThread.mailboxUuid, uids)
 
                 if (apiResponse.isSuccess()) {
-                    updateFolderUnreadCount(folderId, liveThread)
+                    decrementFolderUnreadCount(folderId, liveThread.unseenMessagesCount, this)
                     liveThread.apply {
                         messages.forEach { it.seen = true }
                         unseenMessagesCount = 0
@@ -155,10 +155,16 @@ object ThreadController {
         }
     }
 
-    private fun MutableRealm.updateFolderUnreadCount(folderId: String?, latestThread: Thread) {
-        val folder = folderId?.let { FolderController.getFolder(folderId, this) } ?: return
-        val newUnreadCount = folder.unreadCount - latestThread.unseenMessagesCount
-        FolderController.updateFolderUnreadCount(folderId, newUnreadCount, this)
+    private fun setFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
+        FolderController.updateFolder(folderId, realm) {
+            it.unreadCount = unseenMessagesCount
+        }
+    }
+
+    private fun decrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
+        FolderController.updateFolder(folderId, realm) {
+            it.unreadCount -= unseenMessagesCount
+        }
     }
 
     private fun MutableRealm.saveMessageWithBackedUpData(apiMessage: Message, realmMessage: Message) {

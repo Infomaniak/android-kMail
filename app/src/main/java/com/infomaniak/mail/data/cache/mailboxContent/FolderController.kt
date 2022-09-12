@@ -119,13 +119,6 @@ object FolderController {
         return realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }
 
-    fun updateFolderUnreadCount(id: String, unreadCount: Int, realm: MutableRealm? = null) {
-        updateFolder(id, realm) {
-            it.unreadCount = unreadCount
-            // it.totalCount = threadsResult.totalMessagesCount // TODO: We don't use this for now.
-        }
-    }
-
     fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm? = null) {
         updateFolder(id, realm) {
             it.lastUpdatedAt = Date().toRealmInstant()
