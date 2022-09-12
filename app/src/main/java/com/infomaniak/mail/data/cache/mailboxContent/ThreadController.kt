@@ -131,10 +131,10 @@ object ThreadController {
 
             RealmDatabase.mailboxContent.writeBlocking {
 
-                val latestThread = getThread(thread.uid, this) ?: return@writeBlocking
+                val liveThread = getThread(thread.uid, this) ?: return@writeBlocking
 
                 val uids = mutableListOf<String>().apply {
-                    latestThread.messages.forEach {
+                    liveThread.messages.forEach {
                         if (!it.seen) {
                             add(it.uid)
                             addAll(it.duplicates.map { duplicate -> duplicate.uid })
@@ -142,11 +142,11 @@ object ThreadController {
                     }
                 }
 
-                val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, uids)
+                val apiResponse = ApiRepository.markMessagesAsSeen(liveThread.mailboxUuid, uids)
 
                 if (apiResponse.isSuccess()) {
-                    updateFolderUnreadCount(folderId, latestThread)
-                    latestThread.apply {
+                    updateFolderUnreadCount(folderId, liveThread)
+                    liveThread.apply {
                         messages.forEach { it.seen = true }
                         unseenMessagesCount = 0
                     }
