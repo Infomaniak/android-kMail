@@ -19,16 +19,19 @@ package com.infomaniak.mail.data.models
 
 import android.content.Context
 import android.os.Parcelable
+import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 
 interface Correspondent : Parcelable {
-    var email: String
+    val email: String
     var name: String
 
     fun isMe(): Boolean = AccountUtils.currentUser?.email == this.email
 
     fun getNameOrEmail(): String = name.ifBlank { email }
+
+    fun computeInitials(): String = getNameOrEmail().firstOrEmpty().toString().uppercase()
 
     fun displayedName(context: Context): String = if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
 }

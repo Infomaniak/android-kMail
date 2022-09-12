@@ -51,13 +51,11 @@ class Contact : RealmObject, Correspondent {
     var emails: RealmList<String> = realmListOf()
     @SerialName("addressbook_id")
     var addressBookId: Int = 0
+    var avatar: String? = null
     //endregion
 
-    //region UI data (Ignore & Transient)
-    @Ignore
     @Transient
-    override var email: String = emails.firstOrNull() ?: ""
-    //endregion
+    override val email: String get() = emails.firstOrNull() ?: ""
 
     fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 

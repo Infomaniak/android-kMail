@@ -17,11 +17,15 @@
  */
 package com.infomaniak.mail.ui
 
+import android.Manifest
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.drawerlayout.widget.DrawerLayout
@@ -43,6 +47,8 @@ class MainActivity : ThemedActivity() {
     private val mainViewModel: MainViewModel by viewModels()
 
     val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+
+    private lateinit var contactPermissionResultLauncher: ActivityResultLauncher<String>
 
     lateinit var backgroundColor: Color
     lateinit var backgroundHeaderColor: Color
@@ -71,12 +77,39 @@ class MainActivity : ThemedActivity() {
         backgroundColor = getColor(R.color.backgroundColor).toColor()
         backgroundHeaderColor = getColor(R.color.backgroundHeaderColor).toColor()
 
+        // if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+        //     requestingContactPermission()
+        // }
+
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         listenToNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
 
         setupNavController()
         setupMenuDrawerCallbacks()
+
+        // mainViewModel.updateAddressBooksAndContacts(this)
+    }
+
+    // private fun setup() {
+    //
+    //     // TODO: Does the NewMessageActivity still crash when there is too much recipients?
+    //     listenToNetworkStatus()
+    //     binding.drawerLayout.addDrawerListener(drawerListener)
+    //
+    //     setupNavController()
+    //     setupMenuDrawerCallbacks()
+    //
+    //     mainViewModel.updateAddressBooksAndContacts(this)
+    // }
+
+    private fun requestingContactPermission() {
+        Log.e("gibran", "requestingContactPermission: ");
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), 0)
+        contactPermissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { authorized ->
+            Log.e("gibran", "requestingContactPermission - authorized: ${authorized}")
+        }
+        contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
     }
 
     private fun listenToNetworkStatus() {

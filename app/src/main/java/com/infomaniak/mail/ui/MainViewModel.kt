@@ -17,11 +17,19 @@
  */
 package com.infomaniak.mail.ui
 
+import android.Manifest.permission.READ_CONTACTS
+import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_DENIED
+import android.net.Uri
+import android.provider.ContactsContract.CommonDataKinds
+import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
+import com.infomaniak.mail.data.api.ApiRoutes.resource
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DuplicateController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -35,6 +43,7 @@ import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -43,6 +52,10 @@ import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+typealias Email = String
+typealias Name = String
+
 
 class MainViewModel : ViewModel() {
 
@@ -55,6 +68,8 @@ class MainViewModel : ViewModel() {
         val currentThreadUid = MutableLiveData<String?>()
         val currentMessageUid = MutableLiveData<String?>()
     }
+
+    var mergedContacts: Map<String, MergedContact> = emptyMap()
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var canPaginate = true
@@ -122,10 +137,11 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun updateAddressBooksAndContacts() = viewModelScope.launch(Dispatchers.IO) {
+    fun updateAddressBooksAndContacts(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadAddressBooksAndContacts")
         updateAddressBooks()
         updateContacts()
+        createMergedContacts(context) // TODO : Do something with this value
     }
 
     fun loadCurrentMailbox() {
@@ -203,6 +219,84 @@ class MainViewModel : ViewModel() {
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
 
         ContactController.update(apiContacts)
+    }
+
+    private fun createMergedContacts(context: Context): MutableMap<Pair<Name, Email>, MergedContact> {
+        val realmContacts = ContactController.getContacts()
+        val phoneMergedContacts = getPhoneContacts(context)
+
+        realmContacts.forEach {
+            val key = it.name to it.email
+            val contactAvatar = it.avatar?.let { avatar -> Uri.parse(resource(avatar)) }
+            if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
+                if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
+                    phoneMergedContacts[key]?.avatar = contactAvatar
+                }
+            } else { // If we haven't yet encountered this user, add him
+                phoneMergedContacts[key] = MergedContact(
+                    it.email,
+                    it.name,
+                    contactAvatar
+                )
+            }
+        }
+
+        Log.e("gibran", "createMergedContacts - phoneMergedContacts: ${phoneMergedContacts}")
+        return phoneMergedContacts
+    }
+
+    private fun getPhoneContacts(context: Context): MutableMap<Pair<Name, Email>, MergedContact> {
+        if (ContextCompat.checkSelfPermission(context, READ_CONTACTS) == PERMISSION_DENIED) return mutableMapOf()
+
+        val emails = getListOfEmails(context)
+        if (emails.isEmpty()) return mutableMapOf()
+
+        val contacts: Map<Pair<Name, Email>, Uri?> = getNameAndAvatarForMails(context, emails)
+
+        return createMergedContacts(contacts)
+    }
+
+    private fun getListOfEmails(context: Context): Map<Long, Email> {
+        val mailDictionary: MutableMap<Long, Email> = mutableMapOf()
+        val projection = arrayOf(CommonDataKinds.Email.CONTACT_ID, CommonDataKinds.Email.ADDRESS)
+        val contentUri = CommonDataKinds.Email.CONTENT_URI
+        val cursor = context.contentResolver.query(contentUri, projection, null, null, null) ?: return emptyMap()
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow(CommonDataKinds.Email.CONTACT_ID))
+            val address = cursor.getString(cursor.getColumnIndexOrThrow(CommonDataKinds.Email.ADDRESS))
+            mailDictionary[id] = address
+        }
+        cursor.close()
+
+        return mailDictionary
+    }
+
+    private fun getNameAndAvatarForMails(context: Context, emails: Map<Long, Email>): Map<Pair<Name, Email>, Uri?> {
+        val projection = arrayOf(Contactables.CONTACT_ID, Contactables.DISPLAY_NAME, Contactables.PHOTO_THUMBNAIL_URI)
+        val cursor = context.contentResolver.query(Contactables.CONTENT_URI, projection, null, null, null) ?: return emptyMap()
+
+        val contacts: MutableMap<Pair<Name, Email>, Uri?> = mutableMapOf()
+        while (cursor.moveToNext()) {
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow(Contactables.CONTACT_ID))
+
+            if (emails.contains(id)) {
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.DISPLAY_NAME))
+                val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.PHOTO_THUMBNAIL_URI))
+
+                contacts[name to emails[id]!!] = photoUri?.let { Uri.parse(it) }
+            }
+        }
+        cursor.close()
+        return contacts
+    }
+
+    private fun createMergedContacts(contacts: Map<Pair<Name, Email>, Uri?>): MutableMap<Pair<Name, Email>, MergedContact> {
+        val mergedContacts = mutableMapOf<Pair<Name, Email>, MergedContact>()
+        contacts.forEach { (key, avatarUri) ->
+            mergedContacts[key] = MergedContact(key.second, key.first, avatarUri)
+        }
+        return mergedContacts
     }
 
     private fun updateMailboxes() {
