@@ -92,7 +92,7 @@ object MailboxController {
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
-        val deletableMailboxes = getMailboxes(AccountUtils.currentUserId, apiMailboxes.map { it.mailboxId })
+        val outdatedMailboxes = getMailboxes(AccountUtils.currentUserId, apiMailboxes.map { it.mailboxId })
 
         // Save new data
         Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
@@ -100,19 +100,24 @@ object MailboxController {
 
         // Delete outdated data
         Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
-        val isCurrentMailboxDeleted = deletableMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
-        if (isCurrentMailboxDeleted) {
-            RealmDatabase.closeMailboxContent()
-            AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
-        }
-        deleteMailboxes(deletableMailboxes)
-        deletableMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
+        val isCurrentMailboxDeleted = deleteOutdatedData(outdatedMailboxes)
 
         if (isCurrentMailboxDeleted) AccountUtils.reloadApp()
     }
 
     fun upsertMailboxes(mailboxes: List<Mailbox>) {
         RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+    }
+
+    private fun deleteOutdatedData(outdatedMailboxes: List<Mailbox>): Boolean {
+        val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
+        if (isCurrentMailboxDeleted) {
+            RealmDatabase.closeMailboxContent()
+            AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
+        }
+        deleteMailboxes(outdatedMailboxes)
+        outdatedMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
+        return isCurrentMailboxDeleted
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
