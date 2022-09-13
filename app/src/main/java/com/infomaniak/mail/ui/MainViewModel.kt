@@ -248,7 +248,7 @@ class MainViewModel : ViewModel() {
     private fun updateMessages(thread: Thread) {
         val apiMessages = fetchMessages(thread)
 
-        MessageController.update(apiMessages, thread)
+        MessageController.update(thread.messages, apiMessages)
     }
 
     private fun fetchMessages(thread: Thread): List<Message> {
