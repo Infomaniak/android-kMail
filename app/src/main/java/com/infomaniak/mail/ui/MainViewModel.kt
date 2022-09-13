@@ -136,7 +136,7 @@ class MainViewModel : ViewModel() {
         selectMailbox(mailbox)
         updateMailboxQuotas(mailbox)
         updateFolders(mailbox)
-        FolderController.getCurrentFolder(currentFolderId.value, DEFAULT_SELECTED_FOLDER)?.let { folder ->
+        FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
             updateThreads(mailbox.uuid, folder.id)
         }

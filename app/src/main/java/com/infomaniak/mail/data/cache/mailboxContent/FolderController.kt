@@ -64,11 +64,16 @@ object FolderController {
         return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
     }
 
-    fun getCurrentFolder(currentFolderId: String?, defaultRole: FolderRole): Folder? = with(RealmDatabase.mailboxContent) {
-        val folderById = currentFolderId?.let(::getFolder)
-        val folderByRole = query<Folder>("${Folder::_role.name} = '${defaultRole.name}'").first().find()
-        val firstFolder = getFolders().firstOrNull()
-        return folderById ?: folderByRole ?: firstFolder
+    fun getFolder(role: FolderRole, realm: MutableRealm? = null): Folder? {
+        return realm.getFolderQuery(role).find()
+    }
+
+    fun getFolderAsync(role: FolderRole, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Folder>> {
+        return realm.getFolderQuery(role).asFlow().toSharedFlow()
+    }
+
+    private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
     }
     //endregion
 
