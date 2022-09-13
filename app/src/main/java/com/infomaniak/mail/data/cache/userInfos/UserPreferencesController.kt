@@ -19,21 +19,28 @@ package com.infomaniak.mail.data.cache.userInfos
 
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.user.UserPreferences
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 
 // TODO: Will we need this file in the future? It seems to be unused for now.
-// TODO: Refactor this Controller so it matches other Controllers format. This is still the old format.
 object UserPreferencesController {
 
-    fun getUserPreferences(): UserPreferences = with(RealmDatabase.userInfos) {
-        query<UserPreferences>().first().find() ?: writeBlocking { copyToRealm(UserPreferences()) }
+    //region Get data
+    fun getUserPreferences(realm: MutableRealm? = null): UserPreferences {
+        val block: (MutableRealm) -> UserPreferences = {
+            it.query<UserPreferences>().first().find() ?: it.copyToRealm(UserPreferences())
+        }
+        return realm?.let(block) ?: RealmDatabase.userInfos.writeBlocking(block)
     }
+    //endregion
 
-    fun updateUserPreferences(onUpdate: (userPreferences: UserPreferences) -> Unit): UserPreferences? {
-        return RealmDatabase.userInfos.writeBlocking { findLatest(getUserPreferences())?.also(onUpdate) }
+    //region Edit data
+    fun updateUserPreferences(onUpdate: (userPreferences: UserPreferences) -> Unit) {
+        RealmDatabase.userInfos.writeBlocking { onUpdate(getUserPreferences(this)) }
     }
 
     fun removeUserPreferences() {
-        RealmDatabase.userInfos.writeBlocking { findLatest(getUserPreferences())?.let(::delete) }
+        RealmDatabase.userInfos.writeBlocking { getUserPreferences(this).let(::delete) }
     }
+    //endregion
 }

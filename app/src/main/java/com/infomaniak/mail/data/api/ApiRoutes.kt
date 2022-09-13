@@ -59,7 +59,7 @@ object ApiRoutes {
         threadMode: String,
         offset: Int,
         filter: ThreadFilter,
-        searchText: String? = null
+        searchText: String? = null,
     ): String {
         val urlSearch = searchText?.let { "&scontains=$it" } ?: ""
         val urlAttachment = if (filter == ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
