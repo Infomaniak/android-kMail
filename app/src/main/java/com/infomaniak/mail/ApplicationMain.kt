@@ -59,10 +59,9 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
 
-        AppCompatDelegate.setDefaultNightMode(UiSettings(this).nightMode)
-
         if (BuildConfig.DEBUG) configureDebugMode()
         configureSentry()
+        enforceAppTheme()
         configureAccountUtils()
         configureAppReloading()
         configureInfomaniakCore()
@@ -93,6 +92,10 @@ class ApplicationMain : Application(), ImageLoaderFactory {
                 if (BuildConfig.DEBUG) null else event
             }
         }
+    }
+
+    private fun enforceAppTheme() {
+        AppCompatDelegate.setDefaultNightMode(UiSettings(this).nightMode)
     }
 
     private fun configureAccountUtils() {
