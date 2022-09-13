@@ -69,7 +69,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun UserPreferences.setupPreferencesText() = with(binding) {
-        densitySubtitle.setText(getListDensityMode().localisedNameRes)
+        densitySubtitle.setText(getThreadsDensity().localisedNameRes)
         themeSubtitle.setText(getThemeMode().localisedNameRes)
         displayModeSubtitle.setText(getThreadMode().localisedNameRes)
         externalContentSubtitle.setText(getExternalContentMode().localisedNameRes)

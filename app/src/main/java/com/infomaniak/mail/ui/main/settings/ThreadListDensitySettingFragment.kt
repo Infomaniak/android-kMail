@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
-import com.infomaniak.mail.data.models.user.UserPreferences.ListDensityMode
+import com.infomaniak.mail.data.models.user.UserPreferences.ThreadsDensity.*
 import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
 
 class ThreadListDensitySettingFragment : Fragment() {
@@ -67,16 +67,16 @@ class ThreadListDensitySettingFragment : Fragment() {
         }
     }
 
-    private fun getCheckedButtonFromDensity() = when (UserPreferencesController.getUserPreferences().getListDensityMode()) {
-        ListDensityMode.COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
-        ListDensityMode.LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
+    private fun getCheckedButtonFromDensity() = when (UserPreferencesController.getUserPreferences().getThreadsDensity()) {
+        COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
+        LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
         else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default
     }
 
     private fun getDensityFromCheckedButton(buttonId: Int) = when (buttonId) {
-        R.id.listDensityButtonCompact -> ListDensityMode.COMPACT to R.drawable.bg_list_density_compact
-        R.id.listDensityButtonLarge -> ListDensityMode.LARGE to R.drawable.bg_list_density_large
-        else -> ListDensityMode.DEFAULT to R.drawable.bg_list_density_default
+        R.id.listDensityButtonCompact -> COMPACT to R.drawable.bg_list_density_compact
+        R.id.listDensityButtonLarge -> LARGE to R.drawable.bg_list_density_large
+        else -> DEFAULT to R.drawable.bg_list_density_default
     }
 
     override fun onPause() {

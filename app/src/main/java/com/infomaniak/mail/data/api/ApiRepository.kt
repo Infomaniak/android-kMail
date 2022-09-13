@@ -100,7 +100,7 @@ object ApiRepository : ApiRepositoryCore() {
         mailboxHostingId: Int,
         mailboxMailbox: String,
         hasMailFiltering: Boolean,
-        hasMoveSpam: Boolean
+        hasMoveSpam: Boolean,
     ): ApiResponse<Boolean> {
         val body = mapOf("has_mail_filtering" to hasMailFiltering, "has_move_spam" to hasMoveSpam)
         return callApi(ApiRoutes.securedMailbox(mailboxHostingId, mailboxMailbox), PATCH, body)

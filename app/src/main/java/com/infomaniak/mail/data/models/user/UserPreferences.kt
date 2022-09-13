@@ -32,7 +32,7 @@ class UserPreferences : RealmObject {
     //region API data
     var theme: String = ThemeMode.DEFAULT.apiName
     @SerialName("density")
-    var threadListDensity: String = ListDensityMode.DEFAULT.apiName
+    var threadListDensity: String = ThreadsDensity.DEFAULT.apiName
     @SerialName("thread_mode")
     var threadMode: Int = ThreadMode.THREADS.apiValue
     @SerialName("auto_trust_emails")
@@ -122,10 +122,10 @@ class UserPreferences : RealmObject {
         else -> ThemeMode.DEFAULT
     }
 
-    fun getListDensityMode(): ListDensityMode = when (threadListDensity) {
-        ListDensityMode.COMPACT.apiName -> ListDensityMode.COMPACT
-        ListDensityMode.LARGE.apiName -> ListDensityMode.LARGE
-        else -> ListDensityMode.DEFAULT
+    fun getThreadsDensity(): ThreadsDensity = when (threadListDensity) {
+        ThreadsDensity.COMPACT.apiName -> ThreadsDensity.COMPACT
+        ThreadsDensity.LARGE.apiName -> ThreadsDensity.LARGE
+        else -> ThreadsDensity.DEFAULT
     }
 
     fun getThreadMode(): ThreadMode = when (threadMode) {
@@ -154,7 +154,7 @@ class UserPreferences : RealmObject {
         DARK("dark", AppCompatDelegate.MODE_NIGHT_YES, R.string.settingsOptionDarkTheme);
     }
 
-    enum class ListDensityMode(val apiName: String, @StringRes val localisedNameRes: Int) {
+    enum class ThreadsDensity(val apiName: String, @StringRes val localisedNameRes: Int) {
         COMPACT("high", R.string.settingsDensityOptionCompact),
         DEFAULT("normal", R.string.settingsDensityOptionNormal),
         LARGE("low", R.string.settingsDensityOptionLarge),
