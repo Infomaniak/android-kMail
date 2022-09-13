@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
+import com.infomaniak.mail.utils.notYetImplemented
 
 class SendSettingsFragment : Fragment() {
 
@@ -54,8 +55,10 @@ class SendSettingsFragment : Fragment() {
             safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToFordwardMailsSetting())
         }
 
-        settingsSendIncludeOriginalMessage.setOnClickListener { settingsSendIncludeOriginalMessageSwitch.toggle() } // TODO
+        settingsSendIncludeOriginalMessage.setOnClickListener { settingsSendIncludeOriginalMessageSwitch.performClick() }
+        settingsSendIncludeOriginalMessageSwitch.setOnClickListener { notYetImplemented() }
 
-        settingsSendAcknowledgement.setOnClickListener { settingsSendAcknowledgementSwitch.toggle() } // TODO
+        settingsSendAcknowledgement.setOnClickListener { settingsSendAcknowledgementSwitch.performClick() }
+        settingsSendAcknowledgementSwitch.setOnClickListener { notYetImplemented() }
     }
 }

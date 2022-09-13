@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentCancelDelaySettingBinding
+import com.infomaniak.mail.utils.notYetImplemented
 
 class CancelDelaySettingFragment : Fragment() {
 
@@ -58,12 +59,30 @@ class CancelDelaySettingFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsDisabled.setOnClickListener { settingsDisabledCheck.selectOption() }
-        settingCancel10.setOnClickListener { settingCancel10Check.selectOption() }
-        settingCancel15.setOnClickListener { settingCancel15Check.selectOption() }
-        settingCancel20.setOnClickListener { settingCancel20Check.selectOption() }
-        settingCancel25.setOnClickListener { settingCancel25Check.selectOption() }
-        settingCancel30.setOnClickListener { settingCancel30Check.selectOption() }
+        settingsDisabled.setOnClickListener {
+            notYetImplemented()
+            settingsDisabledCheck.selectOption()
+        }
+        settingCancel10.setOnClickListener {
+            notYetImplemented()
+            settingCancel10Check.selectOption()
+        }
+        settingCancel15.setOnClickListener {
+            notYetImplemented()
+            settingCancel15Check.selectOption()
+        }
+        settingCancel20.setOnClickListener {
+            notYetImplemented()
+            settingCancel20Check.selectOption()
+        }
+        settingCancel25.setOnClickListener {
+            notYetImplemented()
+            settingCancel25Check.selectOption()
+        }
+        settingCancel30.setOnClickListener {
+            notYetImplemented()
+            settingCancel30Check.selectOption()
+        }
     }
 
     private fun ImageView.selectOption() = with(binding) {

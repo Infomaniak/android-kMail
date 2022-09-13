@@ -29,6 +29,7 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
+import com.infomaniak.mail.utils.notYetImplemented
 
 class ExternalContentSettingFragment : Fragment() {
 
@@ -58,9 +59,11 @@ class ExternalContentSettingFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         settingsOptionAlways.setOnClickListener {
+            notYetImplemented()
             updateExternalContentSetting(UserPreferences.ExternalContentMode.ALWAYS, settingsOptionAlwaysCheck)
         }
         settingsOptionAskMe.setOnClickListener {
+            notYetImplemented()
             updateExternalContentSetting(UserPreferences.ExternalContentMode.ASK_ME, settingsOptionAskMeCheck)
         }
     }

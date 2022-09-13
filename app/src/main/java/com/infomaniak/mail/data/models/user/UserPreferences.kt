@@ -25,7 +25,6 @@ import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 @Serializable
 class UserPreferences : RealmObject {

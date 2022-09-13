@@ -31,6 +31,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
+import com.infomaniak.mail.utils.notYetImplemented
 
 class SwipeActionsSelectionSettingFragment : Fragment() {
 
@@ -72,42 +73,52 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         actionDelete.setOnClickListener {
+            notYetImplemented()
             actionDeleteCheck.selectOption()
             saveAction(SwipeAction.DELETE)
         }
         actionArchive.setOnClickListener {
+            notYetImplemented()
             actionArchiveCheck.selectOption()
             saveAction(SwipeAction.ARCHIVE)
         }
         actionReadUnread.setOnClickListener {
+            notYetImplemented()
             actionReadUnreadCheck.selectOption()
             saveAction(SwipeAction.READ_UNREAD)
         }
         actionMove.setOnClickListener {
+            notYetImplemented()
             actionMoveCheck.selectOption()
             saveAction(SwipeAction.MOVE)
         }
         actionFavorite.setOnClickListener {
+            notYetImplemented()
             actionFavoriteCheck.selectOption()
             saveAction(SwipeAction.FAVORITE)
         }
         actionPostpone.setOnClickListener {
+            notYetImplemented()
             actionPostponeCheck.selectOption()
             saveAction(SwipeAction.POSTPONE)
         }
         actionSpam.setOnClickListener {
+            notYetImplemented()
             actionSpamCheck.selectOption()
             saveAction(SwipeAction.SPAM)
         }
         actionReadAndArchive.setOnClickListener {
+            notYetImplemented()
             actionReadAndArchiveCheck.selectOption()
             saveAction(SwipeAction.READ_AND_ARCHIVE)
         }
         actionQuickActionsMenu.setOnClickListener {
+            notYetImplemented()
             actionQuickActionsMenuCheck.selectOption()
             saveAction(SwipeAction.QUICKACTIONS_MENU)
         }
         actionNone.setOnClickListener {
+            notYetImplemented()
             actionNoneCheck.selectOption()
             saveAction(SwipeAction.NONE)
         }

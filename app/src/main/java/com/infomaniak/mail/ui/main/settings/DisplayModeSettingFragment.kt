@@ -29,6 +29,7 @@ import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
 import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
+import com.infomaniak.mail.utils.notYetImplemented
 
 class DisplayModeSettingFragment : Fragment() {
 
@@ -57,8 +58,14 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsOptionDiscussions.setOnClickListener { updateDisplayMode(ThreadMode.THREADS, settingsOptionDiscussionsCheck) }
-        settingsOptionMessages.setOnClickListener { updateDisplayMode(ThreadMode.MESSAGES, settingsOptionMessagesCheck) }
+        settingsOptionDiscussions.setOnClickListener {
+            notYetImplemented()
+            updateDisplayMode(ThreadMode.THREADS, settingsOptionDiscussionsCheck)
+        }
+        settingsOptionMessages.setOnClickListener {
+            notYetImplemented()
+            updateDisplayMode(ThreadMode.MESSAGES, settingsOptionMessagesCheck)
+        }
     }
 
     private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {

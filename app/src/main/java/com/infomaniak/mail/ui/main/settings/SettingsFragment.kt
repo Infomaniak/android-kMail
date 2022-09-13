@@ -63,7 +63,7 @@ class SettingsFragment : Fragment() {
     private fun setupAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
         lifecycleScope.launch(Dispatchers.IO) {
-            val mailboxes = MailboxController.getMailboxesSync(AccountUtils.currentUserId)
+            val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
             withContext(Dispatchers.Main) { mailboxesAdapter.setMailboxes(mailboxes) }
         }
     }
@@ -83,8 +83,7 @@ class SettingsFragment : Fragment() {
         }
 
         settingsAppLock.setOnClickListener { settingsAppLockSwitch.performClick() }
-
-        settingsAppLockSwitch.setOnClickListener { if (settingsAppLockSwitch.isChecked) notYetImplemented() }
+        settingsAppLockSwitch.setOnClickListener { notYetImplemented() }
 
         settingsThreadListDensity.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsToThreadsDensitySetting())

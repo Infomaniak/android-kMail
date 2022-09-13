@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.databinding.FragmentForwardMailsSettingBinding
+import com.infomaniak.mail.utils.notYetImplemented
 
 class ForwardMailsSettingFragment : Fragment() {
 
@@ -47,8 +48,14 @@ class ForwardMailsSettingFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
-        settingsTransferInBody.setOnClickListener { settingsTransferInBodyCheck.selectOption() }
-        settingsTransferAsAttachment.setOnClickListener { settingsTransferAsAttachmentCheck.selectOption() }
+        settingsTransferInBody.setOnClickListener {
+            notYetImplemented()
+            settingsTransferInBodyCheck.selectOption()
+        }
+        settingsTransferAsAttachment.setOnClickListener {
+            notYetImplemented()
+            settingsTransferAsAttachmentCheck.selectOption()
+        }
     }
 
     private fun ImageView.selectOption() = with(binding) {

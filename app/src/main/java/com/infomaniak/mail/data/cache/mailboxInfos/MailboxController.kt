@@ -46,7 +46,7 @@ object MailboxController {
         return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>().sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
     }
 
-    private fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
+    fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
         return realm.getMailboxesQuery(userId).find()
     }
 
