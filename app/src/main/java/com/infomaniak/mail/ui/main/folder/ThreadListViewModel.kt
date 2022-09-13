@@ -25,7 +25,6 @@ import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
@@ -33,12 +32,12 @@ class ThreadListViewModel : ViewModel() {
 
     private var updatedAtJob: Job? = null
 
-    val isRecovering = MutableLiveData(false)
+    val isRecoveringFinished = MutableLiveData(true)
     val updatedAtTrigger = MutableLiveData<Unit>()
 
     val currentFolder = MutableLiveData<Folder>()
     val currentFolderThreads = Transformations.switchMap(currentFolder) { folder ->
-        liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().toSharedFlow().map { it.list }.asLiveData()) }
+        liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().toSharedFlow().asLiveData()) }
     }
 
     fun listenToFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {

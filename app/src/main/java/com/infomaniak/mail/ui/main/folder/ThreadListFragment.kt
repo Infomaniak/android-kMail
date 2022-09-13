@@ -53,6 +53,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -114,8 +115,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
             threadDensity = ThreadDensity.LARGE, // TODO : Take this value from the settings when available
-            parentRecycler = binding.threadsList,
-            onSwipeFinished = { threadListViewModel.isRecovering.value = false },
+            onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
             adapter = threadListAdapter
@@ -195,7 +195,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     blockOtherSwipes()
                     notifyItemChanged(position) // Animate the swiped element back to its original position
                 }
-                threadListViewModel.isRecovering.value = true
+                threadListViewModel.isRecoveringFinished.value = false
 
                 return true
             }
@@ -241,7 +241,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderThreads() {
-        threadListViewModel.currentFolderThreads.observe(viewLifecycleOwner, ::onThreadsUpdate)
+        threadListViewModel.currentFolderThreads.bindListChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
+            waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
+            beforeUpdateAdapter = ::onThreadsUpdate
+        }
     }
 
     private fun observeCurrentMailbox() {
@@ -344,17 +347,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
 
-        if (isRecovering.value == true) {
-            Log.i("UI", "Displaying threads got delayed because of swipe recovering animation")
-            isRecovering.observe(viewLifecycleOwner) { value ->
-                if (value == false) {
-                    binding.threadsList.postOnAnimation { displayThreads(threads) }
-                    isRecovering.removeObservers(viewLifecycleOwner)
-                }
-            }
-        } else {
-            displayThreads(threads)
-        }
+        displayThreads(threads)
     }
 
     private fun displayThreads(threads: List<Thread>) {
@@ -362,7 +355,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
-        threadListAdapter.updateAdapterList(threads, binding.root.context)
 
         if (firstMessageHasChanged(threads)) scrollToTop()
     }
