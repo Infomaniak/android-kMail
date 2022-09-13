@@ -21,7 +21,6 @@ import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
@@ -41,29 +40,33 @@ object MessageController {
     //endregion
 
     //region Edit data
-    fun update(apiMessages: List<Message>, thread: Thread) {
-
-        // Get current data
-        Log.d(RealmDatabase.TAG, "Messages: Get current data")
-        val realmMessages = thread.messages
+    fun update(realmMessages: List<Message>, apiMessages: List<Message>) {
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Messages: Get outdated data")
         // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
-        val deletableMessages = realmMessages.filter { realmMessage ->
-            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
-        }
+        val outdatedMessages = getOutdatedMessages(realmMessages, apiMessages)
 
         RealmDatabase.mailboxContent.writeBlocking {
             // Save new data
             Log.d(RealmDatabase.TAG, "Messages: Save new data")
-            apiMessages.forEach { apiMessage ->
-                if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
-            }
+            insertNewData(apiMessages)
 
             // Delete outdated data
             Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")
-            deleteMessages(deletableMessages)
+            deleteMessages(outdatedMessages)
+        }
+    }
+
+    private fun getOutdatedMessages(realmMessages: List<Message>, apiMessages: List<Message>): List<Message> {
+        return realmMessages.filter { realmMessage ->
+            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
+        }
+    }
+
+    private fun MutableRealm.insertNewData(apiMessages: List<Message>) {
+        apiMessages.forEach { apiMessage ->
+            if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
         }
     }
 
@@ -76,13 +79,12 @@ object MessageController {
     }
 
     fun deleteMessage(uid: String, realm: MutableRealm? = null) {
-        if (realm == null) {
-            RealmDatabase.mailboxContent.writeBlocking { deleteMessage(uid, this) }
-        } else {
-            getMessage(uid, realm)
-                ?.also { message -> message.draftUuid?.let { getDraft(it, realm) }?.let(realm::delete) }
-                ?.let(realm::delete)
+        val block: (MutableRealm) -> Unit = {
+            getMessage(uid, it)
+                ?.also { message -> message.draftUuid?.let { draftUuid -> getDraft(draftUuid, it) }?.let(it::delete) }
+                ?.let(it::delete)
         }
+        realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }
     //endregion
 
