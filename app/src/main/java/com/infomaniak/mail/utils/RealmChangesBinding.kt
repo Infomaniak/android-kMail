@@ -93,13 +93,15 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 
     private fun UpdatedResults<T>.notifyAdapter() {
         onRealmChanged.updateList(list)
-        deletionRanges.forEach { recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length) }
-        insertionRanges.forEach { recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length) }
-        changeRanges.forEach { recyclerViewAdapter.notifyItemRangeChanged(it.startIndex, it.length) }
+        notifyItemRanges()
     }
 
     private fun UpdatedList<T>.notifyAdapter() {
         onRealmChanged.updateList(list)
+        notifyItemRanges()
+    }
+
+    private fun ListChangeSet.notifyItemRanges() {
         deletionRanges.forEach { recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length) }
         insertionRanges.forEach { recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length) }
         changeRanges.forEach { recyclerViewAdapter.notifyItemRangeChanged(it.startIndex, it.length) }
