@@ -342,17 +342,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun onThreadsUpdate(threads: List<Thread>) = with(threadListViewModel) {
-        if (!isResumed) return@with
-
-        if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
-
-        displayThreads(threads)
-    }
-
-    private fun displayThreads(threads: List<Thread>) {
+    private fun onThreadsUpdate(threads: List<Thread>) {
         Log.i("UI", "Received threads (${threads.size})")
-
+        if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
 
