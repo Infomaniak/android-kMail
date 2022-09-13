@@ -43,7 +43,7 @@ object MessageController {
     }
 
     private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
-        return (this ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} == '$uid'").first()
+        return (this ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} = '$uid'").first()
     }
     //endregion
 
@@ -115,8 +115,8 @@ object MessageController {
     // fun getDeletableMessages(thread: Thread, messagesToKeep: List<Message>): RealmResults<Message> {
     //     val messagesIds = messagesToKeep.map { it.uid }
     //     val query = messagesIds.joinToString(
-    //         prefix = "NOT (${Message::uid.name} == '",
-    //         separator = "' OR ${Message::uid.name} == '",
+    //         prefix = "NOT (${Message::uid.name} = '",
+    //         separator = "' OR ${Message::uid.name} = '",
     //         postfix = "')"
     //     )
     //     return MailRealm.mailboxContent.query<Message>(query).find()

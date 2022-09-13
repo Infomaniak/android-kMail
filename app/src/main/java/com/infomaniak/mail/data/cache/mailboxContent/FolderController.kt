@@ -61,7 +61,7 @@ object FolderController {
     }
 
     private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} == '$id'").first()
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
     }
 
     fun getCurrentFolder(currentFolderId: String?, defaultRole: FolderRole): Folder? = with(RealmDatabase.mailboxContent) {
@@ -152,8 +152,8 @@ object FolderController {
     // fun getDeletableFolders(foldersToKeep: List<Folder>): RealmResults<Folder> {
     //     val foldersIds = foldersToKeep.map { it.id }
     //     val query = foldersIds.joinToString(
-    //         prefix = "NOT (${Folder::id.name} == '",
-    //         separator = "' OR ${Folder::id.name} == '",
+    //         prefix = "NOT (${Folder::id.name} = '",
+    //         separator = "' OR ${Folder::id.name} = '",
     //         postfix = "')"
     //     )
     //     return MailRealm.mailboxContent.query<Folder>(query).find()

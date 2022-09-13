@@ -39,7 +39,7 @@ object QuotasController {
 
     private fun MutableRealm?.getQuotasQuery(mailboxObjectId: String): RealmSingleQuery<Quotas> {
         return (this ?: RealmDatabase.mailboxInfos)
-            .query<Quotas>("${Quotas::mailboxObjectId.name} == '$mailboxObjectId'")
+            .query<Quotas>("${Quotas::mailboxObjectId.name} = '$mailboxObjectId'")
             .first()
     }
     //endregion

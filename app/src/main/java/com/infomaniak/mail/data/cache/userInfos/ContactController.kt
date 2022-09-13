@@ -46,18 +46,6 @@ object ContactController {
         return (this ?: RealmDatabase.userInfos).query()
     }
 
-    private fun getContact(id: String, realm: MutableRealm? = null): Contact? {
-        return realm.getContactQuery(id).find()
-    }
-
-    private fun getContactAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Contact>> {
-        return realm.getContactQuery(id).asFlow().toSharedFlow()
-    }
-
-    private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} == '$id'").first()
-    }
-
     private fun getContacts(addressBookId: Int, realm: MutableRealm? = null): RealmResults<Contact> {
         return realm.getContactsQuery(addressBookId).find()
     }
@@ -67,7 +55,19 @@ object ContactController {
     }
 
     private fun MutableRealm?.getContactsQuery(addressBookId: Int): RealmQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query("${Contact::addressBookId.name} == '$addressBookId'")
+        return (this ?: RealmDatabase.userInfos).query("${Contact::addressBookId.name} = '$addressBookId'")
+    }
+
+    private fun getContact(id: String, realm: MutableRealm? = null): Contact? {
+        return realm.getContactQuery(id).find()
+    }
+
+    private fun getContactAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Contact>> {
+        return realm.getContactQuery(id).asFlow().toSharedFlow()
+    }
+
+    private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
+        return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} = '$id'").first()
     }
     //endregion
 

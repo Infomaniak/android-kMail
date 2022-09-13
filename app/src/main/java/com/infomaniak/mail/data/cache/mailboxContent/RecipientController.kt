@@ -24,7 +24,7 @@ object RecipientController {
      */
     // private fun getRecipients(): RealmResults<Recipient> = MailRealm.mailboxContent.query<Recipient>().find()
 
-    // private fun getRecipientsByEmail(email: String): RealmResults<Recipient> = MailRealm.mailboxContent.query<Recipient>("${Recipient::email.name} == '$email'").find()
+    // private fun getRecipientsByEmail(email: String): RealmResults<Recipient> = MailRealm.mailboxContent.query<Recipient>("${Recipient::email.name} = '$email'").find()
 
     // private fun getRecipientByEmail(email: String): Recipient? = getRecipientsByEmail(email).firstOrNull()
 

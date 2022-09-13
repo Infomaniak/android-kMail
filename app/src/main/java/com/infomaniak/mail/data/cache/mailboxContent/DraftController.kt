@@ -39,7 +39,7 @@ object DraftController {
     }
 
     private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} == '$uuid'").first()
+        return (this ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
     }
     //endregion
 

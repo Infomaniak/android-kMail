@@ -57,7 +57,7 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int): RealmQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} == '$userId'")
+        return (this ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} = '$userId'")
     }
 
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
@@ -69,7 +69,7 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} = '$objectId'").first()
     }
 
     fun getCurrentMailbox(): Mailbox? = with(RealmDatabase.mailboxInfos) {
@@ -137,12 +137,12 @@ object MailboxController {
     // }
 
     // fun selectMailboxByEmail(email: String) {
-    //     currentMailbox = RealmController.mailboxInfos.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+    //     currentMailbox = RealmController.mailboxInfos.query<Mailbox>("${Mailbox::email.name} = '$email'").first().find()
     //     currentMailbox?.let { AccountUtils.currentMailboxId = it.mailboxId } ?: throw MailboxNotFoundException(email)
     // }
 
     // fun getMailboxInfoByEmail(email: String): Mailbox? {
-    //     return RealmController.mailboxInfos.query<Mailbox>("${Mailbox::email.name} == '$email'").first().find()
+    //     return RealmController.mailboxInfos.query<Mailbox>("${Mailbox::email.name} = '$email'").first().find()
     // }
 
     // private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {
@@ -154,8 +154,8 @@ object MailboxController {
     // fun getDeletableMailboxes(mailboxesToKeep: List<Mailbox>): RealmResults<Mailbox> {
     //     val objectIds = mailboxesToKeep.map { it.objectId }
     //     val query = objectIds.joinToString(
-    //         prefix = "NOT (${Mailbox::objectId.name} == '",
-    //         separator = "' OR ${Mailbox::objectId.name} == '",
+    //         prefix = "NOT (${Mailbox::objectId.name} = '",
+    //         separator = "' OR ${Mailbox::objectId.name} = '",
     //         postfix = "')"
     //     )
     //     return RealmController.mailboxInfos.query<Mailbox>(query).find()

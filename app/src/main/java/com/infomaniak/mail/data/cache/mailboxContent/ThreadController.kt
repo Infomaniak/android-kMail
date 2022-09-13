@@ -48,7 +48,7 @@ object ThreadController {
     }
 
     private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
-        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} == '$uid'").first()
+        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} = '$uid'").first()
     }
 
     private fun MutableRealm.getMergedThread(apiThread: Thread, realmThread: Thread?): Thread {
@@ -250,8 +250,8 @@ object ThreadController {
     // fun getDeletableThreads(folder: Folder, threadsToKeep: List<Thread>): RealmResults<Thread> {
     //     val threadsIds = threadsToKeep.map { it.uid }
     //     val query = threadsIds.joinToString(
-    //         prefix = "NOT (${Thread::uid.name} == '",
-    //         separator = "' OR ${Thread::uid.name} == '",
+    //         prefix = "NOT (${Thread::uid.name} = '",
+    //         separator = "' OR ${Thread::uid.name} = '",
     //         postfix = "')"
     //     )
     //     return MailRealm.mailboxContent.query<Thread>(query).find()

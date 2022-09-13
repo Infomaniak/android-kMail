@@ -55,7 +55,7 @@ object AddressBookController {
     }
 
     private fun MutableRealm?.getAddressBookQuery(id: Int): RealmSingleQuery<AddressBook> {
-        return (this ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} == '$id'").first()
+        return (this ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} = '$id'").first()
     }
     //endregion
 
