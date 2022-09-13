@@ -36,6 +36,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     var afterUpdateAdapter: (() -> Unit)? = null
 
     init {
+        @Suppress("UNCHECKED_CAST")
         onRealmChanged = recyclerViewAdapter as OnRealmChanged<T>
     }
 
@@ -90,38 +91,26 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
         recyclerViewAdapter.notifyDataSetChanged()
     }
 
+    private fun UpdatedResults<T>.notifyAdapter() {
+        onRealmChanged.updateList(list)
+        deletionRanges.forEach { recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length) }
+        insertionRanges.forEach { recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length) }
+        changeRanges.forEach { recyclerViewAdapter.notifyItemRangeChanged(it.startIndex, it.length) }
+    }
+
+    private fun UpdatedList<T>.notifyAdapter() {
+        onRealmChanged.updateList(list)
+        deletionRanges.forEach { recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length) }
+        insertionRanges.forEach { recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length) }
+        changeRanges.forEach { recyclerViewAdapter.notifyItemRangeChanged(it.startIndex, it.length) }
+    }
+
     private fun LiveData<Boolean>.observeWaiting(whenCanNotify: () -> Unit) {
         observe(lifecycleOwner) { canNotify ->
             if (canNotify) {
                 onRealmChanged.recyclerView.postOnAnimation { whenCanNotify() }
                 waitingBeforeNotifyAdapter?.removeObservers(lifecycleOwner)
             }
-        }
-    }
-
-    private fun UpdatedResults<T>.notifyAdapter() {
-        onRealmChanged.updateList(list)
-        deletionRanges.forEach {
-            recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length)
-        }
-        insertionRanges.forEach {
-            recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length)
-        }
-        changeRanges.forEach {
-            recyclerViewAdapter.notifyItemRangeChanged(it.startIndex, it.length)
-        }
-    }
-
-    private fun UpdatedList<T>.notifyAdapter() {
-        onRealmChanged.updateList(list)
-        deletionRanges.forEach {
-            recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length)
-        }
-        insertionRanges.forEach {
-            recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length)
-        }
-        changeRanges.forEach {
-            recyclerViewAdapter.notifyItemRangeChanged(it.startIndex, it.length)
         }
     }
 
@@ -134,14 +123,14 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     companion object {
         fun <VH : RecyclerView.ViewHolder, T : BaseRealmObject> LiveData<ResultsChange<T>>.bindResultsChangeToAdapter(
             lifecycleOwner: LifecycleOwner,
-            recyclerViewAdapter: RecyclerView.Adapter<VH>
+            recyclerViewAdapter: RecyclerView.Adapter<VH>,
         ): RealmChangesBinding<T, VH> {
             return RealmChangesBinding<T, VH>(lifecycleOwner, recyclerViewAdapter).also { it.bindResultsChange(this) }
         }
 
         fun <VH : RecyclerView.ViewHolder, T : BaseRealmObject> LiveData<ListChange<T>>.bindListChangeToAdapter(
             lifecycleOwner: LifecycleOwner,
-            recyclerViewAdapter: RecyclerView.Adapter<VH>
+            recyclerViewAdapter: RecyclerView.Adapter<VH>,
         ): RealmChangesBinding<T, VH> {
             return RealmChangesBinding<T, VH>(lifecycleOwner, recyclerViewAdapter).also { it.bindListChange(this) }
         }

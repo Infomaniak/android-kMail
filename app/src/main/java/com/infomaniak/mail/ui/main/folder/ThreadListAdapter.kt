@@ -54,7 +54,7 @@ import kotlin.math.abs
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
-    private val onSwipeFinished: () -> Unit
+    private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     override lateinit var recyclerView: RecyclerView
@@ -220,9 +220,7 @@ class ThreadListAdapter(
         return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
 
-    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? {
-        return null
-    }
+    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
         dataSet = formatList(itemList, recyclerView.context, threadDensity)
