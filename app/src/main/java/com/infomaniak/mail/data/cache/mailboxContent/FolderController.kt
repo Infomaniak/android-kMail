@@ -68,10 +68,6 @@ object FolderController {
         return realm.getFolderQuery(role).find()
     }
 
-    fun getFolderAsync(role: FolderRole, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Folder>> {
-        return realm.getFolderQuery(role).asFlow().toSharedFlow()
-    }
-
     private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
         return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
     }
@@ -140,17 +136,6 @@ object FolderController {
         folders.forEach { getFolder(it.id, this)?.let(::delete) }
     }
     //endregion
-
-    /**
-     * TODO?
-     */
-    // fun deleteFolders(folders: List<Folder>) {
-    //     MailRealm.mailboxContent.writeBlocking { folders.forEach { getLatestFolder(it.id)?.let(::delete) } }
-    // }
-
-    // fun deleteFolder(id: String) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
-    // }
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640

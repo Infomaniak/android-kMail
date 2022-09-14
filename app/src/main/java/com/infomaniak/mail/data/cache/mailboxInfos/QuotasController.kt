@@ -29,10 +29,6 @@ import kotlinx.coroutines.flow.SharedFlow
 object QuotasController {
 
     //region Get data
-    fun getQuotas(mailboxObjectId: String, realm: MutableRealm? = null): Quotas? {
-        return realm.getQuotasQuery(mailboxObjectId).find()
-    }
-
     fun getQuotasAsync(mailboxObjectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Quotas>> {
         return realm.getQuotasQuery(mailboxObjectId).asFlow().toSharedFlow()
     }

@@ -22,24 +22,17 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
-import kotlinx.coroutines.flow.SharedFlow
 
 object MessageController {
 
     //region Get data
     fun getMessage(id: String, realm: MutableRealm? = null): Message? {
         return realm.getMessageQuery(id).find()
-    }
-
-    private fun getMessageAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Message>> {
-        return realm.getMessageQuery(id).asFlow().toSharedFlow()
     }
 
     private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
@@ -92,23 +85,6 @@ object MessageController {
         }
     }
     //endregion
-
-    /**
-     * TODO?
-     */
-    // fun upsertMessages(messages: List<Message>) {
-    //     RealmController.mailboxContent.writeBlocking { messages.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
-    // }
-
-    // fun deleteMessages(messages: List<Message>) {
-    //     MailRealm.mailboxContent.writeBlocking {
-    //         messages.forEach { message -> deleteLatestMessage(message.uid) }
-    //     }
-    // }
-
-    // fun upsertMessage(message: Message) {
-    //     MailRealm.mailboxContent.writeBlocking { copyToRealm(message, UpdatePolicy.ALL) }
-    // }
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640

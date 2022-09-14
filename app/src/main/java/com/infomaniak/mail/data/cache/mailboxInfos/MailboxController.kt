@@ -27,7 +27,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
@@ -36,10 +35,6 @@ import kotlinx.coroutines.flow.SharedFlow
 object MailboxController {
 
     //region Get data
-    private fun getAllMailboxes(realm: MutableRealm? = null): RealmResults<Mailbox> {
-        return realm.getAllMailboxesQuery().find()
-    }
-
     fun getAllMailboxesAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
         return realm.getAllMailboxesQuery().asFlow().toSharedFlow()
     }
@@ -62,10 +57,6 @@ object MailboxController {
 
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
         return realm.getMailboxQuery(objectId).find()
-    }
-
-    private fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Mailbox>> {
-        return realm.getMailboxQuery(objectId).asFlow().toSharedFlow()
     }
 
     private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
@@ -125,30 +116,6 @@ object MailboxController {
     }
     //endregion
 
-    /**
-     * TODO?
-     */
-    // fun upsertMailbox(mailbox: Mailbox) {
-    //     RealmController.mailboxInfos.writeBlocking { copyToRealm(mailbox, UpdatePolicy.ALL) }
-    // }
-
-    // fun deleteMailbox(id: String) {
-    //     RealmController.mailboxInfos.writeBlocking { getLatestMailbox(id)?.let(::delete) }
-    // }
-
-    // fun selectMailboxByEmail(email: String) {
-    //     currentMailbox = RealmController.mailboxInfos.query<Mailbox>("${Mailbox::email.name} = '$email'").first().find()
-    //     currentMailbox?.let { AccountUtils.currentMailboxId = it.mailboxId } ?: throw MailboxNotFoundException(email)
-    // }
-
-    // fun getMailboxInfoByEmail(email: String): Mailbox? {
-    //     return RealmController.mailboxInfos.query<Mailbox>("${Mailbox::email.name} = '$email'").first().find()
-    // }
-
-    // private fun MutableRealm.removeMailboxInfoIfAlreadyExisting(mailbox: Mailbox) {
-    //     getMailboxInfoByObjectId(mailbox.mailboxId)?.let { findLatest(it)?.let(::delete) }
-    // }
-
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
     // fun getDeletableMailboxes(mailboxesToKeep: List<Mailbox>): RealmResults<Mailbox> {
@@ -160,6 +127,4 @@ object MailboxController {
     //     )
     //     return RealmController.mailboxInfos.query<Mailbox>(query).find()
     // }
-
-    // class MailboxNotFoundException(email: String) : Exception("Mailbox [$email] not found")
 }
