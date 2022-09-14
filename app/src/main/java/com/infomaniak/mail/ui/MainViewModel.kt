@@ -201,21 +201,6 @@ class MainViewModel : ViewModel() {
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
 
-    private fun getCurrentMailbox(mailboxes: List<Mailbox>): Mailbox? {
-        return with(mailboxes) {
-            find { it.mailboxId == AccountUtils.currentMailboxId }
-                ?: firstOrNull()
-        }
-    }
-
-    private fun getCurrentFolder(folders: List<Folder>): Folder? {
-        return with(folders) {
-            find { it.id == currentFolderId.value }
-                ?: find { it.role == DEFAULT_SELECTED_FOLDER }
-                ?: firstOrNull()
-        }
-    }
-
     private fun updateAddressBooks() {
         val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
 

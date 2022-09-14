@@ -28,8 +28,7 @@ class DateSeparatorItemDecoration : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         if (view is TextView && parent.getChildAdapterPosition(view) != 0) {
             outRect.set(0, 16.toPx(), 0, 8.toPx())
-        }
-        else {
+        } else {
             super.getItemOffsets(outRect, view, parent, state)
         }
     }
