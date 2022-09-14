@@ -71,6 +71,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
+    private var previousFolderId: String? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -275,7 +276,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun getFolder(folderId: String) {
         mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
-            scrollToTop()
             threadListViewModel.currentFolder.value = folder
             displayFolderName(folder)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
@@ -369,6 +369,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
 
         threadListAdapter.updateAdapterList(threads, binding.root.context)
+
+        if (folderHasChanged()) scrollToTop()
     }
 
     private fun displayNoEmailView() = with(binding) {
@@ -379,6 +381,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
         noMailLayoutGroup.isGone = true
+    }
+
+    private fun folderHasChanged(): Boolean {
+        val currentFolderId = MainViewModel.currentFolderId.value
+        return (currentFolderId != previousFolderId).also {
+            previousFolderId = currentFolderId
+        }
     }
 
     private fun downloadThreads() = with(mainViewModel) {
