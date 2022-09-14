@@ -63,11 +63,14 @@ object MailboxController {
         return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} = '$objectId'").first()
     }
 
-    fun getCurrentMailbox(): Mailbox? = with(RealmDatabase.mailboxInfos) {
-        val checkUserId = "${Mailbox::userId.name} = '${AccountUtils.currentUserId}'"
-        val checkMailboxId = "${Mailbox::mailboxId.name} = '${AccountUtils.currentMailboxId}'"
-        val mailbox = query<Mailbox>("$checkUserId AND $checkMailboxId").first().find()
-        return mailbox ?: query<Mailbox>(checkUserId).first().find()
+    fun getMailbox(userId: Int, mailboxId: Int, realm: MutableRealm? = null): Mailbox? {
+        return realm.getMailboxQuery(userId, mailboxId).find() ?: realm.getMailboxesQuery(userId).first().find()
+    }
+
+    private fun MutableRealm?.getMailboxQuery(userId: Int, mailboxId: Int): RealmSingleQuery<Mailbox> {
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>(
+            "${Mailbox::userId.name} = '$userId' AND ${Mailbox::mailboxId.name} = '$mailboxId'"
+        ).first()
     }
     //endregion
 
