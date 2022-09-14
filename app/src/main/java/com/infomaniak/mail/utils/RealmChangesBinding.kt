@@ -33,7 +33,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 
     var waitingBeforeNotifyAdapter: LiveData<Boolean>? = null
     var beforeUpdateAdapter: ((itemList: List<T>) -> Unit)? = null
-    var afterUpdateAdapter: (() -> Unit)? = null
+    var afterUpdateAdapter: ((itemList: List<T>) -> Unit)? = null
 
     init {
         @Suppress("UNCHECKED_CAST")
@@ -50,7 +50,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
                 waitingBeforeNotifyAdapter?.observeWaiting { resultsChange.notifyAdapter() } ?: resultsChange.notifyAdapter()
             }
         }
-        afterUpdateAdapter?.invoke()
+        afterUpdateAdapter?.invoke(resultsChange.list)
     }
 
     private val listChangeObserver: (ListChange<T>) -> Unit = { listChange ->
@@ -67,7 +67,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
                 recyclerViewAdapter.notifyItemRangeRemoved(0, listChange.list.count())
             }
         }
-        afterUpdateAdapter?.invoke()
+        afterUpdateAdapter?.invoke(listChange.list)
     }
 
     fun bindResultsChange(resultsChangeLiveData: LiveData<ResultsChange<T>>) {

@@ -244,6 +244,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListViewModel.currentFolderThreads.bindListChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
             beforeUpdateAdapter = ::onThreadsUpdate
+            afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
         }
     }
 
@@ -346,9 +347,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Log.i("UI", "Received threads (${threads.size})")
         if (threads.size < PER_PAGE) mainViewModel.canContinueToPaginate = false
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
-
-
-        if (firstMessageHasChanged(threads)) scrollToTop()
     }
 
     private fun displayNoEmailView() = with(binding) {
