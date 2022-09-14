@@ -255,7 +255,6 @@ class MainViewModel : ViewModel() {
             } else {
                 ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
                     completedMessage.apply {
-                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
                         fullyDownloaded = true
                         // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
                         @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
