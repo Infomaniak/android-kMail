@@ -183,7 +183,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsList.swipeListener = object : OnItemSwipeListener<Any> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Any): Boolean {
                 when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> ThreadController.markAsSeen(item as Thread) // TODO: Toggle between seen and unseen
+                    SwipeDirection.LEFT_TO_RIGHT -> ThreadController.markAsSeen(
+                        item as Thread,
+                        MainViewModel.currentFolderId.value!!,
+                    ) // TODO: Toggle between seen and unseen
                     SwipeDirection.RIGHT_TO_LEFT -> notYetImplemented() // TODO: Delete thread
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }

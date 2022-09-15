@@ -100,7 +100,7 @@ object ThreadController {
         }
         val deletableMessages = deletableThreads.flatMap { thread -> thread.messages.filter { it.folderId == folderId } }
 
-        RealmDatabase.mailboxContent.writeBlocking {
+        return RealmDatabase.mailboxContent.writeBlocking {
             // Save new data
             Log.d(RealmDatabase.TAG, "Threads: Save new data")
             val newPageSize = apiThreads.size - offset
@@ -110,30 +110,31 @@ object ThreadController {
                     val mergedThread = getMergedThread(apiThread, realmThread)
                     copyToRealm(mergedThread, UpdatePolicy.ALL)
                 }
-                updateFolder(folderId, apiThreads)
+                updateFolderThreads(folderId, apiThreads)
             }
 
             // Delete outdated data
             Log.d(RealmDatabase.TAG, "Threads: Delete outdated data")
             deleteMessages(deletableMessages)
             deleteThreads(deletableThreads)
-        }
 
-        return threadsResult?.let {
-            val canContinueToPaginate = it.messagesCount >= ApiRepository.PER_PAGE
-            FolderController.updateFolderUnreadCount(folderId, it.folderUnseenMessage)
-            canContinueToPaginate
-        } ?: false
+            threadsResult?.let {
+                val canContinueToPaginate = it.messagesCount >= ApiRepository.PER_PAGE
+                setFolderUnreadCount(folderId, it.folderUnseenMessage, this)
+                canContinueToPaginate
+            } ?: false
+        }
     }
 
-    fun markAsSeen(thread: Thread) {
+    fun markAsSeen(thread: Thread, folderId: String) {
         if (thread.unseenMessagesCount != 0) {
 
             RealmDatabase.mailboxContent.writeBlocking {
-                val latestThread = getThread(thread.uid, this) ?: return@writeBlocking
+
+                val liveThread = getThread(thread.uid, this) ?: return@writeBlocking
 
                 val uids = mutableListOf<String>().apply {
-                    latestThread.messages.forEach {
+                    liveThread.messages.forEach {
                         if (!it.seen) {
                             add(it.uid)
                             addAll(it.duplicates.map { duplicate -> duplicate.uid })
@@ -141,15 +142,28 @@ object ThreadController {
                     }
                 }
 
-                val apiResponse = ApiRepository.markMessagesAsSeen(thread.mailboxUuid, uids)
+                val apiResponse = ApiRepository.markMessagesAsSeen(liveThread.mailboxUuid, uids)
 
                 if (apiResponse.isSuccess()) {
-                    latestThread.apply {
+                    decrementFolderUnreadCount(folderId, liveThread.unseenMessagesCount, this)
+                    liveThread.apply {
                         messages.forEach { it.seen = true }
                         unseenMessagesCount = 0
                     }
                 }
             }
+        }
+    }
+
+    private fun setFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
+        FolderController.updateFolder(folderId, realm) {
+            it.unreadCount = unseenMessagesCount
+        }
+    }
+
+    private fun decrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
+        FolderController.updateFolder(folderId, realm) {
+            it.unreadCount -= unseenMessagesCount
         }
     }
 
@@ -168,10 +182,9 @@ object ThreadController {
         addAll(values)
     }
 
-    private fun MutableRealm.updateFolder(folderId: String, apiThreads: List<Thread>) {
-        FolderController.getFolder(folderId, this)?.let { latestFolder ->
-            latestFolder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
-            copyToRealm(latestFolder, UpdatePolicy.ALL)
+    private fun MutableRealm.updateFolderThreads(folderId: String, apiThreads: List<Thread>) {
+        FolderController.updateFolder(folderId, this) { folder ->
+            folder.threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
         }
     }
 
