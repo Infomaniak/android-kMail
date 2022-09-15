@@ -34,13 +34,17 @@ import kotlinx.coroutines.flow.SharedFlow
 
 object MailboxController {
 
+    private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} = '$userId'"
+    private val sortByUnseenMessagesDesc = "SORT(${Mailbox::unseenMessages.name} DESC)"
+
     //region Get data
     fun getAllMailboxesAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
         return realm.getAllMailboxesQuery().asFlow().toSharedFlow()
     }
 
     private fun MutableRealm?.getAllMailboxesQuery(): RealmQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query()
+        val checkExists = "${Mailbox::userId.name} != '-1'" // TODO: This is ugly. How do we fix it?
+        return (this ?: RealmDatabase.mailboxInfos).query("$checkExists $sortByUnseenMessagesDesc")
     }
 
     private fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
@@ -52,7 +56,7 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int): RealmQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} = '$userId'")
+        return (this ?: RealmDatabase.mailboxInfos).query("${checkHasUserId(userId)} $sortByUnseenMessagesDesc")
     }
 
     private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: MutableRealm? = null): RealmResults<Mailbox> {
@@ -60,9 +64,8 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>): RealmQuery<Mailbox> {
-        val checkHasUserId = "${Mailbox::userId.name} = '$userId'"
         val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxInfos).query("$checkHasUserId AND $checkIsNotInExceptions")
+        return (this ?: RealmDatabase.mailboxInfos).query("${checkHasUserId(userId)} AND $checkIsNotInExceptions")
     }
 
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
@@ -78,9 +81,8 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getMailboxQuery(userId: Int, mailboxId: Int): RealmSingleQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>(
-            "${Mailbox::userId.name} = '$userId' AND ${Mailbox::mailboxId.name} = '$mailboxId'"
-        ).first()
+        val checkMailboxId = "${Mailbox::mailboxId.name} = '$mailboxId'"
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
     }
     //endregion
 

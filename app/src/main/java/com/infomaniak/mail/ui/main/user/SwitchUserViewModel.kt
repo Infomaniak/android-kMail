@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.sortMailboxes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -45,7 +44,7 @@ class SwitchUserViewModel : ViewModel() {
 
         emitSource(MailboxController.getAllMailboxesAsync().map { mailboxes ->
             users.map { user ->
-                UiAccount(user, mailboxes.list.filter { it.userId == user.id }.sortMailboxes())
+                UiAccount(user, mailboxes.list.filter { it.userId == user.id })
             }.sortAccounts()
         }.asLiveData())
     }
