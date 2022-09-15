@@ -31,7 +31,6 @@ import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Mailbox
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -127,5 +126,3 @@ fun Context.getAttributeColor(@IdRes attribute: Int): Int {
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
 }
-
-fun List<Mailbox>.sortMailboxes(): List<Mailbox> = sortedByDescending { it.unseenMessages }

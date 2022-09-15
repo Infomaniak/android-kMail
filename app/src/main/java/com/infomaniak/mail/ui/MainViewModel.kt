@@ -127,18 +127,16 @@ class MainViewModel : ViewModel() {
 
     fun loadCurrentMailbox() {
         Log.i(TAG, "loadCurrentMailbox")
-        val mailboxes = updateMailboxes()
-        getCurrentMailbox(mailboxes)?.let { mailbox ->
-            openMailbox(mailbox)
-        }
+        updateMailboxes()
+        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
         updateMailboxQuotas(mailbox)
-        val folders = updateFolders(mailbox)
-        getCurrentFolder(folders)?.let { folder ->
+        updateFolders(mailbox)
+        FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
             updateThreads(mailbox.uuid, folder.id)
         }
@@ -203,21 +201,6 @@ class MainViewModel : ViewModel() {
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
 
-    private fun getCurrentMailbox(mailboxes: List<Mailbox>): Mailbox? {
-        return with(mailboxes) {
-            find { it.mailboxId == AccountUtils.currentMailboxId }
-                ?: firstOrNull()
-        }
-    }
-
-    private fun getCurrentFolder(folders: List<Folder>): Folder? {
-        return with(folders) {
-            find { it.id == currentFolderId.value }
-                ?: find { it.role == DEFAULT_SELECTED_FOLDER }
-                ?: firstOrNull()
-        }
-    }
-
     private fun updateAddressBooks() {
         val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
 
@@ -230,18 +213,18 @@ class MainViewModel : ViewModel() {
         ContactController.update(apiContacts)
     }
 
-    private fun updateMailboxes(): List<Mailbox> {
+    private fun updateMailboxes() {
         val apiMailboxes = ApiRepository.getMailboxes().data?.map {
             it.initLocalValues(AccountUtils.currentUserId)
         } ?: emptyList()
 
-        return MailboxController.update(apiMailboxes)
+        MailboxController.update(apiMailboxes)
     }
 
-    private fun updateFolders(mailbox: Mailbox): List<Folder> {
+    private fun updateFolders(mailbox: Mailbox) {
         val apiFolders = ApiRepository.getFolders(mailbox.uuid).data?.formatFoldersListWithAllChildren() ?: emptyList()
 
-        return FolderController.update(apiFolders)
+        FolderController.update(apiFolders)
     }
 
     private fun updateThreads(

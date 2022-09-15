@@ -25,16 +25,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessag
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.types.RealmList
-import kotlinx.coroutines.flow.SharedFlow
 
 object ThreadController {
 
@@ -43,12 +40,8 @@ object ThreadController {
         return realm.getThreadQuery(uid).find()
     }
 
-    private fun getThreadAsync(uid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Thread>> {
-        return realm.getThreadQuery(uid).asFlow().toSharedFlow()
-    }
-
     private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
-        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} == '$uid'").first()
+        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} = '$uid'").first()
     }
 
     private fun MutableRealm.getMergedThread(apiThread: Thread, realmThread: Thread?): Thread {
@@ -224,34 +217,13 @@ object ThreadController {
     }
     //endregion
 
-    /**
-     * TODO?
-     */
-    // fun deleteThreads(threads: List<Thread>) {
-    //     MailRealm.mailboxContent.writeBlocking { threads.forEach { getLatestThread(it.uid)?.let(::delete) } }
-    // }
-
-    // fun upsertThread(thread: Thread) {
-    //     MailRealm.mailboxContent.writeBlocking { copyToRealm(thread, UpdatePolicy.ALL) }
-    // }
-
-    // fun upsertLatestThread(uid: String) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let { copyToRealm(it, UpdatePolicy.ALL) } }
-    // }
-
-    // fun updateThread(uid: String, onUpdate: (thread: Thread) -> Unit) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestThread(uid)?.let(onUpdate) }
-    // }
-
-    // fun getLatestThread(uid: String): Thread? = RealmController.mailboxContent.writeBlocking { getLatestThread(uid) }
-
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
     // fun getDeletableThreads(folder: Folder, threadsToKeep: List<Thread>): RealmResults<Thread> {
     //     val threadsIds = threadsToKeep.map { it.uid }
     //     val query = threadsIds.joinToString(
-    //         prefix = "NOT (${Thread::uid.name} == '",
-    //         separator = "' OR ${Thread::uid.name} == '",
+    //         prefix = "NOT (${Thread::uid.name} = '",
+    //         separator = "' OR ${Thread::uid.name} = '",
     //         postfix = "')"
     //     )
     //     return MailRealm.mailboxContent.query<Thread>(query).find()

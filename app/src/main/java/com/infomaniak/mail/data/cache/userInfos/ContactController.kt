@@ -20,26 +20,18 @@ package com.infomaniak.mail.data.cache.userInfos
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Contact
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import kotlinx.coroutines.flow.SharedFlow
 
 object ContactController {
 
     //region Get data
     fun getContacts(realm: MutableRealm? = null): RealmResults<Contact> {
         return realm.getContactsQuery().find()
-    }
-
-    private fun getContactsAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Contact>> {
-        return realm.getContactsQuery().asFlow().toSharedFlow()
     }
 
     private fun MutableRealm?.getContactsQuery(): RealmQuery<Contact> {
@@ -50,24 +42,8 @@ object ContactController {
         return realm.getContactQuery(id).find()
     }
 
-    private fun getContactAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Contact>> {
-        return realm.getContactQuery(id).asFlow().toSharedFlow()
-    }
-
     private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} == '$id'").first()
-    }
-
-    private fun getContacts(addressBookId: Int, realm: MutableRealm? = null): RealmResults<Contact> {
-        return realm.getContactsQuery(addressBookId).find()
-    }
-
-    private fun getContactsAsync(addressBookId: Int, realm: MutableRealm? = null): SharedFlow<ResultsChange<Contact>> {
-        return realm.getContactsQuery(addressBookId).asFlow().toSharedFlow()
-    }
-
-    private fun MutableRealm?.getContactsQuery(addressBookId: Int): RealmQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query("${Contact::addressBookId.name} == '$addressBookId'")
+        return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} = '$id'").first()
     }
     //endregion
 

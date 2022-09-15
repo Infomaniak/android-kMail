@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -60,14 +61,22 @@ object FolderController {
     }
 
     private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} == '$id'").first()
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
+    }
+
+    fun getFolder(role: FolderRole, realm: MutableRealm? = null): Folder? {
+        return realm.getFolderQuery(role).find()
+    }
+
+    private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
     }
     //endregion
 
     //region Edit data
-    fun update(apiFolders: List<Folder>): List<Folder> {
-
+    fun update(apiFolders: List<Folder>) {
         RealmDatabase.mailboxContent.writeBlocking {
+
             // Get current data
             Log.d(RealmDatabase.TAG, "Folders: Get current data")
             val realmFolders = getFolders(this)
@@ -106,8 +115,6 @@ object FolderController {
             deleteThreads(deletableThreads)
             deleteFolders(deletableFolders)
         }
-
-        return apiFolders
     }
 
     private fun upsertFolder(folder: Folder): Folder {
@@ -130,24 +137,13 @@ object FolderController {
     }
     //endregion
 
-    /**
-     * TODO?
-     */
-    // fun deleteFolders(folders: List<Folder>) {
-    //     MailRealm.mailboxContent.writeBlocking { folders.forEach { getLatestFolder(it.id)?.let(::delete) } }
-    // }
-
-    // fun deleteFolder(id: String) {
-    //     MailRealm.mailboxContent.writeBlocking { getLatestFolder(id)?.let(::delete) }
-    // }
-
     // TODO: RealmKotlin doesn't fully support `IN` for now.
     // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
     // fun getDeletableFolders(foldersToKeep: List<Folder>): RealmResults<Folder> {
     //     val foldersIds = foldersToKeep.map { it.id }
     //     val query = foldersIds.joinToString(
-    //         prefix = "NOT (${Folder::id.name} == '",
-    //         separator = "' OR ${Folder::id.name} == '",
+    //         prefix = "NOT (${Folder::id.name} = '",
+    //         separator = "' OR ${Folder::id.name} = '",
     //         postfix = "')"
     //     )
     //     return MailRealm.mailboxContent.query<Folder>(query).find()

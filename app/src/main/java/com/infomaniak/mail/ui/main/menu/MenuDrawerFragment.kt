@@ -30,7 +30,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
-import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
@@ -156,7 +155,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeMailboxes() = with(binding) {
         mainViewModel.listenToMailboxes().observe(viewLifecycleOwner) { mailboxes ->
-            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }.sortMailboxes()
+            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
             addressAdapter.setMailboxes(sortedMailboxes)
             if (sortedMailboxes.isEmpty()) {
                 addressesList.isGone = true
