@@ -30,12 +30,12 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.SharedFlow
 
 object MailboxController {
 
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} = '$userId'"
-    private val sortByUnseenMessagesDesc = "SORT(${Mailbox::unseenMessages.name} DESC)"
 
     //region Get data
     fun getAllMailboxesAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
@@ -43,8 +43,7 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getAllMailboxesQuery(): RealmQuery<Mailbox> {
-        val checkExists = "${Mailbox::userId.name} != '-1'" // TODO: This is ugly. How do we fix it?
-        return (this ?: RealmDatabase.mailboxInfos).query("$checkExists $sortByUnseenMessagesDesc")
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>().sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
     }
 
     private fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
@@ -56,7 +55,9 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int): RealmQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query("${checkHasUserId(userId)} $sortByUnseenMessagesDesc")
+        return (this ?: RealmDatabase.mailboxInfos)
+            .query<Mailbox>(checkHasUserId(userId))
+            .sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
     }
 
     private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: MutableRealm? = null): RealmResults<Mailbox> {
@@ -65,7 +66,7 @@ object MailboxController {
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>): RealmQuery<Mailbox> {
         val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxInfos).query("${checkHasUserId(userId)} AND $checkIsNotInExceptions")
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
     }
 
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
