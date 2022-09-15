@@ -55,6 +55,16 @@ object MailboxController {
         return (this ?: RealmDatabase.mailboxInfos).query("${Mailbox::userId.name} = '$userId'")
     }
 
+    private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: MutableRealm? = null): RealmResults<Mailbox> {
+        return realm.getMailboxesQuery(userId, exceptionMailboxIds).find()
+    }
+
+    private fun MutableRealm?.getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>): RealmQuery<Mailbox> {
+        val checkHasUserId = "${Mailbox::userId.name} = '$userId'"
+        val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "\"$it\"" }}}"
+        return (this ?: RealmDatabase.mailboxInfos).query("$checkHasUserId AND $checkIsNotInExceptions")
+    }
+
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
         return realm.getMailboxQuery(objectId).find()
     }
@@ -77,15 +87,9 @@ object MailboxController {
     //region Edit data
     fun update(apiMailboxes: List<Mailbox>) {
 
-        // Get current data
-        Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-        val realmMailboxes = getMailboxes(AccountUtils.currentUserId)
-
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
-        val deletableMailboxes = realmMailboxes.filter { realmMailbox ->
-            apiMailboxes.none { apiMailbox -> apiMailbox.mailboxId == realmMailbox.mailboxId }
-        }
+        val deletableMailboxes = getMailboxes(AccountUtils.currentUserId, apiMailboxes.map { it.mailboxId })
 
         // Save new data
         Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
