@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.ext.realmListOf
@@ -37,22 +38,16 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    val recipients = mutableListOf<UiContact>()
-    val newMessageCc = mutableListOf<UiContact>()
-    val newMessageBcc = mutableListOf<UiContact>()
+    val recipients = mutableListOf<MergedContact>()
+    val newMessageCc = mutableListOf<MergedContact>()
+    val newMessageBcc = mutableListOf<MergedContact>()
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = SingleLiveEvent<EditorAction>()
 
-    fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
-        emit(mutableListOf<UiContact>().apply {
-            ContactController.getContacts().forEach { contact ->
-                contact.emails.forEach { email ->
-                    add(UiContact(email, contact.name))
-                }
-            }
-        })
+    fun getContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
+        emit(ContactController.getMergedContacts())
     }
 
     fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
@@ -81,7 +76,7 @@ class NewMessageViewModel : ViewModel() {
         // replyTo = realmListOf()
     }
 
-    private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient>? {
+    private fun List<MergedContact>.toRealmRecipients(): RealmList<Recipient>? {
         return if (isEmpty()) null else map {
             Recipient().apply {
                 email = it.email

@@ -40,6 +40,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -197,7 +198,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {
+    private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(binding) {
         val toAlreadyUsedContactMails = newMessageViewModel.recipients.map { it.email }.toMutableList()
         val ccAlreadyUsedContactMails = newMessageViewModel.newMessageCc.map { it.email }.toMutableList()
         val bccAlreadyUsedContactMails = newMessageViewModel.newMessageBcc.map { it.email }.toMutableList()
@@ -237,7 +238,11 @@ class NewMessageFragment : Fragment() {
             val alreadyUsedEmails = contactAdapter.getAlreadyUsedEmails(fieldType)
             if (alreadyUsedEmails.none { it == input }) {
                 alreadyUsedEmails.add(input)
-                val contact = UiContact(input)
+                val contact = MergedContact().apply { // TODO : Instanciating a merged contact this way is unsafe
+                    name = input
+                    email = input
+                    initLocalValues()
+                }
                 getContacts(fieldType).add(contact)
                 createChip(fieldType, contact)
             }
@@ -247,7 +252,7 @@ class NewMessageFragment : Fragment() {
     }
 
     //region Chips behavior
-    private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
+    private fun getContacts(field: FieldType): MutableList<MergedContact> = when (field) {
         TO -> newMessageViewModel.recipients
         CC -> newMessageViewModel.newMessageCc
         BCC -> newMessageViewModel.newMessageBcc
@@ -276,7 +281,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun removeEmail(field: FieldType, contact: UiContact) {
+    private fun removeEmail(field: FieldType, contact: MergedContact) {
         val index = getContacts(field).indexOfFirst { it.email == contact.email }
         removeEmail(field, index)
     }
@@ -305,9 +310,9 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.newMessageBcc.forEach { createChip(BCC, it) }
     }
 
-    private fun createChip(field: FieldType, contact: UiContact) {
+    private fun createChip(field: FieldType, contact: MergedContact) {
         ChipContactBinding.inflate(layoutInflater).root.apply {
-            val name = if (contact.name?.isBlank() == true) null else contact.name
+            val name = contact.name.ifBlank { null }
             text = name ?: contact.email
             setOnClickListener { removeEmail(field, contact) }
             getChipGroup(field).addView(this)

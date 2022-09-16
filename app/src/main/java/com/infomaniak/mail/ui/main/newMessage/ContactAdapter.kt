@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
@@ -29,15 +30,15 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.utils.isEmail
 
 class ContactAdapter(
-    private val allContacts: List<UiContact> = emptyList(),
+    private val allContacts: List<MergedContact> = emptyList(),
     private val toAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val ccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
     private val bccAlreadyUsedContactIds: MutableList<String> = mutableListOf(),
-    private val onItemClick: (item: UiContact, field: FieldType) -> Unit,
+    private val onItemClick: (item: MergedContact, field: FieldType) -> Unit,
     private val addUnrecognizedContact: (field: FieldType) -> Unit,
 ) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
 
-    private var contacts = mutableListOf<UiContact>()
+    private var contacts = mutableListOf<MergedContact>()
     private var currentField: FieldType = TO
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
@@ -48,7 +49,7 @@ class ContactAdapter(
         val contact = contacts[position]
         userName.text = contact.name
         userEmail.text = contact.email
-        userAvatar.loadAvatar(contact.toCorrespondent())
+        userAvatar.loadAvatar(contact)
         root.setOnClickListener { selectContact(contact) }
     }
 
@@ -71,7 +72,7 @@ class ContactAdapter(
         BCC -> bccAlreadyUsedContactIds
     }
 
-    private fun selectContact(contact: UiContact) {
+    private fun selectContact(contact: MergedContact) {
         onItemClick(contact, currentField)
         getAlreadyUsedEmails(currentField).add(contact.email)
     }
@@ -98,7 +99,7 @@ class ContactAdapter(
                     mutableListOf()
                 } else {
                     @Suppress("UNCHECKED_CAST")
-                    results.values as MutableList<UiContact>
+                    results.values as MutableList<MergedContact>
                 }
                 orderItemList()
                 notifyDataSetChanged()

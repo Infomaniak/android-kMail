@@ -26,7 +26,6 @@ import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes.resource
 import com.infomaniak.mail.data.models.Correspondent
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.databinding.ViewAvatarBinding
@@ -62,11 +61,12 @@ class AvatarView @JvmOverloads constructor(
         return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.imageLoader)
     }
 
-    // fun loadAvatar(email: String) : Disposable {
-    //     with(MergedContact.findContact(email)) {
-    //
-    //         binding.avatarImage.loadAvatar(email.hashCode(), avatar?.let(::resource), computeInitials(), context.imageLoader)
-    //     }
-    //     // return binding.avatarImage.loadAvatar(email.hashCode(), avatar?.let(::resource), computeInitials(), context.imageLoader)
-    // }
+    fun loadAvatar(mergedContact: MergedContact): Disposable {
+        return binding.avatarImage.loadAvatar(
+            mergedContact.email.hashCode(),
+            mergedContact.avatar.toString(),
+            (mergedContact as Correspondent).computeInitials(),
+            context.imageLoader
+        )
+    }
 }
