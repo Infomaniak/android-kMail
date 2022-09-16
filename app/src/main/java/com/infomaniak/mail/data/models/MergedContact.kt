@@ -18,37 +18,26 @@
 package com.infomaniak.mail.data.models
 
 import android.net.Uri
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
 @Parcelize
-data class MergedContact(
-    override var email : String,
-    override var name: String,
+class MergedContact : RealmObject, Correspondent {
+    @PrimaryKey
+    var id = ""
+    override var email: String = ""
+    override var name: String = ""
+    private var _avatar: String? = null
+
     var avatar: Uri?
-) : Correspondent {
-// data class MergedContact(val contact: Contact? = null) : Correspondent {
-    // override var email : String = ""
-    // override var name: String = ""
-    // var avatar: Uri? = null
-    //
-    // init {
-    //
-    // }
+        get() = Uri.parse(_avatar)
+        set(value) {
+            _avatar = value.toString()
+        }
 
-    // private fun findPhoneContact(email: String) {
-    //
-    // }
-
-    // val color: String = ?
-
-    // val firstName: String = ""
-    // val lastName: String = ""
-
-    companion object {
-        // fun findContact(email: String): MergedContact {
-        //
-        // }
+    fun initLocalValues() {
+        id = email.hashCode().toString() + "_" + email
     }
 }

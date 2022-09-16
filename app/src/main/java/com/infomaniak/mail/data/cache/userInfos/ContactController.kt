@@ -21,6 +21,7 @@ import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.RealmDatabase.update
 import com.infomaniak.mail.data.models.Contact
+import com.infomaniak.mail.data.models.MergedContact
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -39,12 +40,28 @@ object ContactController {
         return (this ?: RealmDatabase.userInfos).query()
     }
 
+    fun getMergedContacts(realm: MutableRealm? = null): RealmResults<MergedContact> {
+        return realm.getMergedContactsQuery().find()
+    }
+
+    private fun MutableRealm?.getMergedContactsQuery(): RealmQuery<MergedContact> {
+        return (this ?: RealmDatabase.userInfos).query()
+    }
+
     private fun getContact(id: String, realm: MutableRealm? = null): Contact? {
         return realm.getContactQuery(id).find()
     }
 
     private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
         return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} = '$id'").first()
+    }
+
+    private fun getMergedContact(id: String, realm: MutableRealm? = null): MergedContact? {
+        return realm.getMergedContactQuery(id).find()
+    }
+
+    private fun MutableRealm?.getMergedContactQuery(id: String): RealmSingleQuery<MergedContact> {
+        return (this ?: RealmDatabase.userInfos).query<MergedContact>("${MergedContact::id.name} = '$id'").first()
     }
     //endregion
 
@@ -54,12 +71,41 @@ object ContactController {
         RealmDatabase.userInfos.update<Contact>(apiContacts)
     }
 
+    fun update2(apiContacts: List<MergedContact>) {
+
+        // Get current data
+        Log.d(RealmDatabase.TAG, "Contacts: Get current data")
+        val realmContacts = getMergedContacts()
+
+        // Get outdated data
+        Log.d(RealmDatabase.TAG, "Contacts: Get outdated data")
+        val deletableContacts = realmContacts.filter { realmContact ->
+            apiContacts.none { it.id == realmContact.id }
+        }
+
+        // Save new data
+        Log.d(RealmDatabase.TAG, "Contacts: Save new data")
+        upsertMergedContacts(apiContacts)
+
+        // Delete outdated data
+        Log.d(RealmDatabase.TAG, "Contacts: Delete outdated data")
+        deleteMergedContacts(deletableContacts)
+    }
+
     private fun upsertContacts(contacts: List<Contact>) {
+        RealmDatabase.userInfos.writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+    }
+
+    private fun upsertMergedContacts(contacts: List<MergedContact>) {
         RealmDatabase.userInfos.writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     private fun deleteContacts(contacts: List<Contact>) {
         RealmDatabase.userInfos.writeBlocking { contacts.forEach { getContact(it.id)?.let(::delete) } }
+    }
+
+    private fun deleteMergedContacts(contacts: List<MergedContact>) {
+        RealmDatabase.userInfos.writeBlocking { contacts.forEach { getMergedContact(it.id)?.let(::delete) } }
     }
     //endregion
 }

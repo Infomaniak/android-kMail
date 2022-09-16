@@ -69,8 +69,6 @@ class MainViewModel : ViewModel() {
         val currentMessageUid = MutableLiveData<String?>()
     }
 
-    var mergedContacts: Map<String, MergedContact> = emptyMap()
-
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var canPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
@@ -141,7 +139,7 @@ class MainViewModel : ViewModel() {
         Log.i(TAG, "loadAddressBooksAndContacts")
         updateAddressBooks()
         updateContacts()
-        createMergedContacts(context) // TODO : Do something with this value
+        createMergedContacts(context)
     }
 
     fun loadCurrentMailbox() {
@@ -221,7 +219,7 @@ class MainViewModel : ViewModel() {
         ContactController.update(apiContacts)
     }
 
-    private fun createMergedContacts(context: Context): MutableMap<Pair<Name, Email>, MergedContact> {
+    private fun createMergedContacts(context: Context) {
         val realmContacts = ContactController.getContacts()
         val phoneMergedContacts = getPhoneContacts(context)
 
@@ -233,16 +231,18 @@ class MainViewModel : ViewModel() {
                     phoneMergedContacts[key]?.avatar = contactAvatar
                 }
             } else { // If we haven't yet encountered this user, add him
-                phoneMergedContacts[key] = MergedContact(
-                    it.email,
-                    it.name,
-                    contactAvatar
-                )
+                phoneMergedContacts[key] = MergedContact().apply {
+                    email = it.email
+                    name = it.name
+                    avatar = contactAvatar
+                    initLocalValues()
+                }
             }
         }
 
-        Log.e("gibran", "createMergedContacts - phoneMergedContacts: ${phoneMergedContacts}")
-        return phoneMergedContacts
+        // Log.e("gibran", "createMergedContacts - phoneMergedContacts: ${phoneMergedContacts}")
+
+        ContactController.update2(phoneMergedContacts.values.toList())
     }
 
     private fun getPhoneContacts(context: Context): MutableMap<Pair<Name, Email>, MergedContact> {
@@ -294,7 +294,12 @@ class MainViewModel : ViewModel() {
     private fun createMergedContacts(contacts: Map<Pair<Name, Email>, Uri?>): MutableMap<Pair<Name, Email>, MergedContact> {
         val mergedContacts = mutableMapOf<Pair<Name, Email>, MergedContact>()
         contacts.forEach { (key, avatarUri) ->
-            mergedContacts[key] = MergedContact(key.second, key.first, avatarUri)
+            mergedContacts[key] = MergedContact().apply {
+                email = key.second
+                name = key.first
+                avatar = avatarUri
+                initLocalValues()
+            }
         }
         return mergedContacts
     }
