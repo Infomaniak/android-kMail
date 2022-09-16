@@ -224,18 +224,20 @@ class MainViewModel : ViewModel() {
         val phoneMergedContacts = getPhoneContacts(context)
 
         realmContacts.forEach {
-            val key = it.name to it.email
-            val contactAvatar = it.avatar?.let { avatar -> Uri.parse(resource(avatar)) }
-            if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
-                if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
-                    phoneMergedContacts[key]?.avatar = contactAvatar
-                }
-            } else { // If we haven't yet encountered this user, add him
-                phoneMergedContacts[key] = MergedContact().apply {
-                    email = it.email
-                    name = it.name
-                    avatar = contactAvatar
-                    initLocalValues()
+            it.emails.forEach { email ->
+                val key = it.name to email
+                val contactAvatar = it.avatar?.let { avatar -> Uri.parse(resource(avatar)) }
+                if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
+                    if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
+                        phoneMergedContacts[key]?.avatar = contactAvatar
+                    }
+                } else { // If we haven't yet encountered this user, add him
+                    phoneMergedContacts[key] = MergedContact().apply {
+                        this.email = email
+                        name = it.name
+                        avatar = contactAvatar
+                        initLocalValues()
+                    }
                 }
             }
         }
@@ -249,15 +251,17 @@ class MainViewModel : ViewModel() {
         if (ContextCompat.checkSelfPermission(context, READ_CONTACTS) == PERMISSION_DENIED) return mutableMapOf()
 
         val emails = getListOfEmails(context)
+        Log.e("gibran", "getPhoneContacts - emails: ${emails}")
         if (emails.isEmpty()) return mutableMapOf()
 
         val contacts: Map<Pair<Name, Email>, Uri?> = getNameAndAvatarForMails(context, emails)
+        Log.e("gibran", "getPhoneContacts - contacts: ${contacts}")
 
         return createMergedContacts(contacts)
     }
 
-    private fun getListOfEmails(context: Context): Map<Long, Email> {
-        val mailDictionary: MutableMap<Long, Email> = mutableMapOf()
+    private fun getListOfEmails(context: Context): Map<Long, Set<Email>> {
+        val mailDictionary: MutableMap<Long, MutableSet<Email>> = mutableMapOf()
         val projection = arrayOf(CommonDataKinds.Email.CONTACT_ID, CommonDataKinds.Email.ADDRESS)
         val contentUri = CommonDataKinds.Email.CONTENT_URI
         val cursor = context.contentResolver.query(contentUri, projection, null, null, null) ?: return emptyMap()
@@ -265,14 +269,18 @@ class MainViewModel : ViewModel() {
         while (cursor.moveToNext()) {
             val id = cursor.getLong(cursor.getColumnIndexOrThrow(CommonDataKinds.Email.CONTACT_ID))
             val address = cursor.getString(cursor.getColumnIndexOrThrow(CommonDataKinds.Email.ADDRESS))
-            mailDictionary[id] = address
+            mailDictionary[id]?.let {
+                mailDictionary[id]?.add(address)
+            } ?: run {
+                mailDictionary[id] = mutableSetOf(address)
+            }
         }
         cursor.close()
 
         return mailDictionary
     }
 
-    private fun getNameAndAvatarForMails(context: Context, emails: Map<Long, Email>): Map<Pair<Name, Email>, Uri?> {
+    private fun getNameAndAvatarForMails(context: Context, emails: Map<Long, Set<Email>>): Map<Pair<Name, Email>, Uri?> {
         val projection = arrayOf(Contactables.CONTACT_ID, Contactables.DISPLAY_NAME, Contactables.PHOTO_THUMBNAIL_URI)
         val cursor = context.contentResolver.query(Contactables.CONTENT_URI, projection, null, null, null) ?: return emptyMap()
 
@@ -284,7 +292,9 @@ class MainViewModel : ViewModel() {
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.DISPLAY_NAME))
                 val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.PHOTO_THUMBNAIL_URI))
 
-                contacts[name to emails[id]!!] = photoUri?.let { Uri.parse(it) }
+                emails[id]!!.forEach { email ->
+                    contacts[name to email] = photoUri?.let { Uri.parse(it) }
+                }
             }
         }
         cursor.close()

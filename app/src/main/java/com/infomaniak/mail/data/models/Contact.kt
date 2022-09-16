@@ -23,23 +23,19 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
-@Parcelize
 @Serializable
-class Contact : RealmObject, Correspondent {
+class Contact : RealmObject {
 
     //region API data
     @PrimaryKey
     var id: String = ""
-    override var name: String = ""
+    var name: String = ""
     @SerialName("firstname")
     var firstName: String = ""
     @SerialName("lastname")
@@ -53,9 +49,6 @@ class Contact : RealmObject, Correspondent {
     var addressBookId: Int = 0
     var avatar: String? = null
     //endregion
-
-    @Transient
-    override val email: String get() = emails.firstOrNull() ?: ""
 
     fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
