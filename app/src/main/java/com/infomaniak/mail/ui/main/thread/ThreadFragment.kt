@@ -117,6 +117,7 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            contacts = mainViewModel.mergedContact
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }

@@ -21,16 +21,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.notYetImplemented
 
 class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
 
-    lateinit var binding: BottomSheetDetailedContactBinding
+    private val viewModel: MainViewModel by activityViewModels()
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
+    lateinit var binding: BottomSheetDetailedContactBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -39,7 +42,9 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        userAvatar.loadAvatar(navigationArgs.correspondent)
+        val correspondent = navigationArgs.correspondent
+        val knownContact = viewModel.mergedContact[correspondent.name to correspondent.email]
+        knownContact?.let { userAvatar.loadAvatar(it) } ?: run { userAvatar.loadAvatar(correspondent) }
         fillInUserNameAndEmail(navigationArgs.correspondent, name, email)
 
         writeMail.setOnClickListener { notYetImplemented() }

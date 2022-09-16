@@ -35,6 +35,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.UiUtils
@@ -88,6 +89,7 @@ class MainActivity : ThemedActivity() {
         setupNavController()
         setupMenuDrawerCallbacks()
 
+        mainViewModel.mergedContact = ContactController.getMergedContacts().associateBy { it.name to it.email }
         // mainViewModel.updateAddressBooksAndContacts(this)
     }
 

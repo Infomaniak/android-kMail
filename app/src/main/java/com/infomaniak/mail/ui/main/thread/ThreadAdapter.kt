@@ -29,18 +29,22 @@ import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
+import com.infomaniak.mail.ui.Email
+import com.infomaniak.mail.ui.Name
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
 
-class ThreadAdapter(
-    private var messages: List<Message> = mutableListOf(),
-) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+
+    private var messages = listOf<Message>()
+    var contacts: Map<Pair<Name, Email>, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -95,7 +99,8 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.from.first()
-            userAvatar.loadAvatar(firstSender)
+            val knownContact = contacts[firstSender.name to firstSender.email]
+            knownContact?.let { userAvatar.loadAvatar(it) } ?: run { userAvatar.loadAvatar(firstSender) }
             expeditorName.apply {
                 fillInUserNameAndEmail(firstSender, this)
                 setTextColor(context.getColor(R.color.primaryTextColor))

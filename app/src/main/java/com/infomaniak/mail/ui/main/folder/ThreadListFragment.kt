@@ -114,6 +114,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
             threadDensity = ThreadDensity.LARGE, // TODO: Take this value from the settings when available
+            contacts = mainViewModel.mergedContact,
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {

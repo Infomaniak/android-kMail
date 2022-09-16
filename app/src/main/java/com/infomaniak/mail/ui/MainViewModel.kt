@@ -74,6 +74,8 @@ class MainViewModel : ViewModel() {
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = MutableLiveData(false)
 
+    var mergedContact: Map<Pair<Name, Email>, MergedContact> = emptyMap()
+
     fun close() {
         Log.i(TAG, "close")
         RealmDatabase.close()
