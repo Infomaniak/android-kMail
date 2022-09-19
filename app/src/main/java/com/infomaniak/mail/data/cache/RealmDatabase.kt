@@ -148,7 +148,6 @@ object RealmDatabase {
             val userInfos = setOf(
                 UserPreferences::class,
                 AddressBook::class,
-                Contact::class,
                 MergedContact::class,
             )
 

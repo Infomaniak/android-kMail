@@ -136,8 +136,7 @@ class MainViewModel : ViewModel() {
     fun updateAddressBooksAndContacts(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadAddressBooksAndContacts")
         updateAddressBooks()
-        updateContacts()
-        createMergedContacts(context)
+        updateContacts(context)
     }
 
     fun loadCurrentMailbox() {
@@ -211,23 +210,17 @@ class MainViewModel : ViewModel() {
         AddressBookController.update(apiAddressBooks)
     }
 
-    private fun updateContacts() {
+    private fun updateContacts(context: Context) {
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
-
-        ContactController.update(apiContacts)
-    }
-
-    private fun createMergedContacts(context: Context) {
-        val realmContacts = ContactController.getContacts()
         val phoneMergedContacts = getPhoneContacts(context)
 
-        realmContacts.forEach {
-            it.emails.forEach { email ->
+        apiContacts.forEach { apiContact ->
+            apiContact.emails.forEach { email ->
                 val key = Recipient().apply {
-                    name = it.name
+                    name = apiContact.name
                     this.email = email
                 }
-                val contactAvatar = it.avatar?.let { avatar -> resource(avatar) }
+                val contactAvatar = apiContact.avatar?.let { avatar -> resource(avatar) }
                 if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
                     if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
                         phoneMergedContacts[key]?.avatar = contactAvatar
@@ -235,7 +228,7 @@ class MainViewModel : ViewModel() {
                 } else { // If we haven't yet encountered this user, add him
                     phoneMergedContacts[key] = MergedContact().apply {
                         this.email = email
-                        name = it.name
+                        name = apiContact.name
                         avatar = contactAvatar
                         initLocalValues()
                     }
@@ -245,7 +238,7 @@ class MainViewModel : ViewModel() {
 
         Log.e("gibran", "createMergedContacts - phoneMergedContacts: ${phoneMergedContacts}")
 
-        ContactController.update2(phoneMergedContacts.values.toList())
+        ContactController.update(phoneMergedContacts.values.toList())
     }
 
     private fun getPhoneContacts(context: Context): MutableMap<Recipient, MergedContact> {
