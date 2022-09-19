@@ -22,7 +22,25 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import io.realm.kotlin.notifications.*
 import io.realm.kotlin.types.BaseRealmObject
+import io.realm.kotlin.types.RealmObject
 
+/**
+ * The RealmChangesBinding class is an utility class for binding RecyclerView UI elements to Realm data.
+ *
+ * This adapter will automatically handle any updates to its data and call `notifyDataSetChanged()`,
+ * `notifyItemInserted()`, `notifyItemRemoved()` or `notifyItemRangeChanged()` as appropriate.
+ *
+ * The RealmAdapter will stop receiving updates if the Realm instance providing the [ResultsChange] or [ListChange] is
+ * closed.
+ *
+ * If the adapter contains Realm model classes with a primary key that is either an [Int] or a [Long], call
+ * `setHasStableIds(true)` in the constructor and override [RecyclerView.Adapter.getItemId] as described by the Javadoc in that method.
+ *
+ * @param T type of [RealmObject] stored in the adapter.
+ * @param VH type of RecyclerView.ViewHolder used in the adapter.
+ * @see RecyclerView.Adapter.setHasStableIds
+ * @see RecyclerView.Adapter.getItemId
+ */
 class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> private constructor(
     private val lifecycleOwner: LifecycleOwner,
     private val recyclerViewAdapter: RecyclerView.Adapter<VH>,
