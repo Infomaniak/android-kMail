@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui
 import android.Manifest.permission.READ_CONTACTS
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_DENIED
-import android.net.Uri
 import android.provider.ContactsContract.CommonDataKinds
 import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.util.Log
@@ -228,7 +227,7 @@ class MainViewModel : ViewModel() {
                     name = it.name
                     this.email = email
                 }
-                val contactAvatar = it.avatar?.let { avatar -> Uri.parse(resource(avatar)) }
+                val contactAvatar = it.avatar?.let { avatar -> resource(avatar) }
                 if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
                     if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
                         phoneMergedContacts[key]?.avatar = contactAvatar
@@ -244,7 +243,7 @@ class MainViewModel : ViewModel() {
             }
         }
 
-        // Log.e("gibran", "createMergedContacts - phoneMergedContacts: ${phoneMergedContacts}")
+        Log.e("gibran", "createMergedContacts - phoneMergedContacts: ${phoneMergedContacts}")
 
         ContactController.update2(phoneMergedContacts.values.toList())
     }
@@ -253,11 +252,9 @@ class MainViewModel : ViewModel() {
         if (ContextCompat.checkSelfPermission(context, READ_CONTACTS) == PERMISSION_DENIED) return mutableMapOf()
 
         val emails = getListOfEmails(context)
-        Log.e("gibran", "getPhoneContacts - emails: ${emails}")
         if (emails.isEmpty()) return mutableMapOf()
 
-        val contacts: Map<Recipient, Uri?> = getNameAndAvatarForMails(context, emails)
-        Log.e("gibran", "getPhoneContacts - contacts: ${contacts}")
+        val contacts: Map<Recipient, String?> = getNameAndAvatarForMails(context, emails)
 
         return createMergedContacts(contacts)
     }
@@ -282,11 +279,11 @@ class MainViewModel : ViewModel() {
         return mailDictionary
     }
 
-    private fun getNameAndAvatarForMails(context: Context, emails: Map<Long, Set<String>>): Map<Recipient, Uri?> {
+    private fun getNameAndAvatarForMails(context: Context, emails: Map<Long, Set<String>>): Map<Recipient, String?> {
         val projection = arrayOf(Contactables.CONTACT_ID, Contactables.DISPLAY_NAME, Contactables.PHOTO_THUMBNAIL_URI)
         val cursor = context.contentResolver.query(Contactables.CONTENT_URI, projection, null, null, null) ?: return emptyMap()
 
-        val contacts: MutableMap<Recipient, Uri?> = mutableMapOf()
+        val contacts: MutableMap<Recipient, String?> = mutableMapOf()
         while (cursor.moveToNext()) {
             val id = cursor.getLong(cursor.getColumnIndexOrThrow(Contactables.CONTACT_ID))
 
@@ -299,9 +296,7 @@ class MainViewModel : ViewModel() {
                         this.email = email
                         this.name = name
                     }
-                    Log.e("gibran", "getNameAndAvatarForMails - key.email: ${key.email}")
-                    Log.e("gibran", "getNameAndAvatarForMails - key.name: ${key.name}")
-                    contacts[key] = photoUri?.let { Uri.parse(it) }
+                    contacts[key] = photoUri
                 }
             }
         }
@@ -309,7 +304,7 @@ class MainViewModel : ViewModel() {
         return contacts
     }
 
-    private fun createMergedContacts(contacts: Map<Recipient, Uri?>): MutableMap<Recipient, MergedContact> {
+    private fun createMergedContacts(contacts: Map<Recipient, String?>): MutableMap<Recipient, MergedContact> {
         val mergedContacts = mutableMapOf<Recipient, MergedContact>()
         contacts.forEach { (key, avatarUri) ->
             mergedContacts[key] = MergedContact().apply {

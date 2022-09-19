@@ -47,6 +47,8 @@ class Recipient : RealmObject, Correspondent {
         return this
     }
 
+    override fun toString(): String = "($email -> $name)"
+
     override fun equals(other: Any?): Boolean = other is Recipient && other.email == email && other.name == name
 
     override fun hashCode(): Int {

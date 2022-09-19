@@ -64,7 +64,7 @@ class AvatarView @JvmOverloads constructor(
     }
 
     private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
-        val avatar = (correspondent as? MergedContact)?.avatar?.toString()
+        val avatar = (correspondent as? MergedContact)?.avatar
         return loadAvatar(email.hashCode(), avatar, computeInitials(), context.imageLoader)
     }
 

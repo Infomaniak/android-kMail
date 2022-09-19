@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models
 
-import android.net.Uri
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
@@ -29,15 +28,13 @@ class MergedContact : RealmObject, Correspondent {
     var id = ""
     override var email: String = ""
     override var name: String = ""
-    private var _avatar: String? = null
-
-    var avatar: Uri?
-        get() = Uri.parse(_avatar)
-        set(value) {
-            _avatar = value.toString()
-        }
+    var avatar: String? = null
 
     fun initLocalValues() {
         id = email.hashCode().toString() + "_" + email
+    }
+
+    override fun toString(): String {
+        return "$avatar, $email, $name"
     }
 }
