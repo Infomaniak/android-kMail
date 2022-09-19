@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import android.widget.ImageView
 import coil.imageLoader
 import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
@@ -28,6 +29,7 @@ import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Correspondent
 import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 
 class AvatarView @JvmOverloads constructor(
@@ -53,20 +55,20 @@ class AvatarView @JvmOverloads constructor(
 
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.avatar.setOnClickListener(onClickListener)
 
-    fun loadAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
-        return binding.avatarImage.loadAvatar(email.hashCode(), null, computeInitials(), context.imageLoader)
+    fun loadAvatar(recipient: Recipient, contacts: Map<Recipient, MergedContact>) {
+        binding.avatarImage.loadCorrespondentAvatar(contacts[recipient] ?: recipient)
+    }
+
+    fun loadAvatar(mergedContact: MergedContact) {
+        binding.avatarImage.loadCorrespondentAvatar(mergedContact)
+    }
+
+    private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
+        val avatar = (correspondent as? MergedContact)?.avatar?.toString()
+        return loadAvatar(email.hashCode(), avatar, computeInitials(), context.imageLoader)
     }
 
     fun loadAvatar(user: User): Disposable {
         return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.imageLoader)
-    }
-
-    fun loadAvatar(mergedContact: MergedContact): Disposable {
-        return binding.avatarImage.loadAvatar(
-            mergedContact.email.hashCode(),
-            mergedContact.avatar.toString(),
-            (mergedContact as Correspondent).computeInitials(),
-            context.imageLoader
-        )
     }
 }

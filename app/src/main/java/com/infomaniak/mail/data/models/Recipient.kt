@@ -47,7 +47,11 @@ class Recipient : RealmObject, Correspondent {
         return this
     }
 
-    override fun equals(other: Any?): Boolean = other is Recipient && other.objectId == objectId
+    override fun equals(other: Any?): Boolean = other is Recipient && other.email == email && other.name == name
 
-    override fun hashCode(): Int = objectId.hashCode()
+    override fun hashCode(): Int {
+        var result = email.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
+    }
 }

@@ -38,12 +38,11 @@ import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
-import com.infomaniak.mail.ui.Email
-import com.infomaniak.mail.ui.Name
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.COMPACT
@@ -56,7 +55,7 @@ import kotlin.math.abs
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
-    private val contacts: Map<Pair<Name, Email>, MergedContact>,
+    private val contacts: Map<Recipient, MergedContact>,
     private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
@@ -115,8 +114,7 @@ class ThreadListAdapter(
         fillInUserNameAndEmail(firstFrom, expeditor)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
         mailBodyPreview.text = messages.last().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
-        val knownContact = contacts[firstFrom.name to firstFrom.email]
-        knownContact?.let { expeditorAvatar.loadAvatar(it) } ?: run { expeditorAvatar.loadAvatar(firstFrom) }
+        expeditorAvatar.loadAvatar(firstFrom, contacts)
 
         mailDate.text = formatDate(root.context)
 

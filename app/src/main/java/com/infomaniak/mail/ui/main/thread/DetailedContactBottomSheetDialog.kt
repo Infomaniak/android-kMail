@@ -42,10 +42,9 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        val correspondent = navigationArgs.correspondent
-        val knownContact = viewModel.mergedContact[correspondent.name to correspondent.email]
-        knownContact?.let { userAvatar.loadAvatar(it) } ?: run { userAvatar.loadAvatar(correspondent) }
-        fillInUserNameAndEmail(navigationArgs.correspondent, name, email)
+        val recipient = navigationArgs.recipient
+        userAvatar.loadAvatar(recipient, viewModel.mergedContact)
+        fillInUserNameAndEmail(navigationArgs.recipient, name, email)
 
         writeMail.setOnClickListener { notYetImplemented() }
         addToContacts.setOnClickListener { notYetImplemented() }
