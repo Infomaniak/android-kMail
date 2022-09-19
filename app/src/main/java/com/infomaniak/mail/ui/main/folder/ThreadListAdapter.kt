@@ -64,6 +64,10 @@ class ThreadListAdapter(
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
+    init {
+        setHasStableIds(true)
+    }
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         this.recyclerView = recyclerView
@@ -92,6 +96,14 @@ class ThreadListAdapter(
         dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
         displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
         else -> DisplayType.THREAD.layout
+    }
+
+    override fun getItemId(position: Int): Long {
+        return when (val item = dataSet[position]) {
+            is Thread -> item.uid.hashCode().toLong()
+            is String -> item.hashCode().toLong()
+            else -> super.getItemId(position)
+        }
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
