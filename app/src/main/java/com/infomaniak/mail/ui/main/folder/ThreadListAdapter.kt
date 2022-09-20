@@ -183,7 +183,7 @@ class ThreadListAdapter(
         offsetY: Int,
         canvasUnder: Canvas?,
         canvasOver: Canvas?,
-        isUserControlled: Boolean
+        isUserControlled: Boolean,
     ): Unit = with(viewHolder.binding) {
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width

@@ -51,6 +51,7 @@ class Contact : RealmObject, Correspondent {
     var emails: RealmList<String> = realmListOf()
     @SerialName("addressbook_id")
     var addressBookId: Int = 0
+    //endregion
 
     //region UI data (Ignore & Transient)
     @Ignore

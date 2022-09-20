@@ -41,12 +41,12 @@ object MessageController {
 
     //region Edit data
     fun update(realmMessages: List<Message>, apiMessages: List<Message>) {
-
-        // Get outdated data
-        Log.d(RealmDatabase.TAG, "Messages: Get outdated data")
-        val outdatedMessages = getOutdatedMessages(realmMessages, apiMessages)
-
         RealmDatabase.mailboxContent.writeBlocking {
+
+            // Get outdated data
+            Log.d(RealmDatabase.TAG, "Messages: Get outdated data")
+            val outdatedMessages = getOutdatedMessages(realmMessages, apiMessages)
+
             // Save new data
             Log.d(RealmDatabase.TAG, "Messages: Save new data")
             insertNewData(apiMessages)

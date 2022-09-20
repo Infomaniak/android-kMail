@@ -231,5 +231,4 @@ object ThreadController {
         RealmDatabase.mailboxContent.writeBlocking { getThread(uid, this)?.let(::delete) }
     }
     //endregion
-
 }

@@ -66,8 +66,8 @@ object UiUtils {
         animate: Boolean,
         @ColorInt oldColor: Int,
         @ColorInt newColor: Int,
-        duration: Long = 150,
-        setColor: (Int) -> Unit
+        duration: Long = 150L,
+        setColor: (Int) -> Unit,
     ) {
         if (animate) {
             ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {

@@ -181,7 +181,7 @@ class IntroFragment : Fragment() {
         @StyleRes val theme: Int,
         @ColorRes private val primary: Int,
         @ColorRes private val secondaryBackground: Int,
-        @ColorRes private val ripple: Int
+        @ColorRes private val ripple: Int,
     ) {
         PINK(R.style.AppTheme_Pink, R.color.pinkMail, R.color.pinkBoardingSecondaryBackground, R.color.pinkMailRipple),
         BLUE(R.style.AppTheme_Blue, R.color.blueMail, R.color.blueBoardingSecondaryBackground, R.color.blueMailRipple);
