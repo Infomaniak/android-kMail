@@ -37,7 +37,10 @@ import io.realm.kotlin.types.RealmObject
  * `setHasStableIds(true)` in the constructor and override [RecyclerView.Adapter.getItemId] as described by the Javadoc in that method.
  *
  * @param T type of [RealmObject] stored in the adapter.
- * @param VH type of RecyclerView.ViewHolder used in the adapter.
+ * @param VH type of [RecyclerView.ViewHolder] used in the adapter.
+ * @param lifecycleOwner the lifecycle owner of the adapter.
+ * @param recyclerViewAdapter the [RecyclerView.Adapter] to bind to.
+ * @param data [LiveData] of [ListChange] or [ResultsChange] to bind to the adapter.
  * @see RecyclerView.Adapter.setHasStableIds
  * @see RecyclerView.Adapter.getItemId
  */
