@@ -130,16 +130,4 @@ object MailboxController {
         }
     }
     //endregion
-
-    // TODO: RealmKotlin doesn't fully support `IN` for now.
-    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    // fun getDeletableMailboxes(mailboxesToKeep: List<Mailbox>): RealmResults<Mailbox> {
-    //     val objectIds = mailboxesToKeep.map { it.objectId }
-    //     val query = objectIds.joinToString(
-    //         prefix = "NOT (${Mailbox::objectId.name} = '",
-    //         separator = "' OR ${Mailbox::objectId.name} = '",
-    //         postfix = "')"
-    //     )
-    //     return RealmController.mailboxInfos.query<Mailbox>(query).find()
-    // }
 }
