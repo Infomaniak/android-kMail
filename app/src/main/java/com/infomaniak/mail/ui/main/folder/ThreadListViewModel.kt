@@ -20,7 +20,9 @@ package com.infomaniak.mail.ui.main.folder
 import android.text.format.DateUtils
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -56,5 +58,9 @@ class ThreadListViewModel : ViewModel() {
                 updatedAtTrigger.postValue(Unit)
             }
         }
+    }
+
+    fun toggleSeenStatus(thread: Thread, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
+        ThreadController.toggleSeenStatus(thread, folderId)
     }
 }

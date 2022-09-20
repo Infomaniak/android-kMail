@@ -45,7 +45,6 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -182,9 +181,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadsList.swipeListener = object : OnItemSwipeListener<Any> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Any): Boolean {
+                item as Thread
                 when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> ThreadController.toggleSeenStatus(
-                        thread = item as Thread,
+                    SwipeDirection.LEFT_TO_RIGHT -> threadListViewModel.toggleSeenStatus(
+                        thread = item,
                         folderId = MainViewModel.currentFolderId.value!!,
                     )
                     SwipeDirection.RIGHT_TO_LEFT -> notYetImplemented() // TODO: Delete thread
