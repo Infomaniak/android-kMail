@@ -245,43 +245,6 @@ class ThreadListAdapter(
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
-    private class ThreadListDiffCallback(
-        private val oldList: List<Any>,
-        private val newList: List<Any>,
-    ) : DragDropSwipeDiffCallback<Any>(oldList, newList) {
-
-        override fun getOldListSize(): Int = oldList.size
-
-        override fun getNewListSize(): Int = newList.size
-
-        override fun isSameItem(oldItem: Any, newItem: Any): Boolean {
-            return when {
-                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
-                oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
-                oldItem.isValid() && newItem.isValid() -> oldItem.uid == newItem.uid // Both are valid
-                else -> false
-            }
-        }
-
-        override fun isSameContent(oldItem: Any, newItem: Any): Boolean {
-            return when {
-                oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
-                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
-                else -> { // Both are Threads
-                    if ((oldItem as Thread).uid == (newItem as Thread).uid) { // Same items
-                        oldItem.subject == newItem.subject &&
-                                oldItem.messagesCount == newItem.messagesCount &&
-                                oldItem.unseenMessagesCount == newItem.unseenMessagesCount &&
-                                oldItem.isFavorite == newItem.isFavorite
-                        // TODO: Add other fields checks
-                    } else { // Not same items
-                        false
-                    }
-                }
-            }
-        }
-    }
-
     companion object {
         const val SWIPE_ANIMATION_THRESHOLD = 0.15f
         private val CARD_ELEVATION = 6.toPx().toFloat()
