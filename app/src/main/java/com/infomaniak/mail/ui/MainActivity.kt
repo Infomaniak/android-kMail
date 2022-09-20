@@ -25,7 +25,6 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.app.ActivityCompat
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.drawerlayout.widget.DrawerLayout
@@ -35,8 +34,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.userInfos.ContactController
-import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.UiUtils
@@ -79,10 +76,6 @@ class MainActivity : ThemedActivity() {
         backgroundColor = getColor(R.color.backgroundColor).toColor()
         backgroundHeaderColor = getColor(R.color.backgroundHeaderColor).toColor()
 
-        // if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
-        //     requestingContactPermission()
-        // }
-
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         listenToNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
@@ -90,34 +83,18 @@ class MainActivity : ThemedActivity() {
         setupNavController()
         setupMenuDrawerCallbacks()
 
-        mainViewModel.mergedContact = ContactController.getMergedContacts().associateBy {
-            Recipient().apply {
-                name = it.name
-                email = it.email
-            }
-        }
-        // mainViewModel.updateAddressBooksAndContacts(this)
+        mainViewModel.listenToMergedContacts()
+        requestContactsPermission()
     }
 
-    // private fun setup() {
-    //
-    //     // TODO: Does the NewMessageActivity still crash when there is too much recipients?
-    //     listenToNetworkStatus()
-    //     binding.drawerLayout.addDrawerListener(drawerListener)
-    //
-    //     setupNavController()
-    //     setupMenuDrawerCallbacks()
-    //
-    //     mainViewModel.updateAddressBooksAndContacts(this)
-    // }
-
-    private fun requestingContactPermission() {
-        Log.e("gibran", "requestingContactPermission: ");
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS), 0)
-        contactPermissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { authorized ->
-            Log.e("gibran", "requestingContactPermission - authorized: ${authorized}")
+    private fun requestContactsPermission() {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+            contactPermissionResultLauncher =
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) { authorized ->
+                    if (authorized) mainViewModel.updateAddressBooksAndContacts(this)
+                }
+            contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
-        contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
     }
 
     private fun listenToNetworkStatus() {

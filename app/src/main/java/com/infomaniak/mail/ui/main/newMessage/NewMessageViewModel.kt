@@ -23,7 +23,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.userInfos.ContactController
+import com.infomaniak.mail.data.cache.userInfos.MergedContactController
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
@@ -47,7 +47,7 @@ class NewMessageViewModel : ViewModel() {
     val editorAction = SingleLiveEvent<EditorAction>()
 
     fun getContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
-        emit(ContactController.getMergedContacts())
+        emit(MergedContactController.getMergedContacts())
     }
 
     fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {

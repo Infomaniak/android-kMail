@@ -38,7 +38,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThread
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.AddressBookController
-import com.infomaniak.mail.data.cache.userInfos.ContactController
+import com.infomaniak.mail.data.cache.userInfos.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -70,7 +70,7 @@ class MainViewModel : ViewModel() {
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = MutableLiveData(false)
 
-    var mergedContact: Map<Recipient, MergedContact> = emptyMap()
+    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
 
     fun close() {
         Log.i(TAG, "close")
@@ -236,7 +236,7 @@ class MainViewModel : ViewModel() {
             }
         }
 
-        ContactController.update(phoneMergedContacts.values.toList())
+        MergedContactController.update(phoneMergedContacts.values.toList())
     }
 
     private fun getPhoneContacts(context: Context): MutableMap<Recipient, MergedContact> {
@@ -306,6 +306,19 @@ class MainViewModel : ViewModel() {
             }
         }
         return mergedContacts
+    }
+
+    fun listenToMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
+        MergedContactController.getMergedContactsAsync().collect {
+            mergedContacts.postValue(
+                it.list.associateBy { mergedContact ->
+                    Recipient().apply {
+                        name = mergedContact.name
+                        email = mergedContact.email
+                    }
+                }
+            )
+        }
     }
 
     private fun updateMailboxes() {

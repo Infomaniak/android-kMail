@@ -43,7 +43,7 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val recipient = navigationArgs.recipient
-        userAvatar.loadAvatar(recipient, viewModel.mergedContact)
+        userAvatar.loadAvatar(recipient, viewModel.mergedContacts.value ?: emptyMap())
         fillInUserNameAndEmail(navigationArgs.recipient, name, email)
 
         writeMail.setOnClickListener { notYetImplemented() }

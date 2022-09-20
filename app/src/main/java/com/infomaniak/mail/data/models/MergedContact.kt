@@ -36,6 +36,6 @@ class MergedContact : RealmObject, Correspondent {
     }
 
     override fun toString(): String {
-        return "$avatar, $email, $name"
+        return "{$avatar, $email, $name}"
     }
 }

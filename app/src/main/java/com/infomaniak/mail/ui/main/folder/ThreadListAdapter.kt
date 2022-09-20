@@ -55,7 +55,7 @@ import kotlin.math.abs
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
-    private val contacts: Map<Recipient, MergedContact>,
+    private var contacts: Map<Recipient, MergedContact>,
     private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
@@ -84,6 +84,16 @@ class ThreadListAdapter(
         }
 
         return ThreadViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.firstOrNull() is Unit && holder.itemViewType == DisplayType.THREAD.layout) {
+            (holder.binding as CardviewThreadItemBinding).apply {
+                expeditorAvatar.loadAvatar((dataSet[position] as Thread).from.first(), contacts)
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding) {
@@ -238,6 +248,11 @@ class ThreadListAdapter(
 
     override fun updateList(itemList: List<Thread>) {
         dataSet = formatList(itemList, recyclerView.context, threadDensity)
+    }
+
+    fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
+        contacts = newContacts
+        notifyItemRangeChanged(0, itemCount, Unit)
     }
 
     private enum class DisplayType(val layout: Int) {
