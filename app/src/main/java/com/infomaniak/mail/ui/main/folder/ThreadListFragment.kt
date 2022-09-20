@@ -114,7 +114,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadDensity = ThreadDensity.LARGE, // TODO : Take this value from the settings when available
+            threadDensity = ThreadDensity.LARGE, // TODO: Take this value from the settings when available
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {

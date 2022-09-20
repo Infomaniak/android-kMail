@@ -46,6 +46,7 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity
 import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.COMPACT
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.RealmChangesBinding.OnRealmChanged
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import io.realm.kotlin.ext.isValid
 import kotlin.math.abs
@@ -55,7 +56,7 @@ import kotlin.math.abs
 class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
     private val onSwipeFinished: () -> Unit,
-) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
+) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), OnRealmChanged<Thread> {
 
     override lateinit var recyclerView: RecyclerView
 
@@ -183,7 +184,7 @@ class ThreadListAdapter(
         offsetY: Int,
         canvasUnder: Canvas?,
         canvasOver: Canvas?,
-        isUserControlled: Boolean
+        isUserControlled: Boolean,
     ): Unit = with(viewHolder.binding) {
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width
@@ -296,7 +297,7 @@ class ThreadListAdapter(
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()
 
-            // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
+            // TODO: Use realm to directly get the sorted list instead of sortedByDescending()
             threads.sortedByDescending { it.date }.forEachIndexed { _, thread ->
                 val sectionTitle = thread.getSectionTitle(context)
                 when {
@@ -325,7 +326,7 @@ class ThreadListAdapter(
         }
     }
 
-    class ThreadViewHolder(val binding: ViewBinding) : DragDropSwipeAdapter.ViewHolder(binding.root) {
+    class ThreadViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {
         var isSwipedOverHalf = false
     }
 }
