@@ -22,23 +22,29 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.RealmDatabase.update
 import com.infomaniak.mail.data.models.MergedContact
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.types.RealmList
+import io.realm.kotlin.types.BaseRealmObject
 
 object ContactController {
 
     //region Get data
-    private fun getMergedContacts(exceptionContactIds: List<String>, realm: MutableRealm? = null): RealmResults<MergedContact> {
+    fun getMergedContacts(exceptionContactIds: List<String>? = null, realm: MutableRealm? = null): RealmResults<MergedContact> {
         return realm.getMergedContactsQuery(exceptionContactIds).find()
     }
 
-    private fun MutableRealm?.getMergedContactsQuery(exceptionContactIds: List<String>): RealmQuery<MergedContact> {
-        val checkIsNotInExceptions = "NOT ${MergedContact::id.name} IN {${exceptionContactIds.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.userInfos).query(checkIsNotInExceptions)
+    private fun MutableRealm?.getMergedContactsQuery(exceptionContactIds: List<String>?): RealmQuery<MergedContact> {
+        val checkIsNotInExceptions = exceptionContactIds?.let { ids ->
+            "NOT ${MergedContact::id.name} IN {${ids.joinToString { "\"$it\"" }}}"
+        }
+        return (this ?: RealmDatabase.userInfos).nullQuery(checkIsNotInExceptions)
+    }
+
+    private inline fun <reified T : BaseRealmObject> TypedRealm.nullQuery(queryInput: String?): RealmQuery<T> {
+        return if (queryInput == null) query() else query(queryInput)
     }
     //endregion
 
@@ -53,7 +59,7 @@ object ContactController {
         RealmDatabase.userInfos.writeBlocking {
             // Get outdated data
             Log.d(RealmDatabase.TAG, "Contacts: Get outdated data")
-            val deletableContacts = getMergedContacts(apiContacts.map { it.id }, this).toRealmList()
+            val deletableContacts = getMergedContacts(apiContacts.map { it.id }, this)
 
             // Save new data
             Log.d(RealmDatabase.TAG, "Contacts: Save new data")
@@ -70,7 +76,7 @@ object ContactController {
         realm?.let(block) ?: RealmDatabase.userInfos.writeBlocking(block)
     }
 
-    private fun deleteMergedContacts(contacts: RealmList<MergedContact>, realm: MutableRealm? = null) {
+    private fun deleteMergedContacts(contacts: RealmResults<MergedContact>, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = { it.delete(contacts) }
         realm?.let(block) ?: RealmDatabase.userInfos.writeBlocking(block)
     }
