@@ -104,7 +104,6 @@ object ThreadController {
     }
 
     private fun getOutdatedMessages(realmThreads: List<Thread>, folderId: String): List<Message> {
-        // val deletableThreads = MailboxContentController.getDeletableThreads(threadsFromApi)
         return realmThreads.flatMap { thread -> thread.messages.filter { it.folderId == folderId } }
     }
 
@@ -252,15 +251,4 @@ object ThreadController {
     }
     //endregion
 
-    // TODO: RealmKotlin doesn't fully support `IN` for now.
-    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    // fun getDeletableThreads(folder: Folder, threadsToKeep: List<Thread>): RealmResults<Thread> {
-    //     val threadsIds = threadsToKeep.map { it.uid }
-    //     val query = threadsIds.joinToString(
-    //         prefix = "NOT (${Thread::uid.name} = '",
-    //         separator = "' OR ${Thread::uid.name} = '",
-    //         postfix = "')"
-    //     )
-    //     return MailRealm.mailboxContent.query<Thread>(query).find()
-    // }
 }

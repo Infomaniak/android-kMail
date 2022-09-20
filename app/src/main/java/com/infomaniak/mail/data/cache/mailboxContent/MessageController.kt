@@ -44,7 +44,6 @@ object MessageController {
 
         // Get outdated data
         Log.d(RealmDatabase.TAG, "Messages: Get outdated data")
-        // val deletableMessages = MailboxContentController.getDeletableMessages(messagesFromApi)
         val outdatedMessages = getOutdatedMessages(realmMessages, apiMessages)
 
         RealmDatabase.mailboxContent.writeBlocking {
@@ -87,16 +86,4 @@ object MessageController {
         realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }
     //endregion
-
-    // TODO: RealmKotlin doesn't fully support `IN` for now.
-    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    // fun getDeletableMessages(thread: Thread, messagesToKeep: List<Message>): RealmResults<Message> {
-    //     val messagesIds = messagesToKeep.map { it.uid }
-    //     val query = messagesIds.joinToString(
-    //         prefix = "NOT (${Message::uid.name} = '",
-    //         separator = "' OR ${Message::uid.name} = '",
-    //         postfix = "')"
-    //     )
-    //     return MailRealm.mailboxContent.query<Message>(query).find()
-    // }
 }

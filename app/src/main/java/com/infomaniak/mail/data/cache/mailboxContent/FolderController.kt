@@ -157,16 +157,4 @@ object FolderController {
         folders.forEach { getFolder(it.id, this)?.let(::delete) }
     }
     //endregion
-
-    // TODO: RealmKotlin doesn't fully support `IN` for now.
-    // TODO: Workaround: https://github.com/realm/realm-js/issues/2781#issuecomment-607213640
-    // fun getDeletableFolders(foldersToKeep: List<Folder>): RealmResults<Folder> {
-    //     val foldersIds = foldersToKeep.map { it.id }
-    //     val query = foldersIds.joinToString(
-    //         prefix = "NOT (${Folder::id.name} = '",
-    //         separator = "' OR ${Folder::id.name} = '",
-    //         postfix = "')"
-    //     )
-    //     return MailRealm.mailboxContent.query<Folder>(query).find()
-    // }
 }
