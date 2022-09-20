@@ -27,6 +27,7 @@ import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
@@ -53,20 +54,23 @@ import kotlin.math.abs
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
-    private val parentRecycler: DragDropSwipeRecyclerView,
-    private val onSwipeFinished: () -> Unit
-) :
-    DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()) {
+    private val onSwipeFinished: () -> Unit,
+) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
+
+    override lateinit var recyclerView: RecyclerView
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
 
-    override fun getItemViewType(position: Int): Int = when {
-        dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
-        displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
-        else -> DisplayType.THREAD.layout
+    init {
+        setHasStableIds(true)
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
@@ -85,6 +89,20 @@ class ThreadListAdapter(
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
             DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int = when {
+        dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
+        displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
+        else -> DisplayType.THREAD.layout
+    }
+
+    override fun getItemId(position: Int): Long {
+        return when (val item = dataSet[position]) {
+            is Thread -> item.uid.hashCode().toLong()
+            is String -> item.hashCode().toLong()
+            else -> super.getItemId(position)
         }
     }
 
@@ -149,7 +167,7 @@ class ThreadListAdapter(
     }
 
     override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) {
-        parentRecycler.apply {
+        (recyclerView as DragDropSwipeRecyclerView).apply {
             behindSwipedItemIconSecondaryDrawableId = if ((item as Thread).unseenMessagesCount > 0) {
                 R.drawable.ic_envelope_open
             } else {
@@ -214,12 +232,10 @@ class ThreadListAdapter(
         return getItemViewType(position) == DisplayType.THREAD.layout && swipingIsAuthorized
     }
 
-    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any> {
-        return ThreadListDiffCallback(oldList, newList)
-    }
+    override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
-    fun updateAdapterList(newList: List<Thread>, context: Context) {
-        dataSet = formatList(newList, context, threadDensity)
+    override fun updateList(itemList: List<Thread>) {
+        dataSet = formatList(itemList, recyclerView.context, threadDensity)
     }
 
     private enum class DisplayType(val layout: Int) {
