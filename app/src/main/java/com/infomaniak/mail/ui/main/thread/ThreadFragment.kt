@@ -170,8 +170,16 @@ class ThreadFragment : Fragment() {
 
     private fun displayMessages(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
+        leaveIfThreadIsEmpty(messages)
         threadAdapter.notifyAdapter(messages.toMutableList())
         binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+    }
+
+    private fun leaveIfThreadIsEmpty(messages: List<Message>) {
+        if (messages.isEmpty()) {
+            threadViewModel.deleteThread(navigationArgs.threadUid)
+            findNavController().popBackStack()
+        }
     }
 
     private companion object {

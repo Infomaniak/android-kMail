@@ -192,6 +192,10 @@ object ThreadController {
     fun MutableRealm.deleteThreads(threads: List<Thread>) {
         threads.forEach { getThread(it.uid, this)?.let(::delete) }
     }
+
+    fun deleteThread(uid: String) {
+        RealmDatabase.mailboxContent.writeBlocking { getThread(uid, this)?.let(::delete) }
+    }
     //endregion
 
     // TODO: RealmKotlin doesn't fully support `IN` for now.
