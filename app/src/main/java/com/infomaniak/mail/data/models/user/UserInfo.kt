@@ -52,4 +52,6 @@ class UserInfo : RealmObject, Correspondent {
     var isRestricted: Boolean = false
     @SerialName("from_webmail1")
     var fromWebmail1: Boolean = false
+
+    override val initials by lazy { computeInitials() }
 }

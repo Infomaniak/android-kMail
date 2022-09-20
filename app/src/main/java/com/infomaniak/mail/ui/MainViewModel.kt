@@ -236,8 +236,6 @@ class MainViewModel : ViewModel() {
             }
         }
 
-        Log.e("gibran", "createMergedContacts - phoneMergedContacts: ${phoneMergedContacts}")
-
         ContactController.update(phoneMergedContacts.values.toList())
     }
 

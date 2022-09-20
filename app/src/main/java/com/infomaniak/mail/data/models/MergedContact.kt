@@ -29,6 +29,7 @@ class MergedContact : RealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
     var avatar: String? = null
+    override val initials by lazy { computeInitials() }
 
     fun initLocalValues() {
         id = email.hashCode().toString() + "_" + email

@@ -38,6 +38,7 @@ class Recipient : RealmObject, Correspondent {
     @Transient
     @PrimaryKey
     var objectId: String = "" // TODO: Remove this variable when we have EmbeddedObjects
+    override val initials by lazy { computeInitials() }
     //endregion
 
     // TODO: Remove this method when we have EmbeddedObjects
