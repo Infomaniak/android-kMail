@@ -238,7 +238,7 @@ class NewMessageFragment : Fragment() {
             val alreadyUsedEmails = contactAdapter.getAlreadyUsedEmails(fieldType)
             if (alreadyUsedEmails.none { it == input }) {
                 alreadyUsedEmails.add(input)
-                val contact = MergedContact().apply { // TODO : Instanciating a merged contact this way is unsafe
+                val contact = MergedContact().apply { // TODO : Instantiating a merged contact this way is unsafe
                     name = input
                     email = input
                     initLocalValues()
@@ -312,8 +312,7 @@ class NewMessageFragment : Fragment() {
 
     private fun createChip(field: FieldType, contact: MergedContact) {
         ChipContactBinding.inflate(layoutInflater).root.apply {
-            val name = contact.name.ifBlank { null }
-            text = name ?: contact.email
+            text = contact.getNameOrEmail()
             setOnClickListener { removeEmail(field, contact) }
             getChipGroup(field).addView(this)
         }

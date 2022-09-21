@@ -226,7 +226,7 @@ class MainViewModel : ViewModel() {
                         phoneMergedContacts[key]?.avatar = contactAvatar
                     }
                 } else { // If we haven't yet encountered this user, add him
-                    phoneMergedContacts[key] = MergedContact().apply { // TODO : Instanciating a merged contact this way is unsafe
+                    phoneMergedContacts[key] = MergedContact().apply { // TODO : Instantiating a merged contact this way is unsafe
                         this.email = email
                         name = apiContact.name
                         avatar = contactAvatar
@@ -247,7 +247,7 @@ class MainViewModel : ViewModel() {
 
         val contacts: Map<Recipient, String?> = getNameAndAvatarForMails(context, emails)
 
-        return createMergedContacts(contacts)
+        return contacts.toMergedContactsMap()
     }
 
     private fun getListOfEmails(context: Context): Map<Long, Set<String>> {
@@ -259,11 +259,8 @@ class MainViewModel : ViewModel() {
         while (cursor.moveToNext()) {
             val id = cursor.getLong(cursor.getColumnIndexOrThrow(CommonDataKinds.Email.CONTACT_ID))
             val address = cursor.getString(cursor.getColumnIndexOrThrow(CommonDataKinds.Email.ADDRESS))
-            mailDictionary[id]?.let {
-                mailDictionary[id]?.add(address)
-            } ?: run {
-                mailDictionary[id] = mutableSetOf(address)
-            }
+
+            mailDictionary[id]?.add(address) ?: run { mailDictionary[id] = mutableSetOf(address) }
         }
         cursor.close()
 
@@ -295,10 +292,10 @@ class MainViewModel : ViewModel() {
         return contacts
     }
 
-    private fun createMergedContacts(contacts: Map<Recipient, String?>): MutableMap<Recipient, MergedContact> {
+    private fun Map<Recipient, String?>.toMergedContactsMap(): MutableMap<Recipient, MergedContact> {
         val mergedContacts = mutableMapOf<Recipient, MergedContact>()
-        contacts.forEach { (key, avatarUri) ->
-            mergedContacts[key] = MergedContact().apply { // TODO : Instanciating a merged contact this way is unsafe
+        forEach { (key, avatarUri) ->
+            mergedContacts[key] = MergedContact().apply { // TODO : Instantiating a merged contact this way is unsafe
                 email = key.email
                 name = key.name
                 avatar = avatarUri
@@ -308,7 +305,7 @@ class MainViewModel : ViewModel() {
         return mergedContacts
     }
 
-    fun listenToMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
+    fun listenToRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
         MergedContactController.getMergedContactsAsync().collect {
             mergedContacts.postValue(
                 it.list.associateBy { mergedContact ->

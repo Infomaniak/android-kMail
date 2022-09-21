@@ -83,7 +83,7 @@ class MainActivity : ThemedActivity() {
         setupNavController()
         setupMenuDrawerCallbacks()
 
-        mainViewModel.listenToMergedContacts()
+        mainViewModel.listenToRealmMergedContacts()
         requestContactsPermission()
     }
 

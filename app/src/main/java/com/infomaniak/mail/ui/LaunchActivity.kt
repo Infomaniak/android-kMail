@@ -17,15 +17,10 @@
  */
 package com.infomaniak.mail.ui
 
-import android.Manifest.permission.READ_CONTACTS
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
@@ -34,7 +29,6 @@ import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.log
 
 class LaunchActivity : AppCompatActivity() {
 
@@ -42,7 +36,6 @@ class LaunchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.e("gibran", "startApp - Is PackageManager.PERMISSION_DENIED: ${ContextCompat.checkSelfPermission(this, READ_CONTACTS) == PackageManager.PERMISSION_DENIED}")
         lifecycleScope.launch(Dispatchers.IO) {
             if (AccountUtils.requestCurrentUser() == null) loginUser() else startApp()
         }
@@ -56,14 +49,11 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private suspend fun startApp() {
-        Log.e("gibran", "startApp: ", );
         mainViewModel.updateAddressBooksAndContacts(this)
         mainViewModel.loadCurrentMailbox()
 
         withContext(Dispatchers.Main) {
-            Log.e("gibran", "startApp: setting observer");
             MainViewModel.currentMailboxObjectId.observeNotNull(this@LaunchActivity) {
-                Log.e("gibran", "startApp: observing");
                 // TODO: If there is no Internet, the app won't be able to start.
                 startActivity(Intent(this@LaunchActivity, MainActivity::class.java))
             }
