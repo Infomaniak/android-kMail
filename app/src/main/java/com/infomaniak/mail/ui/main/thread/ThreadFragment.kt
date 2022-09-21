@@ -43,6 +43,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
@@ -166,14 +167,13 @@ class ThreadFragment : Fragment() {
 
     private fun listenToMessages(thread: Thread) {
         mainViewModel.openThread(thread)
-        threadViewModel.listenToMessages(thread).observe(viewLifecycleOwner, ::displayMessages)
-    }
-
-    private fun displayMessages(messages: List<Message>) {
-        Log.i("UI", "Received messages (${messages.size})")
-        leaveIfThreadIsEmpty(messages)
-        threadAdapter.notifyAdapter(messages.toMutableList())
-        binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+        threadViewModel.listenToMessages(thread).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+            beforeUpdateAdapter = { messages ->
+                Log.i("UI", "Received messages (${messages.size})")
+                leaveIfThreadIsEmpty(messages)
+            }
+            afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+        }
     }
 
     private fun leaveIfThreadIsEmpty(messages: List<Message>) {
