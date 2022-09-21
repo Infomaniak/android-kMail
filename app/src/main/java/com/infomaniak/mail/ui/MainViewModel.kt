@@ -137,7 +137,6 @@ class MainViewModel : ViewModel() {
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
-        updateMailboxQuotas(mailbox)
         updateFolders(mailbox)
         FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
@@ -145,20 +144,21 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun updateMailboxQuotas(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "forceRefreshMailboxes")
+        updateMailboxes()
+        updateCurrentMailboxQuotas()
+    }
+
+    private fun updateCurrentMailboxQuotas() {
+        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
         if (mailbox.isLimited) {
             ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.let { quotas ->
-                quotas.mailboxObjectId = mailbox.objectId
                 MailboxController.updateMailbox(mailbox.objectId) {
                     it.quotas = quotas
                 }
             }
         }
-    }
-
-    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "forceRefreshMailboxes")
-        updateMailboxes()
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -206,11 +206,11 @@ class MainViewModel : ViewModel() {
     }
 
     private fun updateMailboxes() {
-        val apiMailboxes = ApiRepository.getMailboxes().data?.map {
-            it.initLocalValues(AccountUtils.currentUserId)
-        } ?: emptyList()
+        val apiMailboxes = ApiRepository.getMailboxes().data
+            ?.map { it.initLocalValues(AccountUtils.currentUserId) }
+            ?: emptyList()
 
-        MailboxController.update(apiMailboxes)
+        MailboxController.update(apiMailboxes, AccountUtils.currentUserId)
     }
 
     private fun updateFolders(mailbox: Mailbox) {

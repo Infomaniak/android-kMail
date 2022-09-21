@@ -207,8 +207,8 @@ class MenuDrawerFragment : Fragment() {
             storageDivider.isVisible = isLimited
 
             if (isLimited) {
-                storageText.text = quotas?.getText(context, MenuDrawerViewModel.QUOTAS_MAX_SIZE) ?: return@observe
-                storageIndicator.progress = quotas.getProgress(MenuDrawerViewModel.QUOTAS_MAX_SIZE)
+                storageText.text = quotas?.getText(context) ?: return@observe
+                storageIndicator.progress = quotas.getProgress()
             }
         }
     }

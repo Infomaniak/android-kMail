@@ -27,6 +27,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
@@ -38,11 +39,11 @@ object MailboxController {
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} = '$userId'"
 
     //region Get data
-    fun getAllMailboxesAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
-        return realm.getAllMailboxesQuery().asFlow().toSharedFlow()
+    fun getMailboxesAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
+        return realm.getMailboxesQuery().asFlow().toSharedFlow()
     }
 
-    private fun MutableRealm?.getAllMailboxesQuery(): RealmQuery<Mailbox> {
+    private fun MutableRealm?.getMailboxesQuery(): RealmQuery<Mailbox> {
         return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>().sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
     }
 
@@ -55,8 +56,7 @@ object MailboxController {
     }
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int): RealmQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos)
-            .query<Mailbox>(checkHasUserId(userId))
+        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>(checkHasUserId(userId))
             .sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
     }
 
@@ -71,6 +71,10 @@ object MailboxController {
 
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
         return realm.getMailboxQuery(objectId).find()
+    }
+
+    fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Mailbox>> {
+        return realm.getMailboxQuery(objectId).asFlow().toSharedFlow()
     }
 
     private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
@@ -88,46 +92,50 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    fun update(apiMailboxes: List<Mailbox>) {
+    fun update(apiMailboxes: List<Mailbox>, userId: Int) {
 
-        // Get outdated data
-        Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
-        val outdatedMailboxes = getMailboxes(AccountUtils.currentUserId, apiMailboxes.map { it.mailboxId })
+        // Get current data
+        Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
+        val realmMailboxes = getMailboxes(userId)
 
-        // Save new data
-        Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
-        upsertMailboxes(apiMailboxes)
+        val isCurrentMailboxDeleted = RealmDatabase.mailboxInfos.writeBlocking {
 
-        // Delete outdated data
-        Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
-        val isCurrentMailboxDeleted = deleteOutdatedData(outdatedMailboxes)
+            // Get outdated data
+            Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
+            val outdatedMailboxes = getMailboxes(userId, apiMailboxes.map { it.mailboxId }, this)
+
+            // Save new data
+            Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
+            upsertMailboxes(realmMailboxes, apiMailboxes)
+
+            // Delete outdated data
+            Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
+            return@writeBlocking deleteOutdatedData(outdatedMailboxes)
+        }
 
         if (isCurrentMailboxDeleted) AccountUtils.reloadApp()
     }
 
-    fun upsertMailboxes(mailboxes: List<Mailbox>) {
-        RealmDatabase.mailboxInfos.writeBlocking { mailboxes.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+    private fun MutableRealm.upsertMailboxes(realmMailboxes: List<Mailbox>, apiMailboxes: List<Mailbox>) {
+        apiMailboxes.forEach { apiMailbox ->
+            apiMailbox.quotas = realmMailboxes.find { realmMailbox -> realmMailbox.objectId == apiMailbox.objectId }?.quotas
+            copyToRealm(apiMailbox, UpdatePolicy.ALL)
+        }
     }
 
-    private fun deleteOutdatedData(outdatedMailboxes: List<Mailbox>): Boolean {
+    private fun MutableRealm.deleteOutdatedData(outdatedMailboxes: RealmResults<Mailbox>): Boolean {
         val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
             RealmDatabase.closeMailboxContent()
             AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
         }
-        deleteMailboxes(outdatedMailboxes)
+        delete(outdatedMailboxes)
         outdatedMailboxes.forEach { RealmDatabase.deleteMailboxContent(it.mailboxId) }
         return isCurrentMailboxDeleted
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
         RealmDatabase.mailboxInfos.writeBlocking { getMailbox(objectId, this)?.let(onUpdate) }
-    }
-
-    private fun deleteMailboxes(mailboxes: List<Mailbox>) {
-        RealmDatabase.mailboxInfos.writeBlocking {
-            mailboxes.forEach { getMailbox(it.objectId, this)?.let(::delete) }
-        }
     }
     //endregion
 }

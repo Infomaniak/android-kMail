@@ -42,7 +42,7 @@ class SwitchUserViewModel : ViewModel() {
 
         updateMailboxes(users)
 
-        emitSource(MailboxController.getAllMailboxesAsync().map { mailboxes ->
+        emitSource(MailboxController.getMailboxesAsync().map { mailboxes ->
             users.map { user ->
                 UiAccount(user, mailboxes.list.filter { it.userId == user.id })
             }.sortAccounts()
@@ -52,9 +52,12 @@ class SwitchUserViewModel : ViewModel() {
     private fun updateMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
         users.forEach { user ->
             val okHttpClient = createOkHttpClientForSpecificUser(user)
-            ApiRepository.getMailboxes(okHttpClient).data
+
+            val apiMailboxes = ApiRepository.getMailboxes(okHttpClient).data
                 ?.map { it.initLocalValues(user.id) }
-                ?.let(MailboxController::upsertMailboxes)
+                ?: emptyList()
+
+            MailboxController.update(apiMailboxes, user.id)
         }
     }
 
