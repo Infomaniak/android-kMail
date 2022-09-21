@@ -183,7 +183,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Any): Boolean {
                 item as Thread
                 when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> threadListViewModel.toggleSeenStatus(
+                    SwipeDirection.LEFT_TO_RIGHT -> mainViewModel.toggleSeenStatus(
                         thread = item,
                         folderId = MainViewModel.currentFolderId.value!!,
                     )
