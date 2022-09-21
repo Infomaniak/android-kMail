@@ -246,7 +246,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun fetchMessages(thread: Thread): List<Message> {
-        return thread.messages.map { realmMessage ->
+        return thread.messages.mapNotNull { realmMessage ->
             if (realmMessage.fullyDownloaded) {
                 realmMessage
             } else {
@@ -265,8 +265,6 @@ class MainViewModel : ViewModel() {
                     //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
                     //     completedMessage.draftUuid = draft?.uuid
                     // }
-                }.let { apiMessage ->
-                    apiMessage ?: realmMessage
                 }
             }
         }
