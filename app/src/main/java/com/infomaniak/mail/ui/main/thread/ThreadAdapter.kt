@@ -70,6 +70,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
+        val message = messages[position]
+        if (payloads.firstOrNull() is Unit && !message.isDraft) {
+            holder.binding.userAvatar.loadAvatar(message.from.first(), contacts)
+        }
+        super.onBindViewHolder(holder, position, payloads)
+    }
+
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
         val message = messages[position]
 
@@ -254,6 +262,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ItemMessageBinding.getAllRecipientFormatted(message: Message): String = with(message) {
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
+    }
+
+    fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
+        contacts = newContacts
+        notifyItemRangeChanged(0, itemCount, Unit)
     }
 
     private companion object {

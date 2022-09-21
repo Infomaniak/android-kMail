@@ -49,5 +49,15 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         writeMail.setOnClickListener { notYetImplemented() }
         addToContacts.setOnClickListener { notYetImplemented() }
         copyAddress.setOnClickListener { notYetImplemented() }
+
+        listenToContacts()
+    }
+
+
+    private fun listenToContacts() {
+        viewModel.mergedContacts.observe(viewLifecycleOwner) {
+            val recipient = navigationArgs.recipient
+            binding.userAvatar.loadAvatar(recipient, it ?: emptyMap())
+        }
     }
 }

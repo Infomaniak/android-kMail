@@ -70,6 +70,7 @@ class ThreadFragment : Fragment() {
         setupUi()
         setupAdapter()
         getThread()
+        listenToContacts()
     }
 
     private fun setupUi() = with(binding) {
@@ -174,6 +175,12 @@ class ThreadFragment : Fragment() {
                 leaveIfThreadIsEmpty(messages)
             }
             afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+        }
+    }
+
+    private fun listenToContacts() {
+        mainViewModel.mergedContacts.observe(viewLifecycleOwner) {
+            threadAdapter.updateContacts(it ?: emptyMap())
         }
     }
 
