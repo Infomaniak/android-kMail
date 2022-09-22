@@ -70,4 +70,13 @@
         <!-- Defaults to false. If false, displays the classic divider used everywhere in Settings between items -->
         <attr name="ignoreDividers" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="ToggleableTextFormatterItemView">
+        <attr name="android:contentDescription" format="string" />
+        <attr name="backgroundColor" format="color" />
+        <attr name="icon" />
+        <attr name="iconColor" format="color" />
+        <attr name="selectedBackgroundColor" format="color" />
+        <attr name="selectedIconColor" format="color" />
+    </declare-styleable>
 </resources>

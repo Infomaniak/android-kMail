@@ -43,7 +43,9 @@ class NewMessageViewModel : ViewModel() {
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
-    val editorAction = SingleLiveEvent<EditorAction>()
+
+    // Boolean : for toggleable actions, false if the formatting has been removed and true if the formatting has been applied
+    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
         emit(mutableListOf<UiContact>().apply {

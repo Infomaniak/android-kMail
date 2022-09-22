@@ -66,7 +66,7 @@
                 android:id="@+id/editorTextOptions"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonTextOptionsOpen"
                 app:icon="@drawable/ic_editor_text_options"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -78,7 +78,7 @@
                 android:id="@+id/editorAttachment"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonAttachment"
                 app:icon="@drawable/ic_attachment_inclined"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -90,7 +90,7 @@
                 android:id="@+id/editorCamera"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonCamera"
                 app:icon="@drawable/ic_editor_camera"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -102,7 +102,7 @@
                 android:id="@+id/editorLink"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonHyperlink"
                 app:icon="@drawable/ic_editor_link"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -114,7 +114,7 @@
                 android:id="@+id/editorClock"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonSchedule"
                 app:icon="@drawable/ic_editor_clock"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -122,56 +122,51 @@
                 app:layout_constraintStart_toEndOf="@+id/editorLink"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorBold"
-                style="@style/EditorIconButton"
+                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonBold"
-                android:minWidth="0dp"
                 app:icon="@drawable/ic_editor_bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorItalic"
                 app:layout_constraintStart_toEndOf="@+id/editorClock"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorItalic"
-                style="@style/EditorIconButton"
+                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonItalic"
-                android:minWidth="0dp"
                 app:icon="@drawable/ic_editor_italic"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorUnderlined"
                 app:layout_constraintStart_toEndOf="@+id/editorBold"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorUnderlined"
-                style="@style/EditorIconButton"
+                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonUnderlined"
-                android:minWidth="0dp"
                 app:icon="@drawable/ic_editor_underline"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorStrikeThrough"
                 app:layout_constraintStart_toEndOf="@+id/editorItalic"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
+            <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorStrikeThrough"
-                style="@style/EditorIconButton"
+                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonStrikedThrough"
-                android:minWidth="0dp"
                 app:icon="@drawable/ic_editor_strikethrough"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorList"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/editorUnderlined"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -179,7 +174,7 @@
                 android:id="@+id/editorList"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/buttonBulletPoint"
                 android:minWidth="0dp"
                 app:icon="@drawable/ic_editor_list"
