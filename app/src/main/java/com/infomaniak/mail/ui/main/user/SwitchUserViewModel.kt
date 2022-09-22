@@ -44,7 +44,7 @@ class SwitchUserViewModel : ViewModel() {
 
         emitSource(MailboxController.getAllMailboxesAsync().map { mailboxes ->
             users.map { user ->
-                UiAccount(user, mailboxes.list.filter { it.userId == user.id })
+                UiAccount(user, mailboxes.list.filter { it.userId == user.id }, true)
             }.sortAccounts()
         }.asLiveData())
     }
