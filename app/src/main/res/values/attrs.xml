@@ -46,4 +46,14 @@
     <declare-styleable name="AvatarView">
         <attr name="android:src" format="reference|color" />
     </declare-styleable>
+
+    <declare-styleable name="ItemSettingView">
+        <attr name="title" format="string" />
+        <attr name="subtitle" format="string" />
+        <attr name="itemAction" format="enum">
+            <enum name="none" value="0"/>
+            <enum name="chevron" value="1"/>
+            <enum name="toggle" value="2"/>
+        </attr>
+    </declare-styleable>
 </resources>

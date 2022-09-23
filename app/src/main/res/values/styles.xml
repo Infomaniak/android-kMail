@@ -151,7 +151,7 @@
         <item name="android:textColor">@color/title</item>
         <item name="android:textSize">10sp</item>
         <item name="android:letterSpacing">0</item>
-        <item name="rippleColor">?android:attr/colorControlHighlight</item>
+        <item name="rippleColor">?attr/colorControlHighlight</item>
     </style>
 
 
