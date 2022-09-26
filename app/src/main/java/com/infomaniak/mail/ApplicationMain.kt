@@ -56,6 +56,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
+
         if (BuildConfig.DEBUG) configureDebugMode()
         configureSentry()
         configureAccountUtils()

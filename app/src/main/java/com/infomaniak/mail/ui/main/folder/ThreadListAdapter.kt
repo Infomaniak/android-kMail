@@ -289,14 +289,13 @@ class ThreadListAdapter(
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
 
-
         fun formatList(threads: List<Thread>, context: Context, threadDensity: ThreadDensity): MutableList<Any> {
             if (threadDensity == COMPACT) return threads.toMutableList()
 
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()
 
-            // TODO : Use realm to directly get the sorted list instead of sortedByDescending()
+            // TODO: Use Realm to directly get the sorted list instead of sortedByDescending()
             threads.sortedByDescending { it.date }.forEachIndexed { _, thread ->
                 val sectionTitle = thread.getSectionTitle(context)
                 when {

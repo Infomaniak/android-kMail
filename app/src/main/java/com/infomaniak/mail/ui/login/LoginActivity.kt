@@ -123,7 +123,7 @@ class LoginActivity : AppCompatActivity() {
                             is User -> {
                                 // application.trackCurrentUserId() // TODO: Matomo
                                 // trackAccountEvent("loggedIn") // TODO: Matomo
-                                // TODO : When successfully logged in, set theme color setting to the theme selected during the onBoarding
+                                // TODO: When successfully logged in, set theme color setting to the theme selected during the onBoarding
                                 AccountUtils.reloadApp?.invoke()
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
