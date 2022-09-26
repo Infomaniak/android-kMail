@@ -149,6 +149,7 @@ class SwitchUserAccountsAdapter(
     data class UiAccount(
         val user: User,
         var mailboxes: List<Mailbox>,
-        var isCollapsed: Boolean,
-    )
+    ) {
+        var isCollapsed = true
+    }
 }
