@@ -22,6 +22,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -36,6 +37,7 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.data.models.UiSettings
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
@@ -59,6 +61,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
 
         if (BuildConfig.DEBUG) configureDebugMode()
         configureSentry()
+        enforceAppTheme()
         configureAccountUtils()
         configureAppReloading()
         configureInfomaniakCore()
@@ -89,6 +92,10 @@ class ApplicationMain : Application(), ImageLoaderFactory {
                 if (BuildConfig.DEBUG) null else event
             }
         }
+    }
+
+    private fun enforceAppTheme() {
+        AppCompatDelegate.setDefaultNightMode(UiSettings(this).nightMode)
     }
 
     private fun configureAccountUtils() {
