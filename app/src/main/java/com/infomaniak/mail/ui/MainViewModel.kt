@@ -122,8 +122,9 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun updateAddressBooksAndContacts() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "loadAddressBooksAndContacts")
+    fun updateUserInfos() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "updateUserInfos")
+        updateUserPreferences()
         updateAddressBooks()
         updateContacts()
     }
@@ -191,6 +192,13 @@ class MainViewModel : ViewModel() {
     fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "deleteDraft: ${message.body}")
         if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
+    }
+
+    // TODO: Save wanted API UserPreferences into Realm.
+    private fun updateUserPreferences() {
+        // val userPreferences =  ApiRepository.getUser().data?.preferences
+
+        // UserPreferencesController.upsertApiData(userPreferences)
     }
 
     private fun updateAddressBooks() {
