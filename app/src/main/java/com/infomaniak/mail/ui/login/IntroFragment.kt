@@ -32,7 +32,7 @@ import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
@@ -49,9 +49,12 @@ import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
 
 class IntroFragment : Fragment() {
-    private lateinit var binding: FragmentIntroBinding
-    private val viewModel: IntroViewModel by activityViewModels()
+
     private val navigationArgs: IntroFragmentArgs by navArgs()
+
+    private val introViewModel: IntroViewModel by viewModels()
+
+    private lateinit var binding: FragmentIntroBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -62,7 +65,7 @@ class IntroFragment : Fragment() {
         when (navigationArgs.position) {
             0 -> {
                 pinkBlueSwitch.isVisible = true
-                val selectedTab = pinkBlueTabLayout.getTabAt(if (viewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
+                val selectedTab = pinkBlueTabLayout.getTabAt(if (introViewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
             }
@@ -102,12 +105,12 @@ class IntroFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
             delay(duration)
-            viewModel.theme.postValue(themeColor to true)
+            introViewModel.theme.postValue(themeColor to true)
         }
     }
 
     private fun updateUiWhenThemeChanges(position: Int?) {
-        viewModel.theme.observe(viewLifecycleOwner) { theme ->
+        introViewModel.theme.observe(viewLifecycleOwner) { theme ->
             setUi(theme.first, position, theme.second)
         }
     }

@@ -44,13 +44,13 @@ import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 
 class MenuDrawerFragment : Fragment() {
 
-    var exitDrawer: (() -> Unit)? = null
-    var isDrawerOpen: (() -> Boolean)? = null
-
     private val mainViewModel: MainViewModel by activityViewModels()
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     private lateinit var binding: FragmentMenuDrawerBinding
+
+    var exitDrawer: (() -> Unit)? = null
+    var isDrawerOpen: (() -> Boolean)? = null
 
     private var currentFolderRole: FolderRole? = null
     private var inboxFolderId: String? = null
