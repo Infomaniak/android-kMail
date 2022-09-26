@@ -216,10 +216,7 @@ class MainViewModel : ViewModel() {
 
         apiContacts.forEach { apiContact ->
             apiContact.emails.forEach { email ->
-                val key = Recipient().apply {
-                    name = apiContact.name
-                    this.email = email
-                }
+                val key = Recipient().initLocalValues(email, apiContact.name)
                 val contactAvatar = apiContact.avatar?.let { avatar -> resource(avatar) }
                 if (phoneMergedContacts.contains(key)) { // If we have already encountered this user
                     if (phoneMergedContacts[key]?.avatar == null) { // Only replace the avatar if we didn't have any before
@@ -275,10 +272,7 @@ class MainViewModel : ViewModel() {
                 val photoUri = cursor.getString(cursor.getColumnIndexOrThrow(Contactables.PHOTO_THUMBNAIL_URI))
 
                 emails[id]!!.forEach { email ->
-                    val key = Recipient().apply {
-                        this.email = email
-                        this.name = name
-                    }
+                    val key = Recipient().initLocalValues(email, name)
                     contacts[key] = photoUri
                 }
             }
@@ -299,10 +293,7 @@ class MainViewModel : ViewModel() {
         MergedContactController.getMergedContactsAsync().collect {
             mergedContacts.postValue(
                 it.list.associateBy { mergedContact ->
-                    Recipient().apply {
-                        name = mergedContact.name
-                        email = mergedContact.email
-                    }
+                    Recipient().initLocalValues(mergedContact.email, mergedContact.name)
                 }
             )
         }

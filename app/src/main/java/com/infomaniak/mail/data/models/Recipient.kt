@@ -42,9 +42,10 @@ class Recipient : RealmObject, Correspondent {
     //endregion
 
     // TODO: Remove this method when we have EmbeddedObjects
-    fun initLocalValues(): Recipient {
-        objectId = "${email.hashCode()}_$name"
-
+    fun initLocalValues(email: String? = null, name: String? = null): Recipient {
+        email?.let { this.email = it }
+        name?.let { this.name = it }
+        this.objectId = "${this.email.hashCode()}_${this.name}"
         return this
     }
 

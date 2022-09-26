@@ -77,11 +77,6 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun List<MergedContact>.toRealmRecipients(): RealmList<Recipient>? {
-        return if (isEmpty()) null else map {
-            Recipient().apply {
-                email = it.email
-                name = it.name ?: ""
-            }
-        }.toRealmList()
+        return if (isEmpty()) null else map { Recipient().initLocalValues(it.email, it.name) }.toRealmList()
     }
 }

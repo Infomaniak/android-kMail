@@ -106,7 +106,7 @@ class NewMessageActivity : ThemedActivity() {
         Draft().apply {
             initLocalValues("")
             // TODO: should userInformation (here 'from') be stored in mainViewModel ? see ApiRepository.getUser()
-            from = realmListOf(Recipient().apply { email = getFromMailbox().email })
+            from = realmListOf(Recipient().initLocalValues(getFromMailbox().email))
             subject = getSubject()
             body = getBody()
             priority = MessagePriority.Priority.NORMAL.getPriority()
