@@ -15,6 +15,18 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="33dp"
+    android:height="8dp"
+    android:viewportWidth="33"
+    android:viewportHeight="8">
+    <path
+        android:fillColor="#F5F5F5"
+        android:pathData="M33,8l-33,-0l-0,-8l33,-0z" />
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M33,8l-8,-0l-0,-8l8,-0z" />
+    <path
+        android:fillColor="@color/blueAccent"
+        android:pathData="M25,8l-8,-0l-0,-8l8,-0z" />
+</vector>

@@ -82,4 +82,12 @@
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_border</color>
 
+    <!-- ButtonToggle -->
+    <color name="buttonToggleStroke">#BC0055</color>
+    <color name="buttonToggleBackground">#F7E8EF</color>
+
+    <!-- Accent tint -->
+    <color name="pinkAccent">#BC0055</color>
+    <color name="blueAccent">#0098FF</color>
+
 </resources>

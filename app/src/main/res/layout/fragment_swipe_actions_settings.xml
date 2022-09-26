@@ -16,15 +16,15 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.main.settings.SettingsFragment"
+    tools:context=".ui.main.settings.swipe.SwipeActionsSettingsFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -41,7 +41,7 @@
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
-                android:text="@string/settingsTitle" />
+                android:text="@string/settingsSwipeActionsTitle" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 
@@ -66,69 +66,82 @@
 
                 <TextView
                     style="@style/SettingHeader"
-                    android:text="@string/settingsSectionEmailAddresses" />
+                    android:text="@string/settingsSwipeDescription" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/mailboxesList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_settings_mailbox" />
+                <LinearLayout
+                    android:id="@+id/settingsSwipeShortRight"
+                    style="@style/MenuDrawerItem">
+
+                    <ImageView
+                        style="@style/SettingImageAtStart"
+                        android:layout_width="32dp"
+                        android:src="@drawable/ic_swipe_right_short_pink" />
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsSwipeShortRight" />
+
+                        <TextView
+                            android:id="@+id/settingsSwipeShortRightText"
+                            style="@style/SettingText2Of2WithButton"
+                            tools:text="@string/settingsSwipeActionNone" />
+
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settingsSwipeLongRight"
+                    style="@style/MenuDrawerItem">
+
+                    <ImageView
+                        style="@style/SettingImageAtStart"
+                        android:layout_width="32dp"
+                        android:src="@drawable/ic_swipe_right_long_pink" />
+
+                    <LinearLayout style="@style/Setting2TextsWithButton">
+
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsSwipeLongRight" />
+
+                        <TextView
+                            android:id="@+id/settingsSwipeLongRightText"
+                            style="@style/SettingText2Of2WithButton"
+                            tools:text="@string/settingsSwipeActionNone" />
+
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
+
+                </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionGeneral" />
-
                 <LinearLayout
-                    android:id="@+id/settingsSend"
+                    android:id="@+id/settingsSwipeShortLeft"
                     style="@style/MenuDrawerItem">
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSendTitle" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsAppLock"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsAppLock" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settingsAppLockSwitch"
-                        style="@style/SettingButtonSwitch" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionAppearance" />
-
-                <LinearLayout
-                    android:id="@+id/settingsThreadListDensity"
-                    style="@style/MenuDrawerItem">
+                    <ImageView
+                        style="@style/SettingImageAtStart"
+                        android:layout_width="32dp"
+                        android:src="@drawable/ic_swipe_left_short_pink" />
 
                     <LinearLayout style="@style/Setting2TextsWithButton">
 
                         <TextView
                             style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsThreadListDensityTitle" />
+                            android:text="@string/settingsSwipeShortLeft" />
 
                         <TextView
-                            android:id="@+id/densitySubtitle"
+                            android:id="@+id/settingsSwipeShortLeftText"
                             style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsDefault" />
+                            tools:text="@string/settingsSwipeActionNone" />
+
                     </LinearLayout>
 
                     <ImageView style="@style/SettingButtonChevron" />
@@ -136,91 +149,25 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/settingsTheme"
+                    android:id="@+id/settingsSwipeLongLeft"
                     style="@style/MenuDrawerItem">
+
+                    <ImageView
+                        style="@style/SettingImageAtStart"
+                        android:layout_width="32dp"
+                        android:src="@drawable/ic_swipe_left_long_pink" />
 
                     <LinearLayout style="@style/Setting2TextsWithButton">
 
                         <TextView
                             style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsTheme" />
+                            android:text="@string/settingsSwipeLongLeft" />
 
                         <TextView
-                            android:id="@+id/themeSubtitle"
+                            android:id="@+id/settingsSwipeLongLeftText"
                             style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsOptionSystemTheme" />
-                    </LinearLayout>
+                            tools:text="@string/settingsSwipeActionNone" />
 
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsAccentColor"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsAccentColor" />
-
-                        <TextView
-                            android:id="@+id/accentColorSubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/accentColorPinkTitle" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsSwipeActions"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSwipeActionsTitle" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsMessageDisplay"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsMessageDisplayTitle" />
-
-                        <TextView
-                            android:id="@+id/displayModeSubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsOptionDiscussions" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsExternalContent"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsExternalContentTitle" />
-
-                        <TextView
-                            android:id="@+id/externalContentSubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsOptionAskMe" />
                     </LinearLayout>
 
                     <ImageView style="@style/SettingButtonChevron" />

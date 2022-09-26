@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.main.settings.send.CancelDelaySettingFragment"
+    tools:context=".ui.main.settings.send.SendSettingsFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -41,7 +41,7 @@
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
-                android:text="@string/settingsCancellationPeriodTitle" />
+                android:text="@string/settingsSendTitle" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 
@@ -64,112 +64,77 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsCancellationPeriodDescription" />
-
                 <LinearLayout
-                    android:id="@+id/settingsDisabled"
+                    android:id="@+id/settingsCancellationPeriod"
                     style="@style/MenuDrawerItem">
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsDisabled" />
+                    <LinearLayout style="@style/Setting2TextsWithButton">
 
-                    <ImageView
-                        android:id="@+id/settingsDisabledCheck"
-                        style="@style/SettingButtonCheck"
-                        android:visibility="visible" />
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsCancellationPeriodTitle" />
+
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsDisabled" />
+
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
 
                 </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
                 <LinearLayout
-                    android:id="@+id/settingCancel10"
+                    android:id="@+id/settingsTransferEmails"
                     style="@style/MenuDrawerItem">
 
-                    <TextView
-                        android:id="@+id/settingCancel10Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="10 seconds" />
+                    <LinearLayout style="@style/Setting2TextsWithButton">
 
-                    <ImageView
-                        android:id="@+id/settingCancel10Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
+                        <TextView
+                            style="@style/SettingText1Of2WithButton"
+                            android:text="@string/settingsTransferEmailsTitle" />
+
+                        <TextView
+                            style="@style/SettingText2Of2WithButton"
+                            android:text="@string/settingsTransferInBody" />
+
+                    </LinearLayout>
+
+                    <ImageView style="@style/SettingButtonChevron" />
 
                 </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
                 <LinearLayout
-                    android:id="@+id/settingCancel15"
+                    android:id="@+id/settingsSendIncludeOriginalMessage"
                     style="@style/MenuDrawerItem">
 
                     <TextView
-                        android:id="@+id/settingCancel15Text"
                         style="@style/SettingTextWithButton"
-                        tools:text="15 seconds" />
+                        android:text="@string/settingsSendIncludeOriginalMessage" />
 
-                    <ImageView
-                        android:id="@+id/settingCancel15Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsSendIncludeOriginalMessageSwitch"
+                        style="@style/SettingButtonSwitch" />
 
                 </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
                 <LinearLayout
-                    android:id="@+id/settingCancel20"
+                    android:id="@+id/settingsSendAcknowledgement"
                     style="@style/MenuDrawerItem">
 
                     <TextView
-                        android:id="@+id/settingCancel20Text"
                         style="@style/SettingTextWithButton"
-                        tools:text="20 seconds" />
+                        android:text="@string/settingsSendAcknowledgement" />
 
-                    <ImageView
-                        android:id="@+id/settingCancel20Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingCancel25"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        android:id="@+id/settingCancel25Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="25 seconds" />
-
-                    <ImageView
-                        android:id="@+id/settingCancel25Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingCancel30"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        android:id="@+id/settingCancel30Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="30 seconds" />
-
-                    <ImageView
-                        android:id="@+id/settingCancel30Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/settingsSendAcknowledgementSwitch"
+                        style="@style/SettingButtonSwitch" />
 
                 </LinearLayout>
 

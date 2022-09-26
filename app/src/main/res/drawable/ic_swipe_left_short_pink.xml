@@ -15,20 +15,18 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.main.contact.ContactFragment">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ContactFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="33dp"
+    android:height="8dp"
+    android:viewportWidth="33"
+    android:viewportHeight="8">
+    <path
+        android:fillColor="#F5F5F5"
+        android:pathData="M33,8l-33,-0l-0,-8l33,-0z" />
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M33,8l-8,-0l-0,-8l8,-0z" />
+    <path
+        android:fillColor="@color/pinkAccent"
+        android:pathData="M25,8l-8,-0l-0,-8l8,-0z" />
+</vector>
