@@ -16,11 +16,12 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.main.settings.ThemeSettingFragment"
+    tools:context=".ui.main.settings.ThreadListDensitySettingFragment"
     tools:ignore="ContentDescription,UseCompoundDrawables">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -41,14 +42,13 @@
                 android:ellipsize="end"
                 android:gravity="center_horizontal"
                 android:maxLines="1"
-                android:text="@string/settingsThemeChoiceTitle" />
+                android:text="@string/settingsThreadListDensityTitle" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/background"
         style="@style/BackgroundCardview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -58,7 +58,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:animateLayoutChanges="true"
-            android:clipToPadding="false"
             android:scrollbars="none">
 
             <LinearLayout
@@ -68,68 +67,42 @@
 
                 <TextView
                     style="@style/SettingHeader"
-                    android:text="@string/settingsTheme" />
+                    android:text="@string/settingsSelectDisplayModeDescription" />
 
-                <LinearLayout
-                    android:id="@+id/settingsOptionDefaultTheme"
-                    style="@style/MenuDrawerItem">
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/listDensityButtonsGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/marginStandard"
+                    android:paddingVertical="@dimen/marginStandardSmall"
+                    app:checkedButton="@id/listDensityButtonNormal"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
 
-                    <ImageView
-                        style="@style/SettingImageAtStart"
-                        android:src="@drawable/ic_theme_system" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/listDensityButtonCompact"
+                        style="@style/SettingButtonToggle"
+                        android:text="@string/settingsDensityOptionCompact" />
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsOptionSystemTheme" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/listDensityButtonNormal"
+                        style="@style/SettingButtonToggle"
+                        android:text="@string/settingsDefault" />
 
-                    <ImageView
-                        android:id="@+id/settingsOptionDefaultThemeCheck"
-                        style="@style/SettingButtonCheck"
-                        android:visibility="visible" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/listDensityButtonLarge"
+                        style="@style/SettingButtonToggle"
+                        android:text="@string/settingsDensityOptionLarge" />
 
-                </LinearLayout>
+                </com.google.android.material.button.MaterialButtonToggleGroup>
 
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingsOptionLightTheme"
-                    style="@style/MenuDrawerItem">
-
-                    <ImageView
-                        style="@style/SettingImageAtStart"
-                        android:src="@drawable/ic_theme_light" />
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsOptionLightTheme" />
-
-                    <ImageView
-                        android:id="@+id/settingsOptionLightThemeCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingsOptionDarkTheme"
-                    style="@style/MenuDrawerItem">
-
-                    <ImageView
-                        style="@style/SettingImageAtStart"
-                        android:src="@drawable/ic_theme_dark" />
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsOptionDarkTheme" />
-
-                    <ImageView
-                        android:id="@+id/settingsOptionDarkThemeCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/listDensityImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/marginStandard"
+                    android:paddingVertical="@dimen/marginStandardSmall"
+                    android:src="@drawable/bg_list_density_default" />
 
             </LinearLayout>
 
