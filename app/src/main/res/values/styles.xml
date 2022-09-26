@@ -167,6 +167,8 @@
     </style>
 
     <style name="BackgroundCardview" parent="Widget.Material3.CardView.Filled">
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="cardCornerRadius">0dp</item>
         <item name="cardElevation">6dp</item>

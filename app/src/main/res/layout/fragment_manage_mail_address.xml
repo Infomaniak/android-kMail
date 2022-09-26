@@ -22,13 +22,154 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.menu.ManageMailAddressFragment">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ManageMailAddressFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/titleMyAccount"
+            app:titleCentered="true" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/BackgroundCardview"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.infomaniak.mail.views.AvatarView
+                        android:id="@+id/avatar"
+                        android:layout_width="110dp"
+                        android:layout_height="110dp"
+                        android:layout_marginTop="42dp"
+                        app:layout_constraintBottom_toTopOf="@id/mail"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        tools:src="@tools:sample/avatars[2]" />
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@color/backgroundColor"
+                        app:layout_constraintBottom_toBottomOf="@id/editAvatar"
+                        app:layout_constraintEnd_toEndOf="@id/editAvatar"
+                        app:layout_constraintStart_toStartOf="@id/editAvatar"
+                        app:layout_constraintTop_toTopOf="@id/editAvatar"
+                        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/editAvatar"
+                        style="@style/IconButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:backgroundTint="?attr/colorPrimaryContainer"
+                        app:icon="@drawable/ic_edit_avatar"
+                        app:iconTint="?android:attr/colorPrimary"
+                        app:layout_constraintBottom_toBottomOf="@id/avatar"
+                        app:layout_constraintEnd_toEndOf="@id/avatar"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
+                        app:strokeColor="@color/backgroundColor" />
+
+                    <TextView
+                        android:id="@+id/mail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/marginStandard"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toTopOf="@id/changeAccountButton"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/avatar"
+                        tools:text="myriam.rais@infomaniak.com" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/changeAccountButton"
+                        style="@style/TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/marginStandardMedium"
+                        android:fontFamily="@font/suisseintl_semibold"
+                        android:text="@string/buttonAccountSwitch"
+                        app:layout_constraintBottom_toTopOf="@id/topDivider"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/mail" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/topDivider"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                        app:dividerColor="@color/separatorColor"
+                        app:layout_constraintBottom_toTopOf="@id/associatedEmailAddresses"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                        android:id="@+id/associatedEmailAddresses"
+                        android:layout_width="match_parent"
+                        android:layout_height="74dp"
+                        app:itemAction="chevron"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/topDivider"
+                        app:title="@string/buttonAccountAssociatedEmailAddresses" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                        app:dividerColor="@color/separatorColor"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/associatedEmailAddresses" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/disconnectAccountButton"
+                    style="@style/TextButtonPrimary"
+                    android:layout_width="0dp"
+                    android:layout_marginHorizontal="@dimen/marginStandard"
+                    android:layout_marginVertical="@dimen/marginStandardSmall"
+                    android:text="@string/buttonAccountDisconnect"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
