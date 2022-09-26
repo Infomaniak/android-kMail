@@ -95,6 +95,20 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
+    fun updateMailboxSettings(
+        mailboxHostingId: Int,
+        mailboxName: String,
+        hasMailFiltering: Boolean,
+        hasMoveSpam: Boolean,
+    ): ApiResponse<Boolean> {
+        val body = mapOf("has_mail_filtering" to hasMailFiltering, "has_move_spam" to hasMoveSpam)
+        return callApi(ApiRoutes.securedMailbox(mailboxHostingId, mailboxName), PATCH, body)
+    }
+
+    fun updateFolderRoles(mailboxHostingId: Int, mailboxName: String, body: Map<String, String>) {
+        return callApi(ApiRoutes.securedFolders(mailboxHostingId, mailboxName), PUT, body)
+    }
+
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
         return callApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }

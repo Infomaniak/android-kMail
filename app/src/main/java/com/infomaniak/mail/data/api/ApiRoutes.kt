@@ -31,8 +31,15 @@ object ApiRoutes {
 
     fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
 
-    fun signatures(mailboxHostingId: Int, mailboxName: String): String {
-        return "$MAIL_API/api/securedProxy/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/signatures"
+    fun securedMailbox(mailboxHostingId: Int, mailboxName: String, hasMailboxAuth: Boolean = false): String {
+        val mailboxAuth = if (hasMailboxAuth) "/proxymailboxauth" else ""
+        return "$MAIL_API/api/securedProxy${mailboxAuth}/1/mail_hostings/${mailboxHostingId}/mailboxes/${mailboxName}"
+    }
+
+    fun signatures(mailboxHostingId: Int, mailboxName: String) = "${securedMailbox(mailboxHostingId, mailboxName)}/signatures"
+
+    fun securedFolders(mailboxHostingId: Int, mailboxName: String): String {
+        return "${securedMailbox(mailboxHostingId, mailboxName, true)}/auth/folders"
     }
 
     fun mailbox() = "$MAIL_API/api/mailbox?with=unseen"
