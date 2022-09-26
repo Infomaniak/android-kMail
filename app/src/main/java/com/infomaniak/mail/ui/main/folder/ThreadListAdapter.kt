@@ -113,7 +113,7 @@ class ThreadListAdapter(
 
         fillInUserNameAndEmail(from.first(), expeditor)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
-        mailBodyPreview.text = messages.last().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
+        mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
         expeditorAvatar.loadAvatar(from.first())
 
         mailDate.text = formatDate(root.context)
