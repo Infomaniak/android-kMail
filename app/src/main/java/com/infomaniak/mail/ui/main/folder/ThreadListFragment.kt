@@ -45,6 +45,7 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -113,7 +114,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadDensity = ThreadDensity.LARGE, // TODO: Take this value from the settings when available
+            threadsDensity = UserPreferencesController.getUserPreferences().getThreadsDensity(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
@@ -385,12 +386,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
-
-    enum class ThreadDensity {
-        COMPACT,
-        NORMAL,
-        LARGE,
-    }
 
     private companion object {
         // This is approximately a little more than the number of Threads displayed at the same time on the screen.
