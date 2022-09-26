@@ -43,21 +43,25 @@ class SwitchUserFragment : Fragment() {
     private lateinit var binding: FragmentSwitchUserBinding
 
     private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
-        if (selectedMailbox.userId == AccountUtils.currentUserId) {
-            mainViewModel.openMailbox(selectedMailbox)
-            findNavController().popBackStack()
-        } else {
-            lifecycleScope.launch(Dispatchers.IO) {
-                AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
-                AccountUtils.currentMailboxId = selectedMailbox.mailboxId
+        // TODO: This code is currently removed because if it triggers, the app crashes. This crash is because of the
+        // TODO: removal of the ThreadList DiffUtil. The DiffUtil was checking if the Threads are still `.valid()`.
+        // TODO: When we change Mailbox, the Threads are not valid anymore, so we don't want to display them.
+        // TODO: Now that we don't check that anymore, we display them, so the app crashes.
+        // if (selectedMailbox.userId == AccountUtils.currentUserId) {
+        //     mainViewModel.openMailbox(selectedMailbox)
+        //     findNavController().popBackStack()
+        // } else {
+        lifecycleScope.launch(Dispatchers.IO) {
+            AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
+            AccountUtils.currentMailboxId = selectedMailbox.mailboxId
 
-                withContext(Dispatchers.Main) {
-                    mainViewModel.close()
+            withContext(Dispatchers.Main) {
+                mainViewModel.close()
 
-                    AccountUtils.reloadApp?.invoke()
-                }
+                AccountUtils.reloadApp?.invoke()
             }
         }
+        // }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
