@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThread
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.AddressBookController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
+import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -248,6 +249,7 @@ class MainViewModel : ViewModel() {
         Log.i(TAG, "loadMoreThreads: $offset")
         isDownloadingChanges.postValue(true)
         DuplicateController.removeDuplicates()
+        val threadMode = UserPreferencesController.getUserPreferences().getThreadMode().apiCallValue
         val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data ?: return@launch
         canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
