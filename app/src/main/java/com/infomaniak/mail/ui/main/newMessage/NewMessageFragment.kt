@@ -238,11 +238,7 @@ class NewMessageFragment : Fragment() {
             val alreadyUsedEmails = contactAdapter.getAlreadyUsedEmails(fieldType)
             if (alreadyUsedEmails.none { it == input }) {
                 alreadyUsedEmails.add(input)
-                val contact = MergedContact().apply { // TODO : Instantiating a merged contact this way is unsafe
-                    name = input
-                    email = input
-                    initLocalValues()
-                }
+                val contact = MergedContact().initLocalValues(input, input)
                 getContacts(fieldType).add(contact)
                 createChip(fieldType, contact)
             }

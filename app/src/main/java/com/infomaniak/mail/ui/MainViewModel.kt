@@ -226,12 +226,7 @@ class MainViewModel : ViewModel() {
                         phoneMergedContacts[key]?.avatar = contactAvatar
                     }
                 } else { // If we haven't yet encountered this user, add him
-                    phoneMergedContacts[key] = MergedContact().apply { // TODO : Instantiating a merged contact this way is unsafe
-                        this.email = email
-                        name = apiContact.name
-                        avatar = contactAvatar
-                        initLocalValues()
-                    }
+                    phoneMergedContacts[key] = MergedContact().initLocalValues(email, apiContact.name, contactAvatar)
                 }
             }
         }
@@ -295,12 +290,7 @@ class MainViewModel : ViewModel() {
     private fun Map<Recipient, String?>.toMergedContactsMap(): MutableMap<Recipient, MergedContact> {
         val mergedContacts = mutableMapOf<Recipient, MergedContact>()
         forEach { (key, avatarUri) ->
-            mergedContacts[key] = MergedContact().apply { // TODO : Instantiating a merged contact this way is unsafe
-                email = key.email
-                name = key.name
-                avatar = avatarUri
-                initLocalValues()
-            }
+            mergedContacts[key] = MergedContact().initLocalValues(key.email, key.name, avatarUri)
         }
         return mergedContacts
     }

@@ -32,11 +32,13 @@ class MergedContact : RealmObject, Correspondent {
 
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues() {
-        id = "${email.hashCode()}_$name"
+    fun initLocalValues(email: String, name: String, avatar: String? = null): MergedContact {
+        this.email = email
+        this.name = name
+        avatar?.let { this.avatar = it }
+        this.id = "${email.hashCode()}_$name"
+        return this
     }
 
-    override fun toString(): String {
-        return "{$avatar, $email, $name}"
-    }
+    override fun toString(): String = "{$avatar, $email, $name}"
 }
