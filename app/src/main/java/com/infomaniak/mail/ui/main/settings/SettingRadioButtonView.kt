@@ -32,7 +32,7 @@ import com.google.android.material.R as RMaterial
 class SettingRadioButtonView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr), RadioCheckable {
 
     private val binding: ViewSettingRadioButtonBinding by lazy {
@@ -50,7 +50,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 val textString = typedArray.getString(R.styleable.SettingRadioButtonView_text)
                 val checkMarkColor = typedArray.getColor(
                     R.styleable.SettingRadioButtonView_checkMarkColor,
-                    context.getAttributeColor(RMaterial.attr.colorPrimary)
+                    context.getAttributeColor(RMaterial.attr.colorPrimary),
                 )
                 associatedValue = typedArray.getString(R.styleable.SettingRadioButtonView_value)
 
