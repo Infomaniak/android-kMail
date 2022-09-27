@@ -32,8 +32,7 @@
         android:layout_height="24dp"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         android:visibility="gone"
-        tools:ignore="ContentDescription"
-        tools:src="@drawable/ic_display_mode_message" />
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/text"
