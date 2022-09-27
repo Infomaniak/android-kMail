@@ -18,16 +18,15 @@
 package com.infomaniak.mail.ui.main.menu
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.notYetImplemented
 
 class ManageMailAddressFragment : Fragment() {
 
@@ -38,14 +37,14 @@ class ManageMailAddressFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        root.setNavigationOnClickListener { findNavController().popBackStack() }
 
         AccountUtils.currentUser?.let { avatar.loadAvatar(it) }
-        editAvatar.setOnClickListener { Log.e("gibran", "onViewCreated: modifying avatar") }
+        editAvatar.setOnClickListener { notYetImplemented() }
         mail.text = AccountUtils.currentUser?.email ?: ""
-        changeAccountButton.setOnClickListener { Log.e("gibran", "onViewCreated: changing account") }
-        associatedEmailAddresses.setOnClickListener { Log.e("gibran", "onViewCreated: associated email addresses") }
+        changeAccountButton.setOnClickListener { notYetImplemented() }
+        associatedEmailAddresses.setOnClickListener { notYetImplemented() }
 
-        disconnectAccountButton.setOnClickListener { Log.e("gibran", "onViewCreated: disconnect") }
+        disconnectAccountButton.setOnClickListener { notYetImplemented() }
     }
 }

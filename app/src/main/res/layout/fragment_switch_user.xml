@@ -15,72 +15,48 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="@color/backgroundHeaderColor"
+    app:title="@string/titleMyAccounts"
     tools:context=".ui.main.user.SwitchUserFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="@dimen/marginStandardMedium"
-        android:backgroundTint="@android:color/transparent"
-        app:layout_constraintBottom_toTopOf="@id/background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/titleMyAccounts"
-        app:titleCentered="true" />
+        android:layout_height="match_parent">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/background"
-        style="@style/BackgroundCardview"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewAccount"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingTop="@dimen/marginStandardVerySmall"
+            android:paddingBottom="140dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:itemCount="2"
+            tools:listitem="@layout/item_switch_user_account" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewAccount"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:overScrollMode="never"
-                android:paddingTop="@dimen/marginStandardVerySmall"
-                android:paddingBottom="140dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="2"
-                tools:listitem="@layout/item_switch_user_account" />
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/addAccount"
+            style="@style/H3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/marginStandard"
+            android:layout_marginBottom="@dimen/marginStandard"
+            android:text="@string/buttonAddAccount"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_add"
+            app:iconGravity="start"
+            app:iconPadding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/addAccount"
-                style="@style/H3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/marginStandard"
-                android:layout_marginBottom="@dimen/marginStandard"
-                android:text="@string/buttonAddAccount"
-                android:textAllCaps="false"
-                app:icon="@drawable/ic_add"
-                app:iconGravity="start"
-                app:iconPadding="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>
