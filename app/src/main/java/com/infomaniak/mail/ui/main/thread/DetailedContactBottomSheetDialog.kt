@@ -53,7 +53,6 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         listenToContacts()
     }
 
-
     private fun listenToContacts() {
         viewModel.mergedContacts.observe(viewLifecycleOwner) {
             val recipient = navigationArgs.recipient
