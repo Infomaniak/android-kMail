@@ -119,74 +119,51 @@ object ThreadController {
         }
     }
 
-    fun toggleSeenStatus(thread: Thread, folderId: String) {
-        if (thread.unseenMessagesCount == 0) {
-            markAsUnseen(thread, folderId)
-        } else {
-            markAsSeen(thread, folderId)
-        }
-    }
-
-    private fun markAsUnseen(thread: Thread, folderId: String) {
-        RealmDatabase.mailboxContent.writeBlocking {
-
-            val latestThread = findLatest(thread) ?: return@writeBlocking
-            val lastMessage = latestThread.messages.last()
-
-            val uids = mutableListOf<String>().apply {
-                add(lastMessage.uid)
-                addAll(lastMessage.duplicates.map { duplicate -> duplicate.uid })
-            }
-
-            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uids)
-
-            if (apiResponse.isSuccess()) {
-                latestThread.apply {
-                    lastMessage.seen = false
-                    unseenMessagesCount++
-                }
-                incrementFolderUnreadCount(folderId, latestThread.unseenMessagesCount, this)
-            }
-        }
-    }
-
-    fun markAsSeen(thread: Thread, folderId: String) {
-        if (thread.unseenMessagesCount != 0) {
-
-            RealmDatabase.mailboxContent.writeBlocking {
-
-                val latestThread = findLatest(thread) ?: return@writeBlocking
-
-                val uids = mutableListOf<String>().apply {
-                    latestThread.messages.forEach {
-                        if (!it.seen) {
-                            add(it.uid)
-                            addAll(it.duplicates.map { duplicate -> duplicate.uid })
-                        }
-                    }
-                }
-
-                val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)
-
-                if (apiResponse.isSuccess()) {
-                    incrementFolderUnreadCount(folderId, -latestThread.unseenMessagesCount, this)
-                    latestThread.apply {
-                        messages.forEach { it.seen = true }
-                        unseenMessagesCount = 0
-                    }
-                }
-            }
-        }
-    }
-
     private fun setFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
         FolderController.updateFolder(folderId, realm) {
             it.unreadCount = unseenMessagesCount
         }
     }
 
-    private fun incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, realm: MutableRealm? = null) {
-        FolderController.updateFolder(folderId, realm) {
+    fun getThreadLastMessageUids(thread: Thread): List<String> {
+        val lastMessage = thread.messages.last()
+
+        return mutableListOf<String>().apply {
+            add(lastMessage.uid)
+            addAll(lastMessage.duplicates.map { duplicate -> duplicate.uid })
+        }
+    }
+
+    fun MutableRealm.markThreadAsUnseen(thread: Thread, folderId: String) {
+        thread.apply {
+            messages.last().seen = false
+            unseenMessagesCount++
+        }
+
+        incrementFolderUnreadCount(folderId, thread.unseenMessagesCount)
+    }
+
+    fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
+        return mutableListOf<String>().apply {
+            thread.messages.forEach {
+                if (!it.seen) {
+                    add(it.uid)
+                    addAll(it.duplicates.map { duplicate -> duplicate.uid })
+                }
+            }
+        }
+    }
+
+    fun MutableRealm.markThreadAsSeen(thread: Thread, folderId: String) {
+        incrementFolderUnreadCount(folderId, -thread.unseenMessagesCount)
+        thread.apply {
+            messages.forEach { it.seen = true }
+            unseenMessagesCount = 0
+        }
+    }
+
+    private fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int) {
+        FolderController.updateFolder(folderId, this) {
             it.unreadCount += unseenMessagesCount
         }
     }

@@ -26,6 +26,8 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.AddressBookController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
@@ -171,7 +173,7 @@ class MainViewModel : ViewModel() {
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         selectThread(thread)
-        ThreadController.markAsSeen(thread, currentFolderId.value!!)
+        markAsSeen(thread, currentFolderId.value!!)
         updateMessages(thread)
     }
 
@@ -267,6 +269,34 @@ class MainViewModel : ViewModel() {
                     // }
                 }
             }
+        }
+    }
+
+    fun toggleSeenStatus(thread: Thread, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
+        if (thread.unseenMessagesCount == 0) {
+            markAsUnseen(thread, folderId)
+        } else {
+            markAsSeen(thread, folderId)
+        }
+    }
+
+    private fun markAsUnseen(thread: Thread, folderId: String) {
+        RealmDatabase.mailboxContent.writeBlocking {
+            val latestThread = findLatest(thread) ?: return@writeBlocking
+            val uids = ThreadController.getThreadLastMessageUids(latestThread)
+            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uids)
+            if (apiResponse.isSuccess()) markThreadAsUnseen(latestThread, folderId)
+        }
+    }
+
+    private fun markAsSeen(thread: Thread, folderId: String) {
+        if (thread.unseenMessagesCount == 0) return
+
+        RealmDatabase.mailboxContent.writeBlocking {
+            val latestThread = findLatest(thread) ?: return@writeBlocking
+            val uids = ThreadController.getThreadUnseenMessagesUids(latestThread)
+            val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)
+            if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
         }
     }
 }
