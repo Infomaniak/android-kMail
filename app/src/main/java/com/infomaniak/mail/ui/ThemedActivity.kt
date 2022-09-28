@@ -19,18 +19,11 @@ package com.infomaniak.mail.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.UiSettings
 
 open class ThemedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val isPink = false
-
-        val theme = when {
-            isPink -> R.style.AppTheme_Pink
-            else -> R.style.AppTheme_Blue
-        }
-        setTheme(theme)
-
+        setTheme(UiSettings(this).colorTheme.themeRes)
         super.onCreate(savedInstanceState)
     }
 }
