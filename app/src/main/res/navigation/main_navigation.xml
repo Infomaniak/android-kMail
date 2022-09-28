@@ -174,7 +174,11 @@
         android:id="@+id/manageMailAddressFragment"
         android:name="com.infomaniak.mail.ui.main.menu.ManageMailAddressFragment"
         android:label="ManageMailAddressFragment"
-        tools:layout="@layout/fragment_manage_mail_address" />
+        tools:layout="@layout/fragment_manage_mail_address">
+        <action
+            android:id="@+id/action_manageMailAddressFragment_to_switchUserFragment"
+            app:destination="@id/switchUserFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"

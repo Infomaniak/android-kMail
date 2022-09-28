@@ -40,9 +40,8 @@ class ManageMailAddressFragment : Fragment() {
         root.setNavigationOnClickListener { findNavController().popBackStack() }
 
         AccountUtils.currentUser?.let { avatar.loadAvatar(it) }
-        editAvatar.setOnClickListener { notYetImplemented() }
         mail.text = AccountUtils.currentUser?.email ?: ""
-        changeAccountButton.setOnClickListener { notYetImplemented() }
+        changeAccountButton.setOnClickListener { safeNavigate(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
         associatedEmailAddresses.setOnClickListener { notYetImplemented() }
 
         disconnectAccountButton.setOnClickListener { notYetImplemented() }

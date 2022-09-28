@@ -50,29 +50,6 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     tools:src="@tools:sample/avatars[2]" />
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:background="@color/backgroundColor"
-                    app:layout_constraintBottom_toBottomOf="@id/editAvatar"
-                    app:layout_constraintEnd_toEndOf="@id/editAvatar"
-                    app:layout_constraintStart_toStartOf="@id/editAvatar"
-                    app:layout_constraintTop_toTopOf="@id/editAvatar"
-                    app:shapeAppearanceOverlay="@style/CircleImageView" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/editAvatar"
-                    style="@style/IconButton"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:backgroundTint="?attr/colorPrimaryContainer"
-                    app:icon="@drawable/ic_edit_avatar"
-                    app:iconTint="?android:attr/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="@id/avatar"
-                    app:layout_constraintEnd_toEndOf="@id/avatar"
-                    app:shapeAppearanceOverlay="@style/CircleImageView"
-                    app:strokeColor="@color/backgroundColor" />
-
                 <TextView
                     android:id="@+id/mail"
                     android:layout_width="wrap_content"
