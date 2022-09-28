@@ -27,8 +27,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.UiSettings
-import com.infomaniak.mail.data.models.UiSettings.ColorTheme
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.UiSettings.ColorTheme
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
 
 class AccentColorSettingFragment : Fragment() {

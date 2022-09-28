@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.data.UiSettings.EmailsDisplayType
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 
 object ApiRoutes {
@@ -51,7 +52,7 @@ object ApiRoutes {
     fun threads(
         uuid: String,
         folderId: String,
-        threadMode: String,
+        emailsDisplayType: EmailsDisplayType,
         offset: Int,
         filter: ThreadFilter,
         searchText: String? = null,
@@ -64,8 +65,10 @@ object ApiRoutes {
             ThreadFilter.UNSEEN -> "&filters=${filter.name.lowercase()}"
             else -> ""
         }
-
-        return "${folder(uuid, folderId)}/message?thread=$threadMode&offset=$offset$urlSearch$urlAttachment$urlFilter"
+        val folder = folder(uuid, folderId)
+        val message = "/message"
+        val thread = "?thread=${emailsDisplayType.apiCallValue}"
+        return "$folder$message$thread&offset=$offset$urlSearch$urlAttachment$urlFilter"
     }
 
     fun quotas(mailbox: String, hostingId: Int) = "$MAIL_API/api/mailbox/quotas?mailbox=$mailbox&product_id=$hostingId"

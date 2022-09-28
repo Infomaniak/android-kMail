@@ -37,10 +37,10 @@ import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings.ThreadsDensity
+import com.infomaniak.mail.data.UiSettings.ThreadsDensity.COMPACT
+import com.infomaniak.mail.data.UiSettings.ThreadsDensity.LARGE
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.user.UserPreferences.ThreadsDensity
-import com.infomaniak.mail.data.models.user.UserPreferences.ThreadsDensity.COMPACT
-import com.infomaniak.mail.data.models.user.UserPreferences.ThreadsDensity.LARGE
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding

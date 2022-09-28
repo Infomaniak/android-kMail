@@ -44,8 +44,8 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
-import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -109,12 +109,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        mainViewModel.forceRefreshThreads(filter)
+        val emailsDisplayType = UiSettings(requireContext()).emailsDisplayType
+        mainViewModel.forceRefreshThreads(filter, emailsDisplayType)
     }
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadsDensity = UserPreferencesController.getUserPreferences().getThreadsDensity(),
+            threadsDensity = UiSettings(requireContext()).threadsDensity,
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
@@ -231,7 +232,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             setOnClickListener {
                 isCloseIconVisible = isChecked
                 filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
-                mainViewModel.forceRefreshThreads(filter)
+                val emailsDisplayType = UiSettings(requireContext()).emailsDisplayType
+                mainViewModel.forceRefreshThreads(filter, emailsDisplayType)
             }
         }
     }
@@ -328,7 +330,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
         if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
             clearFilter()
-            mainViewModel.forceRefreshThreads(filter)
+            val emailsDisplayType = UiSettings(requireContext()).emailsDisplayType
+            mainViewModel.forceRefreshThreads(filter, emailsDisplayType)
         }
 
         lastUnreadCount = unreadCount
@@ -375,7 +378,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (canPaginate) {
             currentOffset += PER_PAGE
-            loadMoreThreads(uuid, folderId, currentOffset, filter)
+            val emailsDisplayType = UiSettings(requireContext()).emailsDisplayType
+            loadMoreThreads(uuid, folderId, emailsDisplayType, currentOffset, filter)
         }
     }
 

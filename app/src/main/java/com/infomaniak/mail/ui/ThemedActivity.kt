@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.data.models.UiSettings
+import com.infomaniak.mail.data.UiSettings
 
 open class ThemedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

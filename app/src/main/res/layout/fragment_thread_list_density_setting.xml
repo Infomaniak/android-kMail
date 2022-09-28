@@ -87,7 +87,7 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/listDensityButtonNormal"
                         style="@style/SettingButtonToggle"
-                        android:text="@string/settingsDefault" />
+                        android:text="@string/settingsDensityOptionNormal" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/listDensityButtonLarge"

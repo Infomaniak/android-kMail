@@ -26,8 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
-import com.infomaniak.mail.data.models.user.UserPreferences
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
 
 class SwipeActionsSettingsFragment : Fragment() {
@@ -41,7 +40,7 @@ class SwipeActionsSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
-        UserPreferencesController.getUserPreferences().setupUi()
+        UiSettings(requireContext()).setupUi()
         setupListeners()
     }
 
@@ -49,7 +48,7 @@ class SwipeActionsSettingsFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    private fun UserPreferences.setupUi() = with(binding) {
+    private fun UiSettings.setupUi() = with(binding) {
         settingsSwipeShortRightText.setText(shortRightSwipe.nameRes)
         settingsSwipeLongRightText.setText(longRightSwipe.nameRes)
         settingsSwipeShortLeftText.setText(shortLeftSwipe.nameRes)

@@ -37,7 +37,7 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
-import com.infomaniak.mail.data.models.UiSettings
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.KMailHttpClient
@@ -95,7 +95,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     private fun enforceAppTheme() {
-        AppCompatDelegate.setDefaultNightMode(UiSettings(this).nightMode)
+        AppCompatDelegate.setDefaultNightMode(UiSettings(this).nightMode.mode)
     }
 
     private fun configureAccountUtils() {
