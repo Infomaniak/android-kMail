@@ -42,8 +42,6 @@ class ThreadAdapter(
     private var messages: List<Message> = mutableListOf(),
 ) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
-    override lateinit var recyclerView: RecyclerView
-
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null

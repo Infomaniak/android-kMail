@@ -50,8 +50,10 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     private var resultsChangeLiveData: LiveData<ResultsChange<T>>? = null,
     private var listChangeLiveData: LiveData<ListChange<T>>? = null,
 ) {
+
     private var onRealmChanged: OnRealmChanged<T>
 
+    var recyclerView: RecyclerView? = null
     var waitingBeforeNotifyAdapter: LiveData<Boolean>? = null
     var beforeUpdateAdapter: ((itemList: List<T>) -> Unit)? = null
     var afterUpdateAdapter: ((itemList: List<T>) -> Unit)? = null
@@ -131,14 +133,17 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     private fun LiveData<Boolean>.observeWaiting(whenCanNotify: () -> Unit) {
         observe(lifecycleOwner) { canNotify ->
             if (canNotify) {
-                onRealmChanged.recyclerView.postOnAnimation { whenCanNotify() }
+                if (recyclerView == null) {
+                    throw NullPointerException("You forgot to assign the `recyclerView` used in `waitingBeforeNotifyAdapter`.")
+                } else {
+                    recyclerView?.postOnAnimation { whenCanNotify() }
+                }
                 waitingBeforeNotifyAdapter?.removeObservers(lifecycleOwner)
             }
         }
     }
 
     interface OnRealmChanged<T> {
-        var recyclerView: RecyclerView
         fun updateList(itemList: List<T>)
         fun deleteList() = Unit
     }
