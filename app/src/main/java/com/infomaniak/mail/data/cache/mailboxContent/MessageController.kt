@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
 import com.infomaniak.mail.data.models.message.Message
@@ -40,26 +39,16 @@ object MessageController {
     //endregion
 
     //region Edit data
-    fun update(realmMessages: List<Message>, apiMessages: List<Message>) {
+    fun update(localMessages: List<Message>, apiMessages: List<Message>) {
         RealmDatabase.mailboxContent.writeBlocking {
-
-            // Get outdated data
-            Log.d(RealmDatabase.TAG, "Messages: Get outdated data")
-            val outdatedMessages = getOutdatedMessages(realmMessages, apiMessages)
-
-            // Save new data
-            Log.d(RealmDatabase.TAG, "Messages: Save new data")
+            deleteMessages(getOutdatedMessages(localMessages, apiMessages))
             insertNewData(apiMessages)
-
-            // Delete outdated data
-            Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")
-            deleteMessages(outdatedMessages)
         }
     }
 
-    private fun getOutdatedMessages(realmMessages: List<Message>, apiMessages: List<Message>): List<Message> {
-        return realmMessages.filter { realmMessage ->
-            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
+    private fun getOutdatedMessages(localMessages: List<Message>, apiMessages: List<Message>): List<Message> {
+        return localMessages.filter { localMessage ->
+            apiMessages.none { apiMessage -> apiMessage.uid == localMessage.uid }
         }
     }
 
