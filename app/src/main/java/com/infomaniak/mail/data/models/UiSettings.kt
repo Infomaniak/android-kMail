@@ -3,6 +3,7 @@ package com.infomaniak.mail.data.models
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
@@ -36,8 +37,8 @@ class UiSettings(private val context: Context) {
             _colorTheme = value.name
         }
 
-    enum class ColorTheme(@StringRes val localisedNameRes: Int) {
-        BLUE(R.string.accentColorBlueTitle),
-        PINK(R.string.accentColorPinkTitle),
+    enum class ColorTheme(@StringRes val localisedNameRes: Int, @StyleRes val themeRes: Int) {
+        BLUE(R.string.accentColorBlueTitle, R.style.AppTheme_Blue),
+        PINK(R.string.accentColorPinkTitle, R.style.AppTheme_Pink),
     }
 }
