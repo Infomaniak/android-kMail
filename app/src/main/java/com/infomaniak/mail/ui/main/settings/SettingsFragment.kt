@@ -25,10 +25,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
-import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
-import com.infomaniak.mail.data.models.UiSettings
-import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.notYetImplemented
@@ -53,7 +51,7 @@ class SettingsFragment : Fragment() {
         setupBack()
         setupAdapter()
         setupListeners()
-        UserPreferencesController.getUserPreferences().setupPreferencesText()
+        UiSettings(requireContext()).setupPreferencesText()
     }
 
     private fun setupBack() {
@@ -68,11 +66,11 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun UserPreferences.setupPreferencesText() = with(binding) {
-        densitySubtitle.setText(getThreadsDensity().localisedNameRes)
-        themeSubtitle.setText(getThemeMode().localisedNameRes)
-        displayModeSubtitle.setText(getThreadMode().localisedNameRes)
-        externalContentSubtitle.setText(getExternalContentMode().localisedNameRes)
+    private fun UiSettings.setupPreferencesText() = with(binding) {
+        densitySubtitle.setText(threadsDensity.localisedNameRes)
+        themeSubtitle.setText(nightMode.localisedNameRes)
+        displayModeSubtitle.setText(emailsDisplayType.localisedNameRes)
+        externalContentSubtitle.setText(externalContentMode.localisedNameRes)
         accentColorSubtitle.setText(UiSettings(requireContext()).colorTheme.localisedNameRes)
     }
 

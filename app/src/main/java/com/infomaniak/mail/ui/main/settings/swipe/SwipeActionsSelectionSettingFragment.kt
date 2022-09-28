@@ -28,8 +28,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.UiSettings.SwipeAction
+import com.infomaniak.mail.data.UiSettings.SwipeAction.*
 import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
-import com.infomaniak.mail.data.models.user.UserPreferences.SwipeAction
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -56,17 +58,17 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     private fun setupUi() = with(binding) {
         val actionResId = navigationArgs.titleResId
         toolbarText.setText(actionResId)
-        when (UserPreferencesController.getUserPreferences().getSwipeAction(actionResId)) {
-            SwipeAction.NONE -> actionNoneCheck
-            SwipeAction.ARCHIVE -> actionArchiveCheck
-            SwipeAction.DELETE -> actionDeleteCheck
-            SwipeAction.FAVORITE -> actionFavoriteCheck
-            SwipeAction.MOVE -> actionMoveCheck
-            SwipeAction.POSTPONE -> actionPostponeCheck
-            SwipeAction.QUICKACTIONS_MENU -> actionQuickActionsMenuCheck
-            SwipeAction.READ_AND_ARCHIVE -> actionReadAndArchiveCheck
-            SwipeAction.READ_UNREAD -> actionReadUnreadCheck
-            SwipeAction.SPAM -> actionSpamCheck
+        when (UiSettings(requireContext()).getSwipeAction(actionResId)) {
+            NONE -> actionNoneCheck
+            ARCHIVE -> actionArchiveCheck
+            DELETE -> actionDeleteCheck
+            FAVORITE -> actionFavoriteCheck
+            MOVE -> actionMoveCheck
+            POSTPONE -> actionPostponeCheck
+            QUICKACTIONS_MENU -> actionQuickActionsMenuCheck
+            READ_AND_ARCHIVE -> actionReadAndArchiveCheck
+            READ_UNREAD -> actionReadUnreadCheck
+            SPAM -> actionSpamCheck
             else -> null
         }?.selectOption()
     }
@@ -75,52 +77,52 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         actionDelete.setOnClickListener {
             notYetImplemented()
             actionDeleteCheck.selectOption()
-            saveAction(SwipeAction.DELETE)
+            saveAction(DELETE)
         }
         actionArchive.setOnClickListener {
             notYetImplemented()
             actionArchiveCheck.selectOption()
-            saveAction(SwipeAction.ARCHIVE)
+            saveAction(ARCHIVE)
         }
         actionReadUnread.setOnClickListener {
             notYetImplemented()
             actionReadUnreadCheck.selectOption()
-            saveAction(SwipeAction.READ_UNREAD)
+            saveAction(READ_UNREAD)
         }
         actionMove.setOnClickListener {
             notYetImplemented()
             actionMoveCheck.selectOption()
-            saveAction(SwipeAction.MOVE)
+            saveAction(MOVE)
         }
         actionFavorite.setOnClickListener {
             notYetImplemented()
             actionFavoriteCheck.selectOption()
-            saveAction(SwipeAction.FAVORITE)
+            saveAction(FAVORITE)
         }
         actionPostpone.setOnClickListener {
             notYetImplemented()
             actionPostponeCheck.selectOption()
-            saveAction(SwipeAction.POSTPONE)
+            saveAction(POSTPONE)
         }
         actionSpam.setOnClickListener {
             notYetImplemented()
             actionSpamCheck.selectOption()
-            saveAction(SwipeAction.SPAM)
+            saveAction(SPAM)
         }
         actionReadAndArchive.setOnClickListener {
             notYetImplemented()
             actionReadAndArchiveCheck.selectOption()
-            saveAction(SwipeAction.READ_AND_ARCHIVE)
+            saveAction(READ_AND_ARCHIVE)
         }
         actionQuickActionsMenu.setOnClickListener {
             notYetImplemented()
             actionQuickActionsMenuCheck.selectOption()
-            saveAction(SwipeAction.QUICKACTIONS_MENU)
+            saveAction(QUICKACTIONS_MENU)
         }
         actionNone.setOnClickListener {
             notYetImplemented()
             actionNoneCheck.selectOption()
-            saveAction(SwipeAction.NONE)
+            saveAction(NONE)
         }
     }
 
@@ -140,13 +142,13 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         this@selectOption.isVisible = true
     }
 
-    private fun saveAction(swipeAction: SwipeAction) {
+    private fun saveAction(swipeAction: SwipeAction) = with(UiSettings(requireContext())) {
         UserPreferencesController.updateUserPreferences {
             when (navigationArgs.titleResId) {
-                R.string.settingsSwipeShortRight -> it.shortRightSwipe = swipeAction
-                R.string.settingsSwipeLongRight -> it.longRightSwipe = swipeAction
-                R.string.settingsSwipeShortLeft -> it.shortLeftSwipe = swipeAction
-                R.string.settingsSwipeLongLeft -> it.longLeftSwipe = swipeAction
+                R.string.settingsSwipeShortRight -> shortRightSwipe = swipeAction
+                R.string.settingsSwipeLongRight -> longRightSwipe = swipeAction
+                R.string.settingsSwipeShortLeft -> shortLeftSwipe = swipeAction
+                R.string.settingsSwipeLongLeft -> longLeftSwipe = swipeAction
             }
         }
     }

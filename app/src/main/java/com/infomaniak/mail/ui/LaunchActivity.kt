@@ -22,6 +22,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -50,7 +51,9 @@ class LaunchActivity : AppCompatActivity() {
 
     private suspend fun startApp() {
         mainViewModel.updateUserInfos()
-        mainViewModel.loadCurrentMailbox()
+
+        val emailsDisplayType = UiSettings(this).emailsDisplayType
+        mainViewModel.loadCurrentMailbox(emailsDisplayType)
 
         withContext(Dispatchers.Main) {
             MainViewModel.currentMailboxObjectId.observeNotNull(this@LaunchActivity) {

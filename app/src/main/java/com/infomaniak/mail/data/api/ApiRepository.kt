@@ -22,7 +22,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
-import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
+import com.infomaniak.mail.data.UiSettings.EmailsDisplayType
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.message.Message
@@ -82,11 +82,11 @@ object ApiRepository : ApiRepositoryCore() {
     fun getThreads(
         mailboxUuid: String,
         folderId: String,
+        emailsDisplayType: EmailsDisplayType,
         offset: Int,
         filter: ThreadFilter,
     ): ApiResponse<ThreadsResult> {
-        val threadMode = UserPreferencesController.getUserPreferences().getThreadMode().apiCallValue
-        return callApi(ApiRoutes.threads(mailboxUuid, folderId, threadMode, offset, filter), GET)
+        return callApi(ApiRoutes.threads(mailboxUuid, folderId, emailsDisplayType, offset, filter), GET)
     }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {

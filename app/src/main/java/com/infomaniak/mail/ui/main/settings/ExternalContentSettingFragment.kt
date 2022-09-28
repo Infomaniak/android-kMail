@@ -26,8 +26,10 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
-import com.infomaniak.mail.data.models.user.UserPreferences
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.UiSettings.ExternalContentMode
+import com.infomaniak.mail.data.UiSettings.ExternalContentMode.ALWAYS
+import com.infomaniak.mail.data.UiSettings.ExternalContentMode.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -51,25 +53,25 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UserPreferencesController.getUserPreferences().getExternalContentMode()) {
-            UserPreferences.ExternalContentMode.ALWAYS -> settingsOptionAlwaysCheck.selectOption()
-            UserPreferences.ExternalContentMode.ASK_ME -> settingsOptionAskMeCheck.selectOption()
+        when (UiSettings(requireContext()).externalContentMode) {
+            ALWAYS -> settingsOptionAlwaysCheck.selectOption()
+            ASK_ME -> settingsOptionAskMeCheck.selectOption()
         }
     }
 
     private fun setupListeners() = with(binding) {
         settingsOptionAlways.setOnClickListener {
             notYetImplemented()
-            updateExternalContentSetting(UserPreferences.ExternalContentMode.ALWAYS, settingsOptionAlwaysCheck)
+            updateExternalContentSetting(ALWAYS, settingsOptionAlwaysCheck)
         }
         settingsOptionAskMe.setOnClickListener {
             notYetImplemented()
-            updateExternalContentSetting(UserPreferences.ExternalContentMode.ASK_ME, settingsOptionAskMeCheck)
+            updateExternalContentSetting(ASK_ME, settingsOptionAskMeCheck)
         }
     }
 
-    private fun updateExternalContentSetting(externalContentMode: UserPreferences.ExternalContentMode, chosenOption: ImageView) {
-        UserPreferencesController.updateUserPreferences { it.autoTrustEmails = externalContentMode.apiValue }
+    private fun updateExternalContentSetting(externalContentMode: ExternalContentMode, chosenOption: ImageView) {
+        UiSettings(requireContext()).externalContentMode = externalContentMode
         chosenOption.selectOption()
     }
 

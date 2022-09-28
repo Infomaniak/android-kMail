@@ -26,8 +26,10 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.cache.userInfos.UserPreferencesController
-import com.infomaniak.mail.data.models.user.UserPreferences.ThreadMode
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.UiSettings.EmailsDisplayType
+import com.infomaniak.mail.data.UiSettings.EmailsDisplayType.MESSAGES
+import com.infomaniak.mail.data.UiSettings.EmailsDisplayType.THREADS
 import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -51,25 +53,25 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UserPreferencesController.getUserPreferences().getThreadMode()) {
-            ThreadMode.THREADS -> settingsOptionDiscussionsCheck.selectOption()
-            ThreadMode.MESSAGES -> settingsOptionMessagesCheck.selectOption()
+        when (UiSettings(requireContext()).emailsDisplayType) {
+            THREADS -> settingsOptionDiscussionsCheck.selectOption()
+            MESSAGES -> settingsOptionMessagesCheck.selectOption()
         }
     }
 
     private fun setupListeners() = with(binding) {
         settingsOptionDiscussions.setOnClickListener {
             notYetImplemented()
-            updateDisplayMode(ThreadMode.THREADS, settingsOptionDiscussionsCheck)
+            updateDisplayMode(THREADS, settingsOptionDiscussionsCheck)
         }
         settingsOptionMessages.setOnClickListener {
             notYetImplemented()
-            updateDisplayMode(ThreadMode.MESSAGES, settingsOptionMessagesCheck)
+            updateDisplayMode(MESSAGES, settingsOptionMessagesCheck)
         }
     }
 
-    private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {
-        UserPreferencesController.updateUserPreferences { it.threadMode = displayMode.apiValue }
+    private fun updateDisplayMode(displayMode: EmailsDisplayType, chosenOption: ImageView) {
+        UiSettings(requireContext()).emailsDisplayType = displayMode
         chosenOption.selectOption()
     }
 

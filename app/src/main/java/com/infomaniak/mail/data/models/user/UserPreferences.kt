@@ -17,26 +17,13 @@
  */
 package com.infomaniak.mail.data.models.user
 
-import androidx.annotation.IdRes
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatDelegate
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmObject
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 class UserPreferences : RealmObject {
 
     //region API data
-    var theme: String = ThemeMode.DEFAULT.apiName
-    @SerialName("density")
-    var threadListDensity: String = ThreadsDensity.DEFAULT.apiName
-    @SerialName("thread_mode")
-    var threadMode: Int = ThreadMode.THREADS.apiValue
-    @SerialName("auto_trust_emails")
-    var autoTrustEmails: Int = ExternalContentMode.ASK_ME.apiValue
     // @SerialName("reabirthday_calendar_colord_pos")
     // var birthdayCalendarColor: String = ""
     // @SerialName("calendar_default_event_duration")
@@ -88,110 +75,10 @@ class UserPreferences : RealmObject {
     // private var intelligentMode: String = IntelligentMode.DISABLED.name
     //endregion
 
-    private var _shortRightSwipe: String = SwipeAction.NONE.name
-    var shortRightSwipe: SwipeAction
-        get() = enumValueOfOrNull<SwipeAction>(_shortRightSwipe) ?: SwipeAction.NONE
-        set(value) {
-            _shortRightSwipe = value.name
-        }
-
-    private var _longRightSwipe: String = SwipeAction.NONE.name
-    var longRightSwipe: SwipeAction
-        get() = enumValueOfOrNull<SwipeAction>(_longRightSwipe) ?: SwipeAction.NONE
-        set(value) {
-            _longRightSwipe = value.name
-        }
-
-    private var _shortLeftSwipe: String = SwipeAction.NONE.name
-    var shortLeftSwipe: SwipeAction
-        get() = enumValueOfOrNull<SwipeAction>(_shortLeftSwipe) ?: SwipeAction.NONE
-        set(value) {
-            _shortLeftSwipe = value.name
-        }
-
-    private var _longLeftSwipe: String = SwipeAction.NONE.name
-    var longLeftSwipe: SwipeAction
-        get() = enumValueOfOrNull<SwipeAction>(_longLeftSwipe) ?: SwipeAction.NONE
-        set(value) {
-            _longLeftSwipe = value.name
-        }
-
-    fun getThemeMode(): ThemeMode = when (theme) {
-        ThemeMode.LIGHT.apiName -> ThemeMode.LIGHT
-        ThemeMode.DARK.apiName -> ThemeMode.DARK
-        else -> ThemeMode.DEFAULT
-    }
-
-    fun getThreadsDensity(): ThreadsDensity = when (threadListDensity) {
-        ThreadsDensity.COMPACT.apiName -> ThreadsDensity.COMPACT
-        ThreadsDensity.LARGE.apiName -> ThreadsDensity.LARGE
-        else -> ThreadsDensity.DEFAULT
-    }
-
-    fun getThreadMode(): ThreadMode = when (threadMode) {
-        ThreadMode.MESSAGES.apiValue -> ThreadMode.MESSAGES
-        else -> ThreadMode.THREADS
-    }
-
-    fun getExternalContentMode(): ExternalContentMode = when (autoTrustEmails) {
-        ExternalContentMode.ALWAYS.apiValue -> ExternalContentMode.ALWAYS
-        else -> ExternalContentMode.ASK_ME
-    }
-
-    fun getSwipeAction(@StringRes nameRes: Int): SwipeAction? = when (nameRes) {
-        R.string.settingsSwipeShortRight -> shortRightSwipe
-        R.string.settingsSwipeLongRight -> longRightSwipe
-        R.string.settingsSwipeShortLeft -> shortLeftSwipe
-        R.string.settingsSwipeLongLeft -> longLeftSwipe
-        else -> null
-    }
-
     // fun getIntelligentMode(): IntelligentMode? = enumValueOfOrNull<IntelligentMode>(intelligentMode)
-
-    enum class ThemeMode(val apiName: String, val mode: Int, @StringRes val localisedNameRes: Int) {
-        DEFAULT("medium", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM, R.string.settingsOptionSystemTheme),
-        LIGHT("light", AppCompatDelegate.MODE_NIGHT_NO, R.string.settingsOptionLightTheme),
-        DARK("dark", AppCompatDelegate.MODE_NIGHT_YES, R.string.settingsOptionDarkTheme);
-    }
-
-    enum class ThreadsDensity(val apiName: String, @StringRes val localisedNameRes: Int) {
-        COMPACT("high", R.string.settingsDensityOptionCompact),
-        DEFAULT("normal", R.string.settingsDensityOptionNormal),
-        LARGE("low", R.string.settingsDensityOptionLarge),
-    }
-
-    enum class ThreadMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
-        THREADS(1, "on", R.string.settingsOptionDiscussions),
-        MESSAGES(0, "off", R.string.settingsOptionMessages),
-    }
-
-    enum class ExternalContentMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
-        ALWAYS(1, "true", R.string.settingsOptionAlways),
-        ASK_ME(0, "false", R.string.settingsOptionAskMe),
-    }
 
     // enum class IntelligentMode {
     //     ENABLED,
     //     DISABLED,
     // }
-
-    data class SwipeActions(
-        var shortRightSwipe: SwipeAction = SwipeAction.NONE,
-        var longRightSwipe: SwipeAction = SwipeAction.NONE,
-        var shortLeftSwipe: SwipeAction = SwipeAction.NONE,
-        var longLeftSwipe: SwipeAction = SwipeAction.NONE,
-    )
-
-    enum class SwipeAction(@IdRes val nameRes: Int) {
-        NONE(R.string.settingsSwipeActionNone),
-        ARCHIVE(R.string.actionArchive),
-        DELETE(R.string.actionDelete),
-        FAVORITE(R.string.favoritesFolder),
-        MOVE(R.string.actionMove),
-        POSTPONE(R.string.actionPostpone),
-        QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu),
-        READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive),
-        READ_UNREAD(R.string.settingsSwipeActionReadUnread),
-        SPAM(R.string.actionSpam),
-    }
 }
