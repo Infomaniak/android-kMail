@@ -57,7 +57,7 @@ class ThreadListAdapter(
     private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
-    override lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerView: RecyclerView
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -324,7 +324,7 @@ class ThreadListAdapter(
         }
     }
 
-    class ThreadViewHolder(val binding: ViewBinding) : DragDropSwipeAdapter.ViewHolder(binding.root) {
+    class ThreadViewHolder(val binding: ViewBinding) : ViewHolder(binding.root) {
         var isSwipedOverHalf = false
     }
 }

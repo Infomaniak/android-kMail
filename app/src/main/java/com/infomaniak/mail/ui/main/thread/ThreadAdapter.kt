@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.lib.core.utils.format
@@ -40,8 +39,8 @@ import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
 
 class ThreadAdapter(
-    private var messages: MutableList<Message> = mutableListOf(),
-) : RecyclerView.Adapter<ThreadViewHolder>() {
+    private var messages: List<Message> = mutableListOf(),
+) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -50,6 +49,14 @@ class ThreadAdapter(
     var onDownloadAllClicked: (() -> Unit)? = null
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
+
+    override fun updateList(itemList: List<Message>) {
+        messages = itemList.mapIndexed { index, message ->
+            message.also { if ((index == itemList.lastIndex || !it.seen) && !it.isDraft) it.isExpanded = true }
+        }
+    }
+
+    fun lastIndex() = messages.lastIndex
 
     override fun getItemCount() = messages.size
 
@@ -245,40 +252,6 @@ class ThreadAdapter(
 
     private fun ItemMessageBinding.getAllRecipientFormatted(message: Message): String = with(message) {
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
-    }
-
-    fun notifyAdapter(newList: MutableList<Message>) {
-        DiffUtil.calculateDiff(MessageListDiffCallback(messages, newList)).dispatchUpdatesTo(this)
-        messages = newList
-        messages.forEachIndexed { index, message ->
-            if ((index == lastIndex() || !message.seen) && !message.isDraft) message.isExpanded = true
-        }
-    }
-
-    fun lastIndex() = messages.lastIndex
-
-    private class MessageListDiffCallback(
-        private val oldList: List<Message>,
-        private val newList: List<Message>,
-    ) : DiffUtil.Callback() {
-
-        override fun getOldListSize(): Int = oldList.size
-
-        override fun getNewListSize(): Int = newList.size
-
-        override fun areItemsTheSame(oldIndex: Int, newIndex: Int): Boolean = oldList[oldIndex].uid == newList[newIndex].uid
-
-        override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            val oldItem = oldList[oldIndex]
-            val newItem = newList[newIndex]
-
-            return oldItem.uid == newItem.uid
-                    && oldItem.from == newItem.from
-                    && oldItem.date == newItem.date
-                    && oldItem.attachments == newItem.attachments
-                    && oldItem.subject == newItem.subject
-                    && oldItem.body == newItem.body
-        }
     }
 
     private companion object {
