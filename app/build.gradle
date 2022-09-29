@@ -15,19 +15,22 @@ plugins {
 // Realm Kotlin SNAPSHOT - END /!\
 
 android {
-    compileSdk 32
+
+    namespace 'com.infomaniak.mail'
+
+    compileSdk 33
 
     defaultConfig {
         applicationId 'com.infomaniak.mail'
         minSdk 24
-        targetSdk 32
+        targetSdk 33
         versionCode 1
-        versionName '1.0'
+        versionName '1.0-Alpha'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
-        buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
         buildConfigField 'String', 'FEEDBACK_USER_REPORT', '"https://feedback.userreport.com/9f60b46d-7299-4887-b79d-c756cf474c4d#ideas/popular"'
+        buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
     }
 
     buildTypes {
@@ -50,9 +53,7 @@ android {
 dependencies {
     implementation project(path: ':Core')
 
-    // Realm Kotlin - START /!\
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
-    // Realm Kotlin - END /!\
 
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
     implementation 'com.tbuonomo:dotsindicator:4.3'
