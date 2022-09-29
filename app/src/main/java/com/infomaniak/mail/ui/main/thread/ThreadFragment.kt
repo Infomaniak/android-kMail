@@ -96,7 +96,7 @@ class ThreadFragment : Fragment() {
             }
         }
 
-        AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
+        AppCompatResources.getDrawable(context, R.drawable.mail_divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
         }
 
