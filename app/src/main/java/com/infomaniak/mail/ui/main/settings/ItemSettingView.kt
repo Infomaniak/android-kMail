@@ -22,6 +22,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.res.getStringOrThrow
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
@@ -37,6 +38,7 @@ class ItemSettingView @JvmOverloads constructor(
     }
 
     private var action: Action = Action.NONE
+
     var state
         get() = binding.toggle.isChecked
         set(value) {
@@ -48,14 +50,14 @@ class ItemSettingView @JvmOverloads constructor(
             if (attrs != null) {
                 val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ItemSettingView, 0, 0)
 
-                val titleString = typedArray.getStringOrThrow(R.styleable.ItemSettingView_title)
-                val subtitleString = typedArray.getString(R.styleable.ItemSettingView_subtitle)
                 action = Action.values()[typedArray.getInteger(R.styleable.ItemSettingView_itemAction, 0)]
 
-                title.text = titleString
-                if (subtitleString != null) subtitle.apply {
-                    text = subtitleString
-                    isVisible = true
+                title.text = typedArray.getStringOrThrow(R.styleable.ItemSettingView_title)
+                typedArray.getString(R.styleable.ItemSettingView_subtitle).let {
+                    subtitle.apply {
+                        text = it
+                        isGone = it == null
+                    }
                 }
 
                 chevron.isVisible = action == Action.CHEVRON

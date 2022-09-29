@@ -50,7 +50,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 val textString = typedArray.getString(R.styleable.SettingRadioButtonView_text)
                 val checkMarkColor = typedArray.getColor(
                     R.styleable.SettingRadioButtonView_checkMarkColor,
-                    context.getAttributeColor(RMaterial.attr.colorPrimary),
+                    context.getAttributeColor(RMaterial.attr.colorPrimary)
                 )
                 associatedValue = typedArray.getString(R.styleable.SettingRadioButtonView_value)
 
@@ -61,9 +61,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 text.text = textString
                 checkMark.setColorFilter(checkMarkColor)
 
-                root.setOnClickListener {
-                    (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id)
-                }
+                root.setOnClickListener { (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) }
 
                 typedArray.recycle()
             } else {

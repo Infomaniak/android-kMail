@@ -68,20 +68,21 @@ class SettingRadioGroupView @JvmOverloads constructor(
     }
 
     override fun onChecked(@IdRes viewId: Int) {
-        if (viewId == checkedId) return
         check(viewId)
-        onItemCheckedListener?.invoke(checkedId, checkedValue)
+        if (viewId != checkedId) onItemCheckedListener?.invoke(checkedId, checkedValue)
     }
 
+    @Suppress("TypeParameterFindViewById")
     private fun check(@IdRes viewId: Int) {
         if (viewId == checkedId) return
 
         (findViewById(checkedId) as? RadioCheckable)?.uncheck()
-        val radioButton = this.findViewById(viewId) as RadioCheckable
-        radioButton.check()
+        (findViewById(viewId) as RadioCheckable).apply {
+            check()
+            checkedValue = associatedValue
+        }
 
         checkedId = viewId
-        checkedValue = radioButton.associatedValue
     }
 
     fun onItemCheckedListener(listener: ((Int, String?) -> Unit)?) {
