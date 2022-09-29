@@ -18,11 +18,10 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.RealmDatabase.copyListToRealm
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmSingleQuery
 
@@ -42,19 +41,13 @@ object MessageController {
     fun update(localMessages: List<Message>, apiMessages: List<Message>) {
         RealmDatabase.mailboxContent.writeBlocking {
             deleteMessages(getOutdatedMessages(localMessages, apiMessages))
-            insertNewData(apiMessages)
+            copyListToRealm(apiMessages, alsoCopyManagedItems = false)
         }
     }
 
     private fun getOutdatedMessages(localMessages: List<Message>, apiMessages: List<Message>): List<Message> {
         return localMessages.filter { localMessage ->
             apiMessages.none { apiMessage -> apiMessage.uid == localMessage.uid }
-        }
-    }
-
-    private fun MutableRealm.insertNewData(apiMessages: List<Message>) {
-        apiMessages.forEach { apiMessage ->
-            if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
         }
     }
 
