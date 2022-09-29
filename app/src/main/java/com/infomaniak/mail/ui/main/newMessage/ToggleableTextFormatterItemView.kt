@@ -60,30 +60,24 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
 
         with(binding) {
             if (attrs != null) {
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ToggleableTextFormatterItemView, 0, 0)
+                context.obtainStyledAttributes(attrs, R.styleable.ToggleableTextFormatterItemView, 0, 0).apply {
 
-                val iconDrawable = typedArray.getDrawable(R.styleable.ToggleableTextFormatterItemView_icon)
-                val contentDescription = typedArray.getString(
-                    R.styleable.ToggleableTextFormatterItemView_android_contentDescription
-                )
+                    unselectedIconColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_iconColor)
+                    selectedIconColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_selectedIconColor)
+                    unselectedBackgroundColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_backgroundColor)
+                    selectedBackgroundColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_selectedBackgroundColor)
 
-                unselectedIconColor = typedArray.getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_iconColor)
-                selectedIconColor = typedArray.getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_selectedIconColor)
-                unselectedBackgroundColor = typedArray.getColorOrThrow(
-                    R.styleable.ToggleableTextFormatterItemView_backgroundColor,
-                )
-                selectedBackgroundColor = typedArray.getColorOrThrow(
-                    R.styleable.ToggleableTextFormatterItemView_selectedBackgroundColor,
-                )
+                    icon.apply {
+                        getString(R.styleable.ToggleableTextFormatterItemView_android_contentDescription)?.let {
+                            contentDescription = it
+                        }
+                        setImageDrawable(getDrawable(R.styleable.ToggleableTextFormatterItemView_icon))
+                        setColorFilter(unselectedIconColor)
+                    }
 
-                icon.apply {
-                    contentDescription?.let { this.contentDescription = it }
-                    setImageDrawable(iconDrawable)
-                    setColorFilter(unselectedIconColor)
+                    recycle()
                 }
                 background.setBackgroundColor(unselectedBackgroundColor)
-
-                typedArray.recycle()
             }
         }
     }
