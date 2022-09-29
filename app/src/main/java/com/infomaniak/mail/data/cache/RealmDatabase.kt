@@ -28,8 +28,12 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.user.UserInfo
 import com.infomaniak.mail.data.models.user.UserPreferences
 import com.infomaniak.mail.utils.AccountUtils
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import io.realm.kotlin.types.RealmObject
 
 @Suppress("ObjectPropertyName")
 object RealmDatabase {
@@ -56,6 +60,18 @@ object RealmDatabase {
     val mailboxContent
         get() = _mailboxContent
             ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
+
+    inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
+        writeBlocking {
+            delete(query<T>())
+            copyListToRealm(items)
+        }
+    }
+
+    // TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
+    fun MutableRealm.copyListToRealm(items: List<RealmObject>) {
+        items.forEach { copyToRealm(it, UpdatePolicy.ALL) }
+    }
 
     fun deleteMailboxContent(mailboxId: Int) {
         Realm.deleteRealm(RealmConfigurations.mailboxContent(mailboxId))

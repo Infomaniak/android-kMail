@@ -35,7 +35,7 @@ import com.google.android.material.R as RMaterial
 class MenuDrawerItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     var binding: ItemMenuDrawerBinding

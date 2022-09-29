@@ -47,7 +47,6 @@ import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.COMPA
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import io.realm.kotlin.ext.isValid
 import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
@@ -107,7 +106,6 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
-        if (!isValid()) return // TODO: remove this when realm management will be refactored and stable
 
         fillInUserNameAndEmail(from.first(), expeditor)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
@@ -120,7 +118,7 @@ class ThreadListAdapter(
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
         iconFavorite.isVisible = isFavorite
 
-        threadCount.text = messagesCount.toString()
+        threadCount.text = uniqueMessagesCount.toString()
         threadCountCardview.isVisible = messages.count() > 1
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
@@ -183,7 +181,7 @@ class ThreadListAdapter(
         offsetY: Int,
         canvasUnder: Canvas?,
         canvasOver: Canvas?,
-        isUserControlled: Boolean
+        isUserControlled: Boolean,
     ): Unit = with(viewHolder.binding) {
         val dx = abs(offsetX)
         val progress = dx.toFloat() / root.width
@@ -242,43 +240,6 @@ class ThreadListAdapter(
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
-    }
-
-    private class ThreadListDiffCallback(
-        private val oldList: List<Any>,
-        private val newList: List<Any>,
-    ) : DragDropSwipeDiffCallback<Any>(oldList, newList) {
-
-        override fun getOldListSize(): Int = oldList.size
-
-        override fun getNewListSize(): Int = newList.size
-
-        override fun isSameItem(oldItem: Any, newItem: Any): Boolean {
-            return when {
-                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
-                oldItem !is Thread || newItem !is Thread -> false // Both aren't Threads
-                oldItem.isValid() && newItem.isValid() -> oldItem.uid == newItem.uid // Both are valid
-                else -> false
-            }
-        }
-
-        override fun isSameContent(oldItem: Any, newItem: Any): Boolean {
-            return when {
-                oldItem.javaClass.name != newItem.javaClass.name -> false // Both aren't the same type
-                oldItem is String && newItem is String -> oldItem == newItem // Both are Strings
-                else -> { // Both are Threads
-                    if ((oldItem as Thread).uid == (newItem as Thread).uid) { // Same items
-                        oldItem.subject == newItem.subject &&
-                                oldItem.messagesCount == newItem.messagesCount &&
-                                oldItem.unseenMessagesCount == newItem.unseenMessagesCount &&
-                                oldItem.isFavorite == newItem.isFavorite
-                        // TODO: Add other fields checks
-                    } else { // Not same items
-                        false
-                    }
-                }
-            }
-        }
     }
 
     companion object {

@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.userInfos
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.RealmDatabase.update
 import com.infomaniak.mail.data.models.Contact
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
@@ -49,25 +50,8 @@ object ContactController {
 
     //region Edit data
     fun update(apiContacts: List<Contact>) {
-
-        // Get current data
-        Log.d(RealmDatabase.TAG, "Contacts: Get current data")
-        val realmContacts = getContacts()
-
-        // Get outdated data
-        Log.d(RealmDatabase.TAG, "Contacts: Get outdated data")
-        // val deletableContacts = ContactsController.getDeletableContacts(apiContacts)
-        val deletableContacts = realmContacts.filter { realmContact ->
-            apiContacts.none { it.id == realmContact.id }
-        }
-
-        // Save new data
         Log.d(RealmDatabase.TAG, "Contacts: Save new data")
-        upsertContacts(apiContacts)
-
-        // Delete outdated data
-        Log.d(RealmDatabase.TAG, "Contacts: Delete outdated data")
-        deleteContacts(deletableContacts)
+        RealmDatabase.userInfos.update<Contact>(apiContacts)
     }
 
     private fun upsertContacts(contacts: List<Contact>) {
