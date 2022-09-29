@@ -197,8 +197,6 @@ class LoginActivity : AppCompatActivity() {
                     if (user == null) {
                         getErrorResponse(RCore.string.anErrorHasOccurred)
                     } else {
-                        // DriveInfosController.storeDriveInfos(user.id, driveInfo) // TODO?
-                        // CloudStorageProvider.notifyRootsChanged(context) // TODO?
                         AccountUtils.addUser(user)
                         user
                     }

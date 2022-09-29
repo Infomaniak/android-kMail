@@ -32,6 +32,7 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
@@ -114,15 +115,32 @@ object AccountUtils : CredentialManager {
 
     suspend fun removeUser(context: Context, user: User) {
         userDatabase.userDao().delete(user)
-        // FileController.deleteUserDriveFiles(userRemoved.id) // TODO?
+        removeUserRealmData(context, user.id)
 
         if (currentUserId == user.id) {
             requestCurrentUser()
 
             resetApp(context)
             withContext(Dispatchers.Main) { reloadApp?.invoke() }
+        }
+    }
 
-            // CloudStorageProvider.notifyRootsChanged(context) // TODO?
+    private fun removeUserRealmData(context: Context, userId: Int) {
+        RealmDatabase.mailboxInfos().writeBlocking {
+            // TODO : Is it possible to directly query the ids (only the ids)
+            val mailboxes = MailboxController.getMailboxes(userId, this)
+            mailboxes.forEach(::delete)
+        }
+
+        RealmDatabase.closeMailboxContent()
+        RealmDatabase.closeUserInfos()
+
+        context.filesDir.listFiles()?.forEach { file ->
+            val isMailboxContent = file.name.startsWith(RealmDatabase.mailboxContentDbNamePrefix(userId))
+            val isUserInfos = file.name.startsWith(RealmDatabase.userInfosDbName(userId))
+            if (isMailboxContent || isUserInfos) {
+                if (file.isDirectory) file.deleteRecursively() else file.delete()
+            }
         }
     }
 

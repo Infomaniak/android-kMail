@@ -78,6 +78,12 @@ object RealmDatabase {
         }
     }
 
+    private const val appSettingsDbName = "AppSettings.realm"
+    fun userInfosDbName(userId: Int) = "User-${userId}.realm"
+    private const val mailboxInfosDbName = "MailboxInfos.realm"
+    fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"
+    private fun mailboxContentDbName(userId: Int, mailboxId: Int) = "${mailboxContentDbNamePrefix(userId)}${mailboxId}.realm"
+
     inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
         writeBlocking {
             delete(query<T>())
@@ -123,37 +129,32 @@ object RealmDatabase {
 
     private object RealmConfig {
 
-        private const val appSettingsDbName = "AppSettings.realm"
-        private val userInfosDbName get() = "User-${AccountUtils.currentUserId}.realm"
-        private const val mailboxInfosDbName = "MailboxInfos.realm"
-        private fun mailboxContentDbName(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
-
         val appSettings =
             RealmConfiguration
                 .Builder(RealmSets.appSettings)
                 .name(appSettingsDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         val userInfos
             get() = RealmConfiguration
                 .Builder(RealmSets.userInfos)
-                .name(userInfosDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                .name(userInfosDbName(AccountUtils.currentUserId))
+                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         val mailboxInfos =
             RealmConfiguration
                 .Builder(RealmSets.mailboxInfos)
                 .name(mailboxInfosDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         fun mailboxContent(mailboxId: Int) =
             RealmConfiguration
                 .Builder(RealmSets.mailboxContent)
-                .name(mailboxContentDbName(mailboxId))
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                .name(mailboxContentDbName(AccountUtils.currentUserId, mailboxId))
+                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         private object RealmSets {
