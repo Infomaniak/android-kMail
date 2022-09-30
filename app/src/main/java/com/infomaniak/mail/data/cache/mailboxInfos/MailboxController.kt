@@ -21,6 +21,7 @@ import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -96,13 +97,9 @@ object MailboxController {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
-        val realmMailboxes = getMailboxes(userId)
+        val realmMailboxes = getMailboxes(userId).associate { it.objectId to it.quotas }
 
         val isCurrentMailboxDeleted = RealmDatabase.mailboxInfos.writeBlocking {
-
-            // Get outdated data
-            Log.d(RealmDatabase.TAG, "Mailboxes: Get outdated data")
-            val outdatedMailboxes = getMailboxes(userId, apiMailboxes.map { it.mailboxId }, this)
 
             // Save new data
             Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
@@ -110,20 +107,21 @@ object MailboxController {
 
             // Delete outdated data
             Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
-            return@writeBlocking deleteOutdatedData(outdatedMailboxes)
+            return@writeBlocking deleteOutdatedData(apiMailboxes, userId)
         }
 
         if (isCurrentMailboxDeleted) AccountUtils.reloadApp()
     }
 
-    private fun MutableRealm.upsertMailboxes(realmMailboxes: List<Mailbox>, apiMailboxes: List<Mailbox>) {
+    private fun MutableRealm.upsertMailboxes(realmMailboxes: Map<String, Quotas?>, apiMailboxes: List<Mailbox>) {
         apiMailboxes.forEach { apiMailbox ->
-            apiMailbox.quotas = realmMailboxes.find { realmMailbox -> realmMailbox.objectId == apiMailbox.objectId }?.quotas
+            apiMailbox.quotas = realmMailboxes[apiMailbox.objectId]
             copyToRealm(apiMailbox, UpdatePolicy.ALL)
         }
     }
 
-    private fun MutableRealm.deleteOutdatedData(outdatedMailboxes: RealmResults<Mailbox>): Boolean {
+    private fun MutableRealm.deleteOutdatedData(apiMailboxes: List<Mailbox>, userId: Int): Boolean {
+        val outdatedMailboxes = getMailboxes(userId, apiMailboxes.map { it.mailboxId }, this)
         val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
             RealmDatabase.closeMailboxContent()
