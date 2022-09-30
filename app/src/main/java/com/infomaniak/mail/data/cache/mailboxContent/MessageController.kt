@@ -28,13 +28,15 @@ import io.realm.kotlin.query.RealmSingleQuery
 
 object MessageController {
 
-    //region Get data
-    fun getMessage(id: String, realm: MutableRealm? = null): Message? {
-        return realm.getMessageQuery(id).find()
-    }
-
+    //region Queries
     private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
         return (this ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} = '$uid'").first()
+    }
+    //endregion
+
+    //region Get data
+    fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
+        return realm.getMessageQuery(uid).find()
     }
     //endregion
 
@@ -68,8 +70,10 @@ object MessageController {
     fun deleteMessage(uid: String, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = {
             getMessage(uid, it)
-                ?.also { message -> message.draftUuid?.let { draftUuid -> getDraft(draftUuid, it) }?.let(it::delete) }
-                ?.let { message -> it.delete(message) }
+                ?.let { message ->
+                    message.draftUuid?.let { draftUuid -> getDraft(draftUuid, it) }?.let(it::delete)
+                    it.delete(message)
+                }
         }
         realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }

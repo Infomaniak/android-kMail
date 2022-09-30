@@ -30,21 +30,23 @@ import io.realm.kotlin.query.RealmSingleQuery
 
 object ContactController {
 
+    //region Queries
+    private fun MutableRealm?.getContactsQuery(): RealmQuery<Contact> {
+        return (this ?: RealmDatabase.userInfos).query()
+    }
+
+    private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
+        return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} = '$id'").first()
+    }
+    //endregion
+
     //region Get data
     fun getContacts(realm: MutableRealm? = null): RealmResults<Contact> {
         return realm.getContactsQuery().find()
     }
 
-    private fun MutableRealm?.getContactsQuery(): RealmQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query()
-    }
-
     private fun getContact(id: String, realm: MutableRealm? = null): Contact? {
         return realm.getContactQuery(id).find()
-    }
-
-    private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} = '$id'").first()
     }
     //endregion
 

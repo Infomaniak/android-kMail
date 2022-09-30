@@ -24,27 +24,19 @@ import com.infomaniak.mail.data.models.addressBook.AddressBook
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.RealmQuery
-import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 
 object AddressBookController {
 
-    //region Get data
-    private fun getAddressBooks(realm: MutableRealm? = null): RealmResults<AddressBook> {
-        return realm.getAddressBooksQuery().find()
-    }
-
-    private fun MutableRealm?.getAddressBooksQuery(): RealmQuery<AddressBook> {
-        return (this ?: RealmDatabase.userInfos).query()
-    }
-
-    private fun getAddressBook(id: Int, realm: MutableRealm? = null): AddressBook? {
-        return realm.getAddressBookQuery(id).find()
-    }
-
+    //region Queries
     private fun MutableRealm?.getAddressBookQuery(id: Int): RealmSingleQuery<AddressBook> {
         return (this ?: RealmDatabase.userInfos).query<AddressBook>("${AddressBook::id.name} = '$id'").first()
+    }
+    //endregion
+
+    //region Get data
+    private fun getAddressBook(id: Int, realm: MutableRealm? = null): AddressBook? {
+        return realm.getAddressBookQuery(id).find()
     }
     //endregion
 

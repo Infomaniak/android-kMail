@@ -38,26 +38,32 @@ import java.util.*
 
 object FolderController {
 
-    //region Get data
-    private fun getFolders(realm: MutableRealm? = null): RealmResults<Folder> {
-        return realm.getFoldersQuery().find()
-    }
-
-    fun getFoldersAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Folder>> {
-        return realm.getFoldersQuery().asFlow().toSharedFlow()
-    }
-
+    //region Queries
     private fun MutableRealm?.getFoldersQuery(): RealmQuery<Folder> {
         return (this ?: RealmDatabase.mailboxContent).query()
-    }
-
-    private fun getFolders(exceptionsFoldersIds: List<String>, realm: MutableRealm? = null): RealmResults<Folder> {
-        return realm.getFoldersQuery(exceptionsFoldersIds).find()
     }
 
     private fun MutableRealm?.getFoldersQuery(exceptionsFoldersIds: List<String>): RealmQuery<Folder> {
         val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "\"$it\"" }}}"
         return (this ?: RealmDatabase.mailboxContent).query(checkIsNotInExceptions)
+    }
+
+    private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
+    }
+
+    private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
+    }
+    //endregion
+
+    //region Get data
+    fun getFoldersAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Folder>> {
+        return realm.getFoldersQuery().asFlow().toSharedFlow()
+    }
+
+    private fun getFolders(exceptionsFoldersIds: List<String>, realm: MutableRealm? = null): RealmResults<Folder> {
+        return realm.getFoldersQuery(exceptionsFoldersIds).find()
     }
 
     fun getFolder(id: String, realm: MutableRealm? = null): Folder? {
@@ -68,16 +74,8 @@ object FolderController {
         return realm.getFolderQuery(id).asFlow().toSharedFlow()
     }
 
-    private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
-    }
-
     fun getFolder(role: FolderRole, realm: MutableRealm? = null): Folder? {
         return realm.getFolderQuery(role).find()
-    }
-
-    private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
     }
     //endregion
 
