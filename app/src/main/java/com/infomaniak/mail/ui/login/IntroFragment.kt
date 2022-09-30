@@ -25,14 +25,13 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
@@ -52,7 +51,7 @@ class IntroFragment : Fragment() {
 
     private val navigationArgs: IntroFragmentArgs by navArgs()
 
-    private val introViewModel: IntroViewModel by viewModels()
+    private val introViewModel: IntroViewModel by activityViewModels()
 
     private lateinit var binding: FragmentIntroBinding
 
@@ -116,12 +115,14 @@ class IntroFragment : Fragment() {
     }
 
     /**
-     * animate is necessary because when the activity is started we want to avoid animating the color change the first time
+     * `animate` is necessary because when the activity is started we want to avoid animating the color change the first time.
      */
     private fun setUi(themeColor: ThemeColor, position: Int?, animate: Boolean = true) = with(binding) {
         updateEachPageUi(themeColor, animate)
-        if (position == 0) updateFirstPageUi(themeColor, animate)
-        if (position == 3) updateActivityUi(themeColor, animate)
+        if (position == 0) {
+            updateFirstPageUi(themeColor, animate)
+            if (navigationArgs.isFirstAccount) updateActivityUi(themeColor, animate)
+        }
     }
 
     private fun updateEachPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
@@ -194,7 +195,6 @@ class IntroFragment : Fragment() {
     }
 
     class IntroViewModel : ViewModel() {
-        @ColorInt
         var theme = MutableLiveData(ThemeColor.PINK to false)
     }
 }
