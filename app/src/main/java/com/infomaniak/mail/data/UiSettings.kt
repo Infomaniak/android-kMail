@@ -25,6 +25,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.R
 import kotlin.reflect.KMutableProperty0
 
@@ -49,7 +50,7 @@ class UiSettings(private val context: Context) {
     //region Thread density
     private var _threadDensity: String?
         get() = getPrivateSetting(::threadDensity, DEFAULT_THREAD_DENSITY)
-        set(value) = setPrivateSetting(::threadDensity, value)
+        set(value) = getUiSettings().transaction { putString(::threadDensity.name, value) }
 
     var threadDensity: ThreadDensity
         get() = getSetting(_threadDensity, DEFAULT_THREAD_DENSITY)
@@ -67,7 +68,7 @@ class UiSettings(private val context: Context) {
     //region Theme
     private var _theme: String?
         get() = getPrivateSetting(::theme, DEFAULT_THEME)
-        set(value) = setPrivateSetting(::theme, value)
+        set(value) = getUiSettings().transaction { putString(::theme.name, value) }
 
     var theme: Theme
         get() = getSetting(_theme, DEFAULT_THEME)
@@ -85,7 +86,7 @@ class UiSettings(private val context: Context) {
     //region Accent color
     private var _accentColor: String?
         get() = getPrivateSetting(::accentColor, DEFAULT_ACCENT_COLOR)
-        set(value) = setPrivateSetting(::accentColor, value)
+        set(value) = getUiSettings().transaction { putString(::accentColor.name, value) }
 
     var accentColor: AccentColor
         get() = getSetting(_accentColor, DEFAULT_ACCENT_COLOR)
@@ -129,7 +130,7 @@ class UiSettings(private val context: Context) {
     //region Swipe actions
     private var _swipeShortRight: String?
         get() = getPrivateSetting(::swipeShortRight, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeShortRight, value)
+        set(value) = getUiSettings().transaction { putString(::swipeShortRight.name, value) }
 
     var swipeShortRight: SwipeAction
         get() = getSetting(_swipeShortRight, DEFAULT_SWIPE_ACTION)
@@ -139,7 +140,7 @@ class UiSettings(private val context: Context) {
 
     private var _swipeLongRight: String?
         get() = getPrivateSetting(::swipeLongRight, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeLongRight, value)
+        set(value) = getUiSettings().transaction { putString(::swipeLongRight.name, value) }
 
     var swipeLongRight: SwipeAction
         get() = getSetting(_swipeLongRight, DEFAULT_SWIPE_ACTION)
@@ -149,7 +150,7 @@ class UiSettings(private val context: Context) {
 
     private var _swipeShortLeft: String?
         get() = getPrivateSetting(::swipeShortLeft, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeShortLeft, value)
+        set(value) = getUiSettings().transaction { putString(::swipeShortLeft.name, value) }
 
     var swipeShortLeft: SwipeAction
         get() = getSetting(_swipeShortLeft, DEFAULT_SWIPE_ACTION)
@@ -159,7 +160,7 @@ class UiSettings(private val context: Context) {
 
     private var _swipeLongLeft: String?
         get() = getPrivateSetting(::swipeLongLeft, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeLongLeft, value)
+        set(value) = getUiSettings().transaction { putString(::swipeLongLeft.name, value) }
 
     var swipeLongLeft: SwipeAction
         get() = getSetting(_swipeLongLeft, DEFAULT_SWIPE_ACTION)
@@ -192,7 +193,7 @@ class UiSettings(private val context: Context) {
     //region Thread mode
     private var _threadMode: String?
         get() = getPrivateSetting(::threadMode, DEFAULT_THREAD_MODE)
-        set(value) = setPrivateSetting(::threadMode, value)
+        set(value) = getUiSettings().transaction { putString(::threadMode.name, value) }
 
     var threadMode: ThreadMode
         get() = getSetting(_threadMode, DEFAULT_THREAD_MODE)
@@ -209,7 +210,7 @@ class UiSettings(private val context: Context) {
     //region External content
     private var _externalContent: String?
         get() = getPrivateSetting(::externalContent, DEFAULT_EXTERNAL_CONTENT)
-        set(value) = setPrivateSetting(::externalContent, value)
+        set(value) = getUiSettings().transaction { putString(::externalContent.name, value) }
 
     var externalContent: ExternalContent
         get() = getSetting(_externalContent, DEFAULT_EXTERNAL_CONTENT)
@@ -226,11 +227,6 @@ class UiSettings(private val context: Context) {
     //region Utils
     private fun getPrivateSetting(key: KMutableProperty0<*>, enum: Enum<*>): String? {
         return getUiSettings().getString(key.name, enum.name)
-    }
-
-    private fun setPrivateSetting(key: KMutableProperty0<*>, value: String?) = with(getUiSettings().edit()) {
-        putString(key.name, value)
-        apply()
     }
 
     private inline fun <reified T : Enum<T>> getSetting(enum: String?, default: T): T = enumValueOfOrNull<T>(enum) ?: default
