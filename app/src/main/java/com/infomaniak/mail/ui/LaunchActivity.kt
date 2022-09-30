@@ -52,7 +52,7 @@ class LaunchActivity : AppCompatActivity() {
     private suspend fun startApp() {
         mainViewModel.updateUserInfo()
 
-        val threadMode = UiSettings(this).threadMode
+        val threadMode = UiSettings.getInstance(this).threadMode
         mainViewModel.loadCurrentMailbox(threadMode)
 
         withContext(Dispatchers.Main) {

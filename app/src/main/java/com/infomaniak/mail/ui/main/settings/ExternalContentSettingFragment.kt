@@ -53,7 +53,7 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UiSettings(requireContext()).externalContent) {
+        when (UiSettings.getInstance(requireContext()).externalContent) {
             ALWAYS -> settingsOptionAlwaysCheck.selectOption()
             ASK_ME -> settingsOptionAskMeCheck.selectOption()
         }
@@ -71,7 +71,7 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun updateExternalContentSetting(externalContent: ExternalContent, chosenOption: ImageView) {
-        UiSettings(requireContext()).externalContent = externalContent
+        UiSettings.getInstance(requireContext()).externalContent = externalContent
         chosenOption.selectOption()
     }
 

@@ -51,7 +51,7 @@ class SettingsFragment : Fragment() {
         setupBack()
         setupAdapter()
         setupListeners()
-        UiSettings(requireContext()).setupPreferencesText()
+        UiSettings.getInstance(requireContext()).setupPreferencesText()
     }
 
     private fun setupBack() {
@@ -71,7 +71,7 @@ class SettingsFragment : Fragment() {
         themeSubtitle.setText(theme.localisedNameRes)
         displayModeSubtitle.setText(threadMode.localisedNameRes)
         externalContentSubtitle.setText(externalContent.localisedNameRes)
-        accentColorSubtitle.setText(UiSettings(requireContext()).accentColor.localisedNameRes)
+        accentColorSubtitle.setText(UiSettings.getInstance(requireContext()).accentColor.localisedNameRes)
     }
 
     private fun setupListeners() = with(binding) {

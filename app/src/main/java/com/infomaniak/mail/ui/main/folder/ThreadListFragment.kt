@@ -109,13 +109,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        val threadMode = UiSettings(requireContext()).threadMode
+        val threadMode = UiSettings.getInstance(requireContext()).threadMode
         mainViewModel.forceRefreshThreads(filter, threadMode)
     }
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadDensity = UiSettings(requireContext()).threadDensity,
+            threadDensity = UiSettings.getInstance(requireContext()).threadDensity,
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
@@ -232,7 +232,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             setOnClickListener {
                 isCloseIconVisible = isChecked
                 filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
-                val threadMode = UiSettings(requireContext()).threadMode
+                val threadMode = UiSettings.getInstance(requireContext()).threadMode
                 mainViewModel.forceRefreshThreads(filter, threadMode)
             }
         }
@@ -330,7 +330,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
         if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
             clearFilter()
-            val threadMode = UiSettings(requireContext()).threadMode
+            val threadMode = UiSettings.getInstance(requireContext()).threadMode
             mainViewModel.forceRefreshThreads(filter, threadMode)
         }
 
@@ -378,7 +378,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (canPaginate) {
             currentOffset += PER_PAGE
-            val threadMode = UiSettings(requireContext()).threadMode
+            val threadMode = UiSettings.getInstance(requireContext()).threadMode
             loadMoreThreads(uuid, folderId, threadMode, currentOffset, filter)
         }
     }

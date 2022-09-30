@@ -40,7 +40,7 @@ class SwipeActionsSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
-        UiSettings(requireContext()).setupUi()
+        UiSettings.getInstance(requireContext()).setupUi()
         setupListeners()
     }
 

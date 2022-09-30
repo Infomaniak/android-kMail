@@ -95,7 +95,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     private fun enforceAppTheme() {
-        AppCompatDelegate.setDefaultNightMode(UiSettings(this).theme.mode)
+        AppCompatDelegate.setDefaultNightMode(UiSettings.getInstance(this).theme.mode)
     }
 
     private fun configureAccountUtils() {

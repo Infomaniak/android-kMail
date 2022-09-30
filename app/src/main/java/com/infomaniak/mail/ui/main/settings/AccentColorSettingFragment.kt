@@ -53,7 +53,7 @@ class AccentColorSettingFragment : Fragment() {
     }
 
     private fun setUpCheckMarks() = with(binding) {
-        UiSettings(requireContext()).accentColor.let { accentColor ->
+        UiSettings.getInstance(requireContext()).accentColor.let { accentColor ->
             if (accentColor == PINK) {
                 settingsOptionPinkAccentColorCheck
             } else {
@@ -73,7 +73,7 @@ class AccentColorSettingFragment : Fragment() {
 
     private fun chooseColor(accentColor: AccentColor, selectedImageView: ImageView) {
         activity?.setTheme(if (accentColor == PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
-        UiSettings(requireContext()).accentColor = accentColor
+        UiSettings.getInstance(requireContext()).accentColor = accentColor
         selectedImageView.selectColor(accentColor)
         activity?.recreate()
     }

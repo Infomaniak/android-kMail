@@ -53,7 +53,7 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UiSettings(requireContext()).threadMode) {
+        when (UiSettings.getInstance(requireContext()).threadMode) {
             THREADS -> settingsOptionDiscussionsCheck.selectOption()
             MESSAGES -> settingsOptionMessagesCheck.selectOption()
         }
@@ -71,7 +71,7 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {
-        UiSettings(requireContext()).threadMode = displayMode
+        UiSettings.getInstance(requireContext()).threadMode = displayMode
         chosenOption.selectOption()
     }
 

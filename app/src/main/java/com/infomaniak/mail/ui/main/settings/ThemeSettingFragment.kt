@@ -52,7 +52,7 @@ class ThemeSettingFragment : Fragment() {
     }
 
     private fun setUpCheckMarks() = with(binding) {
-        when (UiSettings(requireContext()).theme) {
+        when (UiSettings.getInstance(requireContext()).theme) {
             LIGHT -> settingsOptionLightThemeCheck
             DARK -> settingsOptionDarkThemeCheck
             else -> settingsOptionDefaultThemeCheck
@@ -68,7 +68,7 @@ class ThemeSettingFragment : Fragment() {
     private fun chooseTheme(theme: Theme, selectedImageView: ImageView) {
         selectedImageView.selectOption()
         setDefaultNightMode(theme.mode)
-        UiSettings(requireContext()).theme = theme
+        UiSettings.getInstance(requireContext()).theme = theme
     }
 
     private fun ImageView.selectOption() = with(binding) {

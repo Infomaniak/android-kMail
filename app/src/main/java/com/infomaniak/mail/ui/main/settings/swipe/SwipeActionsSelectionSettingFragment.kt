@@ -57,7 +57,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     private fun setupUi() = with(binding) {
         val actionResId = navigationArgs.titleResId
         toolbarText.setText(actionResId)
-        when (UiSettings(requireContext()).getSwipeAction(actionResId)) {
+        when (UiSettings.getInstance(requireContext()).getSwipeAction(actionResId)) {
             NONE -> actionNoneCheck
             ARCHIVE -> actionArchiveCheck
             DELETE -> actionDeleteCheck
@@ -141,7 +141,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         this@selectOption.isVisible = true
     }
 
-    private fun saveAction(swipeAction: SwipeAction) = with(UiSettings(requireContext())) {
+    private fun saveAction(swipeAction: SwipeAction) = with(UiSettings.getInstance(requireContext())) {
         when (navigationArgs.titleResId) {
             R.string.settingsSwipeShortRight -> swipeShortRight = swipeAction
             R.string.settingsSwipeLongRight -> swipeLongRight = swipeAction

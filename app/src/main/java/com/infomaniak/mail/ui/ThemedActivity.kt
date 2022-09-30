@@ -23,7 +23,7 @@ import com.infomaniak.mail.data.UiSettings
 
 open class ThemedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(UiSettings(this).accentColor.theme)
+        setTheme(UiSettings.getInstance(this).accentColor.theme)
         super.onCreate(savedInstanceState)
     }
 }

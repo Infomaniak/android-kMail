@@ -62,12 +62,12 @@ class ThreadListDensitySettingFragment : Fragment() {
             if (!isChecked) return@addOnButtonCheckedListener
 
             val (listDensity, resId) = getDensityFromCheckedButton(buttonId)
-            UiSettings(requireContext()).threadDensity = listDensity
+            UiSettings.getInstance(requireContext()).threadDensity = listDensity
             listDensityImage.setImageResource(resId)
         }
     }
 
-    private fun getCheckedButtonFromDensity() = when (UiSettings(requireContext()).threadDensity) {
+    private fun getCheckedButtonFromDensity() = when (UiSettings.getInstance(requireContext()).threadDensity) {
         COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
         LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
         else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default
