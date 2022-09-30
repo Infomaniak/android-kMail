@@ -182,8 +182,10 @@ object ThreadController {
         }
     }
 
+    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     fun getThreadLastMessageUid(thread: Thread): List<String> = listOf(thread.messages.last().uid)
 
+    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
             thread.messages.forEach { if (!it.seen) add(it.uid) }
