@@ -17,32 +17,16 @@
  */
 package com.infomaniak.mail.data.models
 
-import android.util.Log
 import androidx.annotation.DrawableRes
-import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.KMailHttpClient
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
+import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import java.io.BufferedInputStream
-import java.io.File
 
-// @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
 @Serializable
-class Attachment : RealmObject {
-    @PrimaryKey // TODO: Remove `@PrimaryKey` when we have EmbeddedObjects
-    var uuid: String = ""
+class Attachment : EmbeddedRealmObject {
     @SerialName("mime_type")
     var mimeType: String = ""
     var encoding: String = ""
@@ -57,16 +41,7 @@ class Attachment : RealmObject {
     var localUri: String = ""
     var thumbnail: String = ""
 
-    // TODO: Remove this method when we have EmbeddedObjects
-    fun initLocalValues(position: Int, parentMessageUid: String) {
-        uuid = "attachment_${position}_${parentMessageUid}"
-    }
-
     fun getDisposition(): AttachmentDisposition? = enumValueOfOrNull<AttachmentDisposition>(disposition)
-
-    override fun equals(other: Any?): Boolean = other is Attachment && other.uuid == uuid
-
-    override fun hashCode(): Int = uuid.hashCode()
 
     fun getFileTypeFromExtension(): AttachmentType = when (mimeType) {
         in Regex("application/(zip|rar|x-tar|.*compressed|.*archive)") -> AttachmentType.ARCHIVE
@@ -99,33 +74,33 @@ class Attachment : RealmObject {
     }
 
     // TODO: Use this, and move it elsewhere.
-    suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
-
-        fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
-            val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
-            return okHttpClient.newBuilder().build().newCall(request).execute()
-        }
-
-        fun saveAttachmentData(response: Response, outputFile: File, onFinish: (() -> Unit)) {
-            Log.d("TAG", "Save remote data to ${outputFile.path}")
-            BufferedInputStream(response.body?.byteStream()).use { input ->
-                outputFile.outputStream().use { output ->
-                    input.copyTo(output)
-                    onFinish()
-                }
-            }
-        }
-
-        val response = downloadAttachmentData(
-            fileUrl = ApiRoutes.resource(attachment.resource),
-            okHttpClient = KMailHttpClient.getHttpClient(AccountUtils.currentUserId),
-        )
-
-        val file = File(cacheDir, "${attachment.uuid}_${attachment.name}")
-
-        saveAttachmentData(response, file) {
-            attachment.localUri = file.toURI().toString()
-            RealmDatabase.mailboxContent.writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
-        }
-    }
+    // suspend fun fetchAttachment(attachment: Attachment, cacheDir: File) {
+    //
+    //     fun downloadAttachmentData(fileUrl: String, okHttpClient: OkHttpClient): Response {
+    //         val request = Request.Builder().url(fileUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
+    //         return okHttpClient.newBuilder().build().newCall(request).execute()
+    //     }
+    //
+    //     fun saveAttachmentData(response: Response, outputFile: File, onFinish: (() -> Unit)) {
+    //         Log.d("TAG", "Save remote data to ${outputFile.path}")
+    //         BufferedInputStream(response.body?.byteStream()).use { input ->
+    //             outputFile.outputStream().use { output ->
+    //                 input.copyTo(output)
+    //                 onFinish()
+    //             }
+    //         }
+    //     }
+    //
+    //     val response = downloadAttachmentData(
+    //         fileUrl = ApiRoutes.resource(attachment.resource),
+    //         okHttpClient = KMailHttpClient.getHttpClient(AccountUtils.currentUserId),
+    //     )
+    //
+    //     val file = File(cacheDir, "${attachment.uuid}_${attachment.name}")
+    //
+    //     saveAttachmentData(response, file) {
+    //         attachment.localUri = file.toURI().toString()
+    //         RealmDatabase.mailboxContent.writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
+    //     }
+    // }
 }

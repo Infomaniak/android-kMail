@@ -21,7 +21,6 @@ package com.infomaniak.mail.data.models
 
 import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
@@ -75,10 +74,6 @@ class Draft : RealmObject {
     fun initLocalValues(messageUid: String) {
         if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
         parentMessageUid = messageUid
-
-        cc = cc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        bcc = bcc?.map { it.initLocalValues() }?.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
     }
 
     fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
