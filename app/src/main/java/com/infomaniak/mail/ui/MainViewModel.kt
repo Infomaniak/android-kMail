@@ -23,7 +23,6 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DuplicateController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -224,7 +223,6 @@ class MainViewModel : ViewModel() {
         folderId: String,
         filter: ThreadFilter = ThreadFilter.ALL,
     ) {
-        DuplicateController.removeDuplicates()
         val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, OFFSET_FIRST_PAGE, filter).data ?: return
         canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter)
         FolderController.updateFolderLastUpdatedAt(folderId)
@@ -239,7 +237,6 @@ class MainViewModel : ViewModel() {
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
         isDownloadingChanges.postValue(true)
-        DuplicateController.removeDuplicates()
         val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data ?: return@launch
         canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
@@ -251,11 +248,11 @@ class MainViewModel : ViewModel() {
     }
 
     private fun fetchMessages(thread: Thread): List<Message> {
-        return thread.messages.mapNotNull { realmMessage ->
-            if (realmMessage.fullyDownloaded) {
-                realmMessage
+        return thread.messages.mapNotNull { localMessage ->
+            if (localMessage.fullyDownloaded) {
+                localMessage
             } else {
-                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
+                ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
                     completedMessage.fullyDownloaded = true
                     // TODO: Uncomment this when managing Drafts folder
                     // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {

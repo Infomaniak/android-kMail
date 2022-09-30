@@ -19,53 +19,43 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.RealmDatabase.copyListToRealm
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmSingleQuery
 
 object MessageController {
 
-    //region Get data
-    fun getMessage(id: String, realm: MutableRealm? = null): Message? {
-        return realm.getMessageQuery(id).find()
-    }
-
+    //region Queries
     private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
         return (this ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} = '$uid'").first()
     }
     //endregion
 
+    //region Get data
+    fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
+        return realm.getMessageQuery(uid).find()
+    }
+    //endregion
+
     //region Edit data
-    fun update(realmMessages: List<Message>, apiMessages: List<Message>) {
+    fun update(localMessages: List<Message>, apiMessages: List<Message>) {
         RealmDatabase.mailboxContent.writeBlocking {
 
-            // Get outdated data
-            Log.d(RealmDatabase.TAG, "Messages: Get outdated data")
-            val outdatedMessages = getOutdatedMessages(realmMessages, apiMessages)
-
-            // Save new data
-            Log.d(RealmDatabase.TAG, "Messages: Save new data")
-            insertNewData(apiMessages)
-
-            // Delete outdated data
             Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")
-            deleteMessages(outdatedMessages)
+            deleteMessages(getOutdatedMessages(localMessages, apiMessages))
+
+            Log.d(RealmDatabase.TAG, "Messages: Save new data")
+            copyListToRealm(apiMessages, alsoCopyManagedItems = false)
         }
     }
 
-    private fun getOutdatedMessages(realmMessages: List<Message>, apiMessages: List<Message>): List<Message> {
-        return realmMessages.filter { realmMessage ->
-            apiMessages.none { apiMessage -> apiMessage.uid == realmMessage.uid }
-        }
-    }
-
-    private fun MutableRealm.insertNewData(apiMessages: List<Message>) {
-        apiMessages.forEach { apiMessage ->
-            if (!apiMessage.isManaged()) copyToRealm(apiMessage, UpdatePolicy.ALL)
+    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
+    private fun getOutdatedMessages(localMessages: List<Message>, apiMessages: List<Message>): List<Message> {
+        return localMessages.filter { localMessage ->
+            apiMessages.none { apiMessage -> apiMessage.uid == localMessage.uid }
         }
     }
 
@@ -74,14 +64,16 @@ object MessageController {
     }
 
     fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.forEach { deleteMessage(it.uid, this) }
+        messages.reversed().forEach { deleteMessage(it.uid, this) }
     }
 
     fun deleteMessage(uid: String, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = {
             getMessage(uid, it)
-                ?.also { message -> message.draftUuid?.let { draftUuid -> getDraft(draftUuid, it) }?.let(it::delete) }
-                ?.let(it::delete)
+                ?.let { message ->
+                    message.draftUuid?.let { draftUuid -> getDraft(draftUuid, it) }?.let(it::delete)
+                    it.delete(message)
+                }
         }
         realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }

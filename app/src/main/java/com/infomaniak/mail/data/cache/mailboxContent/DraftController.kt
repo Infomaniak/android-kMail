@@ -26,13 +26,15 @@ import io.realm.kotlin.query.RealmSingleQuery
 
 object DraftController {
 
+    //region Queries
+    private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
+    }
+    //endregion
+
     //region Get data
     fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
         return realm.getDraftQuery(uuid).find()
-    }
-
-    private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
     }
     //endregion
 

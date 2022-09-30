@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.message.Body
-import com.infomaniak.mail.data.models.message.Duplicate
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignatureEmail
@@ -32,6 +31,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmObject
 
@@ -69,8 +69,8 @@ object RealmDatabase {
     }
 
     // TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
-    fun MutableRealm.copyListToRealm(items: List<RealmObject>) {
-        items.forEach { copyToRealm(it, UpdatePolicy.ALL) }
+    fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
+        items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
     }
 
     fun deleteMailboxContent(mailboxId: Int) {
@@ -161,7 +161,6 @@ object RealmDatabase {
                 Thread::class,
                 Message::class,
                 Draft::class,
-                Duplicate::class,
                 Recipient::class,
                 Body::class,
                 Attachment::class,
