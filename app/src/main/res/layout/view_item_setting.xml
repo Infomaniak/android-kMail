@@ -20,6 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?selectableItemBackground"
+    android:baselineAligned="false"
     android:gravity="center"
     android:paddingVertical="12dp"
     android:paddingStart="@dimen/marginStandard"
