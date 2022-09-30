@@ -27,9 +27,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.EmailsDisplayType
-import com.infomaniak.mail.data.UiSettings.EmailsDisplayType.MESSAGES
-import com.infomaniak.mail.data.UiSettings.EmailsDisplayType.THREADS
+import com.infomaniak.mail.data.UiSettings.ThreadMode
+import com.infomaniak.mail.data.UiSettings.ThreadMode.MESSAGES
+import com.infomaniak.mail.data.UiSettings.ThreadMode.THREADS
 import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -53,7 +53,7 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UiSettings(requireContext()).emailsDisplayType) {
+        when (UiSettings(requireContext()).threadMode) {
             THREADS -> settingsOptionDiscussionsCheck.selectOption()
             MESSAGES -> settingsOptionMessagesCheck.selectOption()
         }
@@ -70,8 +70,8 @@ class DisplayModeSettingFragment : Fragment() {
         }
     }
 
-    private fun updateDisplayMode(displayMode: EmailsDisplayType, chosenOption: ImageView) {
-        UiSettings(requireContext()).emailsDisplayType = displayMode
+    private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {
+        UiSettings(requireContext()).threadMode = displayMode
         chosenOption.selectOption()
     }
 

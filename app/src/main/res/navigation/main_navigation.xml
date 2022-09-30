@@ -188,7 +188,7 @@
             android:id="@+id/action_settings_to_sendSettings"
             app:destination="@id/sendSettingsFragment" />
         <action
-            android:id="@+id/action_settings_to_threadsDensitySetting"
+            android:id="@+id/action_settings_to_threadListDensitySetting"
             app:destination="@id/threadListDensitySettingFragment" />
         <action
             android:id="@+id/action_settings_to_themeSetting"

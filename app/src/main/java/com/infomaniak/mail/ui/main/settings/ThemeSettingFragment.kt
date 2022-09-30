@@ -28,8 +28,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.NightMode
-import com.infomaniak.mail.data.UiSettings.NightMode.*
+import com.infomaniak.mail.data.UiSettings.Theme
+import com.infomaniak.mail.data.UiSettings.Theme.*
 import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
 
 class ThemeSettingFragment : Fragment() {
@@ -52,7 +52,7 @@ class ThemeSettingFragment : Fragment() {
     }
 
     private fun setUpCheckMarks() = with(binding) {
-        when (UiSettings(requireContext()).nightMode) {
+        when (UiSettings(requireContext()).theme) {
             LIGHT -> settingsOptionLightThemeCheck
             DARK -> settingsOptionDarkThemeCheck
             else -> settingsOptionDefaultThemeCheck
@@ -65,10 +65,10 @@ class ThemeSettingFragment : Fragment() {
         settingsOptionDarkTheme.setOnClickListener { chooseTheme(DARK, settingsOptionDarkThemeCheck) }
     }
 
-    private fun chooseTheme(theme: NightMode, selectedImageView: ImageView) {
+    private fun chooseTheme(theme: Theme, selectedImageView: ImageView) {
         selectedImageView.selectOption()
         setDefaultNightMode(theme.mode)
-        UiSettings(requireContext()).nightMode = theme
+        UiSettings(requireContext()).theme = theme
     }
 
     private fun ImageView.selectOption() = with(binding) {

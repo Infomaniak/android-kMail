@@ -67,11 +67,11 @@ class SettingsFragment : Fragment() {
     }
 
     private fun UiSettings.setupPreferencesText() = with(binding) {
-        densitySubtitle.setText(threadsDensity.localisedNameRes)
-        themeSubtitle.setText(nightMode.localisedNameRes)
-        displayModeSubtitle.setText(emailsDisplayType.localisedNameRes)
-        externalContentSubtitle.setText(externalContentMode.localisedNameRes)
-        accentColorSubtitle.setText(UiSettings(requireContext()).colorTheme.localisedNameRes)
+        densitySubtitle.setText(threadDensity.localisedNameRes)
+        themeSubtitle.setText(theme.localisedNameRes)
+        displayModeSubtitle.setText(threadMode.localisedNameRes)
+        externalContentSubtitle.setText(externalContent.localisedNameRes)
+        accentColorSubtitle.setText(UiSettings(requireContext()).accentColor.localisedNameRes)
     }
 
     private fun setupListeners() = with(binding) {
@@ -84,7 +84,7 @@ class SettingsFragment : Fragment() {
         settingsAppLockSwitch.setOnClickListener { notYetImplemented() }
 
         settingsThreadListDensity.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToThreadsDensitySetting())
+            safeNavigate(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
         }
 
         settingsTheme.setOnClickListener {

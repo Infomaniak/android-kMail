@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.mail.data.UiSettings.EmailsDisplayType
+import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -129,20 +129,20 @@ class MainViewModel : ViewModel() {
         updateContacts()
     }
 
-    fun loadCurrentMailbox(emailsDisplayType: EmailsDisplayType) {
+    fun loadCurrentMailbox(threadMode: ThreadMode) {
         Log.i(TAG, "loadCurrentMailbox")
         updateMailboxes()
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-            ?.let { openMailbox(it, emailsDisplayType) }
+            ?.let { openMailbox(it, threadMode) }
     }
 
-    fun openMailbox(mailbox: Mailbox, emailsDisplayType: EmailsDisplayType) = viewModelScope.launch(Dispatchers.IO) {
+    fun openMailbox(mailbox: Mailbox, threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
         updateFolders(mailbox)
         FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
-            refreshThreads(mailbox.uuid, folder.id, emailsDisplayType)
+            refreshThreads(mailbox.uuid, folder.id, threadMode)
         }
     }
 
@@ -163,7 +163,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun openFolder(folderId: String, emailsDisplayType: EmailsDisplayType) = viewModelScope.launch(Dispatchers.IO) {
+    fun openFolder(folderId: String, threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
         val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
         if (folderId == currentFolderId.value) return@launch
@@ -171,7 +171,7 @@ class MainViewModel : ViewModel() {
         Log.i(TAG, "openFolder: $folderId")
 
         selectFolder(folderId)
-        refreshThreads(mailboxUuid, folderId, emailsDisplayType)
+        refreshThreads(mailboxUuid, folderId, threadMode)
     }
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
@@ -180,14 +180,14 @@ class MainViewModel : ViewModel() {
         updateMessages(thread)
     }
 
-    fun forceRefreshThreads(filter: ThreadFilter, emailsDisplayType: EmailsDisplayType) = viewModelScope.launch(Dispatchers.IO) {
+    fun forceRefreshThreads(filter: ThreadFilter, threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshThreads")
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
         val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges.postValue(true)
-        refreshThreads(mailboxUuid, folderId, emailsDisplayType, filter)
+        refreshThreads(mailboxUuid, folderId, threadMode, filter)
     }
 
     fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
@@ -231,18 +231,10 @@ class MainViewModel : ViewModel() {
     private fun refreshThreads(
         mailboxUuid: String,
         folderId: String,
-        emailsDisplayType: EmailsDisplayType,
+        threadMode: ThreadMode,
         filter: ThreadFilter = ThreadFilter.ALL,
     ) {
-        val threadsResult =
-            ApiRepository.getThreads(
-                mailboxUuid,
-                folderId,
-                emailsDisplayType,
-                OFFSET_FIRST_PAGE,
-                filter,
-            ).data ?: return
-
+        val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, threadMode, OFFSET_FIRST_PAGE, filter).data ?: return
         canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter)
         FolderController.updateFolderLastUpdatedAt(folderId)
         isDownloadingChanges.postValue(false)
@@ -251,22 +243,13 @@ class MainViewModel : ViewModel() {
     fun loadMoreThreads(
         mailboxUuid: String,
         folderId: String,
-        emailsDisplayType: EmailsDisplayType,
+        threadMode: ThreadMode,
         offset: Int,
         filter: ThreadFilter,
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
         isDownloadingChanges.postValue(true)
-
-        val threadsResult =
-            ApiRepository.getThreads(
-                mailboxUuid,
-                folderId,
-                emailsDisplayType,
-                offset,
-                filter,
-            ).data ?: return@launch
-
+        val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, threadMode, offset, filter).data ?: return@launch
         canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
     }

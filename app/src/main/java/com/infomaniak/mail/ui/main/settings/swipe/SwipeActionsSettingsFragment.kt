@@ -49,10 +49,10 @@ class SwipeActionsSettingsFragment : Fragment() {
     }
 
     private fun UiSettings.setupUi() = with(binding) {
-        settingsSwipeShortRightText.setText(shortRightSwipe.nameRes)
-        settingsSwipeLongRightText.setText(longRightSwipe.nameRes)
-        settingsSwipeShortLeftText.setText(shortLeftSwipe.nameRes)
-        settingsSwipeLongLeftText.setText(longLeftSwipe.nameRes)
+        settingsSwipeShortRightText.setText(swipeShortRight.nameRes)
+        settingsSwipeLongRightText.setText(swipeLongRight.nameRes)
+        settingsSwipeShortLeftText.setText(swipeShortLeft.nameRes)
+        settingsSwipeLongLeftText.setText(swipeLongLeft.nameRes)
     }
 
     private fun setupListeners() = with(binding) {
