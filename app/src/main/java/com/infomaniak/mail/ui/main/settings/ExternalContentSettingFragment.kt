@@ -27,9 +27,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.ExternalContentMode
-import com.infomaniak.mail.data.UiSettings.ExternalContentMode.ALWAYS
-import com.infomaniak.mail.data.UiSettings.ExternalContentMode.ASK_ME
+import com.infomaniak.mail.data.UiSettings.ExternalContent
+import com.infomaniak.mail.data.UiSettings.ExternalContent.ALWAYS
+import com.infomaniak.mail.data.UiSettings.ExternalContent.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -53,7 +53,7 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UiSettings(requireContext()).externalContentMode) {
+        when (UiSettings(requireContext()).externalContent) {
             ALWAYS -> settingsOptionAlwaysCheck.selectOption()
             ASK_ME -> settingsOptionAskMeCheck.selectOption()
         }
@@ -70,8 +70,8 @@ class ExternalContentSettingFragment : Fragment() {
         }
     }
 
-    private fun updateExternalContentSetting(externalContentMode: ExternalContentMode, chosenOption: ImageView) {
-        UiSettings(requireContext()).externalContentMode = externalContentMode
+    private fun updateExternalContentSetting(externalContent: ExternalContent, chosenOption: ImageView) {
+        UiSettings(requireContext()).externalContent = externalContent
         chosenOption.selectOption()
     }
 

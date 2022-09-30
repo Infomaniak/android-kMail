@@ -145,10 +145,10 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     private fun saveAction(swipeAction: SwipeAction) = with(UiSettings(requireContext())) {
         UserPreferencesController.updateUserPreferences {
             when (navigationArgs.titleResId) {
-                R.string.settingsSwipeShortRight -> shortRightSwipe = swipeAction
-                R.string.settingsSwipeLongRight -> longRightSwipe = swipeAction
-                R.string.settingsSwipeShortLeft -> shortLeftSwipe = swipeAction
-                R.string.settingsSwipeLongLeft -> longLeftSwipe = swipeAction
+                R.string.settingsSwipeShortRight -> swipeShortRight = swipeAction
+                R.string.settingsSwipeLongRight -> swipeLongRight = swipeAction
+                R.string.settingsSwipeShortLeft -> swipeShortLeft = swipeAction
+                R.string.settingsSwipeLongLeft -> swipeLongLeft = swipeAction
             }
         }
     }

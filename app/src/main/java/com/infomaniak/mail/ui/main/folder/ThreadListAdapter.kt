@@ -37,9 +37,9 @@ import com.infomaniak.lib.core.utils.capitalizeFirstChar
 import com.infomaniak.lib.core.utils.format
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings.ThreadsDensity
-import com.infomaniak.mail.data.UiSettings.ThreadsDensity.COMPACT
-import com.infomaniak.mail.data.UiSettings.ThreadsDensity.LARGE
+import com.infomaniak.mail.data.UiSettings.ThreadDensity
+import com.infomaniak.mail.data.UiSettings.ThreadDensity.COMPACT
+import com.infomaniak.mail.data.UiSettings.ThreadDensity.LARGE
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
@@ -53,7 +53,7 @@ import kotlin.math.abs
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
-    private val threadsDensity: ThreadsDensity,
+    private val threadDensity: ThreadDensity,
     private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
@@ -126,9 +126,9 @@ class ThreadListAdapter(
 
         root.setOnClickListener { onThreadClicked?.invoke(this@with) }
 
-        expeditorAvatar.isVisible = threadsDensity == LARGE
-        mailBodyPreview.isGone = threadsDensity == COMPACT
-        mailSubject.setMargins(top = if (threadsDensity == COMPACT) 0 else 4.toPx())
+        expeditorAvatar.isVisible = threadDensity == LARGE
+        mailBodyPreview.isGone = threadDensity == COMPACT
+        mailSubject.setMargins(top = if (threadDensity == COMPACT) 0 else 4.toPx())
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
@@ -234,7 +234,7 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
-        dataSet = formatList(itemList, recyclerView.context, threadsDensity)
+        dataSet = formatList(itemList, recyclerView.context, threadDensity)
     }
 
     private enum class DisplayType(val layout: Int) {
@@ -251,8 +251,8 @@ class ThreadListAdapter(
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
 
-        fun formatList(threads: List<Thread>, context: Context, threadsDensity: ThreadsDensity): MutableList<Any> {
-            if (threadsDensity == COMPACT) return threads.toMutableList()
+        fun formatList(threads: List<Thread>, context: Context, threadDensity: ThreadDensity): MutableList<Any> {
+            if (threadDensity == COMPACT) return threads.toMutableList()
 
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()

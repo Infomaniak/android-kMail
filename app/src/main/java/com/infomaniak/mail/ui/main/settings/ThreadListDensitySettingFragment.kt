@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.ThreadsDensity.*
+import com.infomaniak.mail.data.UiSettings.ThreadDensity.*
 import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
 
 class ThreadListDensitySettingFragment : Fragment() {
@@ -62,12 +62,12 @@ class ThreadListDensitySettingFragment : Fragment() {
             if (!isChecked) return@addOnButtonCheckedListener
 
             val (listDensity, resId) = getDensityFromCheckedButton(buttonId)
-            UiSettings(requireContext()).threadsDensity = listDensity
+            UiSettings(requireContext()).threadDensity = listDensity
             listDensityImage.setImageResource(resId)
         }
     }
 
-    private fun getCheckedButtonFromDensity() = when (UiSettings(requireContext()).threadsDensity) {
+    private fun getCheckedButtonFromDensity() = when (UiSettings(requireContext()).threadDensity) {
         COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
         LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
         else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default

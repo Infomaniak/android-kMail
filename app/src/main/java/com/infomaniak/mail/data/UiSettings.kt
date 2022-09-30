@@ -30,12 +30,12 @@ import kotlin.reflect.KMutableProperty0
 class UiSettings(private val context: Context) {
 
     private companion object {
-        val DEFAULT_THREADS_DENSITY = ThreadsDensity.NORMAL
-        val DEFAULT_NIGHT_MODE = NightMode.SYSTEM
-        val DEFAULT_COLOR_THEME = ColorTheme.PINK
+        val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
+        val DEFAULT_THEME = Theme.SYSTEM
+        val DEFAULT_ACCENT_COLOR = AccentColor.PINK
         val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
-        val DEFAULT_EMAILS_DISPLAY_TYPE = EmailsDisplayType.THREADS
-        val DEFAULT_EXTERNAL_CONTENT_MODE = ExternalContentMode.ASK_ME
+        val DEFAULT_THREAD_MODE = ThreadMode.THREADS
+        val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
     }
 
     private fun getUiSettings(): SharedPreferences = context.getSharedPreferences("UISettings", Context.MODE_PRIVATE)
@@ -45,98 +45,98 @@ class UiSettings(private val context: Context) {
         apply()
     }
 
-    //regin Threads density
-    private var _threadsDensity: String?
-        get() = getPrivateSetting(::threadsDensity, DEFAULT_THREADS_DENSITY)
-        set(value) = setPrivateSetting(::threadsDensity, value)
+    //region Thread density
+    private var _threadDensity: String?
+        get() = getPrivateSetting(::threadDensity, DEFAULT_THREAD_DENSITY)
+        set(value) = setPrivateSetting(::threadDensity, value)
 
-    var threadsDensity: ThreadsDensity
-        get() = getSetting(_threadsDensity, DEFAULT_THREADS_DENSITY)
+    var threadDensity: ThreadDensity
+        get() = getSetting(_threadDensity, DEFAULT_THREAD_DENSITY)
         set(value) {
-            _threadsDensity = value.name
+            _threadDensity = value.name
         }
 
-    enum class ThreadsDensity(val apiName: String, @StringRes val localisedNameRes: Int) {
+    enum class ThreadDensity(val apiName: String, @StringRes val localisedNameRes: Int) {
         COMPACT("high", R.string.settingsDensityOptionCompact),
         NORMAL("normal", R.string.settingsDensityOptionNormal),
         LARGE("low", R.string.settingsDensityOptionLarge),
     }
     //endregion
 
-    //regin Night mode
-    private var _nightMode: String?
-        get() = getPrivateSetting(::nightMode, DEFAULT_NIGHT_MODE)
-        set(value) = setPrivateSetting(::nightMode, value)
+    //region Theme
+    private var _theme: String?
+        get() = getPrivateSetting(::theme, DEFAULT_THEME)
+        set(value) = setPrivateSetting(::theme, value)
 
-    var nightMode: NightMode
-        get() = getSetting(_nightMode, DEFAULT_NIGHT_MODE)
+    var theme: Theme
+        get() = getSetting(_theme, DEFAULT_THEME)
         set(value) {
-            _nightMode = value.name
+            _theme = value.name
         }
 
-    enum class NightMode(val apiName: String, @StringRes val localisedNameRes: Int, val mode: Int) {
+    enum class Theme(val apiName: String, @StringRes val localisedNameRes: Int, val mode: Int) {
         SYSTEM("medium", R.string.settingsOptionSystemTheme, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
         LIGHT("light", R.string.settingsOptionLightTheme, AppCompatDelegate.MODE_NIGHT_NO),
         DARK("dark", R.string.settingsOptionDarkTheme, AppCompatDelegate.MODE_NIGHT_YES);
     }
     //endregion
 
-    //region Color theme
-    private var _colorTheme: String?
-        get() = getPrivateSetting(::colorTheme, DEFAULT_COLOR_THEME)
-        set(value) = setPrivateSetting(::colorTheme, value)
+    //region Accent color
+    private var _accentColor: String?
+        get() = getPrivateSetting(::accentColor, DEFAULT_ACCENT_COLOR)
+        set(value) = setPrivateSetting(::accentColor, value)
 
-    var colorTheme: ColorTheme
-        get() = getSetting(_colorTheme, DEFAULT_COLOR_THEME)
+    var accentColor: AccentColor
+        get() = getSetting(_accentColor, DEFAULT_ACCENT_COLOR)
         set(value) {
-            _colorTheme = value.name
+            _accentColor = value.name
         }
 
-    enum class ColorTheme(@StringRes val localisedNameRes: Int, @StyleRes val themeRes: Int) {
+    enum class AccentColor(@StringRes val localisedNameRes: Int, @StyleRes val themeRes: Int) {
         PINK(R.string.accentColorPinkTitle, R.style.AppTheme_Pink),
         BLUE(R.string.accentColorBlueTitle, R.style.AppTheme_Blue),
     }
     //endregion
 
     //region Swipe actions
-    private var _shortRightSwipe: String?
-        get() = getPrivateSetting(::shortRightSwipe, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::shortRightSwipe, value)
+    private var _swipeShortRight: String?
+        get() = getPrivateSetting(::swipeShortRight, DEFAULT_SWIPE_ACTION)
+        set(value) = setPrivateSetting(::swipeShortRight, value)
 
-    var shortRightSwipe: SwipeAction
-        get() = getSetting(_shortRightSwipe, DEFAULT_SWIPE_ACTION)
+    var swipeShortRight: SwipeAction
+        get() = getSetting(_swipeShortRight, DEFAULT_SWIPE_ACTION)
         set(value) {
-            _shortRightSwipe = value.name
+            _swipeShortRight = value.name
         }
 
-    private var _longRightSwipe: String?
-        get() = getPrivateSetting(::longRightSwipe, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::longRightSwipe, value)
+    private var _swipeLongRight: String?
+        get() = getPrivateSetting(::swipeLongRight, DEFAULT_SWIPE_ACTION)
+        set(value) = setPrivateSetting(::swipeLongRight, value)
 
-    var longRightSwipe: SwipeAction
-        get() = getSetting(_longRightSwipe, DEFAULT_SWIPE_ACTION)
+    var swipeLongRight: SwipeAction
+        get() = getSetting(_swipeLongRight, DEFAULT_SWIPE_ACTION)
         set(value) {
-            _longRightSwipe = value.name
+            _swipeLongRight = value.name
         }
 
-    private var _shortLeftSwipe: String?
-        get() = getPrivateSetting(::shortLeftSwipe, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::shortLeftSwipe, value)
+    private var _swipeShortLeft: String?
+        get() = getPrivateSetting(::swipeShortLeft, DEFAULT_SWIPE_ACTION)
+        set(value) = setPrivateSetting(::swipeShortLeft, value)
 
-    var shortLeftSwipe: SwipeAction
-        get() = getSetting(_shortLeftSwipe, DEFAULT_SWIPE_ACTION)
+    var swipeShortLeft: SwipeAction
+        get() = getSetting(_swipeShortLeft, DEFAULT_SWIPE_ACTION)
         set(value) {
-            _shortLeftSwipe = value.name
+            _swipeShortLeft = value.name
         }
 
-    private var _longLeftSwipe: String?
-        get() = getPrivateSetting(::longLeftSwipe, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::longLeftSwipe, value)
+    private var _swipeLongLeft: String?
+        get() = getPrivateSetting(::swipeLongLeft, DEFAULT_SWIPE_ACTION)
+        set(value) = setPrivateSetting(::swipeLongLeft, value)
 
-    var longLeftSwipe: SwipeAction
-        get() = getSetting(_longLeftSwipe, DEFAULT_SWIPE_ACTION)
+    var swipeLongLeft: SwipeAction
+        get() = getSetting(_swipeLongLeft, DEFAULT_SWIPE_ACTION)
         set(value) {
-            _longLeftSwipe = value.name
+            _swipeLongLeft = value.name
         }
 
     enum class SwipeAction(@IdRes val nameRes: Int) {
@@ -153,50 +153,43 @@ class UiSettings(private val context: Context) {
     }
 
     fun getSwipeAction(@StringRes nameRes: Int): SwipeAction? = when (nameRes) {
-        R.string.settingsSwipeShortRight -> shortRightSwipe
-        R.string.settingsSwipeLongRight -> longRightSwipe
-        R.string.settingsSwipeShortLeft -> shortLeftSwipe
-        R.string.settingsSwipeLongLeft -> longLeftSwipe
+        R.string.settingsSwipeShortRight -> swipeShortRight
+        R.string.settingsSwipeLongRight -> swipeLongRight
+        R.string.settingsSwipeShortLeft -> swipeShortLeft
+        R.string.settingsSwipeLongLeft -> swipeLongLeft
         else -> null
     }
-
-    data class SwipeActions(
-        var shortRightSwipe: SwipeAction = SwipeAction.NONE,
-        var longRightSwipe: SwipeAction = SwipeAction.NONE,
-        var shortLeftSwipe: SwipeAction = SwipeAction.NONE,
-        var longLeftSwipe: SwipeAction = SwipeAction.NONE,
-    )
     //endregion
 
-    // Emails display type
-    private var _emailsDisplayType: String?
-        get() = getPrivateSetting(::emailsDisplayType, DEFAULT_EMAILS_DISPLAY_TYPE)
-        set(value) = setPrivateSetting(::emailsDisplayType, value)
+    //region Thread mode
+    private var _threadMode: String?
+        get() = getPrivateSetting(::threadMode, DEFAULT_THREAD_MODE)
+        set(value) = setPrivateSetting(::threadMode, value)
 
-    var emailsDisplayType: EmailsDisplayType
-        get() = getSetting(_emailsDisplayType, DEFAULT_EMAILS_DISPLAY_TYPE)
+    var threadMode: ThreadMode
+        get() = getSetting(_threadMode, DEFAULT_THREAD_MODE)
         set(value) {
-            _emailsDisplayType = value.name
+            _threadMode = value.name
         }
 
-    enum class EmailsDisplayType(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
+    enum class ThreadMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
         THREADS(1, "on", R.string.settingsOptionDiscussions),
         MESSAGES(0, "off", R.string.settingsOptionMessages),
     }
     //endregion
 
-    // External content mode
-    private var _externalContentMode: String?
-        get() = getPrivateSetting(::externalContentMode, DEFAULT_EXTERNAL_CONTENT_MODE)
-        set(value) = setPrivateSetting(::externalContentMode, value)
+    //region External content
+    private var _externalContent: String?
+        get() = getPrivateSetting(::externalContent, DEFAULT_EXTERNAL_CONTENT)
+        set(value) = setPrivateSetting(::externalContent, value)
 
-    var externalContentMode: ExternalContentMode
-        get() = getSetting(_externalContentMode, DEFAULT_EXTERNAL_CONTENT_MODE)
+    var externalContent: ExternalContent
+        get() = getSetting(_externalContent, DEFAULT_EXTERNAL_CONTENT)
         set(value) {
-            _externalContentMode = value.name
+            _externalContent = value.name
         }
 
-    enum class ExternalContentMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
+    enum class ExternalContent(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
         ALWAYS(1, "true", R.string.settingsOptionAlways),
         ASK_ME(0, "false", R.string.settingsOptionAskMe),
     }

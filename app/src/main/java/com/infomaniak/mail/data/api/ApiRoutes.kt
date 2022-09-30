@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
-import com.infomaniak.mail.data.UiSettings.EmailsDisplayType
+import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 
 object ApiRoutes {
@@ -52,7 +52,7 @@ object ApiRoutes {
     fun threads(
         uuid: String,
         folderId: String,
-        emailsDisplayType: EmailsDisplayType,
+        threadMode: ThreadMode,
         offset: Int,
         filter: ThreadFilter,
         searchText: String? = null,
@@ -67,7 +67,7 @@ object ApiRoutes {
         }
         val folder = folder(uuid, folderId)
         val message = "/message"
-        val thread = "?thread=${emailsDisplayType.apiCallValue}"
+        val thread = "?thread=${threadMode.apiCallValue}"
         return "$folder$message$thread&offset=$offset$urlSearch$urlAttachment$urlFilter"
     }
 

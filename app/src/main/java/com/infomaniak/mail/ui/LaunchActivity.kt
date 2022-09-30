@@ -52,8 +52,8 @@ class LaunchActivity : AppCompatActivity() {
     private suspend fun startApp() {
         mainViewModel.updateUserInfos()
 
-        val emailsDisplayType = UiSettings(this).emailsDisplayType
-        mainViewModel.loadCurrentMailbox(emailsDisplayType)
+        val threadMode = UiSettings(this).threadMode
+        mainViewModel.loadCurrentMailbox(threadMode)
 
         withContext(Dispatchers.Main) {
             MainViewModel.currentMailboxObjectId.observeNotNull(this@LaunchActivity) {
