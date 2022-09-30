@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
-import com.infomaniak.mail.data.models.user.UserResult
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -52,8 +51,6 @@ object ApiRepository : ApiRepositoryCore() {
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
     fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)
-
-    fun getUser(): ApiResponse<UserResult> = callApi(ApiRoutes.user(), GET)
 
     // fun getContactImage(path: String): ApiResponse<Data> = callKotlinxApi(ApiRoutes.resource(path), GET)
 

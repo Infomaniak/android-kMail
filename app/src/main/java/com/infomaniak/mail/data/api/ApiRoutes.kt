@@ -29,8 +29,6 @@ object ApiRoutes {
 
     fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
 
-    fun user() = "$MAIL_API/api/user"
-
     fun signatures(hostingId: Int, mailboxName: String): String {
         return "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
     }
