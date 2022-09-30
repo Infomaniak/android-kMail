@@ -18,9 +18,10 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
+    android:tint="@color/iconColor"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="#000000"
+        android:fillColor="#000"
         android:pathData="M19,12.028C19.001,11.366 18.717,10.736 18.22,10.299L7.068,0.488C6.3,-0.157 5.157,-0.07 4.494,0.683C3.832,1.436 3.892,2.581 4.629,3.261L14.381,11.84C14.436,11.887 14.467,11.956 14.467,12.028C14.467,12.1 14.436,12.168 14.381,12.216L4.629,20.795C3.892,21.475 3.832,22.619 4.494,23.373C5.157,24.126 6.3,24.213 7.068,23.568L18.216,13.76C18.714,13.322 19,12.691 19,12.028Z" />
 </vector>
