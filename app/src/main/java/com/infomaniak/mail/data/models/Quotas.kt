@@ -20,40 +20,34 @@ package com.infomaniak.mail.data.models
 import android.content.Context
 import com.infomaniak.lib.core.utils.FormatterFileSize
 import com.infomaniak.mail.R
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
+import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlin.math.ceil
 
 @Serializable
-class Quotas : RealmObject {
+class Quotas : EmbeddedRealmObject {
 
-    //region API data
     var size: Int = 0
     @SerialName("size_checked_at")
     var sizeCheckedAt: Long = 0L
-    //endregion
 
-    //region Local data (Transient)
-    @Transient
-    @PrimaryKey
-    var mailboxObjectId: String = ""
-    //endregion
-
-    fun getText(context: Context, maxSize: Long): String {
+    fun getText(context: Context): String {
         val usedSize = size.toLong()
 
         val formattedUsedSize = FormatterFileSize.formatShortFileSize(context, usedSize)
-        val formattedMaxSize = FormatterFileSize.formatShortFileSize(context, maxSize)
+        val formattedMaxSize = FormatterFileSize.formatShortFileSize(context, QUOTAS_MAX_SIZE)
 
         return context.getString(R.string.menuDrawerMailboxStorage, formattedUsedSize, formattedMaxSize)
     }
 
-    fun getProgress(maxSize: Long): Int {
+    fun getProgress(): Int {
         val usedSize = size.toLong()
 
-        return ceil(100.0f * usedSize.toFloat() / maxSize.toFloat()).toInt()
+        return ceil(100.0f * usedSize.toFloat() / QUOTAS_MAX_SIZE.toFloat()).toInt()
+    }
+
+    companion object {
+        private const val QUOTAS_MAX_SIZE = 21_474_836_480L // TODO: Get this value from API?
     }
 }
