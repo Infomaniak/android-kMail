@@ -45,6 +45,7 @@ object MessageController {
         }
     }
 
+    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     private fun getOutdatedMessages(localMessages: List<Message>, apiMessages: List<Message>): List<Message> {
         return localMessages.filter { localMessage ->
             apiMessages.none { apiMessage -> apiMessage.uid == localMessage.uid }
