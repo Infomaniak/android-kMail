@@ -83,31 +83,19 @@
                     style="@style/SettingHeader"
                     android:text="@string/settingsSectionGeneral" />
 
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsSend"
-                    style="@style/MenuDrawerItem">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:title="@string/settingsSendTitle" />
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSendTitle" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsAppLock"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsAppLock" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settingsAppLockSwitch"
-                        style="@style/SettingButtonSwitch" />
-
-                </LinearLayout>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="toggle"
+                    app:title="@string/settingsAppLock" />
 
                 <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
@@ -115,122 +103,54 @@
                     style="@style/SettingHeader"
                     android:text="@string/settingsSectionAppearance" />
 
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsThreadListDensity"
-                    style="@style/MenuDrawerItem">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:subtitle="@string/settingsDefault"
+                    app:title="@string/settingsThreadListDensityTitle" />
 
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsThreadListDensityTitle" />
-
-                        <TextView
-                            android:id="@+id/densitySubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsDefault" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsTheme"
-                    style="@style/MenuDrawerItem">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:subtitle="@string/settingsOptionSystemTheme"
+                    app:title="@string/settingsTheme" />
 
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsTheme" />
-
-                        <TextView
-                            android:id="@+id/themeSubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsOptionSystemTheme" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsAccentColor"
-                    style="@style/MenuDrawerItem">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:subtitle="@string/accentColorPinkTitle"
+                    app:title="@string/settingsAccentColor" />
 
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsAccentColor" />
-
-                        <TextView
-                            android:id="@+id/accentColorSubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/accentColorPinkTitle" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsSwipeActions"
-                    style="@style/MenuDrawerItem">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:title="@string/settingsSwipeActionsTitle" />
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSwipeActionsTitle" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsMessageDisplay"
-                    style="@style/MenuDrawerItem">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:subtitle="@string/settingsOptionDiscussions"
+                    app:title="@string/settingsMessageDisplayTitle" />
 
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsMessageDisplayTitle" />
-
-                        <TextView
-                            android:id="@+id/displayModeSubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsOptionDiscussions" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
                     android:id="@+id/settingsExternalContent"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsExternalContentTitle" />
-
-                        <TextView
-                            android:id="@+id/externalContentSubtitle"
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsOptionAskMe" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:itemAction="chevron"
+                    app:subtitle="@string/settingsOptionAskMe"
+                    app:title="@string/settingsExternalContentTitle" />
 
             </LinearLayout>
-
         </androidx.core.widget.NestedScrollView>
-
     </com.google.android.material.card.MaterialCardView>
-
 </LinearLayout>

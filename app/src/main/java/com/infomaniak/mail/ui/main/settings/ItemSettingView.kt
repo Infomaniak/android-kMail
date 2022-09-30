@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.annotation.StringRes
 import androidx.core.content.res.getStringOrThrow
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -71,6 +72,10 @@ class ItemSettingView @JvmOverloads constructor(
         }
 
         toggle.setOnClickListener(listener)
+    }
+
+    fun setSubtitle(@StringRes subtitle: Int) {
+        binding.subtitle.setText(subtitle)
     }
 
     private enum class Action {
