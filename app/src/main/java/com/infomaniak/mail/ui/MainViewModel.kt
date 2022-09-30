@@ -286,8 +286,8 @@ class MainViewModel : ViewModel() {
     private fun markAsUnseen(thread: Thread, folderId: String) {
         RealmDatabase.mailboxContent.writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uids = ThreadController.getThreadLastMessageUids(latestThread)
-            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uids)
+            val uid = ThreadController.getThreadLastMessageUid(latestThread)
+            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)
             if (apiResponse.isSuccess()) markThreadAsUnseen(latestThread, folderId)
         }
     }
