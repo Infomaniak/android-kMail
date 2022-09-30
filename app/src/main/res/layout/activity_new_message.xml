@@ -124,7 +124,6 @@
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorBold"
-                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonBold"
@@ -136,7 +135,6 @@
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorItalic"
-                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonItalic"
@@ -148,7 +146,6 @@
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorUnderlined"
-                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonUnderlined"
@@ -160,7 +157,6 @@
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
                 android:id="@+id/editorStrikeThrough"
-                style="@style/ToggelableEditorIconButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonStrikedThrough"
