@@ -66,20 +66,17 @@ object ThreadController {
         filter: ThreadFilter,
     ): Boolean = RealmDatabase.mailboxContent.writeBlocking {
 
-        // Get current data
+        Log.d(RealmDatabase.TAG, "Threads: Get current data")
         val localThreads = getLocalThreads(folderId, filter)
         val apiThreads = initApiThreads(threadsResult, mailboxUuid)
 
-        // Get outdated data
         Log.d(RealmDatabase.TAG, "Threads: Get outdated data")
         val outdatedMessages = getOutdatedMessages(localThreads)
 
-        // Delete outdated data
         Log.d(RealmDatabase.TAG, "Threads: Delete outdated data")
         deleteMessages(outdatedMessages)
         deleteThreads(localThreads)
 
-        // Save new data
         Log.d(RealmDatabase.TAG, "Threads: Save new data")
         updateFolderThreads(folderId, apiThreads, threadsResult.folderUnseenMessage)
 
@@ -123,12 +120,10 @@ object ThreadController {
         filter: ThreadFilter,
     ): Boolean = RealmDatabase.mailboxContent.writeBlocking {
 
-        // Get current data
         Log.d(RealmDatabase.TAG, "Threads: Get current data")
         val localThreads = getLocalThreads(folderId, filter)
         val apiThreads = initPaginatedThreads(threadsResult, localThreads, mailboxUuid)
 
-        // Save new data
         Log.d(RealmDatabase.TAG, "Threads: Save new data")
         insertNewData(localThreads, apiThreads, folderId, offset, threadsResult.folderUnseenMessage)
 
@@ -211,7 +206,7 @@ object ThreadController {
         addAll(values)
     }
 
-    fun MutableRealm.deleteThreads(threads: List<Thread>) {
+    private fun MutableRealm.deleteThreads(threads: List<Thread>) {
         threads.forEach(::delete)
     }
 

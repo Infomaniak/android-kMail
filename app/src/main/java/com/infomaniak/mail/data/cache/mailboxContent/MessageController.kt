@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.RealmDatabase.copyListToRealm
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
@@ -40,7 +41,11 @@ object MessageController {
     //region Edit data
     fun update(localMessages: List<Message>, apiMessages: List<Message>) {
         RealmDatabase.mailboxContent.writeBlocking {
+
+            Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")
             deleteMessages(getOutdatedMessages(localMessages, apiMessages))
+
+            Log.d(RealmDatabase.TAG, "Messages: Save new data")
             copyListToRealm(apiMessages, alsoCopyManagedItems = false)
         }
     }
@@ -57,14 +62,14 @@ object MessageController {
     }
 
     fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.forEach { deleteMessage(it.uid, this) }
+        messages.reversed().forEach { deleteMessage(it.uid, this) }
     }
 
     fun deleteMessage(uid: String, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = {
             getMessage(uid, it)
                 ?.also { message -> message.draftUuid?.let { draftUuid -> getDraft(draftUuid, it) }?.let(it::delete) }
-                ?.let(it::delete)
+                ?.let { message -> it.delete(message) }
         }
         realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }

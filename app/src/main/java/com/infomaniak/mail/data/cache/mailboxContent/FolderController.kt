@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.toRealmInstant
@@ -86,21 +85,21 @@ object FolderController {
     fun update(apiFolders: List<Folder>) {
         RealmDatabase.mailboxContent.writeBlocking {
 
-            // Get outdated data
-            Log.d(RealmDatabase.TAG, "Folders: Get outdated data")
-            val outdatedFolders = getFolders(apiFolders.map { it.id }, this)
-            val outdatedThreads = outdatedFolders.flatMap { it.threads }
-            val outdatedMessages = outdatedThreads.flatMap { it.messages }
-
-            // Delete outdated data
             Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
-            deleteMessages(outdatedMessages)
-            deleteThreads(outdatedThreads)
-            deleteFolders(outdatedFolders)
+            deleteOutdatedFolders(apiFolders)
 
-            // Save new data
             Log.d(RealmDatabase.TAG, "Folders: Save new data")
             insertNewData(apiFolders)
+        }
+    }
+
+    private fun MutableRealm.deleteOutdatedFolders(apiFolders: List<Folder>) {
+        getFolders(apiFolders.map { it.id }, this).reversed().forEach { folder ->
+            folder.threads.reversed().forEach { thread ->
+                deleteMessages(thread.messages)
+                delete(thread)
+            }
+            delete(folder)
         }
     }
 
@@ -129,10 +128,6 @@ object FolderController {
         updateFolder(id, realm) {
             it.lastUpdatedAt = Date().toRealmInstant()
         }
-    }
-
-    private fun MutableRealm.deleteFolders(folders: List<Folder>) {
-        folders.forEach { getFolder(it.id, this)?.let(::delete) }
     }
     //endregion
 }

@@ -101,11 +101,9 @@ object MailboxController {
 
         val isCurrentMailboxDeleted = RealmDatabase.mailboxInfos.writeBlocking {
 
-            // Save new data
             Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
             upsertMailboxes(localMailboxes, apiMailboxes)
 
-            // Delete outdated data
             Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
             return@writeBlocking deleteOutdatedData(apiMailboxes, userId)
         }
