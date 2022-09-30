@@ -71,15 +71,15 @@ class AccentColorSettingFragment : Fragment() {
         }
     }
 
-    private fun chooseColor(color: AccentColor, selectedImageView: ImageView) {
-        activity?.setTheme(if (color == PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
-        UiSettings(requireContext()).accentColor = color
-        selectedImageView.selectColor(color)
+    private fun chooseColor(accentColor: AccentColor, selectedImageView: ImageView) {
+        activity?.setTheme(if (accentColor == PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
+        UiSettings(requireContext()).accentColor = accentColor
+        selectedImageView.selectColor(accentColor)
         activity?.recreate()
     }
 
-    private fun ImageView.selectColor(color: AccentColor) {
-        val colorRes = if (color == PINK) {
+    private fun ImageView.selectColor(accentColor: AccentColor) {
+        val colorRes = if (accentColor == PINK) {
             binding.settingsOptionBlueAccentColorCheck.setCheckMarkGone(this)
             R.color.pinkMail
         } else {

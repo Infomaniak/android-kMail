@@ -19,6 +19,7 @@ package com.infomaniak.mail.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
@@ -29,13 +30,13 @@ import kotlin.reflect.KMutableProperty0
 
 class UiSettings(private val context: Context) {
 
-    private companion object {
-        val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
-        val DEFAULT_THEME = Theme.SYSTEM
+    companion object {
+        private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
+        private val DEFAULT_THEME = Theme.SYSTEM
         val DEFAULT_ACCENT_COLOR = AccentColor.PINK
-        val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
-        val DEFAULT_THREAD_MODE = ThreadMode.THREADS
-        val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
+        private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
+        private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
+        private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
     }
 
     private fun getUiSettings(): SharedPreferences = context.getSharedPreferences("UISettings", Context.MODE_PRIVATE)
@@ -92,9 +93,36 @@ class UiSettings(private val context: Context) {
             _accentColor = value.name
         }
 
-    enum class AccentColor(@StringRes val localisedNameRes: Int, @StyleRes val themeRes: Int) {
-        PINK(R.string.accentColorPinkTitle, R.style.AppTheme_Pink),
-        BLUE(R.string.accentColorBlueTitle, R.style.AppTheme_Blue),
+    enum class AccentColor(
+        @StringRes val localisedNameRes: Int,
+        @StyleRes val theme: Int,
+        @ColorRes private val primary: Int,
+        @ColorRes private val secondaryBackground: Int,
+        @ColorRes private val ripple: Int,
+        val introTabIndex: Int,
+    ) {
+        PINK(
+            R.string.accentColorPinkTitle,
+            R.style.AppTheme_Pink,
+            R.color.pinkMail,
+            R.color.pinkBoardingSecondaryBackground,
+            R.color.pinkMailRipple,
+            0,
+        ),
+        BLUE(
+            R.string.accentColorBlueTitle,
+            R.style.AppTheme_Blue,
+            R.color.blueMail,
+            R.color.blueBoardingSecondaryBackground,
+            R.color.blueMailRipple,
+            1,
+        );
+
+        fun getPrimary(context: Context): Int = context.getColor(primary)
+
+        fun getSecondaryBackground(context: Context): Int = context.getColor(secondaryBackground)
+
+        fun getRipple(context: Context): Int = context.getColor(ripple)
     }
     //endregion
 
