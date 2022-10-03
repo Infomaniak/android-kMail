@@ -23,34 +23,26 @@ import com.infomaniak.mail.data.cache.RealmDatabase.update
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.types.BaseRealmObject
 import kotlinx.coroutines.flow.SharedFlow
 
 object MergedContactController {
+    //region Queries
+    private fun MutableRealm?.getMergedContactsQuery(): RealmQuery<MergedContact> {
+        return (this ?: RealmDatabase.userInfos).query()
+    }
+    //endregion
 
     //region Get data
-    fun getMergedContacts(exceptionContactIds: List<String>? = null, realm: MutableRealm? = null): RealmResults<MergedContact> {
-        return realm.getMergedContactsQuery(exceptionContactIds).find()
+    fun getMergedContacts(realm: MutableRealm? = null): RealmResults<MergedContact> {
+        return realm.getMergedContactsQuery().find()
     }
 
     fun getMergedContactsAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<MergedContact>> {
         return realm.getMergedContactsQuery().asFlow().toSharedFlow()
-    }
-
-    private fun MutableRealm?.getMergedContactsQuery(exceptionContactIds: List<String>? = null): RealmQuery<MergedContact> {
-        val checkIsNotInExceptions = exceptionContactIds?.let { ids ->
-            "NOT ${MergedContact::id.name} IN {${ids.joinToString { "\"$it\"" }}}"
-        }
-        return (this ?: RealmDatabase.userInfos).nullQuery(checkIsNotInExceptions)
-    }
-
-    private inline fun <reified T : BaseRealmObject> TypedRealm.nullQuery(queryInput: String?): RealmQuery<T> {
-        return if (queryInput == null) query() else query(queryInput)
     }
     //endregion
 

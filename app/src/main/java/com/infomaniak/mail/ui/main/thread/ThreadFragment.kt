@@ -128,8 +128,6 @@ class ThreadFragment : Fragment() {
                     // TODO: There shouldn't be any Api call in fragments. Move this in the ViewModel.
                     val draft = ApiRepository.getDraft(message.draftResource).data?.apply {
                         initLocalValues(parentUid)
-                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                        attachments.forEachIndexed { index, attachment -> attachment.initLocalValues(index, parentUid) }
                         DraftController.upsertDraft(this)
                     }
                     MessageController.updateMessage(message.uid) {

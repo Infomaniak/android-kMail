@@ -17,35 +17,23 @@
  */
 package com.infomaniak.mail.data.models
 
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.PrimaryKey
+import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
-// @RealmClass(embedded = true) // TODO: https://github.com/realm/realm-kotlin/issues/551
-@Suppress("PROPERTY_WONT_BE_SERIALIZED")
 @Parcelize
 @Serializable
-class Recipient : RealmObject, Correspondent {
-
-    //region API data
+@Suppress("PROPERTY_WONT_BE_SERIALIZED")
+class Recipient : EmbeddedRealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
-    //endregion
 
-    //region Local data (Transient)
-    @Transient
-    @PrimaryKey
-    var objectId: String = "" // TODO: Remove this variable when we have EmbeddedObjects
     override val initials by lazy { computeInitials() }
-    //endregion
 
     // TODO: Remove this method when we have EmbeddedObjects
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
         email?.let { this.email = it }
         name?.let { this.name = it }
-        this.objectId = "${this.email.hashCode()}_${this.name}"
         return this
     }
 

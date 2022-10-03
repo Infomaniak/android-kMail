@@ -25,10 +25,6 @@ import kotlinx.coroutines.flow.map
 
 class MenuDrawerViewModel : ViewModel() {
 
-    companion object {
-        const val QUOTAS_MAX_SIZE = 21_474_836_480L // TODO: Get this value from API?
-    }
-
     val currentMailboxObjectId = MutableLiveData<String>()
 
     val folders = Transformations.switchMap(currentMailboxObjectId) {
@@ -36,6 +32,6 @@ class MenuDrawerViewModel : ViewModel() {
     }
 
     val quotas = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
-        liveData(Dispatchers.IO) { emitSource(QuotasController.getQuotasAsync(mailboxObjectId).map { it.obj }.asLiveData()) }
+        liveData(Dispatchers.IO) { emitSource(QuotasController.getQuotasAsync(mailboxObjectId).asLiveData()) }
     }
 }

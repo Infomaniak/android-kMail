@@ -21,40 +21,27 @@ import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.types.RealmList
 
 object ThreadController {
+
+    //region Queries
+    private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
+        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} = '$uid'").first()
+    }
+    //endregion
 
     //region Get data
     fun getThread(uid: String, realm: MutableRealm? = null): Thread? {
         return realm.getThreadQuery(uid).find()
-    }
-
-    private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
-        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} = '$uid'").first()
-    }
-
-    private fun MutableRealm.getMergedThread(apiThread: Thread, realmThread: Thread?): Thread {
-        return apiThread.apply {
-            if (realmThread != null) {
-                messages.forEach { apiMessage ->
-                    realmThread.messages.find { realmMessage -> realmMessage.uid == apiMessage.uid }
-                        ?.let { realmMessage -> getMessage(realmMessage.uid, this@getMergedThread) }
-                        ?.let { realmMessage -> saveMessageWithBackedUpData(apiMessage, realmMessage) }
-                }
-            }
-        }
     }
     //endregion
 
@@ -66,27 +53,24 @@ object ThreadController {
         filter: ThreadFilter,
     ): Boolean = RealmDatabase.mailboxContent.writeBlocking {
 
-        // Get current data
-        val realmThreads = getRealmThreads(folderId, filter)
-        val apiThreads = getApiThreads(threadsResult, mailboxUuid)
+        Log.d(RealmDatabase.TAG, "Threads: Get current data")
+        val localThreads = getLocalThreads(folderId, filter)
+        val apiThreads = initApiThreads(threadsResult, mailboxUuid)
 
-        // Get outdated data
         Log.d(RealmDatabase.TAG, "Threads: Get outdated data")
-        val outdatedMessages = getOutdatedMessages(realmThreads, folderId)
+        val outdatedMessages = getOutdatedMessages(localThreads)
 
-        // Delete outdated data
         Log.d(RealmDatabase.TAG, "Threads: Delete outdated data")
         deleteMessages(outdatedMessages)
-        deleteThreads(realmThreads)
+        deleteThreads(localThreads)
 
-        // Save new data
         Log.d(RealmDatabase.TAG, "Threads: Save new data")
         updateFolderThreads(folderId, apiThreads, threadsResult.folderUnseenMessage)
 
         return@writeBlocking canPaginate(threadsResult.messagesCount)
     }
 
-    private fun MutableRealm.getRealmThreads(folderId: String, filter: ThreadFilter): List<Thread> {
+    private fun MutableRealm.getLocalThreads(folderId: String, filter: ThreadFilter): List<Thread> {
         return FolderController.getFolder(folderId, this)?.threads?.filter {
             when (filter) {
                 ThreadFilter.SEEN -> it.unseenMessagesCount == 0
@@ -98,13 +82,11 @@ object ThreadController {
         } ?: emptyList()
     }
 
-    private fun getApiThreads(threadsResult: ThreadsResult, mailboxUuid: String): List<Thread> {
+    private fun initApiThreads(threadsResult: ThreadsResult, mailboxUuid: String): List<Thread> {
         return threadsResult.threads.map { it.initLocalValues(mailboxUuid) }
     }
 
-    private fun getOutdatedMessages(realmThreads: List<Thread>, folderId: String): List<Message> {
-        return realmThreads.flatMap { thread -> thread.messages.filter { it.folderId == folderId } }
-    }
+    private fun getOutdatedMessages(localThreads: List<Thread>): List<Message> = localThreads.flatMap { it.messages }
 
     private fun MutableRealm.updateFolderThreads(folderId: String, apiThreads: List<Thread>, folderUnseenMessage: Int) {
         FolderController.updateFolder(folderId, this) { folder ->
@@ -125,43 +107,29 @@ object ThreadController {
         filter: ThreadFilter,
     ): Boolean = RealmDatabase.mailboxContent.writeBlocking {
 
-        // Get current data
-        Log.d(RealmDatabase.TAG, "Threads: Get current data")
-        val realmThreads = getRealmThreads(folderId, filter)
-        val apiThreads = getPaginatedThreads(threadsResult, realmThreads, mailboxUuid)
+        Log.d(RealmDatabase.TAG, "Threads: Get new data")
+        val apiThreads = initPaginatedThreads(folderId, filter, threadsResult, mailboxUuid)
 
-        // Save new data
         Log.d(RealmDatabase.TAG, "Threads: Save new data")
-        insertNewData(realmThreads, apiThreads, folderId, offset, threadsResult.folderUnseenMessage)
+        insertNewData(apiThreads, folderId, offset, threadsResult.folderUnseenMessage)
 
         return@writeBlocking canPaginate(threadsResult.messagesCount)
     }
 
-    private fun getPaginatedThreads(
+    private fun MutableRealm.initPaginatedThreads(
+        folderId: String,
+        filter: ThreadFilter,
         threadsResult: ThreadsResult,
-        realmThreads: List<Thread>,
         mailboxUuid: String,
     ): List<Thread> {
-        val apiThreadsSinceOffset = getApiThreads(threadsResult, mailboxUuid)
-        return realmThreads.plus(apiThreadsSinceOffset).distinctBy { it.uid }
+        val localThreads = getLocalThreads(folderId, filter)
+        val apiThreadsSinceOffset = initApiThreads(threadsResult, mailboxUuid)
+        return localThreads.plus(apiThreadsSinceOffset).distinctBy { it.uid }
     }
 
-    private fun MutableRealm.insertNewData(
-        realmThreads: List<Thread>,
-        apiThreads: List<Thread>,
-        folderId: String,
-        offset: Int,
-        folderUnseenMessage: Int,
-    ) {
+    private fun MutableRealm.insertNewData(apiThreads: List<Thread>, folderId: String, offset: Int, folderUnseenMessage: Int) {
         val newPageSize = apiThreads.size - offset
-        if (newPageSize > 0) {
-            apiThreads.takeLast(newPageSize).forEach { apiThread ->
-                val realmThread = realmThreads.find { it.uid == apiThread.uid }
-                val mergedThread = getMergedThread(apiThread, realmThread)
-                copyToRealm(mergedThread, UpdatePolicy.ALL)
-            }
-            updateFolderThreads(folderId, apiThreads, folderUnseenMessage)
-        }
+        if (newPageSize > 0) updateFolderThreads(folderId, apiThreads, folderUnseenMessage)
     }
 
     fun MutableRealm.markThreadAsUnseen(thread: Thread, folderId: String) {
@@ -182,23 +150,13 @@ object ThreadController {
         }
     }
 
-    fun getThreadLastMessageUids(thread: Thread): List<String> {
-        val lastMessage = thread.messages.last()
+    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
+    fun getThreadLastMessageUid(thread: Thread): List<String> = listOf(thread.messages.last().uid)
 
-        return mutableListOf<String>().apply {
-            add(lastMessage.uid)
-            addAll(lastMessage.duplicates.map { duplicate -> duplicate.uid })
-        }
-    }
-
+    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
-            thread.messages.forEach {
-                if (!it.seen) {
-                    add(it.uid)
-                    addAll(it.duplicates.map { duplicate -> duplicate.uid })
-                }
-            }
+            thread.messages.forEach { if (!it.seen) add(it.uid) }
         }
     }
 
@@ -208,22 +166,7 @@ object ThreadController {
         }
     }
 
-    private fun MutableRealm.saveMessageWithBackedUpData(apiMessage: Message, realmMessage: Message) {
-        apiMessage.apply {
-            fullyDownloaded = realmMessage.fullyDownloaded
-            body = realmMessage.body
-            attachmentsResource = realmMessage.attachmentsResource
-            attachments.setRealmListValues(realmMessage.attachments)
-        }
-        copyToRealm(apiMessage, UpdatePolicy.ALL)
-    }
-
-    private fun <T> RealmList<T>.setRealmListValues(values: RealmList<T>) {
-        if (isNotEmpty()) clear()
-        addAll(values)
-    }
-
-    fun MutableRealm.deleteThreads(threads: List<Thread>) {
+    private fun MutableRealm.deleteThreads(threads: List<Thread>) {
         threads.forEach(::delete)
     }
 

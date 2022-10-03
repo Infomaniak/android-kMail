@@ -318,6 +318,9 @@
         android:label="fragment_intro"
         tools:layout="@layout/fragment_intro">
         <argument
+            android:name="isFirstAccount"
+            app:argType="boolean" />
+        <argument
             android:name="position"
             app:argType="integer" />
     </fragment>

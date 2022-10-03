@@ -29,7 +29,7 @@ class IntroPagerAdapter(manager: FragmentManager, lifecycle: Lifecycle, private 
 
     override fun createFragment(position: Int): Fragment {
         return IntroFragment().apply {
-            arguments = IntroFragmentArgs(if (isFirstAccount) position else position + 1).toBundle()
+            arguments = IntroFragmentArgs(isFirstAccount, if (isFirstAccount) position else position + 1).toBundle()
         }
     }
 }

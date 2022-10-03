@@ -20,11 +20,8 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.deleteThreads
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
@@ -41,17 +38,32 @@ import java.util.*
 
 object FolderController {
 
-    //region Get data
-    private fun getFolders(realm: MutableRealm? = null): RealmResults<Folder> {
-        return realm.getFoldersQuery().find()
+    //region Queries
+    private fun MutableRealm?.getFoldersQuery(): RealmQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query()
     }
 
+    private fun MutableRealm?.getFoldersQuery(exceptionsFoldersIds: List<String>): RealmQuery<Folder> {
+        val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "\"$it\"" }}}"
+        return (this ?: RealmDatabase.mailboxContent).query(checkIsNotInExceptions)
+    }
+
+    private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
+    }
+
+    private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
+    }
+    //endregion
+
+    //region Get data
     fun getFoldersAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Folder>> {
         return realm.getFoldersQuery().asFlow().toSharedFlow()
     }
 
-    private fun MutableRealm?.getFoldersQuery(): RealmQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query()
+    private fun getFolders(exceptionsFoldersIds: List<String>, realm: MutableRealm? = null): RealmResults<Folder> {
+        return realm.getFoldersQuery(exceptionsFoldersIds).find()
     }
 
     fun getFolder(id: String, realm: MutableRealm? = null): Folder? {
@@ -62,16 +74,8 @@ object FolderController {
         return realm.getFolderQuery(id).asFlow().toSharedFlow()
     }
 
-    private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
-    }
-
     fun getFolder(role: FolderRole, realm: MutableRealm? = null): Folder? {
         return realm.getFolderQuery(role).find()
-    }
-
-    private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
     }
     //endregion
 
@@ -79,67 +83,38 @@ object FolderController {
     fun update(apiFolders: List<Folder>) {
         RealmDatabase.mailboxContent.writeBlocking {
 
-            // Get current data
-            Log.d(RealmDatabase.TAG, "Folders: Get current data")
-            val realmFolders = getFolders(this)
-
-            // Get outdated data
-            Log.d(RealmDatabase.TAG, "Folders: Get outdated data")
-            val (outdatedFolders, outdatedThreads, outdatedMessages) = getOutdatedData(realmFolders, apiFolders)
-
-            // Save new data
-            Log.d(RealmDatabase.TAG, "Folders: Save new data")
-            insertNewData(realmFolders, apiFolders)
-
-            // Delete outdated data
             Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
-            deleteMessages(outdatedMessages)
-            deleteThreads(outdatedThreads)
-            deleteFolders(outdatedFolders)
+            deleteOutdatedFolders(apiFolders)
+
+            Log.d(RealmDatabase.TAG, "Folders: Save new data")
+            insertNewData(apiFolders)
         }
     }
 
-    private fun getOutdatedData(
-        realmFolders: RealmResults<Folder>,
-        apiFolders: List<Folder>,
-    ): Triple<List<Folder>, List<Thread>, List<Message>> {
-
-        // Outdated Folders
-        val outdatedFolders = realmFolders.filter { realmFolder ->
-            apiFolders.none { apiFolder -> apiFolder.id == realmFolder.id }
+    private fun MutableRealm.deleteOutdatedFolders(apiFolders: List<Folder>) {
+        getFolders(apiFolders.map { it.id }, this).reversed().forEach { folder ->
+            folder.threads.reversed().forEach { thread ->
+                deleteMessages(thread.messages)
+                delete(thread)
+            }
+            delete(folder)
         }
-
-        // Outdated Messages
-        val possiblyOutdatedThreads = outdatedFolders.flatMap { it.threads }
-        val outdatedMessages = possiblyOutdatedThreads.flatMap { it.messages }.filter { message ->
-            outdatedFolders.any { folder -> folder.id == message.folderId }
-        }
-
-        // Outdated Threads
-        val outdatedThreads = possiblyOutdatedThreads.filter { thread ->
-            thread.messages.all { message -> outdatedMessages.any { it.uid == message.uid } }
-        }
-
-        return Triple(outdatedFolders, outdatedThreads, outdatedMessages)
     }
 
-    private fun MutableRealm.insertNewData(realmFolders: RealmResults<Folder>, apiFolders: List<Folder>) {
+    private fun MutableRealm.insertNewData(apiFolders: List<Folder>) {
+
         apiFolders.forEach { apiFolder ->
 
-            realmFolders.find { it.id == apiFolder.id }?.let { realmFolder ->
+            getFolder(apiFolder.id, this)?.let { localFolder ->
                 apiFolder.initLocalValues(
-                    threads = realmFolder.threads.toRealmList(),
-                    parentLink = realmFolder.parentLink,
-                    lastUpdatedAt = realmFolder.lastUpdatedAt,
+                    threads = localFolder.threads.toRealmList(),
+                    parentLink = localFolder.parentLink,
+                    lastUpdatedAt = localFolder.lastUpdatedAt,
                 )
             }
 
             copyToRealm(apiFolder, UpdatePolicy.ALL)
         }
-    }
-
-    private fun upsertFolder(folder: Folder): Folder {
-        return RealmDatabase.mailboxContent.writeBlocking { copyToRealm(folder, UpdatePolicy.ALL) }
     }
 
     fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
@@ -151,10 +126,6 @@ object FolderController {
         updateFolder(id, realm) {
             it.lastUpdatedAt = Date().toRealmInstant()
         }
-    }
-
-    private fun MutableRealm.deleteFolders(folders: List<Folder>) {
-        folders.forEach { getFolder(it.id, this)?.let(::delete) }
     }
     //endregion
 }

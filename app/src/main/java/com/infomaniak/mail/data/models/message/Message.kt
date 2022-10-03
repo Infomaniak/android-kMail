@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -87,7 +86,6 @@ class Message : RealmObject {
     var safeDisplay: Boolean = false
     @SerialName("is_duplicate")
     var isDuplicate: Boolean = false
-    var duplicates: RealmList<Duplicate> = realmListOf()
     //endregion
 
     //region Local data (Transient)
@@ -114,16 +112,6 @@ class Message : RealmObject {
     //endregion
 
     val dkimStatus: MessageDKIM get() = Utils.enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
-
-    fun initLocalValues(): Message {
-        from = from.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        cc = cc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        bcc = bcc.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        to = to.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-        replyTo = replyTo.map { it.initLocalValues() }.toRealmList() // TODO: Remove this when we have EmbeddedObjects
-
-        return this
-    }
 
     enum class MessageDKIM {
         VALID,

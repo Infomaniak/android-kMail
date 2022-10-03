@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.api.ApiRoutes.resource
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DuplicateController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -148,7 +147,6 @@ class MainViewModel : ViewModel() {
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
-        updateMailboxQuotas(mailbox)
         updateFolders(mailbox)
         FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
@@ -156,20 +154,21 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun updateMailboxQuotas(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+        Log.i(TAG, "forceRefreshMailboxes")
+        updateMailboxes()
+        updateCurrentMailboxQuotas()
+    }
+
+    private fun updateCurrentMailboxQuotas() {
+        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
         if (mailbox.isLimited) {
             ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.let { quotas ->
-                quotas.mailboxObjectId = mailbox.objectId
                 MailboxController.updateMailbox(mailbox.objectId) {
                     it.quotas = quotas
                 }
             }
         }
-    }
-
-    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "forceRefreshMailboxes")
-        updateMailboxes()
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -300,11 +299,11 @@ class MainViewModel : ViewModel() {
     }
 
     private fun updateMailboxes() {
-        val apiMailboxes = ApiRepository.getMailboxes().data?.map {
-            it.initLocalValues(AccountUtils.currentUserId)
-        } ?: emptyList()
+        val apiMailboxes = ApiRepository.getMailboxes().data
+            ?.map { it.initLocalValues(AccountUtils.currentUserId) }
+            ?: emptyList()
 
-        MailboxController.update(apiMailboxes)
+        MailboxController.update(apiMailboxes, AccountUtils.currentUserId)
     }
 
     private fun updateFolders(mailbox: Mailbox) {
@@ -318,7 +317,6 @@ class MainViewModel : ViewModel() {
         folderId: String,
         filter: ThreadFilter = ThreadFilter.ALL,
     ) {
-        DuplicateController.removeDuplicates()
         val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, OFFSET_FIRST_PAGE, filter).data ?: return
         canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter)
         FolderController.updateFolderLastUpdatedAt(folderId)
@@ -333,7 +331,6 @@ class MainViewModel : ViewModel() {
     ) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadMoreThreads: $offset")
         isDownloadingChanges.postValue(true)
-        DuplicateController.removeDuplicates()
         val threadsResult = ApiRepository.getThreads(mailboxUuid, folderId, offset, filter).data ?: return@launch
         canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
@@ -345,19 +342,12 @@ class MainViewModel : ViewModel() {
     }
 
     private fun fetchMessages(thread: Thread): List<Message> {
-        return thread.messages.mapNotNull { realmMessage ->
-            if (realmMessage.fullyDownloaded) {
-                realmMessage
+        return thread.messages.mapNotNull { localMessage ->
+            if (localMessage.fullyDownloaded) {
+                localMessage
             } else {
-                ApiRepository.getMessage(realmMessage.resource).data?.also { completedMessage ->
-                    completedMessage.apply {
-                        initLocalValues() // TODO: Remove this when we have EmbeddedObjects
-                        fullyDownloaded = true
-                        body?.initLocalValues(uid) // TODO: Remove this when we have EmbeddedObjects
-                        // TODO: Remove this `forEachIndexed` when we have EmbeddedObjects
-                        @Suppress("SAFE_CALL_WILL_CHANGE_NULLABILITY", "UNNECESSARY_SAFE_CALL")
-                        attachments?.forEachIndexed { index, attachment -> attachment.initLocalValues(index, uid) }
-                    }
+                ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
+                    completedMessage.fullyDownloaded = true
                     // TODO: Uncomment this when managing Drafts folder
                     // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
                     //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
@@ -380,8 +370,8 @@ class MainViewModel : ViewModel() {
     private fun markAsUnseen(thread: Thread, folderId: String) {
         RealmDatabase.mailboxContent.writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uids = ThreadController.getThreadLastMessageUids(latestThread)
-            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uids)
+            val uid = ThreadController.getThreadLastMessageUid(latestThread)
+            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)
             if (apiResponse.isSuccess()) markThreadAsUnseen(latestThread, folderId)
         }
     }

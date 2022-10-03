@@ -123,7 +123,7 @@ class ThreadListAdapter(
         val firstFrom = from.first()
         fillInUserNameAndEmail(firstFrom, expeditor)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
-        mailBodyPreview.text = messages.last().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
+        mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
         expeditorAvatar.loadAvatar(firstFrom, contacts)
 
         mailDate.text = formatDate(root.context)
@@ -133,7 +133,7 @@ class ThreadListAdapter(
         iconFavorite.isVisible = isFavorite
 
         threadCount.text = uniqueMessagesCount.toString()
-        threadCountCardview.isVisible = messages.count() > 1
+        threadCountCardview.isVisible = uniqueMessagesCount > 1
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
