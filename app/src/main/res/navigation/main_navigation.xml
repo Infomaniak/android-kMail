@@ -203,22 +203,46 @@
             app:destination="@id/sendSettingsFragment" />
         <action
             android:id="@+id/action_settings_to_threadListDensitySetting"
-            app:destination="@id/threadListDensitySettingFragment" />
+            app:destination="@id/threadListDensitySettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
         <action
             android:id="@+id/action_settings_to_themeSetting"
-            app:destination="@id/themeSettingFragment" />
+            app:destination="@id/themeSettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
         <action
             android:id="@+id/action_settings_to_accentColorSetting"
-            app:destination="@id/accentColorSettingFragment" />
+            app:destination="@id/accentColorSettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
         <action
             android:id="@+id/action_settings_to_swipeActionsSetting"
-            app:destination="@id/swipeActionsSettingsFragment" />
+            app:destination="@id/swipeActionsSettingsFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
         <action
             android:id="@+id/action_settings_to_displayModeSetting"
-            app:destination="@id/displayModeSettingFragment" />
+            app:destination="@id/displayModeSettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
         <action
             android:id="@+id/action_settings_to_externalContentSetting"
-            app:destination="@id/externalContentSettingFragment" />
+            app:destination="@id/externalContentSettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
     </fragment>
 
     <fragment
@@ -320,7 +344,11 @@
         tools:layout="@layout/fragment_swipe_actions_settings">
         <action
             android:id="@+id/action_swipe_actions_settings_to_SwipeActionSelectionSetting"
-            app:destination="@id/swipeActionSelectionSettingFragment" />
+            app:destination="@id/swipeActionSelectionSettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
     </fragment>
 
     <fragment
