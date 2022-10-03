@@ -47,6 +47,7 @@ class MenuDrawerFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
@@ -58,8 +59,7 @@ class MenuDrawerFragment : Fragment() {
     private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
-        val threadMode = UiSettings.getInstance(requireContext()).threadMode
-        mainViewModel.openMailbox(selectedMailbox, threadMode)
+        mainViewModel.openMailbox(selectedMailbox, uiSettings.threadMode)
         closeDrawer()
     }
 
@@ -246,8 +246,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun openFolder(folderId: String) {
-        val threadMode = UiSettings.getInstance(requireContext()).threadMode
-        mainViewModel.openFolder(folderId, threadMode)
+        mainViewModel.openFolder(folderId, uiSettings.threadMode)
         closeDrawer()
     }
 

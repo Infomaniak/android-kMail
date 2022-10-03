@@ -37,6 +37,7 @@ import kotlinx.coroutines.withContext
 class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
         safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId))
@@ -51,7 +52,7 @@ class SettingsFragment : Fragment() {
         setupBack()
         setupAdapter()
         setupListeners()
-        UiSettings.getInstance(requireContext()).setupPreferencesText()
+        uiSettings.setupPreferencesText()
     }
 
     private fun setupBack() {
@@ -71,7 +72,7 @@ class SettingsFragment : Fragment() {
         themeSubtitle.setText(theme.localisedNameRes)
         displayModeSubtitle.setText(threadMode.localisedNameRes)
         externalContentSubtitle.setText(externalContent.localisedNameRes)
-        accentColorSubtitle.setText(UiSettings.getInstance(requireContext()).accentColor.localisedNameRes)
+        accentColorSubtitle.setText(uiSettings.accentColor.localisedNameRes)
     }
 
     private fun setupListeners() = with(binding) {

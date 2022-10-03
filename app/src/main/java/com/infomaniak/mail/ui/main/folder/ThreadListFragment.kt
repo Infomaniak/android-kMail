@@ -64,6 +64,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private lateinit var binding: FragmentThreadListBinding
 
@@ -109,13 +110,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        val threadMode = UiSettings.getInstance(requireContext()).threadMode
-        mainViewModel.forceRefreshThreads(filter, threadMode)
+        mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
     }
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadDensity = UiSettings.getInstance(requireContext()).threadDensity,
+            threadDensity = uiSettings.threadDensity,
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
@@ -232,8 +232,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             setOnClickListener {
                 isCloseIconVisible = isChecked
                 filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
-                val threadMode = UiSettings.getInstance(requireContext()).threadMode
-                mainViewModel.forceRefreshThreads(filter, threadMode)
+                mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
             }
         }
     }
@@ -330,8 +329,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
         if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
             clearFilter()
-            val threadMode = UiSettings.getInstance(requireContext()).threadMode
-            mainViewModel.forceRefreshThreads(filter, threadMode)
+            mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
         }
 
         lastUnreadCount = unreadCount
@@ -378,8 +376,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (canPaginate) {
             currentOffset += PER_PAGE
-            val threadMode = UiSettings.getInstance(requireContext()).threadMode
-            loadMoreThreads(uuid, folderId, threadMode, currentOffset, filter)
+            loadMoreThreads(uuid, folderId, uiSettings.threadMode, currentOffset, filter)
         }
     }
 

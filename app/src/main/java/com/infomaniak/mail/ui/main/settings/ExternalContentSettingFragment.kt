@@ -36,6 +36,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 class ExternalContentSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentExternalContentSettingBinding
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentExternalContentSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -53,7 +54,7 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UiSettings.getInstance(requireContext()).externalContent) {
+        when (uiSettings.externalContent) {
             ALWAYS -> settingsOptionAlwaysCheck.selectOption()
             ASK_ME -> settingsOptionAskMeCheck.selectOption()
         }
@@ -71,7 +72,7 @@ class ExternalContentSettingFragment : Fragment() {
     }
 
     private fun updateExternalContentSetting(externalContent: ExternalContent, chosenOption: ImageView) {
-        UiSettings.getInstance(requireContext()).externalContent = externalContent
+        uiSettings.externalContent = externalContent
         chosenOption.selectOption()
     }
 

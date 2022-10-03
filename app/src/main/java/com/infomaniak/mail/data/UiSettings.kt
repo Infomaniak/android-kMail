@@ -32,10 +32,7 @@ class UiSettings private constructor(context: Context) {
 
     private val sharedPreferences = context.applicationContext.getSharedPreferences("UISettings", Context.MODE_PRIVATE)
 
-    fun removeUiSettings() = with(sharedPreferences.edit()) {
-        clear()
-        apply()
-    }
+    fun removeUiSettings() = sharedPreferences.transaction { clear() }
 
     //region Thread density
     private var _threadDensity: String?
@@ -223,12 +220,12 @@ class UiSettings private constructor(context: Context) {
     //endregion
 
     companion object {
-        private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
-        private val DEFAULT_THEME = Theme.SYSTEM
         val DEFAULT_ACCENT_COLOR = AccentColor.PINK
-        private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
-        private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
+        private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
+        private val DEFAULT_THEME = Theme.SYSTEM
+        private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
+        private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
 
         @Volatile
         private var INSTANCE: UiSettings? = null
@@ -236,9 +233,7 @@ class UiSettings private constructor(context: Context) {
         fun getInstance(context: Context): UiSettings {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE?.let { return it }
-                UiSettings(context).also {
-                    INSTANCE = it
-                }
+                UiSettings(context).also { INSTANCE = it }
             }
         }
     }

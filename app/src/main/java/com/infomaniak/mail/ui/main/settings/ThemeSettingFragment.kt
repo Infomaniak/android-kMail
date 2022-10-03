@@ -35,6 +35,7 @@ import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
 class ThemeSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentThemeSettingBinding
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThemeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -52,7 +53,7 @@ class ThemeSettingFragment : Fragment() {
     }
 
     private fun setUpCheckMarks() = with(binding) {
-        when (UiSettings.getInstance(requireContext()).theme) {
+        when (uiSettings.theme) {
             LIGHT -> settingsOptionLightThemeCheck
             DARK -> settingsOptionDarkThemeCheck
             else -> settingsOptionDefaultThemeCheck
@@ -68,7 +69,7 @@ class ThemeSettingFragment : Fragment() {
     private fun chooseTheme(theme: Theme, selectedImageView: ImageView) {
         selectedImageView.selectOption()
         setDefaultNightMode(theme.mode)
-        UiSettings.getInstance(requireContext()).theme = theme
+        uiSettings.theme = theme
     }
 
     private fun ImageView.selectOption() = with(binding) {

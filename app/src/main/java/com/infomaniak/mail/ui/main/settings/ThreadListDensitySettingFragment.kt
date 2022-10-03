@@ -31,6 +31,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
 class ThreadListDensitySettingFragment : Fragment() {
 
     private lateinit var binding: FragmentThreadListDensitySettingBinding
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -62,12 +63,12 @@ class ThreadListDensitySettingFragment : Fragment() {
             if (!isChecked) return@addOnButtonCheckedListener
 
             val (listDensity, resId) = getDensityFromCheckedButton(buttonId)
-            UiSettings.getInstance(requireContext()).threadDensity = listDensity
+            uiSettings.threadDensity = listDensity
             listDensityImage.setImageResource(resId)
         }
     }
 
-    private fun getCheckedButtonFromDensity() = when (UiSettings.getInstance(requireContext()).threadDensity) {
+    private fun getCheckedButtonFromDensity() = when (uiSettings.threadDensity) {
         COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
         LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
         else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default

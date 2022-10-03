@@ -36,6 +36,7 @@ import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
 class AccentColorSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentAccentColorSettingBinding
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccentColorSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -53,7 +54,7 @@ class AccentColorSettingFragment : Fragment() {
     }
 
     private fun setUpCheckMarks() = with(binding) {
-        UiSettings.getInstance(requireContext()).accentColor.let { accentColor ->
+        uiSettings.accentColor.let { accentColor ->
             if (accentColor == PINK) {
                 settingsOptionPinkAccentColorCheck
             } else {
@@ -73,7 +74,7 @@ class AccentColorSettingFragment : Fragment() {
 
     private fun chooseColor(accentColor: AccentColor, selectedImageView: ImageView) {
         activity?.setTheme(if (accentColor == PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
-        UiSettings.getInstance(requireContext()).accentColor = accentColor
+        uiSettings.accentColor = accentColor
         selectedImageView.selectColor(accentColor)
         activity?.recreate()
     }

@@ -36,6 +36,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 class DisplayModeSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayModeSettingBinding
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentDisplayModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -53,7 +54,7 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun setupUi() = with(binding) {
-        when (UiSettings.getInstance(requireContext()).threadMode) {
+        when (uiSettings.threadMode) {
             THREADS -> settingsOptionDiscussionsCheck.selectOption()
             MESSAGES -> settingsOptionMessagesCheck.selectOption()
         }
@@ -71,7 +72,7 @@ class DisplayModeSettingFragment : Fragment() {
     }
 
     private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {
-        UiSettings.getInstance(requireContext()).threadMode = displayMode
+        uiSettings.threadMode = displayMode
         chosenOption.selectOption()
     }
 
