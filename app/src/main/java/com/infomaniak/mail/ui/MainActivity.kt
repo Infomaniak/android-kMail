@@ -33,6 +33,7 @@ import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.requestPermissionsIsPossible
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
@@ -88,7 +89,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun requestContactsPermission() {
-        if (shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+        if (requestPermissionsIsPossible(arrayOf(Manifest.permission.READ_CONTACTS))) {
             contactPermissionResultLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestPermission()) { authorized ->
                     if (authorized) mainViewModel.updateAddressBooksAndContacts(this)

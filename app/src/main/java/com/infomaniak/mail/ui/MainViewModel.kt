@@ -19,11 +19,9 @@ package com.infomaniak.mail.ui
 
 import android.Manifest.permission.READ_CONTACTS
 import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_DENIED
 import android.provider.ContactsContract.CommonDataKinds
 import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
@@ -48,6 +46,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import io.sentry.android.core.internal.util.Permissions.hasPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -231,7 +230,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun getPhoneContacts(context: Context): MutableMap<Recipient, MergedContact> {
-        if (ContextCompat.checkSelfPermission(context, READ_CONTACTS) == PERMISSION_DENIED) return mutableMapOf()
+        if (!hasPermission(context, READ_CONTACTS)) return mutableMapOf()
 
         val emails = getListOfEmails(context)
         if (emails.isEmpty()) return mutableMapOf()
