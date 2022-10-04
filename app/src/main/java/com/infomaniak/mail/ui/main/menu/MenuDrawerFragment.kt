@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
@@ -46,6 +47,7 @@ class MenuDrawerFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
@@ -57,7 +59,7 @@ class MenuDrawerFragment : Fragment() {
     private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
-        mainViewModel.openMailbox(selectedMailbox)
+        mainViewModel.openMailbox(selectedMailbox, uiSettings.threadMode)
         closeDrawer()
     }
 
@@ -244,7 +246,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun openFolder(folderId: String) {
-        mainViewModel.openFolder(folderId)
+        mainViewModel.openFolder(folderId, uiSettings.threadMode)
         closeDrawer()
     }
 

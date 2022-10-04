@@ -40,6 +40,7 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.data.UiSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
@@ -123,7 +124,6 @@ class LoginActivity : AppCompatActivity() {
                             is User -> {
                                 // application.trackCurrentUserId() // TODO: Matomo
                                 // trackAccountEvent("loggedIn") // TODO: Matomo
-                                // TODO: When successfully logged in, set theme color setting to the theme selected during the onBoarding
                                 AccountUtils.reloadApp?.invoke()
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
@@ -147,15 +147,15 @@ class LoginActivity : AppCompatActivity() {
         showSnackbar(error)
     }
 
-    fun updateUi(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
-        animatePrimaryColorElements(themeColor, animate)
-        animateSecondaryColorElements(themeColor, animate)
+    fun updateUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
+        animatePrimaryColorElements(accentColor, animate)
+        animateSecondaryColorElements(accentColor, animate)
     }
 
-    private fun animatePrimaryColorElements(themeColor: IntroFragment.ThemeColor, animate: Boolean) = with(binding) {
-        val newPrimary = themeColor.getPrimary(this@LoginActivity)
+    private fun animatePrimaryColorElements(accentColor: AccentColor, animate: Boolean) = with(binding) {
+        val newPrimary = accentColor.getPrimary(this@LoginActivity)
         val oldPrimary = dotsIndicator.selectedDotColor
-        val ripple = themeColor.getRipple(this@LoginActivity)
+        val ripple = accentColor.getRipple(this@LoginActivity)
 
         animateColorChange(animate, oldPrimary, newPrimary) { color ->
             val singleColorStateList = ColorStateList.valueOf(color)
@@ -167,8 +167,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun animateSecondaryColorElements(themeColor: IntroFragment.ThemeColor, animate: Boolean) {
-        val newSecondaryBackground = themeColor.getSecondaryBackground(this@LoginActivity)
+    private fun animateSecondaryColorElements(accentColor: AccentColor, animate: Boolean) {
+        val newSecondaryBackground = accentColor.getSecondaryBackground(this@LoginActivity)
         val oldSecondaryBackground = window.statusBarColor
         animateColorChange(animate, oldSecondaryBackground, newSecondaryBackground) { color ->
             window.statusBarColor = color

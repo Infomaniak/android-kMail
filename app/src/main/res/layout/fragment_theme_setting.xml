@@ -15,6 +15,126 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.main.settings.ThemeSettingFragment"
+    tools:ignore="ContentDescription,UseCompoundDrawables">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="@string/settingsThemeChoiceTitle" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/background"
+        style="@style/BackgroundCardview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:clipToPadding="false"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsTheme" />
+
+                <LinearLayout
+                    android:id="@+id/settingsOptionDefaultTheme"
+                    style="@style/MenuDrawerItem">
+
+                    <ImageView
+                        style="@style/SettingImageAtStart"
+                        android:src="@drawable/ic_theme_system" />
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsOptionSystemTheme" />
+
+                    <ImageView
+                        android:id="@+id/settingsOptionDefaultThemeCheck"
+                        style="@style/SettingButtonCheck"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <LinearLayout
+                    android:id="@+id/settingsOptionLightTheme"
+                    style="@style/MenuDrawerItem">
+
+                    <ImageView
+                        style="@style/SettingImageAtStart"
+                        android:src="@drawable/ic_theme_light" />
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsOptionLightTheme" />
+
+                    <ImageView
+                        android:id="@+id/settingsOptionLightThemeCheck"
+                        style="@style/SettingButtonCheck"
+                        tools:visibility="visible" />
+
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <LinearLayout
+                    android:id="@+id/settingsOptionDarkTheme"
+                    style="@style/MenuDrawerItem">
+
+                    <ImageView
+                        style="@style/SettingImageAtStart"
+                        android:src="@drawable/ic_theme_dark" />
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsOptionDarkTheme" />
+
+                    <ImageView
+                        android:id="@+id/settingsOptionDarkThemeCheck"
+                        style="@style/SettingButtonCheck"
+                        tools:visibility="visible" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

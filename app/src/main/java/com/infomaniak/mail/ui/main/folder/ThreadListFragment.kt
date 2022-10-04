@@ -44,6 +44,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
@@ -63,6 +64,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private lateinit var binding: FragmentThreadListBinding
 
@@ -108,12 +110,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        mainViewModel.forceRefreshThreads(filter)
+        mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
     }
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadDensity = ThreadDensity.LARGE, // TODO: Take this value from the settings when available
+            threadDensity = uiSettings.threadDensity,
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
@@ -230,7 +232,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             setOnClickListener {
                 isCloseIconVisible = isChecked
                 filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
-                mainViewModel.forceRefreshThreads(filter)
+                mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
             }
         }
     }
@@ -327,7 +329,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
         if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
             clearFilter()
-            mainViewModel.forceRefreshThreads(filter)
+            mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
         }
 
         lastUnreadCount = unreadCount
@@ -374,7 +376,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (canPaginate) {
             currentOffset += PER_PAGE
-            loadMoreThreads(uuid, folderId, currentOffset, filter)
+            loadMoreThreads(uuid, folderId, uiSettings.threadMode, currentOffset, filter)
         }
     }
 
@@ -385,12 +387,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
-
-    enum class ThreadDensity {
-        COMPACT,
-        NORMAL,
-        LARGE,
-    }
 
     private companion object {
         // This is approximately a little more than the number of Threads displayed at the same time on the screen.

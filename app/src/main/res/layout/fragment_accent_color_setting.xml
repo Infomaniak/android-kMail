@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.main.settings.ThemeSettingFragment"
+    tools:ignore="ContentDescription,UseCompoundDrawables">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="@string/settingsAccentColor" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/BackgroundCardview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/SettingHeader"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:text="@string/settingsAccentColorDescription" />
+
+            <LinearLayout
+                android:id="@+id/settingsOptionPinkAccentColor"
+                style="@style/MenuDrawerItem">
+
+                <ImageView
+                    style="@style/SettingImageAtStart"
+                    android:src="@drawable/ic_theme_pink" />
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/accentColorPinkTitle" />
+
+                <ImageView
+                    android:id="@+id/settingsOptionPinkAccentColorCheck"
+                    style="@style/SettingButtonCheck"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <LinearLayout
+                android:id="@+id/settingsOptionBlueAccentColor"
+                style="@style/MenuDrawerItem">
+
+                <ImageView
+                    style="@style/SettingImageAtStart"
+                    android:src="@drawable/ic_theme_blue" />
+
+                <TextView
+                    style="@style/SettingTextWithButton"
+                    android:text="@string/accentColorBlueTitle" />
+
+                <ImageView
+                    android:id="@+id/settingsOptionBlueAccentColorCheck"
+                    style="@style/SettingButtonCheck"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

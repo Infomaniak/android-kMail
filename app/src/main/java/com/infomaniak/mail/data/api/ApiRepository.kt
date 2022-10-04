@@ -22,13 +22,13 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
+import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
-import com.infomaniak.mail.data.models.user.UserResult
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -51,8 +51,6 @@ object ApiRepository : ApiRepositoryCore() {
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
     fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)
-
-    fun getUser(): ApiResponse<UserResult> = callApi(ApiRoutes.user(), GET)
 
     // fun getContactImage(path: String): ApiResponse<Data> = callKotlinxApi(ApiRoutes.resource(path), GET)
 
@@ -78,8 +76,14 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getThreads(mailboxUuid: String, folderId: String, offset: Int, filter: ThreadFilter): ApiResponse<ThreadsResult> {
-        return callApi(ApiRoutes.threads(mailboxUuid, folderId, offset, filter), GET)
+    fun getThreads(
+        mailboxUuid: String,
+        folderId: String,
+        threadMode: ThreadMode,
+        offset: Int,
+        filter: ThreadFilter,
+    ): ApiResponse<ThreadsResult> {
+        return callApi(ApiRoutes.threads(mailboxUuid, folderId, threadMode, offset, filter), GET)
     }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {

@@ -25,9 +25,7 @@ import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -39,6 +37,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.UiSettings.AccentColor
+import com.infomaniak.mail.data.UiSettings.AccentColor.BLUE
+import com.infomaniak.mail.data.UiSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
@@ -64,7 +66,9 @@ class IntroFragment : Fragment() {
         when (navigationArgs.position) {
             0 -> {
                 pinkBlueSwitch.isVisible = true
-                val selectedTab = pinkBlueTabLayout.getTabAt(if (introViewModel.theme.value?.first == ThemeColor.PINK) 0 else 1)
+                val tabIndex = introViewModel.currentAccentColor.value?.introTabIndex
+                    ?: UiSettings.DEFAULT_ACCENT_COLOR.introTabIndex
+                val selectedTab = pinkBlueTabLayout.getTabAt(tabIndex)
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
             }
@@ -91,8 +95,9 @@ class IntroFragment : Fragment() {
     private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                val newSelectedTheme = if (pinkBlueTabLayout.selectedTabPosition == 0) ThemeColor.PINK else ThemeColor.BLUE
-                triggerUiUpdateWhenAnimationEnd(newSelectedTheme)
+                val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == PINK.introTabIndex) PINK else BLUE
+                UiSettings.getInstance(requireContext()).accentColor = newSelectedAccentColor
+                triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
@@ -100,39 +105,43 @@ class IntroFragment : Fragment() {
         })
     }
 
-    private fun triggerUiUpdateWhenAnimationEnd(themeColor: ThemeColor) {
+    private fun triggerUiUpdateWhenAnimationEnd(accentColor: AccentColor) {
         lifecycleScope.launch(Dispatchers.IO) {
             val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
             delay(duration)
-            introViewModel.theme.postValue(themeColor to true)
+            introViewModel.currentAccentColor.postValue(accentColor)
         }
     }
 
     private fun updateUiWhenThemeChanges(position: Int?) {
-        introViewModel.theme.observe(viewLifecycleOwner) { theme ->
-            setUi(theme.first, position, theme.second)
+        introViewModel.currentAccentColor.observe(viewLifecycleOwner) { accentColor ->
+            setUi(
+                accentColor = accentColor ?: UiSettings.DEFAULT_ACCENT_COLOR,
+                position = position,
+                animate = accentColor != null,
+            )
         }
     }
 
     /**
      * `animate` is necessary because when the activity is started we want to avoid animating the color change the first time.
      */
-    private fun setUi(themeColor: ThemeColor, position: Int?, animate: Boolean = true) = with(binding) {
-        updateEachPageUi(themeColor, animate)
+    private fun setUi(accentColor: AccentColor, position: Int?, animate: Boolean = true) = with(binding) {
+        updateEachPageUi(accentColor, animate)
         if (position == 0) {
-            updateFirstPageUi(themeColor, animate)
-            if (navigationArgs.isFirstAccount) updateActivityUi(themeColor, animate)
+            updateFirstPageUi(accentColor, animate)
+            if (navigationArgs.isFirstAccount) updateActivityUi(accentColor, animate)
         }
     }
 
-    private fun updateEachPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
-        val newColor = themeColor.getSecondaryBackground(requireContext())
+    private fun updateEachPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
+        val newColor = accentColor.getSecondaryBackground(requireContext())
         val oldColor = requireActivity().window.statusBarColor
         animateColorChange(animate, oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
 
-        val drawable: Drawable? = getThemedDrawable(themeColor.theme, R.drawable.ic_boarding_illu_1)
+        val drawable: Drawable? = getThemedDrawable(accentColor.theme, R.drawable.ic_boarding_illu_1)
         iconLayout.setImageDrawable(drawable)
     }
 
@@ -140,16 +149,16 @@ class IntroFragment : Fragment() {
         return VectorDrawableCompat.create(resources, drawableRes, ContextThemeWrapper(context, theme).theme)
     }
 
-    private fun updateFirstPageUi(themeColor: ThemeColor, animate: Boolean) = with(binding) {
-        animateTabIndicatorAndTextColor(themeColor, requireContext(), animate)
-        animateTabBackgroundColor(themeColor, requireContext(), animate)
+    private fun updateFirstPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
+        animateTabIndicatorAndTextColor(accentColor, requireContext(), animate)
+        animateTabBackgroundColor(accentColor, requireContext(), animate)
     }
 
-    private fun animateTabIndicatorAndTextColor(themeColor: ThemeColor, context: Context, animate: Boolean) = with(binding) {
-        val isPink = themeColor == ThemeColor.PINK
-        val newPrimary = themeColor.getPrimary(context)
+    private fun animateTabIndicatorAndTextColor(accentColor: AccentColor, context: Context, animate: Boolean) = with(binding) {
+        val isPink = accentColor == PINK
+        val newPrimary = accentColor.getPrimary(context)
         val colorOnPrimary = context.getAttributeColor(RMaterial.attr.colorOnPrimary)
-        val oldPrimary = if (isPink) ThemeColor.BLUE.getPrimary(context) else ThemeColor.PINK.getPrimary(context)
+        val oldPrimary = if (isPink) BLUE.getPrimary(context) else PINK.getPrimary(context)
 
         animateColorChange(animate, oldPrimary, newPrimary) { color ->
             pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
@@ -159,14 +168,14 @@ class IntroFragment : Fragment() {
         }
     }
 
-    private fun animateTabBackgroundColor(themeColor: ThemeColor, context: Context, animate: Boolean) = with(binding) {
-        val isPink = themeColor == ThemeColor.PINK
+    private fun animateTabBackgroundColor(accentColor: AccentColor, context: Context, animate: Boolean) = with(binding) {
+        val isPink = accentColor == PINK
         val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
         val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
         val oldBackground = if (isPink) {
-            ThemeColor.BLUE.getSecondaryBackground(context)
+            BLUE.getSecondaryBackground(context)
         } else {
-            ThemeColor.PINK.getSecondaryBackground(context)
+            PINK.getSecondaryBackground(context)
         }
 
         animateColorChange(animate, oldBackground, tabBackground) { color ->
@@ -174,27 +183,11 @@ class IntroFragment : Fragment() {
         }
     }
 
-    private fun updateActivityUi(themeColor: ThemeColor, animate: Boolean) {
-        (requireActivity() as LoginActivity).updateUi(themeColor, animate)
-    }
-
-    enum class ThemeColor(
-        @StyleRes val theme: Int,
-        @ColorRes private val primary: Int,
-        @ColorRes private val secondaryBackground: Int,
-        @ColorRes private val ripple: Int,
-    ) {
-        PINK(R.style.AppTheme_Pink, R.color.pinkMail, R.color.pinkBoardingSecondaryBackground, R.color.pinkMailRipple),
-        BLUE(R.style.AppTheme_Blue, R.color.blueMail, R.color.blueBoardingSecondaryBackground, R.color.blueMailRipple);
-
-        fun getPrimary(context: Context): Int = context.getColor(primary)
-
-        fun getSecondaryBackground(context: Context): Int = context.getColor(secondaryBackground)
-
-        fun getRipple(context: Context): Int = context.getColor(ripple)
+    private fun updateActivityUi(accentColor: AccentColor, animate: Boolean) {
+        (requireActivity() as LoginActivity).updateUi(accentColor, animate)
     }
 
     class IntroViewModel : ViewModel() {
-        var theme = MutableLiveData(ThemeColor.PINK to false)
+        var currentAccentColor: MutableLiveData<AccentColor?> = MutableLiveData(null)
     }
 }

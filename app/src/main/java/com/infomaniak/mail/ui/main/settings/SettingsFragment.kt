@@ -22,11 +22,90 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.databinding.FragmentSettingsBinding
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.notYetImplemented
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
+    private lateinit var binding: FragmentSettingsBinding
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
+
+    private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
+        safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId))
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        return FragmentSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupBack()
+        setupAdapter()
+        setupListeners()
+        uiSettings.setupPreferencesText()
+    }
+
+    private fun setupBack() {
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    }
+
+    private fun setupAdapter() {
+        binding.mailboxesList.adapter = mailboxesAdapter
+        lifecycleScope.launch(Dispatchers.IO) {
+            val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
+            withContext(Dispatchers.Main) { mailboxesAdapter.setMailboxes(mailboxes) }
+        }
+    }
+
+    private fun UiSettings.setupPreferencesText() = with(binding) {
+        densitySubtitle.setText(threadDensity.localisedNameRes)
+        themeSubtitle.setText(theme.localisedNameRes)
+        displayModeSubtitle.setText(threadMode.localisedNameRes)
+        externalContentSubtitle.setText(externalContent.localisedNameRes)
+        accentColorSubtitle.setText(uiSettings.accentColor.localisedNameRes)
+    }
+
+    private fun setupListeners() = with(binding) {
+
+        settingsSend.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToSendSettings())
+        }
+
+        settingsAppLock.setOnClickListener { settingsAppLockSwitch.performClick() }
+        settingsAppLockSwitch.setOnClickListener { notYetImplemented() }
+
+        settingsThreadListDensity.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
+        }
+
+        settingsTheme.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToThemeSetting())
+        }
+
+        settingsAccentColor.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToAccentColorSetting())
+        }
+
+        settingsSwipeActions.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
+        }
+
+        settingsMessageDisplay.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
+        }
+
+        settingsExternalContent.setOnClickListener {
+            safeNavigate(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
+        }
     }
 }
