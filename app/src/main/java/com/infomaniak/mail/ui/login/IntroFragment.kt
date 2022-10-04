@@ -95,7 +95,7 @@ class IntroFragment : Fragment() {
     private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == 0) PINK else BLUE
+                val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == PINK.introTabIndex) PINK else BLUE
                 UiSettings.getInstance(requireContext()).accentColor = newSelectedAccentColor
                 triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor)
             }
