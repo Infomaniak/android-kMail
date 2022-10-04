@@ -34,6 +34,17 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    private val binding: ItemToggleableTextFormatterBinding
+
+    @ColorInt
+    private var unselectedIconColor: Int = -1
+    @ColorInt
+    private var selectedIconColor: Int = -1
+    @ColorInt
+    private var unselectedBackgroundColor: Int = -1
+    @ColorInt
+    private var selectedBackgroundColor: Int = -1
+
     var isSwitched: Boolean = false
         set(isActivated) = with(binding) {
             field = isActivated
@@ -45,17 +56,6 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
                 background.setBackgroundColor(unselectedBackgroundColor)
             }
         }
-
-    val binding: ItemToggleableTextFormatterBinding
-
-    @ColorInt
-    private var unselectedIconColor: Int = -1
-    @ColorInt
-    private var selectedIconColor: Int = -1
-    @ColorInt
-    private var unselectedBackgroundColor: Int = -1
-    @ColorInt
-    private var selectedBackgroundColor: Int = -1
 
     init {
         binding = ItemToggleableTextFormatterBinding.inflate(LayoutInflater.from(context), this, true)
