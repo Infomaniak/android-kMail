@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
 import com.infomaniak.mail.utils.context
@@ -73,24 +74,14 @@ class MenuDrawerItemView @JvmOverloads constructor(
     init {
         binding = ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true)
 
-        if (attrs != null) {
+        attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
             val defaultTextSize = binding.itemName.textSize.toInt()
 
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MenuDrawerItemView, 0, 0)
-
-            val iconDrawable = typedArray.getDrawable(R.styleable.MenuDrawerItemView_icon)
-            val nameText = typedArray.getString(R.styleable.MenuDrawerItemView_text)
-            val badgeText = typedArray.getString(R.styleable.MenuDrawerItemView_badge)
-            val indentValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, 0)
-            val textSizeValue = typedArray.getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
-
-            icon = iconDrawable
-            text = nameText
-            badge = badgeText
-            indent = indentValue
-            textSize = textSizeValue
-
-            typedArray.recycle()
+            icon = getDrawable(R.styleable.MenuDrawerItemView_icon)
+            text = getString(R.styleable.MenuDrawerItemView_text)
+            badge = getString(R.styleable.MenuDrawerItemView_badge)
+            indent = getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, 0)
+            textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
         }
     }
 

@@ -31,6 +31,7 @@ import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
 
@@ -46,11 +47,8 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     private val menu: Menu by lazy { ActionMenuView(context).menu }
 
     init {
-        attrs?.let {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomQuickActionBarView, 0, 0)
-            val menuRes = typedArray.getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu)
-
-            MenuInflater(context).inflate(menuRes, menu)
+        attrs?.getAttributes(context, R.styleable.BottomQuickActionBarView) {
+            MenuInflater(context).inflate(getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu), menu)
 
             buttons.forEachIndexed { index, button ->
                 if (index >= menu.size) {
@@ -62,8 +60,6 @@ class BottomQuickActionBarView @JvmOverloads constructor(
                     }
                 }
             }
-
-            typedArray.recycle()
         }
     }
 

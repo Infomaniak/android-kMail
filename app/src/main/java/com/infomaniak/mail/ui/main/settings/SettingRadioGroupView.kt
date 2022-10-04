@@ -24,6 +24,7 @@ import android.widget.LinearLayout
 import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.lib.core.R as RCore
 
@@ -42,15 +43,12 @@ class SettingRadioGroupView @JvmOverloads constructor(
     init {
         orientation = VERTICAL
 
-        if (attrs != null) {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SettingRadioGroupView, 0, 0)
-
-            checkedId = typedArray.getResourceId(R.styleable.SettingRadioGroupView_defaultCheckedId, View.NO_ID)
+        attrs?.getAttributes(context, R.styleable.SettingRadioGroupView) {
+            checkedId = getResourceId(R.styleable.SettingRadioGroupView_defaultCheckedId, View.NO_ID)
             check(checkedId)
 
-            shouldAddDividers = !typedArray.getBoolean(R.styleable.SettingRadioGroupView_ignoreDividers, false)
+            shouldAddDividers = !getBoolean(R.styleable.SettingRadioGroupView_ignoreDividers, false)
 
-            typedArray.recycle()
         }
 
         if (shouldAddDividers) {
@@ -64,6 +62,8 @@ class SettingRadioGroupView @JvmOverloads constructor(
         children.forEach {
             if (it is RadioCheckable && it.id == View.NO_ID) it.id = generateViewId()
         }
+
+        super.onFinishInflate()
     }
 
     override fun onChecked(@IdRes viewId: Int) {

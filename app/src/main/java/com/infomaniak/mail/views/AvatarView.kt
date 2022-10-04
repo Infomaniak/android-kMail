@@ -25,6 +25,7 @@ import android.widget.ImageView
 import coil.imageLoader
 import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MergedContact
@@ -41,15 +42,8 @@ class AvatarView @JvmOverloads constructor(
     private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
-        with(binding) {
-            if (attrs != null) {
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.AvatarView, 0, 0)
-
-                val src = typedArray.getDrawable(R.styleable.AvatarView_android_src)
-                avatarImage.setImageDrawable(src)
-
-                typedArray.recycle()
-            }
+        attrs?.getAttributes(context, R.styleable.AvatarView) {
+            binding.avatarImage.setImageDrawable(getDrawable(R.styleable.AvatarView_android_src))
         }
     }
 

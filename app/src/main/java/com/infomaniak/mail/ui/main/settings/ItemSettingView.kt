@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import androidx.core.content.res.getStringOrThrow
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
 
@@ -45,13 +46,12 @@ class ItemSettingView @JvmOverloads constructor(
 
     init {
         with(binding) {
-            if (attrs != null) {
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ItemSettingView, 0, 0)
+            attrs?.getAttributes(context, R.styleable.ItemSettingView) {
+                action = Action.values()[getInteger(R.styleable.ItemSettingView_itemAction, 0)]
 
-                action = Action.values()[typedArray.getInteger(R.styleable.ItemSettingView_itemAction, 0)]
+                title.text = getStringOrThrow(R.styleable.ItemSettingView_title)
 
-                title.text = typedArray.getStringOrThrow(R.styleable.ItemSettingView_title)
-                typedArray.getString(R.styleable.ItemSettingView_subtitle).let {
+                getString(R.styleable.ItemSettingView_subtitle).let {
                     subtitle.apply {
                         text = it
                         isGone = it == null
@@ -60,8 +60,6 @@ class ItemSettingView @JvmOverloads constructor(
 
                 chevron.isVisible = action == Action.CHEVRON
                 toggle.isVisible = action == Action.TOGGLE
-
-                typedArray.recycle()
             }
         }
     }
