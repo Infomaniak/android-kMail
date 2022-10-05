@@ -36,11 +36,9 @@ class ActionItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var binding: ItemBottomSheetActionBinding
+    val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
-        binding = ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true)
-
         with(binding) {
             attrs?.getAttributes(context, R.styleable.ActionItemView) {
                 button.icon = getDrawable(R.styleable.ActionItemView_icon)

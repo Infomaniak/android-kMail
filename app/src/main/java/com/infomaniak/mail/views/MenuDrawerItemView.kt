@@ -39,7 +39,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var binding: ItemMenuDrawerBinding
+    val binding by lazy { ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true) }
 
     var badge: CharSequence? = null
         set(value) {
@@ -72,8 +72,6 @@ class MenuDrawerItemView @JvmOverloads constructor(
         }
 
     init {
-        binding = ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true)
-
         attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
             val defaultTextSize = binding.itemName.textSize.toInt()
 
