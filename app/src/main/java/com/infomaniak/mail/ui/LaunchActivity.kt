@@ -22,6 +22,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -49,8 +50,8 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private suspend fun startApp() {
-        mainViewModel.updateAddressBooksAndContacts(this)
-        mainViewModel.loadCurrentMailbox()
+        mainViewModel.updateUserInfo(this)
+        mainViewModel.loadCurrentMailbox(UiSettings.getInstance(this).threadMode)
 
         withContext(Dispatchers.Main) {
             MainViewModel.currentMailboxObjectId.observeNotNull(this@LaunchActivity) {

@@ -39,13 +39,14 @@ import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.UiSettings.ThreadDensity
+import com.infomaniak.mail.data.UiSettings.ThreadDensity.COMPACT
+import com.infomaniak.mail.data.UiSettings.ThreadDensity.LARGE
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity
-import com.infomaniak.mail.ui.main.folder.ThreadListFragment.ThreadDensity.COMPACT
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
@@ -139,7 +140,7 @@ class ThreadListAdapter(
 
         root.setOnClickListener { onThreadClicked?.invoke(this@with) }
 
-        expeditorAvatar.isVisible = threadDensity == ThreadDensity.LARGE
+        expeditorAvatar.isVisible = threadDensity == LARGE
         mailBodyPreview.isGone = threadDensity == COMPACT
         mailSubject.setMargins(top = if (threadDensity == COMPACT) 0 else 4.toPx())
     }

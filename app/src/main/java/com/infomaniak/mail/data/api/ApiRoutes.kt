@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 
 object ApiRoutes {
@@ -27,8 +28,6 @@ object ApiRoutes {
     fun addressBooks() = "$MAIL_API/api/pim/addressbook"
 
     fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
-
-    fun user() = "$MAIL_API/api/user"
 
     fun signatures(hostingId: Int, mailboxName: String): String {
         return "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
@@ -48,7 +47,18 @@ object ApiRoutes {
 
     // fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
 
-    fun threads(uuid: String, folderId: String, offset: Int, filter: ThreadFilter, searchText: String? = null): String {
+    fun threads(
+        uuid: String,
+        folderId: String,
+        threadMode: ThreadMode,
+        offset: Int,
+        filter: ThreadFilter,
+        searchText: String? = null,
+    ): String {
+        val folder = folder(uuid, folderId)
+        val message = "/message"
+        val thread = "?thread=${threadMode.apiCallValue}"
+        val page = "&offset=$offset"
         val urlSearch = searchText?.let { "&scontains=$it" } ?: ""
         val urlAttachment = if (filter == ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
         val urlFilter = when (filter) {
@@ -57,8 +67,7 @@ object ApiRoutes {
             ThreadFilter.UNSEEN -> "&filters=${filter.name.lowercase()}"
             else -> ""
         }
-
-        return "${folder(uuid, folderId)}/message?thread=on&offset=$offset$urlSearch$urlAttachment$urlFilter"
+        return "${folder}${message}${thread}${page}${urlSearch}${urlAttachment}${urlFilter}"
     }
 
     fun quotas(mailbox: String, hostingId: Int) = "$MAIL_API/api/mailbox/quotas?mailbox=$mailbox&product_id=$hostingId"

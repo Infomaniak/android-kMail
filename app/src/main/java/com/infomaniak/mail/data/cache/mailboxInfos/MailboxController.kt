@@ -69,7 +69,7 @@ object MailboxController {
         return realm.getMailboxesQuery().asFlow().toSharedFlow()
     }
 
-    private fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
+    fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
         return realm.getMailboxesQuery(userId).find()
     }
 

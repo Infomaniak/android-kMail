@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.main.settings.send.ForwardMailsSettingFragment"
+    tools:ignore="ContentDescription,UseCompoundDrawables">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <TextView
+                style="@style/H2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:ellipsize="end"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="@string/settingsTransferEmailsTitle" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/BackgroundCardview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/SettingHeader"
+                    android:text="@string/settingsTransferEmailsDescription" />
+
+                <LinearLayout
+                    android:id="@+id/settingsTransferInBody"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsTransferInBody" />
+
+                    <ImageView
+                        android:id="@+id/settingsTransferInBodyCheck"
+                        style="@style/SettingButtonCheck"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+                <LinearLayout
+                    android:id="@+id/settingsTransferAsAttachment"
+                    style="@style/MenuDrawerItem">
+
+                    <TextView
+                        style="@style/SettingTextWithButton"
+                        android:text="@string/settingsTransferAsAttachment" />
+
+                    <ImageView
+                        android:id="@+id/settingsTransferAsAttachmentCheck"
+                        style="@style/SettingButtonCheck"
+                        tools:visibility="visible" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>
