@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
@@ -69,7 +68,8 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        getThread()
+        observeMessages()
+        observeThread()
     }
 
     private fun setupUi() = with(binding) {
@@ -160,30 +160,32 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun getThread() {
-        threadViewModel.getThread(navigationArgs.threadUid).observeNotNull(viewLifecycleOwner, ::listenToMessages)
+    private fun observeThread() {
+        threadViewModel.listenToThread(navigationArgs.threadUid).observeNotNull(viewLifecycleOwner) { thread ->
+            mainViewModel.openThread(thread)
+            threadViewModel.thread.value = thread
+        }
     }
 
-    private fun listenToMessages(thread: Thread) {
-        mainViewModel.openThread(thread)
-        threadViewModel.listenToMessages(thread).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
-            beforeUpdateAdapter = { messages ->
-                Log.i("UI", "Received messages (${messages.size})")
-                leaveIfThreadIsEmpty(messages)
-            }
+    private fun observeMessages() {
+        threadViewModel.messages.bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+            beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
         }
     }
 
-    private fun leaveIfThreadIsEmpty(messages: List<Message>) {
-        if (messages.isEmpty()) {
-            threadViewModel.deleteThread(navigationArgs.threadUid)
-            // TODO: The day we'll have the Notifications, we'll have to check if this `popBackStack` executes correctly.
-            // TODO: If the fact of opening a Thread via a Notification doesn't fully populate the backStack, the action
-            // TODO: of leaving this fragment (either via a classic Back button, or via this `popBackStack`) will
-            // TODO: probably quit the app instead of going back to the ThreadList fragment (as it should be).
-            findNavController().popBackStack(R.id.threadListFragment, inclusive = false)
-        }
+    private fun onMessagesUpdate(messages: List<Message>) {
+        Log.i("UI", "Received messages (${messages.size})")
+        if (messages.isEmpty()) leaveThread()
+    }
+
+    private fun leaveThread() {
+        threadViewModel.deleteThread(navigationArgs.threadUid)
+        // TODO: The day we'll have the Notifications, we'll have to check if this `popBackStack` executes correctly.
+        // TODO: If the fact of opening a Thread via a Notification doesn't fully populate the backStack, the action
+        // TODO: of leaving this fragment (either via a classic Back button, or via this `popBackStack`) will
+        // TODO: probably quit the app instead of going back to the ThreadList fragment (as it should be).
+        findNavController().popBackStack(R.id.threadListFragment, inclusive = false)
     }
 
     private companion object {

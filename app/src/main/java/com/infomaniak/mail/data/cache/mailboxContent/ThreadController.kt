@@ -25,10 +25,13 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
+import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.coroutines.flow.SharedFlow
 
 object ThreadController {
 
@@ -39,8 +42,12 @@ object ThreadController {
     //endregion
 
     //region Get data
-    fun getThread(uid: String, realm: MutableRealm? = null): Thread? {
+    private fun getThread(uid: String, realm: MutableRealm? = null): Thread? {
         return realm.getThreadQuery(uid).find()
+    }
+
+    fun getThreadAsync(uid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Thread>> {
+        return realm.getThreadQuery(uid).asFlow().toSharedFlow()
     }
     //endregion
 
