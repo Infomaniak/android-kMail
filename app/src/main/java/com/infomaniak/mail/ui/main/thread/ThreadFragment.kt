@@ -78,6 +78,7 @@ class ThreadFragment : Fragment() {
         threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
         iconFavorite.apply {
             setIconResource(if (navigationArgs.threadIsFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
+            setIconTintResource(if (navigationArgs.threadIsFavorite) R.color.favoriteYellow else R.color.iconColor)
             setOnClickListener { notYetImplemented() }
         }
 
