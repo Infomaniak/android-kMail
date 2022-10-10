@@ -173,7 +173,8 @@ class MainViewModel : ViewModel() {
         refreshThreads(mailboxUuid, folderId, threadMode)
     }
 
-    fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
         selectThread(thread)
         markAsSeen(thread, currentFolderId.value!!)
         updateMessages(thread)
