@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmSingleQuery
@@ -91,7 +90,7 @@ object ThreadController {
     private fun MutableRealm.updateFolderThreads(folderId: String, apiThreads: List<Thread>, folderUnseenMessage: Int) {
         FolderController.updateFolder(folderId, this) { folder ->
             folder.apply {
-                threads = apiThreads.map { if (it.isManaged()) findLatest(it) ?: it else it }.toRealmList()
+                threads = apiThreads.toRealmList()
                 unreadCount = folderUnseenMessage
             }
         }
