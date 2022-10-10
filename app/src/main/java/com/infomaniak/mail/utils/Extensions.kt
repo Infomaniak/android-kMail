@@ -27,8 +27,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
-import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.endOfTheWeek
+import com.infomaniak.lib.core.utils.startOfTheDay
+import com.infomaniak.lib.core.utils.startOfTheWeek
 import com.infomaniak.mail.R
 import io.realm.kotlin.types.RealmInstant
 import kotlinx.coroutines.CoroutineScope
@@ -44,13 +46,6 @@ fun Date.toRealmInstant(): RealmInstant {
     return RealmInstant.from(seconds, nanoseconds)
 }
 
-fun Date.isToday(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() && day() == now.day() }
-
-fun Date.isYesterday(): Boolean {
-    val yesterday = Calendar.getInstance().apply { add(Calendar.DATE, -1) }.time
-    return year() == yesterday.year() && month() == yesterday.month() && day() == yesterday.day()
-}
-
 fun Date.isSmallerThanDays(daysAgo: Int): Boolean {
     val lastDay = Calendar.getInstance().apply {
         add(Calendar.DATE, -daysAgo)
@@ -58,19 +53,10 @@ fun Date.isSmallerThanDays(daysAgo: Int): Boolean {
     return lastDay <= this
 }
 
-fun Date.isThisWeek(): Boolean {
-    val now = Date()
-    return this in now.startOfTheWeek()..now.endOfTheWeek()
-}
-
 fun Date.isLastWeek(): Boolean {
     val lastWeek = Calendar.getInstance().apply { add(Calendar.WEEK_OF_YEAR, -1) }.time
     return this in lastWeek.startOfTheWeek()..lastWeek.endOfTheWeek()
 }
-
-fun Date.isThisMonth(): Boolean = Date().let { now -> year() == now.year() && month() == now.month() }
-
-fun Date.isThisYear(): Boolean = Date().let { now -> year() == now.year() }
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
