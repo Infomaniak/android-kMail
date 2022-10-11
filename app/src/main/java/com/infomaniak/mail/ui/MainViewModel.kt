@@ -128,7 +128,7 @@ class MainViewModel : ViewModel() {
         updateContacts()
     }
 
-    fun loadCurrentMailbox(threadMode: ThreadMode) {
+    fun loadCurrentMailbox(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadCurrentMailbox")
         updateMailboxes()
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
