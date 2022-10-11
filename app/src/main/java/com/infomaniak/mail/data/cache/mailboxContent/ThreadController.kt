@@ -34,7 +34,7 @@ object ThreadController {
 
     //region Queries
     private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
-        return (this ?: RealmDatabase.mailboxContent).query<Thread>("${Thread::uid.name} = '$uid'").first()
+        return (this ?: RealmDatabase.mailboxContent()).query<Thread>("${Thread::uid.name} = '$uid'").first()
     }
     //endregion
 
@@ -50,7 +50,7 @@ object ThreadController {
         mailboxUuid: String,
         folderId: String,
         filter: ThreadFilter,
-    ): Boolean = RealmDatabase.mailboxContent.writeBlocking {
+    ): Boolean = RealmDatabase.mailboxContent().writeBlocking {
 
         Log.d(RealmDatabase.TAG, "Threads: Get current data")
         val localThreads = getLocalThreads(folderId, filter)
@@ -104,7 +104,7 @@ object ThreadController {
         folderId: String,
         offset: Int,
         filter: ThreadFilter,
-    ): Boolean = RealmDatabase.mailboxContent.writeBlocking {
+    ): Boolean = RealmDatabase.mailboxContent().writeBlocking {
 
         Log.d(RealmDatabase.TAG, "Threads: Get new data")
         val apiThreads = initPaginatedThreads(folderId, filter, threadsResult, mailboxUuid)
@@ -170,7 +170,7 @@ object ThreadController {
     }
 
     fun deleteThread(uid: String) {
-        RealmDatabase.mailboxContent.writeBlocking { getThread(uid, this)?.let(::delete) }
+        RealmDatabase.mailboxContent().writeBlocking { getThread(uid, this)?.let(::delete) }
     }
     //endregion
 }

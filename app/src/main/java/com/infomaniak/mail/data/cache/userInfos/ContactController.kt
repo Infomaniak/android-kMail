@@ -32,11 +32,11 @@ object ContactController {
 
     //region Queries
     private fun MutableRealm?.getContactsQuery(): RealmQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query()
+        return (this ?: RealmDatabase.userInfos()).query()
     }
 
     private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos).query<Contact>("${Contact::id.name} = '$id'").first()
+        return (this ?: RealmDatabase.userInfos()).query<Contact>("${Contact::id.name} = '$id'").first()
     }
     //endregion
 
@@ -53,15 +53,15 @@ object ContactController {
     //region Edit data
     fun update(apiContacts: List<Contact>) {
         Log.d(RealmDatabase.TAG, "Contacts: Save new data")
-        RealmDatabase.userInfos.update<Contact>(apiContacts)
+        RealmDatabase.userInfos().update<Contact>(apiContacts)
     }
 
     private fun upsertContacts(contacts: List<Contact>) {
-        RealmDatabase.userInfos.writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+        RealmDatabase.userInfos().writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     private fun deleteContacts(contacts: List<Contact>) {
-        RealmDatabase.userInfos.writeBlocking { contacts.forEach { getContact(it.id)?.let(::delete) } }
+        RealmDatabase.userInfos().writeBlocking { contacts.forEach { getContact(it.id)?.let(::delete) } }
     }
     //endregion
 }

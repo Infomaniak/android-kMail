@@ -40,20 +40,20 @@ object FolderController {
 
     //region Queries
     private fun MutableRealm?.getFoldersQuery(): RealmQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query()
+        return (this ?: RealmDatabase.mailboxContent()).query()
     }
 
     private fun MutableRealm?.getFoldersQuery(exceptionsFoldersIds: List<String>): RealmQuery<Folder> {
         val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxContent).query(checkIsNotInExceptions)
+        return (this ?: RealmDatabase.mailboxContent()).query(checkIsNotInExceptions)
     }
 
     private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::id.name} = '$id'").first()
+        return (this ?: RealmDatabase.mailboxContent()).query<Folder>("${Folder::id.name} = '$id'").first()
     }
 
     private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
+        return (this ?: RealmDatabase.mailboxContent()).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
     }
     //endregion
 
@@ -81,7 +81,7 @@ object FolderController {
 
     //region Edit data
     fun update(apiFolders: List<Folder>) {
-        RealmDatabase.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent().writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
             deleteOutdatedFolders(apiFolders)
@@ -119,7 +119,7 @@ object FolderController {
 
     fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
         val block: (MutableRealm) -> Unit = { getFolder(id, it)?.let(onUpdate) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
     fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm? = null) {
