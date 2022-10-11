@@ -36,7 +36,7 @@ class AvatarView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewAvatarBinding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
+    private val binding by lazy { ViewAvatarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
         with(binding) {

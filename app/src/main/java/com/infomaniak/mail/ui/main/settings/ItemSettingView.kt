@@ -33,9 +33,7 @@ class ItemSettingView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewItemSettingBinding by lazy {
-        ViewItemSettingBinding.inflate(LayoutInflater.from(context), this, true)
-    }
+    private val binding by lazy { ViewItemSettingBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var action: Action = Action.NONE
 

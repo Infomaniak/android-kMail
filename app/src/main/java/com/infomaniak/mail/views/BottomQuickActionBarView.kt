@@ -29,7 +29,6 @@ import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.size
-import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewBottomQuickActionBarBinding
 
@@ -39,13 +38,10 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewBottomQuickActionBarBinding by lazy {
-        ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    private val buttons: List<MaterialButton> by lazy {
-        with(binding) { listOf(button1, button2, button3, button4, button5) }
-    }
-    private val menu: MenuBuilder by lazy { MenuBuilder(context) }
+    private val binding by lazy { ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private val buttons by lazy { with(binding) { listOf(button1, button2, button3, button4, button5) } }
+    private val menu by lazy { MenuBuilder(context) }
 
     init {
         attrs?.let {

@@ -38,7 +38,8 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
 
     private val navigationArgs: SwipeActionsSelectionSettingFragmentArgs by navArgs()
     private lateinit var binding: FragmentSwipeActionsSelectionSettingBinding
-    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
+
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSwipeActionsSelectionSettingBinding.inflate(inflater, container, false).also { binding = it }.root

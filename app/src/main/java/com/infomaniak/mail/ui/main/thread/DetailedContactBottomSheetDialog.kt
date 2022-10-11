@@ -29,8 +29,8 @@ import com.infomaniak.mail.utils.notYetImplemented
 
 class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
 
-    lateinit var binding: BottomSheetDetailedContactBinding
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
+    lateinit var binding: BottomSheetDetailedContactBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root

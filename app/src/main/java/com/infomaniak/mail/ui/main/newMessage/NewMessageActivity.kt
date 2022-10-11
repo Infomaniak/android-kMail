@@ -37,12 +37,12 @@ import io.realm.kotlin.ext.realmListOf
 
 class NewMessageActivity : ThemedActivity() {
 
+    private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
+
     private val mainViewModel: MainViewModel by viewModels()
     private val newMessageViewModel: NewMessageViewModel by viewModels()
 
-    private val binding: ActivityNewMessageBinding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
-
-    private val newMessageFragment: NewMessageFragment by lazy {
+    private val newMessageFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.fragmentContainer)?.let {
             it.childFragmentManager.primaryNavigationFragment as NewMessageFragment
         }!!

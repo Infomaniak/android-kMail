@@ -45,12 +45,12 @@ import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 
 class MenuDrawerFragment : Fragment() {
 
+    private lateinit var binding: FragmentMenuDrawerBinding
+
     private val mainViewModel: MainViewModel by activityViewModels()
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
-    private lateinit var binding: FragmentMenuDrawerBinding
-
-    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     var exitDrawer: (() -> Unit)? = null
     var isDrawerOpen: (() -> Boolean)? = null

@@ -54,10 +54,10 @@ import com.infomaniak.lib.core.R as RCore
 
 class NewMessageFragment : Fragment() {
 
+    private lateinit var binding: FragmentNewMessageBinding
+
     private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
-
-    private lateinit var binding: FragmentNewMessageBinding
 
     private lateinit var contactAdapter: ContactAdapter
 

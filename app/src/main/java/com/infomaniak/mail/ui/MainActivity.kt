@@ -40,9 +40,9 @@ import io.sentry.SentryLevel
 
 class MainActivity : ThemedActivity() {
 
-    private val mainViewModel: MainViewModel by viewModels()
+    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
-    val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val mainViewModel: MainViewModel by viewModels()
 
     lateinit var backgroundColor: Color
     lateinit var backgroundHeaderColor: Color

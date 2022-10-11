@@ -36,7 +36,8 @@ import com.infomaniak.mail.utils.notYetImplemented
 class DisplayModeSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayModeSettingBinding
-    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
+
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentDisplayModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
