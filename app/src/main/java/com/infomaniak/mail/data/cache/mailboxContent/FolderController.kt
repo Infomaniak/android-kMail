@@ -119,7 +119,7 @@ object FolderController {
 
     fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
         val block: (MutableRealm) -> Unit = { getFolder(id, it)?.let(onUpdate) }
-        return realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
+        realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
     }
 
     fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm? = null) {
