@@ -19,21 +19,16 @@ package com.infomaniak.mail.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class LaunchActivity : AppCompatActivity() {
-
-    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,15 +44,7 @@ class LaunchActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun startApp() {
-        mainViewModel.updateUserInfo()
-        mainViewModel.loadCurrentMailbox(UiSettings.getInstance(this).threadMode)
-
-        withContext(Dispatchers.Main) {
-            MainViewModel.currentMailboxObjectId.observeNotNull(this@LaunchActivity) {
-                // TODO: If there is no Internet, the app won't be able to start.
-                startActivity(Intent(this@LaunchActivity, MainActivity::class.java))
-            }
-        }
+    private fun startApp() {
+        startActivity(Intent(this, MainActivity::class.java))
     }
 }

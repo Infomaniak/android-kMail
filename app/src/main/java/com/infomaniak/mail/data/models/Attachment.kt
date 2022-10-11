@@ -100,7 +100,7 @@ class Attachment : EmbeddedRealmObject {
     //
     //     saveAttachmentData(response, file) {
     //         attachment.localUri = file.toURI().toString()
-    //         RealmDatabase.mailboxContent.writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
+    //         RealmDatabase.mailboxContent().writeBlocking { copyToRealm(attachment, UpdatePolicy.ALL) }
     //     }
     // }
 }

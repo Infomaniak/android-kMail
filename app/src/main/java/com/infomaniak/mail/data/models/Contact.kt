@@ -46,8 +46,8 @@ class Contact : RealmObject, Correspondent {
     var lastName: String = ""
     var color: String = ""
     var other: Boolean = false
-    @SerialName("contacted_times")
-    private var contactedTimes: Map<String?, Int?> = emptyMap()
+    // @SerialName("contacted_times")
+    // private var contactedTimes: Map<String?, Int?> = emptyMap()
     var emails: RealmList<String> = realmListOf()
     @SerialName("addressbook_id")
     var addressBookId: Int = 0
@@ -59,10 +59,10 @@ class Contact : RealmObject, Correspondent {
     override var email: String = emails.firstOrNull() ?: ""
     //endregion
 
-    fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
+    // fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
-    data class ContactedTimes(
-        val email: String?,
-        val count: Int?,
-    )
+    // data class ContactedTimes(
+    //     val email: String?,
+    //     val count: Int?,
+    // )
 }

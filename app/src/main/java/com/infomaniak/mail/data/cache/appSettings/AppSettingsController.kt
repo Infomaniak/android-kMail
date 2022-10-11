@@ -27,17 +27,17 @@ object AppSettingsController {
     //region Get data
     fun getAppSettings(realm: MutableRealm? = null): AppSettings {
         val block: (MutableRealm) -> AppSettings = { it.query<AppSettings>().first().find() ?: it.copyToRealm(AppSettings()) }
-        return realm?.let(block) ?: RealmDatabase.appSettings.writeBlocking(block)
+        return realm?.let(block) ?: RealmDatabase.appSettings().writeBlocking(block)
     }
     //endregion
 
     //region Edit data
     fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
-        RealmDatabase.appSettings.writeBlocking { onUpdate(getAppSettings(this)) }
+        RealmDatabase.appSettings().writeBlocking { onUpdate(getAppSettings(this)) }
     }
 
     fun removeAppSettings() {
-        RealmDatabase.appSettings.writeBlocking { getAppSettings(this).let(::delete) }
+        RealmDatabase.appSettings().writeBlocking { getAppSettings(this).let(::delete) }
     }
     //endregion
 }

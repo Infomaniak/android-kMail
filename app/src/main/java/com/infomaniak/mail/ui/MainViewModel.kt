@@ -128,7 +128,7 @@ class MainViewModel : ViewModel() {
         updateContacts()
     }
 
-    fun loadCurrentMailbox(threadMode: ThreadMode) {
+    fun loadCurrentMailbox(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadCurrentMailbox")
         updateMailboxes()
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
@@ -278,7 +278,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun markAsUnseen(thread: Thread, folderId: String) {
-        RealmDatabase.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent().writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
             val uid = ThreadController.getThreadLastMessageUid(latestThread)
             val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)
@@ -289,7 +289,7 @@ class MainViewModel : ViewModel() {
     private fun markAsSeen(thread: Thread, folderId: String) {
         if (thread.unseenMessagesCount == 0) return
 
-        RealmDatabase.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent().writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
             val uids = ThreadController.getThreadUnseenMessagesUids(latestThread)
             val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)
