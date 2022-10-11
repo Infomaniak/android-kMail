@@ -47,9 +47,10 @@ class MenuDrawerFragment : Fragment() {
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
-    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private lateinit var binding: FragmentMenuDrawerBinding
+
+    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     var exitDrawer: (() -> Unit)? = null
     var isDrawerOpen: (() -> Boolean)? = null
