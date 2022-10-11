@@ -70,6 +70,7 @@
                     android:layout_marginBottom="@dimen/marginStandardMedium"
                     android:fontFamily="@font/suisseintl_semibold"
                     android:text="@string/buttonAccountSwitch"
+                    android:textSize="16sp"
                     app:layout_constraintBottom_toTopOf="@id/topDivider"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
