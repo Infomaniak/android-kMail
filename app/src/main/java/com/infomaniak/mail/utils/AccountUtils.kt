@@ -127,7 +127,7 @@ object AccountUtils : CredentialManager {
 
     private fun removeUserRealmData(context: Context, userId: Int) {
         RealmDatabase.mailboxInfos().writeBlocking {
-            // TODO : Is it possible to directly query the ids (only the ids)
+            // TODO: Is it possible to directly query the ids (only the ids)?
             val mailboxes = MailboxController.getMailboxes(userId, this)
             mailboxes.forEach(::delete)
         }

@@ -40,10 +40,7 @@ class SimpleSettingView @JvmOverloads constructor(
 
         if (attrs != null) {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleSettingView, 0, 0)
-
-            val titleString = typedArray.getString(R.styleable.SimpleSettingView_title)
-            titleString?.let { binding.toolbar.title = titleString }
-
+            typedArray.getString(R.styleable.SimpleSettingView_title)?.let { binding.toolbar.title = it }
             typedArray.recycle()
         }
     }

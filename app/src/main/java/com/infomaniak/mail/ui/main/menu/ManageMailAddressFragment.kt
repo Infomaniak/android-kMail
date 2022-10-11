@@ -45,7 +45,7 @@ class ManageMailAddressFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         root.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        AccountUtils.currentUser?.let { avatar.loadAvatar(it) }
+        AccountUtils.currentUser?.let(avatar::loadAvatar)
         mail.text = AccountUtils.currentUser?.email ?: ""
         changeAccountButton.setOnClickListener { safeNavigate(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
         associatedEmailAddresses.setOnClickListener { notYetImplemented() }
