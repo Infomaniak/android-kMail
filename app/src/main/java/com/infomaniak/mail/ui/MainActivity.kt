@@ -40,6 +40,7 @@ import io.sentry.SentryLevel
 
 class MainActivity : ThemedActivity() {
 
+    // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
