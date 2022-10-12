@@ -40,7 +40,7 @@ class SwipeActionsSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBack()
-        UiSettings.getInstance(requireContext()).setupUi()
+        binding.setupUi()
         setupListeners()
     }
 
@@ -48,7 +48,7 @@ class SwipeActionsSettingsFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    private fun UiSettings.setupUi() = with(binding) {
+    private fun FragmentSwipeActionsSettingsBinding.setupUi() = with(UiSettings.getInstance(requireContext())) {
         settingsSwipeShortRightText.setText(swipeShortRight.nameRes)
         settingsSwipeLongRightText.setText(swipeLongRight.nameRes)
         settingsSwipeShortLeftText.setText(swipeShortLeft.nameRes)

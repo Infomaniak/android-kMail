@@ -19,7 +19,6 @@ package com.infomaniak.mail.data
 
 import android.content.Context
 import androidx.annotation.ColorRes
-import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
@@ -155,7 +154,7 @@ class UiSettings private constructor(context: Context) {
             _swipeLongLeft = value.name
         }
 
-    enum class SwipeAction(@IdRes val nameRes: Int) {
+    enum class SwipeAction(@StringRes val nameRes: Int) {
         NONE(R.string.settingsSwipeActionNone),
         ARCHIVE(R.string.actionArchive),
         DELETE(R.string.actionDelete),
