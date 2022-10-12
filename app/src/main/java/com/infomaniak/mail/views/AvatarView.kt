@@ -55,6 +55,10 @@ class AvatarView @JvmOverloads constructor(
 
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.avatar.setOnClickListener(onClickListener)
 
+    fun loadAvatar(user: User): Disposable {
+        return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.imageLoader)
+    }
+
     fun loadAvatar(recipient: Recipient, contacts: Map<Recipient, MergedContact>) {
         binding.avatarImage.loadCorrespondentAvatar(contacts[recipient] ?: recipient)
     }
@@ -66,9 +70,5 @@ class AvatarView @JvmOverloads constructor(
     private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
         val avatar = (correspondent as? MergedContact)?.avatar
         return loadAvatar(email.hashCode(), avatar, initials, context.imageLoader)
-    }
-
-    fun loadAvatar(user: User): Disposable {
-        return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.imageLoader)
     }
 }
