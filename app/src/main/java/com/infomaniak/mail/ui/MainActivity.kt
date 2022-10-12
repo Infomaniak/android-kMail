@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -44,8 +43,8 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private lateinit var backgroundColor: Color
-    private lateinit var backgroundHeaderColor: Color
+    private val backgroundColor by lazy { getColor(R.color.backgroundColor).toColor() }
+    private val backgroundHeaderColor by lazy { getColor(R.color.backgroundHeaderColor).toColor() }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -67,9 +66,6 @@ class MainActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        backgroundColor = getColor(R.color.backgroundColor).toColor()
-        backgroundHeaderColor = getColor(R.color.backgroundHeaderColor).toColor()
 
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         listenToNetworkStatus()
