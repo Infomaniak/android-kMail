@@ -36,17 +36,17 @@ data class Contact(
     val lastName: String = "",
     val color: String = "",
     val other: Boolean = false,
-    @SerialName("contacted_times")
-    private val contactedTimes: Map<String?, Int?> = emptyMap(),
+    // @SerialName("contacted_times")
+    // private val contactedTimes: Map<String?, Int?> = emptyMap(),
     val emails: RealmList<String> = realmListOf(),
     @SerialName("addressbook_id")
     val addressBookId: Int = 0,
     val avatar: String? = null,
 ) {
-    fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
+    // fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
-    data class ContactedTimes(
-        val email: String?,
-        val count: Int?,
-    )
+    // data class ContactedTimes(
+    //     val email: String?,
+    //     val count: Int?,
+    // )
 }
