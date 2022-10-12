@@ -37,10 +37,9 @@ import kotlinx.coroutines.withContext
 
 class SwitchUserFragment : Fragment() {
 
+    private lateinit var binding: FragmentSwitchUserBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val switchUserViewModel: SwitchUserViewModel by viewModels()
-
-    private lateinit var binding: FragmentSwitchUserBinding
 
     private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
         // TODO: This code is currently removed because if it triggers, the app crashes. This crash is because of the

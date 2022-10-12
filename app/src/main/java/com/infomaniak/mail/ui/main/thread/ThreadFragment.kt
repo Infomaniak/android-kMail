@@ -53,9 +53,8 @@ import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
 
-    private val navigationArgs: ThreadFragmentArgs by navArgs()
     private lateinit var binding: FragmentThreadBinding
-
+    private val navigationArgs: ThreadFragmentArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 

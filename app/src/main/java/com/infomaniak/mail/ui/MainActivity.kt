@@ -41,11 +41,10 @@ import io.sentry.SentryLevel
 class MainActivity : ThemedActivity() {
 
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
     private val mainViewModel: MainViewModel by viewModels()
 
-    lateinit var backgroundColor: Color
-    lateinit var backgroundHeaderColor: Color
+    private lateinit var backgroundColor: Color
+    private lateinit var backgroundHeaderColor: Color
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
