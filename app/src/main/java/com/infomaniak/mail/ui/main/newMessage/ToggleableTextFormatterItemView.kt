@@ -18,15 +18,14 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.core.content.res.getColorOrThrow
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemToggleableTextFormatterBinding
-import com.infomaniak.lib.core.R as RCore
 
 class ToggleableTextFormatterItemView @JvmOverloads constructor(
     context: Context,
@@ -34,7 +33,7 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ItemToggleableTextFormatterBinding
+    private val binding by lazy { ItemToggleableTextFormatterBinding.inflate(LayoutInflater.from(context), this, true) }
 
     @ColorInt
     private var unselectedIconColor: Int = -1
@@ -58,26 +57,17 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
         }
 
     init {
-        binding = ItemToggleableTextFormatterBinding.inflate(LayoutInflater.from(context), this, true)
-
         with(binding) {
-            attrs?.getAttributes(context, R.styleable.ToggleableTextFormatterItemView) {
-                unselectedIconColor = getColor(
-                    R.styleable.ToggleableTextFormatterItemView_iconColor,
-                    context.getColor(R.color.iconColor)
-                )
-                selectedIconColor = getColor(
-                    R.styleable.ToggleableTextFormatterItemView_selectedIconColor,
-                    context.getColor(RCore.color.backgroundCardview)
-                )
-                unselectedBackgroundColor = getColor(
-                    R.styleable.ToggleableTextFormatterItemView_backgroundColor,
-                    Color.TRANSPARENT
-                )
-                selectedBackgroundColor = getColor(
-                    R.styleable.ToggleableTextFormatterItemView_selectedBackgroundColor,
-                    context.getColor(R.color.iconColor)
-                )
+            attrs?.getAttributes(
+                context,
+                R.styleable.ToggleableTextFormatterItemView,
+                defStyleAttr,
+                R.style.ToggleableTextFormatterItemView
+            ) {
+                unselectedIconColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_iconColor)
+                selectedIconColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_selectedIconColor)
+                unselectedBackgroundColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_backgroundColor)
+                selectedBackgroundColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_selectedBackgroundColor)
 
                 icon.apply {
                     getString(R.styleable.ToggleableTextFormatterItemView_android_contentDescription)?.let {

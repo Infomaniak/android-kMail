@@ -357,6 +357,17 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+
+    <!-- Default styles -->
+
+    <style name="ToggleableTextFormatterItemView">
+        <item name="backgroundColor">@android:color/transparent</item>
+        <item name="iconColor">@color/iconColor</item>
+        <item name="selectedBackgroundColor">@color/iconColor</item>
+        <item name="selectedIconColor">@color/backgroundCardview</item>
+    </style>
+
+
     <!-- Other -->
 
     <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
