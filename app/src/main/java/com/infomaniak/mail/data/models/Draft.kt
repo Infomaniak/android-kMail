@@ -28,6 +28,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import java.util.*
 
 @Serializable
 class Draft : RealmObject {
@@ -71,18 +72,14 @@ class Draft : RealmObject {
     var parentMessageUid: String = "" // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
-    fun initLocalValues(messageUid: String) {
-        if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
-        parentMessageUid = messageUid
+    fun initLocalValues(messageUid: String? = null) {
+        if (uuid.isEmpty()) uuid = "${LOCAL_DRAFT_UUID_PREFIX}_${messageUid ?: UUID.randomUUID()}"
+        messageUid?.let { parentMessageUid = it }
     }
 
-    fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
-
-    enum class DraftAction {
-        SEND, SAVE
-    }
+    fun hasLocalUuid() = uuid.startsWith(LOCAL_DRAFT_UUID_PREFIX)
 
     companion object {
-        private const val OFFLINE_DRAFT_UUID_PREFIX = "offline"
+        private const val LOCAL_DRAFT_UUID_PREFIX = "local"
     }
 }

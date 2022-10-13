@@ -19,10 +19,13 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.coroutines.flow.SharedFlow
 
 object DraftController {
 
@@ -36,11 +39,20 @@ object DraftController {
     fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
         return realm.getDraftQuery(uuid).find()
     }
+
+    fun getDraftAsync(uuid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Draft>> {
+        return realm.getDraftQuery(uuid).asFlow().toSharedFlow()
+    }
     //endregion
 
     //region Edit data
     fun upsertDraft(draft: Draft, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = { it.copyToRealm(draft, UpdatePolicy.ALL) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
+    fun updateDraft(uuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getDraft(uuid, it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
     //endregion

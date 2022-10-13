@@ -21,70 +21,75 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.data.models.Draft.DraftAction
-import com.infomaniak.mail.data.models.MessagePriority
-import com.infomaniak.mail.data.models.MessagePriority.getPriority
-import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.ThemedActivity
-import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction.*
-import com.infomaniak.mail.utils.observeNotNull
-import io.realm.kotlin.ext.realmListOf
 
 class NewMessageActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
-    private val mainViewModel: MainViewModel by viewModels()
+    private val navigationArgs: NewMessageActivityArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by viewModels()
-
-    private val newMessageFragment by lazy {
-        supportFragmentManager.findFragmentById(R.id.fragmentContainer)?.let {
-            it.childFragmentManager.primaryNavigationFragment as NewMessageFragment
-        }!!
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(binding.root)
+        newMessageViewModel.setupDraft(navigationArgs.draftUuid)
+        setupToolbar()
+        setupEditorActions()
+        setupEditorFormatActionsToggle()
+    }
 
-        binding.apply {
-            setContentView(root)
-
-            toolbar.setNavigationOnClickListener {
-                sendMail(DraftAction.SAVE)
-                onBackPressed()
+    private fun setupToolbar() = with(binding) {
+        toolbar.setNavigationOnClickListener {
+            newMessageViewModel.saveMail()
+            onBackPressed()
+        }
+        toolbar.setOnMenuItemClickListener {
+            newMessageViewModel.sendMail { isSuccess ->
+                if (isSuccess) finish()
             }
-            toolbar.setOnMenuItemClickListener {
-                if (sendMail(DraftAction.SEND)) finish()
-                true
-            }
-
-            linkEditor(editorAttachment, ATTACHMENT)
-            linkEditor(editorCamera, CAMERA)
-            linkEditor(editorLink, LINK)
-            linkEditor(editorClock, CLOCK)
-
-            linkEditor(editorBold, BOLD)
-            linkEditor(editorItalic, ITALIC)
-            linkEditor(editorUnderlined, UNDERLINE)
-            linkEditor(editorStrikeThrough, STRIKE_THROUGH)
-            linkEditor(editorList, UNORDERED_LIST)
-
-            handleEditorToggle()
+            true
         }
     }
 
-    private fun ActivityNewMessageBinding.handleEditorToggle() {
+    private fun setupEditorActions() = with(binding) {
+
+        fun setEditorActionClickListener(view: MaterialButton, action: EditorAction) {
+            view.setOnClickListener { newMessageViewModel.editorAction.value = action }
+        }
+
+        setEditorActionClickListener(editorAttachment, EditorAction.ATTACHMENT)
+        setEditorActionClickListener(editorCamera, EditorAction.CAMERA)
+        setEditorActionClickListener(editorLink, EditorAction.LINK)
+        setEditorActionClickListener(editorClock, EditorAction.CLOCK)
+
+        setEditorActionClickListener(editorBold, EditorAction.BOLD)
+        setEditorActionClickListener(editorItalic, EditorAction.ITALIC)
+        setEditorActionClickListener(editorUnderlined, EditorAction.UNDERLINE)
+        setEditorActionClickListener(editorStrikeThrough, EditorAction.STRIKE_THROUGH)
+        setEditorActionClickListener(editorList, EditorAction.UNORDERED_LIST)
+    }
+
+    private fun setupEditorFormatActionsToggle() = with(binding) {
         editorTextOptions.setOnClickListener {
             newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
             updateEditorVisibility(newMessageViewModel.isEditorExpanded)
         }
     }
 
-    private fun ActivityNewMessageBinding.updateEditorVisibility(isEditorExpanded: Boolean) {
+    // This function is called from NewMessageFragment
+    fun toggleEditor(isVisible: Boolean) {
+        binding.editor.isVisible = isVisible
+        if (!isVisible) {
+            newMessageViewModel.isEditorExpanded = false
+            updateEditorVisibility(false)
+        }
+    }
+
+    private fun updateEditorVisibility(isEditorExpanded: Boolean) = with(binding) {
         val color = if (isEditorExpanded) R.color.pinkMail else R.color.iconColor
         val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
 
@@ -95,41 +100,6 @@ class NewMessageActivity : ThemedActivity() {
 
         editorActions.isGone = isEditorExpanded
         textEditing.isVisible = isEditorExpanded
-    }
-
-    private fun linkEditor(view: MaterialButton, action: EditorAction) {
-        view.setOnClickListener { newMessageViewModel.editorAction.value = action }
-    }
-
-    private fun createDraft() = with(newMessageFragment) {
-        Draft().apply {
-            initLocalValues("")
-            // TODO: should userInformation (here 'from') be stored in mainViewModel ? see ApiRepository.getUser()
-            from = realmListOf(Recipient().apply { email = getFromMailbox().email })
-            subject = getSubject()
-            body = getBody()
-            priority = MessagePriority.Priority.NORMAL.getPriority()
-        }
-    }
-
-    private fun sendMail(action: DraftAction): Boolean {
-        if (newMessageViewModel.recipients.isEmpty()) return false
-
-        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return false
-
-        mainViewModel.getMailbox(mailboxObjectId).observeNotNull(this) { mailbox ->
-            newMessageViewModel.sendMail(createDraft(), action, mailbox)
-        }
-
-        return true
-    }
-
-    fun toggleEditor(isVisible: Boolean) {
-        binding.editor.isVisible = isVisible
-        if (!isVisible) {
-            newMessageViewModel.isEditorExpanded = false
-            binding.updateEditorVisibility(false)
-        }
     }
 
     enum class EditorAction {
