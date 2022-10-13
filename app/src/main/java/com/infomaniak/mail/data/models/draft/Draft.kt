@@ -31,6 +31,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import java.util.*
 
 @Serializable
 class Draft : RealmObject {
@@ -64,7 +65,8 @@ class Draft : RealmObject {
     @SerialName("action")
     private var _action: String = ""
     var delay: Int = 0
-    var priority: String? = null
+    @SerialName("priority")
+    private var _priority: String? = null
     @SerialName("st_uuid")
     var stUuid: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
@@ -81,6 +83,19 @@ class Draft : RealmObject {
             _action = value.toString()
         }
 
+    var priority
+        get() = enumValueOfOrNull<Priority>(_priority)
+        set(value) {
+            _priority = value.toString()
+        }
+
+    fun initLocalValues(messageUid: String? = null) {
+        if (uuid.isEmpty()) uuid = "${LOCAL_DRAFT_UUID_PREFIX}_${messageUid ?: UUID.randomUUID()}"
+        messageUid?.let { parentMessageUid = it }
+    }
+
+    fun hasLocalUuid() = uuid.startsWith(LOCAL_DRAFT_UUID_PREFIX)
+
     enum class DraftAction {
         SEND,
         SAVE;
@@ -88,14 +103,7 @@ class Draft : RealmObject {
         override fun toString() = name.lowercase()
     }
 
-    fun initLocalValues(messageUid: String) {
-        if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
-        parentMessageUid = messageUid
-    }
-
-    fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
-
     companion object {
-        private const val OFFLINE_DRAFT_UUID_PREFIX = "offline"
+        private const val LOCAL_DRAFT_UUID_PREFIX = "local"
     }
 }
