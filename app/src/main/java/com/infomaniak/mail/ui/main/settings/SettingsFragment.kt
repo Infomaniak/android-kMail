@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -50,14 +49,9 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
         setupAdapter()
         setupListeners()
         uiSettings.setupPreferencesText()
-    }
-
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
     private fun setupAdapter() {

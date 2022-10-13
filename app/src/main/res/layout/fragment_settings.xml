@@ -15,142 +15,111 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.settings.SettingsFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    app:title="@string/settingsTitle"
+    tools:context=".ui.main.settings.SettingsFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:scrollbars="none">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-            <TextView
-                style="@style/H2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:text="@string/settingsTitle" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        style="@style/BackdropCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:scrollbars="none">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/settingsSectionEmailAddresses" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/mailboxesList"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_settings_mailbox" />
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionEmailAddresses" />
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/mailboxesList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_settings_mailbox" />
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/settingsSectionGeneral" />
 
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsSend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsSendTitle" />
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionGeneral" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsAppLock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsAppLock" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsSend"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="chevron"
-                    app:title="@string/settingsSendTitle" />
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsAppLock"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="toggle"
-                    app:title="@string/settingsAppLock" />
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/settingsSectionAppearance" />
 
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsThreadListDensity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="@string/settingsDefault"
+                app:title="@string/settingsThreadListDensityTitle" />
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionAppearance" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="@string/settingsOptionSystemTheme"
+                app:title="@string/settingsTheme" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsThreadListDensity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="chevron"
-                    app:subtitle="@string/settingsDefault"
-                    app:title="@string/settingsThreadListDensityTitle" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsAccentColor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="@string/accentColorPinkTitle"
+                app:title="@string/settingsAccentColor" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsTheme"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="chevron"
-                    app:subtitle="@string/settingsOptionSystemTheme"
-                    app:title="@string/settingsTheme" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsSwipeActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsSwipeActionsTitle" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsAccentColor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="chevron"
-                    app:subtitle="@string/accentColorPinkTitle"
-                    app:title="@string/settingsAccentColor" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsMessageDisplay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="@string/settingsOptionDiscussions"
+                app:title="@string/settingsMessageDisplayTitle" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsSwipeActions"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="chevron"
-                    app:title="@string/settingsSwipeActionsTitle" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsExternalContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="@string/settingsOptionAskMe"
+                app:title="@string/settingsExternalContentTitle" />
 
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsMessageDisplay"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="chevron"
-                    app:subtitle="@string/settingsOptionDiscussions"
-                    app:title="@string/settingsMessageDisplayTitle" />
-
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                    android:id="@+id/settingsExternalContent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:itemAction="chevron"
-                    app:subtitle="@string/settingsOptionAskMe"
-                    app:title="@string/settingsExternalContentTitle" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-    </com.google.android.material.card.MaterialCardView>
-</LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>
