@@ -17,17 +17,17 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.cache.userInfos.ContactController
 import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.data.models.Draft.DraftAction
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.MessagePriority
+import com.infomaniak.mail.data.models.MessagePriority.getPriority
 import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -37,13 +37,39 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    val recipients = mutableListOf<UiContact>()
-    val newMessageCc = mutableListOf<UiContact>()
-    val newMessageBcc = mutableListOf<UiContact>()
+    val mailTo = MutableLiveData<List<UiContact>?>(emptyList())
+    val mailCc = MutableLiveData<List<UiContact>?>(emptyList())
+    val mailBcc = MutableLiveData<List<UiContact>?>(emptyList())
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
     val editorAction = SingleLiveEvent<EditorAction>()
+
+    val currentDraftUuid = MutableLiveData<String?>()
+
+    fun setupDraft(draftUuid: String?) = viewModelScope.launch(Dispatchers.IO) {
+        val uuid = draftUuid ?: run {
+            return@run Draft()
+                .apply {
+                    initLocalValues()
+                    priority = MessagePriority.Priority.NORMAL.getPriority()
+                }
+                .also { DraftController.upsertDraft(it) } // Don't try to write it with `.also(xx::yy)`, it will crash.
+                .uuid
+        }
+
+        DraftController.getDraft(uuid)?.let { draft ->
+            mailTo.postValue(draft.to.toUiContacts())
+            mailCc.postValue(draft.cc.toUiContacts())
+            mailBcc.postValue(draft.bcc.toUiContacts())
+        }
+
+        currentDraftUuid.postValue(uuid)
+    }
+
+    fun getDraft(uuid: String): LiveData<Draft?> = liveData(Dispatchers.IO) {
+        emit(DraftController.getDraft(uuid))
+    }
 
     fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
         emit(mutableListOf<UiContact>().apply {
@@ -55,31 +81,98 @@ class NewMessageViewModel : ViewModel() {
         })
     }
 
-    fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
-        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
-        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
+    fun saveMail() = viewModelScope.launch(Dispatchers.IO) {
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
-            draft.identityId = signature.data?.defaultSignatureId
-            if (action == DraftAction.SEND) sendDraft() else saveDraft()
+        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return@launch
+        val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: return@launch
+
+        val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
+
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.action = "save"
+            it.identityId = signature.data?.defaultSignatureId
+        }
+        val draft = DraftController.getDraft(draftUuid) ?: return@launch
+
+        ApiRepository.saveDraft(mailbox.uuid, draft)
+    }
+
+    fun sendMail(completion: (isSuccess: Boolean) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+
+        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: run {
+            completion(false)
+            return@launch
+        }
+        val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: run {
+            completion(false)
+            return@launch
+        }
+
+        val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
+
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.action = "send"
+            it.identityId = signature.data?.defaultSignatureId
+        }
+        val draft = DraftController.getDraft(draftUuid) ?: run {
+            completion(false)
+            return@launch
+        }
+
+        if (draft.to.isEmpty()) {
+            completion(false)
+            return@launch
+        }
+
+        val isSuccess = ApiRepository.sendDraft(mailbox.uuid, draft).isSuccess()
+        completion(isSuccess)
+    }
+
+    fun updateDraftFrom(email: String) = viewModelScope.launch(Dispatchers.IO) {
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.from = realmListOf(Recipient().apply { this.email = email })
         }
     }
 
-    private fun Draft.fillForApi(draftAction: String) = apply {
-        action = draftAction
-        to = recipients.toRealmRecipients() ?: realmListOf()
-        cc = newMessageCc.toRealmRecipients()
-        bcc = newMessageBcc.toRealmRecipients()
-
-        // TODO: manage advanced functionalities
-        // quote = ""
-        // references = ""
-        // delay = 0
-        // inReplyTo = ""
-        // inReplyToUid = ""
-        // replyTo = realmListOf()
+    fun updateDraftTo(to: List<UiContact>) = viewModelScope.launch(Dispatchers.IO) {
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.to = to.toRealmRecipients()
+        }
     }
+
+    fun updateDraftCc(cc: List<UiContact>) = viewModelScope.launch(Dispatchers.IO) {
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.cc = cc.toRealmRecipients()
+        }
+    }
+
+    fun updateDraftBcc(bcc: List<UiContact>) = viewModelScope.launch(Dispatchers.IO) {
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.bcc = bcc.toRealmRecipients()
+        }
+    }
+
+    fun updateDraftSubject(subject: String) = viewModelScope.launch(Dispatchers.IO) {
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.subject = subject
+        }
+    }
+
+    fun updateDraftBody(body: String) = viewModelScope.launch(Dispatchers.IO) {
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        DraftController.updateDraft(draftUuid) {
+            it.body = body
+        }
+    }
+
+    private fun RealmList<Recipient>.toUiContacts(): List<UiContact> = map { UiContact(it.email, it.getNameOrEmail()) }
 
     private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient> {
         return if (isEmpty()) realmListOf() else map {
