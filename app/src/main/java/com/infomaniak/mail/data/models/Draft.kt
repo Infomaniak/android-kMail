@@ -52,8 +52,8 @@ class Draft : RealmObject {
     @SerialName("mime_type")
     var mimeType: String = "any/any"
     var body: String = ""
-    var cc: RealmList<Recipient>? = null
-    var bcc: RealmList<Recipient>? = null
+    var cc: RealmList<Recipient> = realmListOf()
+    var bcc: RealmList<Recipient> = realmListOf()
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String = ""
