@@ -66,6 +66,10 @@
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
+    <style name="Callout.Light">
+        <item name="android:textColor">@color/secondaryText</item>
+    </style>
+
     <style name="Callout.Tertiary">
         <item name="android:textColor">@color/hintTextColor</item>
     </style>
