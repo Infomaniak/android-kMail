@@ -28,16 +28,12 @@ import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -45,8 +41,6 @@ import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
@@ -120,23 +114,12 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val parentUid = message.uid
-                    // TODO: There shouldn't be any Api call in fragments. Move this in the ViewModel.
-                    val draft = ApiRepository.getDraft(message.draftResource).data?.apply {
-                        initLocalValues(parentUid)
-                        DraftController.upsertDraft(this)
-                    }
-                    MessageController.updateMessage(message.uid) {
-                        it.draftUuid = draft?.uuid
-                    }
-                    // TODO: Open the draft in draft editor
+                threadViewModel.fetchDraft(message) { draftUuid ->
+                    safeNavigate(ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(draftUuid))
                 }
             }
             onDeleteDraftClicked = { message ->
-                // TODO: Replace MailboxContentController with MailApi one when currentMailbox will be available
                 mainViewModel.deleteDraft(message)
-                // TODO: Delete Body & Attachments too. When they'll be EmbeddedObject, they should delete by themself automatically.
             }
             onAttachmentClicked = { attachment ->
                 notYetImplemented()
@@ -151,7 +134,7 @@ class ThreadFragment : Fragment() {
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
                         isFavorite = message.isFavorite,
-                        isSeen = message.seen
+                        isSeen = message.seen,
                     )
                 )
             }
