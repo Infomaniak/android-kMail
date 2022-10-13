@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.newMessage
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.ContactController
@@ -29,6 +30,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
@@ -50,23 +52,30 @@ class NewMessageViewModel : ViewModel() {
     val currentDraftUuid = MutableLiveData<String?>()
 
     fun setupDraft(draftUuid: String?) = viewModelScope.launch(Dispatchers.IO) {
-        val uuid = draftUuid ?: run {
-            return@run Draft()
-                .apply {
-                    initLocalValues()
-                    priority = Priority.NORMAL
-                }
-                .also { DraftController.upsertDraft(it) } // Don't try to write it with `.also(xx::yy)`, it will crash.
-                .uuid
+        val uuid = RealmDatabase.mailboxContent().writeBlocking {
+            return@writeBlocking if (draftUuid == null) {
+                createDraft()
+            } else {
+                updateLiveData(draftUuid)
+                draftUuid
+            }
         }
 
-        DraftController.getDraft(uuid)?.let { draft ->
+        currentDraftUuid.postValue(uuid)
+    }
+
+    private fun MutableRealm.createDraft(): String {
+        return Draft().initLocalValues(priority = Priority.NORMAL)
+            .also { DraftController.upsertDraft(it, this) }
+            .uuid
+    }
+
+    private fun MutableRealm.updateLiveData(uuid: String) {
+        DraftController.getDraft(uuid, this)?.let { draft ->
             mailTo.postValue(draft.to.toUiContacts())
             mailCc.postValue(draft.cc.toUiContacts())
             mailBcc.postValue(draft.bcc.toUiContacts())
         }
-
-        currentDraftUuid.postValue(uuid)
     }
 
     fun getDraft(uuid: String): LiveData<Draft?> = liveData(Dispatchers.IO) {
@@ -85,19 +94,28 @@ class NewMessageViewModel : ViewModel() {
 
     fun saveMail() = viewModelScope.launch(Dispatchers.IO) {
 
-        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return@launch
-        val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: return@launch
+        fun makeApiCall(): Draft? {
+            val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return null
+            val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: return null
 
-        val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
+            return RealmDatabase.mailboxContent().writeBlocking {
+                val draftUuid = currentDraftUuid.value ?: return@writeBlocking null
+                val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking null
+                if (!draft.hasBeenModified) return@writeBlocking draft
 
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.action = DraftAction.SAVE
-            it.identityId = signature.data?.defaultSignatureId
+                val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
+                draft.identityId = signature.data?.defaultSignatureId
+                draft.action = DraftAction.SAVE
+
+                ApiRepository.saveDraft(mailbox.uuid, draft)
+
+                return@writeBlocking draft
+            }
         }
-        val draft = DraftController.getDraft(draftUuid) ?: return@launch
 
-        ApiRepository.saveDraft(mailbox.uuid, draft)
+        makeApiCall()?.let { draft ->
+            RealmDatabase.mailboxContent().writeBlocking { findLatest(draft)?.let(::delete) }
+        }
     }
 
     fun sendMail(completion: (isSuccess: Boolean) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
@@ -111,31 +129,29 @@ class NewMessageViewModel : ViewModel() {
             return@launch
         }
 
-        val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
+        RealmDatabase.mailboxContent().writeBlocking {
+            val draftUuid = currentDraftUuid.value ?: return@writeBlocking
+            val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
+            if (!draft.hasBeenModified || draft.to.isEmpty()) return@writeBlocking
 
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.action = DraftAction.SEND
-            it.identityId = signature.data?.defaultSignatureId
-        }
-        val draft = DraftController.getDraft(draftUuid) ?: run {
-            completion(false)
-            return@launch
-        }
+            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
+            draft.identityId = signature.data?.defaultSignatureId
+            draft.action = DraftAction.SEND
 
-        if (draft.to.isEmpty()) {
-            completion(false)
-            return@launch
+            val isSuccess = ApiRepository.sendDraft(mailbox.uuid, draft).isSuccess()
+            if (isSuccess) delete(draft)
+
+            completion(isSuccess)
         }
 
-        val isSuccess = ApiRepository.sendDraft(mailbox.uuid, draft).isSuccess()
-        completion(isSuccess)
+        completion(false)
     }
 
-    fun updateDraftFrom(email: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun updateDraftFrom(email: String, isDefaultEmail: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         val draftUuid = currentDraftUuid.value ?: return@launch
         DraftController.updateDraft(draftUuid) {
             it.from = realmListOf(Recipient().apply { this.email = email })
+            it.hasBeenModified = !isDefaultEmail
         }
     }
 
@@ -143,6 +159,7 @@ class NewMessageViewModel : ViewModel() {
         val draftUuid = currentDraftUuid.value ?: return@launch
         DraftController.updateDraft(draftUuid) {
             it.to = to.toRealmRecipients()
+            it.hasBeenModified = true
         }
     }
 
@@ -150,6 +167,7 @@ class NewMessageViewModel : ViewModel() {
         val draftUuid = currentDraftUuid.value ?: return@launch
         DraftController.updateDraft(draftUuid) {
             it.cc = cc.toRealmRecipients()
+            it.hasBeenModified = true
         }
     }
 
@@ -157,6 +175,7 @@ class NewMessageViewModel : ViewModel() {
         val draftUuid = currentDraftUuid.value ?: return@launch
         DraftController.updateDraft(draftUuid) {
             it.bcc = bcc.toRealmRecipients()
+            it.hasBeenModified = true
         }
     }
 
@@ -164,6 +183,7 @@ class NewMessageViewModel : ViewModel() {
         val draftUuid = currentDraftUuid.value ?: return@launch
         DraftController.updateDraft(draftUuid) {
             it.subject = subject
+            it.hasBeenModified = true
         }
     }
 
@@ -171,6 +191,7 @@ class NewMessageViewModel : ViewModel() {
         val draftUuid = currentDraftUuid.value ?: return@launch
         DraftController.updateDraft(draftUuid) {
             it.body = body
+            it.hasBeenModified = true
         }
     }
 
