@@ -99,6 +99,8 @@ class Thread : RealmObject {
         }
     }
 
+    fun isOnlyOneDraft(): Boolean = messages.count() == 1 && messages.first().isDraft
+
     enum class ThreadFilter(@IdRes val filterNameRes: Int) {
         ALL(R.string.searchAllMessages),
         SEEN(R.string.searchFilterRead),

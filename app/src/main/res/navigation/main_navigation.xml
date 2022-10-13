@@ -36,7 +36,7 @@
             android:id="@+id/action_threadListFragment_to_newFolderDialog"
             app:destination="@id/newFolderDialog" />
         <action
-            android:id="@+id/action_homeFragment_to_newMessageActivity"
+            android:id="@+id/action_threadListFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
             android:id="@+id/action_threadListFragment_to_searchFragment"

@@ -372,6 +372,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
+    //region Open Draft
+    val openDraftUuid = SingleLiveEvent<String?>()
+
+    fun fetchDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+        val parentMessageUid = message.uid
+        ApiRepository.getDraft(message.draftResource).data?.let { draft ->
+            DraftController.upsertDraft(draft.initLocalValues(parentMessageUid))
+            openDraftUuid.postValue(draft.uuid)
+        }
+    }
+    //endregion
+
     //region New Message
     // TODO: This is temporary, while waiting for a "DraftsManager".
     fun executeDraftsActions() = viewModelScope.launch(Dispatchers.IO) {

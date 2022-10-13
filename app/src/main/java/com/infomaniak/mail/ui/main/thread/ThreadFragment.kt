@@ -60,7 +60,7 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
-        observeDraftUuid()
+        observeOpenDraftUuid()
         setupAdapter()
         mainViewModel.openThread(navigationArgs.threadUid)
         bindMessages()
@@ -110,8 +110,8 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeDraftUuid() {
-        threadViewModel.openDraftUuid.observeNotNull(viewLifecycleOwner) { draftUuid ->
+    private fun observeOpenDraftUuid() {
+        mainViewModel.openDraftUuid.observeNotNull(viewLifecycleOwner) { draftUuid ->
             safeNavigate(ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(draftUuid))
         }
     }
@@ -124,7 +124,7 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
-                threadViewModel.fetchDraft(message)
+                mainViewModel.fetchDraft(message)
             }
             onDeleteDraftClicked = { message ->
                 mainViewModel.deleteDraft(message)

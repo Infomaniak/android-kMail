@@ -94,6 +94,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         setupOnRefresh()
+        observeOpenDraftUuid()
         setupAdapter()
         setupListeners()
         setupUserAvatar()
@@ -113,6 +114,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         mainViewModel.forceRefreshThreads(filter)
+    }
+
+    private fun observeOpenDraftUuid() {
+        mainViewModel.openDraftUuid.observeNotNull(viewLifecycleOwner) { draftUuid ->
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(draftUuid))
+        }
     }
 
     private fun setupAdapter() {
@@ -145,15 +152,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            onThreadClicked = {
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
-                        threadUid = it.uid,
-                        threadSubject = it.subject,
-                        threadIsFavorite = it.isFavorite,
-                        unseenMessagesCount = it.unseenMessagesCount,
+            onThreadClicked = { thread ->
+                if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
+                    mainViewModel.fetchDraft(thread.messages.first())
+                } else {
+                    safeNavigate(
+                        ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
+                            threadUid = thread.uid,
+                            threadSubject = thread.subject,
+                            threadIsFavorite = thread.isFavorite,
+                            unseenMessagesCount = thread.unseenMessagesCount,
+                        )
                     )
-                )
+                }
             }
         }
     }
@@ -171,7 +182,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         newMessageFab.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
         }
 
         threadsList.scrollListener = object : OnListScrollListener {
