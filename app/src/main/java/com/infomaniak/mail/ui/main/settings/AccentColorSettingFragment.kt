@@ -21,11 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.UiSettings.AccentColor
@@ -43,56 +39,26 @@ class AccentColorSettingFragment : Fragment() {
         return FragmentAccentColorSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setUpCheckMarks()
-        setupListeners()
-    }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
+        initTranslationTable(
+            mapOf(
+                R.id.pinkRadioButton to PINK,
+                R.id.blueRadioButton to BLUE
+            )
+        )
 
-    private fun setUpCheckMarks() = with(binding) {
-        uiSettings.accentColor.let { accentColor ->
-            if (accentColor == PINK) {
-                settingsOptionPinkAccentColorCheck
-            } else {
-                settingsOptionBlueAccentColorCheck
-            }.selectColor(accentColor)
+        check(uiSettings.accentColor)
+
+        onItemCheckedListener { _, _, enum ->
+            chooseColor(enum as? AccentColor ?: return@onItemCheckedListener)
         }
     }
 
-    private fun setupListeners() = with(binding) {
-        settingsOptionPinkAccentColor.setOnClickListener {
-            chooseColor(PINK, settingsOptionPinkAccentColorCheck)
-        }
-        settingsOptionBlueAccentColor.setOnClickListener {
-            chooseColor(BLUE, settingsOptionBlueAccentColorCheck)
-        }
-    }
-
-    private fun chooseColor(accentColor: AccentColor, selectedImageView: ImageView) {
-        activity?.setTheme(if (accentColor == PINK) R.style.AppTheme_Pink else R.style.AppTheme_Blue)
+    private fun chooseColor(accentColor: AccentColor) {
+        activity?.setTheme(accentColor.theme)
         uiSettings.accentColor = accentColor
-        selectedImageView.selectColor(accentColor)
         activity?.recreate()
-    }
-
-    private fun ImageView.selectColor(accentColor: AccentColor) {
-        val colorRes = if (accentColor == PINK) {
-            binding.settingsOptionBlueAccentColorCheck.setCheckMarkGone(this)
-            R.color.pinkMail
-        } else {
-            binding.settingsOptionPinkAccentColorCheck.setCheckMarkGone(this)
-            R.color.blueMail
-        }
-        setColorFilter(context.getColor(colorRes))
-        isVisible = true
-    }
-
-    private fun ImageView.setCheckMarkGone(selectedOption: ImageView) {
-        if (this != selectedOption) isGone = true
     }
 }

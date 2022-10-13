@@ -15,95 +15,45 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.settings.ThemeSettingFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    app:title="@string/settingsAccentColor"
+    tools:context=".ui.main.settings.ThemeSettingFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <TextView
+            style="@style/SettingHeader"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:text="@string/settingsAccentColorDescription" />
+
+        <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+            android:id="@+id/radioGroup"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="wrap_content">
 
-            <TextView
-                style="@style/H2"
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/pinkRadioButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:text="@string/settingsAccentColor" />
+                app:checkMarkColor="@color/pinkMail"
+                app:icon="@drawable/ic_theme_pink"
+                app:text="@string/accentColorPinkTitle" />
 
-        </com.google.android.material.appbar.MaterialToolbar>
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/blueRadioButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:checkMarkColor="@color/blueMail"
+                app:icon="@drawable/ic_theme_blue"
+                app:text="@string/accentColorBlueTitle" />
 
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        style="@style/BackgroundCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/SettingHeader"
-                android:layout_marginTop="@dimen/marginStandardMedium"
-                android:text="@string/settingsAccentColorDescription" />
-
-            <LinearLayout
-                android:id="@+id/settingsOptionPinkAccentColor"
-                style="@style/MenuDrawerItem">
-
-                <ImageView
-                    style="@style/SettingImageAtStart"
-                    android:src="@drawable/ic_theme_pink" />
-
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/accentColorPinkTitle" />
-
-                <ImageView
-                    android:id="@+id/settingsOptionPinkAccentColorCheck"
-                    style="@style/SettingButtonCheck"
-                    android:visibility="visible" />
-
-            </LinearLayout>
-
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-            <LinearLayout
-                android:id="@+id/settingsOptionBlueAccentColor"
-                style="@style/MenuDrawerItem">
-
-                <ImageView
-                    style="@style/SettingImageAtStart"
-                    android:src="@drawable/ic_theme_blue" />
-
-                <TextView
-                    style="@style/SettingTextWithButton"
-                    android:text="@string/accentColorBlueTitle" />
-
-                <ImageView
-                    android:id="@+id/settingsOptionBlueAccentColorCheck"
-                    style="@style/SettingButtonCheck"
-                    tools:visibility="visible" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>
+        </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+    </LinearLayout>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>

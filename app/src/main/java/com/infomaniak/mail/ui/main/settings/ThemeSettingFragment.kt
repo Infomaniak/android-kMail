@@ -21,12 +21,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.UiSettings.Theme
 import com.infomaniak.mail.data.UiSettings.Theme.*
@@ -42,46 +39,26 @@ class ThemeSettingFragment : Fragment() {
         return FragmentThemeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setUpCheckMarks()
-        setupListeners()
+
+        initTranslationTable(
+            mapOf(
+                R.id.systemTheme to SYSTEM,
+                R.id.lightTheme to LIGHT,
+                R.id.darkTheme to DARK
+            )
+        )
+
+        check(uiSettings.theme)
+
+        onItemCheckedListener { _, _, enum ->
+            chooseTheme(enum as? Theme ?: return@onItemCheckedListener)
+        }
     }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
-
-    private fun setUpCheckMarks() = with(binding) {
-        when (uiSettings.theme) {
-            LIGHT -> settingsOptionLightThemeCheck
-            DARK -> settingsOptionDarkThemeCheck
-            else -> settingsOptionDefaultThemeCheck
-        }.selectOption()
-    }
-
-    private fun setupListeners() = with(binding) {
-        settingsOptionDefaultTheme.setOnClickListener { chooseTheme(SYSTEM, settingsOptionDefaultThemeCheck) }
-        settingsOptionLightTheme.setOnClickListener { chooseTheme(LIGHT, settingsOptionLightThemeCheck) }
-        settingsOptionDarkTheme.setOnClickListener { chooseTheme(DARK, settingsOptionDarkThemeCheck) }
-    }
-
-    private fun chooseTheme(theme: Theme, selectedImageView: ImageView) {
-        selectedImageView.selectOption()
+    private fun chooseTheme(theme: Theme) {
         setDefaultNightMode(theme.mode)
         uiSettings.theme = theme
-    }
-
-    private fun ImageView.selectOption() = with(binding) {
-        settingsOptionDefaultThemeCheck.setCheckMarkGone(this@selectOption)
-        settingsOptionLightThemeCheck.setCheckMarkGone(this@selectOption)
-        settingsOptionDarkThemeCheck.setCheckMarkGone(this@selectOption)
-
-        this@selectOption.isVisible = true
-    }
-
-    private fun ImageView.setCheckMarkGone(selectedOption: ImageView) {
-        if (this != selectedOption) isGone = true
     }
 }

@@ -24,6 +24,7 @@ import android.widget.LinearLayout
 import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.lib.core.R as RCore
 
@@ -36,21 +37,19 @@ class SettingRadioGroupView @JvmOverloads constructor(
     @IdRes
     private var checkedId: Int = View.NO_ID
     private var checkedValue: String? = null
-    private var onItemCheckedListener: ((Int, String?) -> Unit)? = null
+    private var onItemCheckedListener: ((Int, String?, Enum<*>?) -> Unit)? = null
     private var shouldAddDividers = true
+
+    private var translationTable: Map<Int, Enum<*>> = emptyMap()
 
     init {
         orientation = VERTICAL
 
-        if (attrs != null) {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SettingRadioGroupView, 0, 0)
-
-            checkedId = typedArray.getResourceId(R.styleable.SettingRadioGroupView_defaultCheckedId, View.NO_ID)
+        attrs?.getAttributes(context, R.styleable.SettingRadioGroupView) {
+            checkedId = getResourceId(R.styleable.SettingRadioGroupView_defaultCheckedId, View.NO_ID)
             check(checkedId)
 
-            shouldAddDividers = !typedArray.getBoolean(R.styleable.SettingRadioGroupView_ignoreDividers, false)
-
-            typedArray.recycle()
+            shouldAddDividers = !getBoolean(R.styleable.SettingRadioGroupView_ignoreDividers, false)
         }
 
         if (shouldAddDividers) {
@@ -64,11 +63,18 @@ class SettingRadioGroupView @JvmOverloads constructor(
         children.forEach {
             if (it is RadioCheckable && it.id == View.NO_ID) it.id = generateViewId()
         }
+        super.onFinishInflate()
     }
 
     override fun onChecked(@IdRes viewId: Int) {
-        check(viewId)
-        if (viewId != checkedId) onItemCheckedListener?.invoke(checkedId, checkedValue)
+        if (viewId != checkedId) {
+            check(viewId)
+            onItemCheckedListener?.invoke(checkedId, checkedValue, translationTable[viewId])
+        }
+    }
+
+    fun initTranslationTable(newMap: Map<Int, Enum<*>>) {
+        translationTable = newMap
     }
 
     @Suppress("TypeParameterFindViewById")
@@ -76,7 +82,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
         if (viewId == checkedId) return
 
         (findViewById(checkedId) as? RadioCheckable)?.uncheck()
-        (findViewById(viewId) as RadioCheckable).apply {
+        with(findViewById(viewId) as RadioCheckable) {
             check()
             checkedValue = associatedValue
         }
@@ -84,7 +90,12 @@ class SettingRadioGroupView @JvmOverloads constructor(
         checkedId = viewId
     }
 
-    fun onItemCheckedListener(listener: ((Int, String?) -> Unit)?) {
+    fun check(e: Enum<*>) {
+        val viewId = translationTable.keys.firstOrNull { translationTable[it] == e } ?: return
+        check(viewId)
+    }
+
+    fun onItemCheckedListener(listener: ((id: Int, value: String?, e: Enum<*>?) -> Unit)?) {
         onItemCheckedListener = listener
     }
 }
