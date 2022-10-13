@@ -26,7 +26,6 @@ jobs:
           token: ${{ secrets.REBASE_PR_TOKEN }}
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-          persist-credentials: false # This is important if you have branch protection rules!
 
       # Link: https://httgp.com/signing-commits-in-github-actions/
       - name: Import bot's GPG key for signing commits
@@ -40,10 +39,8 @@ jobs:
           git_commit_gpgsign: true
 
       - name: perform rebase
-        # run: |
-        #   git config --global user.email "${GITHUB_ACTOR}"
-        #   git config --global user.name "${GITHUB_ACTOR}"
         run: |
+          git config --global user.email "kevin.boulongne+bot@gmail.com"
           git status
           git pull
           git checkout "$DEFAULT_BRANCH"
