@@ -90,8 +90,6 @@ class Message : RealmObject {
 
     //region Local data (Transient)
     @Transient
-    var draftUuid: String? = null
-    @Transient
     var fullyDownloaded: Boolean = false
     @Transient
     var hasUnsubscribeLink: Boolean = false

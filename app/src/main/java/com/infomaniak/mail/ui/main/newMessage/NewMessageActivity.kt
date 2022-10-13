@@ -44,7 +44,6 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun setupToolbar() = with(binding) {
         toolbar.setNavigationOnClickListener {
-            newMessageViewModel.saveMail()
             onBackPressed()
         }
         toolbar.setOnMenuItemClickListener {
@@ -53,6 +52,12 @@ class NewMessageActivity : ThemedActivity() {
             }
             true
         }
+    }
+
+    // This function is called from both NewMessageActivity & NewMessageFragment
+    override fun onBackPressed() {
+        newMessageViewModel.saveMail()
+        super.onBackPressed()
     }
 
     private fun setupEditorActions() = with(binding) {
