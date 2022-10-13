@@ -26,7 +26,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.LoginActivity
@@ -70,7 +69,7 @@ class SwitchUserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         setAdapter()
-        setOnClickListeners()
+        setupOnClickListener()
         observeAccounts()
     }
 
@@ -78,8 +77,7 @@ class SwitchUserFragment : Fragment() {
         binding.recyclerViewAccount.adapter = accountsAdapter
     }
 
-    private fun setOnClickListeners() = with(binding) {
-        root.setNavigationOnClickListener { findNavController().popBackStack() }
+    private fun setupOnClickListener() = with(binding) {
         addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
     }
 

@@ -23,6 +23,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.navigation.findNavController
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSimpleSettingBinding
 
@@ -48,11 +50,11 @@ class SimpleSettingView @JvmOverloads constructor(
         binding = ViewSimpleSettingBinding.inflate(LayoutInflater.from(context), this)
         isBindingInflated = true
 
-        if (attrs != null) {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleSettingView, 0, 0)
-            typedArray.getString(R.styleable.SimpleSettingView_title)?.let { binding.toolbar.title = it }
-            typedArray.recycle()
+        attrs?.getAttributes(context, R.styleable.SimpleSettingView) {
+            getString(R.styleable.SimpleSettingView_title)?.let { binding.toolbar.title = it }
         }
+
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {

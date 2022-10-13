@@ -27,7 +27,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -47,7 +46,6 @@ class ManageMailAddressFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        root.setNavigationOnClickListener { findNavController().popBackStack() }
 
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
