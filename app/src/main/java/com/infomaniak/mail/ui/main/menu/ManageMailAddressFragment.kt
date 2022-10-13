@@ -35,8 +35,8 @@ import kotlinx.coroutines.launch
 
 class ManageMailAddressFragment : Fragment() {
 
-    private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var binding: FragmentManageMailAddressBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
