@@ -18,6 +18,10 @@
 package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.*
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -25,6 +29,7 @@ import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ThreadViewModel : ViewModel() {
 
@@ -37,4 +42,18 @@ class ThreadViewModel : ViewModel() {
     }
 
     fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }
+
+    fun fetchDraft(message: Message, completion: (draftUuid: String) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        val parentMessageUid = message.uid
+        ApiRepository.getDraft(message.draftResource).data?.let { draft ->
+            draft.initLocalValues(parentMessageUid)
+            RealmDatabase.mailboxContent().writeBlocking {
+                DraftController.upsertDraft(draft, this)
+                MessageController.updateMessage(parentMessageUid, this) {
+                    it.draftUuid = draft.uuid
+                }
+            }
+            withContext(Dispatchers.Main) { completion(draft.uuid) }
+        }
+    }
 }
