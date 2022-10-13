@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.RealmDatabase.copyListToRealm
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.getDraft
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
@@ -35,7 +34,7 @@ object MessageController {
     //endregion
 
     //region Get data
-    fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
+    private fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
         return realm.getMessageQuery(uid).find()
     }
     //endregion
@@ -59,11 +58,6 @@ object MessageController {
         }
     }
 
-    fun updateMessage(uid: String, realm: MutableRealm? = null, onUpdate: (message: Message) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getMessage(uid, it)?.let(onUpdate) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
-
     fun MutableRealm.deleteMessages(messages: List<Message>) {
         messages.reversed().forEach { deleteMessage(it.uid, this) }
     }
@@ -72,7 +66,8 @@ object MessageController {
         val block: (MutableRealm) -> Unit = {
             getMessage(uid, it)
                 ?.let { message ->
-                    message.draftUuid?.let { draftUuid -> getDraft(draftUuid, it) }?.let(it::delete)
+                    val draft = DraftController.getDraftByParentMessageUid(message.uid, it)
+                    if (draft != null) it.delete(draft)
                     it.delete(message)
                 }
         }

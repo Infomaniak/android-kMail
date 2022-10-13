@@ -33,6 +33,10 @@ object DraftController {
     private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
         return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
     }
+
+    private fun MutableRealm?.getDraftByParentMessageUidQuery(messageUid: String): RealmSingleQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::parentMessageUid.name} = '$messageUid'").first()
+    }
     //endregion
 
     //region Get data
@@ -42,6 +46,10 @@ object DraftController {
 
     fun getDraftAsync(uuid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Draft>> {
         return realm.getDraftQuery(uuid).asFlow().toSharedFlow()
+    }
+
+    fun getDraftByParentMessageUid(parentMessageUid: String, realm: MutableRealm? = null): Draft? {
+        return realm.getDraftByParentMessageUidQuery(parentMessageUid).find()
     }
     //endregion
 
