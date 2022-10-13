@@ -107,7 +107,7 @@ object ApiRepository : ApiRepositoryCore() {
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<Draft> {
-        val body = Json.encodeToString(draft)
+        val body = Json.encodeToString(draft).removeEmptyRealmList()
         fun postDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
@@ -115,7 +115,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
-        val body = Json.encodeToString(draft)
+        val body = Json.encodeToString(draft).removeEmptyRealmList()
         fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
@@ -155,4 +155,9 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
+
+    /**
+     * Temporary replace empty [RealmList] with a null value because API doesn't support this
+     */
+    private fun String.removeEmptyRealmList() = replace("[]", "null")
 }

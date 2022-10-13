@@ -81,8 +81,8 @@ class NewMessageViewModel : ViewModel() {
         // replyTo = realmListOf()
     }
 
-    private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient>? {
-        return if (isEmpty()) null else map {
+    private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient> {
+        return if (isEmpty()) realmListOf() else map {
             Recipient().apply {
                 email = it.email
                 name = it.name ?: ""
