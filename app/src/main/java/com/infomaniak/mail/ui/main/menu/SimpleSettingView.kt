@@ -29,7 +29,7 @@ import com.infomaniak.mail.databinding.ViewSimpleSettingBinding
 class SimpleSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewSimpleSettingBinding
@@ -57,5 +57,4 @@ class SimpleSettingView @JvmOverloads constructor(
     fun setNavigationOnClickListener(listener: OnClickListener) {
         binding.toolbar.setNavigationOnClickListener(listener)
     }
-
 }
