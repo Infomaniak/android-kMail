@@ -48,7 +48,10 @@ class NewMessageActivity : ThemedActivity() {
         }
         toolbar.setOnMenuItemClickListener {
             newMessageViewModel.sendMail { isSuccess ->
-                if (isSuccess) finish()
+                if (isSuccess) {
+                    newMessageViewModel.deleteDraft()
+                    finish()
+                }
             }
             true
         }
@@ -56,7 +59,9 @@ class NewMessageActivity : ThemedActivity() {
 
     // This function is called from both NewMessageActivity & NewMessageFragment
     override fun onBackPressed() {
-        newMessageViewModel.saveMail()
+        newMessageViewModel.saveMail {
+            newMessageViewModel.deleteDraft()
+        }
         super.onBackPressed()
     }
 
