@@ -95,7 +95,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
         check(viewId)
     }
 
-    fun onItemCheckedListener(listener: ((id: Int, value: String?, e: Enum<*>?) -> Unit)?) {
+    fun onItemCheckedListener(listener: ((id: Int, value: String?, enum: Enum<*>?) -> Unit)?) {
         onItemCheckedListener = listener
     }
 }

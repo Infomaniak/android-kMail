@@ -52,15 +52,20 @@ class ItemSettingView @JvmOverloads constructor(
 
                 title.text = getStringOrThrow(R.styleable.ItemSettingView_title)
 
+                (getDrawable(R.styleable.ItemSettingView_icon)).let {
+                    icon.setImageDrawable(it)
+                    icon.isGone = it == null
+                }
+
                 getString(R.styleable.ItemSettingView_subtitle).let {
                     subtitle.apply {
                         text = it
                         isGone = it == null
+
+                        chevron.isVisible = action == Action.CHEVRON
+                        toggle.isVisible = action == Action.TOGGLE
                     }
                 }
-
-                chevron.isVisible = action == Action.CHEVRON
-                toggle.isVisible = action == Action.TOGGLE
             }
         }
     }
@@ -75,7 +80,10 @@ class ItemSettingView @JvmOverloads constructor(
     }
 
     fun setSubtitle(@StringRes subtitle: Int) {
-        binding.subtitle.setText(subtitle)
+        binding.subtitle.apply {
+            setText(subtitle)
+            isVisible = true
+        }
     }
 
     private enum class Action {

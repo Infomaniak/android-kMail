@@ -51,6 +51,7 @@
     <declare-styleable name="ItemSettingView">
         <attr name="title" />
         <attr name="subtitle" format="string" />
+        <attr name="icon" />
         <attr name="itemAction" format="enum">
             <enum name="none" value="0" />
             <enum name="chevron" value="1" />
