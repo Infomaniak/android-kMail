@@ -15,94 +15,41 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.settings.ExternalContentSettingFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    app:title="@string/settingsExternalContentTitle"
+    tools:context=".ui.main.settings.ThemeSettingFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <TextView
+            style="@style/SettingHeader"
+            android:layout_marginTop="@dimen/marginStandardMedium"
+            android:text="@string/settingsSelectDisplayModeDescription" />
+
+        <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+            android:id="@+id/radioGroup"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="wrap_content">
 
-            <TextView
-                style="@style/H2"
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/always"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:text="@string/settingsExternalContentTitle" />
+                app:text="@string/settingsOptionAlways" />
 
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        style="@style/BackdropCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:scrollbars="none">
-
-            <LinearLayout
+            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                android:id="@+id/askMe"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                app:text="@string/settingsOptionAskMe" />
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSelectDisplayModeDescription" />
-
-                <LinearLayout
-                    android:id="@+id/settingsOptionAlways"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsOptionAlways" />
-
-                    <ImageView
-                        android:id="@+id/settingsOptionAlwaysCheck"
-                        style="@style/SettingButtonCheck"
-                        android:visibility="visible" />
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingsOptionAskMe"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsOptionAskMe" />
-
-                    <ImageView
-                        android:id="@+id/settingsOptionAskMeCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>
+        </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+    </LinearLayout>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>
