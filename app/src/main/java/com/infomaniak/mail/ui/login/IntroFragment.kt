@@ -52,7 +52,7 @@ class IntroFragment : Fragment() {
 
     private lateinit var binding: FragmentIntroBinding
     private val navigationArgs: IntroFragmentArgs by navArgs()
-    private val loginViewModel: LoginViewModel by activityViewModels()
+    private val introViewModel: IntroViewModel by activityViewModels()
 
     private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
@@ -63,10 +63,9 @@ class IntroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         when (navigationArgs.position) {
-            0 -> {
+            0 -> introViewModel.currentAccentColor.value?.let { accentColor ->
                 pinkBlueSwitch.isVisible = true
-                val tabIndex = loginViewModel.currentAccentColor.value?.introTabIndex!!
-                val selectedTab = pinkBlueTabLayout.getTabAt(tabIndex)
+                val selectedTab = pinkBlueTabLayout.getTabAt(accentColor.introTabIndex)
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
             }
@@ -109,12 +108,12 @@ class IntroFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val duration = resources.getInteger(R.integer.loginLayoutAnimationDuration).toLong()
             delay(duration)
-            loginViewModel.currentAccentColor.postValue(accentColor)
+            introViewModel.currentAccentColor.postValue(accentColor)
         }
     }
 
     private fun updateUiWhenThemeChanges(position: Int?) {
-        loginViewModel.currentAccentColor.observeNotNull(viewLifecycleOwner) { accentColor ->
+        introViewModel.currentAccentColor.observeNotNull(viewLifecycleOwner) { accentColor ->
             setUi(accentColor, position, animate = true)
         }
     }
