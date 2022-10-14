@@ -92,30 +92,30 @@ class NewMessageViewModel : ViewModel() {
         })
     }
 
-    fun saveMail() = viewModelScope.launch(Dispatchers.IO) {
+    fun saveMail(completion: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
 
-        fun makeApiCall(): Draft? {
-            val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return null
-            val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: return null
-
-            return RealmDatabase.mailboxContent().writeBlocking {
-                val draftUuid = currentDraftUuid.value ?: return@writeBlocking null
-                val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking null
-                if (!draft.hasBeenModified) return@writeBlocking draft
-
-                val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
-                draft.identityId = signature.data?.defaultSignatureId
-                draft.action = DraftAction.SAVE
-
-                ApiRepository.saveDraft(mailbox.uuid, draft)
-
-                return@writeBlocking draft
-            }
+        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: run {
+            completion()
+            return@launch
+        }
+        val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: run {
+            completion()
+            return@launch
         }
 
-        makeApiCall()?.let { draft ->
-            RealmDatabase.mailboxContent().writeBlocking { findLatest(draft)?.let(::delete) }
+        RealmDatabase.mailboxContent().writeBlocking {
+            val draftUuid = currentDraftUuid.value ?: return@writeBlocking
+            val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
+            if (!draft.hasBeenModified) return@writeBlocking
+
+            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
+            draft.identityId = signature.data?.defaultSignatureId
+            draft.action = DraftAction.SAVE
+
+            ApiRepository.saveDraft(mailbox.uuid, draft)
         }
+
+        completion()
     }
 
     fun sendMail(completion: (isSuccess: Boolean) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
@@ -129,6 +129,8 @@ class NewMessageViewModel : ViewModel() {
             return@launch
         }
 
+        var isSuccess = false
+
         RealmDatabase.mailboxContent().writeBlocking {
             val draftUuid = currentDraftUuid.value ?: return@writeBlocking
             val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
@@ -138,13 +140,18 @@ class NewMessageViewModel : ViewModel() {
             draft.identityId = signature.data?.defaultSignatureId
             draft.action = DraftAction.SEND
 
-            val isSuccess = ApiRepository.sendDraft(mailbox.uuid, draft).isSuccess()
-            if (isSuccess) delete(draft)
-
-            completion(isSuccess)
+            isSuccess = ApiRepository.sendDraft(mailbox.uuid, draft).isSuccess()
         }
 
-        completion(false)
+        completion(isSuccess)
+    }
+
+    fun deleteDraft() = viewModelScope.launch(Dispatchers.IO) {
+        val draftUuid = currentDraftUuid.value ?: return@launch
+        RealmDatabase.mailboxContent().writeBlocking {
+            val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
+            delete(draft)
+        }
     }
 
     fun updateDraftFrom(email: String, isDefaultEmail: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
