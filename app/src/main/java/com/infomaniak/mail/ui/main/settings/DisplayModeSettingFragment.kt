@@ -21,11 +21,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.UiSettings.ThreadMode.MESSAGES
@@ -43,45 +40,21 @@ class DisplayModeSettingFragment : Fragment() {
         return FragmentDisplayModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setupUi()
-        setupListeners()
-    }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
+        initTranslationTable(
+            mapOf(
+                R.id.threadMode to THREADS,
+                R.id.messageMode to MESSAGES,
+            )
+        )
 
-    private fun setupUi() = with(binding) {
-        when (uiSettings.threadMode) {
-            THREADS -> settingsOptionDiscussionsCheck.selectOption()
-            MESSAGES -> settingsOptionMessagesCheck.selectOption()
-        }
-    }
+        check(uiSettings.threadMode)
 
-    private fun setupListeners() = with(binding) {
-        settingsOptionDiscussions.setOnClickListener {
+        onItemCheckedListener { _, _, enum ->
             notYetImplemented()
-            updateDisplayMode(THREADS, settingsOptionDiscussionsCheck)
+            uiSettings.threadMode = enum as? ThreadMode ?: return@onItemCheckedListener
         }
-        settingsOptionMessages.setOnClickListener {
-            notYetImplemented()
-            updateDisplayMode(MESSAGES, settingsOptionMessagesCheck)
-        }
-    }
-
-    private fun updateDisplayMode(displayMode: ThreadMode, chosenOption: ImageView) {
-        uiSettings.threadMode = displayMode
-        chosenOption.selectOption()
-    }
-
-    private fun ImageView.selectOption() = with(binding) {
-
-        settingsOptionDiscussionsCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionMessagesCheck.let { if (it != this@selectOption) it.isInvisible = true }
-
-        this@selectOption.isVisible = true
     }
 }
