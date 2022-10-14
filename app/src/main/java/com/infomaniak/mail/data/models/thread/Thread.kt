@@ -21,16 +21,14 @@ package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import androidx.annotation.IdRes
-import com.infomaniak.lib.core.utils.FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR
-import com.infomaniak.lib.core.utils.FORMAT_DATE_HOUR_MINUTE
-import com.infomaniak.lib.core.utils.FORMAT_DATE_SHORT_DAY_ONE_CHAR
-import com.infomaniak.lib.core.utils.format
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.isSmallerThanDays
+import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
