@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.format.DateUtils
 import android.transition.TransitionManager
 import android.util.Log
@@ -72,7 +73,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var lastUpdatedDate: Date? = null
     private var previousFirstMessageUid: String? = null
 
-    private val showLoadingTimer by lazy { Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true } }
+    private val showLoadingTimer: CountDownTimer by lazy {
+        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
+    }
 
     var filter: ThreadFilter = ThreadFilter.ALL
     private var lastUnreadCount = 0

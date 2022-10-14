@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -43,8 +44,8 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val backgroundColor by lazy { getColor(R.color.backgroundColor).toColor() }
-    private val backgroundHeaderColor by lazy { getColor(R.color.backgroundHeaderColor).toColor() }
+    private val backgroundColor: Color by lazy { getColor(R.color.backgroundColor).toColor() }
+    private val backgroundHeaderColor: Color by lazy { getColor(R.color.backgroundHeaderColor).toColor() }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
