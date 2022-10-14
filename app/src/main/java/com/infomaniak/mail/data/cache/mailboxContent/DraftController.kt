@@ -22,9 +22,7 @@ import com.infomaniak.mail.data.models.draft.Draft
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
-import kotlinx.coroutines.flow.Flow
 
 object DraftController {
 
@@ -41,10 +39,6 @@ object DraftController {
     //region Get data
     fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
         return realm.getDraftQuery(uuid).find()
-    }
-
-    fun getDraftAsync(uuid: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Draft>> {
-        return realm.getDraftQuery(uuid).asFlow()
     }
 
     fun getDraftByParentMessageUid(parentMessageUid: String, realm: MutableRealm? = null): Draft? {
