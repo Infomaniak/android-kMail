@@ -124,7 +124,7 @@ class IntroFragment : Fragment() {
     private fun setUi(accentColor: AccentColor, position: Int?, animate: Boolean) = with(binding) {
         updateEachPageUi(accentColor, animate)
         if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(accentColor, animate)
-        if (position == A_SINGLE_ALWAYS_PRESENT_PAGE) updateActivityUi(accentColor, animate)
+        if (position == LOGIN_BUTTON_PAGE) updateActivityUi(accentColor, animate)
     }
 
     private fun updateEachPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
@@ -182,6 +182,6 @@ class IntroFragment : Fragment() {
 
     private companion object {
         const val ACCENT_COLOR_PICKER_PAGE = 0
-        const val A_SINGLE_ALWAYS_PRESENT_PAGE = 3
+        const val LOGIN_BUTTON_PAGE = 3
     }
 }
