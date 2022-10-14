@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/swipeBackground"
+        android:layout_width="match_parent"
+        android:layout_height="88dp"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        app:cardBackgroundColor="@color/border"
+        app:cardCornerRadius="@dimen/radius"
+        app:cardElevation="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp" />
+
+    <TextView
+        android:id="@+id/swipeToDefine"
+        style="@style/Callout.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="3dp"
+        android:text="@string/settingsSwipeActionToDefine"
+        android:textColor="@color/iconColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/swipeForeground"
+        app:layout_constraintStart_toStartOf="@id/swipeBackground"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/swipeIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:elevation="3dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/swipeForeground"
+        app:layout_constraintStart_toStartOf="@id/swipeBackground"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/ic_bin"
+        tools:visibility="gone" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/swipeForeground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="88dp"
+        app:cardBackgroundColor="@color/backgroundCardview"
+        app:cardCornerRadius="@dimen/radius"
+        app:cardElevation="3dp"
+        app:layout_constraintBottom_toBottomOf="@id/swipeBackground"
+        app:layout_constraintEnd_toEndOf="@id/swipeBackground"
+        app:layout_constraintStart_toStartOf="@id/swipeBackground"
+        app:layout_constraintTop_toTopOf="@id/swipeBackground"
+        app:strokeWidth="0dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="3dp"
+        app:layout_constraintBottom_toBottomOf="@id/swipeForeground"
+        app:layout_constraintEnd_toEndOf="@id/swipeForeground"
+        app:layout_constraintStart_toStartOf="@id/swipeForeground"
+        app:layout_constraintTop_toTopOf="@id/swipeForeground">
+
+        <include
+            layout="@layout/swipe_illustration_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="-88dp" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
