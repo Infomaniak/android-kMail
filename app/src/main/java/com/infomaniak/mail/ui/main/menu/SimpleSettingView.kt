@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.annotation.StringRes
 import androidx.navigation.findNavController
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
@@ -63,6 +64,10 @@ class SimpleSettingView @JvmOverloads constructor(
         } else {
             super.addView(child, index, params)
         }
+    }
+
+    fun setTitle(@StringRes title: Int) {
+        binding.toolbar.setTitle(title)
     }
 
     fun setNavigationOnClickListener(listener: OnClickListener) {

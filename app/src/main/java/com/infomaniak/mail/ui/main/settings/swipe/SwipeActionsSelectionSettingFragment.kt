@@ -21,11 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.UiSettings
@@ -45,102 +41,35 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         return FragmentSwipeActionsSelectionSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setupUi()
-        setupListeners()
-    }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
-
-    private fun setupUi() = with(binding) {
         val actionResId = navigationArgs.titleResId
-        toolbarText.setText(actionResId)
-        when (uiSettings.getSwipeAction(actionResId)) {
-            NONE -> actionNoneCheck
-            ARCHIVE -> actionArchiveCheck
-            DELETE -> actionDeleteCheck
-            FAVORITE -> actionFavoriteCheck
-            MOVE -> actionMoveCheck
-            POSTPONE -> actionPostponeCheck
-            QUICKACTIONS_MENU -> actionQuickActionsMenuCheck
-            READ_AND_ARCHIVE -> actionReadAndArchiveCheck
-            READ_UNREAD -> actionReadUnreadCheck
-            SPAM -> actionSpamCheck
-            else -> null
-        }?.selectOption()
-    }
+        root.setTitle(actionResId)
 
-    private fun setupListeners() = with(binding) {
-        actionDelete.setOnClickListener {
-            notYetImplemented()
-            actionDeleteCheck.selectOption()
-            saveAction(DELETE)
-        }
-        actionArchive.setOnClickListener {
-            notYetImplemented()
-            actionArchiveCheck.selectOption()
-            saveAction(ARCHIVE)
-        }
-        actionReadUnread.setOnClickListener {
-            notYetImplemented()
-            actionReadUnreadCheck.selectOption()
-            saveAction(READ_UNREAD)
-        }
-        actionMove.setOnClickListener {
-            notYetImplemented()
-            actionMoveCheck.selectOption()
-            saveAction(MOVE)
-        }
-        actionFavorite.setOnClickListener {
-            notYetImplemented()
-            actionFavoriteCheck.selectOption()
-            saveAction(FAVORITE)
-        }
-        actionPostpone.setOnClickListener {
-            notYetImplemented()
-            actionPostponeCheck.selectOption()
-            saveAction(POSTPONE)
-        }
-        actionSpam.setOnClickListener {
-            notYetImplemented()
-            actionSpamCheck.selectOption()
-            saveAction(SPAM)
-        }
-        actionReadAndArchive.setOnClickListener {
-            notYetImplemented()
-            actionReadAndArchiveCheck.selectOption()
-            saveAction(READ_AND_ARCHIVE)
-        }
-        actionQuickActionsMenu.setOnClickListener {
-            notYetImplemented()
-            actionQuickActionsMenuCheck.selectOption()
-            saveAction(QUICKACTIONS_MENU)
-        }
-        actionNone.setOnClickListener {
-            notYetImplemented()
-            actionNoneCheck.selectOption()
-            saveAction(NONE)
-        }
-    }
+        radioGroup.apply {
+            initTranslationTable(
+                mapOf(
+                    R.id.delete to DELETE,
+                    R.id.archive to ARCHIVE,
+                    R.id.readUnread to READ_UNREAD,
+                    R.id.move to MOVE,
+                    R.id.favorite to FAVORITE,
+                    R.id.postpone to POSTPONE,
+                    R.id.spam to SPAM,
+                    R.id.readAndArchive to READ_AND_ARCHIVE,
+                    R.id.quickActionMenu to QUICKACTIONS_MENU,
+                    R.id.none to NONE
+                )
+            )
 
-    private fun ImageView.selectOption() = with(binding) {
+            check(uiSettings.getSwipeAction(actionResId))
 
-        actionDeleteCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionArchiveCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionReadUnreadCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionMoveCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionFavoriteCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionPostponeCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionSpamCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionReadAndArchiveCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionQuickActionsMenuCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        actionNoneCheck.let { if (it != this@selectOption) it.isInvisible = true }
-
-        this@selectOption.isVisible = true
+            onItemCheckedListener { _, _, enum ->
+                notYetImplemented()
+                saveAction(enum as? SwipeAction ?: return@onItemCheckedListener)
+            }
+        }
     }
 
     private fun saveAction(swipeAction: SwipeAction) = with(uiSettings) {

@@ -79,24 +79,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:subtitle="@string/settingsDefault"
-                app:title="@string/settingsThreadListDensityTitle" />
+                app:title="@string/settingsThreadListDensityTitle"
+                tools:subtitle="@string/settingsDefault" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:subtitle="@string/settingsOptionSystemTheme"
-                app:title="@string/settingsTheme" />
+                app:title="@string/settingsTheme"
+                tools:subtitle="@string/settingsOptionSystemTheme" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsAccentColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:subtitle="@string/accentColorPinkTitle"
-                app:title="@string/settingsAccentColor" />
+                app:title="@string/settingsAccentColor"
+                tools:subtitle="@string/accentColorPinkTitle" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsSwipeActions"
@@ -110,16 +110,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:subtitle="@string/settingsOptionDiscussions"
-                app:title="@string/settingsMessageDisplayTitle" />
+                app:title="@string/settingsMessageDisplayTitle"
+                tools:subtitle="@string/settingsOptionDiscussions" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsExternalContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
-                app:subtitle="@string/settingsOptionAskMe"
-                app:title="@string/settingsExternalContentTitle" />
+                app:title="@string/settingsExternalContentTitle"
+                tools:subtitle="@string/settingsOptionAskMe" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

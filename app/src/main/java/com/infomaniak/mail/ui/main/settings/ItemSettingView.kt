@@ -25,6 +25,7 @@ import androidx.annotation.StringRes
 import androidx.core.content.res.getStringOrThrow
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewItemSettingBinding
 
@@ -46,23 +47,26 @@ class ItemSettingView @JvmOverloads constructor(
 
     init {
         with(binding) {
-            if (attrs != null) {
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ItemSettingView, 0, 0)
+            attrs?.getAttributes(context, R.styleable.ItemSettingView) {
+                action = Action.values()[getInteger(R.styleable.ItemSettingView_itemAction, 0)]
 
-                action = Action.values()[typedArray.getInteger(R.styleable.ItemSettingView_itemAction, 0)]
+                title.text = getStringOrThrow(R.styleable.ItemSettingView_title)
 
-                title.text = typedArray.getStringOrThrow(R.styleable.ItemSettingView_title)
-                typedArray.getString(R.styleable.ItemSettingView_subtitle).let {
+                (getDrawable(R.styleable.ItemSettingView_icon)).let {
+                    icon.setImageDrawable(it)
+                    icon.isGone = it == null
+                }
+
+                getString(R.styleable.ItemSettingView_subtitle).let {
+
                     subtitle.apply {
                         text = it
                         isGone = it == null
+
+                        chevron.isVisible = action == Action.CHEVRON
+                        toggle.isVisible = action == Action.TOGGLE
                     }
                 }
-
-                chevron.isVisible = action == Action.CHEVRON
-                toggle.isVisible = action == Action.TOGGLE
-
-                typedArray.recycle()
             }
         }
     }
@@ -77,7 +81,10 @@ class ItemSettingView @JvmOverloads constructor(
     }
 
     fun setSubtitle(@StringRes subtitle: Int) {
-        binding.subtitle.setText(subtitle)
+        binding.subtitle.apply {
+            setText(subtitle)
+            isVisible = true
+        }
     }
 
     private enum class Action {

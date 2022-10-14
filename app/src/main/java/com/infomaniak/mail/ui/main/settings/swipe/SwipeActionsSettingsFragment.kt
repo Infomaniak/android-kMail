@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.UiSettings
@@ -37,31 +36,18 @@ class SwipeActionsSettingsFragment : Fragment() {
         return FragmentSwipeActionsSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        binding.setupUi()
-        setupListeners()
-    }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
+        with(UiSettings.getInstance(requireContext())) {
+            swipeRight.setSubtitle(swipeLongRight.nameRes)
+            swipeLeft.setSubtitle(swipeLongLeft.nameRes)
+        }
 
-    private fun FragmentSwipeActionsSettingsBinding.setupUi() = with(UiSettings.getInstance(requireContext())) {
-        settingsSwipeShortRightText.setText(swipeShortRight.nameRes)
-        settingsSwipeLongRightText.setText(swipeLongRight.nameRes)
-        settingsSwipeShortLeftText.setText(swipeShortLeft.nameRes)
-        settingsSwipeLongLeftText.setText(swipeLongLeft.nameRes)
+        swipeRight.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongRight) }
+        swipeLeft.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongLeft) }
     }
-
-    private fun setupListeners() = with(binding) {
-        settingsSwipeShortRight.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeShortRight) }
-        settingsSwipeLongRight.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongRight) }
-        settingsSwipeShortLeft.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeShortLeft) }
-        settingsSwipeLongLeft.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongLeft) }
-    }
-
+    
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {
         safeNavigate(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
     }

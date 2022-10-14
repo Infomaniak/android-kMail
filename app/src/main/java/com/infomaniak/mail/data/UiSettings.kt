@@ -167,12 +167,12 @@ class UiSettings private constructor(context: Context) {
         SPAM(R.string.actionSpam),
     }
 
-    fun getSwipeAction(@StringRes nameRes: Int): SwipeAction? = when (nameRes) {
+    fun getSwipeAction(@StringRes nameRes: Int): SwipeAction = when (nameRes) {
         R.string.settingsSwipeShortRight -> swipeShortRight
         R.string.settingsSwipeLongRight -> swipeLongRight
         R.string.settingsSwipeShortLeft -> swipeShortLeft
         R.string.settingsSwipeLongLeft -> swipeLongLeft
-        else -> null
+        else -> throw IllegalArgumentException()
     }
     //endregion
 
