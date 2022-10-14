@@ -54,6 +54,8 @@ class IntroFragment : Fragment() {
     private val navigationArgs: IntroFragmentArgs by navArgs()
     private val loginViewModel: LoginViewModel by activityViewModels()
 
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -86,13 +88,15 @@ class IntroFragment : Fragment() {
         }
 
         updateUiWhenThemeChanges(navigationArgs.position)
+
+        setUi(uiSettings.accentColor, navigationArgs.position, animate = false)
     }
 
     private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == PINK.introTabIndex) PINK else BLUE
-                UiSettings.getInstance(requireContext()).accentColor = newSelectedAccentColor
+                uiSettings.accentColor = newSelectedAccentColor
                 triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor)
             }
 
@@ -111,15 +115,17 @@ class IntroFragment : Fragment() {
 
     private fun updateUiWhenThemeChanges(position: Int?) {
         loginViewModel.currentAccentColor.observeNotNull(viewLifecycleOwner) { accentColor ->
-            setUi(accentColor, position)
+            setUi(accentColor, position, animate = true)
         }
     }
 
-    private fun setUi(accentColor: AccentColor, position: Int?) = with(binding) {
-        val animate = position == 0
+    /**
+     * `animate` is necessary because when the activity is started, we want to avoid animating the color change the first time.
+     */
+    private fun setUi(accentColor: AccentColor, position: Int?, animate: Boolean) = with(binding) {
         updateEachPageUi(accentColor, animate)
-        if (position == 0) updateFirstPageUi(accentColor, animate)
-        if (position == 3) updateActivityUi(accentColor, animate)
+        if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(accentColor, animate)
+        if (position == A_SINGLE_ALWAYS_PRESENT_PAGE) updateActivityUi(accentColor, animate)
     }
 
     private fun updateEachPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
@@ -137,7 +143,7 @@ class IntroFragment : Fragment() {
         return VectorDrawableCompat.create(resources, drawableRes, ContextThemeWrapper(context, theme).theme)
     }
 
-    private fun updateFirstPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
+    private fun updateAccentColorPickerPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
         animateTabIndicatorAndTextColor(accentColor, requireContext(), animate)
         animateTabBackgroundColor(accentColor, requireContext(), animate)
     }
@@ -173,5 +179,10 @@ class IntroFragment : Fragment() {
 
     private fun updateActivityUi(accentColor: AccentColor, animate: Boolean) {
         (requireActivity() as LoginActivity).updateUi(accentColor, animate)
+    }
+
+    private companion object {
+        const val ACCENT_COLOR_PICKER_PAGE = 0
+        const val A_SINGLE_ALWAYS_PRESENT_PAGE = 3
     }
 }
