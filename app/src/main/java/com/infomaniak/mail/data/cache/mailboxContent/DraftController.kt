@@ -19,13 +19,10 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmSingleQuery
-import kotlinx.coroutines.flow.SharedFlow
 
 object DraftController {
 
@@ -42,10 +39,6 @@ object DraftController {
     //region Get data
     fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
         return realm.getDraftQuery(uuid).find()
-    }
-
-    fun getDraftAsync(uuid: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Draft>> {
-        return realm.getDraftQuery(uuid).asFlow().toSharedFlow()
     }
 
     fun getDraftByParentMessageUid(parentMessageUid: String, realm: MutableRealm? = null): Draft? {
