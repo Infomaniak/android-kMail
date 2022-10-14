@@ -42,17 +42,11 @@ class MainActionsView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewMainActionsBinding by lazy {
-        ViewMainActionsBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    private val buttons: List<MaterialButton> by lazy {
-        with(binding) { listOf(button1, button2, button3, button4) }
-    }
-    private val textViews: List<TextView> by lazy {
-        with(binding) { listOf(textView1, textView2, textView3, textView4) }
-    }
+    private val binding by lazy { ViewMainActionsBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private val menu: MenuBuilder by lazy { MenuBuilder(context) }
+    private val buttons by lazy { with(binding) { listOf(button1, button2, button3, button4) } }
+    private val textViews by lazy { with(binding) { listOf(textView1, textView2, textView3, textView4) } }
+    private val menu by lazy { MenuBuilder(context) }
 
     init {
         if (attrs != null) {

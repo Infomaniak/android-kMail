@@ -35,9 +35,7 @@ class SettingRadioButtonView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr), RadioCheckable {
 
-    private val binding: ViewSettingRadioButtonBinding by lazy {
-        ViewSettingRadioButtonBinding.inflate(LayoutInflater.from(context), this, true)
-    }
+    private val binding by lazy { ViewSettingRadioButtonBinding.inflate(LayoutInflater.from(context), this, true) }
 
     override val associatedValue: String?
 

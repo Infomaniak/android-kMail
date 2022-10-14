@@ -51,11 +51,9 @@ import com.google.android.material.R as RMaterial
 
 class IntroFragment : Fragment() {
 
-    private val navigationArgs: IntroFragmentArgs by navArgs()
-
-    private val introViewModel: IntroViewModel by activityViewModels()
-
     private lateinit var binding: FragmentIntroBinding
+    private val navigationArgs: IntroFragmentArgs by navArgs()
+    private val introViewModel: IntroViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root

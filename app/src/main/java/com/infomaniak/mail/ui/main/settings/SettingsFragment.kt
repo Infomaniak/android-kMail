@@ -37,7 +37,8 @@ import kotlinx.coroutines.withContext
 class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
-    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
+
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
         safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId))
