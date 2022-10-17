@@ -33,22 +33,20 @@ object ContactUtils {
         if (!Permissions.hasPermission(context, Manifest.permission.READ_CONTACTS)) return mutableMapOf()
 
         return runCatching {
-            val emails = getListOfEmails(context)
-            if (emails.isEmpty()) return mutableMapOf()
-
-            createMergedContactsForEmailAddresses(context, emails)
+            val emails = context.getLocalEmails()
+            if (emails.isEmpty()) mutableMapOf() else context.getMergedEmailsContacts(emails)
         }.getOrElse { exception ->
             Sentry.captureException(exception)
             mutableMapOf()
         }
     }
 
-    private fun getListOfEmails(context: Context): Map<Long, Set<String>> {
+    private fun Context.getLocalEmails(): Map<Long, Set<String>> {
         val mailDictionary: MutableMap<Long, MutableSet<String>> = mutableMapOf()
         val projection = arrayOf(Email.CONTACT_ID, Email.ADDRESS)
         val contentUri = Email.CONTENT_URI
 
-        (context.contentResolver.query(contentUri, projection, null, null, null) ?: return emptyMap()).use { cursor ->
+        contentResolver.query(contentUri, projection, null, null, null)?.use { cursor ->
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(cursor.getColumnIndexOrThrow(Email.CONTACT_ID))
                 val address = cursor.getString(cursor.getColumnIndexOrThrow(Email.ADDRESS))
@@ -60,21 +58,13 @@ object ContactUtils {
         return mailDictionary
     }
 
-    private fun createMergedContactsForEmailAddresses(
-        context: Context,
+    private fun Context.getMergedEmailsContacts(
         emails: Map<Long, Set<String>>
     ): MutableMap<Recipient, MergedContact> {
         val projection = arrayOf(Contactables.CONTACT_ID, Contactables.DISPLAY_NAME, Contactables.PHOTO_THUMBNAIL_URI)
-        val contactCursor = context.contentResolver.query(
-            Contactables.CONTENT_URI,
-            projection,
-            null,
-            null,
-            null
-        ) ?: return mutableMapOf()
-
         val contacts: MutableMap<Recipient, MergedContact> = mutableMapOf()
-        contactCursor.use { cursor ->
+
+        contentResolver.query(Contactables.CONTENT_URI, projection, null, null, null)?.use { cursor ->
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(cursor.getColumnIndexOrThrow(Contactables.CONTACT_ID))
 
