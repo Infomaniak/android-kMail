@@ -46,7 +46,7 @@ class MainActionsView @JvmOverloads constructor(
 
     private val buttons: List<MaterialButton> by lazy { with(binding) { listOf(button1, button2, button3, button4) } }
     private val textViews: List<TextView> by lazy { with(binding) { listOf(textView1, textView2, textView3, textView4) } }
-    private val menu by lazy { ActionMenuView(context).menu }
+    private val menu: Menu by lazy { ActionMenuView(context).menu }
 
     init {
         if (attrs != null) {
