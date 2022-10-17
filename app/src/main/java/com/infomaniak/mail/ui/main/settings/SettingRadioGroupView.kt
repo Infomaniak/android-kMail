@@ -78,7 +78,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
     }
 
     @Suppress("TypeParameterFindViewById")
-    private fun check(@IdRes viewId: Int) {
+    fun check(@IdRes viewId: Int) {
         if (viewId == checkedId) return
 
         (findViewById(checkedId) as? RadioCheckable)?.uncheck()

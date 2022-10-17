@@ -31,6 +31,41 @@ class UiSettings private constructor(context: Context) {
 
     fun removeUiSettings() = sharedPreferences.transaction { clear() }
 
+    //region Cancel delay
+    var cancelDelay: Int
+        get() = sharedPreferences.getInt(CANCEL_DELAY_KEY, DEFAULT_CANCEL_DELAY)
+        set(value) = sharedPreferences.transaction { putInt(CANCEL_DELAY_KEY, value) }
+    //endregion
+
+    //region Email forwarding
+    private var _emailForwarding: String?
+        get() = getPrivateSetting(::emailForwarding, DEFAULT_EMAIL_FORWARDING)
+        set(value) = setPrivateSetting(::emailForwarding, value)
+
+    var emailForwarding: EmailForwarding
+        get() = getSetting(_emailForwarding, DEFAULT_EMAIL_FORWARDING)
+        set(value) {
+            _emailForwarding = value.name
+        }
+
+    enum class EmailForwarding(@StringRes val localisedNameRes: Int) {
+        IN_BODY(R.string.settingsTransferInBody),
+        AS_ATTACHMENT(R.string.settingsTransferAsAttachment),
+    }
+    //endregion
+
+    //region Include original message in reply
+    var includeMessageInReply: Boolean
+        get() = sharedPreferences.getBoolean(INCLUDE_MESSAGE_IN_REPLY_KEY, DEFAULT_INCLUDE_MESSAGE_IN_REPLY)
+        set(value) = sharedPreferences.transaction { putBoolean(INCLUDE_MESSAGE_IN_REPLY_KEY, value) }
+    //endregion
+
+    //region Include original message in reply
+    var askEmailAcknowledgement: Boolean
+        get() = sharedPreferences.getBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT)
+        set(value) = sharedPreferences.transaction { putBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, value) }
+    //endregion
+
     //region Thread density
     private var _threadDensity: String?
         get() = getPrivateSetting(::threadDensity, DEFAULT_THREAD_DENSITY)
@@ -42,10 +77,10 @@ class UiSettings private constructor(context: Context) {
             _threadDensity = value.name
         }
 
-    enum class ThreadDensity(val apiName: String, @StringRes val localisedNameRes: Int) {
-        COMPACT("high", R.string.settingsDensityOptionCompact),
-        NORMAL("normal", R.string.settingsDensityOptionNormal),
-        LARGE("low", R.string.settingsDensityOptionLarge),
+    enum class ThreadDensity(@StringRes val localisedNameRes: Int) {
+        COMPACT(R.string.settingsDensityOptionCompact),
+        NORMAL(R.string.settingsDensityOptionNormal),
+        LARGE(R.string.settingsDensityOptionLarge),
     }
     //endregion
 
@@ -60,10 +95,10 @@ class UiSettings private constructor(context: Context) {
             _theme = value.name
         }
 
-    enum class Theme(val apiName: String, @StringRes val localisedNameRes: Int, val mode: Int) {
-        SYSTEM("medium", R.string.settingsOptionSystemTheme, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
-        LIGHT("light", R.string.settingsOptionLightTheme, AppCompatDelegate.MODE_NIGHT_NO),
-        DARK("dark", R.string.settingsOptionDarkTheme, AppCompatDelegate.MODE_NIGHT_YES);
+    enum class Theme(@StringRes val localisedNameRes: Int, val mode: Int) {
+        SYSTEM(R.string.settingsOptionSystemTheme, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
+        LIGHT(R.string.settingsOptionLightTheme, AppCompatDelegate.MODE_NIGHT_NO),
+        DARK(R.string.settingsOptionDarkTheme, AppCompatDelegate.MODE_NIGHT_YES);
     }
     //endregion
 
@@ -190,9 +225,9 @@ class UiSettings private constructor(context: Context) {
             _threadMode = value.name
         }
 
-    enum class ThreadMode(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
-        THREADS(1, "on", R.string.settingsOptionDiscussions),
-        MESSAGES(0, "off", R.string.settingsOptionMessages),
+    enum class ThreadMode(val apiCallValue: String, @StringRes val localisedNameRes: Int) {
+        THREADS("on", R.string.settingsOptionDiscussions),
+        MESSAGES("off", R.string.settingsOptionMessages),
     }
     //endregion
 
@@ -207,9 +242,9 @@ class UiSettings private constructor(context: Context) {
             _externalContent = value.name
         }
 
-    enum class ExternalContent(val apiValue: Int, val apiCallValue: String, @StringRes val localisedNameRes: Int) {
-        ALWAYS(1, "true", R.string.settingsOptionAlways),
-        ASK_ME(0, "false", R.string.settingsOptionAskMe),
+    enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int) {
+        ALWAYS("true", R.string.settingsOptionAlways),
+        ASK_ME("false", R.string.settingsOptionAskMe),
     }
     //endregion
 
@@ -226,13 +261,21 @@ class UiSettings private constructor(context: Context) {
     //endregion
 
     companion object {
-        val DEFAULT_ACCENT_COLOR = AccentColor.PINK
-        private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
-        private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
-        private val DEFAULT_THEME = Theme.SYSTEM
-        private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
-        private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
+        private const val DEFAULT_CANCEL_DELAY = 10
+        private val DEFAULT_EMAIL_FORWARDING = EmailForwarding.IN_BODY
+        private const val DEFAULT_INCLUDE_MESSAGE_IN_REPLY = true
+        private const val DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT = false
 
+        private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
+        private val DEFAULT_THEME = Theme.SYSTEM
+        val DEFAULT_ACCENT_COLOR = AccentColor.PINK
+        private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
+        private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
+        private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
+
+        private const val CANCEL_DELAY_KEY = "cancelDelay"
+        private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReply"
+        private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgment"
         @Volatile
         private var INSTANCE: UiSettings? = null
 
