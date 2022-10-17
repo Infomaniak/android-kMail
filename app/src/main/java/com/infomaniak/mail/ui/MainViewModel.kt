@@ -17,7 +17,7 @@
  */
 package com.infomaniak.mail.ui
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
@@ -49,7 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
@@ -129,10 +129,10 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun updateUserInfo(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun updateUserInfo() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "updateUserInfo")
         updateAddressBooks()
-        updateContacts(context)
+        updateContacts()
     }
 
     fun loadCurrentMailbox(threadMode: ThreadMode) {
@@ -207,9 +207,9 @@ class MainViewModel : ViewModel() {
         AddressBookController.update(apiAddressBooks)
     }
 
-    private fun updateContacts(context: Context) {
+    private fun updateContacts() {
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
-        val phoneMergedContacts = getPhoneContacts(context)
+        val phoneMergedContacts = getPhoneContacts(getApplication())
 
         mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
 

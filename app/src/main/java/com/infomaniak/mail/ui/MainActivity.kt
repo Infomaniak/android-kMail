@@ -92,7 +92,7 @@ class MainActivity : ThemedActivity() {
         if (requestPermissionsIsPossible(arrayOf(Manifest.permission.READ_CONTACTS))) {
             contactPermissionResultLauncher =
                 registerForActivityResult(ActivityResultContracts.RequestPermission()) { authorized ->
-                    if (authorized) mainViewModel.updateUserInfo(this)
+                    if (authorized) mainViewModel.updateUserInfo()
                 }
             contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
         }

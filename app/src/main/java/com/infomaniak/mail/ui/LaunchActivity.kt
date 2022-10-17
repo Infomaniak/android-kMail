@@ -50,7 +50,7 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private suspend fun startApp() {
-        mainViewModel.updateUserInfo(this)
+        mainViewModel.updateUserInfo()
         mainViewModel.loadCurrentMailbox(UiSettings.getInstance(this).threadMode)
 
         withContext(Dispatchers.Main) {
