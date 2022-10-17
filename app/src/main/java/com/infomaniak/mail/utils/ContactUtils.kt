@@ -29,6 +29,7 @@ import io.sentry.Sentry
 import io.sentry.android.core.internal.util.Permissions
 
 object ContactUtils {
+
     fun getPhoneContacts(context: Context): MutableMap<Recipient, MergedContact> {
         if (!Permissions.hasPermission(context, Manifest.permission.READ_CONTACTS)) return mutableMapOf()
 
@@ -58,9 +59,7 @@ object ContactUtils {
         return mailDictionary
     }
 
-    private fun Context.getMergedEmailsContacts(
-        emails: Map<Long, Set<String>>
-    ): MutableMap<Recipient, MergedContact> {
+    private fun Context.getMergedEmailsContacts(emails: Map<Long, Set<String>>): MutableMap<Recipient, MergedContact> {
         val projection = arrayOf(Contactables.CONTACT_ID, Contactables.DISPLAY_NAME, Contactables.PHOTO_THUMBNAIL_URI)
         val contacts: MutableMap<Recipient, MergedContact> = mutableMapOf()
 
