@@ -31,7 +31,8 @@ import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
 class ThreadListDensitySettingFragment : Fragment() {
 
     private lateinit var binding: FragmentThreadListDensitySettingBinding
-    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
+
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root

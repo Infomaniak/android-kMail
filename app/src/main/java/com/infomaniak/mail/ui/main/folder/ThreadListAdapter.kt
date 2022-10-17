@@ -33,9 +33,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallback
 import com.google.android.material.card.MaterialCardView
-import com.infomaniak.lib.core.utils.capitalizeFirstChar
-import com.infomaniak.lib.core.utils.format
-import com.infomaniak.lib.core.utils.toPx
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.Recipient
@@ -47,9 +45,11 @@ import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
-import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.RealmChangesBinding
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
+import com.infomaniak.mail.utils.isLastWeek
+import com.infomaniak.mail.utils.setMargins
 import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?

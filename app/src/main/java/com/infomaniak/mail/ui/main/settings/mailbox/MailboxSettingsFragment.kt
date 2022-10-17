@@ -34,8 +34,8 @@ import kotlinx.coroutines.withContext
 
 class MailboxSettingsFragment : Fragment() {
 
-    private val navigationArgs: MailboxSettingsFragmentArgs by navArgs()
     private lateinit var binding: FragmentMailboxSettingsBinding
+    private val navigationArgs: MailboxSettingsFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMailboxSettingsBinding.inflate(inflater, container, false).also { binding = it }.root

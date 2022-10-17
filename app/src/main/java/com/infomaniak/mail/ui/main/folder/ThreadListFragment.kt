@@ -62,12 +62,11 @@ import kotlin.math.max
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
+    private lateinit var binding: FragmentThreadListBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
-    private lateinit var binding: FragmentThreadListBinding
-
-    private val uiSettings: UiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
     private var folderJob: Job? = null
 
     private lateinit var threadListAdapter: ThreadListAdapter

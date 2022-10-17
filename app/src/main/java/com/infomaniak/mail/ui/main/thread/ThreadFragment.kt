@@ -52,12 +52,11 @@ import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
 
+    private lateinit var binding: FragmentThreadBinding
     private val navigationArgs: ThreadFragmentArgs by navArgs()
-
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
-    private lateinit var binding: FragmentThreadBinding
     private var threadAdapter = ThreadAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

@@ -29,7 +29,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 
 open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
 
-    lateinit var binding: BottomSheetReplyBinding
+    private lateinit var binding: BottomSheetReplyBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetReplyBinding.inflate(inflater, container, false).also { binding = it }.root

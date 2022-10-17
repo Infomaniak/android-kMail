@@ -39,12 +39,9 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val binding: ViewBottomQuickActionBarBinding by lazy {
-        ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true)
-    }
-    private val buttons: List<MaterialButton> by lazy {
-        with(binding) { listOf(button1, button2, button3, button4, button5) }
-    }
+    private val binding by lazy { ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private val buttons: List<MaterialButton> by lazy { with(binding) { listOf(button1, button2, button3, button4, button5) } }
     private val menu: MenuBuilder by lazy { MenuBuilder(context) }
 
     init {

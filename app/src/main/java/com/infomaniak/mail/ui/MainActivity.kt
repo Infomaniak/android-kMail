@@ -44,14 +44,14 @@ import io.sentry.SentryLevel
 
 class MainActivity : ThemedActivity() {
 
+    // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
+    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
-
-    val binding: ActivityMainBinding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
     private lateinit var contactPermissionResultLauncher: ActivityResultLauncher<String>
 
-    lateinit var backgroundColor: Color
-    lateinit var backgroundHeaderColor: Color
+    private val backgroundColor: Color by lazy { getColor(R.color.backgroundColor).toColor() }
+    private val backgroundHeaderColor: Color by lazy { getColor(R.color.backgroundHeaderColor).toColor() }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -73,9 +73,6 @@ class MainActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        backgroundColor = getColor(R.color.backgroundColor).toColor()
-        backgroundHeaderColor = getColor(R.color.backgroundHeaderColor).toColor()
 
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         listenToNetworkStatus()
