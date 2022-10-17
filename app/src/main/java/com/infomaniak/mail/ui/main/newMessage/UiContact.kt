@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import com.infomaniak.mail.data.models.Correspondent
-import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.data.models.correspondent.Recipient
 
 data class UiContact(
     val email: String,

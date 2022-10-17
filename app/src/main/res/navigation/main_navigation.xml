@@ -129,7 +129,7 @@
         tools:layout="@layout/bottom_sheet_detailed_contact">
         <argument
             android:name="correspondent"
-            app:argType="com.infomaniak.mail.data.models.Correspondent" />
+            app:argType="com.infomaniak.mail.data.models.correspondent.Correspondent" />
     </dialog>
 
     <dialog
