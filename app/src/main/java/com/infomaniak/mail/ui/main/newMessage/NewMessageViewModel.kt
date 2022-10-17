@@ -35,14 +35,23 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    val mailTo = MutableLiveData<List<UiContact>?>(emptyList())
-    val mailCc = MutableLiveData<List<UiContact>?>(emptyList())
-    val mailBcc = MutableLiveData<List<UiContact>?>(emptyList())
+    var mailFrom = ""
+    var mailTo = emptyList<UiContact>()
+    var mailCc = emptyList<UiContact>()
+    var mailBcc = emptyList<UiContact>()
+    var mailSubject = ""
+    var mailBody = ""
+    var draftHasBeenModified = false
 
+    private var autoSaveJob: Job? = null
+
+    var isAutocompletionOpened = false
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
 
@@ -72,14 +81,12 @@ class NewMessageViewModel : ViewModel() {
 
     private fun MutableRealm.updateLiveData(uuid: String) {
         DraftController.getDraft(uuid, this)?.let { draft ->
-            mailTo.postValue(draft.to.toUiContacts())
-            mailCc.postValue(draft.cc.toUiContacts())
-            mailBcc.postValue(draft.bcc.toUiContacts())
+            mailTo = draft.to.toUiContacts()
+            mailCc = draft.cc.toUiContacts()
+            mailBcc = draft.bcc.toUiContacts()
+            mailSubject = draft.subject
+            mailBody = draft.body
         }
-    }
-
-    fun getDraft(uuid: String): LiveData<Draft?> = liveData(Dispatchers.IO) {
-        emit(DraftController.getDraft(uuid))
     }
 
     fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
@@ -105,6 +112,9 @@ class NewMessageViewModel : ViewModel() {
 
         RealmDatabase.mailboxContent().writeBlocking {
             val draftUuid = currentDraftUuid.value ?: return@writeBlocking
+
+            saveDraft(draftUuid, this)
+
             val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
             if (!draft.hasBeenModified) return@writeBlocking
 
@@ -154,55 +164,78 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun updateDraftFrom(email: String, isDefaultEmail: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.from = realmListOf(Recipient().apply { this.email = email })
-            it.hasBeenModified = !isDefaultEmail
+    fun updateMailFrom(email: String) {
+        if (email != mailFrom) {
+            mailFrom = email
+            autoSaveDraft()
         }
     }
 
-    fun updateDraftTo(to: List<UiContact>) = viewModelScope.launch(Dispatchers.IO) {
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.to = to.toRealmRecipients()
-            it.hasBeenModified = true
+    fun updateMailTo(to: List<UiContact>) {
+        if (to != mailTo) {
+            mailTo = to
+            autoSaveDraft()
         }
     }
 
-    fun updateDraftCc(cc: List<UiContact>) = viewModelScope.launch(Dispatchers.IO) {
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.cc = cc.toRealmRecipients()
-            it.hasBeenModified = true
+    fun updateMailCc(cc: List<UiContact>) {
+        if (cc != mailCc) {
+            mailCc = cc
+            autoSaveDraft()
         }
     }
 
-    fun updateDraftBcc(bcc: List<UiContact>) = viewModelScope.launch(Dispatchers.IO) {
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.bcc = bcc.toRealmRecipients()
-            it.hasBeenModified = true
+    fun updateMailBcc(bcc: List<UiContact>) {
+        if (bcc != mailBcc) {
+            mailBcc = bcc
+            autoSaveDraft()
         }
     }
 
-    fun updateDraftSubject(subject: String) = viewModelScope.launch(Dispatchers.IO) {
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.subject = subject
-            it.hasBeenModified = true
+    fun updateMailSubject(subject: String) {
+        if (subject != mailSubject) {
+            mailSubject = subject
+            autoSaveDraft()
         }
     }
 
-    fun updateDraftBody(body: String) = viewModelScope.launch(Dispatchers.IO) {
-        val draftUuid = currentDraftUuid.value ?: return@launch
-        DraftController.updateDraft(draftUuid) {
-            it.body = body
-            it.hasBeenModified = true
+    fun updateMailBody(body: String) {
+        if (body != mailBody) {
+            mailBody = body
+            autoSaveDraft()
         }
     }
 
-    private fun RealmList<Recipient>.toUiContacts(): List<UiContact> = map { UiContact(it.email, it.getNameOrEmail()) }
+    private fun autoSaveDraft() {
+        draftHasBeenModified = true
+        autoSaveJob?.cancel()
+        autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
+            val draftUuid = currentDraftUuid.value ?: return@launch
+            saveDraft(draftUuid)
+        }
+    }
+
+    private fun saveDraft(draftUuid: String, realm: MutableRealm? = null) {
+        DraftController.updateDraft(draftUuid, realm) {
+            it.from = realmListOf(Recipient().apply { this.email = mailFrom })
+            it.to = mailTo.toRealmRecipients()
+            it.cc = mailCc.toRealmRecipients()
+            it.bcc = mailBcc.toRealmRecipients()
+            it.subject = mailSubject
+            it.body = mailBody
+            it.hasBeenModified = draftHasBeenModified
+        }
+    }
+
+    override fun onCleared() {
+        autoSaveJob?.cancel()
+        super.onCleared()
+    }
+
+    private fun RealmList<Recipient>.toUiContacts(): MutableList<UiContact> {
+        return map { UiContact(it.email, it.getNameOrEmail()) }.toMutableList()
+    }
 
     private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient> {
         return if (isEmpty()) realmListOf() else map {
@@ -211,5 +244,9 @@ class NewMessageViewModel : ViewModel() {
                 name = it.name ?: ""
             }
         }.toRealmList()
+    }
+
+    private companion object {
+        const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
     }
 }

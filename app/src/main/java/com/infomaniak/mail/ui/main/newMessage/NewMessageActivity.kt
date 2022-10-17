@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -46,15 +47,29 @@ class NewMessageActivity : ThemedActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         newMessageViewModel.setupDraft(navigationArgs.draftUuid)
+        handleOnBackPressed()
         setupToolbar()
         setupEditorActions()
         setupEditorFormatActionsToggle()
     }
 
-    private fun setupToolbar() = with(binding) {
-        toolbar.setNavigationOnClickListener {
-            onBackPressed()
+    private fun handleOnBackPressed() {
+        onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
+            if (newMessageViewModel.isAutocompletionOpened) {
+                newMessageFragment.closeAutocompletion()
+            } else {
+                newMessageViewModel.saveMail {
+                    newMessageViewModel.deleteDraft()
+                }
+                finish()
+            }
         }
+    }
+
+    private fun setupToolbar() = with(binding) {
+
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
         toolbar.setOnMenuItemClickListener {
             newMessageViewModel.sendMail { isSuccess ->
                 if (isSuccess) {
@@ -64,14 +79,6 @@ class NewMessageActivity : ThemedActivity() {
             }
             true
         }
-    }
-
-    // This function is called from both NewMessageActivity & NewMessageFragment
-    override fun onBackPressed() {
-        newMessageViewModel.saveMail {
-            newMessageViewModel.deleteDraft()
-        }
-        super.onBackPressed()
     }
 
     private fun setupEditorActions() = with(binding) {
