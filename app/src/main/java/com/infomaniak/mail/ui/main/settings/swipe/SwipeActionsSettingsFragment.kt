@@ -22,6 +22,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
@@ -42,12 +44,26 @@ class SwipeActionsSettingsFragment : Fragment() {
         with(UiSettings.getInstance(requireContext())) {
             swipeRight.setSubtitle(swipeLongRight.nameRes)
             swipeLeft.setSubtitle(swipeLongLeft.nameRes)
+
+            swipeRightIllustration.apply {
+                swipeBackground.setCardBackgroundColor(swipeLongRight.getBackgroundColor(requireContext()))
+                swipeLongRight.iconRes?.let { swipeIcon.setImageResource(it) }
+                swipeIcon.isGone = swipeLongRight.iconRes == null
+                swipeToDefine.isVisible = swipeLongRight.iconRes == null
+            }
+
+            swipeLeftIllustration.apply {
+                swipeBackground.setCardBackgroundColor(swipeLongLeft.getBackgroundColor(requireContext()))
+                swipeLongLeft.iconRes?.let { swipeIcon.setImageResource(it) }
+                swipeIcon.isGone = swipeLongLeft.iconRes == null
+                swipeToDefine.isVisible = swipeLongLeft.iconRes == null
+            }
         }
 
         swipeRight.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongRight) }
         swipeLeft.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongLeft) }
     }
-    
+
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {
         safeNavigate(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
     }
