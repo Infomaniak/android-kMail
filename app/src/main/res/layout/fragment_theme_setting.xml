@@ -23,42 +23,47 @@
     app:title="@string/settingsThemeChoiceTitle"
     tools:context=".ui.main.settings.ThemeSettingFragment">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            style="@style/SettingHeader"
-            android:layout_marginTop="@dimen/marginStandardMedium"
-            android:text="@string/settingsTheme" />
-
-        <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
-            android:id="@+id/radioGroup"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/systemTheme"
+            <TextView
+                style="@style/SettingHeader"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:text="@string/settingsTheme" />
+
+            <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+                android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_theme_system"
-                app:text="@string/settingsOptionSystemTheme" />
+                android:layout_height="wrap_content">
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/lightTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_theme_light"
-                app:text="@string/settingsOptionLightTheme" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/systemTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_theme_system"
+                    app:text="@string/settingsOptionSystemTheme" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/darkTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_theme_dark"
-                app:text="@string/settingsOptionDarkTheme" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/lightTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_theme_light"
+                    app:text="@string/settingsOptionLightTheme" />
 
-        </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
-    </LinearLayout>
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/darkTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_theme_dark"
+                    app:text="@string/settingsOptionDarkTheme" />
+
+            </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>

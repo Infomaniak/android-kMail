@@ -23,76 +23,81 @@
     tools:context=".ui.main.settings.ThemeSettingFragment"
     tools:title="@string/settingsSwipeShortRight">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
-            android:id="@+id/radioGroup"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/delete"
+            <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+                android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/actionDelete" />
+                android:layout_height="wrap_content">
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/archive"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/actionArchive" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionDelete" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/readUnread"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/settingsSwipeActionReadUnread" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/archive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionArchive" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/move"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/actionMove" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/readUnread"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionReadUnread" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/favorite"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/favoritesFolder" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/move"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionMove" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/postpone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/actionPostpone" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/favorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/favoritesFolder" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/spam"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/actionSpam" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/postpone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionPostpone" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/readAndArchive"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/settingsSwipeActionReadAndArchive" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/spam"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionSpam" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/quickActionMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/settingsSwipeActionQuickActionsMenu" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/readAndArchive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionReadAndArchive" />
 
-            <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                android:id="@+id/none"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:text="@string/settingsSwipeActionNone" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/quickActionMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionQuickActionsMenu" />
 
-        </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
-    </LinearLayout>
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/none"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionNone" />
+
+            </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </com.infomaniak.mail.ui.main.menu.SimpleSettingView>

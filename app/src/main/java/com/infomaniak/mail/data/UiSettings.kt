@@ -18,9 +18,7 @@
 package com.infomaniak.mail.data
 
 import android.content.Context
-import androidx.annotation.ColorRes
-import androidx.annotation.StringRes
-import androidx.annotation.StyleRes
+import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
@@ -154,17 +152,22 @@ class UiSettings private constructor(context: Context) {
             _swipeLongLeft = value.name
         }
 
-    enum class SwipeAction(@StringRes val nameRes: Int) {
-        NONE(R.string.settingsSwipeActionNone),
-        ARCHIVE(R.string.actionArchive),
-        DELETE(R.string.actionDelete),
-        FAVORITE(R.string.favoritesFolder),
-        MOVE(R.string.actionMove),
-        POSTPONE(R.string.actionPostpone),
-        QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu),
-        READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive),
-        READ_UNREAD(R.string.settingsSwipeActionReadUnread),
-        SPAM(R.string.actionSpam),
+    enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes private val colorRes: Int, @DrawableRes val iconRes: Int?) {
+        DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin),
+        ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder),
+        READ_UNREAD(R.string.settingsSwipeActionReadUnread, R.color.swipeReadUnread, R.drawable.ic_envelope),
+        MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move),
+        FAVORITE(R.string.favoritesFolder, R.color.swipeFavorite, R.drawable.ic_star),
+        POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock),
+        SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam),
+        READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive, R.color.swipeNone, null), // TODO
+        QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu, R.color.swipeQuickActionMenu, R.drawable.ic_param_dots),
+        NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null);
+
+        @ColorInt
+        fun getBackgroundColor(context: Context): Int {
+            return context.getColor(colorRes)
+        }
     }
 
     fun getSwipeAction(@StringRes nameRes: Int): SwipeAction = when (nameRes) {
