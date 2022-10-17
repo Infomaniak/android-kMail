@@ -21,48 +21,37 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.UiSettings.EmailForwarding
 import com.infomaniak.mail.databinding.FragmentForwardMailsSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
 class ForwardMailsSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentForwardMailsSettingBinding
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentForwardMailsSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setupListeners()
-    }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
+        initTranslationTable(
+            mapOf(
+                R.id.inBody to EmailForwarding.IN_BODY,
+                R.id.asAttachment to EmailForwarding.AS_ATTACHMENT
+            )
+        )
 
-    private fun setupListeners() = with(binding) {
-        settingsTransferInBody.setOnClickListener {
+        check(uiSettings.emailForwarding)
+
+        onItemCheckedListener { _, _, enum ->
+            uiSettings.emailForwarding = (enum as? EmailForwarding) ?: return@onItemCheckedListener
             notYetImplemented()
-            settingsTransferInBodyCheck.selectOption()
         }
-        settingsTransferAsAttachment.setOnClickListener {
-            notYetImplemented()
-            settingsTransferAsAttachmentCheck.selectOption()
-        }
-    }
-
-    private fun ImageView.selectOption() = with(binding) {
-
-        settingsTransferInBodyCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsTransferAsAttachmentCheck.let { if (it != this@selectOption) it.isInvisible = true }
-
-        this@selectOption.isVisible = true
     }
 }

@@ -15,168 +15,77 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.settings.send.CancelDelaySettingFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    app:title="@string/settingsCancellationPeriodTitle"
+    tools:context=".ui.main.settings.send.CancelDelaySettingFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBar"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-            <TextView
-                style="@style/H2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:text="@string/settingsCancellationPeriodTitle" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        style="@style/BackgroundCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:scrollbars="none">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                style="@style/SettingHeader"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:text="@string/settingsCancellationPeriodDescription" />
+
+            <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+                android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsCancellationPeriodDescription" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/disabled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsDisabled"
+                    app:value="0" />
 
-                <LinearLayout
-                    android:id="@+id/settingsDisabled"
-                    style="@style/MenuDrawerItem">
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/seconds10"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:value="10"
+                    tools:text="10 seconds" />
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsDisabled" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/seconds15"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:value="15"
+                    tools:text="15 seconds" />
 
-                    <ImageView
-                        android:id="@+id/settingsDisabledCheck"
-                        style="@style/SettingButtonCheck"
-                        android:visibility="visible" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/seconds20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:value="20"
+                    tools:text="20 seconds" />
 
-                </LinearLayout>
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/seconds25"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:value="25"
+                    tools:text="25 seconds" />
 
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/seconds30"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:value="30"
+                    tools:text="30 seconds" />
 
-                <LinearLayout
-                    android:id="@+id/settingCancel10"
-                    style="@style/MenuDrawerItem">
+            </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>
 
-                    <TextView
-                        android:id="@+id/settingCancel10Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="10 seconds" />
-
-                    <ImageView
-                        android:id="@+id/settingCancel10Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingCancel15"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        android:id="@+id/settingCancel15Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="15 seconds" />
-
-                    <ImageView
-                        android:id="@+id/settingCancel15Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingCancel20"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        android:id="@+id/settingCancel20Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="20 seconds" />
-
-                    <ImageView
-                        android:id="@+id/settingCancel20Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingCancel25"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        android:id="@+id/settingCancel25Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="25 seconds" />
-
-                    <ImageView
-                        android:id="@+id/settingCancel25Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingCancel30"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        android:id="@+id/settingCancel30Text"
-                        style="@style/SettingTextWithButton"
-                        tools:text="30 seconds" />
-
-                    <ImageView
-                        android:id="@+id/settingCancel30Check"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>

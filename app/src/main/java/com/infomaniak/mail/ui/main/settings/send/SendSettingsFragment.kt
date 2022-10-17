@@ -22,14 +22,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
 class SendSettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSendSettingsBinding
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSendSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -37,16 +39,25 @@ class SendSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
+        setInitialState()
         setupListeners()
     }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    private fun setInitialState() = with(binding) {
+        val cancelDelay = uiSettings.cancelDelay
+        val subtitle = if (cancelDelay == 0) {
+            getString(R.string.settingsDisabled)
+        } else {
+            getString(R.string.settingsDelaySeconds, cancelDelay)
+        }
+
+        settingsCancellationPeriod.setSubtitle(subtitle)
+        settingsTransferEmails.setSubtitle(uiSettings.emailForwarding.localisedNameRes)
+        settingsSendIncludeOriginalMessage.isChecked = uiSettings.includeMessageInReply
+        settingsSendAcknowledgement.isChecked = uiSettings.askEmailAcknowledgement
     }
 
     private fun setupListeners() = with(binding) {
-
         settingsCancellationPeriod.setOnClickListener {
             safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToCancelDelaySetting())
         }
@@ -55,10 +66,18 @@ class SendSettingsFragment : Fragment() {
             safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToFordwardMailsSetting())
         }
 
-        settingsSendIncludeOriginalMessage.setOnClickListener { settingsSendIncludeOriginalMessageSwitch.performClick() }
-        settingsSendIncludeOriginalMessageSwitch.setOnClickListener { notYetImplemented() }
+        settingsSendIncludeOriginalMessage.apply {
+            setOnClickListener {
+                uiSettings.includeMessageInReply = isChecked
+                notYetImplemented()
+            }
+        }
 
-        settingsSendAcknowledgement.setOnClickListener { settingsSendAcknowledgementSwitch.performClick() }
-        settingsSendAcknowledgementSwitch.setOnClickListener { notYetImplemented() }
+        settingsSendAcknowledgement.apply {
+            setOnClickListener {
+                uiSettings.askEmailAcknowledgement = isChecked
+                notYetImplemented()
+            }
+        }
     }
 }

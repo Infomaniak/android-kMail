@@ -39,7 +39,7 @@ class ItemSettingView @JvmOverloads constructor(
 
     private var action: Action = Action.NONE
 
-    var state
+    var isChecked
         get() = binding.toggle.isChecked
         set(value) {
             binding.toggle.isChecked = value
@@ -83,6 +83,13 @@ class ItemSettingView @JvmOverloads constructor(
     fun setSubtitle(@StringRes subtitle: Int) {
         binding.subtitle.apply {
             setText(subtitle)
+            isVisible = true
+        }
+    }
+
+    fun setSubtitle(subtitle: String) {
+        binding.subtitle.apply {
+            text = subtitle
             isVisible = true
         }
     }

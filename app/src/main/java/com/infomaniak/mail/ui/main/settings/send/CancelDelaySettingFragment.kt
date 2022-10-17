@@ -21,18 +21,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.databinding.FragmentCancelDelaySettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
 class CancelDelaySettingFragment : Fragment() {
 
     private lateinit var binding: FragmentCancelDelaySettingBinding
+    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentCancelDelaySettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -40,60 +38,36 @@ class CancelDelaySettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setupUi()
-        setupListeners()
+
+        setupNames()
+        checkInitialValue()
+
+        binding.radioGroup.onItemCheckedListener { _, value, _ ->
+            val seconds = value?.toInt() ?: throw NullPointerException("Radio button had no associated value")
+            uiSettings.cancelDelay = seconds
+            notYetImplemented()
+        }
     }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
-
-    private fun setupUi() = with(binding) {
+    private fun setupNames() = with(binding) {
         val resId = R.string.settingsDelaySeconds
-        settingCancel10Text.text = getString(resId, 10)
-        settingCancel15Text.text = getString(resId, 15)
-        settingCancel20Text.text = getString(resId, 20)
-        settingCancel25Text.text = getString(resId, 25)
-        settingCancel30Text.text = getString(resId, 30)
+        seconds10.setText(getString(resId, 10))
+        seconds15.setText(getString(resId, 15))
+        seconds20.setText(getString(resId, 20))
+        seconds25.setText(getString(resId, 25))
+        seconds30.setText(getString(resId, 30))
     }
 
-    private fun setupListeners() = with(binding) {
-        settingsDisabled.setOnClickListener {
-            notYetImplemented()
-            settingsDisabledCheck.selectOption()
-        }
-        settingCancel10.setOnClickListener {
-            notYetImplemented()
-            settingCancel10Check.selectOption()
-        }
-        settingCancel15.setOnClickListener {
-            notYetImplemented()
-            settingCancel15Check.selectOption()
-        }
-        settingCancel20.setOnClickListener {
-            notYetImplemented()
-            settingCancel20Check.selectOption()
-        }
-        settingCancel25.setOnClickListener {
-            notYetImplemented()
-            settingCancel25Check.selectOption()
-        }
-        settingCancel30.setOnClickListener {
-            notYetImplemented()
-            settingCancel30Check.selectOption()
-        }
-    }
-
-    private fun ImageView.selectOption() = with(binding) {
-
-        settingsDisabledCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingCancel10Check.let { if (it != this@selectOption) it.isInvisible = true }
-        settingCancel15Check.let { if (it != this@selectOption) it.isInvisible = true }
-        settingCancel20Check.let { if (it != this@selectOption) it.isInvisible = true }
-        settingCancel25Check.let { if (it != this@selectOption) it.isInvisible = true }
-        settingCancel30Check.let { if (it != this@selectOption) it.isInvisible = true }
-
-        this@selectOption.isVisible = true
+    private fun checkInitialValue() = with(binding.radioGroup) {
+        check(
+            when (uiSettings.cancelDelay) {
+                10 -> R.id.seconds10
+                15 -> R.id.seconds15
+                20 -> R.id.seconds20
+                25 -> R.id.seconds25
+                30 -> R.id.seconds30
+                else -> R.id.disabled
+            }
+        )
     }
 }

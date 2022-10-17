@@ -200,7 +200,11 @@
             app:destination="@id/mailboxSettingsFragment" />
         <action
             android:id="@+id/action_settings_to_sendSettings"
-            app:destination="@id/sendSettingsFragment" />
+            app:destination="@id/sendSettingsFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
         <action
             android:id="@+id/action_settings_to_threadListDensitySetting"
             app:destination="@id/threadListDensitySettingFragment"
@@ -319,10 +323,18 @@
         tools:layout="@layout/fragment_send_settings">
         <action
             android:id="@+id/action_sendSettings_to_cancelDelaySetting"
-            app:destination="@id/cancelDelaySettingFragment" />
+            app:destination="@id/cancelDelaySettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
         <action
             android:id="@+id/action_sendSettings_to_fordwardMailsSetting"
-            app:destination="@id/forwardMailsSettingFragment" />
+            app:destination="@id/forwardMailsSettingFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
     </fragment>
 
     <fragment

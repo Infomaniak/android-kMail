@@ -69,4 +69,8 @@ class SettingRadioButtonView @JvmOverloads constructor(
     override fun uncheck() {
         binding.checkMark.isGone = true
     }
+
+    fun setText(newText: String) {
+        binding.text.text = newText
+    }
 }
