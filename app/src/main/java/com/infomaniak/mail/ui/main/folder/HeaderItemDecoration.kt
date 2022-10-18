@@ -224,6 +224,6 @@ class HeaderItemDecoration(
     }
 
     private companion object {
-        const val TAG = "HeaderItemDecoration"
+        val TAG = HeaderItemDecoration::class.simpleName
     }
 }
