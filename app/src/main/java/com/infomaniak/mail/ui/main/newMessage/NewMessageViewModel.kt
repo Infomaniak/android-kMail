@@ -47,7 +47,6 @@ class NewMessageViewModel : ViewModel() {
     var mailBcc = emptyList<UiContact>()
     var mailSubject = ""
     var mailBody = ""
-    var draftHasBeenModified = false
 
     private var autoSaveJob: Job? = null
 
@@ -116,7 +115,6 @@ class NewMessageViewModel : ViewModel() {
             saveDraft(draftUuid, this)
 
             val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
-            if (!draft.hasBeenModified) return@writeBlocking
 
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
             draft.identityId = signature.data?.defaultSignatureId
@@ -144,7 +142,7 @@ class NewMessageViewModel : ViewModel() {
         RealmDatabase.mailboxContent().writeBlocking {
             val draftUuid = currentDraftUuid.value ?: return@writeBlocking
             val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
-            if (!draft.hasBeenModified || draft.to.isEmpty()) return@writeBlocking
+            if (draft.to.isEmpty()) return@writeBlocking
 
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
             draft.identityId = signature.data?.defaultSignatureId
@@ -207,7 +205,6 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun autoSaveDraft() {
-        draftHasBeenModified = true
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
@@ -224,7 +221,6 @@ class NewMessageViewModel : ViewModel() {
             it.bcc = mailBcc.toRealmRecipients()
             it.subject = mailSubject
             it.body = mailBody
-            it.hasBeenModified = draftHasBeenModified
         }
     }
 
