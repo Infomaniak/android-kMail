@@ -146,6 +146,7 @@ class NewMessageViewModel : ViewModel() {
             draft.bcc = mailBcc.toRealmList()
             draft.subject = mailSubject
             draft.body = mailBody
+            draft.mimeType = "text/html"
             identityId?.let { draft.identityId = it }
             action?.let { draft.action = it }
         }
