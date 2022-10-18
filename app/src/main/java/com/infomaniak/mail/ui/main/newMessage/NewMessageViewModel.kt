@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.MergedContact
@@ -29,9 +30,11 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Priority
+import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +56,7 @@ class NewMessageViewModel : ViewModel() {
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
 
-    // Boolean : for toggleable actions, false if the formatting has been removed and true if the formatting has been applied
+    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     val currentDraftUuid = MutableLiveData<String?>()
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
@@ -74,16 +77,18 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun configureDraft(draftUuid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val uuid = RealmDatabase.mailboxContent().writeBlocking {
-            return@writeBlocking if (draftUuid == null) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val uuid = if (draftUuid == null) {
                 createDraft()
             } else {
                 updateLiveData(draftUuid)
                 draftUuid
             }
-        }
 
-        currentDraftUuid.postValue(uuid)
+            setDraftSignature(uuid)
+
+            currentDraftUuid.postValue(uuid)
+        }
     }
 
     private fun MutableRealm.createDraft(): String {
@@ -99,6 +104,38 @@ class NewMessageViewModel : ViewModel() {
             mailBcc.addAll(draft.bcc.toRecipientsList())
             mailSubject = draft.subject
             mailBody = draft.body
+        }
+    }
+
+    private fun MutableRealm.setDraftSignature(draftUuid: String) {
+        DraftController.updateDraft(draftUuid, this) { draft ->
+
+            if (draft.identityId != null) return@updateDraft
+
+            val signatures = SignatureController.getSignatures(this)
+            val defaultSignature = signatures.firstOrNull { it.isDefault } ?: return@updateDraft
+
+            draft.mimeType = "text/html"
+
+            draft.identityId = defaultSignature.id
+
+            draft.from = realmListOf(Recipient().apply {
+                this.email = defaultSignature.sender
+                this.name = defaultSignature.fullName
+            })
+
+            draft.replyTo = realmListOf(Recipient().apply {
+                this.email = defaultSignature.replyTo
+                this.name = ""
+            })
+
+            val html = "<br><br><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+            val body = when (defaultSignature.position) {
+                SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
+                else -> html + draft.body
+            }
+            draft.body = body
+            mailBody = body
         }
     }
 
@@ -146,7 +183,6 @@ class NewMessageViewModel : ViewModel() {
             draft.bcc = mailBcc.toRealmList()
             draft.subject = mailSubject
             draft.body = mailBody
-            draft.mimeType = "text/html"
             identityId?.let { draft.identityId = it }
             action?.let { draft.action = it }
         }
