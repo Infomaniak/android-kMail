@@ -27,7 +27,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Correspondent
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 
 class AvatarView @JvmOverloads constructor(

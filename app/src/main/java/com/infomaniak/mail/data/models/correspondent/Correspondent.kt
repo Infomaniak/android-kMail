@@ -15,16 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.correspondent
 
-import io.realm.kotlin.types.EmbeddedRealmObject
-import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
+import android.content.Context
+import android.os.Parcelable
+import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.AccountUtils
 
-@Parcelize
-@Serializable
-@Suppress("PROPERTY_WONT_BE_SERIALIZED")
-class Recipient : EmbeddedRealmObject, Correspondent {
-    override var email: String = ""
-    override var name: String = ""
+interface Correspondent : Parcelable {
+    var email: String
+    var name: String
+
+    fun isMe(): Boolean = AccountUtils.currentUser?.email == this.email
+
+    fun getNameOrEmail(): String = name.ifBlank { email }
+
+    fun displayedName(context: Context): String = if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
 }

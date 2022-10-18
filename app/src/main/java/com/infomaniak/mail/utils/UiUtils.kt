@@ -24,7 +24,7 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.view.isGone
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Correspondent
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 
 object UiUtils {
 

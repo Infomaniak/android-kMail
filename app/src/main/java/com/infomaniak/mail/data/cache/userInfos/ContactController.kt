@@ -20,7 +20,7 @@ package com.infomaniak.mail.data.cache.userInfos
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.RealmDatabase.update
-import com.infomaniak.mail.data.models.Contact
+import com.infomaniak.mail.data.models.correspondent.Contact
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
