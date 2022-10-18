@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.UiSettings.ThreadDensity.*
@@ -40,18 +39,19 @@ class ThreadListDensitySettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
-        setupBack()
+        initUi()
     }
 
-    private fun setupUi() = with(binding) {
+    private fun initUi() = with(binding) {
         val (checkedButtonId, resId) = getCheckedButtonFromDensity()
         listDensityButtonsGroup.check(checkedButtonId)
         listDensityImage.setImageResource(resId)
     }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    private fun getCheckedButtonFromDensity() = when (uiSettings.threadDensity) {
+        COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
+        LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
+        else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default
     }
 
     override fun onResume() {
@@ -67,12 +67,6 @@ class ThreadListDensitySettingFragment : Fragment() {
             uiSettings.threadDensity = listDensity
             listDensityImage.setImageResource(resId)
         }
-    }
-
-    private fun getCheckedButtonFromDensity() = when (uiSettings.threadDensity) {
-        COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
-        LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
-        else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default
     }
 
     private fun getDensityFromCheckedButton(buttonId: Int) = when (buttonId) {
