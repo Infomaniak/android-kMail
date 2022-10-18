@@ -159,10 +159,9 @@ class MenuDrawerFragment : Fragment() {
         mainViewModel.listenToMailboxes().observe(viewLifecycleOwner) { mailboxes ->
             val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
             addressAdapter.setMailboxes(sortedMailboxes)
-            if (sortedMailboxes.isEmpty()) {
-                addressesList.isGone = true
-                addressesListDivider.isGone = true
-            }
+            val isEmpty = sortedMailboxes.isEmpty()
+            addressesList.isGone = isEmpty
+            addressesListDivider.isGone = isEmpty
         }
     }
 

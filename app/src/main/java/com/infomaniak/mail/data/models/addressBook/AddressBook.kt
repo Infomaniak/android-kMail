@@ -33,7 +33,6 @@ class AddressBook : RealmObject {
     @SerialName("user_id")
     var userId: Int = 0
     var name: String = ""
-    var rights: String = ""
     @SerialName("principal_uri")
     var principalUri: String = ""
     var description: String = ""
