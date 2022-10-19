@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.draft
 
+import com.infomaniak.mail.data.models.Attachment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
