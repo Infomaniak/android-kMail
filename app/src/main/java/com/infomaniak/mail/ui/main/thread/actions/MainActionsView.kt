@@ -24,9 +24,9 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.MotionEvent
+import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.get
 import androidx.core.view.isInvisible
@@ -46,7 +46,7 @@ class MainActionsView @JvmOverloads constructor(
 
     private val buttons: List<MaterialButton> by lazy { with(binding) { listOf(button1, button2, button3, button4) } }
     private val textViews: List<TextView> by lazy { with(binding) { listOf(textView1, textView2, textView3, textView4) } }
-    private val menu: MenuBuilder by lazy { MenuBuilder(context) }
+    private val menu: Menu by lazy { ActionMenuView(context).menu }
 
     init {
         if (attrs != null) {
