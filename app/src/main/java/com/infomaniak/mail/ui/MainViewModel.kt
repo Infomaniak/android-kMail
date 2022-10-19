@@ -29,9 +29,9 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
-import com.infomaniak.mail.data.cache.userInfos.AddressBookController
-import com.infomaniak.mail.data.cache.userInfos.ContactController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.userInfo.AddressBookController
+import com.infomaniak.mail.data.cache.userInfo.ContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
