@@ -35,21 +35,18 @@ import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallb
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.UiSettings.ThreadDensity
 import com.infomaniak.mail.data.UiSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.UiSettings.ThreadDensity.LARGE
+import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
-import com.infomaniak.mail.utils.RealmChangesBinding
-import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import com.infomaniak.mail.utils.isLastWeek
-import com.infomaniak.mail.utils.setMargins
 import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
@@ -89,12 +86,16 @@ class ThreadListAdapter(
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() is Unit && holder.itemViewType == DisplayType.THREAD.layout) {
-            (holder.binding as CardviewThreadItemBinding).apply {
-                expeditorAvatar.loadAvatar((dataSet[position] as Thread).from.first(), contacts)
+            with(holder.binding as CardviewThreadItemBinding) {
+                getDisplayedRecipient((dataSet[position] as Thread))?.let { expeditorAvatar.loadAvatar(it, contacts) }
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
+    }
+
+    private fun getDisplayedRecipient(thread: Thread): Recipient? {
+        return thread.messages.lastOrNull()?.from?.firstOrNull()
     }
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding) {
@@ -121,11 +122,10 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
 
-        val firstFrom = from.first()
-        fillInUserNameAndEmail(firstFrom, expeditor)
+        expeditor.text = formatExpeditorNames(context)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
-        expeditorAvatar.loadAvatar(firstFrom, contacts)
+        getDisplayedRecipient(this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
 
         mailDate.text = formatDate(root.context)
 
@@ -143,6 +143,19 @@ class ThreadListAdapter(
         expeditorAvatar.isVisible = threadDensity == LARGE
         mailBodyPreview.isGone = threadDensity == COMPACT
         mailSubject.setMargins(top = if (threadDensity == COMPACT) 0 else 4.toPx())
+    }
+
+    private fun Thread.formatExpeditorNames(context: Context): String {
+        return if (from.count() == 1) {
+            from.first().displayedName(context)
+        } else {
+            from.joinToString(", ") {
+                with(it.displayedName(context)) {
+                    val delimiter = if (isEmail()) "@" else " "
+                    substringBefore(delimiter)
+                }
+            }
+        }
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {

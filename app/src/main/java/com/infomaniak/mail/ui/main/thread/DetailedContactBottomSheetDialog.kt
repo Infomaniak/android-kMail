@@ -33,7 +33,7 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetDetailedContactBinding
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
-    private val viewModel: MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -42,8 +42,7 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recipient = navigationArgs.recipient
-        userAvatar.loadAvatar(recipient, viewModel.mergedContacts.value ?: emptyMap())
+        userAvatar.loadAvatar(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
         fillInUserNameAndEmail(navigationArgs.recipient, name, email)
 
         writeMail.setOnClickListener { notYetImplemented() }
@@ -54,9 +53,8 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun listenToContacts() {
-        viewModel.mergedContacts.observe(viewLifecycleOwner) {
-            val recipient = navigationArgs.recipient
-            binding.userAvatar.loadAvatar(recipient, it ?: emptyMap())
+        mainViewModel.mergedContacts.observe(viewLifecycleOwner) {
+            binding.userAvatar.loadAvatar(navigationArgs.recipient, it ?: emptyMap())
         }
     }
 }

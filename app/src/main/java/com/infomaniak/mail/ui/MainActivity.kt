@@ -22,7 +22,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.graphics.toColor
@@ -47,7 +46,10 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private lateinit var contactPermissionResultLauncher: ActivityResultLauncher<String>
+    private var contactPermissionResultLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) mainViewModel.updateUserInfo()
+        }
 
     private val backgroundColor: Color by lazy { getColor(R.color.backgroundColor).toColor() }
     private val backgroundHeaderColor: Color by lazy { getColor(R.color.backgroundHeaderColor).toColor() }
@@ -84,14 +86,6 @@ class MainActivity : ThemedActivity() {
         requestContactsPermission()
     }
 
-    private fun requestContactsPermission() {
-        contactPermissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) mainViewModel.updateUserInfo()
-        }
-
-        contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
-    }
-
     private fun listenToNetworkStatus() {
         LiveDataNetworkStatus(this).observe(this) { isAvailable ->
             Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
@@ -111,6 +105,30 @@ class MainActivity : ThemedActivity() {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment)
             .navController
             .addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
+    }
+
+    private fun setupMenuDrawerCallbacks() = with(binding) {
+        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.apply {
+            exitDrawer = { drawerLayout.close() }
+            isDrawerOpen = { drawerLayout.isOpen }
+        }
+    }
+
+    private fun requestContactsPermission() {
+        contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
+    }
+
+    override fun onDestroy() {
+        binding.drawerLayout.removeDrawerListener(drawerListener)
+        super.onDestroy()
+    }
+
+    override fun onBackPressed(): Unit = with(binding) {
+        if (drawerLayout.isOpen) {
+            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     private fun onDestinationChanged(destination: NavDestination) {
@@ -146,27 +164,7 @@ class MainActivity : ThemedActivity() {
         // }
     }
 
-    override fun onBackPressed(): Unit = with(binding) {
-        if (drawerLayout.isOpen) {
-            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    private fun setupMenuDrawerCallbacks() = with(binding) {
-        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.apply {
-            exitDrawer = { drawerLayout.close() }
-            isDrawerOpen = { drawerLayout.isOpen }
-        }
-    }
-
     private fun setDrawerLockMode(isUnlocked: Boolean) {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
-    }
-
-    override fun onDestroy() {
-        binding.drawerLayout.removeDrawerListener(drawerListener)
-        super.onDestroy()
     }
 }
