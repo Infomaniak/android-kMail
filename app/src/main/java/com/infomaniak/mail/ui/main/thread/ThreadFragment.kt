@@ -45,7 +45,6 @@ import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -68,8 +67,7 @@ class ThreadFragment : Fragment() {
         setupUi()
         setupAdapter()
         mainViewModel.openThread(navigationArgs.threadUid)
-        observeMessages()
-        observeThread()
+        bindMessages()
     }
 
     private fun setupUi() = with(binding) {
@@ -160,14 +158,8 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeThread() {
-        threadViewModel.listenToThread(navigationArgs.threadUid).observeNotNull(viewLifecycleOwner) { thread ->
-            threadViewModel.thread.value = thread
-        }
-    }
-
-    private fun observeMessages() {
-        threadViewModel.messages.bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+    private fun bindMessages() {
+        threadViewModel.messages(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
         }

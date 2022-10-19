@@ -19,21 +19,16 @@ package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.toSharedFlow
+import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    val thread = MutableLiveData<Thread>()
-    val messages = Transformations.switchMap(thread) {
-        liveData(Dispatchers.IO) { emitSource(it.messages.asFlow().toSharedFlow().asLiveData()) }
-    }
-
-    fun listenToThread(uid: String): LiveData<Thread?> = liveData(Dispatchers.IO) {
-        emitSource(ThreadController.getThreadAsync(uid).mapNotNull { it.obj }.asLiveData())
+    fun messages(threadUid: String): LiveData<ListChange<Message>> = liveData(Dispatchers.IO) {
+        ThreadController.getThread(threadUid)?.let { emitSource(it.messages.asFlow().toSharedFlow().asLiveData()) }
     }
 
     fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }
