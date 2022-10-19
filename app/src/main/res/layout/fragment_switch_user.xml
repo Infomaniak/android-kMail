@@ -54,7 +54,7 @@
             android:textAllCaps="false"
             app:icon="@drawable/ic_add"
             app:iconGravity="start"
-            app:iconPadding="8dp"
+            app:iconPadding="@dimen/marginStandardSmall"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
