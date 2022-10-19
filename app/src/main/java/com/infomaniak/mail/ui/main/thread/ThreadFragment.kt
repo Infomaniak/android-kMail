@@ -176,7 +176,7 @@ class ThreadFragment : Fragment() {
         // TODO: When opening a Thread via a Notification, the action of leaving this fragment
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
         // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
-        findNavController().popBackStack(R.id.threadListFragment, inclusive = false)
+        findNavController().popBackStack()
     }
 
     private companion object {
