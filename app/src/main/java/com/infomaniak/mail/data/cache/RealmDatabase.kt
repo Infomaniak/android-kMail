@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.data.cache
 
+import android.content.Context
+import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.correspondent.Contact
@@ -78,12 +80,6 @@ object RealmDatabase {
         }
     }
 
-    private const val appSettingsDbName = "AppSettings.realm"
-    fun userInfosDbName(userId: Int) = "User-${userId}.realm"
-    private const val mailboxInfosDbName = "MailboxInfos.realm"
-    fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"
-    private fun mailboxContentDbName(userId: Int, mailboxId: Int) = "${mailboxContentDbNamePrefix(userId)}${mailboxId}.realm"
-
     inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
         writeBlocking {
             delete(query<T>())
@@ -94,10 +90,6 @@ object RealmDatabase {
     // TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
     fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
         items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
-    }
-
-    fun deleteMailboxContent(mailboxId: Int) {
-        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
     }
 
     fun close() {
@@ -127,34 +119,61 @@ object RealmDatabase {
         _mailboxContent = null
     }
 
+    fun deleteMailboxContent(mailboxId: Int) {
+        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
+    }
+
+    fun removeUserData(context: Context, userId: Int) {
+        closeMailboxContent()
+        closeUserInfos()
+        mailboxInfos().writeBlocking { delete(MailboxController.getMailboxes(userId, this)) }
+        deleteUserFiles(context, userId)
+    }
+
+    private fun deleteUserFiles(context: Context, userId: Int) {
+        context.filesDir.listFiles()?.forEach { file ->
+            val isMailboxContent = file.name.startsWith(RealmConfig.mailboxContentDbNamePrefix(userId))
+            val isUserInfos = file.name.startsWith(RealmConfig.userInfosDbName(userId))
+            if (isMailboxContent || isUserInfos) {
+                if (file.isDirectory) file.deleteRecursively() else file.delete()
+            }
+        }
+    }
+
     private object RealmConfig {
+
+        private const val appSettingsDbName = "AppSettings.realm"
+        fun userInfosDbName(userId: Int) = "User-${userId}.realm"
+        private const val mailboxInfosDbName = "MailboxInfos.realm"
+        fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"
+        private fun mailboxContentDbName(userId: Int, mailboxId: Int) = "${mailboxContentDbNamePrefix(userId)}${mailboxId}.realm"
 
         val appSettings =
             RealmConfiguration
                 .Builder(RealmSets.appSettings)
                 .name(appSettingsDbName)
-                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         val userInfos
             get() = RealmConfiguration
                 .Builder(RealmSets.userInfos)
                 .name(userInfosDbName(AccountUtils.currentUserId))
-                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         val mailboxInfos =
             RealmConfiguration
                 .Builder(RealmSets.mailboxInfos)
                 .name(mailboxInfosDbName)
-                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         fun mailboxContent(mailboxId: Int) =
             RealmConfiguration
                 .Builder(RealmSets.mailboxContent)
                 .name(mailboxContentDbName(AccountUtils.currentUserId, mailboxId))
-                // .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
+                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
         private object RealmSets {

@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
@@ -32,7 +31,6 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
@@ -114,32 +112,14 @@ object AccountUtils : CredentialManager {
     }
 
     suspend fun removeUser(context: Context, user: User) {
+
         userDatabase.userDao().delete(user)
-        removeUserRealmData(context, user.id)
+        RealmDatabase.removeUserData(context, user.id)
 
         if (currentUserId == user.id) {
             requestCurrentUser()
-
-            resetApp(context)
+            if (getAllUserCount() == 0) AppSettingsController.removeAppSettings()
             withContext(Dispatchers.Main) { reloadApp?.invoke() }
-        }
-    }
-
-    private fun removeUserRealmData(context: Context, userId: Int) {
-        RealmDatabase.mailboxInfos().writeBlocking {
-            val mailboxes = MailboxController.getMailboxes(userId, this)
-            delete(mailboxes)
-        }
-
-        RealmDatabase.closeMailboxContent()
-        RealmDatabase.closeUserInfos()
-
-        context.filesDir.listFiles()?.forEach { file ->
-            val isMailboxContent = file.name.startsWith(RealmDatabase.mailboxContentDbNamePrefix(userId))
-            val isUserInfos = file.name.startsWith(RealmDatabase.userInfosDbName(userId))
-            if (isMailboxContent || isUserInfos) {
-                if (file.isDirectory) file.deleteRecursively() else file.delete()
-            }
         }
     }
 
@@ -195,18 +175,4 @@ object AccountUtils : CredentialManager {
     }
 
     suspend fun getUserById(id: Int): User? = userDatabase.userDao().findById(id)
-
-    private fun resetApp(context: Context) {
-        if (getAllUserCount() == 0) {
-            AppSettingsController.removeAppSettings()
-            // UiSettings(context).removeUiSettings() // TODO?
-
-            // Delete all app data
-            with(context) {
-                filesDir.deleteRecursively()
-                cacheDir.deleteRecursively()
-            }
-            Log.i("AccountUtils", "resetApp> all user data has been deleted")
-        }
-    }
 }
