@@ -17,13 +17,16 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
@@ -37,6 +40,7 @@ class ManageMailAddressFragment : Fragment() {
 
     private lateinit var binding: FragmentManageMailAddressBinding
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -57,8 +61,12 @@ class ManageMailAddressFragment : Fragment() {
 
     private fun logout() {
         mainViewModel.resetAllCurrentLiveData()
-        lifecycleScope.launch(Dispatchers.IO) {
-            AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
+        manageMailAddressViewModel.removeCurrentUser()
+    }
+
+    class ManageMailAddressViewModel(application: Application) : AndroidViewModel(application) {
+        fun removeCurrentUser() = viewModelScope.launch(Dispatchers.IO) {
+            AccountUtils.removeUser(getApplication(), AccountUtils.currentUser!!)
         }
     }
 }
