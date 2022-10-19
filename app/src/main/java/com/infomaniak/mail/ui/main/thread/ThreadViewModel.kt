@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.Dispatchers
@@ -28,12 +27,8 @@ import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    fun getThread(uid: String): LiveData<Thread?> = liveData(Dispatchers.IO) {
-        emit(ThreadController.getThread(uid))
-    }
-
-    fun listenToMessages(thread: Thread): LiveData<ListChange<Message>> = liveData(Dispatchers.IO) {
-        emitSource(thread.messages.asFlow().toSharedFlow().asLiveData())
+    fun messages(threadUid: String): LiveData<ListChange<Message>> = liveData(Dispatchers.IO) {
+        ThreadController.getThread(threadUid)?.let { emitSource(it.messages.asFlow().toSharedFlow().asLiveData()) }
     }
 
     fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }
