@@ -28,7 +28,7 @@ object DraftController {
 
     //region Queries
     private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
+        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
     }
     //endregion
 
@@ -40,7 +40,7 @@ object DraftController {
 
     //region Edit data
     fun upsertDraft(draft: Draft) {
-        RealmDatabase.mailboxContent.writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
+        RealmDatabase.mailboxContent().writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
     }
     //endregion
 }

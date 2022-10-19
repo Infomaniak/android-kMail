@@ -34,6 +34,10 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Suppress("ObjectPropertyName")
 object RealmDatabase {
@@ -45,21 +49,34 @@ object RealmDatabase {
     private var _mailboxInfos: Realm? = null
     private var _mailboxContent: Realm? = null
 
-    val appSettings: Realm
-        get() = _appSettings
-            ?: Realm.open(RealmConfigurations.appSettings).also { _appSettings = it }
+    private val appSettingsMutex = Mutex()
+    private val userInfosMutex = Mutex()
+    private val mailboxInfosMutex = Mutex()
+    private val mailboxContentMutex = Mutex()
 
-    val userInfos
-        get() = _userInfos
-            ?: Realm.open(RealmConfigurations.userInfos).also { _userInfos = it }
+    fun appSettings(): Realm = runBlocking(Dispatchers.IO) {
+        appSettingsMutex.withLock {
+            _appSettings ?: Realm.open(RealmConfig.appSettings).also { _appSettings = it }
+        }
+    }
 
-    val mailboxInfos
-        get() = _mailboxInfos
-            ?: Realm.open(RealmConfigurations.mailboxInfos).also { _mailboxInfos = it }
+    fun userInfos(): Realm = runBlocking(Dispatchers.IO) {
+        userInfosMutex.withLock {
+            _userInfos ?: Realm.open(RealmConfig.userInfos).also { _userInfos = it }
+        }
+    }
 
-    val mailboxContent
-        get() = _mailboxContent
-            ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
+    fun mailboxInfos(): Realm = runBlocking(Dispatchers.IO) {
+        mailboxInfosMutex.withLock {
+            _mailboxInfos ?: Realm.open(RealmConfig.mailboxInfos).also { _mailboxInfos = it }
+        }
+    }
+
+    fun mailboxContent(): Realm = runBlocking(Dispatchers.IO) {
+        mailboxContentMutex.withLock {
+            _mailboxContent ?: Realm.open(RealmConfig.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
+        }
+    }
 
     inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
         writeBlocking {
@@ -74,7 +91,7 @@ object RealmDatabase {
     }
 
     fun deleteMailboxContent(mailboxId: Int) {
-        Realm.deleteRealm(RealmConfigurations.mailboxContent(mailboxId))
+        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
     }
 
     fun close() {
@@ -104,7 +121,7 @@ object RealmDatabase {
         _mailboxContent = null
     }
 
-    private object RealmConfigurations {
+    private object RealmConfig {
 
         private const val appSettingsDbName = "AppSettings.realm"
         private val userInfosDbName get() = "User-${AccountUtils.currentUserId}.realm"

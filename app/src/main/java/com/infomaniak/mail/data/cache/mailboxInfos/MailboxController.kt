@@ -41,26 +41,26 @@ object MailboxController {
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} = '$userId'"
 
     private fun MutableRealm?.getMailboxesQuery(): RealmQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>().sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
+        return (this ?: RealmDatabase.mailboxInfos()).query<Mailbox>().sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
     }
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int): RealmQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>(checkHasUserId(userId))
+        return (this ?: RealmDatabase.mailboxInfos()).query<Mailbox>(checkHasUserId(userId))
             .sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
     }
 
     private fun MutableRealm?.getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>): RealmQuery<Mailbox> {
         val checkIsNotInExceptions = "NOT ${Mailbox::mailboxId.name} IN {${exceptionMailboxIds.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
+        return (this ?: RealmDatabase.mailboxInfos()).query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
     }
 
     private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
-        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${Mailbox::objectId.name} = '$objectId'").first()
+        return (this ?: RealmDatabase.mailboxInfos()).query<Mailbox>("${Mailbox::objectId.name} = '$objectId'").first()
     }
 
     private fun MutableRealm?.getMailboxQuery(userId: Int, mailboxId: Int): RealmSingleQuery<Mailbox> {
         val checkMailboxId = "${Mailbox::mailboxId.name} = '$mailboxId'"
-        return (this ?: RealmDatabase.mailboxInfos).query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
+        return (this ?: RealmDatabase.mailboxInfos()).query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
     }
     //endregion
 
@@ -101,7 +101,7 @@ object MailboxController {
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
         val localQuotas = getMailboxes(userId).associate { it.objectId to it.quotas }
 
-        val isCurrentMailboxDeleted = RealmDatabase.mailboxInfos.writeBlocking {
+        val isCurrentMailboxDeleted = RealmDatabase.mailboxInfos().writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
             upsertMailboxes(localQuotas, apiMailboxes)
@@ -133,7 +133,7 @@ object MailboxController {
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-        RealmDatabase.mailboxInfos.writeBlocking { getMailbox(objectId, this)?.let(onUpdate) }
+        RealmDatabase.mailboxInfos().writeBlocking { getMailbox(objectId, this)?.let(onUpdate) }
     }
     //endregion
 }
