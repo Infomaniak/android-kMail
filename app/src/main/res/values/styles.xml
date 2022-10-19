@@ -145,13 +145,15 @@
     </style>
 
     <style name="EditorIconButton" parent="IconButton">
-        <item name="cornerRadius">0dp</item>
-        <item name="iconSize">20dp</item>
-        <item name="textAllCaps">false</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textColor">@color/title</item>
         <item name="android:textSize">10sp</item>
-        <item name="android:letterSpacing">0</item>
-        <item name="rippleColor">?attr/colorControlHighlight</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="layout_constraintWidth_max">80dp</item>
+        <item name="rippleColor">?android:attr/colorControlHighlight</item>
+        <item name="textAllCaps">false</item>
     </style>
 
 
@@ -355,6 +357,17 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+
+    <!-- Default styles -->
+
+    <style name="ToggleableTextFormatterItemView">
+        <item name="backgroundColor">@android:color/transparent</item>
+        <item name="iconColor">@color/iconColor</item>
+        <item name="selectedBackgroundColor">@color/iconColor</item>
+        <item name="selectedIconColor">@color/backgroundCardview</item>
+    </style>
+
+
     <!-- Other -->
 
     <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
@@ -380,6 +393,11 @@
     <style name="CircleImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="EditorIconRoundedBackground">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">5dp</item>
     </style>
 
 </resources>
