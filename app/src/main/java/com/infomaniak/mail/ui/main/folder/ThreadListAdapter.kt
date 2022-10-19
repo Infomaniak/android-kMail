@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.UiSettings.ThreadDensity
 import com.infomaniak.mail.data.UiSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.UiSettings.ThreadDensity.LARGE
 import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding

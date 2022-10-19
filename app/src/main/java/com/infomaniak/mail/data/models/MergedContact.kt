@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
+import com.infomaniak.mail.data.models.correspondent.Correspondent
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize

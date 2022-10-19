@@ -45,7 +45,6 @@ import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -67,8 +66,8 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        observeMessages()
-        observeThread()
+        mainViewModel.openThread(navigationArgs.threadUid)
+        bindMessages()
         listenToContacts()
     }
 
@@ -161,15 +160,8 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeThread() {
-        threadViewModel.listenToThread(navigationArgs.threadUid).observeNotNull(viewLifecycleOwner) { thread ->
-            mainViewModel.openThread(thread)
-            threadViewModel.thread.value = thread
-        }
-    }
-
-    private fun observeMessages() {
-        threadViewModel.messages.bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+    private fun bindMessages() {
+        threadViewModel.messages(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
         }
@@ -188,11 +180,11 @@ class ThreadFragment : Fragment() {
 
     private fun leaveThread() {
         threadViewModel.deleteThread(navigationArgs.threadUid)
-        // TODO: The day we'll have the Notifications, we'll have to check if this `popBackStack` executes correctly.
-        // TODO: If the fact of opening a Thread via a Notification doesn't fully populate the backStack, the action
-        // TODO: of leaving this fragment (either via a classic Back button, or via this `popBackStack`) will
-        // TODO: probably quit the app instead of going back to the ThreadList fragment (as it should be).
-        findNavController().popBackStack(R.id.threadListFragment, inclusive = false)
+        // TODO: The day we'll have the Notifications, this `popBackStack` will probably fail to execute correctly.
+        // TODO: When opening a Thread via a Notification, the action of leaving this fragment
+        // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
+        // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
+        findNavController().popBackStack()
     }
 
     private companion object {

@@ -27,9 +27,9 @@ import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Correspondent
 import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.correspondent.Correspondent
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
 
 class AvatarView @JvmOverloads constructor(

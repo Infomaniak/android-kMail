@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.SharedFlow
 object MergedContactController {
     //region Queries
     private fun MutableRealm?.getMergedContactsQuery(): RealmQuery<MergedContact> {
-        return (this ?: RealmDatabase.userInfos).query()
+        return (this ?: RealmDatabase.userInfos()).query()
     }
     //endregion
 
@@ -49,7 +49,7 @@ object MergedContactController {
     //region Edit data
     fun update(mergedContacts: List<MergedContact>) {
         Log.d(RealmDatabase.TAG, "MergedContacts: Save new data")
-        RealmDatabase.userInfos.update<MergedContact>(mergedContacts)
+        RealmDatabase.userInfos().update<MergedContact>(mergedContacts)
     }
     //endregion
 }

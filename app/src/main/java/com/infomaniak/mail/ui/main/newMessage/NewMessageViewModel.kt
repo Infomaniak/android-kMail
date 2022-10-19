@@ -28,7 +28,7 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -44,7 +44,9 @@ class NewMessageViewModel : ViewModel() {
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
-    val editorAction = SingleLiveEvent<EditorAction>()
+
+    // Boolean : for toggleable actions, false if the formatting has been removed and true if the formatting has been applied
+    val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     fun getContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
         emit(MergedContactController.getMergedContacts())

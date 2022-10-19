@@ -30,19 +30,19 @@ object MessageController {
 
     //region Queries
     private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
-        return (this ?: RealmDatabase.mailboxContent).query<Message>("${Message::uid.name} = '$uid'").first()
+        return (this ?: RealmDatabase.mailboxContent()).query<Message>("${Message::uid.name} = '$uid'").first()
     }
     //endregion
 
     //region Get data
-    fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
+    private fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
         return realm.getMessageQuery(uid).find()
     }
     //endregion
 
     //region Edit data
     fun update(localMessages: List<Message>, apiMessages: List<Message>) {
-        RealmDatabase.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent().writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")
             deleteMessages(getOutdatedMessages(localMessages, apiMessages))
@@ -60,7 +60,7 @@ object MessageController {
     }
 
     fun updateMessage(uid: String, onUpdate: (message: Message) -> Unit) {
-        RealmDatabase.mailboxContent.writeBlocking { getMessage(uid, this)?.let(onUpdate) }
+        RealmDatabase.mailboxContent().writeBlocking { getMessage(uid, this)?.let(onUpdate) }
     }
 
     fun MutableRealm.deleteMessages(messages: List<Message>) {
@@ -75,7 +75,7 @@ object MessageController {
                     it.delete(message)
                 }
         }
-        realm?.let(block) ?: RealmDatabase.mailboxContent.writeBlocking(block)
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
     //endregion
 }

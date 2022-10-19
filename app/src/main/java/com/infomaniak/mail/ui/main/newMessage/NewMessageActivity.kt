@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -27,13 +28,16 @@ import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
 import com.infomaniak.mail.data.models.MessagePriority
 import com.infomaniak.mail.data.models.MessagePriority.getPriority
-import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction.*
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.observeNotNull
 import io.realm.kotlin.ext.realmListOf
+import com.google.android.material.R as RMaterial
 
 class NewMessageActivity : ThemedActivity() {
 
@@ -85,11 +89,11 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun ActivityNewMessageBinding.updateEditorVisibility(isEditorExpanded: Boolean) {
-        val color = if (isEditorExpanded) R.color.pinkMail else R.color.iconColor
+        val color = if (isEditorExpanded) context.getAttributeColor(RMaterial.attr.colorPrimary) else getColor(R.color.iconColor)
         val resId = if (isEditorExpanded) R.string.buttonTextOptionsClose else R.string.buttonTextOptionsOpen
 
         editorTextOptions.apply {
-            setIconTintResource(color)
+            iconTint = ColorStateList.valueOf(color)
             contentDescription = getString(resId)
         }
 
@@ -98,7 +102,11 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun linkEditor(view: MaterialButton, action: EditorAction) {
-        view.setOnClickListener { newMessageViewModel.editorAction.value = action }
+        view.setOnClickListener { newMessageViewModel.editorAction.value = action to null }
+    }
+
+    private fun linkEditor(view: ToggleableTextFormatterItemView, action: EditorAction) {
+        view.setOnClickListener { newMessageViewModel.editorAction.value = action to view.isToggled }
     }
 
     private fun createDraft() = with(newMessageFragment) {

@@ -17,7 +17,7 @@
  */
 @file:UseSerializers(RealmListSerializer::class)
 
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.correspondent
 
 import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf

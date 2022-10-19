@@ -33,6 +33,7 @@ class HeaderItemDecoration(
     private val shouldFadeOutHeader: Boolean = false,
     private val isHeader: (itemPosition: Int) -> Boolean,
 ) : RecyclerView.ItemDecoration() {
+
     private var currentHeader: Pair<Int, RecyclerView.ViewHolder>? = null
 
     private inline fun View.doOnEachNextLayout(crossinline action: (view: View) -> Unit) {
@@ -170,9 +171,9 @@ class HeaderItemDecoration(
     }
 
     /**
-     * Returns the previous cardview if in the top inset of a header
-     * Retruns the header if in top..bottom of the header view (in other words, without taking into account insets)
-     * Returns the next cardview if in the bottom inset of a header
+     * Returns the previous cardview if in the top inset of a header.
+     * Returns the header if in top..bottom of the header view (in other words, without taking into account insets).
+     * Returns the next cardview if in the bottom inset of a header.
      */
     private fun getChildInContact(parent: RecyclerView, contactPoint: Int): View? {
         parent.forEachIndexed { index, child ->
@@ -219,10 +220,10 @@ class HeaderItemDecoration(
     enum class Intersection {
         INSET_TOP,
         CENTER,
-        INSET_BOTTOM
+        INSET_BOTTOM,
     }
 
-    companion object {
-        private const val TAG = "HeaderItemDecoration"
+    private companion object {
+        val TAG = HeaderItemDecoration::class.simpleName
     }
 }

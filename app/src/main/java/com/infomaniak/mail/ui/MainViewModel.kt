@@ -37,7 +37,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -135,7 +135,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateContacts()
     }
 
-    fun loadCurrentMailbox(threadMode: ThreadMode) {
+    fun loadCurrentMailbox(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadCurrentMailbox")
         updateMailboxes()
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
@@ -180,7 +180,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads(mailboxUuid, folderId, threadMode)
     }
 
-    fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
         selectThread(thread)
         markAsSeen(thread, currentFolderId.value!!)
         updateMessages(thread)
@@ -298,7 +299,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun markAsUnseen(thread: Thread, folderId: String) {
-        RealmDatabase.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent().writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
             val uid = ThreadController.getThreadLastMessageUid(latestThread)
             val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)
@@ -309,7 +310,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun markAsSeen(thread: Thread, folderId: String) {
         if (thread.unseenMessagesCount == 0) return
 
-        RealmDatabase.mailboxContent.writeBlocking {
+        RealmDatabase.mailboxContent().writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
             val uids = ThreadController.getThreadUnseenMessagesUids(latestThread)
             val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)

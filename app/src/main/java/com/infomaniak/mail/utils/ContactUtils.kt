@@ -22,9 +22,9 @@ import android.content.Context
 import android.provider.ContactsContract.CommonDataKinds.Contactables
 import android.provider.ContactsContract.CommonDataKinds.Email
 import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.models.Contact
 import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.Recipient
+import com.infomaniak.mail.data.models.correspondent.Contact
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import io.sentry.Sentry
 import io.sentry.android.core.internal.util.Permissions
 

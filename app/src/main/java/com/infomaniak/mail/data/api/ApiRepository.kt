@@ -25,6 +25,7 @@ import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
 import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
+import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter

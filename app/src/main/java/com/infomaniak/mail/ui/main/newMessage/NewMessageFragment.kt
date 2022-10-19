@@ -94,23 +94,22 @@ class NewMessageFragment : Fragment() {
 
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
 
-        newMessageViewModel.editorAction.observe(requireActivity()) {
+        newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, isToggled) ->
 
             val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) }
             // TODO: Do stuff here with this `selectedText`?
 
-            when (it) {
+            when (editorAction) {
                 // TODO: Replace logs with actual code
                 EditorAction.ATTACHMENT -> Log.d("SelectedText", "ATTACHMENT")
                 EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
                 EditorAction.LINK -> Log.d("SelectedText", "LINK")
                 EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
-                EditorAction.BOLD -> Log.d("SelectedText", "BOLD")
-                EditorAction.ITALIC -> Log.d("SelectedText", "ITALIC")
-                EditorAction.UNDERLINE -> Log.d("SelectedText", "UNDERLINE")
-                EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH")
+                EditorAction.BOLD -> Log.d("SelectedText", "BOLD: $isToggled")
+                EditorAction.ITALIC -> Log.d("SelectedText", "ITALIC: $isToggled")
+                EditorAction.UNDERLINE -> Log.d("SelectedText", "UNDERLINE: $isToggled")
+                EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH: $isToggled")
                 EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
-                null -> Unit
             }
         }
 
