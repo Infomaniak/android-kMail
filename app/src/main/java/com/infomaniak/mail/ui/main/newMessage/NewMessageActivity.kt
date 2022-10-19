@@ -106,7 +106,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun linkEditor(view: ToggleableTextFormatterItemView, action: EditorAction) {
-        view.setOnClickListener { newMessageViewModel.editorAction.value = action to view.isSwitched }
+        view.setOnClickListener { newMessageViewModel.editorAction.value = action to view.isToggled }
     }
 
     private fun createDraft() = with(newMessageFragment) {

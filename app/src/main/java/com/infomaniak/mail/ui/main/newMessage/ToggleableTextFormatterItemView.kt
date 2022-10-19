@@ -44,10 +44,10 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
     @ColorInt
     private var selectedBackgroundColor: Int = -1
 
-    var isSwitched: Boolean = false
-        set(isActivated) = with(binding) {
-            field = isActivated
-            if (isActivated) {
+    var isToggled: Boolean = false
+        set(value) = with(binding) {
+            field = value
+            if (value) {
                 binding.icon.setColorFilter(selectedIconColor)
                 background.setBackgroundColor(selectedBackgroundColor)
             } else {
@@ -84,7 +84,7 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
 
     override fun setOnClickListener(listener: OnClickListener?) {
         binding.root.setOnClickListener {
-            isSwitched = !isSwitched
+            isToggled = !isToggled
             listener?.onClick(it)
         }
     }
