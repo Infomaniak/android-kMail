@@ -55,30 +55,26 @@ object RealmDatabase {
     private val mailboxContentMutex = Mutex()
 
     fun appSettings(): Realm = runBlocking(Dispatchers.IO) {
-        return@runBlocking appSettingsMutex.withLock {
-            return@withLock _appSettings
-                ?: Realm.open(RealmConfigurations.appSettings).also { _appSettings = it }
+        appSettingsMutex.withLock {
+            _appSettings ?: Realm.open(RealmConfig.appSettings).also { _appSettings = it }
         }
     }
 
     fun userInfos(): Realm = runBlocking(Dispatchers.IO) {
-        return@runBlocking userInfosMutex.withLock {
-            return@withLock _userInfos
-                ?: Realm.open(RealmConfigurations.userInfos).also { _userInfos = it }
+        userInfosMutex.withLock {
+            _userInfos ?: Realm.open(RealmConfig.userInfos).also { _userInfos = it }
         }
     }
 
     fun mailboxInfos(): Realm = runBlocking(Dispatchers.IO) {
-        return@runBlocking mailboxInfosMutex.withLock {
-            return@withLock _mailboxInfos
-                ?: Realm.open(RealmConfigurations.mailboxInfos).also { _mailboxInfos = it }
+        mailboxInfosMutex.withLock {
+            _mailboxInfos ?: Realm.open(RealmConfig.mailboxInfos).also { _mailboxInfos = it }
         }
     }
 
     fun mailboxContent(): Realm = runBlocking(Dispatchers.IO) {
-        return@runBlocking mailboxContentMutex.withLock {
-            return@withLock _mailboxContent
-                ?: Realm.open(RealmConfigurations.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
+        mailboxContentMutex.withLock {
+            _mailboxContent ?: Realm.open(RealmConfig.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
         }
     }
 
@@ -95,7 +91,7 @@ object RealmDatabase {
     }
 
     fun deleteMailboxContent(mailboxId: Int) {
-        Realm.deleteRealm(RealmConfigurations.mailboxContent(mailboxId))
+        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
     }
 
     fun close() {
@@ -125,7 +121,7 @@ object RealmDatabase {
         _mailboxContent = null
     }
 
-    private object RealmConfigurations {
+    private object RealmConfig {
 
         private const val appSettingsDbName = "AppSettings.realm"
         private val userInfosDbName get() = "User-${AccountUtils.currentUserId}.realm"
