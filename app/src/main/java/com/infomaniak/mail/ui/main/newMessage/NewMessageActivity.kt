@@ -26,8 +26,7 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Draft
 import com.infomaniak.mail.data.models.Draft.DraftAction
-import com.infomaniak.mail.data.models.MessagePriority
-import com.infomaniak.mail.data.models.MessagePriority.getPriority
+import com.infomaniak.mail.data.models.Priority
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -116,7 +115,7 @@ class NewMessageActivity : ThemedActivity() {
             from = realmListOf(Recipient().apply { email = getFromMailbox().email })
             subject = getSubject()
             body = getBody()
-            priority = MessagePriority.Priority.NORMAL.getPriority()
+            priority = Priority.NORMAL.toString()
         }
     }
 
