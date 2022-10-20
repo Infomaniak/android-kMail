@@ -22,15 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.utils.notYetImplemented
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MailboxSettingsFragment : Fragment() {
 
@@ -43,49 +37,26 @@ class MailboxSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setupUi()
+        binding.root.setTitle(navigationArgs.mailboxName)
+        setSubtitlesInitialState()
         setupListeners()
     }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
-
-    private fun setupUi() = lifecycleScope.launch(Dispatchers.IO) {
-        val email = MailboxController.getMailbox(navigationArgs.mailboxObjectId)?.email ?: return@launch
-        withContext(Dispatchers.Main) { binding.toolbarText.text = email }
-    }
+    private fun setSubtitlesInitialState() = with(binding) {}
 
     private fun setupListeners() = with(binding) {
-        // val mailbox = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailboxSync) ?: return
-        settingsMailboxGeneralSignature.setOnClickListener { notYetImplemented() } // TODO
-        settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() } // TODO
+        settingsMailboxGeneralSignature.setOnClickListener { notYetImplemented() }
+        settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() } // TODO
-        settingsMailboxGeneralNotifications.setOnClickListener { settingsMailboxGeneralNotificationsSwitch.performClick() }
-        settingsMailboxGeneralNotificationsSwitch.setOnClickListener { notYetImplemented() } // TODO
-        settingsInboxType.setOnClickListener { notYetImplemented() } // TODO
-        settingsInboxRules.setOnClickListener { notYetImplemented() } // TODO
-        settingsInboxRedirect.setOnClickListener { notYetImplemented() } // TODO
-        settingsInboxAlias.setOnClickListener { notYetImplemented() } // TODO
-        settingsSecurityAdsFilter.setOnClickListener { settingsSecurityAdsFilterSwitch.performClick() }
-        settingsSecurityAdsFilterSwitch.setOnClickListener { switch ->
-            notYetImplemented() // TODO
-            // MailboxInfoController.updateMailboxInfo(mailbox.objectId) {
-            //     it.hasSocialAndCommercialFiltering = (switch as SwitchMaterial).isChecked
-            // }
-            // ApiRepository.updateMailboxSettings(mailbox.hostingId, mailbox.mailbox)
-        }
-        settingsSecuritySpamFilter.setOnClickListener { settingsSecuritySpamFilterSwitch.performClick() }
-        settingsSecuritySpamFilterSwitch.setOnClickListener {
-            notYetImplemented() // TODO
-            // MailboxInfoController.updateMailboxInfo(mailbox.objectId) {
-            //     it. = (switch as SwitchMaterial).isChecked
-            // }
-            // ApiRepository.updateMailboxSettings(mailbox.hostingId, mailbox.mailbox, )
-        }
-        settingsSecurityBlockedRecipients.setOnClickListener { notYetImplemented() } // TODO
-        settingsPrivacyDeleteSearchHistory.setOnClickListener { notYetImplemented() } // TODO
-        settingsPrivacyViewLogs.setOnClickListener { notYetImplemented() } // TODO
+        settingsMailboxGeneralNotifications.setOnClickListener { notYetImplemented() } // TODO
+        settingsInboxType.setOnClickListener { notYetImplemented() }
+        settingsInboxRules.setOnClickListener { notYetImplemented() }
+        settingsInboxRedirect.setOnClickListener { notYetImplemented() }
+        settingsInboxAlias.setOnClickListener { notYetImplemented() }
+        settingsSecurityAdsFilter.setOnClickListener { notYetImplemented() }
+        settingsSecuritySpamFilter.setOnClickListener { notYetImplemented() } // TODO ?
+        settingsSecurityBlockedRecipients.setOnClickListener { notYetImplemented() } // TODO ?
+        settingsPrivacyDeleteSearchHistory.setOnClickListener { notYetImplemented() }
+        settingsPrivacyViewLogs.setOnClickListener { notYetImplemented() }
     }
 }

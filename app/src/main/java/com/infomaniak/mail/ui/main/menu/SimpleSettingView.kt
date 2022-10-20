@@ -70,6 +70,10 @@ class SimpleSettingView @JvmOverloads constructor(
         binding.toolbar.setTitle(title)
     }
 
+    fun setTitle(title: String) {
+        binding.toolbar.title = title
+    }
+
     fun setNavigationOnClickListener(listener: OnClickListener) {
         binding.toolbar.setNavigationOnClickListener(listener)
     }

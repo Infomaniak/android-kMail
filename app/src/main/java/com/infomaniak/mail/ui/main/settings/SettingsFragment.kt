@@ -41,7 +41,7 @@ class SettingsFragment : Fragment() {
     private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId))
+        safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId, selectedMailbox.email))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
