@@ -66,6 +66,12 @@ class UiSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, value) }
     //endregion
 
+    //region Lock app when coming back
+    var isAppLocked: Boolean
+        get() = sharedPreferences.getBoolean(IS_APP_LOCKED_KEY, DEFAULT_IS_APP_LOCKED)
+        set(value) = sharedPreferences.transaction { putBoolean(IS_APP_LOCKED_KEY, value) }
+    //endregion
+
     //region Thread density
     private var _threadDensity: String?
         get() = getPrivateSetting(::threadDensity, DEFAULT_THREAD_DENSITY)
@@ -266,6 +272,8 @@ class UiSettings private constructor(context: Context) {
         private const val DEFAULT_INCLUDE_MESSAGE_IN_REPLY = true
         private const val DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT = false
 
+        private const val DEFAULT_IS_APP_LOCKED = false
+
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
         private val DEFAULT_THEME = Theme.SYSTEM
         val DEFAULT_ACCENT_COLOR = AccentColor.PINK
@@ -276,6 +284,7 @@ class UiSettings private constructor(context: Context) {
         private const val CANCEL_DELAY_KEY = "cancelDelay"
         private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReply"
         private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgment"
+        private const val IS_APP_LOCKED_KEY = "isAppLocked"
         @Volatile
         private var INSTANCE: UiSettings? = null
 

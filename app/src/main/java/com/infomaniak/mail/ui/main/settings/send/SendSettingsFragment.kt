@@ -31,6 +31,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 class SendSettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSendSettingsBinding
+
     private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -39,11 +40,16 @@ class SendSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setInitialState()
+        setSubtitlesInitialState()
         setupListeners()
     }
 
-    private fun setInitialState() = with(binding) {
+    override fun onResume() {
+        super.onResume()
+        setSwitchesInitialState()
+    }
+
+    private fun setSubtitlesInitialState() = with(binding) {
         val cancelDelay = uiSettings.cancelDelay
         val subtitle = if (cancelDelay == 0) {
             getString(R.string.settingsDisabled)
@@ -51,10 +57,17 @@ class SendSettingsFragment : Fragment() {
             getString(R.string.settingsDelaySeconds, cancelDelay)
         }
 
-        settingsCancellationPeriod.setSubtitle(subtitle)
-        settingsTransferEmails.setSubtitle(uiSettings.emailForwarding.localisedNameRes)
-        settingsSendIncludeOriginalMessage.isChecked = uiSettings.includeMessageInReply
-        settingsSendAcknowledgement.isChecked = uiSettings.askEmailAcknowledgement
+        with(uiSettings) {
+            settingsCancellationPeriod.setSubtitle(subtitle)
+            settingsTransferEmails.setSubtitle(emailForwarding.localisedNameRes)
+        }
+    }
+
+    private fun setSwitchesInitialState() = with(binding) {
+        with(uiSettings) {
+            settingsSendIncludeOriginalMessage.isChecked = includeMessageInReply
+            settingsSendAcknowledgement.isChecked = askEmailAcknowledgement
+        }
     }
 
     private fun setupListeners() = with(binding) {

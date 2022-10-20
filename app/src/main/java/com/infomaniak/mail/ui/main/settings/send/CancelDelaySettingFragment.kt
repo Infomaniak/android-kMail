@@ -30,6 +30,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 class CancelDelaySettingFragment : Fragment() {
 
     private lateinit var binding: FragmentCancelDelaySettingBinding
+
     private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
