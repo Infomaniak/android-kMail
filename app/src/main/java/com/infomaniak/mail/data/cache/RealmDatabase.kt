@@ -181,10 +181,10 @@ object RealmDatabase {
                 Recipient::class,
                 Body::class,
                 Attachment::class,
+                Signature::class,
             )
 
             val miscellaneous = setOf(
-                Signature::class,
                 SignatureEmail::class,
             )
         }

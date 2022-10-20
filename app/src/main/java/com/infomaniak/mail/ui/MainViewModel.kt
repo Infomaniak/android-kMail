@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
@@ -138,6 +139,7 @@ class MainViewModel : ViewModel() {
     fun openMailbox(mailbox: Mailbox, threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
+        updateSignatures(mailbox)
         updateFolders(mailbox)
         FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
@@ -213,6 +215,12 @@ class MainViewModel : ViewModel() {
             ?: emptyList()
 
         MailboxController.update(apiMailboxes, AccountUtils.currentUserId)
+    }
+
+    private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+        val apiSignatures = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox).data?.signatures ?: return@launch
+
+        SignatureController.update(apiSignatures)
     }
 
     private fun updateFolders(mailbox: Mailbox) {
