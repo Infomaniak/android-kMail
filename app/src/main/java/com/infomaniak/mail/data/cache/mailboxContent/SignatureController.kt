@@ -15,41 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache.userInfos
+package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.RealmDatabase.update
-import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.utils.toSharedFlow
+import com.infomaniak.mail.data.models.signature.Signature
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
-import kotlinx.coroutines.flow.SharedFlow
 
-object MergedContactController {
+object SignatureController {
+
     //region Queries
-    private fun MutableRealm?.getMergedContactsQuery(): RealmQuery<MergedContact> {
-        return (this ?: RealmDatabase.userInfos()).query()
+    private fun MutableRealm?.getSignaturesQuery(): RealmQuery<Signature> {
+        return (this ?: RealmDatabase.mailboxContent()).query()
     }
     //endregion
 
     //region Get data
-    fun getMergedContacts(realm: MutableRealm? = null): RealmResults<MergedContact> {
-        return realm.getMergedContactsQuery().find()
-    }
-
-    fun getMergedContactsAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<MergedContact>> {
-        return realm.getMergedContactsQuery().asFlow().toSharedFlow()
+    fun getSignatures(realm: MutableRealm? = null): RealmResults<Signature> {
+        return realm.getSignaturesQuery().find()
     }
     //endregion
 
     //region Edit data
-    fun update(mergedContacts: List<MergedContact>) {
-        Log.d(RealmDatabase.TAG, "MergedContacts: Save new data")
-        RealmDatabase.userInfos().update<MergedContact>(mergedContacts)
+    fun update(apiSignatures: List<Signature>) {
+        Log.d(RealmDatabase.TAG, "Signatures: Save new data")
+        RealmDatabase.mailboxContent().update<Signature>(apiSignatures)
     }
     //endregion
 }

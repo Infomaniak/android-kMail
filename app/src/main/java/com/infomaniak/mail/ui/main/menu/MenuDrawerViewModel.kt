@@ -19,7 +19,7 @@ package com.infomaniak.mail.ui.main.menu
 
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxInfos.QuotasController
+import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 

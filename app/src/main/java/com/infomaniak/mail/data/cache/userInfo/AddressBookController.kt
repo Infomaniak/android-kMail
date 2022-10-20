@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache.userInfos
+package com.infomaniak.mail.data.cache.userInfo
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -30,7 +30,7 @@ object AddressBookController {
 
     //region Queries
     private fun MutableRealm?.getAddressBookQuery(id: Int): RealmSingleQuery<AddressBook> {
-        return (this ?: RealmDatabase.userInfos()).query<AddressBook>("${AddressBook::id.name} = '$id'").first()
+        return (this ?: RealmDatabase.userInfo()).query<AddressBook>("${AddressBook::id.name} = '$id'").first()
     }
     //endregion
 
@@ -43,15 +43,15 @@ object AddressBookController {
     //region Edit data
     fun update(apiAddressBooks: List<AddressBook>) {
         Log.d(RealmDatabase.TAG, "AddressBooks: Save new data")
-        RealmDatabase.userInfos().update<AddressBook>(apiAddressBooks)
+        RealmDatabase.userInfo().update<AddressBook>(apiAddressBooks)
     }
 
     private fun upsertAddressBooks(addressBooks: List<AddressBook>) {
-        RealmDatabase.userInfos().writeBlocking { addressBooks.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+        RealmDatabase.userInfo().writeBlocking { addressBooks.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     private fun deleteAddressBooks(addressBooks: List<AddressBook>) {
-        RealmDatabase.userInfos().writeBlocking { addressBooks.forEach { getAddressBook(it.id, this)?.let(::delete) } }
+        RealmDatabase.userInfo().writeBlocking { addressBooks.forEach { getAddressBook(it.id, this)?.let(::delete) } }
     }
     //endregion
 }

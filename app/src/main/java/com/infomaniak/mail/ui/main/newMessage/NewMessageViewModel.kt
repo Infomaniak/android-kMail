@@ -23,12 +23,12 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.userInfos.MergedContactController
-import com.infomaniak.mail.data.models.Draft
-import com.infomaniak.mail.data.models.Draft.DraftAction
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
@@ -53,8 +53,8 @@ class NewMessageViewModel : ViewModel() {
     }
 
     fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
-        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
-        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
+        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi(DraftAction.SEND))
+        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi(DraftAction.SAVE))
 
         viewModelScope.launch(Dispatchers.IO) {
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
@@ -63,7 +63,7 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    private fun Draft.fillForApi(draftAction: String) = apply {
+    private fun Draft.fillForApi(draftAction: DraftAction) = apply {
         action = draftAction
         to = recipients.toRealmRecipients() ?: realmListOf()
         cc = newMessageCc.toRealmRecipients()

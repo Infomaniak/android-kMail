@@ -17,9 +17,11 @@
  */
 @file:UseSerializers(RealmListSerializer::class)
 
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.draft
 
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
@@ -59,7 +61,8 @@ class Draft : RealmObject {
     var subject: String = ""
     @SerialName("ack_request")
     var ackRequest: Boolean = false
-    var action: String = ""
+    @SerialName("action")
+    private var _action: String = ""
     var delay: Int = 0
     var priority: String? = null
     @SerialName("st_uuid")
@@ -72,16 +75,25 @@ class Draft : RealmObject {
     var parentMessageUid: String = "" // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
+    var action
+        get() = enumValueOfOrNull<DraftAction>(_action)
+        set(value) {
+            _action = value.toString()
+        }
+
+    enum class DraftAction {
+        SEND,
+        SAVE;
+
+        override fun toString() = name.lowercase()
+    }
+
     fun initLocalValues(messageUid: String) {
         if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
         parentMessageUid = messageUid
     }
 
     fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
-
-    enum class DraftAction {
-        SEND, SAVE
-    }
 
     companion object {
         private const val OFFLINE_DRAFT_UUID_PREFIX = "offline"

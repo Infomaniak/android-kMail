@@ -20,11 +20,12 @@ package com.infomaniak.mail.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.MenuInflater
+import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.res.getResourceIdOrThrow
 import androidx.core.view.get
 import androidx.core.view.isGone
@@ -42,7 +43,7 @@ class BottomQuickActionBarView @JvmOverloads constructor(
     private val binding by lazy { ViewBottomQuickActionBarBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private val buttons: List<MaterialButton> by lazy { with(binding) { listOf(button1, button2, button3, button4, button5) } }
-    private val menu: MenuBuilder by lazy { MenuBuilder(context) }
+    private val menu: Menu by lazy { ActionMenuView(context).menu }
 
     init {
         attrs?.let {

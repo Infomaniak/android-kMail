@@ -26,7 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.notYetImplemented

@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Draft
+import com.infomaniak.mail.data.models.draft.Draft
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
