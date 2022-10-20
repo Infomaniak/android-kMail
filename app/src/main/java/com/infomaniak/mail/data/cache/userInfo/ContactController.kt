@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache.userInfos
+package com.infomaniak.mail.data.cache.userInfo
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -32,11 +32,11 @@ object ContactController {
 
     //region Queries
     private fun MutableRealm?.getContactsQuery(): RealmQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos()).query()
+        return (this ?: RealmDatabase.userInfo()).query()
     }
 
     private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
-        return (this ?: RealmDatabase.userInfos()).query<Contact>("${Contact::id.name} = '$id'").first()
+        return (this ?: RealmDatabase.userInfo()).query<Contact>("${Contact::id.name} = '$id'").first()
     }
     //endregion
 
@@ -53,15 +53,15 @@ object ContactController {
     //region Edit data
     fun update(apiContacts: List<Contact>) {
         Log.d(RealmDatabase.TAG, "Contacts: Save new data")
-        RealmDatabase.userInfos().update<Contact>(apiContacts)
+        RealmDatabase.userInfo().update<Contact>(apiContacts)
     }
 
     private fun upsertContacts(contacts: List<Contact>) {
-        RealmDatabase.userInfos().writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
+        RealmDatabase.userInfo().writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
     }
 
     private fun deleteContacts(contacts: List<Contact>) {
-        RealmDatabase.userInfos().writeBlocking { contacts.forEach { getContact(it.id)?.let(::delete) } }
+        RealmDatabase.userInfo().writeBlocking { contacts.forEach { getContact(it.id)?.let(::delete) } }
     }
     //endregion
 }

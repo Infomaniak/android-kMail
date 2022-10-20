@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache.mailboxInfos
+package com.infomaniak.mail.data.cache.mailboxInfo
 
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.utils.toSharedFlow

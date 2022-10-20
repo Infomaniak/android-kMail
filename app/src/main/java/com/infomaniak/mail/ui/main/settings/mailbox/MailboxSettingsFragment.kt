@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
 import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
@@ -71,7 +71,7 @@ class MailboxSettingsFragment : Fragment() {
         settingsSecurityAdsFilter.setOnClickListener { settingsSecurityAdsFilterSwitch.performClick() }
         settingsSecurityAdsFilterSwitch.setOnClickListener { switch ->
             notYetImplemented() // TODO
-            // MailboxInfosController.updateMailboxInfo(mailbox.objectId) {
+            // MailboxInfoController.updateMailboxInfo(mailbox.objectId) {
             //     it.hasSocialAndCommercialFiltering = (switch as SwitchMaterial).isChecked
             // }
             // ApiRepository.updateMailboxSettings(mailbox.hostingId, mailbox.mailbox)
@@ -79,7 +79,7 @@ class MailboxSettingsFragment : Fragment() {
         settingsSecuritySpamFilter.setOnClickListener { settingsSecuritySpamFilterSwitch.performClick() }
         settingsSecuritySpamFilterSwitch.setOnClickListener {
             notYetImplemented() // TODO
-            // MailboxInfosController.updateMailboxInfo(mailbox.objectId) {
+            // MailboxInfoController.updateMailboxInfo(mailbox.objectId) {
             //     it. = (switch as SwitchMaterial).isChecked
             // }
             // ApiRepository.updateMailboxSettings(mailbox.hostingId, mailbox.mailbox, )
