@@ -27,7 +27,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
 
 class SwipeActionsSettingsFragment : Fragment() {
@@ -41,7 +41,7 @@ class SwipeActionsSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        with(UiSettings.getInstance(requireContext())) {
+        with(LocalSettings.getInstance(requireContext())) {
             swipeRight.setSubtitle(swipeLongRight.nameRes)
             swipeLeft.setSubtitle(swipeLongLeft.nameRes)
 

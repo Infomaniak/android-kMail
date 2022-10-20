@@ -18,7 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
-import com.infomaniak.mail.data.UiSettings.ThreadMode
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter

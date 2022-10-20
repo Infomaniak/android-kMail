@@ -35,9 +35,9 @@ import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallb
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings.ThreadDensity
-import com.infomaniak.mail.data.UiSettings.ThreadDensity.COMPACT
-import com.infomaniak.mail.data.UiSettings.ThreadDensity.LARGE
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity.LARGE
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding

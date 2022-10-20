@@ -22,7 +22,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
-import com.infomaniak.mail.data.UiSettings.ThreadMode
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact

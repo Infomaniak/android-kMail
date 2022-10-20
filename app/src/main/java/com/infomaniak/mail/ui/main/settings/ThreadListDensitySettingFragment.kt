@@ -23,15 +23,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.ThreadDensity.*
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity.*
 import com.infomaniak.mail.databinding.FragmentThreadListDensitySettingBinding
 
 class ThreadListDensitySettingFragment : Fragment() {
 
     private lateinit var binding: FragmentThreadListDensitySettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListDensitySettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -48,7 +48,7 @@ class ThreadListDensitySettingFragment : Fragment() {
         listDensityImage.setImageResource(resId)
     }
 
-    private fun getCheckedButtonFromDensity() = when (uiSettings.threadDensity) {
+    private fun getCheckedButtonFromDensity() = when (localSettings.threadDensity) {
         COMPACT -> R.id.listDensityButtonCompact to R.drawable.bg_list_density_compact
         LARGE -> R.id.listDensityButtonLarge to R.drawable.bg_list_density_large
         else -> R.id.listDensityButtonNormal to R.drawable.bg_list_density_default
@@ -64,7 +64,7 @@ class ThreadListDensitySettingFragment : Fragment() {
             if (!isChecked) return@addOnButtonCheckedListener
 
             val (listDensity, resId) = getDensityFromCheckedButton(buttonId)
-            uiSettings.threadDensity = listDensity
+            localSettings.threadDensity = listDensity
             listDensityImage.setImageResource(resId)
         }
     }

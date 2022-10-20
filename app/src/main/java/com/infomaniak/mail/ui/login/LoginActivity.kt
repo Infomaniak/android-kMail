@@ -40,7 +40,7 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.data.UiSettings.AccentColor
+import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils

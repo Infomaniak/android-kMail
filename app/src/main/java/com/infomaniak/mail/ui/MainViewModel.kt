@@ -21,8 +21,8 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.ThreadMode
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val uiSettings by lazy { UiSettings.getInstance(application) }
+    private val localSettings by lazy { LocalSettings.getInstance(application) }
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var canPaginate = true
@@ -235,7 +235,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val threadsResult = ApiRepository.getThreads(
             mailboxUuid = mailboxUuid,
             folderId = folderId,
-            threadMode = uiSettings.threadMode,
+            threadMode = localSettings.threadMode,
             offset = OFFSET_FIRST_PAGE,
             filter = filter,
         ).data ?: return
@@ -257,7 +257,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val threadsResult = ApiRepository.getThreads(
             mailboxUuid = mailboxUuid,
             folderId = folderId,
-            threadMode = uiSettings.threadMode,
+            threadMode = localSettings.threadMode,
             offset = offset,
             filter = filter,
         ).data ?: return@launch

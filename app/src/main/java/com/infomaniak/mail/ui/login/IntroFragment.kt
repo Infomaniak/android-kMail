@@ -37,10 +37,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.AccentColor
-import com.infomaniak.mail.data.UiSettings.AccentColor.BLUE
-import com.infomaniak.mail.data.UiSettings.AccentColor.PINK
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AccentColor
+import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
+import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
@@ -65,7 +65,7 @@ class IntroFragment : Fragment() {
             0 -> {
                 pinkBlueSwitch.isVisible = true
                 val tabIndex = introViewModel.currentAccentColor.value?.introTabIndex
-                    ?: UiSettings.DEFAULT_ACCENT_COLOR.introTabIndex
+                    ?: LocalSettings.DEFAULT_ACCENT_COLOR.introTabIndex
                 val selectedTab = pinkBlueTabLayout.getTabAt(tabIndex)
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
@@ -94,7 +94,7 @@ class IntroFragment : Fragment() {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == PINK.introTabIndex) PINK else BLUE
-                UiSettings.getInstance(requireContext()).accentColor = newSelectedAccentColor
+                LocalSettings.getInstance(requireContext()).accentColor = newSelectedAccentColor
                 triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor)
             }
 
@@ -114,7 +114,7 @@ class IntroFragment : Fragment() {
     private fun updateUiWhenThemeChanges(position: Int?) {
         introViewModel.currentAccentColor.observe(viewLifecycleOwner) { accentColor ->
             setUi(
-                accentColor = accentColor ?: UiSettings.DEFAULT_ACCENT_COLOR,
+                accentColor = accentColor ?: LocalSettings.DEFAULT_ACCENT_COLOR,
                 position = position,
                 animate = accentColor != null,
             )

@@ -24,9 +24,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.SwipeAction
-import com.infomaniak.mail.data.UiSettings.SwipeAction.*
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.SwipeAction
+import com.infomaniak.mail.data.LocalSettings.SwipeAction.*
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -35,7 +35,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
     private lateinit var binding: FragmentSwipeActionsSelectionSettingBinding
     private val navigationArgs: SwipeActionsSelectionSettingFragmentArgs by navArgs()
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSwipeActionsSelectionSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -61,7 +61,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 R.id.none to NONE
             )
 
-            check(uiSettings.getSwipeAction(actionResId))
+            check(localSettings.getSwipeAction(actionResId))
 
             onItemCheckedListener { _, _, enum ->
                 notYetImplemented()
@@ -70,7 +70,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         }
     }
 
-    private fun saveAction(swipeAction: SwipeAction) = with(uiSettings) {
+    private fun saveAction(swipeAction: SwipeAction) = with(localSettings) {
         when (navigationArgs.titleResId) {
             R.string.settingsSwipeShortRight -> swipeShortRight = swipeAction
             R.string.settingsSwipeLongRight -> swipeLongRight = swipeAction

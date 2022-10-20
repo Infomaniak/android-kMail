@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -32,7 +32,7 @@ class SendSettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSendSettingsBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSendSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -50,21 +50,21 @@ class SendSettingsFragment : Fragment() {
     }
 
     private fun setSubtitlesInitialState() = with(binding) {
-        val cancelDelay = uiSettings.cancelDelay
+        val cancelDelay = localSettings.cancelDelay
         val subtitle = if (cancelDelay == 0) {
             getString(R.string.settingsDisabled)
         } else {
             getString(R.string.settingsDelaySeconds, cancelDelay)
         }
 
-        with(uiSettings) {
+        with(localSettings) {
             settingsCancellationPeriod.setSubtitle(subtitle)
             settingsTransferEmails.setSubtitle(emailForwarding.localisedNameRes)
         }
     }
 
     private fun setSwitchesInitialState() = with(binding) {
-        with(uiSettings) {
+        with(localSettings) {
             settingsSendIncludeOriginalMessage.isChecked = includeMessageInReply
             settingsSendAcknowledgement.isChecked = askEmailAcknowledgement
         }
@@ -81,14 +81,14 @@ class SendSettingsFragment : Fragment() {
 
         settingsSendIncludeOriginalMessage.apply {
             setOnClickListener {
-                uiSettings.includeMessageInReply = isChecked
+                localSettings.includeMessageInReply = isChecked
                 notYetImplemented()
             }
         }
 
         settingsSendAcknowledgement.apply {
             setOnClickListener {
-                uiSettings.askEmailAcknowledgement = isChecked
+                localSettings.askEmailAcknowledgement = isChecked
                 notYetImplemented()
             }
         }

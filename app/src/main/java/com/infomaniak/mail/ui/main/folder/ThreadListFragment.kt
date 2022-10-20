@@ -44,7 +44,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
@@ -113,7 +113,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadDensity = UiSettings.getInstance(requireContext()).threadDensity,
+            threadDensity = LocalSettings.getInstance(requireContext()).threadDensity,
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {

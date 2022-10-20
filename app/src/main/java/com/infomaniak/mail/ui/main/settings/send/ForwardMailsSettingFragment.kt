@@ -23,8 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.EmailForwarding
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.EmailForwarding
 import com.infomaniak.mail.databinding.FragmentForwardMailsSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -32,7 +32,7 @@ class ForwardMailsSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentForwardMailsSettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentForwardMailsSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -46,10 +46,10 @@ class ForwardMailsSettingFragment : Fragment() {
             R.id.asAttachment to EmailForwarding.AS_ATTACHMENT
         )
 
-        check(uiSettings.emailForwarding)
+        check(localSettings.emailForwarding)
 
         onItemCheckedListener { _, _, enum ->
-            uiSettings.emailForwarding = (enum as? EmailForwarding) ?: return@onItemCheckedListener
+            localSettings.emailForwarding = (enum as? EmailForwarding) ?: return@onItemCheckedListener
             notYetImplemented()
         }
     }
