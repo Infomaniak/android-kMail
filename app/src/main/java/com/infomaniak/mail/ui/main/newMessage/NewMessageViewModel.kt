@@ -66,8 +66,8 @@ class NewMessageViewModel : ViewModel() {
     private fun Draft.fillForApi(draftAction: DraftAction) = apply {
         action = draftAction
         to = recipients.toRealmRecipients() ?: realmListOf()
-        cc = newMessageCc.toRealmRecipients()
-        bcc = newMessageBcc.toRealmRecipients()
+        cc = newMessageCc.toRealmRecipients() ?: realmListOf()
+        bcc = newMessageBcc.toRealmRecipients() ?: realmListOf()
 
         // TODO: manage advanced functionalities
         // quote = ""

@@ -110,7 +110,7 @@ object ApiRepository : ApiRepositoryCore() {
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<SaveDraftResult> {
-        val body = Json.encodeToString(draft)
+        val body = Json.encodeToString(draft).removeEmptyRealmLists()
         fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
@@ -118,7 +118,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
-        val body = Json.encodeToString(draft)
+        val body = Json.encodeToString(draft).removeEmptyRealmLists()
         fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
@@ -158,4 +158,10 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
+
+    /**
+     * RealmLists cannot be null, so they have to be empty when there is no data.
+     * But the kMail API doesn't support empty lists, so we have to replace them with a `null` value.
+     */
+    private fun String.removeEmptyRealmLists() = replace("[]", "null")
 }
