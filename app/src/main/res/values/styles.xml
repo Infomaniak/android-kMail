@@ -305,56 +305,6 @@
         <item name="android:paddingTop">12dp</item>
     </style>
 
-    <style name="SettingText" parent="MenuDrawerItem">
-        <item name="android:gravity">center|start</item>
-    </style>
-
-    <style name="SettingImageAtStart">
-        <item name="android:layout_width">24dp</item>
-        <item name="android:layout_height">24dp</item>
-        <item name="android:layout_marginEnd">@dimen/marginStandard</item>
-    </style>
-
-    <style name="SettingTextWithButton">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-    </style>
-
-    <style name="Setting2TextsWithButton" parent="SettingTextWithButton">
-        <item name="android:orientation">vertical</item>
-    </style>
-
-    <style name="SettingText1Of2WithButton">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="SettingText2Of2WithButton" parent="Callout.Secondary">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="SettingButtonChevron">
-        <item name="android:layout_width">12dp</item>
-        <item name="android:layout_height">12dp</item>
-        <item name="android:rotation">@dimen/angleViewRotated</item>
-        <item name="android:src">@drawable/ic_chevron_left</item>
-    </style>
-
-    <style name="SettingButtonCheck">
-        <item name="android:layout_width">15dp</item>
-        <item name="android:layout_height">15dp</item>
-        <item name="android:src">@drawable/ic_check</item>
-        <item name="android:tint">?android:attr/colorPrimary</item>
-        <item name="android:visibility">invisible</item>
-    </style>
-
-    <style name="SettingButtonSwitch">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
     <style name="SettingButtonToggle">
         <item name="android:backgroundTint">@color/button_toggle_background</item>
         <item name="android:layout_height">wrap_content</item>
