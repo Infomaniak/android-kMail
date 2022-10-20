@@ -316,6 +316,9 @@
         <argument
             android:name="mailboxObjectId"
             app:argType="string" />
+        <argument
+            android:name="mailboxName"
+            app:argType="string" />
         <action
             android:id="@+id/action_mailboxSettings_to_signatureSetting"
             app:destination="@id/signatureSettingFragment" />
