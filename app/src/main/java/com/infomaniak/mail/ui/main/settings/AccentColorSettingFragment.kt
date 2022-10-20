@@ -23,17 +23,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.AccentColor
-import com.infomaniak.mail.data.UiSettings.AccentColor.BLUE
-import com.infomaniak.mail.data.UiSettings.AccentColor.PINK
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AccentColor
+import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
+import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentAccentColorSettingBinding
 
 class AccentColorSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentAccentColorSettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentAccentColorSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -47,7 +47,7 @@ class AccentColorSettingFragment : Fragment() {
             R.id.blueRadioButton to BLUE
         )
 
-        check(uiSettings.accentColor)
+        check(localSettings.accentColor)
 
         onItemCheckedListener { _, _, enum ->
             chooseColor(enum as? AccentColor ?: return@onItemCheckedListener)
@@ -56,7 +56,7 @@ class AccentColorSettingFragment : Fragment() {
 
     private fun chooseColor(accentColor: AccentColor) {
         activity?.setTheme(accentColor.theme)
-        uiSettings.accentColor = accentColor
+        localSettings.accentColor = accentColor
         activity?.recreate()
     }
 }

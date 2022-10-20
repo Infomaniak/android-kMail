@@ -25,11 +25,11 @@ import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.R
 import kotlin.reflect.KMutableProperty0
 
-class UiSettings private constructor(context: Context) {
+class LocalSettings private constructor(context: Context) {
 
-    private val sharedPreferences = context.applicationContext.getSharedPreferences("UISettings", Context.MODE_PRIVATE)
+    private val sharedPreferences = context.applicationContext.getSharedPreferences("LocalSettings", Context.MODE_PRIVATE)
 
-    fun removeUiSettings() = sharedPreferences.transaction { clear() }
+    fun removeSettings() = sharedPreferences.transaction { clear() }
 
     //region Cancel delay
     var cancelDelay: Int
@@ -286,12 +286,12 @@ class UiSettings private constructor(context: Context) {
         private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgment"
         private const val IS_APP_LOCKED_KEY = "isAppLocked"
         @Volatile
-        private var INSTANCE: UiSettings? = null
+        private var INSTANCE: LocalSettings? = null
 
-        fun getInstance(context: Context): UiSettings {
+        fun getInstance(context: Context): LocalSettings {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE?.let { return it }
-                UiSettings(context).also { INSTANCE = it }
+                LocalSettings(context).also { INSTANCE = it }
             }
         }
     }

@@ -24,16 +24,16 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.Theme
-import com.infomaniak.mail.data.UiSettings.Theme.*
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.Theme
+import com.infomaniak.mail.data.LocalSettings.Theme.*
 import com.infomaniak.mail.databinding.FragmentThemeSettingBinding
 
 class ThemeSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentThemeSettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThemeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -48,7 +48,7 @@ class ThemeSettingFragment : Fragment() {
             R.id.darkTheme to DARK
         )
 
-        check(uiSettings.theme)
+        check(localSettings.theme)
 
         onItemCheckedListener { _, _, enum ->
             chooseTheme(enum as? Theme ?: return@onItemCheckedListener)
@@ -57,6 +57,6 @@ class ThemeSettingFragment : Fragment() {
 
     private fun chooseTheme(theme: Theme) {
         setDefaultNightMode(theme.mode)
-        uiSettings.theme = theme
+        localSettings.theme = theme
     }
 }

@@ -23,10 +23,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.ExternalContent
-import com.infomaniak.mail.data.UiSettings.ExternalContent.ALWAYS
-import com.infomaniak.mail.data.UiSettings.ExternalContent.ASK_ME
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ExternalContent
+import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
+import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -34,7 +34,7 @@ class ExternalContentSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentExternalContentSettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentExternalContentSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -48,11 +48,11 @@ class ExternalContentSettingFragment : Fragment() {
             R.id.askMe to ASK_ME,
         )
 
-        check(uiSettings.externalContent)
+        check(localSettings.externalContent)
 
         onItemCheckedListener { _, _, enum ->
             notYetImplemented()
-            uiSettings.externalContent = enum as? ExternalContent ?: return@onItemCheckedListener
+            localSettings.externalContent = enum as? ExternalContent ?: return@onItemCheckedListener
         }
     }
 }

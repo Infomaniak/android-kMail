@@ -18,14 +18,13 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
@@ -38,7 +37,7 @@ class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
         safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId, selectedMailbox.email))
@@ -69,7 +68,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setSubtitlesInitialState() = with(binding) {
-        with(uiSettings) {
+        with(localSettings) {
             settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
             settingsTheme.setSubtitle(theme.localisedNameRes)
             settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
@@ -79,20 +78,17 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setSwitchesInitialState() = with(binding) {
-        settingsAppLock.isChecked = uiSettings.isAppLocked
+        settingsAppLock.isChecked = localSettings.isAppLocked
     }
 
     private fun setupListeners() = with(binding) {
-        Log.e("gibran", "setupListeners: ");
-
         settingsSend.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
         settingsAppLock.apply {
             setOnClickListener {
-                uiSettings.isAppLocked = isChecked
-                Log.e("gibran", "setupListeners - when clicked uiSettings.isAppLocked: ${uiSettings.isAppLocked}")
+                localSettings.isAppLocked = isChecked
                 notYetImplemented()
             }
         }

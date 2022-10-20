@@ -23,7 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentCancelDelaySettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -31,7 +31,7 @@ class CancelDelaySettingFragment : Fragment() {
 
     private lateinit var binding: FragmentCancelDelaySettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentCancelDelaySettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -45,7 +45,7 @@ class CancelDelaySettingFragment : Fragment() {
 
         binding.radioGroup.onItemCheckedListener { _, value, _ ->
             val seconds = value?.toInt() ?: throw NullPointerException("Radio button had no associated value")
-            uiSettings.cancelDelay = seconds
+            localSettings.cancelDelay = seconds
             notYetImplemented()
         }
     }
@@ -61,7 +61,7 @@ class CancelDelaySettingFragment : Fragment() {
 
     private fun checkInitialValue() = with(binding.radioGroup) {
         check(
-            when (uiSettings.cancelDelay) {
+            when (localSettings.cancelDelay) {
                 10 -> R.id.seconds10
                 15 -> R.id.seconds15
                 20 -> R.id.seconds20

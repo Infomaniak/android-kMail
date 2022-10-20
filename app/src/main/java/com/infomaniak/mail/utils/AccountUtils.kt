@@ -29,7 +29,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
@@ -125,7 +125,7 @@ object AccountUtils : CredentialManager {
 
     private fun resetSettings(context: Context) {
         AppSettingsController.removeAppSettings()
-        UiSettings.getInstance(context).removeUiSettings()
+        LocalSettings.getInstance(context).removeSettings()
     }
 
     override fun getAllUsers(): LiveData<List<User>> = userDatabase.userDao().getAll()

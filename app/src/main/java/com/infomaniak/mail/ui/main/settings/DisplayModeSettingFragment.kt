@@ -23,10 +23,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.ThreadMode
-import com.infomaniak.mail.data.UiSettings.ThreadMode.MESSAGES
-import com.infomaniak.mail.data.UiSettings.ThreadMode.THREADS
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
+import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGES
+import com.infomaniak.mail.data.LocalSettings.ThreadMode.THREADS
 import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -34,7 +34,7 @@ class DisplayModeSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayModeSettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentDisplayModeSettingBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -48,11 +48,11 @@ class DisplayModeSettingFragment : Fragment() {
             R.id.messageMode to MESSAGES,
         )
 
-        check(uiSettings.threadMode)
+        check(localSettings.threadMode)
 
         onItemCheckedListener { _, _, enum ->
             notYetImplemented()
-            uiSettings.threadMode = enum as? ThreadMode ?: return@onItemCheckedListener
+            localSettings.threadMode = enum as? ThreadMode ?: return@onItemCheckedListener
         }
     }
 }

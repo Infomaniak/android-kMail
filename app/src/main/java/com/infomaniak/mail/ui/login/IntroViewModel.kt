@@ -20,9 +20,9 @@ package com.infomaniak.mail.ui.login
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.AccentColor
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AccentColor
 
 class IntroViewModel(application: Application) : AndroidViewModel(application) {
-    var currentAccentColor: MutableLiveData<AccentColor?> = MutableLiveData(UiSettings.getInstance(application).accentColor)
+    var currentAccentColor: MutableLiveData<AccentColor?> = MutableLiveData(LocalSettings.getInstance(application).accentColor)
 }
