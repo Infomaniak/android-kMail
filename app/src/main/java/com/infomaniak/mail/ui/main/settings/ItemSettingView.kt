@@ -22,7 +22,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
-import androidx.core.content.res.getStringOrThrow
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
@@ -50,7 +49,7 @@ class ItemSettingView @JvmOverloads constructor(
             attrs?.getAttributes(context, R.styleable.ItemSettingView) {
                 action = Action.values()[getInteger(R.styleable.ItemSettingView_itemAction, 0)]
 
-                title.text = getStringOrThrow(R.styleable.ItemSettingView_title)
+                title.text = getString(R.styleable.ItemSettingView_title) ?: ""
 
                 (getDrawable(R.styleable.ItemSettingView_icon)).let {
                     icon.setImageDrawable(it)
@@ -78,6 +77,10 @@ class ItemSettingView @JvmOverloads constructor(
         }
 
         toggle.setOnClickListener(listener)
+    }
+
+    fun setTitle(title: String) {
+        binding.title.text = title
     }
 
     fun setSubtitle(@StringRes subtitle: Int) {
