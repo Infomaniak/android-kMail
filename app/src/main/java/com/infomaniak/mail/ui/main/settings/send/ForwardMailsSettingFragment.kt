@@ -31,6 +31,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 class ForwardMailsSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentForwardMailsSettingBinding
+
     private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

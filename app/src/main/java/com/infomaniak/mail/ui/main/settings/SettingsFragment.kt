@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.settings
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,12 +50,17 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupAdapter()
+        setupMailboxesAdapter()
         setupListeners()
-        uiSettings.setupPreferencesText()
+        setSubtitlesInitialState()
     }
 
-    private fun setupAdapter() {
+    override fun onResume() {
+        super.onResume()
+        setSwitchesInitialState()
+    }
+
+    private fun setupMailboxesAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
@@ -62,21 +68,34 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun UiSettings.setupPreferencesText() = with(binding) {
-        settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
-        settingsTheme.setSubtitle(theme.localisedNameRes)
-        settingsAccentColor.setSubtitle(uiSettings.accentColor.localisedNameRes)
-        settingsMessageDisplay.setSubtitle(threadMode.localisedNameRes)
-        settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
+    private fun setSubtitlesInitialState() = with(binding) {
+        with(uiSettings) {
+            settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
+            settingsTheme.setSubtitle(theme.localisedNameRes)
+            settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
+            settingsMessageDisplay.setSubtitle(threadMode.localisedNameRes)
+            settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
+        }
+    }
+
+    private fun setSwitchesInitialState() = with(binding) {
+        settingsAppLock.isChecked = uiSettings.isAppLocked
     }
 
     private fun setupListeners() = with(binding) {
+        Log.e("gibran", "setupListeners: ");
 
         settingsSend.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
-        settingsAppLock.setOnClickListener { notYetImplemented() }
+        settingsAppLock.apply {
+            setOnClickListener {
+                uiSettings.isAppLocked = isChecked
+                Log.e("gibran", "setupListeners - when clicked uiSettings.isAppLocked: ${uiSettings.isAppLocked}")
+                notYetImplemented()
+            }
+        }
 
         settingsThreadListDensity.setOnClickListener {
             safeNavigate(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
