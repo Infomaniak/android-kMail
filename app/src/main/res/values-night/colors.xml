@@ -68,8 +68,4 @@
     <color name="buttonToggleStroke">#9D1A51</color>
     <color name="buttonToggleBackground">#2A0F1B</color>
 
-    <!-- Accent tint -->
-    <color name="pinkAccent">#E07FA3</color>
-    <color name="blueAccent">#4CB7FF</color>
-
 </resources>
