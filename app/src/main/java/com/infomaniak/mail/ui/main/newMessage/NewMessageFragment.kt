@@ -119,6 +119,13 @@ class NewMessageFragment : Fragment() {
         observeMailboxes()
     }
 
+    fun closeAutocompletion() {
+        fun FieldType.clearField() = getInputView(this).setText("")
+        TO.clearField()
+        CC.clearField()
+        BCC.clearField()
+    }
+
     private fun observeDraftUuid() {
         newMessageViewModel.currentDraftUuid.observeNotNull(viewLifecycleOwner) {
             observeContacts()
@@ -141,13 +148,6 @@ class NewMessageFragment : Fragment() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
         }
-    }
-
-    fun closeAutocompletion() {
-        fun FieldType.clearField() = getInputView(this).setText("")
-        TO.clearField()
-        CC.clearField()
-        BCC.clearField()
     }
 
     private fun enableAutocomplete(field: FieldType) = with(newMessageViewModel) {
@@ -261,23 +261,17 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun addContactToField(field: FieldType, contact: UiContact) = with(newMessageViewModel) {
-        when (field) {
-            TO -> updateMailTo(mailTo.toMutableList().apply { add(contact) })
-            CC -> updateMailCc(mailCc.toMutableList().apply { add(contact) })
-            BCC -> updateMailBcc(mailBcc.toMutableList().apply { add(contact) })
-        }
+        getContacts(field).add(contact)
+        autoSaveDraft()
     }
 
     private fun removeContactFromField(field: FieldType, index: Int) = with(newMessageViewModel) {
-        when (field) {
-            TO -> updateMailTo(mailTo.toMutableList().apply { removeAt(index) })
-            CC -> updateMailCc(mailCc.toMutableList().apply { removeAt(index) })
-            BCC -> updateMailBcc(mailBcc.toMutableList().apply { removeAt(index) })
-        }
+        getContacts(field).removeAt(index)
+        autoSaveDraft()
     }
 
     //region Chips behavior
-    private fun getContacts(field: FieldType): List<UiContact> = when (field) {
+    private fun getContacts(field: FieldType): MutableList<UiContact> = when (field) {
         TO -> newMessageViewModel.mailTo
         CC -> newMessageViewModel.mailCc
         BCC -> newMessageViewModel.mailBcc

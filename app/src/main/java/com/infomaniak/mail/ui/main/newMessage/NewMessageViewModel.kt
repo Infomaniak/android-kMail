@@ -41,9 +41,9 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    var mailTo = emptyList<UiContact>()
-    var mailCc = emptyList<UiContact>()
-    var mailBcc = emptyList<UiContact>()
+    val mailTo = mutableListOf<UiContact>()
+    val mailCc = mutableListOf<UiContact>()
+    val mailBcc = mutableListOf<UiContact>()
     var mailSubject = ""
     var mailBody = ""
 
@@ -79,9 +79,9 @@ class NewMessageViewModel : ViewModel() {
 
     private fun MutableRealm.updateLiveData(uuid: String) {
         DraftController.getDraft(uuid, this)?.let { draft ->
-            mailTo = draft.to.toUiContacts()
-            mailCc = draft.cc.toUiContacts()
-            mailBcc = draft.bcc.toUiContacts()
+            mailTo.addAll(draft.to.toUiContacts())
+            mailCc.addAll(draft.cc.toUiContacts())
+            mailBcc.addAll(draft.bcc.toUiContacts())
             mailSubject = draft.subject
             mailBody = draft.body
         }
@@ -161,27 +161,6 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun updateMailTo(to: List<UiContact>) {
-        if (to != mailTo) {
-            mailTo = to
-            autoSaveDraft()
-        }
-    }
-
-    fun updateMailCc(cc: List<UiContact>) {
-        if (cc != mailCc) {
-            mailCc = cc
-            autoSaveDraft()
-        }
-    }
-
-    fun updateMailBcc(bcc: List<UiContact>) {
-        if (bcc != mailBcc) {
-            mailBcc = bcc
-            autoSaveDraft()
-        }
-    }
-
     fun updateMailSubject(subject: String) {
         if (subject != mailSubject) {
             mailSubject = subject
@@ -196,7 +175,7 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    private fun autoSaveDraft() {
+    fun autoSaveDraft() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
