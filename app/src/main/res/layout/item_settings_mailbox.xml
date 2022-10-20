@@ -15,18 +15,10 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.settings.ItemSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/emailAddress"
-    style="@style/MenuDrawerItem"
-    tools:ignore="UseCompoundDrawables">
-
-    <TextView
-        android:id="@+id/emailAddressText"
-        style="@style/SettingTextWithButton"
-        tools:text="myriam.rais@infomaniak.com" />
-
-    <ImageView
-        style="@style/SettingButtonChevron"
-        tools:ignore="ContentDescription" />
-</LinearLayout>
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:itemAction="chevron"
+    tools:title="myriam.rais@infomaniak.com" />
