@@ -42,11 +42,9 @@ class AccentColorSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
-        initTranslationTable(
-            mapOf(
-                R.id.pinkRadioButton to PINK,
-                R.id.blueRadioButton to BLUE
-            )
+        initBijectionTable(
+            R.id.pinkRadioButton to PINK,
+            R.id.blueRadioButton to BLUE
         )
 
         check(uiSettings.accentColor)

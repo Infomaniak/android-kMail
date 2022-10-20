@@ -47,15 +47,15 @@ class MailboxSettingsFragment : Fragment() {
     private fun setupListeners() = with(binding) {
         settingsMailboxGeneralSignature.setOnClickListener { notYetImplemented() }
         settingsMailboxGeneralAutoreply.setOnClickListener { notYetImplemented() }
-        settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() } // TODO
-        settingsMailboxGeneralNotifications.setOnClickListener { notYetImplemented() } // TODO
+        settingsMailboxGeneralFolders.setOnClickListener { notYetImplemented() }
+        settingsMailboxGeneralNotifications.setOnClickListener { notYetImplemented() }
         settingsInboxType.setOnClickListener { notYetImplemented() }
         settingsInboxRules.setOnClickListener { notYetImplemented() }
         settingsInboxRedirect.setOnClickListener { notYetImplemented() }
         settingsInboxAlias.setOnClickListener { notYetImplemented() }
         settingsSecurityAdsFilter.setOnClickListener { notYetImplemented() }
-        settingsSecuritySpamFilter.setOnClickListener { notYetImplemented() } // TODO ?
-        settingsSecurityBlockedRecipients.setOnClickListener { notYetImplemented() } // TODO ?
+        settingsSecuritySpamFilter.setOnClickListener { notYetImplemented() }
+        settingsSecurityBlockedRecipients.setOnClickListener { notYetImplemented() }
         settingsPrivacyDeleteSearchHistory.setOnClickListener { notYetImplemented() }
         settingsPrivacyViewLogs.setOnClickListener { notYetImplemented() }
     }

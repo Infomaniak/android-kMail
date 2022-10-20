@@ -42,12 +42,10 @@ class ThemeSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
-        initTranslationTable(
-            mapOf(
-                R.id.systemTheme to SYSTEM,
-                R.id.lightTheme to LIGHT,
-                R.id.darkTheme to DARK
-            )
+        initBijectionTable(
+            R.id.systemTheme to SYSTEM,
+            R.id.lightTheme to LIGHT,
+            R.id.darkTheme to DARK
         )
 
         check(uiSettings.theme)

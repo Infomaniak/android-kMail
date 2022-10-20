@@ -40,7 +40,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
     private var onItemCheckedListener: ((Int, String?, Enum<*>?) -> Unit)? = null
     private var shouldAddDividers = true
 
-    private var translationTable: Map<Int, Enum<*>> = emptyMap()
+    private var bijectionTable: Map<Int, Enum<*>> = emptyMap()
 
     init {
         orientation = VERTICAL
@@ -69,12 +69,12 @@ class SettingRadioGroupView @JvmOverloads constructor(
     override fun onChecked(@IdRes viewId: Int) {
         if (viewId != checkedId) {
             check(viewId)
-            onItemCheckedListener?.invoke(checkedId, checkedValue, translationTable[viewId])
+            onItemCheckedListener?.invoke(checkedId, checkedValue, bijectionTable[viewId])
         }
     }
 
-    fun initTranslationTable(newMap: Map<Int, Enum<*>>) {
-        translationTable = newMap
+    fun initBijectionTable(vararg pairs: Pair<Int, Enum<*>>) {
+        bijectionTable = pairs.toMap()
     }
 
     @Suppress("TypeParameterFindViewById")
@@ -91,7 +91,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
     }
 
     fun check(e: Enum<*>) {
-        val viewId = translationTable.keys.firstOrNull { translationTable[it] == e } ?: return
+        val viewId = bijectionTable.keys.firstOrNull { bijectionTable[it] == e } ?: return
         check(viewId)
     }
 
