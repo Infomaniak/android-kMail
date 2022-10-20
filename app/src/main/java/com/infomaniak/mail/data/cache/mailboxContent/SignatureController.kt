@@ -17,30 +17,33 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.cache.RealmDatabase.update
+import com.infomaniak.mail.data.models.signature.Signature
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
 
-object DraftController {
+object SignatureController {
 
     //region Queries
-    private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
+    private fun MutableRealm?.getSignaturesQuery(): RealmQuery<Signature> {
+        return (this ?: RealmDatabase.mailboxContent()).query()
     }
     //endregion
 
     //region Get data
-    fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
-        return realm.getDraftQuery(uuid).find()
+    fun getSignatures(realm: MutableRealm? = null): RealmResults<Signature> {
+        return realm.getSignaturesQuery().find()
     }
     //endregion
 
     //region Edit data
-    fun upsertDraft(draft: Draft) {
-        RealmDatabase.mailboxContent().writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
+    fun update(apiSignatures: List<Signature>) {
+        Log.d(RealmDatabase.TAG, "Signatures: Save new data")
+        RealmDatabase.mailboxContent().update<Signature>(apiSignatures)
     }
     //endregion
 }

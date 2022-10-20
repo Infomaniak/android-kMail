@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models.signature
 
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import io.realm.kotlin.types.RealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -43,8 +44,17 @@ class Signature : RealmObject {
     var isDefault: Boolean = false
     @SerialName("service_mail_model_id")
     var serviceMailModelId: Int? = null
-    var position: String = ""
+    @SerialName("position")
+    private var _position: String = ""
     @SerialName("is_editable")
     var isEditable: Boolean = false
     var content: String = ""
+
+    val position: SignaturePosition?
+        get() = enumValueOfOrNull<SignaturePosition>(_position)
+
+    enum class SignaturePosition(val position: String) {
+        BEFORE_REPLY_MESSAGE("top"),
+        AFTER_REPLY_MESSAGE("bottom"),
+    }
 }

@@ -186,13 +186,14 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        if (mails.count() > 1) {
-            fromMailAddress.apply {
-                setOnClickListener { _ -> addressListPopupWindow.show() }
-                isClickable = true
-                isFocusable = true
-            }
-        }
+        // TODO: This is disabled for now, because we probably don't want to allow changing email & signature.
+        // if (mails.count() > 1) {
+        //     fromMailAddress.apply {
+        //         setOnClickListener { _ -> addressListPopupWindow.show() }
+        //         isClickable = true
+        //         isFocusable = true
+        //     }
+        // }
     }
 
     private fun setupContactsAdapter(allContacts: List<UiContact>) = with(binding) {

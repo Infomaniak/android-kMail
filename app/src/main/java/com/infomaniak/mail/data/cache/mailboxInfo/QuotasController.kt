@@ -15,19 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.cache.mailboxInfo
 
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.utils.toSharedFlow
+import io.realm.kotlin.MutableRealm
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.map
 
-object MessagePriority {
+object QuotasController {
 
-    fun getPriority(priority: String?): Priority? = enumValueOfOrNull<Priority>(priority?.uppercase())
-
-    fun Priority.getPriority() = name.lowercase()
-
-    enum class Priority {
-        LOW,
-        NORMAL,
-        HIGH,
+    fun getQuotasAsync(mailboxObjectId: String, realm: MutableRealm? = null): SharedFlow<Quotas?> {
+        return MailboxController.getMailboxAsync(mailboxObjectId, realm).map { it.obj?.quotas }.toSharedFlow()
     }
 }

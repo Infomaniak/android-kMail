@@ -15,17 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.cache.mailboxInfos
 
-import com.infomaniak.mail.data.models.Quotas
-import com.infomaniak.mail.utils.toSharedFlow
-import io.realm.kotlin.MutableRealm
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.map
+package com.infomaniak.mail.data.models.draft
 
-object QuotasController {
+import com.infomaniak.mail.data.models.Attachment
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-    fun getQuotasAsync(mailboxObjectId: String, realm: MutableRealm? = null): SharedFlow<Quotas?> {
-        return MailboxController.getMailboxAsync(mailboxObjectId, realm).map { it.obj?.quotas }.toSharedFlow()
-    }
-}
+@Serializable
+data class SaveDraftResult(
+    @SerialName("uuid")
+    val draftUuid: String,
+    @SerialName("uid")
+    val messageUid: String,
+    val attachments: List<Attachment>,
+)

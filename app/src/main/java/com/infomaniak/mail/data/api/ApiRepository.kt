@@ -26,6 +26,8 @@ import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.SaveDraftResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -107,10 +109,10 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
-    fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<Draft> {
+    fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<SaveDraftResult> {
         val body = Json.encodeToString(draft)
-        fun postDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
-        fun putDraft(): ApiResponse<Draft> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
+        fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
+        fun putDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
         return if (draft.hasLocalUuid()) postDraft() else putDraft()
     }

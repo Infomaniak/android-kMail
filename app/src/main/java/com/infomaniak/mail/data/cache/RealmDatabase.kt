@@ -18,11 +18,12 @@
 package com.infomaniak.mail.data.cache
 
 import android.content.Context
-import com.infomaniak.mail.data.cache.mailboxInfos.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature
@@ -47,13 +48,13 @@ object RealmDatabase {
     val TAG: String = RealmDatabase::class.java.simpleName
 
     private var _appSettings: Realm? = null
-    private var _userInfos: Realm? = null
-    private var _mailboxInfos: Realm? = null
+    private var _userInfo: Realm? = null
+    private var _mailboxInfo: Realm? = null
     private var _mailboxContent: Realm? = null
 
     private val appSettingsMutex = Mutex()
-    private val userInfosMutex = Mutex()
-    private val mailboxInfosMutex = Mutex()
+    private val userInfoMutex = Mutex()
+    private val mailboxInfoMutex = Mutex()
     private val mailboxContentMutex = Mutex()
 
     fun appSettings(): Realm = runBlocking(Dispatchers.IO) {
@@ -62,15 +63,15 @@ object RealmDatabase {
         }
     }
 
-    fun userInfos(): Realm = runBlocking(Dispatchers.IO) {
-        userInfosMutex.withLock {
-            _userInfos ?: Realm.open(RealmConfig.userInfos).also { _userInfos = it }
+    fun userInfo(): Realm = runBlocking(Dispatchers.IO) {
+        userInfoMutex.withLock {
+            _userInfo ?: Realm.open(RealmConfig.userInfo).also { _userInfo = it }
         }
     }
 
-    fun mailboxInfos(): Realm = runBlocking(Dispatchers.IO) {
-        mailboxInfosMutex.withLock {
-            _mailboxInfos ?: Realm.open(RealmConfig.mailboxInfos).also { _mailboxInfos = it }
+    fun mailboxInfo(): Realm = runBlocking(Dispatchers.IO) {
+        mailboxInfoMutex.withLock {
+            _mailboxInfo ?: Realm.open(RealmConfig.mailboxInfo).also { _mailboxInfo = it }
         }
     }
 
@@ -94,8 +95,8 @@ object RealmDatabase {
 
     fun close() {
         closeMailboxContent()
-        closeMailboxInfos()
-        closeUserInfos()
+        closeMailboxInfo()
+        closeUserInfo()
         closeAppSettings()
     }
 
@@ -104,14 +105,14 @@ object RealmDatabase {
         _appSettings = null
     }
 
-    fun closeUserInfos() {
-        _userInfos?.close()
-        _userInfos = null
+    fun closeUserInfo() {
+        _userInfo?.close()
+        _userInfo = null
     }
 
-    private fun closeMailboxInfos() {
-        _mailboxInfos?.close()
-        _mailboxInfos = null
+    private fun closeMailboxInfo() {
+        _mailboxInfo?.close()
+        _mailboxInfo = null
     }
 
     fun closeMailboxContent() {
@@ -125,16 +126,16 @@ object RealmDatabase {
 
     fun removeUserData(context: Context, userId: Int) {
         closeMailboxContent()
-        closeUserInfos()
-        mailboxInfos().writeBlocking { delete(MailboxController.getMailboxes(userId, this)) }
+        closeUserInfo()
+        mailboxInfo().writeBlocking { delete(MailboxController.getMailboxes(userId, this)) }
         deleteUserFiles(context, userId)
     }
 
     private fun deleteUserFiles(context: Context, userId: Int) {
         context.filesDir.listFiles()?.forEach { file ->
             val isMailboxContent = file.name.startsWith(RealmConfig.mailboxContentDbNamePrefix(userId))
-            val isUserInfos = file.name.startsWith(RealmConfig.userInfosDbName(userId))
-            if (isMailboxContent || isUserInfos) {
+            val isUserInfo = file.name.startsWith(RealmConfig.userInfoDbName(userId))
+            if (isMailboxContent || isUserInfo) {
                 if (file.isDirectory) file.deleteRecursively() else file.delete()
             }
         }
@@ -143,8 +144,8 @@ object RealmDatabase {
     private object RealmConfig {
 
         private const val appSettingsDbName = "AppSettings.realm"
-        fun userInfosDbName(userId: Int) = "User-${userId}.realm"
-        private const val mailboxInfosDbName = "MailboxInfos.realm"
+        fun userInfoDbName(userId: Int) = "User-${userId}.realm"
+        private const val mailboxInfoDbName = "MailboxInfo.realm"
         fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"
         private fun mailboxContentDbName(userId: Int, mailboxId: Int) = "${mailboxContentDbNamePrefix(userId)}${mailboxId}.realm"
 
@@ -155,17 +156,17 @@ object RealmDatabase {
                 .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
-        val userInfos
+        val userInfo
             get() = RealmConfiguration
-                .Builder(RealmSets.userInfos)
-                .name(userInfosDbName(AccountUtils.currentUserId))
+                .Builder(RealmSets.userInfo)
+                .name(userInfoDbName(AccountUtils.currentUserId))
                 .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
-        val mailboxInfos =
+        val mailboxInfo =
             RealmConfiguration
-                .Builder(RealmSets.mailboxInfos)
-                .name(mailboxInfosDbName)
+                .Builder(RealmSets.mailboxInfo)
+                .name(mailboxInfoDbName)
                 .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
                 .build()
 
@@ -182,12 +183,12 @@ object RealmDatabase {
                 AppSettings::class,
             )
 
-            val userInfos = setOf(
+            val userInfo = setOf(
                 AddressBook::class,
                 Contact::class,
             )
 
-            val mailboxInfos = setOf(
+            val mailboxInfo = setOf(
                 Mailbox::class,
                 Quotas::class,
             )
@@ -200,10 +201,10 @@ object RealmDatabase {
                 Recipient::class,
                 Body::class,
                 Attachment::class,
+                Signature::class,
             )
 
             val miscellaneous = setOf(
-                Signature::class,
                 SignatureEmail::class,
             )
         }

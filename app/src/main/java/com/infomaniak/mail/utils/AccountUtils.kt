@@ -68,7 +68,7 @@ object AccountUtils : CredentialManager {
     var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
-            RealmDatabase.closeUserInfos()
+            RealmDatabase.closeUserInfo()
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentUserId = userId }
         }
 
