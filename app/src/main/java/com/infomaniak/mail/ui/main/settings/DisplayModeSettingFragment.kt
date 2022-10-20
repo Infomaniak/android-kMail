@@ -43,11 +43,9 @@ class DisplayModeSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
-        initTranslationTable(
-            mapOf(
-                R.id.threadMode to THREADS,
-                R.id.messageMode to MESSAGES,
-            )
+        initBijectionTable(
+            R.id.threadMode to THREADS,
+            R.id.messageMode to MESSAGES,
         )
 
         check(uiSettings.threadMode)

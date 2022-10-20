@@ -41,11 +41,9 @@ class ForwardMailsSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
-        initTranslationTable(
-            mapOf(
-                R.id.inBody to EmailForwarding.IN_BODY,
-                R.id.asAttachment to EmailForwarding.AS_ATTACHMENT
-            )
+        initBijectionTable(
+            R.id.inBody to EmailForwarding.IN_BODY,
+            R.id.asAttachment to EmailForwarding.AS_ATTACHMENT
         )
 
         check(uiSettings.emailForwarding)

@@ -43,11 +43,9 @@ class ExternalContentSettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
 
-        initTranslationTable(
-            mapOf(
-                R.id.always to ALWAYS,
-                R.id.askMe to ASK_ME,
-            )
+        initBijectionTable(
+            R.id.always to ALWAYS,
+            R.id.askMe to ASK_ME,
         )
 
         check(uiSettings.externalContent)

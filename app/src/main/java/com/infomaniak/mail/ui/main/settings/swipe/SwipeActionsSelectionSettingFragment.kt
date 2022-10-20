@@ -48,19 +48,17 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
         root.setTitle(actionResId)
 
         radioGroup.apply {
-            initTranslationTable(
-                mapOf(
-                    R.id.delete to DELETE,
-                    R.id.archive to ARCHIVE,
-                    R.id.readUnread to READ_UNREAD,
-                    R.id.move to MOVE,
-                    R.id.favorite to FAVORITE,
-                    R.id.postpone to POSTPONE,
-                    R.id.spam to SPAM,
-                    R.id.readAndArchive to READ_AND_ARCHIVE,
-                    R.id.quickActionMenu to QUICKACTIONS_MENU,
-                    R.id.none to NONE
-                )
+            initBijectionTable(
+                R.id.delete to DELETE,
+                R.id.archive to ARCHIVE,
+                R.id.readUnread to READ_UNREAD,
+                R.id.move to MOVE,
+                R.id.favorite to FAVORITE,
+                R.id.postpone to POSTPONE,
+                R.id.spam to SPAM,
+                R.id.readAndArchive to READ_AND_ARCHIVE,
+                R.id.quickActionMenu to QUICKACTIONS_MENU,
+                R.id.none to NONE
             )
 
             check(uiSettings.getSwipeAction(actionResId))
