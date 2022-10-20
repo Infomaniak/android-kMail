@@ -41,7 +41,6 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    var mailFrom = ""
     var mailTo = emptyList<UiContact>()
     var mailCc = emptyList<UiContact>()
     var mailBcc = emptyList<UiContact>()
@@ -162,13 +161,6 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    fun updateMailFrom(email: String) {
-        if (email != mailFrom) {
-            mailFrom = email
-            autoSaveDraft()
-        }
-    }
-
     fun updateMailTo(to: List<UiContact>) {
         if (to != mailTo) {
             mailTo = to
@@ -215,7 +207,6 @@ class NewMessageViewModel : ViewModel() {
 
     private fun saveDraft(draftUuid: String, realm: MutableRealm? = null) {
         DraftController.updateDraft(draftUuid, realm) {
-            it.from = realmListOf(Recipient().apply { this.email = mailFrom })
             it.to = mailTo.toRealmRecipients()
             it.cc = mailCc.toRealmRecipients()
             it.bcc = mailBcc.toRealmRecipients()

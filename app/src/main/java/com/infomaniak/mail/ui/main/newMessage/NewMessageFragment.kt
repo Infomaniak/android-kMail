@@ -183,9 +183,7 @@ class NewMessageFragment : Fragment() {
         selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxObjectId.value }
         val mails = mailboxes.map { it.email }
 
-        val selectedEmail = mailboxes[selectedMailboxIndex].email
-        fromMailAddress.text = selectedEmail
-        newMessageViewModel.mailFrom = selectedEmail
+        fromMailAddress.text = mailboxes[selectedMailboxIndex].email
 
         val adapter = ArrayAdapter(context, RMaterial.layout.support_simple_spinner_dropdown_item, mails)
         addressListPopupWindow.apply {
@@ -195,9 +193,7 @@ class NewMessageFragment : Fragment() {
             anchorView = fromMailAddress
             width = fromMailAddress.width
             setOnItemClickListener { _, _, position, _ ->
-                val email = mails[position]
-                newMessageViewModel.updateMailFrom(email)
-                fromMailAddress.text = email
+                fromMailAddress.text = mails[position]
                 selectedMailboxIndex = position
                 dismiss()
             }
