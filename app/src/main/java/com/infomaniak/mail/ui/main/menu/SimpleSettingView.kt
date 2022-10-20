@@ -34,9 +34,19 @@ class SimpleSettingView @JvmOverloads constructor(
 
     private val binding: ViewSimpleSettingBinding
 
+    /**
+     * We can receive 2 types of children:
+     * - Children that come from the binding
+     * - Children of [SimpleSettingView] that are defined in the xml
+     *
+     * We need to only add the second type of children to the `binding.cardView` to be able to display them
+     */
+    private var isBindingInflated: Boolean = false
+
     init {
         orientation = VERTICAL
         binding = ViewSimpleSettingBinding.inflate(LayoutInflater.from(context), this)
+        isBindingInflated = true
 
         if (attrs != null) {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SimpleSettingView, 0, 0)
@@ -45,12 +55,11 @@ class SimpleSettingView @JvmOverloads constructor(
         }
     }
 
-    override fun addView(child: View?, index: Int, params: ViewGroup.LayoutParams?) {
-        @Suppress("SENSELESS_COMPARISON")
-        if (binding == null) {
-            super.addView(child, index, params)
-        } else {
+    override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
+        if (isBindingInflated) {
             binding.cardview.addView(child, index, params)
+        } else {
+            super.addView(child, index, params)
         }
     }
 
