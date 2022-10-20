@@ -23,7 +23,6 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -33,7 +32,7 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 
 object MailboxController {
 
@@ -65,16 +64,16 @@ object MailboxController {
     //endregion
 
     //region Get data
-    fun getMailboxesAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
-        return realm.getMailboxesQuery().asFlow().toSharedFlow()
+    fun getMailboxesAsync(realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
+        return realm.getMailboxesQuery().asFlow()
     }
 
     fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
         return realm.getMailboxesQuery(userId).find()
     }
 
-    fun getMailboxesAsync(userId: Int, realm: MutableRealm? = null): SharedFlow<ResultsChange<Mailbox>> {
-        return realm.getMailboxesQuery(userId).asFlow().toSharedFlow()
+    fun getMailboxesAsync(userId: Int, realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
+        return realm.getMailboxesQuery(userId).asFlow()
     }
 
     private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: MutableRealm? = null): RealmResults<Mailbox> {
@@ -85,8 +84,8 @@ object MailboxController {
         return realm.getMailboxQuery(objectId).find()
     }
 
-    fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Mailbox>> {
-        return realm.getMailboxQuery(objectId).asFlow().toSharedFlow()
+    fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Mailbox>> {
+        return realm.getMailboxQuery(objectId).asFlow()
     }
 
     fun getMailbox(userId: Int, mailboxId: Int, realm: MutableRealm? = null): Mailbox? {

@@ -47,16 +47,6 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    companion object {
-        private val TAG: String = MainViewModel::class.java.simpleName
-        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
-
-        val currentMailboxObjectId = MutableLiveData<String?>()
-        val currentFolderId = MutableLiveData<String?>()
-        val currentThreadUid = MutableLiveData<String?>()
-        val currentMessageUid = MutableLiveData<String?>()
-    }
-
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var canPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
@@ -304,5 +294,15 @@ class MainViewModel : ViewModel() {
             val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)
             if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
         }
+    }
+
+    companion object {
+        private val TAG: String = MainViewModel::class.java.simpleName
+        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+
+        val currentMailboxObjectId = MutableLiveData<String?>()
+        val currentFolderId = MutableLiveData<String?>()
+        val currentThreadUid = MutableLiveData<String?>()
+        val currentMessageUid = MutableLiveData<String?>()
     }
 }

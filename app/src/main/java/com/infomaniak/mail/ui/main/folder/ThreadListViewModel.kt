@@ -21,7 +21,6 @@ import android.text.format.DateUtils
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.utils.toSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -37,7 +36,7 @@ class ThreadListViewModel : ViewModel() {
 
     val currentFolder = MutableLiveData<Folder>()
     val currentFolderThreads = Transformations.switchMap(currentFolder) { folder ->
-        liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().toSharedFlow().asLiveData()) }
+        liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().asLiveData()) }
     }
 
     fun listenToFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
