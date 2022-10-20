@@ -58,8 +58,8 @@ class NewMessageViewModel : ViewModel() {
     }
 
     fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
-        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi("send"))
-        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi("save"))
+        fun sendDraft() = ApiRepository.sendDraft(mailbox.uuid, draft.fillForApi(DraftAction.SEND))
+        fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi(DraftAction.SAVE))
 
         viewModelScope.launch(Dispatchers.IO) {
             val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
@@ -68,7 +68,7 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    private fun Draft.fillForApi(draftAction: String) = apply {
+    private fun Draft.fillForApi(draftAction: DraftAction) = apply {
         action = draftAction
         to = recipients.toRealmRecipients() ?: realmListOf()
         cc = newMessageCc.toRealmRecipients()
