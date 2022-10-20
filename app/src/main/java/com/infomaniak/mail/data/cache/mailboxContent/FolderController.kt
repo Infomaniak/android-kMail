@@ -23,7 +23,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMes
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.utils.toRealmInstant
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -33,7 +32,7 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 object FolderController {
@@ -58,8 +57,8 @@ object FolderController {
     //endregion
 
     //region Get data
-    fun getFoldersAsync(realm: MutableRealm? = null): SharedFlow<ResultsChange<Folder>> {
-        return realm.getFoldersQuery().asFlow().toSharedFlow()
+    fun getFoldersAsync(realm: MutableRealm? = null): Flow<ResultsChange<Folder>> {
+        return realm.getFoldersQuery().asFlow()
     }
 
     private fun getFolders(exceptionsFoldersIds: List<String>, realm: MutableRealm? = null): RealmResults<Folder> {
@@ -70,8 +69,8 @@ object FolderController {
         return realm.getFolderQuery(id).find()
     }
 
-    fun getFolderAsync(id: String, realm: MutableRealm? = null): SharedFlow<SingleQueryChange<Folder>> {
-        return realm.getFolderQuery(id).asFlow().toSharedFlow()
+    fun getFolderAsync(id: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Folder>> {
+        return realm.getFolderQuery(id).asFlow()
     }
 
     fun getFolder(role: FolderRole, realm: MutableRealm? = null): Folder? {

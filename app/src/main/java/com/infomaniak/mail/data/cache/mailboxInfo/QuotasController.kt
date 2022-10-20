@@ -18,14 +18,13 @@
 package com.infomaniak.mail.data.cache.mailboxInfo
 
 import com.infomaniak.mail.data.models.Quotas
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.MutableRealm
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 object QuotasController {
 
-    fun getQuotasAsync(mailboxObjectId: String, realm: MutableRealm? = null): SharedFlow<Quotas?> {
-        return MailboxController.getMailboxAsync(mailboxObjectId, realm).map { it.obj?.quotas }.toSharedFlow()
+    fun getQuotasAsync(mailboxObjectId: String, realm: MutableRealm? = null): Flow<Quotas?> {
+        return MailboxController.getMailboxAsync(mailboxObjectId, realm).map { it.obj?.quotas }
     }
 }
