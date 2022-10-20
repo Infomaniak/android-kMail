@@ -66,8 +66,9 @@ object MessageController {
         val block: (MutableRealm) -> Unit = {
             getMessage(uid, it)
                 ?.let { message ->
-                    val draft = DraftController.getDraftByParentMessageUid(message.uid, it)
-                    if (draft != null) it.delete(draft)
+                    DraftController.getDraftByParentMessageUid(message.uid, it)?.let { draft ->
+                        it.delete(draft)
+                    }
                     it.delete(message)
                 }
         }

@@ -110,7 +110,6 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    // This function is called from NewMessageFragment
     fun toggleEditor(isVisible: Boolean) {
         binding.editor.isVisible = isVisible
         if (!isVisible) {

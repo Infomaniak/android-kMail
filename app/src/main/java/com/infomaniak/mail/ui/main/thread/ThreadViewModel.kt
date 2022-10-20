@@ -38,9 +38,8 @@ class ThreadViewModel : ViewModel() {
     fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }
 
     fun fetchDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val parentMessageUid = message.uid
         ApiRepository.getDraft(message.draftResource).data?.let { draft ->
-            DraftController.upsertDraft(draft.initLocalValues(parentMessageUid))
+            DraftController.upsertDraft(draft.initLocalValues(message.uid))
             openDraftUuid.postValue(draft.uuid)
         }
     }

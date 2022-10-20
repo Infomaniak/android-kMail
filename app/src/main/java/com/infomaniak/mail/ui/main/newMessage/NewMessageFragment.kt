@@ -68,8 +68,6 @@ class NewMessageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        // handleOnBackPressed()
-
         // TODO: Do we want this button?
         // toTransparentButton.setOnClickListener {
         //     viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
@@ -135,13 +133,13 @@ class NewMessageFragment : Fragment() {
 
     private fun listenToSubject() {
         binding.subjectTextField.doAfterTextChanged { editable ->
-            editable?.let { newMessageViewModel.updateMailSubject(it.toString()) }
+            editable?.toString()?.let(newMessageViewModel::updateMailSubject)
         }
     }
 
     private fun listenToBody() {
         binding.bodyText.doAfterTextChanged { editable ->
-            editable?.let { newMessageViewModel.updateMailBody(it.toString()) }
+            editable?.toString()?.let(newMessageViewModel::updateMailBody)
         }
     }
 
@@ -436,12 +434,6 @@ class NewMessageFragment : Fragment() {
         updateToAutocompleteInputMargins()
     }
     //endregion
-
-    fun getFromMailbox(): Mailbox = mailboxes[selectedMailboxIndex]
-
-    fun getSubject(): String = binding.subjectTextField.text.toString()
-
-    fun getBody(): String = binding.bodyText.text.toString()
 
     enum class FieldType(@StringRes val displayedName: Int) {
         TO(R.string.toTitle),
