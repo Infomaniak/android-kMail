@@ -26,9 +26,11 @@ import androidx.core.view.isVisible
 import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.observeNotNull
 import com.google.android.material.R as RMaterial
 
 class NewMessageActivity : ThemedActivity() {
@@ -51,34 +53,31 @@ class NewMessageActivity : ThemedActivity() {
         setupToolbar()
         setupEditorActions()
         setupEditorFormatActionsToggle()
+        listenToCloseActivity()
     }
 
-    private fun handleOnBackPressed() {
+    private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (newMessageViewModel.isAutocompletionOpened) {
+            if (isAutocompletionOpened) {
                 newMessageFragment.closeAutocompletion()
             } else {
-                newMessageViewModel.saveMail {
-                    newMessageViewModel.deleteDraft()
-                }
-                finish()
+                saveMail(DraftAction.SAVE)
             }
         }
     }
 
-    private fun setupToolbar() = with(binding) {
+    private fun setupToolbar() = with(newMessageViewModel) {
 
-        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        toolbar.setOnMenuItemClickListener {
-            newMessageViewModel.sendMail { isSuccess ->
-                if (isSuccess) {
-                    newMessageViewModel.deleteDraft()
-                    finish()
-                }
-            }
+        binding.toolbar.setOnMenuItemClickListener {
+            if (mailTo.isNotEmpty()) saveMail(DraftAction.SEND)
             true
         }
+    }
+
+    private fun listenToCloseActivity() {
+        newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (it) finish() }
     }
 
     private fun setupEditorActions() = with(binding) {

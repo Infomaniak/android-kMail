@@ -80,6 +80,11 @@ class MainActivity : ThemedActivity() {
         mainViewModel.loadCurrentMailbox(UiSettings.getInstance(this).threadMode)
     }
 
+    override fun onResume() {
+        super.onResume()
+        mainViewModel.executeDraftsActions()
+    }
+
     private fun listenToNetworkStatus() {
         LiveDataNetworkStatus(this).observe(this) { isAvailable ->
             Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")

@@ -55,8 +55,8 @@ class NewMessageViewModel : ViewModel() {
 
     // Boolean : for toggleable actions, false if the formatting has been removed and true if the formatting has been applied
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-
     val currentDraftUuid = MutableLiveData<String?>()
+    val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
     fun setupDraft(draftUuid: String?) = viewModelScope.launch(Dispatchers.IO) {
         val uuid = RealmDatabase.mailboxContent().writeBlocking {
@@ -97,67 +97,13 @@ class NewMessageViewModel : ViewModel() {
         })
     }
 
-    fun saveMail(completion: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-
-        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: run {
-            completion()
-            return@launch
-        }
-        val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: run {
-            completion()
-            return@launch
-        }
-
-        RealmDatabase.mailboxContent().writeBlocking {
-            val draftUuid = currentDraftUuid.value ?: return@writeBlocking
-
-            saveDraft(draftUuid, this)
-
-            val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
-
-            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
-            draft.identityId = signature.data?.defaultSignatureId
-            draft.action = DraftAction.SAVE
-
-            ApiRepository.saveDraft(mailbox.uuid, draft)
-        }
-
-        completion()
-    }
-
-    fun sendMail(completion: (isSuccess: Boolean) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-
-        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: run {
-            completion(false)
-            return@launch
-        }
-        val mailbox = MailboxController.getMailbox(mailboxObjectId) ?: run {
-            completion(false)
-            return@launch
-        }
-
-        var isSuccess = false
-
-        RealmDatabase.mailboxContent().writeBlocking {
-            val draftUuid = currentDraftUuid.value ?: return@writeBlocking
-            val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
-            if (draft.to.isEmpty()) return@writeBlocking
-
-            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
-            draft.identityId = signature.data?.defaultSignatureId
-            draft.action = DraftAction.SEND
-
-            isSuccess = ApiRepository.sendDraft(mailbox.uuid, draft).isSuccess()
-        }
-
-        completion(isSuccess)
-    }
-
-    fun deleteDraft() = viewModelScope.launch(Dispatchers.IO) {
+    fun saveMail(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
         val draftUuid = currentDraftUuid.value ?: return@launch
+        val mailbox = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return@launch
+        val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
         RealmDatabase.mailboxContent().writeBlocking {
-            val draft = DraftController.getDraft(draftUuid, this) ?: return@writeBlocking
-            delete(draft)
+            saveDraft(draftUuid, signature.data?.defaultSignatureId, action, this)
+            shouldCloseActivity.postValue(true)
         }
     }
 
@@ -184,13 +130,15 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    private fun saveDraft(draftUuid: String, realm: MutableRealm? = null) {
-        DraftController.updateDraft(draftUuid, realm) {
-            it.to = mailTo.toRealmRecipients()
-            it.cc = mailCc.toRealmRecipients()
-            it.bcc = mailBcc.toRealmRecipients()
-            it.subject = mailSubject
-            it.body = mailBody
+    private fun saveDraft(draftUuid: String, identityId: Int? = null, action: DraftAction? = null, realm: MutableRealm? = null) {
+        DraftController.updateDraft(draftUuid, realm) { draft ->
+            draft.to = mailTo.toRealmRecipients()
+            draft.cc = mailCc.toRealmRecipients()
+            draft.bcc = mailBcc.toRealmRecipients()
+            draft.subject = mailSubject
+            draft.body = mailBody
+            identityId?.let { draft.identityId = it }
+            action?.let { draft.action = it }
         }
     }
 

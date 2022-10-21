@@ -22,11 +22,17 @@ import com.infomaniak.mail.data.models.draft.Draft
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 
 object DraftController {
 
     //region Queries
+    private fun MutableRealm?.getDraftsQuery(): RealmQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent()).query()
+    }
+
     private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
         return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
     }
@@ -37,6 +43,10 @@ object DraftController {
     //endregion
 
     //region Get data
+    fun getDrafts(realm: MutableRealm? = null): RealmResults<Draft> {
+        return realm.getDraftsQuery().find()
+    }
+
     fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
         return realm.getDraftQuery(uuid).find()
     }
