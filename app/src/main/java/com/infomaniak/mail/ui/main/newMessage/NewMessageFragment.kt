@@ -260,14 +260,14 @@ class NewMessageFragment : Fragment() {
         return isEmail
     }
 
-    private fun addContactToField(field: FieldType, contact: UiContact) = with(newMessageViewModel) {
+    private fun addContactToField(field: FieldType, contact: UiContact) {
         getContacts(field).add(contact)
-        autoSaveDraft()
+        newMessageViewModel.autoSaveDraft()
     }
 
-    private fun removeContactFromField(field: FieldType, index: Int) = with(newMessageViewModel) {
+    private fun removeContactFromField(field: FieldType, index: Int) {
         getContacts(field).removeAt(index)
-        autoSaveDraft()
+        newMessageViewModel.autoSaveDraft()
     }
 
     //region Chips behavior
@@ -370,8 +370,8 @@ class NewMessageFragment : Fragment() {
         toggleAutocompletion(field)
     }
 
-    private fun closeAutocompletionView() = with(newMessageViewModel) {
-        isAutocompletionOpened = false
+    private fun closeAutocompletionView() {
+        newMessageViewModel.isAutocompletionOpened = false
         toggleAutocompletion()
     }
 
