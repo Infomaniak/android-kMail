@@ -286,7 +286,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun toggleSeenStatus(thread: Thread, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
+    //region Mark as seen/unseen
+    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+        val folderId = currentFolderId.value!!
         if (thread.unseenMessagesCount == 0) {
             markAsUnseen(thread, folderId)
         } else {
@@ -313,6 +315,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
         }
     }
+    //endregion
+
+    // Delete Thread
+    fun deleteThread(thread: Thread, filter: ThreadFilter, threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
+        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
+        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
+        ApiRepository.deleteMessages(mailboxUuid, thread.messages.map { it.uid })
+        forceRefreshThreads(filter, threadMode)
+    }
+    //endregion
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
