@@ -94,7 +94,7 @@
     <color name="swipePostpone">#4CB7FF</color>
     <color name="swipeSpam">#FF8500</color>
     <color name="swipeArchive">#BA68C8</color>
-    <color name="swipeQuickActionMenu">@color/grey_text_secondary</color>
+    <color name="swipeQuickActionMenu">#85A2B6</color>
     <color name="swipeNone">@color/grey_border</color>
 
 </resources>
