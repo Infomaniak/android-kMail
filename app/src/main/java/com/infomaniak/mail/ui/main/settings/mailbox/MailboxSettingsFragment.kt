@@ -23,7 +23,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentMailboxSettingsBinding
+import com.infomaniak.mail.ui.main.settings.ItemSettingView
 import com.infomaniak.mail.utils.notYetImplemented
 
 class MailboxSettingsFragment : Fragment() {
@@ -40,9 +42,18 @@ class MailboxSettingsFragment : Fragment() {
         binding.root.setTitle(navigationArgs.mailboxName)
         setSubtitlesInitialState()
         setupListeners()
+
+
     }
 
-    private fun setSubtitlesInitialState() = with(binding) {}
+    private fun setSubtitlesInitialState() = with(binding) {
+        settingsSecurityAdsFilter.updateActivatedSubtitle()
+        settingsSecuritySpamFilter.updateActivatedSubtitle()
+    }
+
+    private fun ItemSettingView.updateActivatedSubtitle() {
+        setSubtitle(if (isChecked) R.string.settingsEnabled else R.string.settingsDisabled)
+    }
 
     private fun setupListeners() = with(binding) {
         settingsMailboxGeneralSignature.setOnClickListener { notYetImplemented() }
@@ -53,8 +64,18 @@ class MailboxSettingsFragment : Fragment() {
         settingsInboxRules.setOnClickListener { notYetImplemented() }
         settingsInboxRedirect.setOnClickListener { notYetImplemented() }
         settingsInboxAlias.setOnClickListener { notYetImplemented() }
-        settingsSecurityAdsFilter.setOnClickListener { notYetImplemented() }
-        settingsSecuritySpamFilter.setOnClickListener { notYetImplemented() }
+        settingsSecurityAdsFilter.apply {
+            setOnClickListener {
+                notYetImplemented()
+                updateActivatedSubtitle()
+            }
+        }
+        settingsSecuritySpamFilter.apply {
+            setOnClickListener {
+                notYetImplemented()
+                updateActivatedSubtitle()
+            }
+        }
         settingsSecurityBlockedRecipients.setOnClickListener { notYetImplemented() }
         settingsPrivacyDeleteSearchHistory.setOnClickListener { notYetImplemented() }
         settingsPrivacyViewLogs.setOnClickListener { notYetImplemented() }

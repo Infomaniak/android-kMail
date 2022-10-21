@@ -197,7 +197,7 @@
     <string name="settingsCancellationPeriodTitle">Délai d’annulation d’envoi</string>
     <string name="settingsDefault">Par défaut</string>
     <string name="settingsDelaySeconds">%d secondes</string>
-    <string name="settingsDensityOptionCompact">Compact</string>
+    <string name="settingsDensityOptionCompact">Compacte</string>
     <string name="settingsDensityOptionLarge">Large</string>
     <string name="settingsDensityOptionNormal">Normal</string>
     <string name="settingsDisabled">Désactivé</string>
