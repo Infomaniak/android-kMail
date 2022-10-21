@@ -110,14 +110,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="toggle"
-                app:title="@string/settingsSecurityAdsFilter" />
+                app:title="@string/settingsSecurityAdsFilter"
+                tools:subtitle="@string/settingsDisabled" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsSecuritySpamFilter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:itemAction="toggle"
-                app:title="@string/settingsSecuritySpamFilter" />
+                app:title="@string/settingsSecuritySpamFilter"
+                tools:subtitle="@string/settingsDisabled" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsSecurityBlockedRecipients"

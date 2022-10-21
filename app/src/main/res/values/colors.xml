@@ -52,7 +52,7 @@
     <color name="selectedAccountCardviewColor">@color/lightenedGrey</color>
     <color name="backgroundDisabledPrimaryButton">@color/grey_text_secondary</color>
     <color name="backgroundQuickActions">#FCFCFC</color>
-    <color name="swipeActionReadBackground">#006AB2</color>
+    <color name="threadDensityBackground">#FFFFFF</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/title</color>
@@ -81,10 +81,6 @@
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_border</color>
-
-    <!-- ButtonToggle -->
-    <color name="buttonToggleStroke">#BC0055</color>
-    <color name="buttonToggleBackground">#F7E8EF</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">#D71E04</color>

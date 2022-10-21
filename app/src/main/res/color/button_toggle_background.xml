@@ -16,6 +16,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/buttonToggleBackground" android:state_checked="true" />
+    <item android:color="?attr/colorPrimaryContainer" android:state_checked="true" />
     <item android:color="@color/backgroundColor" android:state_checked="false" />
 </selector>

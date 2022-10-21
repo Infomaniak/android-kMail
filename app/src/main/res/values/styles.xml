@@ -307,17 +307,20 @@
 
     <style name="SettingButtonToggle">
         <item name="android:backgroundTint">@color/button_toggle_background</item>
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_width">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:paddingStart">0dp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/primaryTextColor</item>
-        <item name="android:textSize">@dimen/textHintSize</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
-        <item name="strokeColor">@color/buttonToggleStroke</item>
+        <item name="strokeColor">?android:attr/colorPrimary</item>
         <item name="strokeWidth">1dp</item>
     </style>
-
 
     <!-- Default styles -->
 

@@ -68,9 +68,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginBottom="30dp"
-                app:cardBackgroundColor="@color/backgroundCardview"
+                app:cardBackgroundColor="@color/threadDensityBackground"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
