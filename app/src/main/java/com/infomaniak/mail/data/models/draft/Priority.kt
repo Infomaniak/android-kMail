@@ -17,14 +17,10 @@
  */
 package com.infomaniak.mail.data.models.draft
 
-import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-
 enum class Priority {
     LOW,
     NORMAL,
     HIGH;
-
-    fun getPriority(priority: String?): Priority? = enumValueOfOrNull<Priority>(priority?.uppercase())
 
     override fun toString() = name.lowercase()
 }
