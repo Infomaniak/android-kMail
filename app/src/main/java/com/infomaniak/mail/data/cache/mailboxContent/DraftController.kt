@@ -39,8 +39,9 @@ object DraftController {
     //endregion
 
     //region Edit data
-    fun upsertDraft(draft: Draft) {
-        RealmDatabase.mailboxContent().writeBlocking { copyToRealm(draft, UpdatePolicy.ALL) }
+    fun upsertDraft(draft: Draft, realm: MutableRealm? = null) {
+        val block: (MutableRealm) -> Unit = { it.copyToRealm(draft, UpdatePolicy.ALL) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
     //endregion
 }
