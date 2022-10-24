@@ -126,5 +126,11 @@ object FolderController {
             it.lastUpdatedAt = Date().toRealmInstant()
         }
     }
+
+    fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int) {
+        updateFolder(folderId, this) {
+            it.unreadCount += unseenMessagesCount
+        }
+    }
     //endregion
 }

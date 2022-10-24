@@ -193,7 +193,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         false
                     }
                     SwipeDirection.RIGHT_TO_LEFT -> {
-                        mainViewModel.deleteThread(item, filter, uiSettings.threadMode)
+                        mainViewModel.deleteThread(item, filter)
                         true
                     }
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")

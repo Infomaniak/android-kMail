@@ -132,7 +132,7 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.deleteMessage(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
-    fun moveMessage(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
+    fun moveMessages(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
         return callApi(
             url = ApiRoutes.moveMessage(mailboxUuid),
             method = POST,

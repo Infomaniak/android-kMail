@@ -27,7 +27,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
@@ -318,11 +320,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     // Delete Thread
-    fun deleteThread(thread: Thread, filter: ThreadFilter, threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteThread(thread: Thread, filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
+
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
         val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
-        ApiRepository.deleteMessages(mailboxUuid, thread.messages.map { it.uid })
-        forceRefreshThreads(filter, threadMode)
+        val currentFolderId = currentFolderId.value ?: return@launch
+
+        RealmDatabase.mailboxContent().writeBlocking {
+            val currentFolderRole = FolderController.getFolder(currentFolderId, this)?.role
+            val messagesUids = thread.messages.map { it.uid }
+
+            val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
+                ApiRepository.deleteMessages(mailboxUuid, messagesUids).isSuccess()
+            } else {
+                val trashId = FolderController.getFolder(FolderRole.TRASH, this)!!.id
+                ApiRepository.moveMessages(mailboxUuid, messagesUids, trashId).isSuccess()
+            }
+
+            if (isSuccess) {
+                incrementFolderUnreadCount(currentFolderId, -thread.unseenMessagesCount)
+                deleteMessages(thread.messages)
+                ThreadController.getThread(thread.uid, this)?.let(::delete)
+            } else {
+                forceRefreshThreads(filter)
+            }
+        }
     }
     //endregion
 

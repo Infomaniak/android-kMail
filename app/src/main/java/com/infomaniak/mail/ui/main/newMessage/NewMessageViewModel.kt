@@ -70,7 +70,7 @@ class NewMessageViewModel : ViewModel() {
 
     private fun Draft.fillForApi(draftAction: DraftAction) = apply {
         action = draftAction
-        to = mailTo.toRealmRecipients() ?: realmListOf()
+        to = mailTo.toRealmRecipients()
         cc = mailCc.toRealmRecipients()
         bcc = mailBcc.toRealmRecipients()
 

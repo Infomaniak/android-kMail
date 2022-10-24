@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -156,12 +157,6 @@ object ThreadController {
     fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
             thread.messages.forEach { if (!it.seen) add(it.uid) }
-        }
-    }
-
-    private fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int) {
-        FolderController.updateFolder(folderId, this) {
-            it.unreadCount += unseenMessagesCount
         }
     }
 
