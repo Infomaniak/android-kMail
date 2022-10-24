@@ -31,7 +31,8 @@ class Mailbox : RealmObject {
     var email: String = ""
     @SerialName("email_idn")
     var emailIdn: String = ""
-    var mailbox: String = ""
+    @SerialName("mailbox")
+    var mailboxName: String = ""
     @SerialName("real_mailbox")
     var realMailbox: String = ""
     @SerialName("link_id")

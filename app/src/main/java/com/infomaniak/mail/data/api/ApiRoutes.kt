@@ -31,26 +31,28 @@ object ApiRoutes {
 
     fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
 
-    fun signatures(hostingId: Int, mailboxName: String): String {
-        return "$MAIL_API/api/securedProxy/1/mail_hostings/$hostingId/mailboxes/$mailboxName/signatures"
+    fun signatures(mailboxHostingId: Int, mailboxName: String): String {
+        return "$MAIL_API/api/securedProxy/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/signatures"
     }
 
     fun mailbox() = "$MAIL_API/api/mailbox?with=unseen"
 
-    fun folders(uuid: String) = "$MAIL_API/api/mail/$uuid/folder"
+    fun folders(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/folder"
 
-    fun folder(uuid: String, folderId: String) = "${folders(uuid)}/$folderId"
+    fun folder(mailboxUuid: String, folderId: String) = "${folders(mailboxUuid)}/$folderId"
 
-    // fun renameFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/rename"
+    // fun renameFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/rename"
 
-    // fun favoriteFolder(uuid: String, folderId: String, favorite: Boolean) = "${folder(uuid, folderId)}/${if (favorite) "favorite" else "unfavorite"}"
+    // fun favoriteFolder(mailboxUuid: String, folderId: String, favorite: Boolean): String {
+    //     return "${folder(mailboxUuid, folderId)}/${if (favorite) "favorite" else "unfavorite"}"
+    // }
 
-    // fun readFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/read"
+    // fun readFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/read"
 
-    // fun flushFolder(uuid: String, folderId: String) = "${folder(uuid, folderId)}/flush"
+    // fun flushFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/flush"
 
     fun threads(
-        uuid: String,
+        mailboxUuid: String,
         folderId: String,
         threadMode: ThreadMode,
         offset: Int,
@@ -58,7 +60,7 @@ object ApiRoutes {
         searchText: String? = null,
     ): String {
 
-        val folder = folder(uuid, folderId)
+        val folder = folder(mailboxUuid, folderId)
 
         val message = "/message"
 
@@ -81,25 +83,31 @@ object ApiRoutes {
         return "${folder}${message}${page}${thread}${urlSearch}${urlAttachment}${urlFilter}"
     }
 
-    fun quotas(mailbox: String, hostingId: Int) = "$MAIL_API/api/mailbox/quotas?mailbox=$mailbox&product_id=$hostingId"
+    fun quotas(mailboxHostingId: Int, mailboxName: String): String {
+        return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
+    }
 
-    fun moveMessage(uuid: String) = "$MAIL_API/api/mail/$uuid/message/move"
+    fun moveMessage(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/move"
 
-    fun deleteMessage(uuid: String) = "$MAIL_API/api/mail/$uuid/message/delete"
+    fun deleteMessage(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/delete"
 
-    fun draft(uuid: String) = "$MAIL_API/api/mail/$uuid/draft"
+    fun draft(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/draft"
 
-    fun draft(uuid: String, draftUuid: String) = "${draft(uuid)}/$draftUuid"
+    fun draft(mailboxUuid: String, draftUuid: String) = "${draft(mailboxUuid)}/$draftUuid"
 
-    fun messageSeen(uuid: String) = "$MAIL_API/api/mail/$uuid/message/seen"
+    fun messageSeen(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/seen"
 
-    fun messageUnseen(uuid: String) = "$MAIL_API/api/mail/$uuid/message/unseen"
+    fun messageUnseen(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/unseen"
 
-    // fun messageSafe(uuid: String) = "$MAIL_API/api/mail/$uuid/message/safe"
+    // fun messageSafe(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/safe"
 
-    // fun createAttachment(uuid: String) = "${draft(uuid)}/attachment"
+    // fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
-    fun starMessage(uuid: String, star: Boolean) = "$MAIL_API/api/mail/$uuid/message/${if (star) "star" else "unstar"}"
+    fun starMessage(mailboxUuid: String, star: Boolean): String {
+        return "$MAIL_API/api/mail/$mailboxUuid/message/${if (star) "star" else "unstar"}"
+    }
 
-    // fun search(uuid: String, folderId: String, searchText: String) = "${folder(uuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
+    // fun search(mailboxUuid: String, folderId: String, searchText: String): String {
+    //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
+    // }
 }

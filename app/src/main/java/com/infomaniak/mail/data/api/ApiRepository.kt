@@ -57,8 +57,8 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun getContactImage(path: String): ApiResponse<Data> = callKotlinxApi(ApiRoutes.resource(path), GET)
 
-    fun getSignatures(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<SignaturesResult> {
-        return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxMailbox), GET)
+    fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
+        return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
     fun getMailboxes(okHttpClient: OkHttpClient = HttpClient.okHttpClient): ApiResponse<List<Mailbox>> {
@@ -93,8 +93,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
     }
 
-    fun getQuotas(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<Quotas> {
-        return callApi(ApiRoutes.quotas(mailboxMailbox, mailboxHostingId), GET)
+    fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
+        return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {

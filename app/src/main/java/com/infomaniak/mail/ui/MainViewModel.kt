@@ -150,7 +150,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun updateCurrentMailboxQuotas() {
         val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
         if (mailbox.isLimited) {
-            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.let { quotas ->
+            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName).data?.let { quotas ->
                 MailboxController.updateMailbox(mailbox.objectId) {
                     it.quotas = quotas
                 }
@@ -212,7 +212,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        val apiSignatures = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox).data?.signatures ?: return@launch
+        val apiSignatures = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName).data?.signatures ?: return@launch
 
         SignatureController.update(apiSignatures)
     }
