@@ -114,7 +114,7 @@ class Message : RealmObject {
     var priority
         get() = enumValueOfOrNull<Priority>(_priority)
         set(value) {
-            _priority = value.toString()
+            _priority = value?.apiCallValue ?: ""
         }
 
     val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID

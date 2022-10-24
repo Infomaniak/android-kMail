@@ -82,13 +82,13 @@ class Draft : RealmObject {
     var action
         get() = enumValueOfOrNull<DraftAction>(_action)
         set(value) {
-            _action = value.toString()
+            _action = value?.apiCallValue ?: ""
         }
 
     var priority
         get() = enumValueOfOrNull<Priority>(_priority)
         set(value) {
-            _priority = value.toString()
+            _priority = value?.apiCallValue ?: ""
         }
 
     fun initLocalValues(messageUid: String? = null, priority: Priority? = null): Draft {
@@ -102,10 +102,8 @@ class Draft : RealmObject {
         return this
     }
 
-    enum class DraftAction {
-        SEND,
-        SAVE;
-
-        override fun toString() = name.lowercase()
+    enum class DraftAction(val apiCallValue: String) {
+        SEND("send"),
+        SAVE("save"),
     }
 }
