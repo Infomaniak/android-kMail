@@ -74,6 +74,8 @@ class Draft : RealmObject {
 
     //region Local data (Transient)
     @Transient
+    var isLocal: Boolean = false
+    @Transient
     var parentMessageUid: String = "" // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
@@ -90,23 +92,20 @@ class Draft : RealmObject {
         }
 
     fun initLocalValues(messageUid: String? = null, priority: Priority? = null): Draft {
-        if (uuid.isEmpty()) uuid = "${LOCAL_DRAFT_UUID_PREFIX}_${UUID.randomUUID()}"
+        if (uuid.isEmpty()) {
+            uuid = UUID.randomUUID().toString()
+            isLocal = true
+        }
         messageUid?.let { this.parentMessageUid = it }
         priority?.let { this.priority = it }
 
         return this
     }
 
-    fun hasLocalUuid() = uuid.startsWith(LOCAL_DRAFT_UUID_PREFIX)
-
     enum class DraftAction {
         SEND,
         SAVE;
 
         override fun toString() = name.lowercase()
-    }
-
-    companion object { // Don't make this Companion private, it will crash at boot.
-        private const val LOCAL_DRAFT_UUID_PREFIX = "local"
     }
 }

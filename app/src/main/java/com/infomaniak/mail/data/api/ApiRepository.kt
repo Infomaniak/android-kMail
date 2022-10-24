@@ -115,7 +115,7 @@ object ApiRepository : ApiRepositoryCore() {
         fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
-        return if (draft.hasLocalUuid()) postDraft() else putDraft()
+        return if (draft.isLocal) postDraft() else putDraft()
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
@@ -123,7 +123,7 @@ object ApiRepository : ApiRepositoryCore() {
         fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
-        return if (draft.hasLocalUuid()) postDraft() else putDraft()
+        return if (draft.isLocal) postDraft() else putDraft()
     }
 
     fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
