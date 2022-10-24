@@ -298,12 +298,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
                     completedMessage.fullyDownloaded = true
-                    // TODO: Uncomment this when managing Drafts folder
-                    // if (completedMessage.isDraft && currentFolder.role = Folder.FolderRole.DRAFT) {
-                    //     Log.e("TAG", "fetchMessagesFromApi: ${completedMessage.subject} | ${completedMessage.body?.value}")
-                    //     val draft = fetchDraft(completedMessage.draftResource, completedMessage.uid)
-                    //     completedMessage.draftUuid = draft?.uuid
-                    // }
+                    if (completedMessage.isDraft) {
+                        completedMessage.draftUuid = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+                    }
                 }
             }
         }
@@ -373,14 +370,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Open Draft
-    val openDraftUuid = SingleLiveEvent<String?>()
-
-    fun fetchDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val parentMessageUid = message.uid
-        ApiRepository.getDraft(message.draftResource).data?.let { draft ->
-            DraftController.upsertDraft(draft.initLocalValues(parentMessageUid))
-            openDraftUuid.postValue(draft.uuid)
-        }
+    fun fetchDraft(draftResource: String, messageUid: String): String? {
+        return ApiRepository.getDraft(draftResource).data?.also { draft ->
+            DraftController.upsertDraft(draft.initLocalValues(messageUid))
+        }?.uuid
     }
     //endregion
 
@@ -402,7 +395,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     DraftAction.SEND -> ApiRepository.sendDraft(mailboxUuid, draft)
                     else -> Unit
                 }
-                delete(draft)
+                if (draft.isLocal || draft.action == DraftAction.SEND) delete(draft)
             }
         }
     }

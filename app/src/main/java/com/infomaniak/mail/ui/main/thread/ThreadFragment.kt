@@ -41,7 +41,6 @@ import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
 import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
@@ -60,7 +59,6 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
-        observeOpenDraftUuid()
         setupAdapter()
         mainViewModel.openThread(navigationArgs.threadUid)
         bindMessages()
@@ -110,12 +108,6 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeOpenDraftUuid() {
-        mainViewModel.openDraftUuid.observeNotNull(viewLifecycleOwner) { draftUuid ->
-            safeNavigate(ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(draftUuid))
-        }
-    }
-
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -124,7 +116,13 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
-                mainViewModel.fetchDraft(message)
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
+                        isOpeningExistingDraft = true,
+                        isExistingDraftAlreadyDownloaded = true,
+                        draftUuid = message.draftUuid,
+                    )
+                )
             }
             onDeleteDraftClicked = { message ->
                 mainViewModel.deleteDraft(message)

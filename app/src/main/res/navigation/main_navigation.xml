@@ -70,7 +70,25 @@
         android:label="NewMessageActivity"
         tools:layout="@layout/activity_new_message">
         <argument
+            android:name="isOpeningExistingDraft"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="isExistingDraftAlreadyDownloaded"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
             android:name="draftUuid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="draftResource"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="messageUid"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />

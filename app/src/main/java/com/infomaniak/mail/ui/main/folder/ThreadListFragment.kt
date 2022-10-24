@@ -94,7 +94,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         setupOnRefresh()
-        observeOpenDraftUuid()
         setupAdapter()
         setupListeners()
         setupUserAvatar()
@@ -114,12 +113,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         mainViewModel.forceRefreshThreads(filter)
-    }
-
-    private fun observeOpenDraftUuid() {
-        mainViewModel.openDraftUuid.observeNotNull(viewLifecycleOwner) { draftUuid ->
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(draftUuid))
-        }
     }
 
     private fun setupAdapter() {
@@ -154,7 +147,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             onThreadClicked = { thread ->
                 if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-                    mainViewModel.fetchDraft(thread.messages.first())
+                    val message = thread.messages.first()
+                    safeNavigate(
+                        ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+                            isOpeningExistingDraft = true,
+                            isExistingDraftAlreadyDownloaded = false,
+                            draftResource = message.draftResource,
+                            messageUid = message.uid,
+                        )
+                    )
                 } else {
                     safeNavigate(
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(

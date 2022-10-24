@@ -58,7 +58,25 @@ class NewMessageViewModel : ViewModel() {
     val currentDraftUuid = MutableLiveData<String?>()
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
-    fun setupDraft(draftUuid: String?) = viewModelScope.launch(Dispatchers.IO) {
+    fun fetchAndConfigureDraft(
+        navigationArgs: NewMessageActivityArgs,
+        mainViewModel: MainViewModel,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        with(navigationArgs) {
+            if (isOpeningExistingDraft) {
+                if (isExistingDraftAlreadyDownloaded) {
+                    configureDraft(draftUuid)
+                } else {
+                    val draftUuid = mainViewModel.fetchDraft(draftResource!!, messageUid!!)
+                    configureDraft(draftUuid)
+                }
+            } else {
+                configureDraft()
+            }
+        }
+    }
+
+    private fun configureDraft(draftUuid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val uuid = RealmDatabase.mailboxContent().writeBlocking {
             return@writeBlocking if (draftUuid == null) {
                 createDraft()

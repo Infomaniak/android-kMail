@@ -28,6 +28,7 @@ import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.ThemedActivity
 import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.observeNotNull
@@ -37,6 +38,7 @@ class NewMessageActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
     private val navigationArgs: NewMessageActivityArgs by navArgs()
+    private val mainViewModel: MainViewModel by viewModels()
     private val newMessageViewModel: NewMessageViewModel by viewModels()
 
     private val newMessageFragment by lazy {
@@ -48,7 +50,7 @@ class NewMessageActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        newMessageViewModel.setupDraft(navigationArgs.draftUuid)
+        newMessageViewModel.fetchAndConfigureDraft(navigationArgs, mainViewModel)
         handleOnBackPressed()
         setupToolbar()
         setupEditorActions()
