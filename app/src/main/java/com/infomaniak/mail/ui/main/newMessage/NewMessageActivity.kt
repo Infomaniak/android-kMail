@@ -120,7 +120,7 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun sendMail(action: DraftAction): Boolean {
-        if (newMessageViewModel.recipients.isEmpty()) return false
+        if (newMessageViewModel.mailTo.isEmpty()) return false
 
         val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return false
 

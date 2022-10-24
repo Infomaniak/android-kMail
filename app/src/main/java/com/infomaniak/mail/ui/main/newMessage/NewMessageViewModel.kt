@@ -38,9 +38,9 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    val recipients = mutableListOf<MergedContact>()
-    val newMessageCc = mutableListOf<MergedContact>()
-    val newMessageBcc = mutableListOf<MergedContact>()
+    val mailTo = mutableListOf<MergedContact>()
+    val mailCc = mutableListOf<MergedContact>()
+    val mailBcc = mutableListOf<MergedContact>()
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
@@ -65,9 +65,9 @@ class NewMessageViewModel : ViewModel() {
 
     private fun Draft.fillForApi(draftAction: DraftAction) = apply {
         action = draftAction
-        to = recipients.toRealmRecipients() ?: realmListOf()
-        cc = newMessageCc.toRealmRecipients() ?: realmListOf()
-        bcc = newMessageBcc.toRealmRecipients() ?: realmListOf()
+        to = mailTo.toRealmRecipients() ?: realmListOf()
+        cc = mailCc.toRealmRecipients() ?: realmListOf()
+        bcc = mailBcc.toRealmRecipients() ?: realmListOf()
 
         // TODO: manage advanced functionalities
         // quote = ""

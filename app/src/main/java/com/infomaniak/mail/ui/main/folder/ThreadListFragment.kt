@@ -66,7 +66,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
     private var folderJob: Job? = null
 
     private lateinit var threadListAdapter: ThreadListAdapter
@@ -110,12 +109,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
+        mainViewModel.forceRefreshThreads(filter)
     }
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
-            threadDensity = uiSettings.threadDensity,
+            threadDensity = UiSettings.getInstance(requireContext()).threadDensity,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
@@ -233,7 +232,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             setOnClickListener {
                 isCloseIconVisible = isChecked
                 filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
-                mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
+                mainViewModel.forceRefreshThreads(filter)
             }
         }
     }
@@ -336,7 +335,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
         if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
             clearFilter()
-            mainViewModel.forceRefreshThreads(filter, uiSettings.threadMode)
+            mainViewModel.forceRefreshThreads(filter)
         }
 
         lastUnreadCount = unreadCount
@@ -383,7 +382,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         if (canPaginate) {
             currentOffset += PER_PAGE
-            loadMoreThreads(uuid, folderId, uiSettings.threadMode, currentOffset, filter)
+            loadMoreThreads(uuid, folderId, currentOffset, filter)
         }
     }
 

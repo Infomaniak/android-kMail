@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.toSharedFlow
 import io.realm.kotlin.notifications.ListChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,7 +34,7 @@ class ThreadViewModel : ViewModel() {
     val openDraftUuid = SingleLiveEvent<String?>()
 
     fun messages(threadUid: String): LiveData<ListChange<Message>> = liveData(Dispatchers.IO) {
-        ThreadController.getThread(threadUid)?.let { emitSource(it.messages.asFlow().toSharedFlow().asLiveData()) }
+        ThreadController.getThread(threadUid)?.let { emitSource(it.messages.asFlow().asLiveData()) }
     }
 
     fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }
