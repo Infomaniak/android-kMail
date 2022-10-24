@@ -55,7 +55,7 @@ class ContactAdapter(
     override fun getItemCount(): Int = contacts.count()
 
     fun addFirstAvailableItem() {
-        contacts.firstOrNull()?.let { ::selectContact } ?: addUnrecognizedContact(currentField)
+        contacts.firstOrNull()?.let(::selectContact) ?: addUnrecognizedContact(currentField)
     }
 
     fun clear() {
