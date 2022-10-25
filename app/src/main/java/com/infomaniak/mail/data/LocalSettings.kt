@@ -23,11 +23,10 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.R
-import kotlin.reflect.KMutableProperty0
 
 class LocalSettings private constructor(context: Context) {
 
-    private val sharedPreferences = context.applicationContext.getSharedPreferences("UISettings", Context.MODE_PRIVATE)
+    private val sharedPreferences = context.applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
     fun removeUiSettings() = sharedPreferences.transaction { clear() }
 
@@ -38,15 +37,9 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Email forwarding
-    private var _emailForwarding: String?
-        get() = getPrivateSetting(::emailForwarding, DEFAULT_EMAIL_FORWARDING)
-        set(value) = setPrivateSetting(::emailForwarding, value)
-
     var emailForwarding: EmailForwarding
-        get() = getSetting(_emailForwarding, DEFAULT_EMAIL_FORWARDING)
-        set(value) {
-            _emailForwarding = value.name
-        }
+        get() = getEnum(EMAIL_FORWARDING_KEY, DEFAULT_EMAIL_FORWARDING)
+        set(value) = putEnum(EMAIL_FORWARDING_KEY, value)
 
     enum class EmailForwarding(@StringRes val localisedNameRes: Int) {
         IN_BODY(R.string.settingsTransferInBody),
@@ -73,15 +66,9 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Thread density
-    private var _threadDensity: String?
-        get() = getPrivateSetting(::threadDensity, DEFAULT_THREAD_DENSITY)
-        set(value) = setPrivateSetting(::threadDensity, value)
-
     var threadDensity: ThreadDensity
-        get() = getSetting(_threadDensity, DEFAULT_THREAD_DENSITY)
-        set(value) {
-            _threadDensity = value.name
-        }
+        get() = getEnum(THREAD_DENSITY_KEY, DEFAULT_THREAD_DENSITY)
+        set(value) = putEnum(THREAD_DENSITY_KEY, value)
 
     enum class ThreadDensity(@StringRes val localisedNameRes: Int) {
         COMPACT(R.string.settingsDensityOptionCompact),
@@ -91,15 +78,9 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Theme
-    private var _theme: String?
-        get() = getPrivateSetting(::theme, DEFAULT_THEME)
-        set(value) = setPrivateSetting(::theme, value)
-
     var theme: Theme
-        get() = getSetting(_theme, DEFAULT_THEME)
-        set(value) {
-            _theme = value.name
-        }
+        get() = getEnum(THEME_KEY, DEFAULT_THEME)
+        set(value) = putEnum(THEME_KEY, value)
 
     enum class Theme(@StringRes val localisedNameRes: Int, val mode: Int) {
         SYSTEM(R.string.settingsOptionSystemTheme, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
@@ -109,15 +90,9 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Accent color
-    private var _accentColor: String?
-        get() = getPrivateSetting(::accentColor, DEFAULT_ACCENT_COLOR)
-        set(value) = setPrivateSetting(::accentColor, value)
-
     var accentColor: AccentColor
-        get() = getSetting(_accentColor, DEFAULT_ACCENT_COLOR)
-        set(value) {
-            _accentColor = value.name
-        }
+        get() = getEnum(ACCENT_COLOR_KEY, DEFAULT_ACCENT_COLOR)
+        set(value) = putEnum(ACCENT_COLOR_KEY, value)
 
     enum class AccentColor(
         @StringRes val localisedNameRes: Int,
@@ -153,25 +128,13 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Swipe actions
-    private var _swipeRight: String?
-        get() = getPrivateSetting(::swipeRight, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeRight, value)
-
     var swipeRight: SwipeAction
-        get() = getSetting(_swipeRight, DEFAULT_SWIPE_ACTION)
-        set(value) {
-            _swipeRight = value.name
-        }
-
-    private var _swipeLeft: String?
-        get() = getPrivateSetting(::swipeLeft, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeLeft, value)
+        get() = getEnum(SWIPE_RIGHT_KEY, DEFAULT_SWIPE_ACTION)
+        set(value) = putEnum(SWIPE_RIGHT_KEY, value)
 
     var swipeLeft: SwipeAction
-        get() = getSetting(_swipeLeft, DEFAULT_SWIPE_ACTION)
-        set(value) {
-            _swipeLeft = value.name
-        }
+        get() = getEnum(SWIPE_LEFT_KEY, DEFAULT_SWIPE_ACTION)
+        set(value) = putEnum(SWIPE_LEFT_KEY, value)
 
     enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes private val colorRes: Int, @DrawableRes val iconRes: Int?) {
         DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin),
@@ -199,15 +162,9 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Thread mode
-    private var _threadMode: String?
-        get() = getPrivateSetting(::threadMode, DEFAULT_THREAD_MODE)
-        set(value) = setPrivateSetting(::threadMode, value)
-
     var threadMode: ThreadMode
-        get() = getSetting(_threadMode, DEFAULT_THREAD_MODE)
-        set(value) {
-            _threadMode = value.name
-        }
+        get() = getEnum(THREAD_MODE_KEY, DEFAULT_THREAD_MODE)
+        set(value) = putEnum(THREAD_MODE_KEY, value)
 
     enum class ThreadMode(val apiCallValue: String, @StringRes val localisedNameRes: Int) {
         THREADS("on", R.string.settingsOptionDiscussions),
@@ -216,15 +173,9 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region External content
-    private var _externalContent: String?
-        get() = getPrivateSetting(::externalContent, DEFAULT_EXTERNAL_CONTENT)
-        set(value) = setPrivateSetting(::externalContent, value)
-
     var externalContent: ExternalContent
-        get() = getSetting(_externalContent, DEFAULT_EXTERNAL_CONTENT)
-        set(value) {
-            _externalContent = value.name
-        }
+        get() = getEnum(EXTERNAL_CONTENT_KEY, DEFAULT_EXTERNAL_CONTENT)
+        set(value) = putEnum(EXTERNAL_CONTENT_KEY, value)
 
     enum class ExternalContent(val apiCallValue: String, @StringRes val localisedNameRes: Int) {
         ALWAYS("true", R.string.settingsOptionAlways),
@@ -233,15 +184,13 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Utils
-    private fun getPrivateSetting(key: KMutableProperty0<*>, enum: Enum<*>): String? {
-        return sharedPreferences.getString(key.name, enum.name)
+    private inline fun <reified T : Enum<T>> getEnum(key: String, default: T): T {
+        return enumValueOfOrNull<T>(sharedPreferences.getString(key, default.name)) ?: default
     }
 
-    private fun setPrivateSetting(keyClass: KMutableProperty0<*>, value: String?) {
-        sharedPreferences.transaction { putString(keyClass.name, value) }
+    private fun putEnum(key: String, value: Enum<*>) {
+        sharedPreferences.transaction { putString(key, value.name) }
     }
-
-    private inline fun <reified T : Enum<T>> getSetting(enum: String?, default: T): T = enumValueOfOrNull<T>(enum) ?: default
     //endregion
 
     companion object {
@@ -263,10 +212,19 @@ class LocalSettings private constructor(context: Context) {
         //endregion
 
         //region Keys
-        private const val CANCEL_DELAY_KEY = "cancelDelay"
-        private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReply"
-        private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgment"
-        private const val IS_APP_LOCKED_KEY = "isAppLocked"
+        private const val SHARED_PREFS_NAME = "LocalSettingsSharedPref"
+        private const val CANCEL_DELAY_KEY = "cancelDelayKey"
+        private const val EMAIL_FORWARDING_KEY = "emailForwardingKey"
+        private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReplyKey"
+        private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgmentKey"
+        private const val IS_APP_LOCKED_KEY = "isAppLockedKey"
+        private const val THREAD_DENSITY_KEY = "threadDensityKey"
+        private const val THEME_KEY = "themeKey"
+        private const val ACCENT_COLOR_KEY = "accentColorKey"
+        private const val SWIPE_RIGHT_KEY = "swipeRightKey"
+        private const val SWIPE_LEFT_KEY = "swipeLeftKey"
+        private const val THREAD_MODE_KEY = "threadModeKey"
+        private const val EXTERNAL_CONTENT_KEY = "externalContentKey"
         //endregion
 
         @Volatile
