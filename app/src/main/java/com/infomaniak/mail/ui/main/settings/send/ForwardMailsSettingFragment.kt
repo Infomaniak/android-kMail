@@ -43,7 +43,7 @@ class ForwardMailsSettingFragment : Fragment() {
 
         initBijectionTable(
             R.id.inBody to EmailForwarding.IN_BODY,
-            R.id.asAttachment to EmailForwarding.AS_ATTACHMENT
+            R.id.asAttachment to EmailForwarding.AS_ATTACHMENT,
         )
 
         check(localSettings.emailForwarding)

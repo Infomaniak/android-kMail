@@ -60,13 +60,13 @@ class LocalSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putBoolean(INCLUDE_MESSAGE_IN_REPLY_KEY, value) }
     //endregion
 
-    //region Include original message in reply
+    //region Ask email acknowledgment
     var askEmailAcknowledgement: Boolean
         get() = sharedPreferences.getBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, DEFAULT_ASK_EMAIL_ACKNOWLEDGMENT)
         set(value) = sharedPreferences.transaction { putBoolean(ASK_EMAIL_ACKNOWLEDGMENT_KEY, value) }
     //endregion
 
-    //region Lock app when coming back
+    //region App lock
     var isAppLocked: Boolean
         get() = sharedPreferences.getBoolean(IS_APP_LOCKED_KEY, DEFAULT_IS_APP_LOCKED)
         set(value) = sharedPreferences.transaction { putBoolean(IS_APP_LOCKED_KEY, value) }
@@ -267,6 +267,8 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     companion object {
+
+        //region Default values
         private const val DEFAULT_CANCEL_DELAY = 10
         private val DEFAULT_EMAIL_FORWARDING = EmailForwarding.IN_BODY
         private const val DEFAULT_INCLUDE_MESSAGE_IN_REPLY = true
@@ -280,11 +282,15 @@ class LocalSettings private constructor(context: Context) {
         private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
         private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
+        //endregion
 
+        //region Keys
         private const val CANCEL_DELAY_KEY = "cancelDelay"
         private const val INCLUDE_MESSAGE_IN_REPLY_KEY = "includeMessageInReply"
         private const val ASK_EMAIL_ACKNOWLEDGMENT_KEY = "askEmailAcknowledgment"
         private const val IS_APP_LOCKED_KEY = "isAppLocked"
+        //endregion
+
         @Volatile
         private var INSTANCE: LocalSettings? = null
 
