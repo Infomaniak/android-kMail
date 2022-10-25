@@ -129,9 +129,16 @@
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="emailSentSnackbar">E-mail envoyé</string>
+    <string name="emptyFolderDescription">Il n\'y a rien à voir, regardez-en un autre :)</string>
+    <string name="emptyFolderTitle">Ce dossier est vide !</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="favoritesFolder">Favoris</string>
+    <plurals name="folderMessageCount">
+        <item quantity="one">Ce dossier contient %d message</item>
+        <item quantity="other">Ce dossier contient %d messages</item>
+    </plurals>
+    <string name="folderNoMessageCount">Ce dossier ne contient aucun message</string>
     <string name="fromTitle">De :</string>
     <string name="helpChatbot">Chatbot</string>
     <string name="helpFAQ">FAQ</string>
@@ -155,6 +162,7 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="noBodyTitle">Ce message est vide.</string>
+    <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noEmailDescription">Composez un nouvel e-mail en cliquant sur \"Nouveau message\" en bas à droite</string>
     <string name="noEmailTitle">Vous n’avez pas d’e-mails</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse e-mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
@@ -184,9 +192,11 @@
     <string name="searchAllMessages">Tous les messages</string>
     <string name="searchFieldPlaceholder">Rechercher un message</string>
     <string name="searchFilterAttachment">Pièces-jointes</string>
-    <string name="searchFilterFolder">Dossier</string>
+    <string name="searchFilterFolder">Tous les dossiers</string>
     <string name="searchFilterRead">Lus</string>
     <string name="searchFilterUnread">Non lus</string>
+    <string name="searchNoResultsDescription">Nous n\'avons rien trouvé correspondant à votre recherche</string>
+    <string name="searchNoResultsTitle">Aucun résultats</string>
     <string name="searchViewHint">Rechercher un message</string>
     <string name="send">Envoyer</string>
     <string name="sentFolder">Messages envoyés</string>

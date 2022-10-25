@@ -45,7 +45,7 @@ class ThemeSettingFragment : Fragment() {
         initBijectionTable(
             R.id.systemTheme to SYSTEM,
             R.id.lightTheme to LIGHT,
-            R.id.darkTheme to DARK
+            R.id.darkTheme to DARK,
         )
 
         check(localSettings.theme)

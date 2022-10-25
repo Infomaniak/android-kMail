@@ -129,9 +129,16 @@
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="emailSentSnackbar">Email sent</string>
+    <string name="emptyFolderDescription">There\'s nothing to see, look at another one :)</string>
+    <string name="emptyFolderTitle">This folder is empty !</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="favoritesFolder">Favorites</string>
+    <plurals name="folderMessageCount">
+        <item quantity="one">This folder contains %d message</item>
+        <item quantity="other">This folder contains %d messages</item>
+    </plurals>
+    <string name="folderNoMessageCount">This folder contains no messages</string>
     <string name="fromTitle">From:</string>
     <string name="helpChatbot">Chatbot</string>
     <string name="helpFAQ">FAQ</string>
@@ -155,6 +162,7 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Type your message</string>
     <string name="noBodyTitle">This message is empty.</string>
+    <string name="noConversationSelected">No conversation selected in %s</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
     <string name="noEmailTitle">You don’t have any emails</string>
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
@@ -184,9 +192,11 @@
     <string name="searchAllMessages">All messages</string>
     <string name="searchFieldPlaceholder">Search an email</string>
     <string name="searchFilterAttachment">Attachments</string>
-    <string name="searchFilterFolder">Folder</string>
+    <string name="searchFilterFolder">All folders</string>
     <string name="searchFilterRead">Read</string>
     <string name="searchFilterUnread">Unread</string>
+    <string name="searchNoResultsDescription">No messages matching your search</string>
+    <string name="searchNoResultsTitle">No results</string>
     <string name="searchViewHint">Search for a message</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sent messages</string>

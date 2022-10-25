@@ -44,7 +44,7 @@ class AccentColorSettingFragment : Fragment() {
 
         initBijectionTable(
             R.id.pinkRadioButton to PINK,
-            R.id.blueRadioButton to BLUE
+            R.id.blueRadioButton to BLUE,
         )
 
         check(localSettings.accentColor)

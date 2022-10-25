@@ -58,7 +58,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 R.id.spam to SPAM,
                 R.id.readAndArchive to READ_AND_ARCHIVE,
                 R.id.quickActionMenu to QUICKACTIONS_MENU,
-                R.id.none to NONE
+                R.id.none to NONE,
             )
 
             check(localSettings.getSwipeAction(actionResId))

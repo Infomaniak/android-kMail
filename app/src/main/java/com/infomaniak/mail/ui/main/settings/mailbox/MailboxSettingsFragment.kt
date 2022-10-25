@@ -42,8 +42,6 @@ class MailboxSettingsFragment : Fragment() {
         binding.root.setTitle(navigationArgs.mailboxName)
         setSubtitlesInitialState()
         setupListeners()
-
-
     }
 
     private fun setSubtitlesInitialState() = with(binding) {
