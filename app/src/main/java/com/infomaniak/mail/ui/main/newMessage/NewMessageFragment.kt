@@ -115,7 +115,7 @@ class NewMessageFragment : Fragment() {
             }
         })
 
-        observeDraftUuid()
+        observeDraftLocalUuid()
         listenToSubject()
         listenToBody()
         observeMailboxes()
@@ -128,8 +128,8 @@ class NewMessageFragment : Fragment() {
         BCC.clearField()
     }
 
-    private fun observeDraftUuid() {
-        newMessageViewModel.currentDraftUuid.observeNotNull(viewLifecycleOwner) {
+    private fun observeDraftLocalUuid() {
+        newMessageViewModel.draftHasBeenSet.observeNotNull(viewLifecycleOwner) {
             observeContacts()
             populateUiWithExistingDraftData()
         }

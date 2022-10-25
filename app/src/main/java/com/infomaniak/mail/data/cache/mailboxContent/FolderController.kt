@@ -121,7 +121,7 @@ object FolderController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm? = null) {
+    fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm) {
         updateFolder(id, realm) {
             it.lastUpdatedAt = Date().toRealmInstant()
         }

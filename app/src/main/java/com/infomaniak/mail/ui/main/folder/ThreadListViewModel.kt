@@ -19,8 +19,10 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.text.format.DateUtils
 import androidx.lifecycle.*
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.message.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -39,6 +41,8 @@ class ThreadListViewModel : ViewModel() {
         liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().asLiveData()) }
     }
 
+    val selectedDraft = MutableLiveData<SelectedDraft>()
+
     fun listenToFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
         emitSource(
             FolderController.getFolderAsync(folderId)
@@ -56,4 +60,15 @@ class ThreadListViewModel : ViewModel() {
             }
         }
     }
+
+    fun navigateToSelectedDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+        val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
+        selectedDraft.postValue(SelectedDraft(localUuid, message.draftResource, message.uid))
+    }
+
+    data class SelectedDraft(
+        val draftLocalUuid: String?,
+        val draftResource: String?,
+        val messageUid: String?,
+    )
 }

@@ -105,6 +105,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         listenToCurrentFolder()
         listenToUpdatedAtTriggers()
         listenToContacts()
+
+        listenToSelectedDraft()
     }
 
     private fun setupOnRefresh() {
@@ -147,15 +149,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             onThreadClicked = { thread ->
                 if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-                    val message = thread.messages.first()
-                    safeNavigate(
-                        ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
-                            isOpeningExistingDraft = true,
-                            isExistingDraftAlreadyDownloaded = false,
-                            draftResource = message.draftResource,
-                            messageUid = message.uid,
-                        )
-                    )
+                    threadListViewModel.navigateToSelectedDraft(thread.messages.first())
                 } else {
                     safeNavigate(
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
@@ -167,6 +161,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     )
                 }
             }
+        }
+    }
+
+    private fun listenToSelectedDraft() {
+        threadListViewModel.selectedDraft.observeNotNull(viewLifecycleOwner) {
+            safeNavigate(
+                ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+                    isDraftExisting = true,
+                    isDraftDownloaded = it.draftLocalUuid != null,
+                    draftLocalUuid = it.draftLocalUuid,
+                    draftResource = it.draftResource,
+                    messageUid = it.messageUid,
+                )
+            )
         }
     }
 
