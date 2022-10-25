@@ -65,7 +65,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
 
             onItemCheckedListener { _, _, enum ->
                 notYetImplemented()
-                saveAction(enum as? SwipeAction ?: return@onItemCheckedListener)
+                (enum as? SwipeAction)?.let(::saveAction)
             }
         }
     }
