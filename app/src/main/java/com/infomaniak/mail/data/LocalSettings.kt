@@ -153,44 +153,24 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     //region Swipe actions
-    private var _swipeShortRight: String?
-        get() = getPrivateSetting(::swipeShortRight, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeShortRight, value)
+    private var _swipeRight: String?
+        get() = getPrivateSetting(::swipeRight, DEFAULT_SWIPE_ACTION)
+        set(value) = setPrivateSetting(::swipeRight, value)
 
-    var swipeShortRight: SwipeAction
-        get() = getSetting(_swipeShortRight, DEFAULT_SWIPE_ACTION)
+    var swipeRight: SwipeAction
+        get() = getSetting(_swipeRight, DEFAULT_SWIPE_ACTION)
         set(value) {
-            _swipeShortRight = value.name
+            _swipeRight = value.name
         }
 
-    private var _swipeLongRight: String?
-        get() = getPrivateSetting(::swipeLongRight, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeLongRight, value)
+    private var _swipeLeft: String?
+        get() = getPrivateSetting(::swipeLeft, DEFAULT_SWIPE_ACTION)
+        set(value) = setPrivateSetting(::swipeLeft, value)
 
-    var swipeLongRight: SwipeAction
-        get() = getSetting(_swipeLongRight, DEFAULT_SWIPE_ACTION)
+    var swipeLeft: SwipeAction
+        get() = getSetting(_swipeLeft, DEFAULT_SWIPE_ACTION)
         set(value) {
-            _swipeLongRight = value.name
-        }
-
-    private var _swipeShortLeft: String?
-        get() = getPrivateSetting(::swipeShortLeft, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeShortLeft, value)
-
-    var swipeShortLeft: SwipeAction
-        get() = getSetting(_swipeShortLeft, DEFAULT_SWIPE_ACTION)
-        set(value) {
-            _swipeShortLeft = value.name
-        }
-
-    private var _swipeLongLeft: String?
-        get() = getPrivateSetting(::swipeLongLeft, DEFAULT_SWIPE_ACTION)
-        set(value) = setPrivateSetting(::swipeLongLeft, value)
-
-    var swipeLongLeft: SwipeAction
-        get() = getSetting(_swipeLongLeft, DEFAULT_SWIPE_ACTION)
-        set(value) {
-            _swipeLongLeft = value.name
+            _swipeLeft = value.name
         }
 
     enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes private val colorRes: Int, @DrawableRes val iconRes: Int?) {
@@ -212,10 +192,8 @@ class LocalSettings private constructor(context: Context) {
     }
 
     fun getSwipeAction(@StringRes nameRes: Int): SwipeAction = when (nameRes) {
-        R.string.settingsSwipeShortRight -> swipeShortRight
-        R.string.settingsSwipeLongRight -> swipeLongRight
-        R.string.settingsSwipeShortLeft -> swipeShortLeft
-        R.string.settingsSwipeLongLeft -> swipeLongLeft
+        R.string.settingsSwipeRight -> swipeRight
+        R.string.settingsSwipeLeft -> swipeLeft
         else -> throw IllegalArgumentException()
     }
     //endregion

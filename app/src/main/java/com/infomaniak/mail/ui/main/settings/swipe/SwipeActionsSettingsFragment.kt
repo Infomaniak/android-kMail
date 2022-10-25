@@ -42,26 +42,26 @@ class SwipeActionsSettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         with(LocalSettings.getInstance(requireContext())) {
-            swipeRight.setSubtitle(swipeLongRight.nameRes)
-            swipeLeft.setSubtitle(swipeLongLeft.nameRes)
+            swipeRightView.setSubtitle(swipeRight.nameRes)
+            swipeLeftView.setSubtitle(swipeLeft.nameRes)
 
             swipeRightIllustration.apply {
-                swipeBackground.setCardBackgroundColor(swipeLongRight.getBackgroundColor(requireContext()))
-                swipeLongRight.iconRes?.let { swipeIcon.setImageResource(it) }
-                swipeIcon.isGone = swipeLongRight.iconRes == null
-                swipeToDefine.isVisible = swipeLongRight.iconRes == null
+                swipeBackground.setCardBackgroundColor(swipeRight.getBackgroundColor(requireContext()))
+                swipeRight.iconRes?.let { swipeIcon.setImageResource(it) }
+                swipeIcon.isGone = swipeRight.iconRes == null
+                swipeToDefine.isVisible = swipeRight.iconRes == null
             }
 
             swipeLeftIllustration.apply {
-                swipeBackground.setCardBackgroundColor(swipeLongLeft.getBackgroundColor(requireContext()))
-                swipeLongLeft.iconRes?.let { swipeIcon.setImageResource(it) }
-                swipeIcon.isGone = swipeLongLeft.iconRes == null
-                swipeToDefine.isVisible = swipeLongLeft.iconRes == null
+                swipeBackground.setCardBackgroundColor(swipeLeft.getBackgroundColor(requireContext()))
+                swipeLeft.iconRes?.let { swipeIcon.setImageResource(it) }
+                swipeIcon.isGone = swipeLeft.iconRes == null
+                swipeToDefine.isVisible = swipeLeft.iconRes == null
             }
         }
 
-        swipeRight.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongRight) }
-        swipeLeft.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongLeft) }
+        swipeRightView.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeRight) }
+        swipeLeftView.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLeft) }
     }
 
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {

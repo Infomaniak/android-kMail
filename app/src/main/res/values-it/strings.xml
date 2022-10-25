@@ -253,10 +253,8 @@
     <string name="settingsSwipeActionToDefine">To define</string>
     <string name="settingsSwipeActionsTitle">Swipe actions</string>
     <string name="settingsSwipeDescription">Swipe items in your inbox and get quick access to your most frequent actions</string>
-    <string name="settingsSwipeLongLeft">Long left swipe</string>
-    <string name="settingsSwipeLongRight">Long right swipe</string>
-    <string name="settingsSwipeShortLeft">Short left swipe</string>
-    <string name="settingsSwipeShortRight">Short right swipe</string>
+    <string name="settingsSwipeLeft">Left swipe</string>
+    <string name="settingsSwipeRight">Right swipe</string>
     <string name="settingsTheme">Theme</string>
     <string name="settingsThemeChoiceTitle">Theme choice</string>
     <string name="settingsThreadListDensityTitle">Thread list density</string>
