@@ -94,9 +94,7 @@ class ThreadListAdapter(
         }
     }
 
-    private fun getDisplayedRecipient(thread: Thread): Recipient? {
-        return thread.messages.lastOrNull()?.from?.firstOrNull()
-    }
+    private fun getDisplayedRecipient(thread: Thread): Recipient? = thread.messages.lastOrNull()?.from?.firstOrNull()
 
     override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding) {
         when (getItemViewType(position)) {

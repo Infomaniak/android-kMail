@@ -304,9 +304,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun listenToContacts() {
-        mainViewModel.mergedContacts.observe(viewLifecycleOwner) {
-            threadListAdapter.updateContacts(it ?: emptyMap())
-        }
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {

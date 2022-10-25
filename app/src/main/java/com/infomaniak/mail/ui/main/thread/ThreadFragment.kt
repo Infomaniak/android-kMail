@@ -162,9 +162,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun listenToContacts() {
-        mainViewModel.mergedContacts.observe(viewLifecycleOwner) {
-            threadAdapter.updateContacts(it ?: emptyMap())
-        }
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 
     private fun leaveThread() {

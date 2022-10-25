@@ -84,7 +84,7 @@ object ContactUtils {
 
     fun mergeApiContactsIntoPhoneContacts(
         apiContacts: List<Contact>,
-        phoneMergedContacts: MutableMap<Recipient, MergedContact>
+        phoneMergedContacts: MutableMap<Recipient, MergedContact>,
     ) {
         apiContacts.forEach { apiContact ->
             apiContact.emails.forEach { email ->

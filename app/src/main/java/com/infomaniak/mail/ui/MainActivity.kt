@@ -22,7 +22,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
@@ -47,10 +47,9 @@ class MainActivity : ThemedActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
 
-    private var contactPermissionResultLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) mainViewModel.updateUserInfo()
-        }
+    private var contactPermissionResultLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
+        if (isGranted) mainViewModel.updateUserInfo()
+    }
 
     private val backgroundColor: Color by lazy { getColor(R.color.backgroundColor).toColor() }
     private val backgroundHeaderColor: Color by lazy { getColor(R.color.backgroundHeaderColor).toColor() }

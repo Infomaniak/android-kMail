@@ -28,6 +28,7 @@ import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.observeNotNull
 
 class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -53,8 +54,8 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun listenToContacts() {
-        mainViewModel.mergedContacts.observe(viewLifecycleOwner) {
-            binding.userAvatar.loadAvatar(navigationArgs.recipient, it ?: emptyMap())
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
+            binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
         }
     }
 }
