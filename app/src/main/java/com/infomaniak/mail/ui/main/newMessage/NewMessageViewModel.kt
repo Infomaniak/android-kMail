@@ -62,7 +62,7 @@ class NewMessageViewModel : ViewModel() {
         fun saveDraft() = ApiRepository.saveDraft(mailbox.uuid, draft.fillForApi(DraftAction.SAVE))
 
         viewModelScope.launch(Dispatchers.IO) {
-            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox)
+            val signature = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)
             draft.identityId = signature.data?.defaultSignatureId
             if (action == DraftAction.SEND) sendDraft() else saveDraft()
         }
