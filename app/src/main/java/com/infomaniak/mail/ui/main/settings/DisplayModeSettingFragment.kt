@@ -52,7 +52,7 @@ class DisplayModeSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, enum ->
             notYetImplemented()
-            localSettings.threadMode = enum as? ThreadMode ?: return@onItemCheckedListener
+            (enum as? ThreadMode)?.let { localSettings.threadMode = it }
         }
     }
 }

@@ -49,8 +49,8 @@ class ForwardMailsSettingFragment : Fragment() {
         check(localSettings.emailForwarding)
 
         onItemCheckedListener { _, _, enum ->
-            localSettings.emailForwarding = (enum as? EmailForwarding) ?: return@onItemCheckedListener
             notYetImplemented()
+            (enum as? EmailForwarding)?.let { localSettings.emailForwarding = it }
         }
     }
 }

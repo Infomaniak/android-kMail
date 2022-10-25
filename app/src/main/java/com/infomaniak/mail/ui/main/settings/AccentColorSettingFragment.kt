@@ -50,7 +50,7 @@ class AccentColorSettingFragment : Fragment() {
         check(localSettings.accentColor)
 
         onItemCheckedListener { _, _, enum ->
-            chooseColor(enum as? AccentColor ?: return@onItemCheckedListener)
+            (enum as? AccentColor)?.let(::chooseColor)
         }
     }
 
