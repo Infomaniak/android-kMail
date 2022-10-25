@@ -30,10 +30,10 @@ class Recipient : EmbeddedRealmObject, Correspondent {
 
     override val initials by lazy { computeInitials() }
 
-    // TODO: Remove this method when we have EmbeddedObjects
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
         email?.let { this.email = it }
         name?.let { this.name = it }
+
         return this
     }
 
