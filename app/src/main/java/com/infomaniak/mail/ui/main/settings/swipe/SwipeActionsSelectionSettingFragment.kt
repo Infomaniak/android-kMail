@@ -72,10 +72,8 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
 
     private fun saveAction(swipeAction: SwipeAction) = with(localSettings) {
         when (navigationArgs.titleResId) {
-            R.string.settingsSwipeShortRight -> swipeShortRight = swipeAction
-            R.string.settingsSwipeLongRight -> swipeLongRight = swipeAction
-            R.string.settingsSwipeShortLeft -> swipeShortLeft = swipeAction
-            R.string.settingsSwipeLongLeft -> swipeLongLeft = swipeAction
+            R.string.settingsSwipeRight -> swipeRight = swipeAction
+            R.string.settingsSwipeLeft -> swipeLeft = swipeAction
         }
     }
 }
