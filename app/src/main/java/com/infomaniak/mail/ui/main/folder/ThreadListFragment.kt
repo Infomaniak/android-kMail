@@ -182,10 +182,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
 
-        threadsList.swipeListener = object : OnItemSwipeListener<Any> {
-            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Any): Boolean {
-
-                item as Thread
+        threadsList.swipeListener = object : OnItemSwipeListener<Thread> {
+            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Thread): Boolean {
 
                 val shouldDeleteItem = when (direction) {
                     SwipeDirection.LEFT_TO_RIGHT -> {
@@ -193,7 +191,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         false
                     }
                     SwipeDirection.RIGHT_TO_LEFT -> {
-                        mainViewModel.deleteThread(item, filter)
+                        mainViewModel.deleteThread(thread = item, filter)
                         true
                     }
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
