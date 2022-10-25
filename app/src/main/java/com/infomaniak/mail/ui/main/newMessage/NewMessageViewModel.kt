@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
@@ -70,7 +71,7 @@ class NewMessageViewModel : ViewModel() {
                     isDraftExisting && !isDraftDownloaded -> {
                         DraftController.fetchDraft(draftResource!!, messageUid!!, this) ?: return@writeBlocking
                     }
-                    else -> createDraft()
+                    else -> createDraft(draftMode, previousMessageUid)
                 }
 
                 setDraftSignature(currentDraftLocalUuid!!)
@@ -91,7 +92,7 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    private fun MutableRealm.createDraft(): String {
+    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
         return Draft()
             .initLocalValues(priority = Priority.NORMAL)
             .also { DraftController.upsertDraft(it, this) }
