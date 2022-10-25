@@ -99,6 +99,18 @@
             app:nullable="true" />
         <!-- Endregion -->
 
+        <!-- Region Draft mode -->
+        <argument
+            android:name="draftMode"
+            android:defaultValue="NEW_MAIL"
+            app:argType="com.infomaniak.mail.data.models.draft.Draft$DraftMode" />
+        <argument
+            android:name="previousMessageUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <!-- Endregion -->
+
     </activity>
 
     <fragment
