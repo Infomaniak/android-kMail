@@ -51,7 +51,7 @@ class ItemSettingView @JvmOverloads constructor(
 
                 title.text = getString(R.styleable.ItemSettingView_title) ?: ""
 
-                (getDrawable(R.styleable.ItemSettingView_icon)).let {
+                getDrawable(R.styleable.ItemSettingView_icon).let {
                     icon.setImageDrawable(it)
                     icon.isGone = it == null
                 }

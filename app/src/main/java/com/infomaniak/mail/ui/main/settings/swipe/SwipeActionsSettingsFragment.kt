@@ -47,14 +47,14 @@ class SwipeActionsSettingsFragment : Fragment() {
 
             swipeRightIllustration.apply {
                 swipeBackground.setCardBackgroundColor(swipeRight.getBackgroundColor(requireContext()))
-                swipeRight.iconRes?.let { swipeIcon.setImageResource(it) }
+                swipeRight.iconRes?.let(swipeIcon::setImageResource)
                 swipeIcon.isGone = swipeRight.iconRes == null
                 swipeToDefine.isVisible = swipeRight.iconRes == null
             }
 
             swipeLeftIllustration.apply {
                 swipeBackground.setCardBackgroundColor(swipeLeft.getBackgroundColor(requireContext()))
-                swipeLeft.iconRes?.let { swipeIcon.setImageResource(it) }
+                swipeLeft.iconRes?.let(swipeIcon::setImageResource)
                 swipeIcon.isGone = swipeLeft.iconRes == null
                 swipeToDefine.isVisible = swipeLeft.iconRes == null
             }
