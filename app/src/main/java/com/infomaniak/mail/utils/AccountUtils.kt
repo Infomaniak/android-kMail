@@ -157,9 +157,7 @@ object AccountUtils : CredentialManager {
                 }
 
                 override suspend fun onRefreshTokenError() {
-                    user?.let {
-                        onRefreshTokenError(it)
-                    }
+                    user?.let { onRefreshTokenError(it) }
                 }
 
                 override suspend fun getApiToken(): ApiToken {

@@ -26,7 +26,7 @@ import com.infomaniak.mail.databinding.ItemSettingsMailboxBinding
 import com.infomaniak.mail.ui.main.settings.SettingsMailboxesAdapter.SettingsMailboxViewHolder
 
 class SettingsMailboxesAdapter(
-    private val onMailboxSelected: (Mailbox) -> Unit
+    private val onMailboxSelected: (Mailbox) -> Unit,
 ) : RecyclerView.Adapter<SettingsMailboxViewHolder>() {
 
     private var mailboxes: List<Mailbox> = emptyList()
