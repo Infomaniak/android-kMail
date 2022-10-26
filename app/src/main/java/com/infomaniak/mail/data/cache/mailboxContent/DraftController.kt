@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.draft.Draft
 import io.realm.kotlin.MutableRealm
@@ -65,6 +66,14 @@ object DraftController {
     fun updateDraft(uuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
         val block: (MutableRealm) -> Unit = { getDraft(uuid, it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+    //endregion
+
+    //region Open Draft
+    fun fetchDraft(draftResource: String, messageUid: String): String? {
+        return ApiRepository.getDraft(draftResource).data?.also { draft ->
+            upsertDraft(draft.initLocalValues(messageUid))
+        }?.uuid
     }
     //endregion
 }

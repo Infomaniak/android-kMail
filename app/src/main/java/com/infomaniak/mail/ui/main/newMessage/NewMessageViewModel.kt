@@ -58,16 +58,13 @@ class NewMessageViewModel : ViewModel() {
     val currentDraftUuid = MutableLiveData<String?>()
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
-    fun fetchAndConfigureDraft(
-        navigationArgs: NewMessageActivityArgs,
-        mainViewModel: MainViewModel,
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    fun fetchAndConfigureDraft(navigationArgs: NewMessageActivityArgs) = viewModelScope.launch(Dispatchers.IO) {
         with(navigationArgs) {
             if (isOpeningExistingDraft) {
                 if (isExistingDraftAlreadyDownloaded) {
                     configureDraft(draftUuid)
                 } else {
-                    val draftUuid = mainViewModel.fetchDraft(draftResource!!, messageUid!!)
+                    val draftUuid = DraftController.fetchDraft(draftResource!!, messageUid!!)
                     configureDraft(draftUuid)
                 }
             } else {

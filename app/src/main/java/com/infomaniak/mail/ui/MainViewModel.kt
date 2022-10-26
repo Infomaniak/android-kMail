@@ -299,7 +299,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
                     completedMessage.fullyDownloaded = true
                     if (completedMessage.isDraft) {
-                        completedMessage.draftUuid = fetchDraft(completedMessage.draftResource, completedMessage.uid)
+                        completedMessage.draftUuid = DraftController.fetchDraft(
+                            completedMessage.draftResource,
+                            completedMessage.uid,
+                        )
                     }
                 }
             }
@@ -366,14 +369,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 forceRefreshThreads(filter)
             }
         }
-    }
-    //endregion
-
-    //region Open Draft
-    fun fetchDraft(draftResource: String, messageUid: String): String? {
-        return ApiRepository.getDraft(draftResource).data?.also { draft ->
-            DraftController.upsertDraft(draft.initLocalValues(messageUid))
-        }?.uuid
     }
     //endregion
 
