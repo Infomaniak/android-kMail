@@ -20,48 +20,36 @@ package com.infomaniak.mail.data.cache.userInfo
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.RealmDatabase.update
-import com.infomaniak.mail.data.models.correspondent.Contact
+import com.infomaniak.mail.data.models.MergedContact
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
-import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.coroutines.flow.Flow
 
-object ContactController {
+object MergedContactController {
 
     //region Queries
-    private fun MutableRealm?.getContactsQuery(): RealmQuery<Contact> {
+    private fun MutableRealm?.getMergedContactsQuery(): RealmQuery<MergedContact> {
         return (this ?: RealmDatabase.userInfo()).query()
-    }
-
-    private fun MutableRealm?.getContactQuery(id: String): RealmSingleQuery<Contact> {
-        return (this ?: RealmDatabase.userInfo()).query<Contact>("${Contact::id.name} = '$id'").first()
     }
     //endregion
 
     //region Get data
-    fun getContacts(realm: MutableRealm? = null): RealmResults<Contact> {
-        return realm.getContactsQuery().find()
+    fun getMergedContacts(realm: MutableRealm? = null): RealmResults<MergedContact> {
+        return realm.getMergedContactsQuery().find()
     }
 
-    private fun getContact(id: String, realm: MutableRealm? = null): Contact? {
-        return realm.getContactQuery(id).find()
+    fun getMergedContactsAsync(realm: MutableRealm? = null): Flow<ResultsChange<MergedContact>> {
+        return realm.getMergedContactsQuery().asFlow()
     }
     //endregion
 
     //region Edit data
-    fun update(apiContacts: List<Contact>) {
-        Log.d(RealmDatabase.TAG, "Contacts: Save new data")
-        RealmDatabase.userInfo().update<Contact>(apiContacts)
-    }
-
-    private fun upsertContacts(contacts: List<Contact>) {
-        RealmDatabase.userInfo().writeBlocking { contacts.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
-    }
-
-    private fun deleteContacts(contacts: List<Contact>) {
-        RealmDatabase.userInfo().writeBlocking { contacts.forEach { getContact(it.id)?.let(::delete) } }
+    fun update(mergedContacts: List<MergedContact>) {
+        Log.d(RealmDatabase.TAG, "MergedContacts: Save new data")
+        RealmDatabase.userInfo().update<MergedContact>(mergedContacts)
     }
     //endregion
 }

@@ -64,6 +64,7 @@ class ThreadFragment : Fragment() {
         setupAdapter()
         mainViewModel.openThread(navigationArgs.threadUid)
         bindMessages()
+        listenToContacts()
     }
 
     private fun setupUi() = with(binding) {
@@ -118,6 +119,7 @@ class ThreadFragment : Fragment() {
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            contacts = mainViewModel.mergedContacts.value ?: emptyMap()
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
@@ -157,6 +159,10 @@ class ThreadFragment : Fragment() {
     private fun onMessagesUpdate(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
         if (messages.isEmpty()) leaveThread()
+    }
+
+    private fun listenToContacts() {
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 
     private fun leaveThread() {

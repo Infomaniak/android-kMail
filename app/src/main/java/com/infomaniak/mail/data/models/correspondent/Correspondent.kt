@@ -26,9 +26,21 @@ interface Correspondent : Parcelable {
     var email: String
     var name: String
 
+    val initials: String
+
     fun isMe(): Boolean = AccountUtils.currentUser?.email == this.email
 
     fun getNameOrEmail(): String = name.ifBlank { email }
+
+    fun computeInitials(): String {
+        val words = getNameOrEmail().replace(Regex("\\p{Punct}"), "").split(" ").filter { it.isNotEmpty() }
+
+        return when (words.count()) {
+            0 -> ""
+            1 -> words.first().first().toString()
+            else -> "${words.first().first()}${words.last().first()}"
+        }.uppercase()
+    }
 
     fun displayedName(context: Context): String = if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
 }

@@ -21,16 +21,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.observeNotNull
 
 class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetDetailedContactBinding
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -39,11 +43,19 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        userAvatar.loadAvatar(navigationArgs.correspondent)
-        fillInUserNameAndEmail(navigationArgs.correspondent, name, email)
+        userAvatar.loadAvatar(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
+        fillInUserNameAndEmail(navigationArgs.recipient, name, email)
 
         writeMail.setOnClickListener { notYetImplemented() }
         addToContacts.setOnClickListener { notYetImplemented() }
         copyAddress.setOnClickListener { notYetImplemented() }
+
+        listenToContacts()
+    }
+
+    private fun listenToContacts() {
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
+            binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
+        }
     }
 }

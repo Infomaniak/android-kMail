@@ -36,14 +36,18 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThread
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
-import com.infomaniak.mail.data.cache.userInfo.ContactController
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
+import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -57,6 +61,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var canPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = MutableLiveData(false)
+
+    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
 
     fun close() {
         Log.i(TAG, "close")
@@ -201,8 +207,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateContacts() {
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
+        val phoneMergedContacts = getPhoneContacts(getApplication())
 
-        ContactController.update(apiContacts)
+        mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
+
+        MergedContactController.update(phoneMergedContacts.values.toList())
+    }
+
+    fun listenToRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
+        MergedContactController.getMergedContactsAsync().collect {
+            mergedContacts.postValue(
+                it.list.associateBy { mergedContact ->
+                    Recipient().initLocalValues(mergedContact.email, mergedContact.name)
+                }
+            )
+        }
     }
 
     private fun updateMailboxes() {
