@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.content.ClipDescription
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
@@ -114,7 +115,7 @@ class NewMessageViewModel : ViewModel() {
 
             val defaultSignature = SignatureController.getDefaultSignature(this) ?: return@updateDraft
 
-            draft.mimeType = "text/html"
+            draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
 
             draft.identityId = defaultSignature.id
 
