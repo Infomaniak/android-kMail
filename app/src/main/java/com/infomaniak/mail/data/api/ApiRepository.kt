@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
+import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -57,8 +58,8 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun getContactImage(path: String): ApiResponse<Data> = callKotlinxApi(ApiRoutes.resource(path), GET)
 
-    fun getSignatures(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<SignaturesResult> {
-        return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxMailbox), GET)
+    fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
+        return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
     fun getMailboxes(okHttpClient: OkHttpClient = HttpClient.okHttpClient): ApiResponse<List<Mailbox>> {
@@ -93,8 +94,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
     }
 
-    fun getQuotas(mailboxHostingId: Int, mailboxMailbox: String): ApiResponse<Quotas> {
-        return callApi(ApiRoutes.quotas(mailboxMailbox, mailboxHostingId), GET)
+    fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
+        return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
@@ -127,11 +128,11 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
 
-    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<EmptyResponse?> {
+    fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {
         return callApi(ApiRoutes.deleteMessage(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
-    fun moveMessage(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
+    fun moveMessages(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
         return callApi(
             url = ApiRoutes.moveMessage(mailboxUuid),
             method = POST,

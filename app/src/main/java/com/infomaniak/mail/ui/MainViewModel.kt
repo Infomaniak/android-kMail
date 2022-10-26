@@ -27,7 +27,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
@@ -156,7 +158,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun updateCurrentMailboxQuotas() {
         val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
         if (mailbox.isLimited) {
-            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailbox).data?.let { quotas ->
+            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName).data?.let { quotas ->
                 MailboxController.updateMailbox(mailbox.objectId) {
                     it.quotas = quotas
                 }
@@ -231,7 +233,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        val apiSignatures = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailbox).data?.signatures ?: return@launch
+        val apiSignatures = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName).data?.signatures ?: return@launch
 
         SignatureController.update(apiSignatures)
     }
@@ -305,7 +307,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun toggleSeenStatus(thread: Thread, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
+    //region Mark as seen/unseen
+    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+        val folderId = currentFolderId.value!!
         if (thread.unseenMessagesCount == 0) {
             markAsUnseen(thread, folderId)
         } else {
@@ -332,6 +336,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
         }
     }
+    //endregion
+
+    // Delete Thread
+    fun deleteThread(thread: Thread, filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
+
+        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
+        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
+        val currentFolderId = currentFolderId.value ?: return@launch
+
+        RealmDatabase.mailboxContent().writeBlocking {
+            val currentFolderRole = FolderController.getFolder(currentFolderId, this)?.role
+            val messagesUids = thread.messages.map { it.uid }
+
+            val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
+                ApiRepository.deleteMessages(mailboxUuid, messagesUids).isSuccess()
+            } else {
+                val trashId = FolderController.getFolder(FolderRole.TRASH, this)!!.id
+                ApiRepository.moveMessages(mailboxUuid, messagesUids, trashId).isSuccess()
+            }
+
+            if (isSuccess) {
+                incrementFolderUnreadCount(currentFolderId, -thread.unseenMessagesCount)
+                deleteMessages(thread.messages)
+                ThreadController.getThread(thread.uid, this)?.let(::delete)
+            } else {
+                // When the swiped animation finished, the Thread has been removed from the UI.
+                // So if the API call failed, we need to put back this Thread in the UI.
+                // Force-refreshing Realm will do that.
+                forceRefreshThreads(filter)
+            }
+        }
+    }
+    //endregion
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
