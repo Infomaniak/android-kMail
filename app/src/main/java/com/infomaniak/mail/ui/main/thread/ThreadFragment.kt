@@ -41,6 +41,7 @@ import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.observeNotNull
 import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
@@ -62,7 +63,7 @@ class ThreadFragment : Fragment() {
         setupAdapter()
         mainViewModel.openThread(navigationArgs.threadUid)
         bindMessages()
-        listenToContacts()
+        observeContacts()
     }
 
     private fun setupUi() = with(binding) {
@@ -159,7 +160,7 @@ class ThreadFragment : Fragment() {
         if (messages.isEmpty()) leaveThread()
     }
 
-    private fun listenToContacts() {
+    private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 
