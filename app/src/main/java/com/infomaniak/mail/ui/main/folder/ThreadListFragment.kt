@@ -52,8 +52,11 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.toDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -179,15 +182,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
         }
 
-        threadsList.swipeListener = object : OnItemSwipeListener<Any> {
-            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Any): Boolean {
-                item as Thread
-                when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> mainViewModel.toggleSeenStatus(
-                        thread = item,
-                        folderId = MainViewModel.currentFolderId.value!!,
-                    )
-                    SwipeDirection.RIGHT_TO_LEFT -> notYetImplemented() // TODO: Delete thread
+        threadsList.swipeListener = object : OnItemSwipeListener<Thread> {
+            override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Thread): Boolean {
+
+                val shouldKeepItem = when (direction) {
+                    SwipeDirection.LEFT_TO_RIGHT -> {
+                        mainViewModel.toggleSeenStatus(thread = item)
+                        true
+                    }
+                    SwipeDirection.RIGHT_TO_LEFT -> {
+                        mainViewModel.deleteThread(thread = item, filter)
+                        false
+                    }
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
@@ -195,9 +201,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     blockOtherSwipes()
                     notifyItemChanged(position) // Animate the swiped element back to its original position
                 }
+
                 threadListViewModel.isRecoveringFinished.value = false
 
-                return true
+                // The return value of this callback is used to determine if the
+                // swiped item should be kept or deleted from the adapter's list.
+                return shouldKeepItem
             }
         }
     }
