@@ -25,6 +25,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
+import io.realm.kotlin.query.RealmSingleQuery
 
 object SignatureController {
 
@@ -32,11 +33,19 @@ object SignatureController {
     private fun MutableRealm?.getSignaturesQuery(): RealmQuery<Signature> {
         return (this ?: RealmDatabase.mailboxContent()).query()
     }
+
+    private fun MutableRealm?.getDefaultSignatureQuery(): RealmSingleQuery<Signature> {
+        return (this ?: RealmDatabase.mailboxContent()).query<Signature>("${Signature::isDefault.name} = true").first()
+    }
     //endregion
 
     //region Get data
     fun getSignatures(realm: MutableRealm? = null): RealmResults<Signature> {
         return realm.getSignaturesQuery().find()
+    }
+
+    fun getDefaultSignature(realm: MutableRealm? = null): Signature? {
+        return realm.getDefaultSignatureQuery().find()
     }
     //endregion
 

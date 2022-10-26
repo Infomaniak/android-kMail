@@ -112,8 +112,7 @@ class NewMessageViewModel : ViewModel() {
 
             if (draft.identityId != null) return@updateDraft
 
-            val signatures = SignatureController.getSignatures(this)
-            val defaultSignature = signatures.firstOrNull { it.isDefault } ?: return@updateDraft
+            val defaultSignature = SignatureController.getDefaultSignature(this) ?: return@updateDraft
 
             draft.mimeType = "text/html"
 
