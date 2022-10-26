@@ -17,13 +17,11 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import android.content.ClipDescription
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.MergedContact
@@ -31,7 +29,6 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Priority
-import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.MutableRealm
@@ -86,7 +83,8 @@ class NewMessageViewModel : ViewModel() {
                 draftUuid
             }
 
-            setDraftSignature(uuid)
+            DraftController.setDraftSignature(uuid, this)
+            mailBody = DraftController.getDraft(uuid, this)?.body ?: ""
 
             currentDraftUuid.postValue(uuid)
         }
@@ -105,37 +103,6 @@ class NewMessageViewModel : ViewModel() {
             mailBcc.addAll(draft.bcc.toRecipientsList())
             mailSubject = draft.subject
             mailBody = draft.body
-        }
-    }
-
-    private fun MutableRealm.setDraftSignature(draftUuid: String) {
-        DraftController.updateDraft(draftUuid, this) { draft ->
-
-            if (draft.identityId != null) return@updateDraft
-
-            val defaultSignature = SignatureController.getDefaultSignature(this) ?: return@updateDraft
-
-            draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
-
-            draft.identityId = defaultSignature.id
-
-            draft.from = realmListOf(Recipient().apply {
-                this.email = defaultSignature.sender
-                this.name = defaultSignature.fullName
-            })
-
-            draft.replyTo = realmListOf(Recipient().apply {
-                this.email = defaultSignature.replyTo
-                this.name = ""
-            })
-
-            val html = "<br><br><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
-            val body = when (defaultSignature.position) {
-                SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
-                else -> html + draft.body
-            }
-            draft.body = body
-            mailBody = body
         }
     }
 
