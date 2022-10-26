@@ -88,7 +88,7 @@ class Draft : RealmObject {
     var priority
         get() = enumValueOfOrNull<Priority>(_priority)
         set(value) {
-            _priority = value?.apiCallValue ?: ""
+            _priority = value?.apiCallValue
         }
 
     fun initLocalValues(messageUid: String? = null, priority: Priority? = null): Draft {

@@ -15,35 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.correspondent
+package com.infomaniak.mail.data.models
 
-import io.realm.kotlin.types.EmbeddedRealmObject
+import com.infomaniak.mail.data.models.correspondent.Correspondent
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.Serializable
 
-@Parcelize
-@Serializable
 @Suppress("PROPERTY_WONT_BE_SERIALIZED")
-class Recipient : EmbeddedRealmObject, Correspondent {
+@Parcelize
+class MergedContact : RealmObject, Correspondent {
+    @PrimaryKey
+    var id = ""
     override var email: String = ""
     override var name: String = ""
+    var avatar: String? = null
 
     override val initials by lazy { computeInitials() }
 
-    fun initLocalValues(email: String? = null, name: String? = null): Recipient {
-        email?.let { this.email = it }
-        name?.let { this.name = it }
+    fun initLocalValues(email: String, name: String, avatar: String? = null): MergedContact {
+        if (this.id.isEmpty()) this.id = "${email.hashCode()}_$name"
+        this.email = email
+        this.name = name
+        avatar?.let { this.avatar = it }
 
         return this
     }
 
-    override fun toString(): String = "($email -> $name)"
-
-    override fun equals(other: Any?): Boolean = other is Recipient && other.email == email && other.name == name
-
-    override fun hashCode(): Int {
-        var result = email.hashCode()
-        result = 31 * result + name.hashCode()
-        return result
-    }
+    override fun toString(): String = "{$avatar, $email, $name}"
 }

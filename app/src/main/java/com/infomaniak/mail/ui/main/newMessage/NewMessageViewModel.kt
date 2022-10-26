@@ -23,7 +23,8 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.cache.userInfo.ContactController
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -31,7 +32,6 @@ import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
@@ -41,9 +41,9 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    val mailTo = mutableListOf<UiContact>()
-    val mailCc = mutableListOf<UiContact>()
-    val mailBcc = mutableListOf<UiContact>()
+    val mailTo = mutableListOf<Recipient>()
+    val mailCc = mutableListOf<Recipient>()
+    val mailBcc = mutableListOf<Recipient>()
     var mailSubject = ""
     var mailBody = ""
 
@@ -79,22 +79,16 @@ class NewMessageViewModel : ViewModel() {
 
     private fun MutableRealm.updateLiveData(uuid: String) {
         DraftController.getDraft(uuid, this)?.let { draft ->
-            mailTo.addAll(draft.to.toUiContacts())
-            mailCc.addAll(draft.cc.toUiContacts())
-            mailBcc.addAll(draft.bcc.toUiContacts())
+            mailTo.addAll(draft.to.toRecipientsList())
+            mailCc.addAll(draft.cc.toRecipientsList())
+            mailBcc.addAll(draft.bcc.toRecipientsList())
             mailSubject = draft.subject
             mailBody = draft.body
         }
     }
 
-    fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
-        emit(mutableListOf<UiContact>().apply {
-            ContactController.getContacts().forEach { contact ->
-                contact.emails.forEach { email ->
-                    add(UiContact(email, contact.name))
-                }
-            }
-        })
+    fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
+        emit(MergedContactController.getMergedContacts())
     }
 
     fun saveMail(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
@@ -132,9 +126,9 @@ class NewMessageViewModel : ViewModel() {
 
     private fun saveDraft(draftUuid: String, identityId: Int? = null, action: DraftAction? = null, realm: MutableRealm? = null) {
         DraftController.updateDraft(draftUuid, realm) { draft ->
-            draft.to = mailTo.toRealmRecipients()
-            draft.cc = mailCc.toRealmRecipients()
-            draft.bcc = mailBcc.toRealmRecipients()
+            draft.to = mailTo.toRealmList()
+            draft.cc = mailCc.toRealmList()
+            draft.bcc = mailBcc.toRealmList()
             draft.subject = mailSubject
             draft.body = mailBody
             identityId?.let { draft.identityId = it }
@@ -147,17 +141,8 @@ class NewMessageViewModel : ViewModel() {
         super.onCleared()
     }
 
-    private fun RealmList<Recipient>.toUiContacts(): MutableList<UiContact> {
-        return map { UiContact(it.email, it.getNameOrEmail()) }.toMutableList()
-    }
-
-    private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient> {
-        return if (isEmpty()) realmListOf() else map {
-            Recipient().apply {
-                email = it.email
-                name = it.name ?: ""
-            }
-        }.toRealmList()
+    private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
+        return map { Recipient().initLocalValues(it.email, it.name) }
     }
 
     private companion object {

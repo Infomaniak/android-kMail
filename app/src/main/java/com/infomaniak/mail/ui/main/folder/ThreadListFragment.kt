@@ -104,6 +104,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         listenToDownloadState()
         listenToCurrentFolder()
         listenToUpdatedAtTriggers()
+        listenToContacts()
     }
 
     private fun setupOnRefresh() {
@@ -117,6 +118,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
             threadDensity = UiSettings.getInstance(requireContext()).threadDensity,
+            contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
@@ -308,6 +310,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun listenToUpdatedAtTriggers() {
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
+    }
+
+    private fun listenToContacts() {
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {

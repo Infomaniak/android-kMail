@@ -22,43 +22,27 @@ package com.infomaniak.mail.data.models.correspondent
 import com.infomaniak.mail.data.api.RealmListSerializer
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.annotations.Ignore
-import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 
-@Suppress("PROPERTY_WONT_BE_SERIALIZED")
-@Parcelize
 @Serializable
-class Contact : RealmObject, Correspondent {
-
-    //region API data
-    @PrimaryKey
-    var id: String = ""
-    override var name: String = ""
+data class Contact(
+    val id: String = "",
+    val name: String = "",
     @SerialName("firstname")
-    var firstName: String = ""
+    val firstName: String = "",
     @SerialName("lastname")
-    var lastName: String = ""
-    var color: String = ""
-    var other: Boolean = false
+    val lastName: String = "",
+    val color: String = "",
+    val other: Boolean = false,
     // @SerialName("contacted_times")
-    // private var contactedTimes: Map<String?, Int?> = emptyMap()
-    var emails: RealmList<String> = realmListOf()
+    // private val contactedTimes: Map<String?, Int?> = emptyMap(),
+    val emails: RealmList<String> = realmListOf(),
     @SerialName("addressbook_id")
-    var addressBookId: Int = 0
-    //endregion
-
-    //region UI data (Ignore & Transient)
-    @Ignore
-    @Transient
-    override var email: String = emails.firstOrNull() ?: ""
-    //endregion
-
+    val addressBookId: Int = 0,
+    val avatar: String? = null,
+) {
     // fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 
     // data class ContactedTimes(

@@ -17,10 +17,12 @@
  */
 package com.infomaniak.mail.ui
 
+import android.Manifest
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
@@ -44,6 +46,10 @@ class MainActivity : ThemedActivity() {
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
+
+    private var contactPermissionResultLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
+        if (isGranted) mainViewModel.updateUserInfo()
+    }
 
     private val backgroundColor: Color by lazy { getColor(R.color.backgroundColor).toColor() }
     private val backgroundHeaderColor: Color by lazy { getColor(R.color.backgroundHeaderColor).toColor() }
@@ -78,10 +84,14 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.updateUserInfo()
         mainViewModel.loadCurrentMailbox(UiSettings.getInstance(this).threadMode)
+
+        mainViewModel.listenToRealmMergedContacts()
+        requestContactsPermission()
     }
 
     override fun onResume() {
         super.onResume()
+        // TODO: This is temporary, while waiting for a "DraftsManager".
         mainViewModel.executeDraftsActions()
     }
 
@@ -104,6 +114,30 @@ class MainActivity : ThemedActivity() {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment)
             .navController
             .addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
+    }
+
+    private fun setupMenuDrawerCallbacks() = with(binding) {
+        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.apply {
+            exitDrawer = { drawerLayout.close() }
+            isDrawerOpen = { drawerLayout.isOpen }
+        }
+    }
+
+    private fun requestContactsPermission() {
+        contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
+    }
+
+    override fun onDestroy() {
+        binding.drawerLayout.removeDrawerListener(drawerListener)
+        super.onDestroy()
+    }
+
+    override fun onBackPressed(): Unit = with(binding) {
+        if (drawerLayout.isOpen) {
+            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     private fun onDestinationChanged(destination: NavDestination) {
@@ -139,27 +173,7 @@ class MainActivity : ThemedActivity() {
         // }
     }
 
-    override fun onBackPressed(): Unit = with(binding) {
-        if (drawerLayout.isOpen) {
-            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    private fun setupMenuDrawerCallbacks() = with(binding) {
-        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.apply {
-            exitDrawer = { drawerLayout.close() }
-            isDrawerOpen = { drawerLayout.isOpen }
-        }
-    }
-
     private fun setDrawerLockMode(isUnlocked: Boolean) {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
-    }
-
-    override fun onDestroy() {
-        binding.drawerLayout.removeDrawerListener(drawerListener)
-        super.onDestroy()
     }
 }
