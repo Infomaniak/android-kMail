@@ -185,14 +185,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsList.swipeListener = object : OnItemSwipeListener<Thread> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Thread): Boolean {
 
-                val shouldDeleteItem = when (direction) {
+                val shouldKeepItem = when (direction) {
                     SwipeDirection.LEFT_TO_RIGHT -> {
                         mainViewModel.toggleSeenStatus(thread = item)
-                        false
+                        true
                     }
                     SwipeDirection.RIGHT_TO_LEFT -> {
                         mainViewModel.deleteThread(thread = item, filter)
-                        true
+                        false
                     }
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
@@ -204,7 +204,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
                 threadListViewModel.isRecoveringFinished.value = false
 
-                return !shouldDeleteItem
+                // The return value of this callback is used to determine if the
+                // swiped item should be kept or deleted from the adapter's list.
+                return shouldKeepItem
             }
         }
     }

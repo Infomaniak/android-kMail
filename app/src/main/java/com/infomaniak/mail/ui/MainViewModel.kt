@@ -342,6 +342,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 deleteMessages(thread.messages)
                 ThreadController.getThread(thread.uid, this)?.let(::delete)
             } else {
+                // When the swiped animation finished, the Thread has been removed from the UI.
+                // So if the API call failed, we need to put back this Thread in the UI.
+                // Force-refreshing Realm will do that.
                 forceRefreshThreads(filter)
             }
         }
