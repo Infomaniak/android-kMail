@@ -61,31 +61,37 @@ object RealmDatabase {
     //region Open Realms
     fun appSettings(): Realm = runBlocking(Dispatchers.IO) {
         appSettingsMutex.withLock {
-            _appSettings ?: Realm.open(appSettingsConfiguration).also { _appSettings = it }
+            _appSettings ?: Realm.open(RealmConfig.appSettings).also { _appSettings = it }
         }
     }
 
     fun userInfo(): Realm = runBlocking(Dispatchers.IO) {
         userInfoMutex.withLock {
-            _userInfo ?: Realm.open(userInfoConfiguration).also { _userInfo = it }
+            _userInfo ?: Realm.open(RealmConfig.userInfo).also { _userInfo = it }
         }
     }
 
     fun mailboxInfo(): Realm = runBlocking(Dispatchers.IO) {
         mailboxInfoMutex.withLock {
-            _mailboxInfo ?: Realm.open(mailboxInfoConfiguration).also { _mailboxInfo = it }
+            _mailboxInfo ?: Realm.open(RealmConfig.mailboxInfo).also { _mailboxInfo = it }
         }
     }
 
     fun mailboxContent(): Realm = runBlocking(Dispatchers.IO) {
         mailboxContentMutex.withLock {
-            _mailboxContent ?: Realm.open(mailboxContentConfiguration(AccountUtils.currentMailboxId))
-                .also { _mailboxContent = it }
+            _mailboxContent ?: Realm.open(RealmConfig.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
         }
     }
     //endregion
 
     //region Close Realms
+    fun close() {
+        closeMailboxContent()
+        closeMailboxInfo()
+        closeUserInfo()
+        closeAppSettings()
+    }
+
     private fun closeAppSettings() {
         _appSettings?.close()
         _appSettings = null
@@ -107,87 +113,77 @@ object RealmDatabase {
     }
     //endregion
 
-    //region Configurations names
-    private const val appSettingsDbName = "AppSettings.realm"
+    private object RealmConfig {
 
-    private val userInfoDbName get() = "User-${AccountUtils.currentUserId}.realm"
+        //region Configurations names
+        const val appSettingsDbName = "AppSettings.realm"
+        const val mailboxInfoDbName = "MailboxInfo.realm"
+        val userInfoDbName get() = "User-${AccountUtils.currentUserId}.realm"
+        fun mailboxContentDbName(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
+        //endregion
 
-    private const val mailboxInfoDbName = "MailboxInfo.realm"
+        //region Configurations sets
+        val appSettingsSet = setOf(
+            AppSettings::class,
+        )
+        val userInfoSet = setOf(
+            AddressBook::class,
+            MergedContact::class,
+        )
+        val mailboxInfoSet = setOf(
+            Mailbox::class,
+            Quotas::class,
+        )
+        val mailboxContentSet = setOf(
+            Folder::class,
+            Thread::class,
+            Message::class,
+            Draft::class,
+            Recipient::class,
+            Body::class,
+            Attachment::class,
+            Signature::class,
+        )
+        val miscellaneousSet = setOf(
+            SignatureEmail::class,
+        )
+        //endregion
 
-    private fun mailboxContentDbName(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
-    //endregion
+        //region Configurations
+        val appSettings =
+            RealmConfiguration
+                .Builder(appSettingsSet)
+                .name(appSettingsDbName)
+                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+                .build()
 
-    //region Configurations sets
-    private val appSettingsSet = setOf(
-        AppSettings::class,
-    )
+        val userInfo
+            get() = RealmConfiguration
+                .Builder(userInfoSet)
+                .name(userInfoDbName)
+                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+                .build()
 
-    private val userInfoSet = setOf(
-        AddressBook::class,
-        MergedContact::class,
-    )
+        val mailboxInfo =
+            RealmConfiguration
+                .Builder(mailboxInfoSet)
+                .name(mailboxInfoDbName)
+                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+                .build()
 
-    private val mailboxInfoSet = setOf(
-        Mailbox::class,
-        Quotas::class,
-    )
+        fun mailboxContent(mailboxId: Int) =
+            RealmConfiguration
+                .Builder(mailboxContentSet)
+                .name(mailboxContentDbName(mailboxId))
+                .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+                .build()
+        //endregion
 
-    private val mailboxContentSet = setOf(
-        Folder::class,
-        Thread::class,
-        Message::class,
-        Draft::class,
-        Recipient::class,
-        Body::class,
-        Attachment::class,
-        Signature::class,
-    )
-
-    private val miscellaneousSet = setOf(
-        SignatureEmail::class,
-    )
-    //endregion
-
-    //region Configurations
-    private val appSettingsConfiguration =
-        RealmConfiguration
-            .Builder(appSettingsSet)
-            .name(appSettingsDbName)
-            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
-            .build()
-
-    private val userInfoConfiguration
-        get() = RealmConfiguration
-            .Builder(userInfoSet)
-            .name(userInfoDbName)
-            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
-            .build()
-
-    private val mailboxInfoConfiguration =
-        RealmConfiguration
-            .Builder(mailboxInfoSet)
-            .name(mailboxInfoDbName)
-            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
-            .build()
-
-    private fun mailboxContentConfiguration(mailboxId: Int) =
-        RealmConfiguration
-            .Builder(mailboxContentSet)
-            .name(mailboxContentDbName(mailboxId))
-            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
-            .build()
-    //endregion
-
-    //region Utils
-    fun close() {
-        closeMailboxContent()
-        closeMailboxInfo()
-        closeUserInfo()
-        closeAppSettings()
     }
 
+    //region Utils
     fun deleteMailboxContent(mailboxId: Int) {
-        Realm.deleteRealm(mailboxContentConfiguration(mailboxId))
+        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
     }
 
     inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
