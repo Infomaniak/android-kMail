@@ -27,13 +27,8 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignatureEmail
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
-import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.isManaged
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.types.RealmObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -113,6 +108,12 @@ object RealmDatabase {
     }
     //endregion
 
+    //region Delete Realm
+    fun deleteMailboxContent(mailboxId: Int) {
+        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
+    }
+    //endregion
+
     private object RealmConfig {
 
         //region Configurations names
@@ -180,22 +181,4 @@ object RealmDatabase {
         //endregion
 
     }
-
-    //region Utils
-    fun deleteMailboxContent(mailboxId: Int) {
-        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
-    }
-
-    inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
-        writeBlocking {
-            delete(query<T>())
-            copyListToRealm(items)
-        }
-    }
-
-    // TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
-    fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
-        items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
-    }
-    //endregion
 }

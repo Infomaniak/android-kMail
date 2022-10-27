@@ -32,7 +32,13 @@ import com.infomaniak.lib.core.utils.endOfTheWeek
 import com.infomaniak.lib.core.utils.startOfTheDay
 import com.infomaniak.lib.core.utils.startOfTheWeek
 import com.infomaniak.mail.R
+import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.isManaged
+import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmInstant
+import io.realm.kotlin.types.RealmObject
 import java.util.*
 
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
@@ -100,3 +106,17 @@ fun Context.getAttributeColor(attribute: Int): Int {
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
 }
+
+//region Realm
+inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
+    writeBlocking {
+        delete(query<T>())
+        copyListToRealm(items)
+    }
+}
+
+// TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
+fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
+    items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
+}
+//endregion
