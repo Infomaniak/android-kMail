@@ -44,63 +44,48 @@ object RealmDatabase {
 
     val TAG: String = RealmDatabase::class.java.simpleName
 
+    //region Realms
     private var _appSettings: Realm? = null
     private var _userInfo: Realm? = null
     private var _mailboxInfo: Realm? = null
     private var _mailboxContent: Realm? = null
+    //endregion
 
+    //region Realms' mutexes
     private val appSettingsMutex = Mutex()
     private val userInfoMutex = Mutex()
     private val mailboxInfoMutex = Mutex()
     private val mailboxContentMutex = Mutex()
+    //endregion
 
+    //region Open Realms
     fun appSettings(): Realm = runBlocking(Dispatchers.IO) {
         appSettingsMutex.withLock {
-            _appSettings ?: Realm.open(RealmConfig.appSettings).also { _appSettings = it }
+            _appSettings ?: Realm.open(appSettingsConfiguration).also { _appSettings = it }
         }
     }
 
     fun userInfo(): Realm = runBlocking(Dispatchers.IO) {
         userInfoMutex.withLock {
-            _userInfo ?: Realm.open(RealmConfig.userInfo).also { _userInfo = it }
+            _userInfo ?: Realm.open(userInfoConfiguration).also { _userInfo = it }
         }
     }
 
     fun mailboxInfo(): Realm = runBlocking(Dispatchers.IO) {
         mailboxInfoMutex.withLock {
-            _mailboxInfo ?: Realm.open(RealmConfig.mailboxInfo).also { _mailboxInfo = it }
+            _mailboxInfo ?: Realm.open(mailboxInfoConfiguration).also { _mailboxInfo = it }
         }
     }
 
     fun mailboxContent(): Realm = runBlocking(Dispatchers.IO) {
         mailboxContentMutex.withLock {
-            _mailboxContent ?: Realm.open(RealmConfig.mailboxContent(AccountUtils.currentMailboxId)).also { _mailboxContent = it }
+            _mailboxContent ?: Realm.open(mailboxContentConfiguration(AccountUtils.currentMailboxId))
+                .also { _mailboxContent = it }
         }
     }
+    //endregion
 
-    inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
-        writeBlocking {
-            delete(query<T>())
-            copyListToRealm(items)
-        }
-    }
-
-    // TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
-    fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
-        items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
-    }
-
-    fun deleteMailboxContent(mailboxId: Int) {
-        Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
-    }
-
-    fun close() {
-        closeMailboxContent()
-        closeMailboxInfo()
-        closeUserInfo()
-        closeAppSettings()
-    }
-
+    //region Close Realms
     private fun closeAppSettings() {
         _appSettings?.close()
         _appSettings = null
@@ -120,72 +105,101 @@ object RealmDatabase {
         _mailboxContent?.close()
         _mailboxContent = null
     }
+    //endregion
 
-    private object RealmConfig {
+    //region Configurations names
+    private const val appSettingsDbName = "AppSettings.realm"
 
-        private const val appSettingsDbName = "AppSettings.realm"
-        private val userInfoDbName get() = "User-${AccountUtils.currentUserId}.realm"
-        private const val mailboxInfoDbName = "MailboxInfo.realm"
-        private fun mailboxContentDbName(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
+    private val userInfoDbName get() = "User-${AccountUtils.currentUserId}.realm"
 
-        val appSettings =
-            RealmConfiguration
-                .Builder(RealmSets.appSettings)
-                .name(appSettingsDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
-                .build()
+    private const val mailboxInfoDbName = "MailboxInfo.realm"
 
-        val userInfo
-            get() = RealmConfiguration
-                .Builder(RealmSets.userInfo)
-                .name(userInfoDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
-                .build()
+    private fun mailboxContentDbName(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
+    //endregion
 
-        val mailboxInfo =
-            RealmConfiguration
-                .Builder(RealmSets.mailboxInfo)
-                .name(mailboxInfoDbName)
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
-                .build()
+    //region Configurations sets
+    private val appSettingsSet = setOf(
+        AppSettings::class,
+    )
 
-        fun mailboxContent(mailboxId: Int) =
-            RealmConfiguration
-                .Builder(RealmSets.mailboxContent)
-                .name(mailboxContentDbName(mailboxId))
-                .deleteRealmIfMigrationNeeded() // TODO: Do we want to keep this in production?
-                .build()
+    private val userInfoSet = setOf(
+        AddressBook::class,
+        MergedContact::class,
+    )
 
-        private object RealmSets {
+    private val mailboxInfoSet = setOf(
+        Mailbox::class,
+        Quotas::class,
+    )
 
-            val appSettings = setOf(
-                AppSettings::class,
-            )
+    private val mailboxContentSet = setOf(
+        Folder::class,
+        Thread::class,
+        Message::class,
+        Draft::class,
+        Recipient::class,
+        Body::class,
+        Attachment::class,
+        Signature::class,
+    )
 
-            val userInfo = setOf(
-                AddressBook::class,
-                MergedContact::class,
-            )
+    private val miscellaneousSet = setOf(
+        SignatureEmail::class,
+    )
+    //endregion
 
-            val mailboxInfo = setOf(
-                Mailbox::class,
-                Quotas::class,
-            )
+    //region Configurations
+    private val appSettingsConfiguration =
+        RealmConfiguration
+            .Builder(appSettingsSet)
+            .name(appSettingsDbName)
+            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+            .build()
 
-            val mailboxContent = setOf(
-                Folder::class,
-                Thread::class,
-                Message::class,
-                Draft::class,
-                Recipient::class,
-                Body::class,
-                Attachment::class,
-                Signature::class,
-            )
+    private val userInfoConfiguration
+        get() = RealmConfiguration
+            .Builder(userInfoSet)
+            .name(userInfoDbName)
+            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+            .build()
 
-            val miscellaneous = setOf(
-                SignatureEmail::class,
-            )
+    private val mailboxInfoConfiguration =
+        RealmConfiguration
+            .Builder(mailboxInfoSet)
+            .name(mailboxInfoDbName)
+            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+            .build()
+
+    private fun mailboxContentConfiguration(mailboxId: Int) =
+        RealmConfiguration
+            .Builder(mailboxContentSet)
+            .name(mailboxContentDbName(mailboxId))
+            .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
+            .build()
+    //endregion
+
+    //region Utils
+    fun close() {
+        closeMailboxContent()
+        closeMailboxInfo()
+        closeUserInfo()
+        closeAppSettings()
+    }
+
+    fun deleteMailboxContent(mailboxId: Int) {
+        Realm.deleteRealm(mailboxContentConfiguration(mailboxId))
+    }
+
+    inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
+        writeBlocking {
+            delete(query<T>())
+            copyListToRealm(items)
         }
     }
+
+    // TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
+    fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
+        items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
+    }
+    //endregion
 }
