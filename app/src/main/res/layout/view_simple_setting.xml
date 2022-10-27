@@ -37,7 +37,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardview"
-        style="@style/BackgroundCardview"
+        style="@style/BackdropCardview"
         android:layout_height="0dp"
         android:layout_weight="1" />
 

@@ -117,7 +117,6 @@ object AccountUtils : CredentialManager {
         RealmDatabase.removeUserData(context, user.id)
 
         if (currentUserId == user.id) {
-            requestCurrentUser()
             if (getAllUserCount() == 0) AppSettingsController.removeAppSettings()
             withContext(Dispatchers.Main) { reloadApp?.invoke() }
         }
