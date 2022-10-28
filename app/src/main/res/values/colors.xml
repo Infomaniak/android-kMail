@@ -57,6 +57,7 @@
     <!-- Texts -->
     <color name="primaryTextColor">@color/title</color>
     <color name="secondaryTextColor">@color/grey_text</color>
+    <color name="tertiaryTextColor">@color/grey_text_secondary</color>
     <color name="snackbarTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/greyTextLight</color>
     <color name="sectionHeaderTextColor">@color/greyTextLight</color>

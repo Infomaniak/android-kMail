@@ -158,7 +158,7 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isGone = true
-        expeditor.setTextAppearance(R.style.H2_Secondary)
+        expeditor.setTextAppearance(R.style.H3_Secondary)
         mailSubject.setTextAppearance(R.style.Body_Secondary)
         mailDate.setTextAppearance(R.style.Callout_Secondary)
         iconAttachment.setDrawableColor(root.context, R.color.secondaryTextColor)
@@ -168,8 +168,8 @@ class ThreadListAdapter(
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
         expeditor.setTextAppearance(R.style.H2)
-        mailSubject.setTextAppearance(R.style.H3)
-        mailDate.setTextAppearance(R.style.Callout_Strong)
+        mailSubject.setTextAppearance(R.style.H4)
+        mailDate.setTextAppearance(R.style.CalloutStrong)
         iconAttachment.setDrawableColor(root.context, R.color.primaryTextColor)
         iconCalendar.setDrawableColor(root.context, R.color.primaryTextColor)
     }

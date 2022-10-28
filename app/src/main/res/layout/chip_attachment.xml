@@ -22,4 +22,4 @@
     android:maxWidth="@dimen/attachmentChipMaxSize"
     android:maxLines="1"
     android:textColor="@color/title"
-    android:textSize="@dimen/textHintSize" />
+    android:textSize="@dimen/textCalloutSize" />

@@ -41,7 +41,7 @@
 
     <TextView
         android:id="@+id/textView1"
-        style="@style/Callout.Highlighted"
+        style="@style/CaptionMedium.Accent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -72,7 +72,7 @@
 
     <TextView
         android:id="@+id/textView2"
-        style="@style/Callout.Highlighted"
+        style="@style/CaptionMedium.Accent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -103,7 +103,7 @@
 
     <TextView
         android:id="@+id/textView3"
-        style="@style/Callout.Highlighted"
+        style="@style/CaptionMedium.Accent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -134,7 +134,7 @@
 
     <TextView
         android:id="@+id/textView4"
-        style="@style/Callout.Highlighted"
+        style="@style/CaptionMedium.Accent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"

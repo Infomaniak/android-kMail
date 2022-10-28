@@ -88,13 +88,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
             Triple(
                 context.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
                 context.getAttributeColor(RMaterial.attr.colorPrimary),
-                R.style.Body_Highlighted
+                R.style.H4_Accent
             )
         } else {
             Triple(
                 ContextCompat.getColor(context, R.color.backgroundColor),
                 ContextCompat.getColor(context, R.color.primaryTextColor),
-                R.style.Body
+                R.style.H5
             )
         }
 

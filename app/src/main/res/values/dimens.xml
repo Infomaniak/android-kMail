@@ -19,8 +19,8 @@
 
     <!-- Text sizes -->
 
-    <dimen name="textHintSize">14sp</dimen>
-    <dimen name="textSmallSize">12sp</dimen>
+    <dimen name="textCalloutSize">14sp</dimen>
+    <dimen name="textCaptionSize">12sp</dimen>
 
     <!-- View sizes -->
 
