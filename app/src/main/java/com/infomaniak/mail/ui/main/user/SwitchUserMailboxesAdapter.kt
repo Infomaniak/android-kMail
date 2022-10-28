@@ -30,7 +30,6 @@ import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
-import com.infomaniak.lib.core.R as RCore
 
 class SwitchUserMailboxesAdapter(
     private var mailboxes: List<Mailbox>,
@@ -67,17 +66,14 @@ class SwitchUserMailboxesAdapter(
             )
         } else {
             Triple(
-                ContextCompat.getColor(context, RCore.color.title),
+                ContextCompat.getColor(context, R.color.primaryTextColor),
                 R.style.Body,
                 R.style.Callout_Accent
             )
         }
 
         envelopeIcon.setColorFilter(color)
-        emailAddress.apply {
-            setTextColor(color)
-            setTextAppearance(textStyle)
-        }
+        emailAddress.setTextAppearance(textStyle)
         unreadCount.setTextAppearance(badgeStyle)
     }
 

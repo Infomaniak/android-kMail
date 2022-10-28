@@ -142,7 +142,7 @@
     <style name="Caption.Secondary">
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
-    
+
 
     <!-- Snackbar -->
 
