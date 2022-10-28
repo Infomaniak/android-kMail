@@ -62,14 +62,14 @@ class SwitchUserMailboxesAdapter(
         val (color, textStyle, badgeStyle) = if (isSelected) {
             Triple(
                 context.getAttributeColor(RMaterial.attr.colorPrimary),
-                R.style.Callout_Highlighted_Strong,
-                R.style.Callout_Highlighted_Strong
+                R.style.H5_Accent,
+                R.style.CalloutMedium_Accent
             )
         } else {
             Triple(
                 ContextCompat.getColor(context, RCore.color.title),
-                R.style.Callout,
-                R.style.Callout_Highlighted
+                R.style.Body,
+                R.style.Callout_Accent
             )
         }
 

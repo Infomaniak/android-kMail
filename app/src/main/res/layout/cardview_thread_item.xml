@@ -78,7 +78,7 @@
 
                 <TextView
                     android:id="@+id/expeditor"
-                    style="@style/H2.Secondary"
+                    style="@style/H3.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
