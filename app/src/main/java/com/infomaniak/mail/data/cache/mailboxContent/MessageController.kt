@@ -34,7 +34,7 @@ object MessageController {
     //endregion
 
     //region Get data
-    private fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
+    fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
         return realm.getMessageQuery(uid).find()
     }
     //endregion
