@@ -212,22 +212,16 @@
 
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                     android:id="@+id/newMessageFab"
-                    style="@style/H3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandard"
                     android:layout_marginBottom="@dimen/marginStandard"
                     android:text="@string/buttonNewMessage"
-                    android:textAllCaps="false"
                     app:icon="@drawable/ic_pencil"
-                    app:iconGravity="start"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
     </com.google.android.material.card.MaterialCardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
