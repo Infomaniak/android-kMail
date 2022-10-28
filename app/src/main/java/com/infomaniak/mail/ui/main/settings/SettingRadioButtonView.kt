@@ -28,7 +28,6 @@ import com.infomaniak.mail.databinding.ViewSettingRadioButtonBinding
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
 
-
 class SettingRadioButtonView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

@@ -79,7 +79,7 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun setOnClickListeners() = with(binding) {
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        root.setNavigationOnClickListener { findNavController().popBackStack() }
         addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
     }
 

@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
@@ -113,16 +112,13 @@ object AccountUtils : CredentialManager {
     }
 
     suspend fun removeUser(context: Context, user: User) {
+
         userDatabase.userDao().delete(user)
-        // FileController.deleteUserDriveFiles(userRemoved.id) // TODO?
+        RealmDatabase.removeUserData(context, user.id)
 
         if (currentUserId == user.id) {
-            requestCurrentUser()
-
-            resetApp(context)
+            if (getAllUserCount() == 0) AppSettingsController.removeAppSettings()
             withContext(Dispatchers.Main) { reloadApp?.invoke() }
-
-            // CloudStorageProvider.notifyRootsChanged(context) // TODO?
         }
     }
 
@@ -178,18 +174,4 @@ object AccountUtils : CredentialManager {
     }
 
     suspend fun getUserById(id: Int): User? = userDatabase.userDao().findById(id)
-
-    private fun resetApp(context: Context) {
-        if (getAllUserCount() == 0) {
-            AppSettingsController.removeAppSettings()
-            // UiSettings(context).removeUiSettings() // TODO?
-
-            // Delete all app data
-            with(context) {
-                filesDir.deleteRecursively()
-                cacheDir.deleteRecursively()
-            }
-            Log.i("AccountUtils", "resetApp> all user data has been deleted")
-        }
-    }
 }

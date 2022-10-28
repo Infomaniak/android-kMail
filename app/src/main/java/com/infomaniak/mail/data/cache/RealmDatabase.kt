@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.data.cache
 
+import android.content.Context
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -112,6 +114,23 @@ object RealmDatabase {
     fun deleteMailboxContent(mailboxId: Int) {
         Realm.deleteRealm(RealmConfig.mailboxContent(mailboxId))
     }
+
+    fun removeUserData(context: Context, userId: Int) {
+        closeMailboxContent()
+        closeUserInfo()
+        mailboxInfo().writeBlocking { delete(MailboxController.getMailboxes(userId, this)) }
+        deleteUserFiles(context, userId)
+    }
+
+    private fun deleteUserFiles(context: Context, userId: Int) {
+        context.filesDir.listFiles()?.forEach { file ->
+            val isMailboxContent = file.name.startsWith(RealmConfig.mailboxContentDbNamePrefix(userId))
+            val isUserInfo = file.name.startsWith(RealmConfig.userInfoDbName(userId))
+            if (isMailboxContent || isUserInfo) {
+                if (file.isDirectory) file.deleteRecursively() else file.delete()
+            }
+        }
+    }
     //endregion
 
     private object RealmConfig {
@@ -119,8 +138,9 @@ object RealmDatabase {
         //region Configurations names
         const val appSettingsDbName = "AppSettings.realm"
         const val mailboxInfoDbName = "MailboxInfo.realm"
-        val userInfoDbName get() = "User-${AccountUtils.currentUserId}.realm"
-        fun mailboxContentDbName(mailboxId: Int) = "Mailbox-${AccountUtils.currentUserId}-${mailboxId}.realm"
+        fun userInfoDbName(userId: Int) = "User-${userId}.realm"
+        fun mailboxContentDbNamePrefix(userId: Int) = "Mailbox-${userId}-"
+        fun mailboxContentDbName(userId: Int, mailboxId: Int) = "${mailboxContentDbNamePrefix(userId)}${mailboxId}.realm"
         //endregion
 
         //region Configurations sets
@@ -161,7 +181,7 @@ object RealmDatabase {
         val userInfo
             get() = RealmConfiguration
                 .Builder(userInfoSet)
-                .name(userInfoDbName)
+                .name(userInfoDbName(AccountUtils.currentUserId))
                 .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
 
@@ -175,7 +195,7 @@ object RealmDatabase {
         fun mailboxContent(mailboxId: Int) =
             RealmConfiguration
                 .Builder(mailboxContentSet)
-                .name(mailboxContentDbName(mailboxId))
+                .name(mailboxContentDbName(AccountUtils.currentUserId, mailboxId))
                 .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
         //endregion

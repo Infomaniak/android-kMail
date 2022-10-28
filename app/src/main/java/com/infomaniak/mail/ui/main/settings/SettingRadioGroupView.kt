@@ -27,7 +27,6 @@ import androidx.core.view.children
 import com.infomaniak.mail.R
 import com.infomaniak.lib.core.R as RCore
 
-
 class SettingRadioGroupView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

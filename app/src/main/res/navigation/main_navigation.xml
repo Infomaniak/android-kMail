@@ -180,7 +180,15 @@
         android:id="@+id/manageMailAddressFragment"
         android:name="com.infomaniak.mail.ui.main.menu.ManageMailAddressFragment"
         android:label="ManageMailAddressFragment"
-        tools:layout="@layout/fragment_manage_mail_address" />
+        tools:layout="@layout/fragment_manage_mail_address">
+        <action
+            android:id="@+id/action_manageMailAddressFragment_to_switchUserFragment"
+            app:destination="@id/switchUserFragment"
+            app:enterAnim="@anim/fragment_swipe_enter"
+            app:exitAnim="@anim/fragment_swipe_exit"
+            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
+            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"

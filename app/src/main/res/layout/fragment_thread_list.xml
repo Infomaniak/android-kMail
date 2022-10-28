@@ -128,10 +128,10 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/background"
-        style="@style/BackgroundCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        style="@style/BackdropCardview"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

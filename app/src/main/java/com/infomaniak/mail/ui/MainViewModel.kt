@@ -67,7 +67,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun close() {
         Log.i(TAG, "close")
         RealmDatabase.close()
+        resetAllCurrentLiveData()
+    }
 
+    fun resetAllCurrentLiveData() {
         currentMessageUid.value = null
         currentThreadUid.value = null
         currentFolderId.value = null
