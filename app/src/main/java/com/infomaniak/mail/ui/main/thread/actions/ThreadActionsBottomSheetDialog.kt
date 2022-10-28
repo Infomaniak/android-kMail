@@ -21,7 +21,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.utils.notYetImplemented
 
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -51,11 +53,21 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         mainActions.setClosingOnClickListener { id: Int ->
             when (id) {
-                R.id.actionReply -> notYetImplemented()
-                R.id.actionReplyAll -> notYetImplemented()
+                R.id.actionReply -> navigateToNewMessageActivity(DraftMode.REPLY)
+                R.id.actionReplyAll -> navigateToNewMessageActivity(DraftMode.REPLY_ALL)
                 R.id.actionForward -> notYetImplemented()
                 R.id.actionDelete -> notYetImplemented()
             }
         }
+    }
+
+    private fun navigateToNewMessageActivity(draftMode: DraftMode) {
+        safeNavigate(
+            ThreadActionsBottomSheetDialogDirections.actionThreadActionsBottomSheetToNewMessageActivity(
+                isDraftExisting = false,
+                draftMode = draftMode,
+                previousMessageUid = navigationArgs.messageUid,
+            )
+        )
     }
 }

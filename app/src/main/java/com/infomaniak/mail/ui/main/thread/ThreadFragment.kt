@@ -82,12 +82,15 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                        isFavorite = navigationArgs.threadIsFavorite,
-                        unseenMessagesCount = navigationArgs.unseenMessagesCount,
+                R.id.quickActionMenu -> {
+                    safeNavigate(
+                        ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                            messageUid = threadAdapter.messages.last().uid,
+                            isFavorite = navigationArgs.threadIsFavorite,
+                            unseenMessagesCount = navigationArgs.unseenMessagesCount,
+                        )
                     )
-                )
+                }
             }
         }
 
@@ -140,6 +143,7 @@ class ThreadFragment : Fragment() {
             onMenuClicked = { message ->
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
+                        messageUid = message.uid,
                         isFavorite = message.isFavorite,
                         isSeen = message.seen,
                     )
