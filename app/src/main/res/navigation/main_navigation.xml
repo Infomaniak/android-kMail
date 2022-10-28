@@ -181,11 +181,17 @@
         android:label="MessageActionBottomSheetDialog"
         tools:layout="@layout/fragment_bottom_sheet_message_actions">
         <argument
+            android:name="messageUid"
+            app:argType="string" />
+        <argument
             android:name="isFavorite"
             app:argType="boolean" />
         <argument
             android:name="isSeen"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_messageActionsBottomSheet_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
@@ -194,11 +200,17 @@
         android:label="ThreadActionsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_actions_menu">
         <argument
+            android:name="messageUid"
+            app:argType="string" />
+        <argument
             android:name="isFavorite"
             app:argType="boolean" />
         <argument
             android:name="unseenMessagesCount"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_threadActionsBottomSheet_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
