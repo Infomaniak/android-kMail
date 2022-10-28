@@ -23,8 +23,9 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.userInfo.ContactController
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -37,9 +38,9 @@ import kotlinx.coroutines.launch
 
 class NewMessageViewModel : ViewModel() {
 
-    val mailTo = mutableListOf<UiContact>()
-    val mailCc = mutableListOf<UiContact>()
-    val mailBcc = mutableListOf<UiContact>()
+    val mailTo = mutableListOf<MergedContact>()
+    val mailCc = mutableListOf<MergedContact>()
+    val mailBcc = mutableListOf<MergedContact>()
 
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
@@ -47,14 +48,8 @@ class NewMessageViewModel : ViewModel() {
     // Boolean : for toggleable actions, false if the formatting has been removed and true if the formatting has been applied
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
-    fun getContacts(): LiveData<List<UiContact>> = liveData(Dispatchers.IO) {
-        emit(mutableListOf<UiContact>().apply {
-            ContactController.getContacts().forEach { contact ->
-                contact.emails.forEach { email ->
-                    add(UiContact(email, contact.name))
-                }
-            }
-        })
+    fun getContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
+        emit(MergedContactController.getMergedContacts())
     }
 
     fun sendMail(draft: Draft, action: DraftAction, mailbox: Mailbox) {
@@ -71,8 +66,8 @@ class NewMessageViewModel : ViewModel() {
     private fun Draft.fillForApi(draftAction: DraftAction) = apply {
         action = draftAction
         to = mailTo.toRealmRecipients() ?: realmListOf()
-        cc = mailCc.toRealmRecipients()
-        bcc = mailBcc.toRealmRecipients()
+        cc = mailCc.toRealmRecipients() ?: realmListOf()
+        bcc = mailBcc.toRealmRecipients() ?: realmListOf()
 
         // TODO: manage advanced functionalities
         // quote = ""
@@ -83,12 +78,7 @@ class NewMessageViewModel : ViewModel() {
         // replyTo = realmListOf()
     }
 
-    private fun List<UiContact>.toRealmRecipients(): RealmList<Recipient> {
-        return if (isEmpty()) realmListOf() else map {
-            Recipient().apply {
-                email = it.email
-                name = it.name ?: ""
-            }
-        }.toRealmList()
+    private fun List<MergedContact>.toRealmRecipients(): RealmList<Recipient>? {
+        return if (isEmpty()) null else map { Recipient().initLocalValues(it.email, it.name) }.toRealmList()
     }
 }

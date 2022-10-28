@@ -28,6 +28,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
@@ -37,9 +38,10 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
 
-class ThreadAdapter(
-    private var messages: List<Message> = mutableListOf(),
-) : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
+
+    private var messages = listOf<Message>()
+    var contacts: Map<Recipient, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
@@ -65,6 +67,14 @@ class ThreadAdapter(
             onContactClicked,
             onAttachmentClicked,
         )
+    }
+
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
+        val message = messages[position]
+        if (payloads.firstOrNull() is Unit && !message.isDraft) {
+            holder.binding.userAvatar.loadAvatar(message.from.first(), contacts)
+        }
+        super.onBindViewHolder(holder, position, payloads)
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
@@ -94,7 +104,7 @@ class ThreadAdapter(
             shortMessageDate.text = ""
         } else {
             val firstSender = message.from.first()
-            userAvatar.loadAvatar(firstSender)
+            userAvatar.loadAvatar(firstSender, contacts)
             expeditorName.apply {
                 fillInUserNameAndEmail(firstSender, this)
                 setTextColor(context.getColor(R.color.primaryTextColor))
@@ -244,13 +254,18 @@ class ThreadAdapter(
             setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
-        recipient.text = if (isExpanded) getAllRecipientFormatted(this@with) else subject
+        recipient.text = if (isExpanded) getAllRecipientsFormatted(this@with) else subject
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
     }
 
-    private fun ItemMessageBinding.getAllRecipientFormatted(message: Message): String = with(message) {
+    private fun ItemMessageBinding.getAllRecipientsFormatted(message: Message): String = with(message) {
         return listOf(*to.toTypedArray(), *cc.toTypedArray(), *bcc.toTypedArray()).joinToString { it.displayedName(context) }
+    }
+
+    fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
+        contacts = newContacts
+        notifyItemRangeChanged(0, itemCount, Unit)
     }
 
     private companion object {

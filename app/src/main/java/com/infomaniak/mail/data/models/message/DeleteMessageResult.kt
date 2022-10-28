@@ -15,19 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.newMessage
 
-import com.infomaniak.mail.data.models.correspondent.Correspondent
-import com.infomaniak.mail.data.models.correspondent.Recipient
+package com.infomaniak.mail.data.models.message
 
-data class UiContact(
-    val email: String,
-    val name: String? = null,
-) {
-    fun toCorrespondent(): Correspondent {
-        return Recipient().apply {
-            name = this@UiContact.name ?: ""
-            email = this@UiContact.email
-        }
-    }
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class DeleteMessageResult(
+    val deleted: Int,
+)

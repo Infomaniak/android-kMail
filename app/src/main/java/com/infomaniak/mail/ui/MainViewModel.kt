@@ -27,21 +27,27 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
-import com.infomaniak.mail.data.cache.userInfo.ContactController
+import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
+import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -55,6 +61,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var canPaginate = true
     var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = MutableLiveData(false)
+
+    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
 
     fun close() {
         Log.i(TAG, "close")
@@ -202,8 +210,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateContacts() {
         val apiContacts = ApiRepository.getContacts().data ?: emptyList()
+        val phoneMergedContacts = getPhoneContacts(getApplication())
 
-        ContactController.update(apiContacts)
+        mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
+
+        MergedContactController.update(phoneMergedContacts.values.toList())
+    }
+
+    fun listenToRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
+        MergedContactController.getMergedContactsAsync().collect {
+            mergedContacts.postValue(
+                it.list.associateBy { mergedContact ->
+                    Recipient().initLocalValues(mergedContact.email, mergedContact.name)
+                }
+            )
+        }
     }
 
     private fun updateMailboxes() {
@@ -289,7 +310,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun toggleSeenStatus(thread: Thread, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
+    //region Mark as seen/unseen
+    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+        val folderId = currentFolderId.value!!
         if (thread.unseenMessagesCount == 0) {
             markAsUnseen(thread, folderId)
         } else {
@@ -316,6 +339,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
         }
     }
+    //endregion
+
+    // Delete Thread
+    fun deleteThread(thread: Thread, filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
+
+        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
+        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
+        val currentFolderId = currentFolderId.value ?: return@launch
+
+        RealmDatabase.mailboxContent().writeBlocking {
+            val currentFolderRole = FolderController.getFolder(currentFolderId, this)?.role
+            val messagesUids = thread.messages.map { it.uid }
+
+            val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
+                ApiRepository.deleteMessages(mailboxUuid, messagesUids).isSuccess()
+            } else {
+                val trashId = FolderController.getFolder(FolderRole.TRASH, this)!!.id
+                ApiRepository.moveMessages(mailboxUuid, messagesUids, trashId).isSuccess()
+            }
+
+            if (isSuccess) {
+                incrementFolderUnreadCount(currentFolderId, -thread.unseenMessagesCount)
+                deleteMessages(thread.messages)
+                ThreadController.getThread(thread.uid, this)?.let(::delete)
+            } else {
+                // When the swiped animation finished, the Thread has been removed from the UI.
+                // So if the API call failed, we need to put back this Thread in the UI.
+                // Force-refreshing Realm will do that.
+                forceRefreshThreads(filter)
+            }
+        }
+    }
+    //endregion
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
