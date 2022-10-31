@@ -217,7 +217,14 @@
         android:id="@+id/replyBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialog"
         android:label="ReplyBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_reply" />
+        tools:layout="@layout/bottom_sheet_reply">
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_replyBottomSheetDialog_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
+    </dialog>
 
     <fragment
         android:id="@+id/helpFragment"

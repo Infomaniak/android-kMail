@@ -77,15 +77,18 @@ class ThreadFragment : Fragment() {
         }
 
         quickActionBar.setOnItemClickListener { menuId ->
+            val lastMessageUid = threadAdapter.messages.last().uid
             when (menuId) {
-                R.id.quickActionReply -> safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog())
+                R.id.quickActionReply -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUid)
+                )
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionDelete -> notYetImplemented()
                 R.id.quickActionMenu -> {
                     safeNavigate(
                         ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                            messageUid = threadAdapter.messages.last().uid,
+                            messageUid = lastMessageUid,
                             isFavorite = navigationArgs.threadIsFavorite,
                             unseenMessagesCount = navigationArgs.unseenMessagesCount,
                         )
@@ -138,7 +141,7 @@ class ThreadFragment : Fragment() {
                 notYetImplemented()
             }
             onReplyClicked = {
-                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog())
+                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = it.uid))
             }
             onMenuClicked = { message ->
                 safeNavigate(
