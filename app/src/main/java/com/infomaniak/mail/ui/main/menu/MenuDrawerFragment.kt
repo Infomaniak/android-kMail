@@ -29,8 +29,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.bugtracker.BugTrackerActivity
-import com.infomaniak.lib.core.bugtracker.BugTrackerActivityArgs
+import com.infomaniak.lib.bugtracker.BugTrackerActivity
+import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig

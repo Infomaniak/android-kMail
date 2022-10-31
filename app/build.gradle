@@ -54,6 +54,7 @@ android {
 
 dependencies {
     implementation project(path: ':Core')
+    implementation project(path: ':Core:BugTracker')
 
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
 
