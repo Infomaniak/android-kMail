@@ -29,9 +29,12 @@ import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.endOfTheWeek
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.startOfTheDay
 import com.infomaniak.lib.core.utils.startOfTheWeek
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -105,6 +108,17 @@ fun Context.getAttributeColor(attribute: Int): Int {
 
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
+}
+
+fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: String) {
+    safeNavigate(
+        R.id.newMessageActivity,
+        NewMessageActivityArgs(
+            isDraftExisting = false,
+            draftMode = draftMode,
+            previousMessageUid = messageUid,
+        ).toBundle(),
+    )
 }
 
 //region Realm
