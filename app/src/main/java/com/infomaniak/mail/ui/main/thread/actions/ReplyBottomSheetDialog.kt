@@ -24,10 +24,10 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
+import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -43,20 +43,10 @@ open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
 
         mainActions.setOnItemClickListener { id: Int ->
             when (id) {
-                R.id.actionReply -> navigateToNewMessageActivity(DraftMode.REPLY)
-                R.id.actionReplyAll -> navigateToNewMessageActivity(DraftMode.REPLY_ALL)
+                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, navigationArgs.messageUid)
+                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, navigationArgs.messageUid)
             }
             findNavController().popBackStack()
         }
-    }
-
-    private fun navigateToNewMessageActivity(draftMode: DraftMode) {
-        safeNavigate(
-            ReplyBottomSheetDialogDirections.actionReplyBottomSheetDialogToNewMessageActivity(
-                isDraftExisting = false,
-                draftMode = draftMode,
-                previousMessageUid = navigationArgs.messageUid,
-            )
-        )
     }
 }
