@@ -19,11 +19,12 @@
 
 package com.infomaniak.mail.data.models.message
 
-import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
@@ -53,7 +54,8 @@ class Message : RealmObject {
     @SerialName("reply_to")
     var replyTo: RealmList<Recipient> = realmListOf()
     var references: String? = null
-    var priority: String? = null
+    @SerialName("priority")
+    private var _priority: String? = null
     @SerialName("dkim_status")
     private var _dkimStatus: String? = null
     @SerialName("folder_id")
@@ -90,8 +92,6 @@ class Message : RealmObject {
 
     //region Local data (Transient)
     @Transient
-    var draftUuid: String? = null
-    @Transient
     var fullyDownloaded: Boolean = false
     @Transient
     var hasUnsubscribeLink: Boolean = false
@@ -111,7 +111,13 @@ class Message : RealmObject {
     var detailsAreExpanded = false
     //endregion
 
-    val dkimStatus: MessageDKIM get() = Utils.enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
+    var priority
+        get() = enumValueOfOrNull<Priority>(_priority)
+        set(value) {
+            _priority = value?.apiCallValue
+        }
+
+    val dkimStatus: MessageDKIM get() = enumValueOfOrNull<MessageDKIM>(_dkimStatus) ?: MessageDKIM.VALID
 
     enum class MessageDKIM {
         VALID,

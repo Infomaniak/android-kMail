@@ -17,10 +17,8 @@
  */
 package com.infomaniak.mail.data.models.draft
 
-enum class Priority {
-    LOW,
-    NORMAL,
-    HIGH;
-
-    override fun toString() = name.lowercase()
+enum class Priority(val apiCallValue: String) {
+    LOW("low"),
+    NORMAL("normal"),
+    HIGH("high"),
 }

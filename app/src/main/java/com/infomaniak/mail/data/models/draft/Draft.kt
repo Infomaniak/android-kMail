@@ -31,6 +31,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import java.util.*
 
 @Serializable
 class Draft : RealmObject {
@@ -64,7 +65,8 @@ class Draft : RealmObject {
     @SerialName("action")
     private var _action: String = ""
     var delay: Int = 0
-    var priority: String? = null
+    @SerialName("priority")
+    private var _priority: String? = null
     @SerialName("st_uuid")
     var stUuid: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
@@ -72,30 +74,36 @@ class Draft : RealmObject {
 
     //region Local data (Transient)
     @Transient
+    var isLocal: Boolean = false
+    @Transient
     var parentMessageUid: String = "" // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
     var action
         get() = enumValueOfOrNull<DraftAction>(_action)
         set(value) {
-            _action = value.toString()
+            _action = value?.apiCallValue ?: ""
         }
 
-    enum class DraftAction {
-        SEND,
-        SAVE;
+    var priority
+        get() = enumValueOfOrNull<Priority>(_priority)
+        set(value) {
+            _priority = value?.apiCallValue
+        }
 
-        override fun toString() = name.lowercase()
+    fun initLocalValues(messageUid: String? = null, priority: Priority? = null): Draft {
+        if (uuid.isEmpty()) {
+            uuid = UUID.randomUUID().toString()
+            isLocal = true
+        }
+        messageUid?.let { this.parentMessageUid = it }
+        priority?.let { this.priority = it }
+
+        return this
     }
 
-    fun initLocalValues(messageUid: String) {
-        if (uuid.isEmpty()) uuid = "${OFFLINE_DRAFT_UUID_PREFIX}_${messageUid}"
-        parentMessageUid = messageUid
-    }
-
-    fun hasLocalUuid() = uuid.startsWith(OFFLINE_DRAFT_UUID_PREFIX)
-
-    companion object {
-        private const val OFFLINE_DRAFT_UUID_PREFIX = "offline"
+    enum class DraftAction(val apiCallValue: String) {
+        SEND("send"),
+        SAVE("save"),
     }
 }

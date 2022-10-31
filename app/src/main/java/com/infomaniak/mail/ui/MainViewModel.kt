@@ -26,12 +26,9 @@ import com.infomaniak.mail.data.UiSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -42,6 +39,8 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -368,6 +367,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 // So if the API call failed, we need to put back this Thread in the UI.
                 // Force-refreshing Realm will do that.
                 forceRefreshThreads(filter)
+            }
+        }
+    }
+    //endregion
+
+    //region New Message
+    // TODO: This is temporary, while waiting for a "DraftsManager".
+    fun executeDraftsActions() = viewModelScope.launch(Dispatchers.IO) {
+        RealmDatabase.mailboxContent().writeBlocking {
+
+            fun getCurrentMailboxUuid(drafts: List<Draft>): String? {
+                return if (drafts.isNotEmpty()) currentMailboxObjectId.value?.let(MailboxController::getMailbox)?.uuid else null
+            }
+
+            val drafts = DraftController.getDrafts(this)
+            val mailboxUuid = getCurrentMailboxUuid(drafts) ?: return@writeBlocking
+
+            drafts.reversed().forEach { draft ->
+                when (draft.action) {
+                    DraftAction.SAVE -> ApiRepository.saveDraft(mailboxUuid, draft)
+                    DraftAction.SEND -> ApiRepository.sendDraft(mailboxUuid, draft)
+                    else -> Unit
+                }
+                delete(draft)
             }
         }
     }

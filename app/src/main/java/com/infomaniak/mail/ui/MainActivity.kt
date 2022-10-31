@@ -89,6 +89,12 @@ class MainActivity : ThemedActivity() {
         requestContactsPermission()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // TODO: This is temporary, while waiting for a "DraftsManager".
+        mainViewModel.executeDraftsActions()
+    }
+
     private fun listenToNetworkStatus() {
         LiveDataNetworkStatus(this).observe(this) { isAvailable ->
             Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")

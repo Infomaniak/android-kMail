@@ -21,11 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import android.widget.TextView

@@ -22,25 +22,48 @@ import com.infomaniak.mail.data.models.draft.Draft
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 
 object DraftController {
 
     //region Queries
+    private fun MutableRealm?.getDraftsQuery(): RealmQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent()).query()
+    }
+
     private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
         return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
+    }
+
+    private fun MutableRealm?.getDraftByParentMessageUidQuery(messageUid: String): RealmSingleQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::parentMessageUid.name} = '$messageUid'").first()
     }
     //endregion
 
     //region Get data
+    fun getDrafts(realm: MutableRealm? = null): RealmResults<Draft> {
+        return realm.getDraftsQuery().find()
+    }
+
     fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
         return realm.getDraftQuery(uuid).find()
+    }
+
+    fun getDraftByParentMessageUid(parentMessageUid: String, realm: MutableRealm? = null): Draft? {
+        return realm.getDraftByParentMessageUidQuery(parentMessageUid).find()
     }
     //endregion
 
     //region Edit data
     fun upsertDraft(draft: Draft, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = { it.copyToRealm(draft, UpdatePolicy.ALL) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
+    fun updateDraft(uuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getDraft(uuid, it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
     //endregion
