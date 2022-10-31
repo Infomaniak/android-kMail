@@ -53,7 +53,7 @@ class NewMessageActivity : ThemedActivity() {
         setupToolbar()
         setupEditorActions()
         setupEditorFormatActionsToggle()
-        listenToCloseActivity()
+        observeCloseActivity()
     }
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
@@ -76,7 +76,7 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    private fun listenToCloseActivity() {
+    private fun observeCloseActivity() {
         newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (it) finish() }
     }
 

@@ -76,7 +76,7 @@ class MainActivity : ThemedActivity() {
         setContentView(binding.root)
 
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
-        listenToNetworkStatus()
+        observeNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
 
         setupNavController()
@@ -85,7 +85,7 @@ class MainActivity : ThemedActivity() {
         mainViewModel.updateUserInfo()
         mainViewModel.loadCurrentMailbox(UiSettings.getInstance(this).threadMode)
 
-        mainViewModel.listenToRealmMergedContacts()
+        mainViewModel.observeRealmMergedContacts()
         requestContactsPermission()
     }
 
@@ -95,7 +95,7 @@ class MainActivity : ThemedActivity() {
         mainViewModel.executeDraftsActions()
     }
 
-    private fun listenToNetworkStatus() {
+    private fun observeNetworkStatus() {
         LiveDataNetworkStatus(this).observe(this) { isAvailable ->
             Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
             Sentry.addBreadcrumb(Breadcrumb().apply {

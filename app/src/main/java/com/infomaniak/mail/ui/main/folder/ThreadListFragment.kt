@@ -101,12 +101,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         observeCurrentFolderThreads()
         observeCurrentMailbox()
-        listenToDownloadState()
-        listenToCurrentFolder()
-        listenToUpdatedAtTriggers()
-        listenToContacts()
+        observeDownloadState()
+        observeCurrentFolder()
+        observeUpdatedAtTriggers()
+        observeContacts()
 
-        listenToSelectedDraft()
+        observeSelectedDraft()
     }
 
     private fun setupOnRefresh() {
@@ -164,7 +164,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun listenToSelectedDraft() {
+    private fun observeSelectedDraft() {
         threadListViewModel.selectedDraft.observeNotNull(viewLifecycleOwner) {
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
@@ -288,7 +288,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun listenToDownloadState() {
+    private fun observeDownloadState() {
         mainViewModel.isDownloadingChanges.observeNotNull(this) { isDownloading ->
             if (isDownloading) {
                 showLoadingTimer.start()
@@ -299,7 +299,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun listenToCurrentFolder() {
+    private fun observeCurrentFolder() {
         MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
 
             lastUpdatedDate = null
@@ -308,7 +308,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             folderJob?.cancel()
             folderJob = lifecycleScope.launch(Dispatchers.Main) {
                 getFolder(folderId)
-                listenToFolder(folderId)
+                observeFolder(folderId)
             }
         }
     }
@@ -320,19 +320,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun listenToFolder(folderId: String) {
-        threadListViewModel.listenToFolder(folderId).observe(viewLifecycleOwner) { folder ->
+    private fun observeFolder(folderId: String) {
+        threadListViewModel.observeFolder(folderId).observe(viewLifecycleOwner) { folder ->
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
         }
     }
 
-    private fun listenToUpdatedAtTriggers() {
+    private fun observeUpdatedAtTriggers() {
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
     }
 
-    private fun listenToContacts() {
+    private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
     }
 
