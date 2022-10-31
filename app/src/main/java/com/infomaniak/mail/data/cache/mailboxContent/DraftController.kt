@@ -17,12 +17,16 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.ClipDescription
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.signature.Signature
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
@@ -74,6 +78,36 @@ object DraftController {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
             upsertDraft(draft.initLocalValues(messageUid))
         }?.uuid
+    }
+
+    fun setDraftSignature(draftUuid: String, realm: MutableRealm) {
+        updateDraft(draftUuid, realm) { draft ->
+
+            if (draft.identityId != null) return@updateDraft
+
+            val defaultSignature = SignatureController.getDefaultSignature(realm) ?: return@updateDraft
+
+            draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
+
+            draft.identityId = defaultSignature.id
+
+            draft.from = realmListOf(Recipient().apply {
+                this.email = defaultSignature.sender
+                this.name = defaultSignature.fullName
+            })
+
+            draft.replyTo = realmListOf(Recipient().apply {
+                this.email = defaultSignature.replyTo
+                this.name = ""
+            })
+
+            val html = "<br><br><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+            val body = when (defaultSignature.position) {
+                Signature.SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
+                else -> html + draft.body
+            }
+            draft.body = body
+        }
     }
     //endregion
 }

@@ -53,7 +53,7 @@ class Draft : RealmObject {
     @SerialName("in_reply_to")
     var inReplyTo: String? = null
     @SerialName("mime_type")
-    var mimeType: String = "any/any"
+    var mimeType: String = ""
     var body: String = ""
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()

@@ -32,6 +32,7 @@ import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +54,7 @@ class NewMessageViewModel : ViewModel() {
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
 
-    // Boolean : for toggleable actions, false if the formatting has been removed and true if the formatting has been applied
+    // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     val currentDraftUuid = MutableLiveData<String?>()
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
@@ -74,16 +75,19 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun configureDraft(draftUuid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val uuid = RealmDatabase.mailboxContent().writeBlocking {
-            return@writeBlocking if (draftUuid == null) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val uuid = if (draftUuid == null) {
                 createDraft()
             } else {
                 updateLiveData(draftUuid)
                 draftUuid
             }
-        }
 
-        currentDraftUuid.postValue(uuid)
+            DraftController.setDraftSignature(uuid, this)
+            mailBody = DraftController.getDraft(uuid, this)?.body ?: ""
+
+            currentDraftUuid.postValue(uuid)
+        }
     }
 
     private fun MutableRealm.createDraft(): String {
