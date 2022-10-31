@@ -34,6 +34,7 @@ import com.infomaniak.lib.core.utils.startOfTheDay
 import com.infomaniak.lib.core.utils.startOfTheWeek
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -120,6 +121,8 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
         ).toBundle(),
     )
 }
+
+fun List<Message>.getLastMessageToExecuteAction(): Message = lastOrNull { !it.isDraft } ?: last()
 
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {

@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
+import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
@@ -135,7 +136,7 @@ object ThreadController {
 
     fun MutableRealm.markThreadAsUnseen(thread: Thread, folderId: String) {
         thread.apply {
-            messages.last().seen = false
+            messages.getLastMessageToExecuteAction().seen = false
             unseenMessagesCount++
         }
 
@@ -152,7 +153,7 @@ object ThreadController {
     }
 
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    fun getThreadLastMessageUid(thread: Thread): List<String> = listOf(thread.messages.last().uid)
+    fun getThreadLastMessageUid(thread: Thread): List<String> = listOf(thread.messages.getLastMessageToExecuteAction().uid)
 
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     fun getThreadUnseenMessagesUids(thread: Thread): List<String> {

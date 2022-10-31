@@ -40,6 +40,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
 import kotlin.math.roundToInt
@@ -77,7 +78,7 @@ class ThreadFragment : Fragment() {
         }
 
         quickActionBar.setOnItemClickListener { menuId ->
-            val lastMessageUid = threadAdapter.messages.last().uid
+            val lastMessageUid = threadAdapter.messages.getLastMessageToExecuteAction().uid
             when (menuId) {
                 R.id.quickActionReply -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUid)
