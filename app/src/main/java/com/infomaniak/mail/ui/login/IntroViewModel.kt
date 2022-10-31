@@ -17,22 +17,12 @@
  */
 package com.infomaniak.mail.ui.login
 
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.UiSettings.AccentColor
 
-class IntroPagerAdapter(
-    manager: FragmentManager,
-    lifecycle: Lifecycle,
-    private val isFirstAccount: Boolean,
-) : FragmentStateAdapter(manager, lifecycle) {
-
-    override fun getItemCount() = if (isFirstAccount) 4 else 3
-
-    override fun createFragment(position: Int): Fragment {
-        return IntroFragment().apply {
-            arguments = IntroFragmentArgs(isFirstAccount, if (isFirstAccount) position else position + 1).toBundle()
-        }
-    }
+class IntroViewModel(application: Application) : AndroidViewModel(application) {
+    var currentAccentColor: MutableLiveData<AccentColor?> = MutableLiveData(UiSettings.getInstance(application).accentColor)
 }

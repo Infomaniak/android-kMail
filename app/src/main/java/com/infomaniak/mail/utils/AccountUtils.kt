@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
@@ -30,6 +29,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.data.UiSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
 import com.infomaniak.mail.data.models.AppSettings
@@ -113,17 +113,19 @@ object AccountUtils : CredentialManager {
     }
 
     suspend fun removeUser(context: Context, user: User) {
+
         userDatabase.userDao().delete(user)
-        // FileController.deleteUserDriveFiles(userRemoved.id) // TODO?
+        RealmDatabase.removeUserData(context, user.id)
 
         if (currentUserId == user.id) {
-            requestCurrentUser()
-
-            resetApp(context)
+            if (getAllUserCount() == 0) resetSettings(context)
             withContext(Dispatchers.Main) { reloadApp?.invoke() }
-
-            // CloudStorageProvider.notifyRootsChanged(context) // TODO?
         }
+    }
+
+    private fun resetSettings(context: Context) {
+        AppSettingsController.removeAppSettings()
+        UiSettings.getInstance(context).removeUiSettings()
     }
 
     override fun getAllUsers(): LiveData<List<User>> = userDatabase.userDao().getAll()
@@ -178,18 +180,4 @@ object AccountUtils : CredentialManager {
     }
 
     suspend fun getUserById(id: Int): User? = userDatabase.userDao().findById(id)
-
-    private fun resetApp(context: Context) {
-        if (getAllUserCount() == 0) {
-            AppSettingsController.removeAppSettings()
-            // UiSettings(context).removeUiSettings() // TODO?
-
-            // Delete all app data
-            with(context) {
-                filesDir.deleteRecursively()
-                cacheDir.deleteRecursively()
-            }
-            Log.i("AccountUtils", "resetApp> all user data has been deleted")
-        }
-    }
 }

@@ -22,11 +22,46 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.mail.R
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.notYetImplemented
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ManageMailAddressFragment : Fragment() {
 
+    private lateinit var binding: FragmentManageMailAddressBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_manage_mail_address, container, false)
+        return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        root.setNavigationOnClickListener { findNavController().popBackStack() }
+
+        AccountUtils.currentUser?.let { user ->
+            avatar.loadAvatar(user)
+            mail.text = user.email
+        }
+
+        changeAccountButton.setOnClickListener { safeNavigate(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
+        associatedEmailAddresses.setOnClickListener { notYetImplemented() }
+        disconnectAccountButton.setOnClickListener { logout() }
+    }
+
+    private fun logout() {
+        // TODO : Remove this call when liveData are not in the companion object of the viewModel anymore
+        mainViewModel.resetAllCurrentLiveData()
+        removeCurrentUser()
+    }
+
+    private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {
+        AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 }

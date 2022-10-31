@@ -19,6 +19,7 @@
     <declare-styleable name="CommonAttributes">
         <attr name="icon" format="reference" />
         <attr name="text" format="string" />
+        <attr name="title" format="string" />
     </declare-styleable>
 
     <declare-styleable name="MenuDrawerItemView">
@@ -48,7 +49,7 @@
     </declare-styleable>
 
     <declare-styleable name="ItemSettingView">
-        <attr name="title" format="string" />
+        <attr name="title" />
         <attr name="subtitle" format="string" />
         <attr name="itemAction" format="enum">
             <enum name="none" value="0" />
@@ -69,6 +70,10 @@
         <attr name="defaultCheckedId" format="reference" />
         <!-- Defaults to false. If false, displays the classic divider used everywhere in Settings between items -->
         <attr name="ignoreDividers" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="SimpleSettingView">
+        <attr name="title" />
     </declare-styleable>
 
     <declare-styleable name="ToggleableTextFormatterItemView">

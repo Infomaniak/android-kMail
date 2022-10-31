@@ -23,11 +23,11 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewSettingRadioButtonBinding
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
-
 
 class SettingRadioButtonView @JvmOverloads constructor(
     context: Context,
@@ -37,20 +37,18 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     private val binding by lazy { ViewSettingRadioButtonBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    override val associatedValue: String?
+    override var associatedValue: String? = null
 
     init {
         with(binding) {
-            if (attrs != null) {
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.SettingRadioButtonView, 0, 0)
-
-                val iconDrawable = typedArray.getDrawable(R.styleable.SettingRadioButtonView_icon)
-                val textString = typedArray.getString(R.styleable.SettingRadioButtonView_text)
-                val checkMarkColor = typedArray.getColor(
+            attrs?.getAttributes(context, R.styleable.SettingRadioButtonView) {
+                val iconDrawable = getDrawable(R.styleable.SettingRadioButtonView_icon)
+                val textString = getString(R.styleable.SettingRadioButtonView_text)
+                val checkMarkColor = getColor(
                     R.styleable.SettingRadioButtonView_checkMarkColor,
                     context.getAttributeColor(RMaterial.attr.colorPrimary)
                 )
-                associatedValue = typedArray.getString(R.styleable.SettingRadioButtonView_value)
+                associatedValue = getString(R.styleable.SettingRadioButtonView_value)
 
                 if (iconDrawable != null) icon.apply {
                     isVisible = true
@@ -60,10 +58,6 @@ class SettingRadioButtonView @JvmOverloads constructor(
                 checkMark.setColorFilter(checkMarkColor)
 
                 root.setOnClickListener { (parent as? OnCheckListener)?.onChecked(this@SettingRadioButtonView.id) }
-
-                typedArray.recycle()
-            } else {
-                associatedValue = null
             }
         }
     }

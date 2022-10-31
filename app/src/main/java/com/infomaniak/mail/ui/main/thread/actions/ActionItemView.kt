@@ -26,6 +26,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
 
@@ -35,24 +36,14 @@ class ActionItemView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var binding: ItemBottomSheetActionBinding
+    val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
-        binding = ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true)
-
         with(binding) {
-            if (attrs != null) {
-                val typedArray = context.obtainStyledAttributes(attrs, R.styleable.ActionItemView, 0, 0)
-
-                val icon = typedArray.getDrawable(R.styleable.ActionItemView_icon)
-                val text = typedArray.getString(R.styleable.ActionItemView_text)
-                val visibleDivider = typedArray.getBoolean(R.styleable.ActionItemView_visibleDivider, true)
-
-                button.icon = icon
-                button.text = text
-                divider.isVisible = visibleDivider
-
-                typedArray.recycle()
+            attrs?.getAttributes(context, R.styleable.ActionItemView) {
+                button.icon = getDrawable(R.styleable.ActionItemView_icon)
+                button.text = getString(R.styleable.ActionItemView_text)
+                divider.isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
             }
         }
     }

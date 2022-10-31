@@ -21,10 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MotionEvent
+import android.view.*
 import android.widget.ActionMenuView
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -33,10 +30,10 @@ import androidx.core.view.get
 import androidx.core.view.isInvisible
 import androidx.core.view.size
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewMainActionsBinding
 
-@SuppressLint("ClickableViewAccessibility")
 class MainActionsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -50,11 +47,8 @@ class MainActionsView @JvmOverloads constructor(
     private val menu: Menu by lazy { ActionMenuView(context).menu }
 
     init {
-        if (attrs != null) {
-            val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MainActionsView, 0, 0)
-            val menuRes = typedArray.getResourceIdOrThrow(R.styleable.BottomQuickActionBarView_menu)
-
-            MenuInflater(context).inflate(menuRes, menu)
+        attrs?.getAttributes(context, R.styleable.MainActionsView) {
+            MenuInflater(context).inflate(getResourceIdOrThrow(R.styleable.MainActionsView_menu), menu)
 
             buttons.forEachIndexed { index, button ->
                 val textView = textViews[index]
@@ -66,34 +60,33 @@ class MainActionsView @JvmOverloads constructor(
                         button.icon = icon
                         textView.apply {
                             text = title
-                            transferClickToButton(button)
+                            transferClickTo(button)
                         }
                     }
                 }
             }
-
-            typedArray.recycle()
         }
     }
 
-    private fun TextView.transferClickToButton(button: MaterialButton) {
+    @SuppressLint("ClickableViewAccessibility")
+    private fun View.transferClickTo(targetView: View) {
         setOnTouchListener { _, event ->
-            (button.background as RippleDrawable).setHotspot(event.x, button.height.toFloat())
+            (targetView.background as RippleDrawable).setHotspot(event.x, targetView.height.toFloat())
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> button.isPressed = true
+                MotionEvent.ACTION_DOWN -> targetView.isPressed = true
                 MotionEvent.ACTION_UP -> {
-                    if (button.isPressed) {
-                        button.isPressed = false
-                        button.callOnClick()
+                    if (targetView.isPressed) {
+                        targetView.isPressed = false
+                        targetView.callOnClick()
                     }
                 }
-                MotionEvent.ACTION_MOVE -> button.isPressed = false
+                MotionEvent.ACTION_MOVE -> targetView.isPressed = false
             }
             true
         }
         setOnClickListener {
-            button.isPressed = true
-            button.isPressed = false
+            targetView.isPressed = true
+            targetView.isPressed = false
         }
     }
 

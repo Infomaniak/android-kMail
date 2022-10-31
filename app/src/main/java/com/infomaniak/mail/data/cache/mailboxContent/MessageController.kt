@@ -19,8 +19,8 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.RealmDatabase.copyListToRealm
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.copyListToRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmSingleQuery

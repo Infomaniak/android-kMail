@@ -19,8 +19,8 @@ package com.infomaniak.mail.data.cache.userInfo
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.RealmDatabase.update
 import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.utils.update
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
