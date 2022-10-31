@@ -60,11 +60,10 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
-        observeDraftUuid()
         setupAdapter()
         mainViewModel.openThread(navigationArgs.threadUid)
         bindMessages()
-        listenToContacts()
+        observeContacts()
     }
 
     private fun setupUi() = with(binding) {
@@ -110,12 +109,6 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun observeDraftUuid() {
-        threadViewModel.openDraftUuid.observeNotNull(viewLifecycleOwner) { draftUuid ->
-            safeNavigate(ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(draftUuid))
-        }
-    }
-
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -124,7 +117,13 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
-                threadViewModel.fetchDraft(message)
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
+                        isOpeningExistingDraft = true,
+                        isExistingDraftAlreadyDownloaded = true,
+                        draftUuid = message.draftUuid,
+                    )
+                )
             }
             onDeleteDraftClicked = { message ->
                 mainViewModel.deleteDraft(message)
@@ -161,7 +160,7 @@ class ThreadFragment : Fragment() {
         if (messages.isEmpty()) leaveThread()
     }
 
-    private fun listenToContacts() {
+    private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 

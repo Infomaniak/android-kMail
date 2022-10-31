@@ -145,15 +145,27 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
-            onThreadClicked = {
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
-                        threadUid = it.uid,
-                        threadSubject = it.subject,
-                        threadIsFavorite = it.isFavorite,
-                        unseenMessagesCount = it.unseenMessagesCount,
+            onThreadClicked = { thread ->
+                if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
+                    val message = thread.messages.first()
+                    safeNavigate(
+                        ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+                            isOpeningExistingDraft = true,
+                            isExistingDraftAlreadyDownloaded = false,
+                            draftResource = message.draftResource,
+                            messageUid = message.uid,
+                        )
                     )
-                )
+                } else {
+                    safeNavigate(
+                        ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
+                            threadUid = thread.uid,
+                            threadSubject = thread.subject,
+                            threadIsFavorite = thread.isFavorite,
+                            unseenMessagesCount = thread.unseenMessagesCount,
+                        )
+                    )
+                }
             }
         }
     }
@@ -171,7 +183,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         newMessageFab.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionHomeFragmentToNewMessageActivity())
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
         }
 
         threadsList.scrollListener = object : OnListScrollListener {

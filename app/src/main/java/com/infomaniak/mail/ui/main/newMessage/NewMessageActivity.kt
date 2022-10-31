@@ -48,7 +48,7 @@ class NewMessageActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        newMessageViewModel.setupDraft(navigationArgs.draftUuid)
+        newMessageViewModel.fetchAndConfigureDraft(navigationArgs)
         handleOnBackPressed()
         setupToolbar()
         setupEditorActions()
