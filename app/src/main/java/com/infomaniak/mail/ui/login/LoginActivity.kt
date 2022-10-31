@@ -113,6 +113,11 @@ class LoginActivity : AppCompatActivity() {
         if (introViewpager.currentItem == 0) super.onBackPressed() else introViewpager.currentItem -= 1
     }
 
+    fun updateUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
+        animatePrimaryColorElements(accentColor, animate)
+        animateSecondaryColorElements(accentColor, animate)
+    }
+
     private fun authenticateUser(authCode: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             infomaniakLogin.getToken(
@@ -145,11 +150,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showError(error: String) {
         showSnackbar(error)
-    }
-
-    fun updateUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
-        animatePrimaryColorElements(accentColor, animate)
-        animateSecondaryColorElements(accentColor, animate)
     }
 
     private fun animatePrimaryColorElements(accentColor: AccentColor, animate: Boolean) = with(binding) {

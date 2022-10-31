@@ -95,6 +95,19 @@ class MainActivity : ThemedActivity() {
         mainViewModel.executeDraftsActions()
     }
 
+    override fun onBackPressed(): Unit = with(binding) {
+        if (drawerLayout.isOpen) {
+            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onDestroy() {
+        binding.drawerLayout.removeDrawerListener(drawerListener)
+        super.onDestroy()
+    }
+
     private fun observeNetworkStatus() {
         LiveDataNetworkStatus(this).observe(this) { isAvailable ->
             Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
@@ -125,19 +138,6 @@ class MainActivity : ThemedActivity() {
 
     private fun requestContactsPermission() {
         contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
-    }
-
-    override fun onDestroy() {
-        binding.drawerLayout.removeDrawerListener(drawerListener)
-        super.onDestroy()
-    }
-
-    override fun onBackPressed(): Unit = with(binding) {
-        if (drawerLayout.isOpen) {
-            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
-        } else {
-            super.onBackPressed()
-        }
     }
 
     private fun onDestinationChanged(destination: NavDestination) {
