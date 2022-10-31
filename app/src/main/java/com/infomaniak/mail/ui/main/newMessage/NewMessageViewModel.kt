@@ -65,25 +65,23 @@ class NewMessageViewModel : ViewModel() {
         with(navigationArgs) {
             RealmDatabase.mailboxContent().writeBlocking {
 
-                currentDraftLocalUuid = if (isDraftExisting) {
-                    if (isDraftDownloaded) {
-                        draftLocalUuid!!
-                    } else {
+                currentDraftLocalUuid = when {
+                    isDraftExisting && isDraftDownloaded -> draftLocalUuid!!
+                    isDraftExisting && !isDraftDownloaded -> {
                         DraftController.fetchDraft(draftResource!!, messageUid!!, this) ?: return@writeBlocking
                     }
-                } else {
-                    createDraft()
+                    else -> createDraft()
                 }
 
                 setDraftSignature(currentDraftLocalUuid!!)
-                initializeUiWithDraftData(currentDraftLocalUuid!!)
+                initUiData(currentDraftLocalUuid!!)
 
                 draftHasBeenSet.postValue(true)
             }
         }
     }
 
-    private fun MutableRealm.initializeUiWithDraftData(draftLocalUuid: String) {
+    private fun MutableRealm.initUiData(draftLocalUuid: String) {
         DraftController.getDraft(draftLocalUuid, this)?.let { draft ->
             mailTo.addAll(draft.to.toRecipientsList())
             mailCc.addAll(draft.cc.toRecipientsList())
@@ -107,43 +105,41 @@ class NewMessageViewModel : ViewModel() {
     fun updateMailSubject(subject: String) {
         if (subject != mailSubject) {
             mailSubject = subject
-            autoSaveDraft()
+            saveDraftDebouncing()
         }
     }
 
     fun updateMailBody(body: String) {
         if (body != mailBody) {
             mailBody = body
-            autoSaveDraft()
+            saveDraftDebouncing()
         }
     }
 
-    fun autoSaveDraft() {
+    fun saveDraftDebouncing() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
-            val draftLocalUuid = currentDraftLocalUuid ?: return@launch
-            val mailboxUuid = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailbox)?.uuid
-                ?: return@launch
+            val mailboxUuid = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailbox)?.uuid!!
 
             RealmDatabase.mailboxContent().writeBlocking {
-                saveDraftInCache(draftLocalUuid, DraftAction.SAVE)
+                saveDraftToLocal(currentDraftLocalUuid!!, DraftAction.SAVE)
 
-                val draft = DraftController.getDraft(draftLocalUuid, this) ?: return@writeBlocking
+                val draft = DraftController.getDraft(currentDraftLocalUuid!!, this) ?: return@writeBlocking
                 DraftController.executeDraftAction(draft, mailboxUuid, this)
             }
         }
     }
 
-    fun saveDraftInCacheThenExit(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
+    fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
         val draftLocalUuid = currentDraftLocalUuid ?: return@launch
         RealmDatabase.mailboxContent().writeBlocking {
-            saveDraftInCache(draftLocalUuid, action)
+            saveDraftToLocal(draftLocalUuid, action)
         }
         shouldCloseActivity.postValue(true)
     }
 
-    private fun MutableRealm.saveDraftInCache(draftLocalUuid: String, action: DraftAction) {
+    private fun MutableRealm.saveDraftToLocal(draftLocalUuid: String, action: DraftAction) {
         DraftController.updateDraft(draftLocalUuid, this) { draft ->
             draft.to = mailTo.toRealmList()
             draft.cc = mailCc.toRealmList()

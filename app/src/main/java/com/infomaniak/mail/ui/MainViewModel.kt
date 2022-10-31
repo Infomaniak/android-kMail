@@ -261,8 +261,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         RealmDatabase.mailboxContent().writeBlocking {
             canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
+
             FolderController.updateFolderLastUpdatedAt(folderId, this)
-            DraftController.cleanOrphans(folderId, threadsResult.threads, this)
+
+            val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+            if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
         }
 
         isDownloadingChanges.postValue(false)

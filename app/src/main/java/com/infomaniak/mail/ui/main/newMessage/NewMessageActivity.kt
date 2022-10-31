@@ -61,7 +61,7 @@ class NewMessageActivity : ThemedActivity() {
             if (isAutocompletionOpened) {
                 newMessageFragment.closeAutocompletion()
             } else {
-                saveDraftInCacheThenExit(DraftAction.SAVE)
+                saveToLocalAndFinish(DraftAction.SAVE)
             }
         }
     }
@@ -71,7 +71,7 @@ class NewMessageActivity : ThemedActivity() {
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding.toolbar.setOnMenuItemClickListener {
-            if (mailTo.isNotEmpty()) saveDraftInCacheThenExit(DraftAction.SEND)
+            if (mailTo.isNotEmpty()) saveToLocalAndFinish(DraftAction.SEND)
             true
         }
     }

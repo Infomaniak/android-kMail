@@ -64,32 +64,31 @@ object MailboxController {
     //endregion
 
     //region Get data
-    fun getMailboxesAsync(realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
-        return realm.getMailboxesQuery().asFlow()
-    }
-
     fun getMailboxes(userId: Int, realm: MutableRealm? = null): RealmResults<Mailbox> {
         return realm.getMailboxesQuery(userId).find()
-    }
-
-    fun getMailboxesAsync(userId: Int, realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
-        return realm.getMailboxesQuery(userId).asFlow()
     }
 
     private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: MutableRealm? = null): RealmResults<Mailbox> {
         return realm.getMailboxesQuery(userId, exceptionMailboxIds).find()
     }
 
+    fun getMailboxesAsync(realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
+        return realm.getMailboxesQuery().asFlow()
+    }
+    fun getMailboxesAsync(userId: Int, realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
+        return realm.getMailboxesQuery(userId).asFlow()
+    }
+
     fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
         return realm.getMailboxQuery(objectId).find()
     }
 
-    fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Mailbox>> {
-        return realm.getMailboxQuery(objectId).asFlow()
-    }
-
     fun getMailbox(userId: Int, mailboxId: Int, realm: MutableRealm? = null): Mailbox? {
         return realm.getMailboxQuery(userId, mailboxId).find() ?: realm.getMailboxesQuery(userId).first().find()
+    }
+
+    fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Mailbox>> {
+        return realm.getMailboxQuery(objectId).asFlow()
     }
     //endregion
 

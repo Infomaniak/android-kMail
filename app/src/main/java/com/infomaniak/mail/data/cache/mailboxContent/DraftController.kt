@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.content.ClipDescription
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -41,12 +40,8 @@ object DraftController {
         return (this ?: RealmDatabase.mailboxContent()).query()
     }
 
-    private fun MutableRealm?.getDraftQuery(localUuid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::localUuid.name} = '$localUuid'").first()
-    }
-
-    private fun MutableRealm?.getDraftByMessageUidQuery(messageUid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::messageUid.name} = '$messageUid'").first()
+    private fun MutableRealm?.getDraftQuery(key: String, value: String): RealmSingleQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("$key = '$value'").first()
     }
     //endregion
 
@@ -56,11 +51,11 @@ object DraftController {
     }
 
     fun getDraft(localUuid: String, realm: MutableRealm? = null): Draft? {
-        return realm.getDraftQuery(localUuid).find()
+        return realm.getDraftQuery(Draft::localUuid.name, localUuid).find()
     }
 
     fun getDraftByMessageUid(messageUid: String, realm: MutableRealm? = null): Draft? {
-        return realm.getDraftByMessageUidQuery(messageUid).find()
+        return realm.getDraftQuery(Draft::messageUid.name, messageUid).find()
     }
     //endregion
 
@@ -75,10 +70,8 @@ object DraftController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun cleanOrphans(folderId: String, threads: List<Thread>, realm: MutableRealm) {
-        val isDraftFolder = FolderController.getFolder(folderId, realm)?.role == FolderRole.DRAFT
-        if (!isDraftFolder) return
-
+    fun cleanOrphans(threads: List<Thread>, realm: MutableRealm) {
+        // TODO: Refactor with LinkingObjects when it's available (https://github.com/realm/realm-kotlin/pull/1021)
         val messagesUids = threads.flatMap { it.messages }.map { it.uid }
         val drafts = getDrafts(realm)
         drafts.reversed().forEach {
