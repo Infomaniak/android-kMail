@@ -22,14 +22,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
-import com.infomaniak.mail.utils.notYetImplemented
 
 open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetReplyBinding
+    private val navigationArgs: ReplyBottomSheetDialogArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetReplyBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -40,10 +43,20 @@ open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
 
         mainActions.setOnItemClickListener { id: Int ->
             when (id) {
-                R.id.actionReply -> notYetImplemented()
-                R.id.actionReplyAll -> notYetImplemented()
+                R.id.actionReply -> navigateToNewMessageActivity(DraftMode.REPLY)
+                R.id.actionReplyAll -> navigateToNewMessageActivity(DraftMode.REPLY_ALL)
             }
             findNavController().popBackStack()
         }
+    }
+
+    private fun navigateToNewMessageActivity(draftMode: DraftMode) {
+        safeNavigate(
+            ReplyBottomSheetDialogDirections.actionReplyBottomSheetDialogToNewMessageActivity(
+                isDraftExisting = false,
+                draftMode = draftMode,
+                previousMessageUid = navigationArgs.messageUid,
+            )
+        )
     }
 }
