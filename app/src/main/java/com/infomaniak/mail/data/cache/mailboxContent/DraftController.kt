@@ -94,16 +94,12 @@ object DraftController {
         }?.localUuid
     }
 
-    fun setDraftSignatureAndGetBody(draftLocalUuid: String, realm: MutableRealm): String {
-        var body = ""
-
-        updateDraft(draftLocalUuid, realm) { draft ->
-
-            body = draft.body
+    fun MutableRealm.setDraftSignature(draftLocalUuid: String) {
+        updateDraft(draftLocalUuid, this) { draft ->
 
             draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
 
-            val defaultSignature = SignatureController.getDefaultSignature(realm) ?: return@updateDraft
+            val defaultSignature = SignatureController.getDefaultSignature(this) ?: return@updateDraft
 
             if (draft.identityId == null) draft.identityId = defaultSignature.id
 
@@ -123,15 +119,12 @@ object DraftController {
 
             if (draft.body.isEmpty()) {
                 val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
-                body = when (defaultSignature.position) {
+                draft.body = when (defaultSignature.position) {
                     SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
                     else -> html + draft.body
                 }
-                draft.body = body
             }
         }
-
-        return body
     }
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
