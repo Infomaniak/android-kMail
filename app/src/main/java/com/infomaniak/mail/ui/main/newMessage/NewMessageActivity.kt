@@ -48,7 +48,7 @@ class NewMessageActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        newMessageViewModel.fetchAndConfigureDraft(navigationArgs)
+        newMessageViewModel.initializeDraftAndUi(navigationArgs)
         handleOnBackPressed()
         setupToolbar()
         setupEditorActions()
@@ -61,7 +61,7 @@ class NewMessageActivity : ThemedActivity() {
             if (isAutocompletionOpened) {
                 newMessageFragment.closeAutocompletion()
             } else {
-                saveMail(DraftAction.SAVE)
+                saveToLocalAndFinish(DraftAction.SAVE)
             }
         }
     }
@@ -71,7 +71,7 @@ class NewMessageActivity : ThemedActivity() {
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding.toolbar.setOnMenuItemClickListener {
-            if (mailTo.isNotEmpty()) saveMail(DraftAction.SEND)
+            if (mailTo.isNotEmpty()) saveToLocalAndFinish(DraftAction.SEND)
             true
         }
     }

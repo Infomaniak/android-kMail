@@ -51,7 +51,8 @@ object ThreadController {
         mailboxUuid: String,
         folderId: String,
         filter: ThreadFilter,
-    ): Boolean = RealmDatabase.mailboxContent().writeBlocking {
+        realm: MutableRealm,
+    ): Boolean = with(realm) {
 
         Log.d(RealmDatabase.TAG, "Threads: Get current data")
         val localThreads = getLocalThreads(folderId, filter)
@@ -67,7 +68,7 @@ object ThreadController {
         Log.d(RealmDatabase.TAG, "Threads: Save new data")
         updateFolderThreads(folderId, apiThreads, threadsResult.folderUnseenMessage)
 
-        return@writeBlocking canPaginate(threadsResult.messagesCount)
+        return canPaginate(threadsResult.messagesCount)
     }
 
     private fun MutableRealm.getLocalThreads(folderId: String, filter: ThreadFilter): List<Thread> {

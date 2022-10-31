@@ -92,7 +92,7 @@ class Message : RealmObject {
 
     //region Local data (Transient)
     @Transient
-    var draftUuid: String? = null
+    var draftLocalUuid: String? = null
     @Transient
     var fullyDownloaded: Boolean = false
     @Transient

@@ -112,18 +112,20 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<SaveDraftResult> {
         val body = Json.encodeToString(draft).removeEmptyRealmLists()
-        fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
-        fun putDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
-        return if (draft.isLocal) postDraft() else putDraft()
+        fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
+        fun putDraft(uuid: String): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body)
+
+        return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
         val body = Json.encodeToString(draft).removeEmptyRealmLists()
-        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
-        fun putDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, draft.uuid), PUT, body)
 
-        return if (draft.isLocal) postDraft() else putDraft()
+        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
+        fun putDraft(uuid: String): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body)
+
+        return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
     fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)

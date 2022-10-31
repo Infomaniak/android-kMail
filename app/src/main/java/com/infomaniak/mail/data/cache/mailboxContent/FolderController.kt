@@ -47,34 +47,30 @@ object FolderController {
         return (this ?: RealmDatabase.mailboxContent()).query(checkIsNotInExceptions)
     }
 
-    private fun MutableRealm?.getFolderQuery(id: String): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Folder>("${Folder::id.name} = '$id'").first()
-    }
-
-    private fun MutableRealm?.getFolderQuery(role: FolderRole): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Folder>("${Folder::_role.name} = '${role.name}'").first()
+    private fun MutableRealm?.getFolderQuery(key: String, value: String): RealmSingleQuery<Folder> {
+        return (this ?: RealmDatabase.mailboxContent()).query<Folder>("$key = '$value'").first()
     }
     //endregion
 
     //region Get data
-    fun getFoldersAsync(realm: MutableRealm? = null): Flow<ResultsChange<Folder>> {
-        return realm.getFoldersQuery().asFlow()
-    }
-
     private fun getFolders(exceptionsFoldersIds: List<String>, realm: MutableRealm? = null): RealmResults<Folder> {
         return realm.getFoldersQuery(exceptionsFoldersIds).find()
     }
 
-    fun getFolder(id: String, realm: MutableRealm? = null): Folder? {
-        return realm.getFolderQuery(id).find()
+    fun getFoldersAsync(realm: MutableRealm? = null): Flow<ResultsChange<Folder>> {
+        return realm.getFoldersQuery().asFlow()
     }
 
-    fun getFolderAsync(id: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Folder>> {
-        return realm.getFolderQuery(id).asFlow()
+    fun getFolder(id: String, realm: MutableRealm? = null): Folder? {
+        return realm.getFolderQuery(Folder::id.name, id).find()
     }
 
     fun getFolder(role: FolderRole, realm: MutableRealm? = null): Folder? {
-        return realm.getFolderQuery(role).find()
+        return realm.getFolderQuery(Folder::_role.name, role.name).find()
+    }
+
+    fun getFolderAsync(id: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Folder>> {
+        return realm.getFolderQuery(Folder::id.name, id).asFlow()
     }
     //endregion
 
@@ -121,7 +117,7 @@ object FolderController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm? = null) {
+    fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm) {
         updateFolder(id, realm) {
             it.lastUpdatedAt = Date().toRealmInstant()
         }

@@ -25,7 +25,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SaveDraftResult(
     @SerialName("uuid")
-    val draftUuid: String,
+    val draftRemoteUuid: String,
     @SerialName("uid")
     val messageUid: String,
     val attachments: List<Attachment>,

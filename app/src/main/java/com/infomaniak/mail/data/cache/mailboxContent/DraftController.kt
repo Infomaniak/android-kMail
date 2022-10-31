@@ -22,7 +22,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
+import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -38,12 +40,8 @@ object DraftController {
         return (this ?: RealmDatabase.mailboxContent()).query()
     }
 
-    private fun MutableRealm?.getDraftQuery(uuid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::uuid.name} = '$uuid'").first()
-    }
-
-    private fun MutableRealm?.getDraftByParentMessageUidQuery(messageUid: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("${Draft::parentMessageUid.name} = '$messageUid'").first()
+    private fun MutableRealm?.getDraftQuery(key: String, value: String): RealmSingleQuery<Draft> {
+        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("$key = '$value'").first()
     }
     //endregion
 
@@ -52,12 +50,12 @@ object DraftController {
         return realm.getDraftsQuery().find()
     }
 
-    fun getDraft(uuid: String, realm: MutableRealm? = null): Draft? {
-        return realm.getDraftQuery(uuid).find()
+    fun getDraft(localUuid: String, realm: MutableRealm? = null): Draft? {
+        return realm.getDraftQuery(Draft::localUuid.name, localUuid).find()
     }
 
-    fun getDraftByParentMessageUid(parentMessageUid: String, realm: MutableRealm? = null): Draft? {
-        return realm.getDraftByParentMessageUidQuery(parentMessageUid).find()
+    fun getDraftByMessageUid(messageUid: String, realm: MutableRealm? = null): Draft? {
+        return realm.getDraftQuery(Draft::messageUid.name, messageUid).find()
     }
     //endregion
 
@@ -67,46 +65,82 @@ object DraftController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun updateDraft(uuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getDraft(uuid, it)?.let(onUpdate) }
+    fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getDraft(localUuid, it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
+    fun cleanOrphans(threads: List<Thread>, realm: MutableRealm) {
+        // TODO: Refactor with LinkingObjects when it's available (https://github.com/realm/realm-kotlin/pull/1021)
+        val messagesUids = threads.flatMap { it.messages }.map { it.uid }
+        val drafts = getDrafts(realm)
+        drafts.reversed().forEach {
+            if (!messagesUids.contains(it.messageUid)) realm.delete(it)
+        }
     }
     //endregion
 
     //region Open Draft
-    fun fetchDraft(draftResource: String, messageUid: String): String? {
+    fun fetchDraft(draftResource: String, messageUid: String, realm: MutableRealm? = null): String? {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
-            upsertDraft(draft.initLocalValues(messageUid))
-        }?.uuid
+            upsertDraft(draft.initLocalValues(messageUid), realm)
+        }?.localUuid
     }
 
-    fun setDraftSignature(draftUuid: String, realm: MutableRealm) {
-        updateDraft(draftUuid, realm) { draft ->
-
-            if (draft.identityId != null) return@updateDraft
-
-            val defaultSignature = SignatureController.getDefaultSignature(realm) ?: return@updateDraft
+    fun MutableRealm.setDraftSignature(draftLocalUuid: String) {
+        updateDraft(draftLocalUuid, this) { draft ->
 
             draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
 
-            draft.identityId = defaultSignature.id
+            val defaultSignature = SignatureController.getDefaultSignature(this) ?: return@updateDraft
 
-            draft.from = realmListOf(Recipient().apply {
-                this.email = defaultSignature.sender
-                this.name = defaultSignature.fullName
-            })
+            if (draft.identityId == null) draft.identityId = defaultSignature.id
 
-            draft.replyTo = realmListOf(Recipient().apply {
-                this.email = defaultSignature.replyTo
-                this.name = ""
-            })
-
-            val html = "<br><br><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
-            val body = when (defaultSignature.position) {
-                Signature.SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
-                else -> html + draft.body
+            if (draft.from.isEmpty()) {
+                draft.from = realmListOf(Recipient().apply {
+                    this.email = defaultSignature.sender
+                    this.name = defaultSignature.fullName
+                })
             }
-            draft.body = body
+
+            if (draft.replyTo.isEmpty()) {
+                draft.replyTo = realmListOf(Recipient().apply {
+                    this.email = defaultSignature.replyTo
+                    this.name = ""
+                })
+            }
+
+            if (draft.body.isEmpty()) {
+                val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+                draft.body = when (defaultSignature.position) {
+                    SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
+                    else -> html + draft.body
+                }
+            }
+        }
+    }
+
+    fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
+
+        when (draft.action) {
+
+            DraftAction.SAVE -> {
+                val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
+                if (apiResponse.isSuccess()) with(apiResponse.data!!) {
+                    updateDraft(draft.localUuid, realm) {
+                        it.remoteUuid = draftRemoteUuid
+                        it.messageUid = messageUid
+                        it.action = DraftAction.NONE
+                    }
+                }
+            }
+
+            DraftAction.SEND -> {
+                val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
+                if (apiResponse.isSuccess()) realm.delete(draft)
+            }
+
+            else -> Unit
         }
     }
     //endregion

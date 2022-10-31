@@ -37,52 +37,60 @@ import java.util.*
 class Draft : RealmObject {
 
     //region API data
-    @PrimaryKey
-    var uuid: String = ""
+    @SerialName("uuid")
+    var remoteUuid: String? = null
+
+    @SerialName("reply_to")
+    var replyTo: RealmList<Recipient> = realmListOf()
+
+    var from: RealmList<Recipient> = realmListOf()
+    var to: RealmList<Recipient> = realmListOf()
+    var cc: RealmList<Recipient> = realmListOf()
+    var bcc: RealmList<Recipient> = realmListOf()
+
+    var subject: String = ""
+    var body: String = ""
+    var attachments: RealmList<Attachment> = realmListOf()
+
+    @SerialName("mime_type")
+    var mimeType: String = ""
     @SerialName("identity_id")
     var identityId: Int? = null
-    var resource: String? = null
+
+    @SerialName("priority")
+    private var _priority: String? = null
+    @SerialName("action")
+    private var _action: String = DraftAction.NONE.apiCallValue
+
+    @SerialName("in_reply_to")
+    var inReplyTo: String? = null
     @SerialName("in_reply_to_uid")
     var inReplyToUid: String? = null
     @SerialName("forwarded_uid")
     var forwardedUid: String? = null
+
+    var resource: String? = null
     var quote: String = ""
     var references: String? = null
-    @SerialName("reply_to")
-    var replyTo: RealmList<Recipient> = realmListOf()
-    @SerialName("in_reply_to")
-    var inReplyTo: String? = null
-    @SerialName("mime_type")
-    var mimeType: String = ""
-    var body: String = ""
-    var cc: RealmList<Recipient> = realmListOf()
-    var bcc: RealmList<Recipient> = realmListOf()
-    var from: RealmList<Recipient> = realmListOf()
-    var to: RealmList<Recipient> = realmListOf()
-    var subject: String = ""
+    var delay: Int = 0
     @SerialName("ack_request")
     var ackRequest: Boolean = false
-    @SerialName("action")
-    private var _action: String = ""
-    var delay: Int = 0
-    @SerialName("priority")
-    private var _priority: String? = null
     @SerialName("st_uuid")
     var stUuid: String? = null
-    var attachments: RealmList<Attachment> = realmListOf()
     //endregion
 
     //region Local data (Transient)
     @Transient
-    var isLocal: Boolean = false
+    @PrimaryKey
+    var localUuid: String = UUID.randomUUID().toString()
     @Transient
-    var parentMessageUid: String = "" // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
+    var messageUid: String? = null
     //endregion
 
     var action
         get() = enumValueOfOrNull<DraftAction>(_action)
         set(value) {
-            _action = value?.apiCallValue ?: ""
+            _action = value?.apiCallValue ?: DraftAction.NONE.apiCallValue
         }
 
     var priority
@@ -92,18 +100,15 @@ class Draft : RealmObject {
         }
 
     fun initLocalValues(messageUid: String? = null, priority: Priority? = null): Draft {
-        if (uuid.isEmpty()) {
-            uuid = UUID.randomUUID().toString()
-            isLocal = true
-        }
-        messageUid?.let { this.parentMessageUid = it }
+        messageUid?.let { this.messageUid = it }
         priority?.let { this.priority = it }
 
         return this
     }
 
     enum class DraftAction(val apiCallValue: String) {
-        SEND("send"),
+        NONE(""),
         SAVE("save"),
+        SEND("send"),
     }
 }

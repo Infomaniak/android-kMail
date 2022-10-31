@@ -69,16 +69,21 @@
         android:name="com.infomaniak.mail.ui.main.newMessage.NewMessageActivity"
         android:label="NewMessageActivity"
         tools:layout="@layout/activity_new_message">
+
+        <!-- Region Current draft status -->
         <argument
-            android:name="isOpeningExistingDraft"
+            android:name="isDraftExisting"
             android:defaultValue="false"
             app:argType="boolean" />
         <argument
-            android:name="isExistingDraftAlreadyDownloaded"
+            android:name="isDraftDownloaded"
             android:defaultValue="false"
             app:argType="boolean" />
+        <!-- Endregion -->
+
+        <!-- Region Get draft -->
         <argument
-            android:name="draftUuid"
+            android:name="draftLocalUuid"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
@@ -92,6 +97,8 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <!-- Endregion -->
+
     </activity>
 
     <fragment

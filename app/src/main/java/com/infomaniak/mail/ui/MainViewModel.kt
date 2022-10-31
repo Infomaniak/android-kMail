@@ -40,7 +40,6 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -260,8 +259,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             filter = filter,
         ).data ?: return
 
-        canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter)
-        FolderController.updateFolderLastUpdatedAt(folderId)
+        RealmDatabase.mailboxContent().writeBlocking {
+            canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
+
+            FolderController.updateFolderLastUpdatedAt(folderId, this)
+
+            val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+            if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+        }
+
         isDownloadingChanges.postValue(false)
     }
 
@@ -299,10 +305,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
                     completedMessage.fullyDownloaded = true
                     if (completedMessage.isDraft) {
-                        completedMessage.draftUuid = DraftController.fetchDraft(
-                            completedMessage.draftResource,
-                            completedMessage.uid,
-                        )
+                        RealmDatabase.mailboxContent().writeBlocking {
+                            val draft = DraftController.getDraftByMessageUid(completedMessage.uid, this)
+                            completedMessage.draftLocalUuid = draft?.localUuid
+                                ?: DraftController.fetchDraft(completedMessage.draftResource, completedMessage.uid, this)
+                        }
                     }
                 }
             }
@@ -375,6 +382,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region New Message
     // TODO: This is temporary, while waiting for a "DraftsManager".
     fun executeDraftsActions() = viewModelScope.launch(Dispatchers.IO) {
+        if (RealmDatabase.mailboxContent().isClosed()) return@launch
         RealmDatabase.mailboxContent().writeBlocking {
 
             fun getCurrentMailboxUuid(drafts: List<Draft>): String? {
@@ -385,12 +393,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val mailboxUuid = getCurrentMailboxUuid(drafts) ?: return@writeBlocking
 
             drafts.reversed().forEach { draft ->
-                when (draft.action) {
-                    DraftAction.SAVE -> ApiRepository.saveDraft(mailboxUuid, draft)
-                    DraftAction.SEND -> ApiRepository.sendDraft(mailboxUuid, draft)
-                    else -> Unit
-                }
-                if (draft.isLocal || draft.action == DraftAction.SEND) delete(draft)
+                DraftController.executeDraftAction(draft, mailboxUuid, this)
             }
         }
     }

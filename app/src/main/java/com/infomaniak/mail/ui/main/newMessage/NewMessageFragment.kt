@@ -115,7 +115,7 @@ class NewMessageFragment : Fragment() {
             }
         })
 
-        observeDraftUuid()
+        observeDraftLocalUuid()
         listenToSubject()
         listenToBody()
         observeMailboxes()
@@ -128,8 +128,8 @@ class NewMessageFragment : Fragment() {
         BCC.clearField()
     }
 
-    private fun observeDraftUuid() {
-        newMessageViewModel.currentDraftUuid.observeNotNull(viewLifecycleOwner) {
+    private fun observeDraftLocalUuid() {
+        newMessageViewModel.draftHasBeenSet.observeNotNull(viewLifecycleOwner) {
             observeContacts()
             populateUiWithExistingDraftData()
         }
@@ -266,12 +266,12 @@ class NewMessageFragment : Fragment() {
 
     private fun addRecipientToField(field: FieldType, recipient: Recipient) {
         getRecipients(field).add(recipient)
-        newMessageViewModel.autoSaveDraft()
+        newMessageViewModel.saveDraftDebouncing()
     }
 
     private fun removeRecipientFromField(field: FieldType, index: Int) {
         getRecipients(field).removeAt(index)
-        newMessageViewModel.autoSaveDraft()
+        newMessageViewModel.saveDraftDebouncing()
     }
 
     //region Chips behavior

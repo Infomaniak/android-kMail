@@ -93,7 +93,7 @@ object ApiRoutes {
 
     fun draft(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/draft"
 
-    fun draft(mailboxUuid: String, draftUuid: String) = "${draft(mailboxUuid)}/$draftUuid"
+    fun draft(mailboxUuid: String, draftRemoteUuid: String) = "${draft(mailboxUuid)}/$draftRemoteUuid"
 
     fun messageSeen(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/seen"
 
