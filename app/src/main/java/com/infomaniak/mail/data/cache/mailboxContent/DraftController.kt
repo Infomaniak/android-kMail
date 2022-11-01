@@ -82,9 +82,12 @@ object DraftController {
     //endregion
 
     //region Open Draft
-    fun fetchDraft(draftResource: String, messageUid: String, realm: MutableRealm? = null): String? {
+    fun MutableRealm.fetchDraft(draftResource: String, messageUid: String): String? {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
-            upsertDraft(draft.initLocalValues(messageUid), realm)
+            upsertDraft(draft.initLocalValues(messageUid), this)
+            MessageController.updateMessage(messageUid, this) {
+                it.draftLocalUuid = draft.localUuid
+            }
         }?.localUuid
     }
 

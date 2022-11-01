@@ -174,7 +174,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
                     isDraftExisting = true,
-                    isDraftDownloaded = it.draftLocalUuid != null,
                     draftLocalUuid = it.draftLocalUuid,
                     draftResource = it.draftResource,
                     messageUid = it.messageUid,
