@@ -50,9 +50,9 @@ class ExternalContentSettingFragment : Fragment() {
 
         check(localSettings.externalContent)
 
-        onItemCheckedListener { _, _, enum ->
+        onItemCheckedListener { _, _, externalContent ->
             notYetImplemented()
-            (enum as? ExternalContent)?.let { localSettings.externalContent = it }
+            localSettings.externalContent = externalContent as ExternalContent
         }
     }
 }

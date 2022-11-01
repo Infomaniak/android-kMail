@@ -49,14 +49,16 @@ class AccentColorSettingFragment : Fragment() {
 
         check(localSettings.accentColor)
 
-        onItemCheckedListener { _, _, enum ->
-            (enum as? AccentColor)?.let(::chooseColor)
+        onItemCheckedListener { _, _, accentColor ->
+            chooseColor(accentColor as AccentColor)
         }
     }
 
     private fun chooseColor(accentColor: AccentColor) {
-        activity?.setTheme(accentColor.theme)
         localSettings.accentColor = accentColor
-        activity?.recreate()
+        activity?.apply {
+            setTheme(accentColor.theme)
+            recreate()
+        }
     }
 }

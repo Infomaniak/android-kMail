@@ -57,13 +57,13 @@ class ToggleableTextFormatterItemView @JvmOverloads constructor(
         }
 
     init {
-        with(binding) {
-            attrs?.getAttributes(
-                context,
-                R.styleable.ToggleableTextFormatterItemView,
-                defStyleAttr,
-                R.style.ToggleableTextFormatterItemView
-            ) {
+        attrs?.getAttributes(
+            context,
+            R.styleable.ToggleableTextFormatterItemView,
+            defStyleAttr,
+            R.style.ToggleableTextFormatterItemView
+        ) {
+            with(binding) {
                 unselectedIconColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_iconColor)
                 selectedIconColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_selectedIconColor)
                 unselectedBackgroundColor = getColorOrThrow(R.styleable.ToggleableTextFormatterItemView_backgroundColor)

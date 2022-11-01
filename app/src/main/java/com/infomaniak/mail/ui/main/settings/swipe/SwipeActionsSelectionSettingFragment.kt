@@ -63,9 +63,9 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
 
             check(localSettings.getSwipeAction(actionResId))
 
-            onItemCheckedListener { _, _, enum ->
+            onItemCheckedListener { _, _, swipeAction ->
                 notYetImplemented()
-                (enum as? SwipeAction)?.let(::saveAction)
+                saveAction(swipeAction as SwipeAction)
             }
         }
     }

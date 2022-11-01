@@ -50,8 +50,8 @@ class ThemeSettingFragment : Fragment() {
 
         check(localSettings.theme)
 
-        onItemCheckedListener { _, _, enum ->
-            (enum as? Theme)?.let(::chooseTheme)
+        onItemCheckedListener { _, _, theme ->
+            chooseTheme(theme as Theme)
         }
     }
 

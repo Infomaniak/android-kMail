@@ -45,8 +45,8 @@ class ItemSettingView @JvmOverloads constructor(
         }
 
     init {
-        with(binding) {
-            attrs?.getAttributes(context, R.styleable.ItemSettingView) {
+        attrs?.getAttributes(context, R.styleable.ItemSettingView) {
+            with(binding) {
                 action = Action.values()[getInteger(R.styleable.ItemSettingView_itemAction, 0)]
 
                 title.text = getString(R.styleable.ItemSettingView_title) ?: ""
@@ -60,11 +60,11 @@ class ItemSettingView @JvmOverloads constructor(
                     subtitle.apply {
                         text = it
                         isGone = it == null
-
-                        chevron.isVisible = action == Action.CHEVRON
-                        toggle.isVisible = action == Action.TOGGLE
                     }
                 }
+
+                chevron.isVisible = action == Action.CHEVRON
+                toggle.isVisible = action == Action.TOGGLE
             }
         }
     }

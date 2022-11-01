@@ -50,9 +50,9 @@ class DisplayModeSettingFragment : Fragment() {
 
         check(localSettings.threadMode)
 
-        onItemCheckedListener { _, _, enum ->
+        onItemCheckedListener { _, _, threadMode ->
             notYetImplemented()
-            (enum as? ThreadMode)?.let { localSettings.threadMode = it }
+            localSettings.threadMode = threadMode as ThreadMode
         }
     }
 }

@@ -73,7 +73,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
         }
     }
 
-    fun initBijectionTable(vararg pairs: Pair<Int, Enum<*>>) {
+    fun <T: Enum<T>> initBijectionTable(vararg pairs: Pair<Int, T>) {
         bijectionTable = pairs.toMap()
     }
 
@@ -90,8 +90,8 @@ class SettingRadioGroupView @JvmOverloads constructor(
         checkedId = viewId
     }
 
-    fun check(e: Enum<*>) {
-        val viewId = bijectionTable.keys.firstOrNull { bijectionTable[it] == e } ?: return
+    fun check(enum: Enum<*>) {
+        val viewId = bijectionTable.keys.firstOrNull { bijectionTable[it] == enum } ?: return
         check(viewId)
     }
 

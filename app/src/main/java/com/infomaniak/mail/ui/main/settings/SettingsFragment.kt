@@ -22,25 +22,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.activityViewModels
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId, selectedMailbox.email))
+        animatedNavigation(
+            SettingsFragmentDirections.actionSettingsToMailboxSettings(
+                selectedMailbox.objectId,
+                selectedMailbox.email
+            )
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -61,10 +63,7 @@ class SettingsFragment : Fragment() {
 
     private fun setupMailboxesAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
-        lifecycleScope.launch(Dispatchers.IO) {
-            val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
-            withContext(Dispatchers.Main) { mailboxesAdapter.setMailboxes(mailboxes) }
-        }
+        mainViewModel.listenToMailboxes().observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
     }
 
     private fun setSubtitlesInitialState() = with(binding) {

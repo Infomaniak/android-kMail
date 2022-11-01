@@ -26,7 +26,7 @@ import com.infomaniak.mail.R
 
 class LocalSettings private constructor(context: Context) {
 
-    private val sharedPreferences = context.applicationContext.getSharedPreferences("LocalSettings", Context.MODE_PRIVATE)
+    private val sharedPreferences = context.applicationContext.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
     fun removeSettings() = sharedPreferences.transaction { clear() }
 

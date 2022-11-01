@@ -52,7 +52,8 @@
                 android:id="@+id/swipeRightIllustration"
                 layout="@layout/swipe_right_illustration"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/marginStandardSmall" />
 
             <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
 
@@ -70,6 +71,7 @@
                 layout="@layout/swipe_left_illustration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/marginStandardSmall"
                 android:layout_marginBottom="@dimen/marginStandard" />
 
         </LinearLayout>

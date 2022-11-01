@@ -79,7 +79,6 @@
                     android:id="@+id/listDensityImage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:elevation="10dp"
                     tools:ignore="ContentDescription"
                     tools:src="@drawable/bg_list_density_large" />
 
