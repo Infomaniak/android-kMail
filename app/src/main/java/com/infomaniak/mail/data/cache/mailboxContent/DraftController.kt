@@ -135,9 +135,7 @@ object DraftController {
     }
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
-
         when (draft.action) {
-
             DraftAction.SAVE -> {
                 val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
                 if (apiResponse.isSuccess()) with(apiResponse.data!!) {
@@ -148,12 +146,10 @@ object DraftController {
                     }
                 }
             }
-
             DraftAction.SEND -> {
                 val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
                 if (apiResponse.isSuccess()) realm.delete(draft)
             }
-
             else -> Unit
         }
     }
