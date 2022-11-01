@@ -296,14 +296,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 localMessage
             } else {
                 ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
-                    completedMessage.fullyDownloaded = true
                     if (completedMessage.isDraft) {
-                        RealmDatabase.mailboxContent().writeBlocking {
-                            val draft = DraftController.getDraftByMessageUid(completedMessage.uid, this)
-                            completedMessage.draftLocalUuid = draft?.localUuid
-                                ?: DraftController.fetchDraft(completedMessage.draftResource, completedMessage.uid, this)
-                        }
+                        completedMessage.draftLocalUuid = DraftController.getDraftByMessageUid(completedMessage.uid)?.localUuid
                     }
+                    completedMessage.fullyDownloaded = true
                 }
             }
         }

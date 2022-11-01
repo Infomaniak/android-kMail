@@ -75,10 +75,6 @@
             android:name="isDraftExisting"
             android:defaultValue="false"
             app:argType="boolean" />
-        <argument
-            android:name="isDraftDownloaded"
-            android:defaultValue="false"
-            app:argType="boolean" />
         <!-- Endregion -->
 
         <!-- Region Get draft -->

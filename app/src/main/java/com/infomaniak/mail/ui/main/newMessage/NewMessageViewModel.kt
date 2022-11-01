@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -67,16 +68,13 @@ class NewMessageViewModel : ViewModel() {
     fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             RealmDatabase.mailboxContent().writeBlocking {
-
-                currentDraftLocalUuid = when {
-                    isDraftExisting && isDraftDownloaded -> draftLocalUuid!!
-                    isDraftExisting && !isDraftDownloaded -> {
-                        DraftController.fetchDraft(draftResource!!, messageUid!!, this) ?: return@writeBlocking
-                    }
-                    else -> createDraft(draftMode, previousMessageUid)
+                currentDraftLocalUuid = if (isDraftExisting) {
+                    draftLocalUuid ?: fetchDraft(draftResource!!, messageUid!!) ?: return@writeBlocking
+                } else {
+                    createDraft(draftMode, previousMessageUid)
+                }.also {
+                    initUiData(it)
                 }
-
-                initUiData(currentDraftLocalUuid!!)
             }
         }
         emit(true)

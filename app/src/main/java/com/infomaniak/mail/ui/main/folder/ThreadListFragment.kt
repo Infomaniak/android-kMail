@@ -155,8 +155,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     threadListViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
                         safeNavigate(
                             ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
-                                isDraftExisting = true,
-                                isDraftDownloaded = it.draftLocalUuid != null,
+                                draftExists = true,
                                 draftLocalUuid = it.draftLocalUuid,
                                 draftResource = it.draftResource,
                                 messageUid = it.messageUid,
