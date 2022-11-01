@@ -171,6 +171,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeSelectedDraft() {
         threadListViewModel.selectedDraft.observeNotNull(viewLifecycleOwner) {
+            threadListViewModel.selectedDraft.value = null
             safeNavigate(
                 ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
                     isDraftExisting = true,
