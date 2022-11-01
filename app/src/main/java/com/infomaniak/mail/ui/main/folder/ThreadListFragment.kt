@@ -208,7 +208,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
                 val shouldKeepItem = when (direction) {
                     SwipeDirection.LEFT_TO_RIGHT -> {
-                        mainViewModel.toggleSeenStatus(thread = item)
+                        threadListViewModel.toggleSeenStatus(thread = item)
                         true
                     }
                     SwipeDirection.RIGHT_TO_LEFT -> {

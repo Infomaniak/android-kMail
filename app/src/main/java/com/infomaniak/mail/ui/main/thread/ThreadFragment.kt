@@ -62,7 +62,7 @@ class ThreadFragment : Fragment() {
         setupUi()
         setupAdapter()
         mainViewModel.openThread(navigationArgs.threadUid)
-        bindMessages()
+        observeMessages()
         observeContacts()
     }
 
@@ -132,7 +132,7 @@ class ThreadFragment : Fragment() {
                 )
             }
             onDeleteDraftClicked = { message ->
-                mainViewModel.deleteDraft(message)
+                threadViewModel.deleteDraft(message)
             }
             onAttachmentClicked = { attachment ->
                 notYetImplemented()
@@ -155,7 +155,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun bindMessages() {
+    private fun observeMessages() {
         threadViewModel.messages(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }

@@ -29,7 +29,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
-import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.*
 import androidx.core.widget.doAfterTextChanged
@@ -428,9 +427,9 @@ class NewMessageFragment : Fragment() {
     }
     //endregion
 
-    enum class FieldType(@StringRes val displayedName: Int) {
-        TO(R.string.toTitle),
-        CC(R.string.ccTitle),
-        BCC(R.string.bccTitle),
+    enum class FieldType {
+        TO,
+        CC,
+        BCC,
     }
 }

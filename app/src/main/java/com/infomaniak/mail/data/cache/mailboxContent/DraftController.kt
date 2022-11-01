@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
@@ -79,6 +80,10 @@ object DraftController {
         }
     }
     //endregion
+
+    fun deleteDraft(message: Message) {
+        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
+    }
 
     //region Open Draft
     fun fetchDraft(draftResource: String, messageUid: String, realm: MutableRealm? = null): String? {

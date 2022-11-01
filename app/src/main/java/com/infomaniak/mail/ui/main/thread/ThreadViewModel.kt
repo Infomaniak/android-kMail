@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.*
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.message.Message
 import io.realm.kotlin.notifications.ListChange
@@ -31,4 +32,6 @@ class ThreadViewModel : ViewModel() {
     }
 
     fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }
+
+    fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) { DraftController.deleteDraft(message) }
 }
