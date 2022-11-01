@@ -23,11 +23,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class SettingsFragment : Fragment() {
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId, selectedMailbox.email))
+        animatedNavigation(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId, selectedMailbox.email))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -83,7 +83,7 @@ class SettingsFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         settingsSend.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToSendSettings())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
         settingsAppLock.apply {
@@ -94,27 +94,27 @@ class SettingsFragment : Fragment() {
         }
 
         settingsThreadListDensity.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
         }
 
         settingsTheme.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToThemeSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToThemeSetting())
         }
 
         settingsAccentColor.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToAccentColorSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToAccentColorSetting())
         }
 
         settingsSwipeActions.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
         }
 
         settingsMessageDisplay.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
         }
 
         settingsExternalContent.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
         }
     }
 }

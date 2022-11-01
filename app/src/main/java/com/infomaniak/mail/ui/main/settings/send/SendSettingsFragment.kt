@@ -22,10 +22,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSendSettingsBinding
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 
 class SendSettingsFragment : Fragment() {
@@ -72,11 +72,11 @@ class SendSettingsFragment : Fragment() {
 
     private fun setupListeners() = with(binding) {
         settingsCancellationPeriod.setOnClickListener {
-            safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToCancelDelaySetting())
+            animatedNavigation(SendSettingsFragmentDirections.actionSendSettingsToCancelDelaySetting())
         }
 
         settingsTransferEmails.setOnClickListener {
-            safeNavigate(SendSettingsFragmentDirections.actionSendSettingsToFordwardMailsSetting())
+            animatedNavigation(SendSettingsFragmentDirections.actionSendSettingsToFordwardMailsSetting())
         }
 
         settingsSendIncludeOriginalMessage.apply {

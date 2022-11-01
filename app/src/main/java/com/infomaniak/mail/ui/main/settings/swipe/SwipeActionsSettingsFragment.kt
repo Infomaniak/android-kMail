@@ -25,10 +25,10 @@ import androidx.annotation.StringRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
+import com.infomaniak.mail.utils.animatedNavigation
 
 class SwipeActionsSettingsFragment : Fragment() {
 
@@ -65,6 +65,6 @@ class SwipeActionsSettingsFragment : Fragment() {
     }
 
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {
-        safeNavigate(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
+        animatedNavigation(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
     }
 }

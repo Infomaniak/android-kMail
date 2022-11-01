@@ -26,8 +26,14 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.navigation.NavDirections
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.DialogFragmentNavigator
+import androidx.navigation.fragment.FragmentNavigator
+import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.canNavigate
 import com.infomaniak.lib.core.utils.endOfTheWeek
 import com.infomaniak.lib.core.utils.startOfTheDay
 import com.infomaniak.lib.core.utils.startOfTheWeek
@@ -105,6 +111,19 @@ fun Context.getAttributeColor(attribute: Int): Int {
 
 fun Fragment.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
+}
+
+fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: String? = null) {
+    if (canNavigate(currentClassName)) {
+        val navOptions = NavOptions
+            .Builder()
+            .setEnterAnim(R.anim.fragment_swipe_enter)
+            .setExitAnim(R.anim.fragment_swipe_exit)
+            .setPopEnterAnim(R.anim.fragment_swipe_pop_enter)
+            .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
+            .build()
+        findNavController().navigate(directions, navOptions)
+    }
 }
 
 //region Realm

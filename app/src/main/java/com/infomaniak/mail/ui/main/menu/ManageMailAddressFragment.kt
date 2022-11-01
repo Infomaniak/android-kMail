@@ -24,10 +24,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ class ManageMailAddressFragment : Fragment() {
             mail.text = user.email
         }
 
-        changeAccountButton.setOnClickListener { safeNavigate(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
+        changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
         associatedEmailAddresses.setOnClickListener { notYetImplemented() }
         disconnectAccountButton.setOnClickListener { logout() }
     }
