@@ -23,7 +23,6 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.navigation.navArgs
 import com.google.android.material.button.MaterialButton
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -36,7 +35,6 @@ import com.google.android.material.R as RMaterial
 class NewMessageActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNewMessageBinding.inflate(layoutInflater) }
-    private val navigationArgs: NewMessageActivityArgs by navArgs()
     private val newMessageViewModel: NewMessageViewModel by viewModels()
 
     private val newMessageFragment by lazy {
@@ -48,8 +46,6 @@ class NewMessageActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        newMessageViewModel.initializeDraftAndUi(navigationArgs)
 
         handleOnBackPressed()
 
