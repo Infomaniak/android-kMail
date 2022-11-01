@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -35,7 +34,6 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
@@ -129,27 +127,18 @@ class NewMessageViewModel : ViewModel() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
-            val mailboxUuid = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailbox)?.uuid!!
-
-            RealmDatabase.mailboxContent().writeBlocking {
-                saveDraftToLocal(currentDraftLocalUuid!!, DraftAction.SAVE)
-
-                val draft = DraftController.getDraft(currentDraftLocalUuid!!, this) ?: return@writeBlocking
-                DraftController.executeDraftAction(draft, mailboxUuid, this)
-            }
+            saveDraftToLocal(currentDraftLocalUuid!!, DraftAction.SAVE)
         }
     }
 
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
         val draftLocalUuid = currentDraftLocalUuid ?: return@launch
-        RealmDatabase.mailboxContent().writeBlocking {
-            saveDraftToLocal(draftLocalUuid, action)
-        }
+        saveDraftToLocal(draftLocalUuid, action)
         shouldCloseActivity.postValue(true)
     }
 
-    private fun MutableRealm.saveDraftToLocal(draftLocalUuid: String, action: DraftAction) {
-        DraftController.updateDraft(draftLocalUuid, this) { draft ->
+    private fun saveDraftToLocal(draftLocalUuid: String, action: DraftAction) {
+        DraftController.updateDraft(draftLocalUuid) { draft ->
             draft.to = mailTo.toRealmList()
             draft.cc = mailCc.toRealmList()
             draft.bcc = mailBcc.toRealmList()
