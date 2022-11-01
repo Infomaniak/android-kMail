@@ -130,7 +130,7 @@ object DraftController {
                     updateDraft(draft.localUuid, realm) {
                         it.remoteUuid = draftRemoteUuid
                         it.messageUid = messageUid
-                        it.action = DraftAction.NONE
+                        it.action = null
                     }
                 }
             }

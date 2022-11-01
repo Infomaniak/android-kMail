@@ -60,7 +60,7 @@ class Draft : RealmObject {
     @SerialName("priority")
     private var _priority: String? = null
     @SerialName("action")
-    private var _action: String = DraftAction.NONE.apiCallValue
+    private var _action: String? = null
 
     @SerialName("in_reply_to")
     var inReplyTo: String? = null
@@ -90,7 +90,7 @@ class Draft : RealmObject {
     var action
         get() = enumValueOfOrNull<DraftAction>(_action)
         set(value) {
-            _action = value?.apiCallValue ?: DraftAction.NONE.apiCallValue
+            _action = value?.apiCallValue
         }
 
     var priority
@@ -107,7 +107,6 @@ class Draft : RealmObject {
     }
 
     enum class DraftAction(val apiCallValue: String) {
-        NONE(""),
         SAVE("save"),
         SEND("send"),
     }
