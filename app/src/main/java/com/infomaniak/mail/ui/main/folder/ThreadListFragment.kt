@@ -109,12 +109,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeSelectedDraft()
     }
 
-    private fun setupOnRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener(this)
+    override fun onResume() {
+        super.onResume()
+        binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
     }
 
     override fun onRefresh() {
         mainViewModel.forceRefreshThreads(filter)
+    }
+
+    private fun setupOnRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
     private fun setupAdapter() {
@@ -264,11 +269,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 mainViewModel.forceRefreshThreads(filter)
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
     }
 
     private fun observeCurrentFolderThreads() {

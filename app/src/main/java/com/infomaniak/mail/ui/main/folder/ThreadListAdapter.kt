@@ -94,8 +94,6 @@ class ThreadListAdapter(
         }
     }
 
-    private fun getDisplayedRecipient(thread: Thread): Recipient? = thread.messages.lastOrNull()?.from?.firstOrNull()
-
     override fun onBindViewHolder(item: Any, viewHolder: ThreadViewHolder, position: Int): Unit = with(viewHolder.binding) {
         when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
@@ -117,6 +115,8 @@ class ThreadListAdapter(
             else -> super.getItemId(position)
         }
     }
+
+    private fun getDisplayedRecipient(thread: Thread): Recipient? = thread.messages.lastOrNull()?.from?.firstOrNull()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
 
