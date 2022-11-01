@@ -36,7 +36,7 @@ import okhttp3.OkHttpClient
 
 class SwitchUserViewModel : ViewModel() {
 
-    fun listenToAccounts(): LiveData<List<UiAccount>> = liveData(Dispatchers.IO) {
+    fun observeAccounts(): LiveData<List<UiAccount>> = liveData(Dispatchers.IO) {
 
         val users = AccountUtils.getAllUsersSync()
 

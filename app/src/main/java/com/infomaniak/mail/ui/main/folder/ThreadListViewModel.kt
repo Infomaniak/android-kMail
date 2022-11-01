@@ -43,7 +43,7 @@ class ThreadListViewModel : ViewModel() {
 
     val selectedDraft = MutableLiveData<SelectedDraft>()
 
-    fun listenToFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
+    fun observeFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
         emitSource(
             FolderController.getFolderAsync(folderId)
                 .mapNotNull { it.obj }

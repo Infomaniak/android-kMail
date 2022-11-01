@@ -50,10 +50,10 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         addToContacts.setOnClickListener { notYetImplemented() }
         copyAddress.setOnClickListener { notYetImplemented() }
 
-        listenToContacts()
+        observeContacts()
     }
 
-    private fun listenToContacts() {
+    private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
             binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
         }

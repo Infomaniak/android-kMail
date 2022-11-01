@@ -116,8 +116,8 @@ class NewMessageFragment : Fragment() {
         })
 
         observeDraftLocalUuid()
-        listenToSubject()
-        listenToBody()
+        observeSubject()
+        observeBody()
         observeMailboxes()
     }
 
@@ -140,13 +140,13 @@ class NewMessageFragment : Fragment() {
         binding.bodyText.setText(mailBody)
     }
 
-    private fun listenToSubject() {
+    private fun observeSubject() {
         binding.subjectTextField.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailSubject)
         }
     }
 
-    private fun listenToBody() {
+    private fun observeBody() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
         }
@@ -176,7 +176,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeMailboxes() {
-        mainViewModel.listenToMailboxes().observe(viewLifecycleOwner, ::setupFromField)
+        mainViewModel.observeMailboxes().observe(viewLifecycleOwner, ::setupFromField)
     }
 
     private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {

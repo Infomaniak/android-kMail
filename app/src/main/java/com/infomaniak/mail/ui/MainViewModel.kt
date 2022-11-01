@@ -75,7 +75,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         currentMailboxObjectId.value = null
     }
 
-    fun listenToMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+    fun observeMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
         emitSource(
             MailboxController.getMailboxesAsync(userId)
                 .map { it.list }
@@ -215,7 +215,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MergedContactController.update(phoneMergedContacts.values.toList())
     }
 
-    fun listenToRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
+    fun observeRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
         MergedContactController.getMergedContactsAsync().collect {
             mergedContacts.postValue(
                 it.list.associateBy { mergedContact ->
