@@ -35,32 +35,32 @@
         app:layout_constraintTop_toTopOf="parent"
         app:strokeWidth="0dp" />
 
-    <TextView
-        android:id="@+id/swipeToDefine"
-        style="@style/Callout.Secondary"
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="3dp"
-        android:text="@string/settingsSwipeActionToDefine"
-        android:textColor="@color/iconColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/swipeForeground"
         app:layout_constraintStart_toStartOf="@id/swipeBackground"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:id="@+id/swipeIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:elevation="3dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/swipeForeground"
-        app:layout_constraintStart_toStartOf="@id/swipeBackground"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white"
-        tools:ignore="ContentDescription"
-        tools:src="@drawable/ic_bin"
-        tools:visibility="gone" />
+        <TextView
+            android:id="@+id/swipeToDefine"
+            style="@style/Callout.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settingsSwipeActionToDefine"
+            android:textColor="@color/iconColor" />
+
+        <ImageView
+            android:id="@+id/swipeIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:tint="@color/white"
+            tools:ignore="ContentDescription"
+            tools:src="@drawable/ic_bin"
+            tools:visibility="gone" />
+    </FrameLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/swipeForeground"

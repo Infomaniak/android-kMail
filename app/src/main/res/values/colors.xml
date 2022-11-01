@@ -83,7 +83,7 @@
     <color name="progressbarTrackColor">@color/grey_border</color>
 
     <!-- Swipe actions -->
-    <color name="swipeDelete">#D71E04</color>
+    <color name="swipeDelete">@color/redDestructiveAction</color>
     <color name="swipeMove">#009688</color>
     <color name="swipeReadUnread">#006AB2</color>
     <color name="swipeFavorite">#FFC10A</color>
@@ -91,6 +91,6 @@
     <color name="swipeSpam">#FF8500</color>
     <color name="swipeArchive">#BA68C8</color>
     <color name="swipeQuickActionMenu">#85A2B6</color>
-    <color name="swipeNone">@color/grey_border</color>
+    <color name="swipeNone">@color/border</color>
 
 </resources>
