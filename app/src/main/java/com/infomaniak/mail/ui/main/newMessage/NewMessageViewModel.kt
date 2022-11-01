@@ -24,8 +24,8 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setDraftSignature
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setSignature
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.MergedContact
@@ -77,7 +77,6 @@ class NewMessageViewModel : ViewModel() {
                     else -> createDraft(draftMode, previousMessageUid)
                 }
 
-                setDraftSignature(currentDraftLocalUuid!!)
                 initUiData(currentDraftLocalUuid!!)
             }
         }
@@ -98,23 +97,8 @@ class NewMessageViewModel : ViewModel() {
         return Draft()
             .initLocalValues(priority = Priority.NORMAL)
             .apply {
-                previousMessageUid?.let { MessageController.getMessage(it, this@createDraft) }?.let { previousMessage ->
-
-                    previousMessage.msgId.let {
-                        this.inReplyTo = it
-                        this.references = it
-                    }
-
-                    when (draftMode) {
-                        DraftMode.REPLY, DraftMode.REPLY_ALL -> this.inReplyToUid = previousMessageUid
-                        DraftMode.FORWARD -> this.forwardedUid = previousMessageUid
-                        DraftMode.NEW_MAIL -> Unit
-                    }
-
-                    this.to = previousMessage.from
-                    if (draftMode == DraftMode.REPLY_ALL) this.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
-                    previousMessage.subject?.let { this.subject = "Re: $it" }
-                }
+                setSignature(this)
+                if (draftMode != DraftMode.NEW_MAIL) setPreviousMessage(this, draftMode, previousMessageUid)
             }
             .also { DraftController.upsertDraft(it, this) }
             .localUuid

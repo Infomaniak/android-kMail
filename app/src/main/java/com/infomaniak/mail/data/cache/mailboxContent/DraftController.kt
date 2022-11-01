@@ -29,6 +29,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
@@ -87,36 +88,49 @@ object DraftController {
         }?.localUuid
     }
 
-    fun MutableRealm.setDraftSignature(draftLocalUuid: String) {
-        updateDraft(draftLocalUuid, this) { draft ->
+    fun MutableRealm.setSignature(draft: Draft) {
 
-            draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
+        draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
 
-            val defaultSignature = SignatureController.getDefaultSignature(this) ?: return@updateDraft
+        SignatureController.getDefaultSignature(this)?.let { defaultSignature ->
 
-            if (draft.identityId == null) draft.identityId = defaultSignature.id
+            draft.identityId = defaultSignature.id
 
-            if (draft.from.isEmpty()) {
-                draft.from = realmListOf(Recipient().apply {
-                    this.email = defaultSignature.sender
-                    this.name = defaultSignature.fullName
-                })
+            draft.from = realmListOf(Recipient().apply {
+                this.email = defaultSignature.sender
+                this.name = defaultSignature.fullName
+            })
+
+            draft.replyTo = realmListOf(Recipient().apply {
+                this.email = defaultSignature.replyTo
+                this.name = ""
+            })
+
+            val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+            draft.body = when (defaultSignature.position) {
+                SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
+                else -> html + draft.body
+            }
+        }
+    }
+
+    fun MutableRealm.setPreviousMessage(draft: Draft, draftMode: Draft.DraftMode, previousMessageUid: String?) {
+        previousMessageUid?.let { MessageController.getMessage(it, this) }?.let { previousMessage ->
+
+            previousMessage.msgId.let {
+                draft.inReplyTo = it
+                draft.references = it
             }
 
-            if (draft.replyTo.isEmpty()) {
-                draft.replyTo = realmListOf(Recipient().apply {
-                    this.email = defaultSignature.replyTo
-                    this.name = ""
-                })
+            when (draftMode) {
+                Draft.DraftMode.REPLY, Draft.DraftMode.REPLY_ALL -> draft.inReplyToUid = previousMessageUid
+                Draft.DraftMode.FORWARD -> draft.forwardedUid = previousMessageUid
+                Draft.DraftMode.NEW_MAIL -> Unit
             }
 
-            if (draft.body.isEmpty()) {
-                val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
-                draft.body = when (defaultSignature.position) {
-                    SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
-                    else -> html + draft.body
-                }
-            }
+            draft.to = previousMessage.from
+            if (draftMode == Draft.DraftMode.REPLY_ALL) draft.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
+            previousMessage.subject?.let { draft.subject = "Re: $it" }
         }
     }
 
