@@ -36,6 +36,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.navArgs
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.mail.R
@@ -47,7 +48,10 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.setMargins
+import com.infomaniak.mail.utils.toggleChevron
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -115,7 +119,7 @@ class NewMessageFragment : Fragment() {
             }
         })
 
-        observeDraftLocalUuid()
+        initializeDraftAndUi()
         observeSubject()
         observeBody()
         observeMailboxes()
@@ -128,11 +132,12 @@ class NewMessageFragment : Fragment() {
         BCC.clearField()
     }
 
-    private fun observeDraftLocalUuid() {
-        newMessageViewModel.draftHasBeenSet.observeNotNull(viewLifecycleOwner) {
-            observeContacts()
-            populateUiWithExistingDraftData()
-        }
+    private fun initializeDraftAndUi() {
+        newMessageViewModel.initializeDraftAndUi(requireActivity().navArgs<NewMessageActivityArgs>().value)
+            .observe(viewLifecycleOwner) {
+                observeContacts()
+                populateUiWithExistingDraftData()
+            }
     }
 
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {

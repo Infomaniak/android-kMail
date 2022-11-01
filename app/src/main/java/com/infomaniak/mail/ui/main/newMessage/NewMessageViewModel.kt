@@ -17,7 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -59,11 +62,10 @@ class NewMessageViewModel : ViewModel() {
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     var currentDraftLocalUuid: String? = null
-    val draftHasBeenSet = MutableLiveData<Boolean?>()
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
-    fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs) = viewModelScope.launch(Dispatchers.IO) {
+    fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             RealmDatabase.mailboxContent().writeBlocking {
 
@@ -77,10 +79,9 @@ class NewMessageViewModel : ViewModel() {
 
                 setDraftSignature(currentDraftLocalUuid!!)
                 initUiData(currentDraftLocalUuid!!)
-
-                draftHasBeenSet.postValue(true)
             }
         }
+        emit(true)
     }
 
     private fun MutableRealm.initUiData(draftLocalUuid: String) {
