@@ -129,7 +129,7 @@
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="emailSentSnackbar">E-mail envoyé</string>
-    <string name="emptyFolderDescription">Il n\'y a rien à voir, regardez-en un autre :)</string>
+    <string name="emptyFolderDescription">Il n‘y a rien à voir, regardez-en un autre :)</string>
     <string name="emptyFolderTitle">Ce dossier est vide !</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
@@ -195,7 +195,7 @@
     <string name="searchFilterFolder">Tous les dossiers</string>
     <string name="searchFilterRead">Lus</string>
     <string name="searchFilterUnread">Non lus</string>
-    <string name="searchNoResultsDescription">Nous n\'avons rien trouvé correspondant à votre recherche</string>
+    <string name="searchNoResultsDescription">Nous n‘avons rien trouvé correspondant à votre recherche</string>
     <string name="searchNoResultsTitle">Aucun résultats</string>
     <string name="searchViewHint">Rechercher un message</string>
     <string name="send">Envoyer</string>
@@ -297,4 +297,5 @@
     <string name="unknownRecipientTitle">(inconnu)</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
+    <string name="workInProgressTitle">Cette fonctionnalité est en cours de développement.</string>
 </resources>

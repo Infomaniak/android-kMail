@@ -129,7 +129,7 @@
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="emailSentSnackbar">Email sent</string>
-    <string name="emptyFolderDescription">There\'s nothing to see, look at another one :)</string>
+    <string name="emptyFolderDescription">There‘s nothing to see, look at another one :)</string>
     <string name="emptyFolderTitle">This folder is empty !</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
@@ -152,7 +152,7 @@
     <string name="messageForwardHeader">Forwarded message</string>
     <string name="messageIsDraftOption">Draft</string>
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
-    <string name="moreStorageText1">Your mailbox is full and you can\'t receive any more messages 🥲</string>
+    <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
     <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, ...)</string>
     <string name="moreStorageTitle">Is your box full? Get more storage!</string>
     <string name="moveTitle">Which folder do you want to move your email to?</string>
@@ -297,4 +297,5 @@
     <string name="unknownRecipientTitle">(unknown)</string>
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
+    <string name="workInProgressTitle">This feature is currently under development.</string>
 </resources>
