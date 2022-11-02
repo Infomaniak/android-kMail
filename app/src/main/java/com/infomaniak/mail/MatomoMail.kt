@@ -19,10 +19,15 @@ package com.infomaniak.mail
 
 import android.content.Context
 import com.infomaniak.lib.core.MatomoCore
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import org.matomo.sdk.Tracker
 
 object MatomoMail : MatomoCore {
 
     override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
     override val siteId = 9
+
+    fun Context.trackAccountEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent("account", name, action, value)
+    }
 }

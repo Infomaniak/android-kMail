@@ -40,6 +40,7 @@ import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
@@ -130,8 +131,7 @@ class LoginActivity : AppCompatActivity() {
                     lifecycleScope.launch(Dispatchers.IO) {
                         when (val user = authenticateUser(this@LoginActivity, it)) {
                             is User -> {
-                                // application.trackCurrentUserId() // TODO: Matomo
-                                // trackAccountEvent("loggedIn") // TODO: Matomo
+                                trackAccountEvent("loggedIn")
                                 AccountUtils.reloadApp?.invoke()
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
