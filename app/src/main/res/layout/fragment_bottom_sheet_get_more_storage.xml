@@ -63,7 +63,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/closeButton"
-            style="@style/TextButtonPrimary.Error"
+            style="@style/TextButtonError"
             android:text="@string/buttonClose" />
 
         <com.google.android.material.button.MaterialButton
