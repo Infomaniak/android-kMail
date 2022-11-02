@@ -28,8 +28,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
-import androidx.navigation.fragment.DialogFragmentNavigator
-import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar

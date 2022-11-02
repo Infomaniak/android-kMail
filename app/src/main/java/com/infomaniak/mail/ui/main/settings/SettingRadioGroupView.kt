@@ -73,7 +73,7 @@ class SettingRadioGroupView @JvmOverloads constructor(
         }
     }
 
-    fun <T: Enum<T>> initBijectionTable(vararg pairs: Pair<Int, T>) {
+    fun <T : Enum<T>> initBijectionTable(vararg pairs: Pair<Int, T>) {
         bijectionTable = pairs.toMap()
     }
 
