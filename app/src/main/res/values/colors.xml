@@ -49,9 +49,8 @@
     <color name="backgroundNewMailColor">@android:color/white</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
-    <color name="selectedAccountCardviewColor">@color/lightenedGrey</color>
+    <color name="backgroundSecondaryColor">@color/lightenedGrey</color>
     <color name="backgroundDisabledPrimaryButton">@color/grey_text_secondary</color>
-    <color name="backgroundQuickActions">#FCFCFC</color>
     <color name="threadDensityBackground">#FFFFFF</color>
 
     <!-- Texts -->
