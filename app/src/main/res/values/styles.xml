@@ -268,11 +268,6 @@
 
     <!-- MenuDrawer -->
 
-    <style name="MenuDrawerBadge" parent="CalloutMedium.Accent">
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">?android:attr/colorPrimary</item>
-    </style>
-
     <style name="MenuDrawerDivider" parent="Widget.Material3.MaterialDivider">
         <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
         <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
@@ -302,16 +297,6 @@
 
     <style name="MenuDrawerItemSelected" parent="MenuDrawerItem">
         <item name="cardBackgroundColor">?attr/colorPrimaryContainer</item>
-    </style>
-
-    <style name="MenuDrawerItemText">
-        <item name="android:drawablePadding">@dimen/marginStandard</item>
-        <item name="android:drawableTint">?android:attr/colorPrimary</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:gravity">start|center</item>
-        <item name="android:lineSpacingMultiplier">1</item>
-        <item name="android:maxLines">2</item>
-        <item name="drawableStartCompat">@drawable/ic_folder</item>
     </style>
 
     <!-- Chips -->

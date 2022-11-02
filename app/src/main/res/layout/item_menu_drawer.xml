@@ -16,6 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/addressItemView"
     style="@style/MenuDrawerItem">
@@ -29,18 +30,26 @@
 
         <TextView
             android:id="@+id/itemName"
-            style="@style/MenuDrawerItemText"
+            style="@style/H5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:drawablePadding="@dimen/marginStandard"
+            android:ellipsize="end"
+            android:gravity="start|center_vertical"
+            android:lineSpacingMultiplier="1"
             android:lines="1"
+            android:maxLines="2"
+            app:drawableStartCompat="@drawable/ic_folder"
+            app:drawableTint="?android:attr/colorPrimary"
             tools:text="Folder (Default/Custom)" />
 
         <TextView
             android:id="@+id/itemBadge"
-            style="@style/MenuDrawerBadge"
+            style="@style/CalloutMedium.Accent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             tools:text="99+" />
 
     </LinearLayout>
