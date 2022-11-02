@@ -41,6 +41,7 @@ import java.util.*
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
+        private set
     var contacts: Map<Recipient, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
