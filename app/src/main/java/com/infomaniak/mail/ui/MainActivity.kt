@@ -159,7 +159,7 @@ class MainActivity : ThemedActivity() {
 
         window.navigationBarColor = getColor(
             when (destination.id) {
-                R.id.threadFragment -> R.color.backgroundQuickActions
+                R.id.threadFragment -> R.color.backgroundSecondaryColor
                 else -> R.color.backgroundColor
             }
         )

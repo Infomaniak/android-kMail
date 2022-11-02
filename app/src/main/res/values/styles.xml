@@ -217,6 +217,26 @@
         <item name="textAllCaps">false</item>
     </style>
 
+    <style name="QuickBottomActionBarButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:drawableTint">?android:attr/colorPrimary</item>
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textSize">@dimen/textCaptionSize</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="iconGravity">textTop</item>
+        <item name="iconPadding">@dimen/marginStandardSmall</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconTint">?android:attr/colorPrimary</item>
+        <item name="layout_constraintWidth_max">120dp</item>
+    </style>
+
 
     <!-- Cardview -->
 
