@@ -63,7 +63,7 @@ class SettingsFragment : Fragment() {
 
     private fun setupMailboxesAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
-        mainViewModel.listenToMailboxes().observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
+        mainViewModel.observeMailboxes().observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
     }
 
     private fun setSubtitlesInitialState() = with(binding) {
