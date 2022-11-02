@@ -68,7 +68,7 @@ class NewMessageViewModel : ViewModel() {
     fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             RealmDatabase.mailboxContent().writeBlocking {
-                currentDraftLocalUuid = if (isDraftExisting) {
+                currentDraftLocalUuid = if (draftExists) {
                     draftLocalUuid ?: fetchDraft(draftResource!!, messageUid!!) ?: return@writeBlocking
                 } else {
                     createDraft(draftMode, previousMessageUid)

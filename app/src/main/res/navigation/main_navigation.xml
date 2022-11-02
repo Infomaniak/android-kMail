@@ -72,7 +72,7 @@
 
         <!-- Region Current draft status -->
         <argument
-            android:name="isDraftExisting"
+            android:name="draftExists"
             android:defaultValue="false"
             app:argType="boolean" />
         <!-- Endregion -->
