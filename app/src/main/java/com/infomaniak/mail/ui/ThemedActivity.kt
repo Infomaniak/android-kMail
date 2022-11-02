@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
 
 open class ThemedActivity : AppCompatActivity() {
@@ -26,5 +27,6 @@ open class ThemedActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(LocalSettings.getInstance(this).accentColor.theme)
         super.onCreate(savedInstanceState)
+        trackScreen()
     }
 }

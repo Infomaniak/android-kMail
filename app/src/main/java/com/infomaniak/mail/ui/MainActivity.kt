@@ -32,6 +32,8 @@ import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
+import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
@@ -166,10 +168,9 @@ class MainActivity : ThemedActivity() {
             }
         )
 
-        // TODO: Matomo
-        // with(destination) {
-        //     application.trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
-        // }
+        with(destination) {
+            trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
+        }
     }
 
     private fun setDrawerLockMode(isUnlocked: Boolean) {

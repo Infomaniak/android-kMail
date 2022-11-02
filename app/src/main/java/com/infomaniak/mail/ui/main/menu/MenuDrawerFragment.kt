@@ -34,6 +34,7 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -230,6 +231,7 @@ class MenuDrawerFragment : Fragment() {
     fun onDrawerOpened() {
         canNavigate = true
         mainViewModel.forceRefreshMailboxes()
+        requireActivity().trackScreen(this::class.java.name, this::class.java.simpleName)
     }
 
     private fun setCustomFoldersCollapsedState() = with(binding) {
