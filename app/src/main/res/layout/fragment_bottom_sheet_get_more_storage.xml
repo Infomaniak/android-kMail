@@ -23,12 +23,12 @@
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/marginStandardMedium"
     android:paddingBottom="@dimen/marginStandardMedium"
-    tools:context=".ui.main.thread.actions.MessageActionsBottomSheetDialog">
+    tools:context=".ui.main.menu.GetMoreStorageBottomSheetDialog">
 
     <include layout="@layout/view_bottom_sheet_separator" />
 
     <TextView
-        style="@style/H3"
+        style="@style/BottomSheetTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -64,8 +64,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/closeButton"
             style="@style/TextButtonPrimary.Error"
-            android:text="@string/buttonClose"
-            android:textColor="@color/red_error" />
+            android:text="@string/buttonClose" />
 
         <com.google.android.material.button.MaterialButton
             style="@style/TextButtonPrimary"

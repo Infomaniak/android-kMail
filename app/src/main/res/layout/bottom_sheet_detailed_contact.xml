@@ -20,14 +20,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".ui.main.thread.DetailedContactBottomSheetDialog">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/marginStandardMedium"
-        tools:context=".ui.main.thread.actions.MessageActionsBottomSheetDialog">
+        android:paddingBottom="@dimen/marginStandardMedium">
 
         <include layout="@layout/view_bottom_sheet_separator" />
 
@@ -50,6 +50,7 @@
 
             <TextView
                 android:id="@+id/name"
+                style="@style/H5"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardSmall"

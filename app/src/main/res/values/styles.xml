@@ -237,6 +237,22 @@
         <item name="layout_constraintWidth_max">120dp</item>
     </style>
 
+    <style name="DetailedContactButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:paddingEnd">@dimen/marginStandard</item>
+        <item name="android:paddingStart">@dimen/marginStandard</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="iconPadding">@dimen/marginStandard</item>
+        <item name="iconSize">20dp</item>
+    </style>
+
 
     <!-- Cardview -->
 
@@ -344,6 +360,8 @@
         <item name="cornerSizeTopLeft">10dp</item>
         <item name="cornerSizeTopRight">10dp</item>
     </style>
+
+    <style name="BottomSheetTitle" parent="H5" />
 
     <!-- Settings -->
 
