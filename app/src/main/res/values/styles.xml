@@ -184,11 +184,16 @@
         <item name="layout_constraintWidth_max">500dp</item>
     </style>
 
-    <style name="TextButtonPrimary.Error">
+    <style name="TextButtonError" parent="TextButtonPrimary">
         <item name="android:textColor">@color/redDestructiveAction</item>
         <item name="backgroundTint">@android:color/transparent</item>
-        <item name="fontFamily">@font/suisseintl_semibold</item>
         <item name="rippleColor">@color/redDestructiveActionTransparent</item>
+    </style>
+
+    <style name="TextButtonSecondary" parent="TextButton">
+        <item name="android:textColor">?android:attr/colorPrimary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
     </style>
 
     <style name="IconButton" parent="Widget.Material3.Button.TextButton">
