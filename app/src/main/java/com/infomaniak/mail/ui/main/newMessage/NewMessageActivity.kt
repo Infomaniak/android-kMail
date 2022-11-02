@@ -48,11 +48,15 @@ class NewMessageActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
         newMessageViewModel.initializeDraftAndUi(navigationArgs)
+
         handleOnBackPressed()
+
         setupToolbar()
         setupEditorActions()
         setupEditorFormatActionsToggle()
+
         observeCloseActivity()
     }
 
