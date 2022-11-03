@@ -274,7 +274,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentMailbox() {
-        MainViewModel.currentMailboxObjectId.observeNotNull(this) { objectId ->
+        MainViewModel.currentMailboxObjectId.observeNotNull(viewLifecycleOwner) { objectId ->
             mainViewModel.getMailbox(objectId).observe(viewLifecycleOwner) { mailbox ->
                 mailboxUuid = mailbox?.uuid
             }
@@ -282,7 +282,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeDownloadState() {
-        mainViewModel.isDownloadingChanges.observeNotNull(this) { isDownloading ->
+        mainViewModel.isDownloadingChanges.observe(viewLifecycleOwner) { isDownloading ->
             if (isDownloading) {
                 showLoadingTimer.start()
             } else {
@@ -293,7 +293,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolder() {
-        MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
+        MainViewModel.currentFolderId.observeNotNull(viewLifecycleOwner) { folderId ->
 
             lastUpdatedDate = null
             updateUpdatedAt()
