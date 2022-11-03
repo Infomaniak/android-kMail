@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.text.format.DateUtils
 import androidx.lifecycle.*
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -38,7 +39,7 @@ class ThreadListViewModel : ViewModel() {
     val isRecoveringFinished = MutableLiveData(true)
     val updatedAtTrigger = MutableLiveData<Unit>()
 
-    val currentFolder = MutableLiveData<Folder>()
+    val currentFolder = SingleLiveEvent<Folder>()
     val currentFolderThreads = Transformations.switchMap(currentFolder) { folder ->
         liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().asLiveData()) }
     }
