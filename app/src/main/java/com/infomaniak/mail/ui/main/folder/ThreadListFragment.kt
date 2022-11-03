@@ -105,8 +105,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeCurrentFolder()
         observeUpdatedAtTriggers()
         observeContacts()
-
-        observeSelectedDraft()
     }
 
     override fun onResume() {
@@ -154,7 +152,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             onThreadClicked = { thread ->
                 if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-                    threadListViewModel.navigateToSelectedDraft(thread.messages.first())
+                    threadListViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+                        safeNavigate(
+                            ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+                                isDraftExisting = true,
+                                isDraftDownloaded = it.draftLocalUuid != null,
+                                draftLocalUuid = it.draftLocalUuid,
+                                draftResource = it.draftResource,
+                                messageUid = it.messageUid,
+                            )
+                        )
+                    }
                 } else {
                     safeNavigate(
                         ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
@@ -166,21 +174,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     )
                 }
             }
-        }
-    }
-
-    private fun observeSelectedDraft() {
-        threadListViewModel.selectedDraft.observeNotNull(viewLifecycleOwner) {
-            threadListViewModel.selectedDraft.value = null
-            safeNavigate(
-                ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
-                    isDraftExisting = true,
-                    isDraftDownloaded = it.draftLocalUuid != null,
-                    draftLocalUuid = it.draftLocalUuid,
-                    draftResource = it.draftResource,
-                    messageUid = it.messageUid,
-                )
-            )
         }
     }
 
