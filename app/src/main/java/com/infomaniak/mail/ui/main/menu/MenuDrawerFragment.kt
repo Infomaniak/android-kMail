@@ -181,7 +181,6 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeCurrentMailbox() {
         MainViewModel.currentMailboxObjectId.observeNotNull(this) { objectId ->
-            menuDrawerViewModel.currentMailboxObjectId.value = objectId
             mainViewModel.getMailbox(objectId).observeNotNull(viewLifecycleOwner) { mailbox ->
                 binding.mailboxSwitcherText.text = mailbox.email
             }
