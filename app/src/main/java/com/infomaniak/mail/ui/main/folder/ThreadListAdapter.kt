@@ -177,11 +177,7 @@ class ThreadListAdapter(
     private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
-        sectionTitle.apply {
-            text = title
-            setTextAppearance(R.style.Callout)
-            setTextColor(context.getColor(R.color.sectionHeaderTextColor))
-        }
+        sectionTitle.text = title
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {

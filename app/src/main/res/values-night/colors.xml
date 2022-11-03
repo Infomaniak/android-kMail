@@ -48,7 +48,6 @@
     <color name="secondaryTextColor">@color/secondaryText</color>
     <color name="tertiaryTextColor">@color/grey_text</color>
     <color name="snackbarTextColor">@color/hover</color>
-    <color name="sectionHeaderTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/grey_text</color>
     <color name="emailChipTextColor">@color/secondaryText</color>
 

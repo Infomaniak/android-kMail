@@ -18,12 +18,11 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/sectionTitle"
-    style="@style/Callout"
+    style="@style/Callout.Secondary"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/backgroundColor"
     android:minWidth="120dp"
     android:paddingHorizontal="@dimen/marginStandardSmall"
     android:paddingVertical="@dimen/marginStandardSmall"
-    android:textColor="@color/sectionHeaderTextColor"
     tools:text="@string/threadListSectionToday" />
