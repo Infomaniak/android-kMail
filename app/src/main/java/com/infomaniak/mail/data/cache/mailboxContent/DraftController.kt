@@ -21,11 +21,13 @@ import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -87,7 +89,11 @@ object DraftController {
     //endregion
 
     fun deleteDraft(message: Message) {
-        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
+        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return
+        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return
+        with(ApiRepository.deleteMessages(mailboxUuid, listOf(message.uid))) {
+            if (isSuccess()) MessageController.deleteMessage(message.uid)
+        }
     }
 
     //region Open Draft

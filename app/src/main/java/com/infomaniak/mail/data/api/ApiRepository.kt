@@ -131,15 +131,12 @@ object ApiRepository : ApiRepositoryCore() {
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
-    // TODO: Handle result status
-    fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
+    // fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
 
-    // TODO: Handle result status
     fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {
         return callApi(ApiRoutes.deleteMessage(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
-    // TODO: Handle result status
     fun moveMessages(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
         return callApi(
             url = ApiRoutes.moveMessage(mailboxUuid),
