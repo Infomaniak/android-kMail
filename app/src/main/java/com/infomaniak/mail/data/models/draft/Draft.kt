@@ -111,4 +111,11 @@ class Draft : RealmObject {
         SAVE("save"),
         SEND("send"),
     }
+
+    enum class DraftMode {
+        NEW_MAIL,
+        REPLY,
+        REPLY_ALL,
+        FORWARD,
+    }
 }

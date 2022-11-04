@@ -99,6 +99,18 @@
             app:nullable="true" />
         <!-- Endregion -->
 
+        <!-- Region Draft mode -->
+        <argument
+            android:name="draftMode"
+            android:defaultValue="NEW_MAIL"
+            app:argType="com.infomaniak.mail.data.models.draft.Draft$DraftMode" />
+        <argument
+            android:name="previousMessageUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <!-- Endregion -->
+
     </activity>
 
     <fragment
@@ -150,7 +162,7 @@
     <fragment
         android:id="@+id/switchUserFragment"
         android:name="com.infomaniak.mail.ui.main.user.SwitchUserFragment"
-        android:label="SwitchUSerFragment"
+        android:label="SwitchUserFragment"
         tools:layout="@layout/fragment_switch_user" />
 
     <dialog
@@ -169,11 +181,17 @@
         android:label="MessageActionBottomSheetDialog"
         tools:layout="@layout/fragment_bottom_sheet_message_actions">
         <argument
+            android:name="messageUid"
+            app:argType="string" />
+        <argument
             android:name="isFavorite"
             app:argType="boolean" />
         <argument
             android:name="isSeen"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_messageActionsBottomSheet_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
@@ -182,18 +200,31 @@
         android:label="ThreadActionsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_actions_menu">
         <argument
+            android:name="messageUid"
+            app:argType="string" />
+        <argument
             android:name="isFavorite"
             app:argType="boolean" />
         <argument
             android:name="unseenMessagesCount"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_threadActionsBottomSheet_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
         android:id="@+id/replyBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.ReplyBottomSheetDialog"
         android:label="ReplyBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_reply" />
+        tools:layout="@layout/bottom_sheet_reply">
+        <argument
+            android:name="messageUid"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_replyBottomSheetDialog_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
+    </dialog>
 
     <fragment
         android:id="@+id/helpFragment"

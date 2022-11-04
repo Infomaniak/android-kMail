@@ -22,12 +22,14 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setDraftSignature
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
@@ -70,7 +72,7 @@ class NewMessageViewModel : ViewModel() {
                     isDraftExisting && !isDraftDownloaded -> {
                         DraftController.fetchDraft(draftResource!!, messageUid!!, this) ?: return@writeBlocking
                     }
-                    else -> createDraft()
+                    else -> createDraft(draftMode, previousMessageUid)
                 }
 
                 setDraftSignature(currentDraftLocalUuid!!)
@@ -91,9 +93,28 @@ class NewMessageViewModel : ViewModel() {
         }
     }
 
-    private fun MutableRealm.createDraft(): String {
+    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
         return Draft()
             .initLocalValues(priority = Priority.NORMAL)
+            .apply {
+                previousMessageUid?.let { MessageController.getMessage(it, this@createDraft) }?.let { previousMessage ->
+
+                    previousMessage.msgId.let {
+                        this.inReplyTo = it
+                        this.references = it
+                    }
+
+                    when (draftMode) {
+                        DraftMode.REPLY, DraftMode.REPLY_ALL -> this.inReplyToUid = previousMessageUid
+                        DraftMode.FORWARD -> this.forwardedUid = previousMessageUid
+                        DraftMode.NEW_MAIL -> Unit
+                    }
+
+                    this.to = previousMessage.from
+                    if (draftMode == DraftMode.REPLY_ALL) this.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
+                    previousMessage.subject?.let { this.subject = "Re: $it" }
+                }
+            }
             .also { DraftController.upsertDraft(it, this) }
             .localUuid
     }
