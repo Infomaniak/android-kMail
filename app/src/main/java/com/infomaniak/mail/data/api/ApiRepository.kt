@@ -37,7 +37,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 
-// TODO: Handle all API call responses
 object ApiRepository : ApiRepositoryCore() {
 
     const val PER_PAGE = 50
@@ -52,20 +51,25 @@ object ApiRepository : ApiRepositoryCore() {
         return ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
     }
 
+    // TODO: Handle result status
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
+    // TODO: Handle result status
     fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)
 
     // fun getContactImage(path: String): ApiResponse<Data> = callKotlinxApi(ApiRoutes.resource(path), GET)
 
+    // TODO: Handle result status
     fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
+    // TODO: Handle result status
     fun getMailboxes(okHttpClient: OkHttpClient = HttpClient.okHttpClient): ApiResponse<List<Mailbox>> {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient)
     }
 
+    // TODO: Handle result status
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
     // fun createFolder(mailboxUuid: String, name: String, path: String?): ApiResponse<Folder> = callKotlinxApi(ApiRoutes.folders(mailboxUuid), POST, mutableMapOf("name" to name).apply { path?.let { "path" to it } })
@@ -80,6 +84,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
+    // TODO: Handle result status
     fun getThreads(
         mailboxUuid: String,
         folderId: String,
@@ -90,18 +95,22 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.threads(mailboxUuid, folderId, threadMode, offset, filter), GET)
     }
 
+    // TODO: Handle result status
     fun getMessage(messageResource: String): ApiResponse<Message> {
         return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
     }
 
+    // TODO: Handle result status
     fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
+    // TODO: Handle result status
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
         return callApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
+    // TODO: Handle result status
     fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
         return callApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
@@ -110,6 +119,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
+    // TODO: Handle result status
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<SaveDraftResult> {
         val body = Json.encodeToString(draft).removeEmptyRealmLists()
 
@@ -119,6 +129,7 @@ object ApiRepository : ApiRepositoryCore() {
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
+    // TODO: Handle result status
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
         val body = Json.encodeToString(draft).removeEmptyRealmLists()
 
@@ -128,12 +139,15 @@ object ApiRepository : ApiRepositoryCore() {
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
+    // TODO: Handle result status
     fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
 
+    // TODO: Handle result status
     fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {
         return callApi(ApiRoutes.deleteMessage(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
+    // TODO: Handle result status
     fun moveMessages(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
         return callApi(
             url = ApiRoutes.moveMessage(mailboxUuid),
@@ -154,11 +168,10 @@ object ApiRepository : ApiRepositoryCore() {
     //     return callKotlinxApi(ApiRoutes.createAttachment(mailboxUuid), POST, attachmentData)
     // }
 
+    // TODO: Handle result status
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> {
-        return callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
-    }
+    // fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> = callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
 
