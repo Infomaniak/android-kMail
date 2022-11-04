@@ -219,11 +219,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateMailboxes() = viewModelScope.launch(Dispatchers.IO) {
-        val apiMailboxes = ApiRepository.getMailboxes().data
-            ?.map { it.initLocalValues(AccountUtils.currentUserId) }
-            ?: emptyList()
-
-        MailboxController.update(apiMailboxes, AccountUtils.currentUserId)
+        with(ApiRepository.getMailboxes()) {
+            if (isSuccess()) MailboxController.update(
+                apiMailboxes = data?.map { it.initLocalValues(AccountUtils.currentUserId) } ?: emptyList(),
+                userId = AccountUtils.currentUserId,
+            )
+        }
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {

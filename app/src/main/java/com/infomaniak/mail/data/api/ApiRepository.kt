@@ -61,7 +61,6 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
-    // TODO: Handle result status
     fun getMailboxes(okHttpClient: OkHttpClient = HttpClient.okHttpClient): ApiResponse<List<Mailbox>> {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient)
     }

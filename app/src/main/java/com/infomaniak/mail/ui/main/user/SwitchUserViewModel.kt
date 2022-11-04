@@ -51,13 +51,12 @@ class SwitchUserViewModel : ViewModel() {
 
     private fun updateMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
         users.forEach { user ->
-            val okHttpClient = createOkHttpClientForSpecificUser(user)
-
-            val apiMailboxes = ApiRepository.getMailboxes(okHttpClient).data
-                ?.map { it.initLocalValues(user.id) }
-                ?: emptyList()
-
-            MailboxController.update(apiMailboxes, user.id)
+            with(ApiRepository.getMailboxes(createOkHttpClientForSpecificUser(user))) {
+                if (isSuccess()) MailboxController.update(
+                    apiMailboxes = data?.map { it.initLocalValues(user.id) } ?: emptyList(),
+                    userId = user.id,
+                )
+            }
         }
     }
 
