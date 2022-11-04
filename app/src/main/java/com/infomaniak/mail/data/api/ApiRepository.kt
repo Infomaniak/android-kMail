@@ -97,7 +97,6 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
     }
 
-    // TODO: Handle result status
     fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }

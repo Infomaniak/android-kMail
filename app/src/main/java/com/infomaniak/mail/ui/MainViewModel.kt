@@ -148,19 +148,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+    fun forceRefreshMailboxes() {
         Log.i(TAG, "forceRefreshMailboxes")
         updateMailboxes()
         updateCurrentMailboxQuotas()
     }
 
-    private fun updateCurrentMailboxQuotas() {
-        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
-        if (mailbox.isLimited) {
-            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName).data?.let { quotas ->
-                MailboxController.updateMailbox(mailbox.objectId) {
-                    it.quotas = quotas
-                }
+    private fun updateCurrentMailboxQuotas() = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return@launch
+        if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
+                it.quotas = data
             }
         }
     }
@@ -220,7 +218,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun updateMailboxes() {
+    private fun updateMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         val apiMailboxes = ApiRepository.getMailboxes().data
             ?.map { it.initLocalValues(AccountUtils.currentUserId) }
             ?: emptyList()
