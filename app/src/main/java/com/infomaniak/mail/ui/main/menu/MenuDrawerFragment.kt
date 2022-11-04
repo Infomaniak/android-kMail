@@ -29,6 +29,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.infomaniak.lib.bugtracker.BugTrackerActivity
+import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
@@ -125,7 +127,21 @@ class MenuDrawerFragment : Fragment() {
         }
         feedbacks.setOnClickListener {
             closeDrawer()
-            context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
+            if (AccountUtils.currentUser?.isStaff == true) {
+                Intent(context, BugTrackerActivity::class.java).apply {
+                    putExtras(
+                        BugTrackerActivityArgs(
+                            user = AccountUtils.currentUser!!,
+                            appBuildNumber = BuildConfig.VERSION_NAME,
+                            bucketIdentifier = BuildConfig.MAIL_BUCKET_ID,
+                            projectName = BuildConfig.MAIL_PROJECT_NAME,
+                        ).toBundle()
+                    )
+                    startActivity(this)
+                }
+            } else {
+                context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
+            }
         }
         help.setOnClickListener {
             notYetImplemented()

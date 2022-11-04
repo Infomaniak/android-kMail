@@ -45,6 +45,7 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
         <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorError">@color/redDestructiveAction</item>
         <item name="extendedFloatingActionButtonStyle">@style/Widget.App.ExtendedFloatingActionButton</item>
         <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
         <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
