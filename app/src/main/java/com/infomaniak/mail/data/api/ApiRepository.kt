@@ -160,7 +160,6 @@ object ApiRepository : ApiRepositoryCore() {
     //     return callKotlinxApi(ApiRoutes.createAttachment(mailboxUuid), POST, attachmentData)
     // }
 
-    // TODO: Handle result status
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
     // fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> = callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))

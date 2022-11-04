@@ -69,7 +69,13 @@ class NewMessageViewModel : ViewModel() {
         with(navigationArgs) {
             RealmDatabase.mailboxContent().writeBlocking {
                 currentDraftLocalUuid = if (draftExists) {
-                    draftLocalUuid ?: fetchDraft(draftResource!!, messageUid!!) ?: return@writeBlocking
+                    draftLocalUuid
+                        ?: fetchDraft(draftResource!!, messageUid!!)
+                        ?: run {
+                            // TODO: Add Loader to block UI while waiting for `fetchDraft` API call to finish
+                            shouldCloseActivity.postValue(true)
+                            return@writeBlocking
+                        }
                 } else {
                     createDraft(draftMode, previousMessageUid)
                 }.also {
