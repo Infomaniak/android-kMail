@@ -97,12 +97,10 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.quotas(mailboxHostingId, mailboxName), GET)
     }
 
-    // TODO: Handle result status
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
         return callApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
-    // TODO: Handle result status
     fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
         return callApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
