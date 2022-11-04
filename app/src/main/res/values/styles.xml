@@ -81,7 +81,7 @@
 
     <style name="CalloutStrong">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">@dimen/textCalloutSize</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <!-- CalloutStrong.Accent is only used in read/unread chip, see R.id.unreadCountChip -->
@@ -90,7 +90,7 @@
 
     <style name="CalloutMedium">
         <item name="android:fontFamily">@font/suisseintl_medium</item>
-        <item name="android:textSize">@dimen/textCalloutSize</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="CalloutMedium.Accent">
@@ -99,7 +99,7 @@
 
     <style name="Callout">
         <item name="android:fontFamily">@font/suisseintl_regular</item>
-        <item name="android:textSize">@dimen/textCalloutSize</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Callout.Accent">
@@ -120,7 +120,7 @@
 
     <style name="CaptionMedium">
         <item name="android:fontFamily">@font/suisseintl_medium</item>
-        <item name="android:textSize">@dimen/textCaptionSize</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="CaptionMedium.Accent">
@@ -131,7 +131,7 @@
 
     <style name="Caption">
         <item name="android:fontFamily">@font/suisseintl_regular</item>
-        <item name="android:textSize">@dimen/textCaptionSize</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="Caption.Secondary">
@@ -149,12 +149,12 @@
 
     <style name="Widget.App.SnackbarButton" parent="Widget.Material3.Button.TextButton.Snackbar">
         <item name="android:textColor">@color/textButtonBlueLight</item>
-        <item name="android:textSize">@dimen/textCalloutSize</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Widget.App.SnackbarTextView" parent="Widget.Material3.Snackbar.TextView">
         <item name="android:textColor">@color/snackbarTextColor</item>
-        <item name="android:textSize">@dimen/textCalloutSize</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 
@@ -164,7 +164,7 @@
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">?android:attr/colorPrimary</item>
-        <item name="android:textSize">@dimen/textCalloutSize</item>
+        <item name="android:textSize">14sp</item>
         <item name="cornerRadius">10dp</item>
     </style>
 
@@ -233,7 +233,7 @@
         <item name="android:paddingStart">0dp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/secondaryTextColor</item>
-        <item name="android:textSize">@dimen/textCaptionSize</item>
+        <item name="android:textSize">12sp</item>
         <item name="cornerRadius">10dp</item>
         <item name="iconGravity">textTop</item>
         <item name="iconPadding">@dimen/marginStandardSmall</item>
