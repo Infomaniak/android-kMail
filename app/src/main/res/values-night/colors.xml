@@ -30,17 +30,15 @@
     <color name="redDestructiveActionTransparent">#1ED71E04</color>
 
     <!-- Backgrounds -->
-    <color name="backgroundCardSelectedColor">@color/grey_title</color>
-    <color name="backgroundChipColor">@color/grey_title</color>
+    <color name="searchBarBackgroundColor">@color/orca</color>
     <color name="backgroundColor">#101010</color>
     <color name="backgroundHeaderColor">#1A1A1A</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundNotificationColor">@color/black</color>
     <color name="backgroundOnBoardingColor">#1A1A1A</color>
     <color name="backgroundSnackbarColor">@color/black</color>
-    <color name="backgroundNewMailColor">@color/grey_title</color>
     <color name="backgroundSecondaryColor">#1A1A1A</color>
-    <color name="backgroundDisabledPrimaryButton">@color/grey_title</color>
+    <color name="backgroundDisabledPrimaryButton">@color/orca</color>
     <color name="threadDensityBackground">#191919</color>
 
     <!-- Texts -->
@@ -52,7 +50,7 @@
     <color name="emailChipTextColor">@color/secondaryText</color>
 
     <!-- Drawables -->
-    <color name="separatorColor">@color/grey_title</color>
+    <color name="separatorColor">@color/orca</color>
 
     <!-- Icons -->
     <color name="chevronColor">@color/lightenedGrey</color>
@@ -60,7 +58,7 @@
     <color name="iconToolbarButton">@color/lightenedGrey</color>
 
     <!-- Cardview -->
-    <color name="attachmentStrokeColor">@color/grey_title</color>
+    <color name="attachmentStrokeColor">@color/orca</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_text</color>

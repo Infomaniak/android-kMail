@@ -40,13 +40,11 @@
     <color name="blueTextLight">#4CB7FF</color>
 
     <!-- Backgrounds -->
-    <color name="backgroundCardSelectedColor">@color/hover</color>
-    <color name="backgroundChipColor">@color/background</color>
+    <color name="searchBarBackgroundColor">@color/hover</color>
     <color name="backgroundColor">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundNotificationColor">@color/grey_text</color>
-    <color name="backgroundNewMailColor">@android:color/white</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
     <color name="backgroundSecondaryColor">@color/lightenedGrey</color>
@@ -54,14 +52,14 @@
     <color name="threadDensityBackground">#FFFFFF</color>
 
     <!-- Texts -->
-    <color name="primaryTextColor">@color/grey_title</color>
+    <color name="primaryTextColor">@color/orca</color>
     <color name="secondaryTextColor">@color/grey_text</color>
     <color name="tertiaryTextColor">@color/grey_text_secondary</color>
     <color name="snackbarTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/greyTextLight</color>
     <color name="notificationTextColor">@color/hover</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
-    <color name="emailChipTextColor">@color/grey_title</color>
+    <color name="emailChipTextColor">@color/orca</color>
 
     <!-- Drawables -->
     <color name="separatorColor">#ECECEC</color>

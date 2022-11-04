@@ -370,7 +370,7 @@
                 android:gravity="top"
                 android:hint="@string/newMessagePlaceholderTitle"
                 android:minHeight="200dp"
-                android:textColor="@color/grey_title" />
+                android:textColor="@color/orca" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
