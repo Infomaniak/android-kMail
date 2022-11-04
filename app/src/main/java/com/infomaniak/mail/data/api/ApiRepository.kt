@@ -79,7 +79,6 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    // TODO: Handle result status
     fun getThreads(
         mailboxUuid: String,
         folderId: String,

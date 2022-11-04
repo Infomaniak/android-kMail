@@ -239,29 +239,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun refreshThreads(
-        mailboxUuid: String,
-        folderId: String,
-        filter: ThreadFilter = ThreadFilter.ALL,
-    ) {
-
-        val threadsResult = ApiRepository.getThreads(
-            mailboxUuid = mailboxUuid,
-            folderId = folderId,
-            threadMode = localSettings.threadMode,
-            offset = OFFSET_FIRST_PAGE,
-            filter = filter,
-        ).data ?: return
-
-        RealmDatabase.mailboxContent().writeBlocking {
-            canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
-
-            FolderController.updateFolderLastUpdatedAt(folderId, this)
-
-            val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
-            if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+    private fun refreshThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter = ThreadFilter.ALL) {
+        with(ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, OFFSET_FIRST_PAGE, filter)) {
+            if (isSuccess() && data != null) {
+                RealmDatabase.mailboxContent().writeBlocking {
+                    val threadsResult = data!!
+                    canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
+                    FolderController.updateFolderLastUpdatedAt(folderId, this)
+                    val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+                    if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+                }
+            }
         }
-
         isDownloadingChanges.postValue(false)
     }
 
@@ -271,18 +260,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         offset: Int,
         filter: ThreadFilter,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "loadMoreThreads: $offset")
+        Log.i(TAG, "Load more threads: $offset")
         isDownloadingChanges.postValue(true)
 
-        val threadsResult = ApiRepository.getThreads(
-            mailboxUuid = mailboxUuid,
-            folderId = folderId,
-            threadMode = localSettings.threadMode,
-            offset = offset,
-            filter = filter,
-        ).data ?: return@launch
+        with(ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, offset, filter)) {
+            if (isSuccess() && data != null) {
+                canPaginate = ThreadController.loadMoreThreads(data!!, mailboxUuid, folderId, offset, filter)
+            }
+        }
 
-        canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
     }
 
