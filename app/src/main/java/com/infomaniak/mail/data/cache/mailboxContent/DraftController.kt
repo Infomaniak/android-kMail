@@ -145,19 +145,15 @@ object DraftController {
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
         when (draft.action) {
-            DraftAction.SAVE -> {
-                val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
-                if (apiResponse.isSuccess()) with(apiResponse.data!!) {
-                    updateDraft(draft.localUuid, realm) {
-                        it.remoteUuid = draftRemoteUuid
-                        it.messageUid = messageUid
-                        it.action = null
-                    }
+            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft)) {
+                if (isSuccess()) updateDraft(draft.localUuid, realm) {
+                    it.remoteUuid = data?.draftRemoteUuid
+                    it.messageUid = data?.messageUid
+                    it.action = null
                 }
             }
-            DraftAction.SEND -> {
-                val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
-                if (apiResponse.isSuccess()) realm.delete(draft)
+            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft)) {
+                if (isSuccess()) realm.delete(draft)
             }
             else -> Unit
         }
