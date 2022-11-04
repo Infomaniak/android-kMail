@@ -41,8 +41,6 @@ class ThreadListViewModel : ViewModel() {
         liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().asLiveData()) }
     }
 
-    val selectedDraft = MutableLiveData<SelectedDraft>()
-
     fun observeFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
         emitSource(
             FolderController.getFolderAsync(folderId)
@@ -61,9 +59,9 @@ class ThreadListViewModel : ViewModel() {
         }
     }
 
-    fun navigateToSelectedDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+    fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
-        selectedDraft.postValue(SelectedDraft(localUuid, message.draftResource, message.uid))
+        emit(SelectedDraft(localUuid, message.draftResource, message.uid))
     }
 
     data class SelectedDraft(
