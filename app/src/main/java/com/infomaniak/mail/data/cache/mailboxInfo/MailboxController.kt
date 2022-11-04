@@ -75,6 +75,7 @@ object MailboxController {
     fun getMailboxesAsync(realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
         return realm.getMailboxesQuery().asFlow()
     }
+
     fun getMailboxesAsync(userId: Int, realm: MutableRealm? = null): Flow<ResultsChange<Mailbox>> {
         return realm.getMailboxesQuery(userId).asFlow()
     }

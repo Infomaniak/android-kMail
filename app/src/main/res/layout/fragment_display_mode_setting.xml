@@ -15,104 +15,48 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.settings.DisplayModeSettingFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    app:title="@string/settingsMessageDisplayTitle"
+    tools:context=".ui.main.settings.DisplayModeSettingFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBar"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-            <TextView
-                style="@style/H2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:text="@string/settingsMessageDisplayTitle" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/background"
-        style="@style/BackdropCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:scrollbars="none">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                style="@style/SettingHeader"
+                android:layout_marginTop="@dimen/marginStandardMedium"
+                android:text="@string/settingsSelectDisplayModeDescription" />
+
+            <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+                android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSelectDisplayModeDescription" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/threadMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_display_mode_thread"
+                    app:text="@string/settingsOptionDiscussions" />
 
-                <LinearLayout
-                    android:id="@+id/settingsOptionDiscussions"
-                    style="@style/MenuDrawerItem">
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/messageMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_display_mode_message"
+                    app:text="@string/settingsOptionMessages" />
 
-                    <ImageView
-                        style="@style/SettingImageAtStart"
-                        android:src="@drawable/ic_display_mode_thread" />
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsOptionDiscussions" />
-
-                    <ImageView
-                        android:id="@+id/settingsOptionDiscussionsCheck"
-                        style="@style/SettingButtonCheck"
-                        android:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingsOptionMessages"
-                    style="@style/MenuDrawerItem">
-
-                    <ImageView
-                        style="@style/SettingImageAtStart"
-                        android:src="@drawable/ic_display_mode_message" />
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsOptionMessages" />
-
-                    <ImageView
-                        android:id="@+id/settingsOptionMessagesCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>
+            </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>

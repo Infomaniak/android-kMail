@@ -129,9 +129,16 @@
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="emailSentSnackbar">E-mail envoyé</string>
+    <string name="emptyFolderDescription">Il n‘y a rien à voir, regardez-en un autre :)</string>
+    <string name="emptyFolderTitle">Ce dossier est vide !</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="favoritesFolder">Favoris</string>
+    <plurals name="folderMessageCount">
+        <item quantity="one">Ce dossier contient %d message</item>
+        <item quantity="other">Ce dossier contient %d messages</item>
+    </plurals>
+    <string name="folderNoMessageCount">Ce dossier ne contient aucun message</string>
     <string name="fromTitle">De :</string>
     <string name="helpChatbot">Chatbot</string>
     <string name="helpFAQ">FAQ</string>
@@ -155,6 +162,7 @@
     </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="noBodyTitle">Ce message est vide.</string>
+    <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noEmailDescription">Composez un nouvel e-mail en cliquant sur \"Nouveau message\" en bas à droite</string>
     <string name="noEmailTitle">Vous n’avez pas d’e-mails</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse e-mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
@@ -184,9 +192,11 @@
     <string name="searchAllMessages">Tous les messages</string>
     <string name="searchFieldPlaceholder">Rechercher un message</string>
     <string name="searchFilterAttachment">Pièces-jointes</string>
-    <string name="searchFilterFolder">Dossier</string>
+    <string name="searchFilterFolder">Tous les dossiers</string>
     <string name="searchFilterRead">Lus</string>
     <string name="searchFilterUnread">Non lus</string>
+    <string name="searchNoResultsDescription">Nous n‘avons rien trouvé correspondant à votre recherche</string>
+    <string name="searchNoResultsTitle">Aucun résultats</string>
     <string name="searchViewHint">Rechercher un message</string>
     <string name="send">Envoyer</string>
     <string name="sentFolder">Messages envoyés</string>
@@ -197,7 +207,7 @@
     <string name="settingsCancellationPeriodTitle">Délai d’annulation d’envoi</string>
     <string name="settingsDefault">Par défaut</string>
     <string name="settingsDelaySeconds">%d secondes</string>
-    <string name="settingsDensityOptionCompact">Compact</string>
+    <string name="settingsDensityOptionCompact">Compacte</string>
     <string name="settingsDensityOptionLarge">Large</string>
     <string name="settingsDensityOptionNormal">Normal</string>
     <string name="settingsDisabled">Désactivé</string>
@@ -243,10 +253,8 @@
     <string name="settingsSwipeActionToDefine">À définir</string>
     <string name="settingsSwipeActionsTitle">Actions de balayage dans la messagerie</string>
     <string name="settingsSwipeDescription">Balayez des éléments dans votre boîte de réception et accédez rapidement à vos actions les plus fréquentes</string>
-    <string name="settingsSwipeLongLeft">Balayage long vers la gauche</string>
-    <string name="settingsSwipeLongRight">Balayage long vers la droite</string>
-    <string name="settingsSwipeShortLeft">Balayage court vers la gauche</string>
-    <string name="settingsSwipeShortRight">Balayage court vers la droite</string>
+    <string name="settingsSwipeLeft">Balayage vers la gauche</string>
+    <string name="settingsSwipeRight">Balayage vers la droite</string>
     <string name="settingsTheme">Thème</string>
     <string name="settingsThemeChoiceTitle">Choix du thème</string>
     <string name="settingsThreadListDensityTitle">Densité de la liste de conversation</string>
@@ -289,4 +297,5 @@
     <string name="unknownRecipientTitle">(inconnu)</string>
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
+    <string name="workInProgressTitle">Cette fonctionnalité est en cours de développement.</string>
 </resources>

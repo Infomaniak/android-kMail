@@ -33,7 +33,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.utils.LiveDataNetworkStatus
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.UiUtils
@@ -83,7 +83,7 @@ class MainActivity : ThemedActivity() {
         setupMenuDrawerCallbacks()
 
         mainViewModel.updateUserInfo()
-        mainViewModel.loadCurrentMailbox(UiSettings.getInstance(this).threadMode)
+        mainViewModel.loadCurrentMailbox(LocalSettings.getInstance(this).threadMode)
 
         mainViewModel.observeRealmMergedContacts()
         requestContactsPermission()

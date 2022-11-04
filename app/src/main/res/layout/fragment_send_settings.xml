@@ -15,133 +15,66 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.main.settings.send.SendSettingsFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    app:title="@string/settingsSendTitle"
+    tools:context=".ui.main.settings.send.SendSettingsFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBar"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-            <TextView
-                style="@style/H2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:text="@string/settingsSendTitle" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        style="@style/BackdropCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:scrollbars="none">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsCancellationPeriod"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsCancellationPeriodTitle"
+                tools:subtitle="@string/settingsDisabled" />
 
-                <LinearLayout
-                    android:id="@+id/settingsCancellationPeriod"
-                    style="@style/MenuDrawerItem">
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:layout_marginVertical="0dp" />
 
-                    <LinearLayout style="@style/Setting2TextsWithButton">
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsTransferEmails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsTransferEmailsTitle"
+                tools:subtitle="@string/settingsTransferInBody" />
 
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsCancellationPeriodTitle" />
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:layout_marginVertical="0dp" />
 
-                        <TextView
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsDisabled" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsSendIncludeOriginalMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsSendIncludeOriginalMessage" />
 
-                    </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:layout_marginVertical="0dp" />
 
-                    <ImageView style="@style/SettingButtonChevron" />
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsSendAcknowledgement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsSendAcknowledgement" />
 
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingsTransferEmails"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsTransferEmailsTitle" />
-
-                        <TextView
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsTransferInBody" />
-
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingsSendIncludeOriginalMessage"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSendIncludeOriginalMessage" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settingsSendIncludeOriginalMessageSwitch"
-                        style="@style/SettingButtonSwitch" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/settingsSendAcknowledgement"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSendAcknowledgement" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settingsSendAcknowledgementSwitch"
-                        style="@style/SettingButtonSwitch" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>

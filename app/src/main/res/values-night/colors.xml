@@ -42,6 +42,7 @@
     <color name="selectedAccountCardviewColor">#1A1A1A</color>
     <color name="backgroundDisabledPrimaryButton">@color/grey_title</color>
     <color name="backgroundQuickActions">#1A1A1A</color>
+    <color name="threadDensityBackground">#191919</color>
 
     <!-- Texts -->
     <color name="secondaryTextColor">@color/secondaryText</color>
@@ -63,13 +64,5 @@
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_text</color>
-
-    <!-- ButtonToggle -->
-    <color name="buttonToggleStroke">#9D1A51</color>
-    <color name="buttonToggleBackground">#2A0F1B</color>
-
-    <!-- Accent tint -->
-    <color name="pinkAccent">#E07FA3</color>
-    <color name="blueAccent">#4CB7FF</color>
 
 </resources>

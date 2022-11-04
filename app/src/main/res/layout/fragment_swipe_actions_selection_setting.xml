@@ -15,228 +15,89 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".ui.main.settings.swipe.SwipeActionsSelectionSettingFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    tools:title="@string/settingsSwipeRight">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-            <TextView
-                android:id="@+id/toolbarText"
-                style="@style/H2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                tools:text="@string/settingsSwipeShortRight" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/background"
-        style="@style/BackdropCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:scrollbars="none">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <com.infomaniak.mail.ui.main.settings.SettingRadioGroupView
+                android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
-                <LinearLayout
-                    android:id="@+id/actionDelete"
-                    style="@style/MenuDrawerItem">
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionDelete" />
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/actionDelete" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/archive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionArchive" />
 
-                    <ImageView
-                        android:id="@+id/actionDeleteCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/readUnread"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionReadUnread" />
 
-                </LinearLayout>
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/move"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionMove" />
 
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/favorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/favoritesFolder" />
 
-                <LinearLayout
-                    android:id="@+id/actionArchive"
-                    style="@style/MenuDrawerItem">
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/postpone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionPostpone" />
 
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/actionArchive" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/spam"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/actionSpam" />
 
-                    <ImageView
-                        android:id="@+id/actionArchiveCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/readAndArchive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionReadAndArchive" />
 
-                </LinearLayout>
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/quickActionMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionQuickActionsMenu" />
 
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
+                    android:id="@+id/none"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:text="@string/settingsSwipeActionNone" />
 
-                <LinearLayout
-                    android:id="@+id/actionReadUnread"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSwipeActionReadUnread" />
-
-                    <ImageView
-                        android:id="@+id/actionReadUnreadCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/actionMove"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/actionMove" />
-
-                    <ImageView
-                        android:id="@+id/actionMoveCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/actionFavorite"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/favoritesFolder" />
-
-                    <ImageView
-                        android:id="@+id/actionFavoriteCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/actionPostpone"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/actionPostpone" />
-
-                    <ImageView
-                        android:id="@+id/actionPostponeCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/actionSpam"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/actionSpam" />
-
-                    <ImageView
-                        android:id="@+id/actionSpamCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/actionReadAndArchive"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSwipeActionReadAndArchive" />
-
-                    <ImageView
-                        android:id="@+id/actionReadAndArchiveCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/actionQuickActionsMenu"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSwipeActionQuickActionsMenu" />
-
-                    <ImageView
-                        android:id="@+id/actionQuickActionsMenuCheck"
-                        style="@style/SettingButtonCheck"
-                        tools:visibility="visible" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <LinearLayout
-                    android:id="@+id/actionNone"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsSwipeActionNone" />
-
-                    <ImageView
-                        android:id="@+id/actionNoneCheck"
-                        style="@style/SettingButtonCheck"
-                        android:visibility="visible" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>
+            </com.infomaniak.mail.ui.main.settings.SettingRadioGroupView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>

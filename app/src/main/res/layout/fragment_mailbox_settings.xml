@@ -15,265 +15,140 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.ui.main.menu.SimpleSettingView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.main.settings.mailbox.MailboxSettingsFragment"
-    tools:ignore="ContentDescription,UseCompoundDrawables">
+    android:layout_height="wrap_content"
+    tools:title="myriam.rais@infomaniak.com">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBar"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:scrollbars="none">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-            <TextView
-                android:id="@+id/toolbarText"
-                style="@style/H2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                tools:text="myriam.rais@infomaniak.com" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.card.MaterialCardView
-        style="@style/BackdropCardview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.core.widget.NestedScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:scrollbars="none">
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/marginStandardVerySmall">
 
-            <LinearLayout
+            <TextView
+                style="@style/SettingHeader"
+                android:layout_marginTop="@dimen/marginStandardSmall"
+                android:text="@string/settingsSectionGeneral" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsMailboxGeneralSignature"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionGeneral" />
-
-                <LinearLayout
-                    android:id="@+id/settingsMailboxGeneralSignature"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsMailboxGeneralSignature" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsMailboxGeneralAutoreply"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsMailboxGeneralAutoreply" />
-
-                        <TextView
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsDisabled" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsMailboxGeneralFolders"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsMailboxGeneralFolders" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsMailboxGeneralNotifications"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsMailboxGeneralNotifications" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settingsMailboxGeneralNotificationsSwitch"
-                        style="@style/SettingButtonSwitch" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsInboxType" />
-
-                <LinearLayout
-                    android:id="@+id/settingsInboxType"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsInboxType" />
-
-                        <TextView
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsDefault" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsInboxRules"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsInboxRules" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsInboxRedirect"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsInboxRedirect" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsInboxAlias"
-                    style="@style/MenuDrawerItem">
-
-                    <TextView
-                        style="@style/SettingTextWithButton"
-                        android:text="@string/settingsInboxAlias" />
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionSecurity" />
-
-                <LinearLayout
-                    android:id="@+id/settingsSecurityAdsFilter"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsSecurityAdsFilter" />
-
-                        <TextView
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsDisabled" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settingsSecurityAdsFilterSwitch"
-                        style="@style/SettingButtonSwitch" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsSecuritySpamFilter"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsSecuritySpamFilter" />
-
-                        <TextView
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsDisabled" />
-                    </LinearLayout>
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settingsSecuritySpamFilterSwitch"
-                        style="@style/SettingButtonSwitch" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/settingsSecurityBlockedRecipients"
-                    style="@style/MenuDrawerItem">
-
-                    <LinearLayout style="@style/Setting2TextsWithButton">
-
-                        <TextView
-                            style="@style/SettingText1Of2WithButton"
-                            android:text="@string/settingsSecurityBlockedRecipients" />
-
-                        <TextView
-                            style="@style/SettingText2Of2WithButton"
-                            android:text="@string/settingsSecurityBlockedRecipients" />
-                    </LinearLayout>
-
-                    <ImageView style="@style/SettingButtonChevron" />
-
-                </LinearLayout>
-
-                <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
-
-                <TextView
-                    style="@style/SettingHeader"
-                    android:text="@string/settingsSectionPrivacy" />
-
-                <TextView
-                    android:id="@+id/settingsPrivacyDeleteSearchHistory"
-                    style="@style/SettingText"
-                    android:text="@string/settingsPrivacyDeleteSearchHistory" />
-
-                <TextView
-                    android:id="@+id/settingsPrivacyViewLogs"
-                    style="@style/SettingText"
-                    android:text="@string/settingsPrivacyViewLogs" />
-
-            </LinearLayout>
-
-        </androidx.core.widget.NestedScrollView>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsMailboxGeneralSignature" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsMailboxGeneralAutoreply"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="@string/settingsDisabled"
+                app:title="@string/settingsMailboxGeneralAutoreply" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsMailboxGeneralFolders"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:title="@string/settingsMailboxGeneralFolders" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsMailboxGeneralNotifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsMailboxGeneralNotifications" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/inboxFolder" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsInboxType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="@string/settingsDefault"
+                app:title="@string/settingsInboxType" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsInboxRules"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/settingsInboxRules" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsInboxRedirect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/settingsInboxRedirect" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsInboxAlias"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/settingsInboxAlias" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/settingsSectionSecurity" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsSecurityAdsFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsSecurityAdsFilter"
+                tools:subtitle="@string/settingsDisabled" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsSecuritySpamFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="toggle"
+                app:title="@string/settingsSecuritySpamFilter"
+                tools:subtitle="@string/settingsDisabled" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsSecurityBlockedRecipients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemAction="chevron"
+                app:subtitle="0 expeditor"
+                app:title="@string/settingsSecurityBlockedRecipients" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+
+            <TextView
+                style="@style/SettingHeader"
+                android:text="@string/settingsSectionPrivacy" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsPrivacyDeleteSearchHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/settingsPrivacyDeleteSearchHistory" />
+
+            <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                android:id="@+id/settingsPrivacyViewLogs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/settingsPrivacyViewLogs" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</com.infomaniak.mail.ui.main.menu.SimpleSettingView>

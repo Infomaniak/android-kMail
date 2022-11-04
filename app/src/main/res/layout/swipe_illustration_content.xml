@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    tools:layout_height="88dp"
+    tools:layout_width="match_parent">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/avatar"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="26dp"
+        android:background="#C4C4C4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/title"
+        android:layout_width="75dp"
+        android:layout_height="14dp"
+        android:layout_marginStart="@dimen/marginStandard"
+        android:background="#9F9F9F"
+        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:layout_constraintTop_toTopOf="@id/avatar"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/description1"
+        android:layout_width="236dp"
+        android:layout_height="7dp"
+        android:layout_marginStart="@dimen/marginStandard"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="@dimen/marginStandardSmall"
+        android:background="#C4C4C4"
+        app:layout_constraintBottom_toTopOf="@id/description2"
+        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/description2"
+        android:layout_width="160dp"
+        android:layout_height="8dp"
+        android:layout_marginStart="@dimen/marginStandard"
+        android:layout_marginTop="12dp"
+        android:background="#C4C4C4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.67"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/hour"
+        android:layout_width="40dp"
+        android:layout_height="8dp"
+        android:layout_marginEnd="22dp"
+        android:background="#C4C4C4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/description1"
+        app:layout_constraintTop_toTopOf="@id/avatar"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="22dp"
+        android:src="@drawable/ic_star"
+        app:layout_constraintBottom_toBottomOf="@id/description2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/description1"
+        tools:ignore="ContentDescription" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

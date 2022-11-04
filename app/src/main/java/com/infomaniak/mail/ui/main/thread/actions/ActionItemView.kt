@@ -39,8 +39,8 @@ class ActionItemView @JvmOverloads constructor(
     val binding by lazy { ItemBottomSheetActionBinding.inflate(LayoutInflater.from(context), this, true) }
 
     init {
-        with(binding) {
-            attrs?.getAttributes(context, R.styleable.ActionItemView) {
+        attrs?.getAttributes(context, R.styleable.ActionItemView) {
+            with(binding) {
                 button.icon = getDrawable(R.styleable.ActionItemView_icon)
                 button.text = getString(R.styleable.ActionItemView_text)
                 divider.isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)

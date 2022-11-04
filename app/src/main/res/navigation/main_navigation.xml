@@ -208,11 +208,7 @@
         tools:layout="@layout/fragment_manage_mail_address">
         <action
             android:id="@+id/action_manageMailAddressFragment_to_switchUserFragment"
-            app:destination="@id/switchUserFragment"
-            app:enterAnim="@anim/fragment_swipe_enter"
-            app:exitAnim="@anim/fragment_swipe_exit"
-            app:popEnterAnim="@anim/fragment_swipe_pop_enter"
-            app:popExitAnim="@anim/fragment_swipe_pop_exit" />
+            app:destination="@id/switchUserFragment" />
     </fragment>
 
     <fragment
@@ -283,6 +279,9 @@
         tools:layout="@layout/fragment_mailbox_settings">
         <argument
             android:name="mailboxObjectId"
+            app:argType="string" />
+        <argument
+            android:name="mailboxName"
             app:argType="string" />
         <action
             android:id="@+id/action_mailboxSettings_to_signatureSetting"

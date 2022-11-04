@@ -22,26 +22,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import androidx.fragment.app.activityViewModels
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSettingsBinding
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        safeNavigate(SettingsFragmentDirections.actionSettingsToMailboxSettings(selectedMailbox.objectId))
+        animatedNavigation(
+            SettingsFragmentDirections.actionSettingsToMailboxSettings(
+                selectedMailbox.objectId,
+                selectedMailbox.email
+            )
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -50,63 +51,69 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setupAdapter()
+        setupMailboxesAdapter()
         setupListeners()
-        uiSettings.setupPreferencesText()
+        setSubtitlesInitialState()
     }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+    override fun onResume() {
+        super.onResume()
+        setSwitchesInitialState()
     }
 
-    private fun setupAdapter() {
+    private fun setupMailboxesAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
-        lifecycleScope.launch(Dispatchers.IO) {
-            val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
-            withContext(Dispatchers.Main) { mailboxesAdapter.setMailboxes(mailboxes) }
+        mainViewModel.observeMailboxes().observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
+    }
+
+    private fun setSubtitlesInitialState() = with(binding) {
+        with(localSettings) {
+            settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
+            settingsTheme.setSubtitle(theme.localisedNameRes)
+            settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
+            settingsMessageDisplay.setSubtitle(threadMode.localisedNameRes)
+            settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
         }
     }
 
-    private fun UiSettings.setupPreferencesText() = with(binding) {
-        densitySubtitle.setText(threadDensity.localisedNameRes)
-        themeSubtitle.setText(theme.localisedNameRes)
-        displayModeSubtitle.setText(threadMode.localisedNameRes)
-        externalContentSubtitle.setText(externalContent.localisedNameRes)
-        accentColorSubtitle.setText(uiSettings.accentColor.localisedNameRes)
+    private fun setSwitchesInitialState() = with(binding) {
+        settingsAppLock.isChecked = localSettings.isAppLocked
     }
 
     private fun setupListeners() = with(binding) {
-
         settingsSend.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToSendSettings())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
 
-        settingsAppLock.setOnClickListener { settingsAppLockSwitch.performClick() }
-        settingsAppLockSwitch.setOnClickListener { notYetImplemented() }
+        settingsAppLock.apply {
+            setOnClickListener {
+                localSettings.isAppLocked = isChecked
+                notYetImplemented()
+            }
+        }
 
         settingsThreadListDensity.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToThreadListDensitySetting())
         }
 
         settingsTheme.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToThemeSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToThemeSetting())
         }
 
         settingsAccentColor.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToAccentColorSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToAccentColorSetting())
         }
 
         settingsSwipeActions.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
         }
 
         settingsMessageDisplay.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
         }
 
         settingsExternalContent.setOnClickListener {
-            safeNavigate(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
+            animatedNavigation(SettingsFragmentDirections.actionSettingsToExternalContentSetting())
         }
     }
 }

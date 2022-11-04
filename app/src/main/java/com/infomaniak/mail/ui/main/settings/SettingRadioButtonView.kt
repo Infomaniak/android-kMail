@@ -40,8 +40,8 @@ class SettingRadioButtonView @JvmOverloads constructor(
     override var associatedValue: String? = null
 
     init {
-        with(binding) {
-            attrs?.getAttributes(context, R.styleable.SettingRadioButtonView) {
+        attrs?.getAttributes(context, R.styleable.SettingRadioButtonView) {
+            with(binding) {
                 val iconDrawable = getDrawable(R.styleable.SettingRadioButtonView_icon)
                 val textString = getString(R.styleable.SettingRadioButtonView_text)
                 val checkMarkColor = getColor(
@@ -68,5 +68,9 @@ class SettingRadioButtonView @JvmOverloads constructor(
 
     override fun uncheck() {
         binding.checkMark.isGone = true
+    }
+
+    fun setText(newText: String) {
+        binding.text.text = newText
     }
 }

@@ -24,9 +24,6 @@
         android:fillColor="#F5F5F5"
         android:pathData="M33,8l-33,-0l-0,-8l33,-0z" />
     <path
-        android:fillColor="@color/pinkAccent"
+        android:fillColor="?android:attr/colorPrimary"
         android:pathData="M33,8l-8,-0l-0,-8l8,-0z" />
-    <path
-        android:fillColor="#E0E0E0"
-        android:pathData="M25,8l-8,-0l-0,-8l8,-0z" />
 </vector>

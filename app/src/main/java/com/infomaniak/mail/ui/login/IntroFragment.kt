@@ -35,10 +35,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.AccentColor
-import com.infomaniak.mail.data.UiSettings.AccentColor.BLUE
-import com.infomaniak.mail.data.UiSettings.AccentColor.PINK
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.AccentColor
+import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
+import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
@@ -54,7 +54,7 @@ class IntroFragment : Fragment() {
     private val navigationArgs: IntroFragmentArgs by navArgs()
     private val introViewModel: IntroViewModel by activityViewModels()
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentIntroBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -88,14 +88,14 @@ class IntroFragment : Fragment() {
 
         updateUiWhenThemeChanges(navigationArgs.position)
 
-        setUi(uiSettings.accentColor, navigationArgs.position, animate = false)
+        setUi(localSettings.accentColor, navigationArgs.position, animate = false)
     }
 
     private fun setTabSelectedListener() = with(binding) {
         pinkBlueTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val newSelectedAccentColor = if (pinkBlueTabLayout.selectedTabPosition == PINK.introTabIndex) PINK else BLUE
-                uiSettings.accentColor = newSelectedAccentColor
+                localSettings.accentColor = newSelectedAccentColor
                 triggerUiUpdateWhenAnimationEnd(newSelectedAccentColor)
             }
 

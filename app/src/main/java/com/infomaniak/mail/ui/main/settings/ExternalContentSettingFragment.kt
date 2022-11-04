@@ -21,15 +21,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import com.infomaniak.mail.data.UiSettings
-import com.infomaniak.mail.data.UiSettings.ExternalContent
-import com.infomaniak.mail.data.UiSettings.ExternalContent.ALWAYS
-import com.infomaniak.mail.data.UiSettings.ExternalContent.ASK_ME
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.ExternalContent
+import com.infomaniak.mail.data.LocalSettings.ExternalContent.ALWAYS
+import com.infomaniak.mail.data.LocalSettings.ExternalContent.ASK_ME
 import com.infomaniak.mail.databinding.FragmentExternalContentSettingBinding
 import com.infomaniak.mail.utils.notYetImplemented
 
@@ -37,50 +34,25 @@ class ExternalContentSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentExternalContentSettingBinding
 
-    private val uiSettings by lazy { UiSettings.getInstance(requireContext()) }
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentExternalContentSettingBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding.radioGroup) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        setupUi()
-        setupListeners()
-    }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
+        initBijectionTable(
+            R.id.always to ALWAYS,
+            R.id.askMe to ASK_ME,
+        )
 
-    private fun setupUi() = with(binding) {
-        when (uiSettings.externalContent) {
-            ALWAYS -> settingsOptionAlwaysCheck.selectOption()
-            ASK_ME -> settingsOptionAskMeCheck.selectOption()
-        }
-    }
+        check(localSettings.externalContent)
 
-    private fun setupListeners() = with(binding) {
-        settingsOptionAlways.setOnClickListener {
+        onItemCheckedListener { _, _, externalContent ->
             notYetImplemented()
-            updateExternalContentSetting(ALWAYS, settingsOptionAlwaysCheck)
+            localSettings.externalContent = externalContent as ExternalContent
         }
-        settingsOptionAskMe.setOnClickListener {
-            notYetImplemented()
-            updateExternalContentSetting(ASK_ME, settingsOptionAskMeCheck)
-        }
-    }
-
-    private fun updateExternalContentSetting(externalContent: ExternalContent, chosenOption: ImageView) {
-        uiSettings.externalContent = externalContent
-        chosenOption.selectOption()
-    }
-
-    private fun ImageView.selectOption() = with(binding) {
-        settingsOptionAlwaysCheck.let { if (it != this@selectOption) it.isInvisible = true }
-        settingsOptionAskMeCheck.let { if (it != this@selectOption) it.isInvisible = true }
-
-        this@selectOption.isVisible = true
     }
 }

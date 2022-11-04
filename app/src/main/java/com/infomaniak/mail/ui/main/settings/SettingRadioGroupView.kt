@@ -37,8 +37,10 @@ class SettingRadioGroupView @JvmOverloads constructor(
     @IdRes
     private var checkedId: Int = View.NO_ID
     private var checkedValue: String? = null
-    private var onItemCheckedListener: ((Int, String?) -> Unit)? = null
+    private var onItemCheckedListener: ((Int, String?, Enum<*>?) -> Unit)? = null
     private var shouldAddDividers = true
+
+    private var bijectionTable: Map<Int, Enum<*>> = emptyMap()
 
     init {
         orientation = VERTICAL
@@ -48,7 +50,6 @@ class SettingRadioGroupView @JvmOverloads constructor(
             check(checkedId)
 
             shouldAddDividers = !getBoolean(R.styleable.SettingRadioGroupView_ignoreDividers, false)
-
         }
 
         if (shouldAddDividers) {
@@ -62,21 +63,26 @@ class SettingRadioGroupView @JvmOverloads constructor(
         children.forEach {
             if (it is RadioCheckable && it.id == View.NO_ID) it.id = generateViewId()
         }
-
         super.onFinishInflate()
     }
 
     override fun onChecked(@IdRes viewId: Int) {
-        check(viewId)
-        if (viewId != checkedId) onItemCheckedListener?.invoke(checkedId, checkedValue)
+        if (viewId != checkedId) {
+            check(viewId)
+            onItemCheckedListener?.invoke(checkedId, checkedValue, bijectionTable[viewId])
+        }
+    }
+
+    fun <T : Enum<T>> initBijectionTable(vararg pairs: Pair<Int, T>) {
+        bijectionTable = pairs.toMap()
     }
 
     @Suppress("TypeParameterFindViewById")
-    private fun check(@IdRes viewId: Int) {
+    fun check(@IdRes viewId: Int) {
         if (viewId == checkedId) return
 
         (findViewById(checkedId) as? RadioCheckable)?.uncheck()
-        (findViewById(viewId) as RadioCheckable).apply {
+        with(findViewById(viewId) as RadioCheckable) {
             check()
             checkedValue = associatedValue
         }
@@ -84,7 +90,12 @@ class SettingRadioGroupView @JvmOverloads constructor(
         checkedId = viewId
     }
 
-    fun onItemCheckedListener(listener: ((Int, String?) -> Unit)?) {
+    fun check(enum: Enum<*>) {
+        val viewId = bijectionTable.keys.firstOrNull { bijectionTable[it] == enum } ?: return
+        check(viewId)
+    }
+
+    fun onItemCheckedListener(listener: ((id: Int, value: String?, enum: Enum<*>?) -> Unit)?) {
         onItemCheckedListener = listener
     }
 }

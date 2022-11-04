@@ -117,16 +117,16 @@
                 android:pathData="M51.5,271C54.54,271 57,268.54 57,265.5C57,262.46 54.54,260 51.5,260C48.46,260 46,262.46 46,265.5C46,268.54 48.46,271 51.5,271ZM42,282C42.01,276.76 46.26,272.51 51.5,272.5C56.74,272.51 60.99,276.76 61,282C61,282.28 60.78,282.5 60.5,282.5H42.5C42.22,282.5 42,282.28 42,282Z" />
         </group>
         <path
-            android:fillColor="@color/pinkAccent"
+            android:fillColor="?android:attr/colorPrimary"
             android:pathData="M25.5,33.82m-3.73,0a3.73,3.73 0,1 1,7.45 0a3.73,3.73 0,1 1,-7.45 0" />
         <path
-            android:fillColor="@color/pinkAccent"
+            android:fillColor="?android:attr/colorPrimary"
             android:pathData="M25.5,111.33m-3.73,0a3.73,3.73 0,1 1,7.45 0a3.73,3.73 0,1 1,-7.45 0" />
         <path
-            android:fillColor="@color/pinkAccent"
+            android:fillColor="?android:attr/colorPrimary"
             android:pathData="M25.5,189.33m-3.73,0a3.73,3.73 0,1 1,7.45 0a3.73,3.73 0,1 1,-7.45 0" />
         <path
-            android:fillColor="@color/pinkAccent"
+            android:fillColor="?android:attr/colorPrimary"
             android:pathData="M25.5,267.33m-3.73,0a3.73,3.73 0,1 1,7.45 0a3.73,3.73 0,1 1,-7.45 0" />
     </group>
 </vector>

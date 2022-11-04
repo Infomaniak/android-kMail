@@ -26,18 +26,19 @@ import com.infomaniak.mail.databinding.ItemSettingsMailboxBinding
 import com.infomaniak.mail.ui.main.settings.SettingsMailboxesAdapter.SettingsMailboxViewHolder
 
 class SettingsMailboxesAdapter(
-    private var mailboxes: List<Mailbox> = emptyList(),
     private val onMailboxSelected: (Mailbox) -> Unit,
 ) : RecyclerView.Adapter<SettingsMailboxViewHolder>() {
+
+    private var mailboxes: List<Mailbox> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingsMailboxViewHolder {
         return SettingsMailboxViewHolder(ItemSettingsMailboxBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: SettingsMailboxViewHolder, position: Int): Unit = with(holder.binding) {
+    override fun onBindViewHolder(holder: SettingsMailboxViewHolder, position: Int): Unit = with(holder.binding.root) {
         val mailbox = mailboxes[position]
-        emailAddressText.text = mailbox.email
-        root.setOnClickListener { onMailboxSelected(mailbox) }
+        setTitle(mailbox.email)
+        setOnClickListener { onMailboxSelected(mailbox) }
     }
 
     override fun getItemCount(): Int = mailboxes.count()

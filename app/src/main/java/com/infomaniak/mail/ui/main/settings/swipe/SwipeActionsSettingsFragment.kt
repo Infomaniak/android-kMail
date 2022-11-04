@@ -22,12 +22,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.UiSettings
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSettingsBinding
+import com.infomaniak.mail.utils.animatedNavigation
 
 class SwipeActionsSettingsFragment : Fragment() {
 
@@ -37,32 +38,33 @@ class SwipeActionsSettingsFragment : Fragment() {
         return FragmentSwipeActionsSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        setupBack()
-        binding.setupUi()
-        setupListeners()
-    }
 
-    private fun setupBack() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-    }
+        with(LocalSettings.getInstance(requireContext())) {
+            swipeRightView.setSubtitle(swipeRight.nameRes)
+            swipeLeftView.setSubtitle(swipeLeft.nameRes)
 
-    private fun FragmentSwipeActionsSettingsBinding.setupUi() = with(UiSettings.getInstance(requireContext())) {
-        settingsSwipeShortRightText.setText(swipeShortRight.nameRes)
-        settingsSwipeLongRightText.setText(swipeLongRight.nameRes)
-        settingsSwipeShortLeftText.setText(swipeShortLeft.nameRes)
-        settingsSwipeLongLeftText.setText(swipeLongLeft.nameRes)
-    }
+            swipeRightIllustration.apply {
+                swipeBackground.setCardBackgroundColor(swipeRight.getBackgroundColor(requireContext()))
+                swipeRight.iconRes?.let(swipeIcon::setImageResource)
+                swipeIcon.isGone = swipeRight.iconRes == null
+                swipeToDefine.isVisible = swipeRight.iconRes == null
+            }
 
-    private fun setupListeners() = with(binding) {
-        settingsSwipeShortRight.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeShortRight) }
-        settingsSwipeLongRight.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongRight) }
-        settingsSwipeShortLeft.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeShortLeft) }
-        settingsSwipeLongLeft.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLongLeft) }
+            swipeLeftIllustration.apply {
+                swipeBackground.setCardBackgroundColor(swipeLeft.getBackgroundColor(requireContext()))
+                swipeLeft.iconRes?.let(swipeIcon::setImageResource)
+                swipeIcon.isGone = swipeLeft.iconRes == null
+                swipeToDefine.isVisible = swipeLeft.iconRes == null
+            }
+        }
+
+        swipeRightView.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeRight) }
+        swipeLeftView.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLeft) }
     }
 
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {
-        safeNavigate(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
+        animatedNavigation(SwipeActionsSettingsFragmentDirections.actionSwipeActionsSettingsToSwipeActionSelectionSetting(resId))
     }
 }
