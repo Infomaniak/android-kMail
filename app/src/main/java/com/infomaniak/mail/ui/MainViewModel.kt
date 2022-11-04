@@ -229,9 +229,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        val apiSignatures = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName).data?.signatures ?: return@launch
-
-        SignatureController.update(apiSignatures)
+        with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) SignatureController.update(data?.signatures ?: emptyList())
+        }
     }
 
     private fun updateFolders(mailbox: Mailbox) {

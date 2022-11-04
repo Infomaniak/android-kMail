@@ -57,7 +57,6 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun getContactImage(path: String): ApiResponse<Data> = callKotlinxApi(ApiRoutes.resource(path), GET)
 
-    // TODO: Handle result status
     fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
