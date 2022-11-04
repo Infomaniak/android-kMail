@@ -65,7 +65,6 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient)
     }
 
-    // TODO: Handle result status
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)
 
     // fun createFolder(mailboxUuid: String, name: String, path: String?): ApiResponse<Folder> = callKotlinxApi(ApiRoutes.folders(mailboxUuid), POST, mutableMapOf("name" to name).apply { path?.let { "path" to it } })

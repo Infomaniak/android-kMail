@@ -234,9 +234,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateFolders(mailbox: Mailbox) {
-        val apiFolders = ApiRepository.getFolders(mailbox.uuid).data?.formatFoldersListWithAllChildren() ?: emptyList()
-
-        FolderController.update(apiFolders)
+        with(ApiRepository.getFolders(mailbox.uuid)) {
+            if (isSuccess()) FolderController.update(data?.formatFoldersListWithAllChildren() ?: emptyList())
+        }
     }
 
     private fun refreshThreads(
