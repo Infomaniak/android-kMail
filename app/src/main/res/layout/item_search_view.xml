@@ -20,9 +20,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/searchViewHeight"
-    app:cardBackgroundColor="@color/backgroundCardSelectedColor"
-    app:cardCornerRadius="20dp"
-    tools:showIn="@layout/fragment_thread_list">
+    app:cardBackgroundColor="@color/searchBarBackgroundColor"
+    app:cardCornerRadius="20dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
