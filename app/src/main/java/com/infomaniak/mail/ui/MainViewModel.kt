@@ -194,18 +194,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateAddressBooks() {
-        val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
-
-        AddressBookController.update(apiAddressBooks)
+        with(ApiRepository.getAddressBooks()) {
+            if (isSuccess()) AddressBookController.update(data?.addressBooks ?: emptyList())
+        }
     }
 
     private fun updateContacts() {
-        val apiContacts = ApiRepository.getContacts().data ?: emptyList()
-        val phoneMergedContacts = getPhoneContacts(getApplication())
-
-        mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
-
-        MergedContactController.update(phoneMergedContacts.values.toList())
+        with(ApiRepository.getContacts()) {
+            if (isSuccess()) {
+                val apiContacts = data ?: emptyList()
+                val phoneMergedContacts = getPhoneContacts(getApplication())
+                mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
+                MergedContactController.update(phoneMergedContacts.values.toList())
+            }
+        }
     }
 
     fun observeRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {

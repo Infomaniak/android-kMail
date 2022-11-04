@@ -51,10 +51,8 @@ object ApiRepository : ApiRepositoryCore() {
         return ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
     }
 
-    // TODO: Handle result status
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
-    // TODO: Handle result status
     fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)
 
     // fun getContactImage(path: String): ApiResponse<Data> = callKotlinxApi(ApiRoutes.resource(path), GET)
