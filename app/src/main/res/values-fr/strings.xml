@@ -128,6 +128,7 @@
     <string name="createFolderTitle">Quel sera le nom de ce dossier ?</string>
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
+    <string name="draftPrefix">(Brouillon)</string>
     <string name="emailSentSnackbar">E-mail envoyé</string>
     <string name="emptyFolderDescription">Il n‘y a rien à voir, regardez-en un autre :)</string>
     <string name="emptyFolderTitle">Ce dossier est vide !</string>

@@ -128,6 +128,7 @@
     <string name="createFolderTitle">What will this folder be called?</string>
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
+    <string name="draftPrefix">(Draft)</string>
     <string name="emailSentSnackbar">Email sent</string>
     <string name="emptyFolderDescription">There‘s nothing to see, look at another one :)</string>
     <string name="emptyFolderTitle">This folder is empty !</string>
