@@ -17,11 +17,6 @@
   -->
 <resources>
 
-    <!-- Text sizes -->
-
-    <dimen name="textCalloutSize">14sp</dimen>
-    <dimen name="textCaptionSize">12sp</dimen>
-
     <!-- View sizes -->
 
     <dimen name="attachmentChipMaxSize">160dp</dimen>
