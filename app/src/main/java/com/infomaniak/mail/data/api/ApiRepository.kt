@@ -89,7 +89,6 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.threads(mailboxUuid, folderId, threadMode, offset, filter), GET)
     }
 
-    // TODO: Handle result status
     fun getMessage(messageResource: String): ApiResponse<Message> {
         return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
     }

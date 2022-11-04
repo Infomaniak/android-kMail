@@ -282,11 +282,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (localMessage.fullyDownloaded) {
                 localMessage
             } else {
-                ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
-                    if (completedMessage.isDraft) {
-                        completedMessage.draftLocalUuid = DraftController.getDraftByMessageUid(completedMessage.uid)?.localUuid
+                with(ApiRepository.getMessage(localMessage.resource)) {
+                    if (isSuccess()) {
+                        data?.also {
+                            if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid)?.localUuid
+                            it.fullyDownloaded = true
+                        }
+                    } else {
+                        null
                     }
-                    completedMessage.fullyDownloaded = true
                 }
             }
         }
