@@ -112,6 +112,7 @@
                     android:layout_marginHorizontal="@dimen/marginStandardSmall"
                     android:src="@drawable/ic_chevron_down"
                     app:layout_constraintHorizontal_bias="0"
+                    app:tint="@color/iconSecondaryColor"
                     tools:ignore="ContentDescription" />
             </LinearLayout>
 
@@ -285,6 +286,7 @@
         app:layout_constraintBottom_toTopOf="@id/headerDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
+        app:tint="@color/iconSecondaryColor"
         tools:ignore="ContentDescription" />
 
     <TextView

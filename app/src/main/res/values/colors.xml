@@ -44,7 +44,6 @@
     <color name="backgroundColor">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
-    <color name="backgroundNotificationColor">@color/grey_text</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
     <color name="backgroundSecondaryColor">@color/lightenedGrey</color>
@@ -53,10 +52,10 @@
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
-    <color name="secondaryTextColor">@color/grey_text</color>
+    <color name="secondaryTextColor">@color/elephant</color>
     <color name="tertiaryTextColor">@color/grey_text_secondary</color>
-    <color name="snackbarTextColor">@color/grey_text</color>
-    <color name="hintTextColor">@color/greyTextLight</color>
+    <color name="snackbarTextColor">@color/elephant</color>
+    <color name="hintTextColor">@color/grey_text_secondary</color>
     <color name="notificationTextColor">@color/hover</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="emailChipTextColor">@color/orca</color>
@@ -66,9 +65,8 @@
     <color name="separatorLighter">#ECECEC</color>
 
     <!-- Icons -->
-    <color name="chevronColor">@color/grey_text</color>
-    <color name="iconColor">@color/grey_text</color>
-    <color name="iconToolbarButton">@color/primaryTextColor</color>
+    <color name="iconColor">@color/elephant</color>
+    <color name="iconSecondaryColor">@color/elephant</color>
     <color name="favoriteYellow">#F1BE41</color>
 
     <!-- Buttons -->

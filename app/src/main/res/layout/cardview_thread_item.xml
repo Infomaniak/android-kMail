@@ -127,23 +127,26 @@
                     android:contentDescription="@string/contentDescriptionIconCalendar"
                     android:src="@drawable/ic_calendar"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
+                    app:layout_constraintBottom_toBottomOf="@id/mailDate"
                     app:layout_constraintEnd_toStartOf="@id/iconAttachment"
-                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    app:layout_constraintTop_toTopOf="@id/mailDate"
+                    app:tint="@color/iconSecondaryColor"
                     tools:visibility="visible" />
 
                 <ImageView
                     android:id="@+id/iconAttachment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionIconAttachments"
                     android:src="@drawable/ic_attachment"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/expeditor"
+                    app:layout_constraintBottom_toBottomOf="@id/mailDate"
                     app:layout_constraintEnd_toStartOf="@id/mailDate"
-                    app:layout_constraintTop_toTopOf="@id/expeditor"
+                    app:layout_constraintTop_toTopOf="@id/mailDate"
+                    app:tint="@color/iconSecondaryColor"
                     tools:visibility="visible" />
 
                 <TextView
