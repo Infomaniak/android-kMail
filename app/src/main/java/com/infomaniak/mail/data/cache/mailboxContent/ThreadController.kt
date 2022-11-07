@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.thread.ThreadsResult
+import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
@@ -133,7 +134,7 @@ object ThreadController {
         if (newPageSize > 0) updateFolderThreads(folderId, apiThreads, folderUnseenMessage)
     }
 
-    fun MutableRealm.markThreadAsUnseen(thread: Thread, folderId: String) {
+    private fun MutableRealm.markThreadAsUnseen(thread: Thread, folderId: String) {
         thread.apply {
             messages.last().seen = false
             unseenMessagesCount++
@@ -142,7 +143,7 @@ object ThreadController {
         incrementFolderUnreadCount(folderId, thread.unseenMessagesCount)
     }
 
-    fun MutableRealm.markThreadAsSeen(thread: Thread, folderId: String) {
+    private fun MutableRealm.markThreadAsSeen(thread: Thread, folderId: String) {
         incrementFolderUnreadCount(folderId, -thread.unseenMessagesCount)
 
         thread.apply {
@@ -152,10 +153,10 @@ object ThreadController {
     }
 
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    fun getThreadLastMessageUid(thread: Thread): List<String> = listOf(thread.messages.last().uid)
+    private fun getThreadLastMessageUid(thread: Thread): List<String> = listOf(thread.messages.last().uid)
 
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
+    private fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
             thread.messages.forEach { if (!it.seen) add(it.uid) }
         }
@@ -167,6 +168,37 @@ object ThreadController {
 
     fun deleteThread(uid: String) {
         RealmDatabase.mailboxContent().writeBlocking { getThread(uid, this)?.let(::delete) }
+    }
+    //endregion
+
+    //region Mark as seen/unseen
+    fun toggleSeenStatus(thread: Thread) {
+        val folderId = MainViewModel.currentFolderId.value!!
+        if (thread.unseenMessagesCount == 0) {
+            markAsUnseen(thread, folderId)
+        } else {
+            markAsSeen(thread, folderId)
+        }
+    }
+
+    private fun markAsUnseen(thread: Thread, folderId: String) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val latestThread = findLatest(thread) ?: return@writeBlocking
+            val uid = getThreadLastMessageUid(latestThread)
+            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)
+            if (apiResponse.isSuccess()) markThreadAsUnseen(latestThread, folderId)
+        }
+    }
+
+    fun markAsSeen(thread: Thread, folderId: String) {
+        if (thread.unseenMessagesCount == 0) return
+
+        RealmDatabase.mailboxContent().writeBlocking {
+            val latestThread = findLatest(thread) ?: return@writeBlocking
+            val uids = getThreadUnseenMessagesUids(latestThread)
+            val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)
+            if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
+        }
     }
     //endregion
 }

@@ -21,8 +21,10 @@ import android.text.format.DateUtils
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -57,6 +59,10 @@ class ThreadListViewModel : ViewModel() {
                 updatedAtTrigger.postValue(Unit)
             }
         }
+    }
+
+    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+        ThreadController.toggleSeenStatus(thread)
     }
 
     fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {

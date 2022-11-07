@@ -58,7 +58,7 @@ class NewMessageViewModel : ViewModel() {
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
-    var currentDraftLocalUuid: String? = null
+    private var currentDraftLocalUuid: String? = null
     val draftHasBeenSet = MutableLiveData<Boolean?>()
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()

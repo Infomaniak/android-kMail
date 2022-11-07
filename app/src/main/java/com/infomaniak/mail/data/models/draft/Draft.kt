@@ -93,7 +93,7 @@ class Draft : RealmObject {
             _action = value?.apiCallValue ?: DraftAction.NONE.apiCallValue
         }
 
-    var priority
+    private var priority
         get() = enumValueOfOrNull<Priority>(_priority)
         set(value) {
             _priority = value?.apiCallValue

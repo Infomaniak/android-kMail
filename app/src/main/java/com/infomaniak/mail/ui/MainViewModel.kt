@@ -22,15 +22,12 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.LocalSettings
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsSeen
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markThreadAsUnseen
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -132,7 +129,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateContacts()
     }
 
-    fun loadCurrentMailbox(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
+    fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadCurrentMailbox")
         updateMailboxes()
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
@@ -181,7 +178,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         selectThread(thread)
-        markAsSeen(thread, currentFolderId.value!!)
+        ThreadController.markAsSeen(thread, currentFolderId.value!!)
         updateMessages(thread)
     }
 
@@ -193,11 +190,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         currentOffset = OFFSET_FIRST_PAGE
         isDownloadingChanges.postValue(true)
         refreshThreads(mailboxUuid, folderId, filter)
-    }
-
-    fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "deleteDraft: ${message.body}")
-        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
     }
 
     private fun updateAddressBooks() {
@@ -315,37 +307,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
-    //region Mark as seen/unseen
-    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
-        val folderId = currentFolderId.value!!
-        if (thread.unseenMessagesCount == 0) {
-            markAsUnseen(thread, folderId)
-        } else {
-            markAsSeen(thread, folderId)
-        }
-    }
-
-    private fun markAsUnseen(thread: Thread, folderId: String) {
-        RealmDatabase.mailboxContent().writeBlocking {
-            val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uid = ThreadController.getThreadLastMessageUid(latestThread)
-            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)
-            if (apiResponse.isSuccess()) markThreadAsUnseen(latestThread, folderId)
-        }
-    }
-
-    private fun markAsSeen(thread: Thread, folderId: String) {
-        if (thread.unseenMessagesCount == 0) return
-
-        RealmDatabase.mailboxContent().writeBlocking {
-            val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uids = ThreadController.getThreadUnseenMessagesUids(latestThread)
-            val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)
-            if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
-        }
-    }
-    //endregion
 
     // Delete Thread
     fun deleteThread(thread: Thread, filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {

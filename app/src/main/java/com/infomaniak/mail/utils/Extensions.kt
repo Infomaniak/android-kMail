@@ -30,12 +30,8 @@ import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
+import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
-import com.infomaniak.lib.core.utils.canNavigate
-import com.infomaniak.lib.core.utils.endOfTheWeek
-import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.utils.startOfTheDay
-import com.infomaniak.lib.core.utils.startOfTheWeek
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs

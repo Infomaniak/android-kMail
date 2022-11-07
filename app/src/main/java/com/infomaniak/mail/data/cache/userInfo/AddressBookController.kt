@@ -21,37 +21,10 @@ import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.addressBook.AddressBook
 import com.infomaniak.mail.utils.update
-import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.UpdatePolicy
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.RealmSingleQuery
 
 object AddressBookController {
-
-    //region Queries
-    private fun MutableRealm?.getAddressBookQuery(id: Int): RealmSingleQuery<AddressBook> {
-        return (this ?: RealmDatabase.userInfo()).query<AddressBook>("${AddressBook::id.name} = '$id'").first()
-    }
-    //endregion
-
-    //region Get data
-    private fun getAddressBook(id: Int, realm: MutableRealm? = null): AddressBook? {
-        return realm.getAddressBookQuery(id).find()
-    }
-    //endregion
-
-    //region Edit data
     fun update(apiAddressBooks: List<AddressBook>) {
         Log.d(RealmDatabase.TAG, "AddressBooks: Save new data")
         RealmDatabase.userInfo().update<AddressBook>(apiAddressBooks)
     }
-
-    private fun upsertAddressBooks(addressBooks: List<AddressBook>) {
-        RealmDatabase.userInfo().writeBlocking { addressBooks.forEach { copyToRealm(it, UpdatePolicy.ALL) } }
-    }
-
-    private fun deleteAddressBooks(addressBooks: List<AddressBook>) {
-        RealmDatabase.userInfo().writeBlocking { addressBooks.forEach { getAddressBook(it.id, this)?.let(::delete) } }
-    }
-    //endregion
 }
