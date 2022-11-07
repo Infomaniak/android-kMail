@@ -95,18 +95,16 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
-        return Draft()
-            .initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
-            .initSignature(this)
-            .apply {
-                if (draftMode != DraftMode.NEW_MAIL) {
-                    previousMessageUid
-                        ?.let { uid -> MessageController.getMessage(uid, this@createDraft) }
-                        ?.let { message -> setPreviousMessage(this, draftMode, message) }
-                }
+        return Draft().apply {
+            initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+            initSignature(this@createDraft)
+            if (draftMode != DraftMode.NEW_MAIL) {
+                previousMessageUid
+                    ?.let { uid -> MessageController.getMessage(uid, this@createDraft) }
+                    ?.let { message -> setPreviousMessage(this, draftMode, message) }
             }
-            .also { DraftController.upsertDraft(it, this) }
-            .localUuid
+            DraftController.upsertDraft(this, this@createDraft)
+        }.localUuid
     }
 
     fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {

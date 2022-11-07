@@ -102,38 +102,31 @@ class Draft : RealmObject {
             _priority = value?.apiCallValue
         }
 
-    fun initLocalValues(messageUid: String? = null, priority: Priority? = null, mimeType: String? = null): Draft {
+    fun initLocalValues(messageUid: String? = null, priority: Priority? = null, mimeType: String? = null) {
         messageUid?.let { this.messageUid = it }
         priority?.let { this.priority = it }
         mimeType?.let { this.mimeType = it }
-
-        return this
     }
 
-    fun initSignature(realm: MutableRealm): Draft {
+    fun initSignature(realm: MutableRealm) = SignatureController.getDefaultSignature(realm)?.let { defaultSignature ->
 
-        SignatureController.getDefaultSignature(realm)?.let { defaultSignature ->
+        identityId = defaultSignature.id
 
-            identityId = defaultSignature.id
+        from = realmListOf(Recipient().apply {
+            this.email = defaultSignature.sender
+            this.name = defaultSignature.fullName
+        })
 
-            from = realmListOf(Recipient().apply {
-                this.email = defaultSignature.sender
-                this.name = defaultSignature.fullName
-            })
+        replyTo = realmListOf(Recipient().apply {
+            this.email = defaultSignature.replyTo
+            this.name = ""
+        })
 
-            replyTo = realmListOf(Recipient().apply {
-                this.email = defaultSignature.replyTo
-                this.name = ""
-            })
-
-            val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
-            body = when (defaultSignature.position) {
-                Signature.SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
-                else -> html + body
-            }
+        val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+        body = when (defaultSignature.position) {
+            Signature.SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
+            else -> html + body
         }
-
-        return this
     }
 
     enum class DraftAction(val apiCallValue: String) {
