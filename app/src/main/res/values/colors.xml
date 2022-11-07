@@ -61,8 +61,9 @@
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="emailChipTextColor">@color/orca</color>
 
-    <!-- Drawables -->
-    <color name="separatorColor">#ECECEC</color>
+    <!-- Separators -->
+    <color name="separatorDarker">#ECECEC</color>
+    <color name="separatorLighter">#ECECEC</color>
 
     <!-- Icons -->
     <color name="chevronColor">@color/grey_text</color>
@@ -74,7 +75,7 @@
     <color name="textButtonBlueLight">@color/blueTextLight</color>
 
     <!-- Cardview -->
-    <color name="attachmentStrokeColor">@color/border</color>
+    <color name="cardViewStrokeColor">@color/border</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_border</color>
