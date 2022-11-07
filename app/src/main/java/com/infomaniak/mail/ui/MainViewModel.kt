@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMes
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -343,7 +344,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region New Message
     // TODO: This is temporary, while waiting for a "DraftsManager".
     fun executeDraftsActions() = viewModelScope.launch(Dispatchers.IO) {
-        if (RealmDatabase.mailboxContent().isClosed()) return@launch
+
+        if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@launch
+
         RealmDatabase.mailboxContent().writeBlocking {
 
             fun getCurrentMailboxUuid(drafts: List<Draft>): String? {
