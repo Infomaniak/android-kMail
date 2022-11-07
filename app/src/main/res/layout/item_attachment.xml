@@ -23,7 +23,7 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
     app:cardCornerRadius="@dimen/smallCornerRadius"
-    app:strokeColor="@color/attachmentStrokeColor"
+    app:strokeColor="@color/cardViewStrokeColor"
     app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout

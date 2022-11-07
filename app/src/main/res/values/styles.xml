@@ -292,7 +292,7 @@
     <style name="MenuDrawerDivider" parent="Widget.Material3.MaterialDivider">
         <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
         <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
-        <item name="dividerColor">@color/separatorColor</item>
+        <item name="dividerColor">@color/separatorLighter</item>
         <item name="dividerInsetEnd">@dimen/marginStandard</item>
         <item name="dividerInsetStart">@dimen/marginStandard</item>
     </style>
@@ -377,7 +377,7 @@
         <item name="android:layout_marginStart">@dimen/marginStandardSmall</item>
         <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="dividerColor">@color/separatorColor</item>
+        <item name="dividerColor">@color/separatorDarker</item>
     </style>
 
     <style name="SettingHeader" parent="Callout.Secondary">

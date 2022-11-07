@@ -49,8 +49,9 @@
     <color name="hintTextColor">@color/grey_text</color>
     <color name="emailChipTextColor">@color/secondaryText</color>
 
-    <!-- Drawables -->
-    <color name="separatorColor">@color/orca</color>
+    <!-- Separators -->
+    <color name="separatorDarker">@color/bat</color>
+    <color name="separatorLighter">@color/orca</color>
 
     <!-- Icons -->
     <color name="chevronColor">@color/lightenedGrey</color>
@@ -58,7 +59,7 @@
     <color name="iconToolbarButton">@color/lightenedGrey</color>
 
     <!-- Cardview -->
-    <color name="attachmentStrokeColor">@color/orca</color>
+    <color name="cardViewStrokeColor">@color/orca</color>
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/grey_text</color>

@@ -32,7 +32,7 @@
         app:cardBackgroundColor="@color/backgroundColor"
         app:cardCornerRadius="10dp"
         app:rippleColor="?attr/colorControlHighlight"
-        app:strokeColor="@color/separatorColor"
+        app:strokeColor="@color/cardViewStrokeColor"
         app:strokeWidth="1dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
