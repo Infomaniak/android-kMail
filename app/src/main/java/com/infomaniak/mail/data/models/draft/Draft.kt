@@ -21,8 +21,11 @@ package com.infomaniak.mail.data.models.draft
 
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.signature.Signature
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -60,7 +63,7 @@ class Draft : RealmObject {
     @SerialName("priority")
     private var _priority: String? = null
     @SerialName("action")
-    private var _action: String = DraftAction.NONE.apiCallValue
+    private var _action: String? = null
 
     @SerialName("in_reply_to")
     var inReplyTo: String? = null
@@ -90,7 +93,7 @@ class Draft : RealmObject {
     var action
         get() = enumValueOfOrNull<DraftAction>(_action)
         set(value) {
-            _action = value?.apiCallValue ?: DraftAction.NONE.apiCallValue
+            _action = value?.apiCallValue
         }
 
     private var priority
@@ -99,15 +102,34 @@ class Draft : RealmObject {
             _priority = value?.apiCallValue
         }
 
-    fun initLocalValues(messageUid: String? = null, priority: Priority? = null): Draft {
+    fun initLocalValues(messageUid: String? = null, priority: Priority? = null, mimeType: String? = null) {
         messageUid?.let { this.messageUid = it }
         priority?.let { this.priority = it }
+        mimeType?.let { this.mimeType = it }
+    }
 
-        return this
+    fun initSignature(realm: MutableRealm) = SignatureController.getDefaultSignature(realm)?.let { defaultSignature ->
+
+        identityId = defaultSignature.id
+
+        from = realmListOf(Recipient().apply {
+            this.email = defaultSignature.sender
+            this.name = defaultSignature.fullName
+        })
+
+        replyTo = realmListOf(Recipient().apply {
+            this.email = defaultSignature.replyTo
+            this.name = ""
+        })
+
+        val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+        body = when (defaultSignature.position) {
+            Signature.SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
+            else -> html + body
+        }
     }
 
     enum class DraftAction(val apiCallValue: String) {
-        NONE(""),
         SAVE("save"),
         SEND("send"),
     }

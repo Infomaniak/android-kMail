@@ -17,11 +17,15 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import androidx.lifecycle.*
+import android.content.ClipDescription
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setDraftSignature
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -59,11 +63,10 @@ class NewMessageViewModel : ViewModel() {
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
     private var currentDraftLocalUuid: String? = null
-    val draftHasBeenSet = MutableLiveData<Boolean?>()
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
-    fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs) = viewModelScope.launch(Dispatchers.IO) {
+    fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             RealmDatabase.mailboxContent().writeBlocking {
 
@@ -75,12 +78,10 @@ class NewMessageViewModel : ViewModel() {
                     else -> createDraft(draftMode, previousMessageUid)
                 }
 
-                setDraftSignature(currentDraftLocalUuid!!)
                 initUiData(currentDraftLocalUuid!!)
-
-                draftHasBeenSet.postValue(true)
             }
         }
+        emit(true)
     }
 
     private fun MutableRealm.initUiData(draftLocalUuid: String) {
@@ -94,29 +95,16 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
-        return Draft()
-            .initLocalValues(priority = Priority.NORMAL)
-            .apply {
-                previousMessageUid?.let { MessageController.getMessage(it, this@createDraft) }?.let { previousMessage ->
-
-                    previousMessage.msgId.let {
-                        this.inReplyTo = it
-                        this.references = it
-                    }
-
-                    when (draftMode) {
-                        DraftMode.REPLY, DraftMode.REPLY_ALL -> this.inReplyToUid = previousMessageUid
-                        DraftMode.FORWARD -> this.forwardedUid = previousMessageUid
-                        DraftMode.NEW_MAIL -> Unit
-                    }
-
-                    this.to = previousMessage.from
-                    if (draftMode == DraftMode.REPLY_ALL) this.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
-                    previousMessage.subject?.let { this.subject = "Re: $it" }
-                }
+        return Draft().apply {
+            initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+            initSignature(this@createDraft)
+            if (draftMode != DraftMode.NEW_MAIL) {
+                previousMessageUid
+                    ?.let { uid -> MessageController.getMessage(uid, this@createDraft) }
+                    ?.let { message -> setPreviousMessage(this, draftMode, message) }
             }
-            .also { DraftController.upsertDraft(it, this) }
-            .localUuid
+            DraftController.upsertDraft(this, this@createDraft)
+        }.localUuid
     }
 
     fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
