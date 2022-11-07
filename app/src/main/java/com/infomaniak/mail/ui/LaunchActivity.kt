@@ -33,10 +33,9 @@ class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
-            AccountUtils.requestCurrentUser()
-                .also { trackUserId(AccountUtils.currentUserId) }
-                ?.let { startApp() }
-                ?: run { loginUser() }
+            val user = AccountUtils.requestCurrentUser()
+            trackUserId(AccountUtils.currentUserId)
+            if (user == null) loginUser() else startApp()
         }
     }
 

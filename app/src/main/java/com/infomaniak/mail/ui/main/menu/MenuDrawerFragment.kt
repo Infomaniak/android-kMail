@@ -231,7 +231,7 @@ class MenuDrawerFragment : Fragment() {
     fun onDrawerOpened() {
         canNavigate = true
         mainViewModel.forceRefreshMailboxes()
-        requireActivity().trackScreen(this::class.java.name, this::class.java.simpleName)
+        trackScreen()
     }
 
     private fun setCustomFoldersCollapsedState() = with(binding) {
