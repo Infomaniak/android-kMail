@@ -37,6 +37,8 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.MatomoMail.addTrackingCallbackForDebugLog
+import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
@@ -52,9 +54,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import org.matomo.sdk.Tracker
 import java.util.*
 
 class ApplicationMain : Application(), ImageLoaderFactory {
+
+    val matomoTracker: Tracker by lazy { buildTracker() }
 
     override fun onCreate() {
         super.onCreate()
@@ -67,6 +72,9 @@ class ApplicationMain : Application(), ImageLoaderFactory {
         configureInfomaniakCore()
         initNotificationChannel()
         configureHttpClient()
+
+        // TODO: Remove before going into production
+        addTrackingCallbackForDebugLog()
     }
 
     private fun configureDebugMode() {

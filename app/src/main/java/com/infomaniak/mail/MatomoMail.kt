@@ -15,18 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui
+package com.infomaniak.mail
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.infomaniak.mail.MatomoMail.trackScreen
-import com.infomaniak.mail.data.LocalSettings
+import android.content.Context
+import com.infomaniak.lib.core.MatomoCore
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
+import org.matomo.sdk.Tracker
 
-open class ThemedActivity : AppCompatActivity() {
+object MatomoMail : MatomoCore {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(LocalSettings.getInstance(this).accentColor.theme)
-        super.onCreate(savedInstanceState)
-        trackScreen()
+    override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
+    override val siteId = 9
+
+    fun Context.trackAccountEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent("account", name, action, value)
     }
 }

@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -32,8 +33,14 @@ class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
-            if (AccountUtils.requestCurrentUser() == null) loginUser() else startApp()
+            val user = AccountUtils.requestCurrentUser()
+            trackUserId(AccountUtils.currentUserId)
+            if (user == null) loginUser() else startApp()
         }
+    }
+
+    private fun startApp() {
+        startActivity(Intent(this, MainActivity::class.java))
     }
 
     private fun loginUser() {
@@ -41,9 +48,5 @@ class LaunchActivity : AppCompatActivity() {
             putExtras(LoginActivityArgs(isFirstAccount = true).toBundle())
             startActivity(this)
         }
-    }
-
-    private fun startApp() {
-        startActivity(Intent(this, MainActivity::class.java))
     }
 }
