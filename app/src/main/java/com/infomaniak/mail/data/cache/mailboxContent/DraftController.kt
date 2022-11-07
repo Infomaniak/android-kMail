@@ -120,24 +120,21 @@ object DraftController {
         }
     }
 
-    fun MutableRealm.setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessageUid: String?) {
-        previousMessageUid?.let { MessageController.getMessage(it, this) }?.let { previousMessage ->
-
-            previousMessage.msgId.let {
-                draft.inReplyTo = it
-                draft.references = it
-            }
-
-            when (draftMode) {
-                DraftMode.REPLY, DraftMode.REPLY_ALL -> draft.inReplyToUid = previousMessageUid
-                DraftMode.FORWARD -> draft.forwardedUid = previousMessageUid
-                DraftMode.NEW_MAIL -> Unit
-            }
-
-            draft.to = previousMessage.from
-            if (draftMode == DraftMode.REPLY_ALL) draft.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
-            previousMessage.subject?.let { draft.subject = "Re: $it" }
+    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
+        previousMessage.msgId.let {
+            draft.inReplyTo = it
+            draft.references = it
         }
+
+        when (draftMode) {
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> draft.inReplyToUid = previousMessage.uid
+            DraftMode.FORWARD -> draft.forwardedUid = previousMessage.uid
+            DraftMode.NEW_MAIL -> Unit
+        }
+
+        draft.to = previousMessage.from
+        if (draftMode == DraftMode.REPLY_ALL) draft.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
+        previousMessage.subject?.let { draft.subject = "Re: $it" }
     }
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {

@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setSignature
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.MergedContact
@@ -98,7 +99,11 @@ class NewMessageViewModel : ViewModel() {
             .initLocalValues(priority = Priority.NORMAL)
             .apply {
                 setSignature(this)
-                if (draftMode != DraftMode.NEW_MAIL) setPreviousMessage(this, draftMode, previousMessageUid)
+                if (draftMode != DraftMode.NEW_MAIL) {
+                    previousMessageUid
+                        ?.let { uid -> MessageController.getMessage(uid, this@createDraft) }
+                        ?.let { message -> setPreviousMessage(this, draftMode, message) }
+                }
             }
             .also { DraftController.upsertDraft(it, this) }
             .localUuid
