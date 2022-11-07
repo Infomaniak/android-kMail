@@ -34,7 +34,6 @@
     <color name="backgroundColor">#101010</color>
     <color name="backgroundHeaderColor">@color/bat</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
-    <color name="backgroundNotificationColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/black</color>
     <color name="backgroundSecondaryColor">#1A1A1A</color>
@@ -44,9 +43,8 @@
     <!-- Texts -->
     <color name="primaryTextColor">@color/grey_border</color>
     <color name="secondaryTextColor">@color/secondaryText</color>
-    <color name="tertiaryTextColor">@color/grey_text</color>
+    <color name="tertiaryTextColor">@color/elephant</color>
     <color name="snackbarTextColor">@color/hover</color>
-    <color name="hintTextColor">@color/grey_text</color>
     <color name="emailChipTextColor">@color/secondaryText</color>
 
     <!-- Separators -->
@@ -54,14 +52,13 @@
     <color name="separatorLighter">@color/orca</color>
 
     <!-- Icons -->
-    <color name="chevronColor">@color/lightenedGrey</color>
-    <color name="iconColor">@color/lightenedGrey</color>
-    <color name="iconToolbarButton">@color/lightenedGrey</color>
+    <color name="iconColor">@color/grey_border</color>
+    <color name="iconSecondaryColor">@color/grey_text_secondary</color>
 
     <!-- Cardview -->
     <color name="cardViewStrokeColor">@color/orca</color>
 
     <!-- Progressbar -->
-    <color name="progressbarTrackColor">@color/grey_text</color>
+    <color name="progressbarTrackColor">@color/elephant</color>
 
 </resources>
