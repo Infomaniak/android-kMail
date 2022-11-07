@@ -3,16 +3,15 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'kotlin-parcelize'
-    // Realm Kotlin PRODUCTION - START /!\
-    id 'io.realm.kotlin'
-    // Realm Kotlin PRODUCTION - END /!\
     id 'androidx.navigation.safeargs.kotlin'
+    // Realm Kotlin PRODUCTION
+    id 'io.realm.kotlin'
 }
 
-// Realm Kotlin SNAPSHOT - START /!\
+// Realm Kotlin SNAPSHOT
 // configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
+// Realm Kotlin SNAPSHOT
 // apply plugin: "io.realm.kotlin"
-// Realm Kotlin SNAPSHOT - END /!\
 
 android {
 

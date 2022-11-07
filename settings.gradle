@@ -12,9 +12,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        // Realm Kotlin SNAPSHOT - START /!\
+        // Realm Kotlin SNAPSHOT
         // maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        // Realm Kotlin SNAPSHOT - END /!\
     }
 }
 

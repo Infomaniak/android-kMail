@@ -1,23 +1,20 @@
 buildscript {
     ext.gradle_version = '7.3.1'
     ext.kotlin_version = '1.7.20'
-    // Realm Kotlin PRODUCTION - START /!\
-    ext.realm_kotlin_version = '1.4.0'
-    // Realm Kotlin PRODUCTION - END /!\
-    // Realm Kotlin SNAPSHOT - START /!\
-    // ext.realm_kotlin_version = '1.5.0-SNAPSHOT' // https://github.com/realm/realm-kotlin/blob/master/buildSrc/src/main/kotlin/Config.kt
-    // Realm Kotlin SNAPSHOT - END /!\
     ext.navigation_version = '2.5.3'
     ext.java_version = JavaVersion.VERSION_1_8
+    // Realm Kotlin PRODUCTION
+    ext.realm_kotlin_version = '1.4.0'
+    // Realm Kotlin SNAPSHOT
+    // ext.realm_kotlin_version = '1.5.0-SNAPSHOT' // https://github.com/realm/realm-kotlin/blob/master/buildSrc/src/main/kotlin/Config.kt
 
-    // Realm Kotlin SNAPSHOT - START /!\
+    // Realm Kotlin SNAPSHOT
     // repositories { maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } }
-    // Realm Kotlin SNAPSHOT - END /!\
+
     dependencies {
-        // Realm Kotlin SNAPSHOT - START /!\
-        // classpath "io.realm.kotlin:gradle-plugin:$realm_kotlin_version"
-        // Realm Kotlin SNAPSHOT - END /!\
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigation_version"
+        // Realm Kotlin SNAPSHOT
+        // classpath "io.realm.kotlin:gradle-plugin:$realm_kotlin_version"
     }
 }
 
@@ -26,9 +23,8 @@ plugins {
     id 'com.android.library' version "$gradle_version" apply false
     id 'org.jetbrains.kotlin.android' version "$kotlin_version" apply false
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version" apply false
-    // Realm Kotlin PRODUCTION - START /!\
+    // Realm Kotlin PRODUCTION
     id 'io.realm.kotlin' version "$realm_kotlin_version" apply false
-    // Realm Kotlin PRODUCTION - END /!\
 }
 
 task clean(type: Delete) { delete rootProject.buildDir }
