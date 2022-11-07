@@ -17,20 +17,16 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import android.content.ClipDescription
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
@@ -92,32 +88,6 @@ object DraftController {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
             upsertDraft(draft.initLocalValues(messageUid), realm)
         }?.localUuid
-    }
-
-    fun MutableRealm.setSignature(draft: Draft) {
-
-        draft.mimeType = ClipDescription.MIMETYPE_TEXT_HTML
-
-        SignatureController.getDefaultSignature(this)?.let { defaultSignature ->
-
-            draft.identityId = defaultSignature.id
-
-            draft.from = realmListOf(Recipient().apply {
-                this.email = defaultSignature.sender
-                this.name = defaultSignature.fullName
-            })
-
-            draft.replyTo = realmListOf(Recipient().apply {
-                this.email = defaultSignature.replyTo
-                this.name = ""
-            })
-
-            val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
-            draft.body = when (defaultSignature.position) {
-                SignaturePosition.AFTER_REPLY_MESSAGE -> draft.body + html
-                else -> html + draft.body
-            }
-        }
     }
 
     fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {

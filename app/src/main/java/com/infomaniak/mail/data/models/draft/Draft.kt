@@ -21,8 +21,11 @@ package com.infomaniak.mail.data.models.draft
 
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.signature.Signature
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -99,9 +102,36 @@ class Draft : RealmObject {
             _priority = value?.apiCallValue
         }
 
-    fun initLocalValues(messageUid: String? = null, priority: Priority? = null): Draft {
+    fun initLocalValues(messageUid: String? = null, priority: Priority? = null, mimeType: String? = null): Draft {
         messageUid?.let { this.messageUid = it }
         priority?.let { this.priority = it }
+        mimeType?.let { this.mimeType = it }
+
+        return this
+    }
+
+    fun initSignature(realm: MutableRealm): Draft {
+
+        SignatureController.getDefaultSignature(realm)?.let { defaultSignature ->
+
+            identityId = defaultSignature.id
+
+            from = realmListOf(Recipient().apply {
+                this.email = defaultSignature.sender
+                this.name = defaultSignature.fullName
+            })
+
+            replyTo = realmListOf(Recipient().apply {
+                this.email = defaultSignature.replyTo
+                this.name = ""
+            })
+
+            val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+            body = when (defaultSignature.position) {
+                Signature.SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
+                else -> html + body
+            }
+        }
 
         return this
     }

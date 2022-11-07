@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.content.ClipDescription
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
@@ -25,7 +26,6 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setSignature
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -96,9 +96,9 @@ class NewMessageViewModel : ViewModel() {
 
     private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
         return Draft()
-            .initLocalValues(priority = Priority.NORMAL)
+            .initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
+            .initSignature(this)
             .apply {
-                setSignature(this)
                 if (draftMode != DraftMode.NEW_MAIL) {
                     previousMessageUid
                         ?.let { uid -> MessageController.getMessage(uid, this@createDraft) }
