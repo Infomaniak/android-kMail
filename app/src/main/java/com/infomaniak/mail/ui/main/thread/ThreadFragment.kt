@@ -61,7 +61,7 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        mainViewModel.openThread(navigationArgs.threadUid)
+        threadViewModel.openThread(navigationArgs.threadUid)
         observeMessages()
         observeContacts()
     }
@@ -167,7 +167,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessages() {
-        threadViewModel.messages(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+        threadViewModel.messages.bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
         }

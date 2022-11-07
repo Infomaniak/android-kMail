@@ -18,17 +18,57 @@
 package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.*
+import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.update
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markAsSeen
 import com.infomaniak.mail.data.models.message.Message
-import io.realm.kotlin.notifications.ListChange
+import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.MainViewModel
+import io.realm.kotlin.MutableRealm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    fun messages(threadUid: String): LiveData<ListChange<Message>> = liveData(Dispatchers.IO) {
-        ThreadController.getThread(threadUid)?.let { emitSource(it.messages.asFlow().asLiveData()) }
+    private val currentThread = MutableLiveData<Thread>()
+    val messages = Transformations.switchMap(currentThread) { thread ->
+        liveData(Dispatchers.IO) { emitSource(thread.messages.asFlow().asLiveData()) }
+    }
+
+    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        ThreadController.getThread(threadUid)?.let { thread ->
+            selectThread(thread)
+            currentThread.postValue(thread)
+            RealmDatabase.mailboxContent().writeBlocking {
+                markAsSeen(thread, MainViewModel.currentFolderId.value!!, realm = this)
+                updateMessages(thread)
+            }
+        }
+    }
+
+    private fun selectThread(thread: Thread) {
+        if (thread.uid != MainViewModel.currentThreadUid.value) MainViewModel.currentThreadUid.postValue(thread.uid)
+    }
+
+    private fun MutableRealm.updateMessages(thread: Thread) {
+        val apiMessages = fetchMessages(thread)
+        update(thread.messages, apiMessages)
+    }
+
+    private fun MutableRealm.fetchMessages(thread: Thread): List<Message> {
+        return thread.messages.mapNotNull { localMessage ->
+            if (localMessage.fullyDownloaded) {
+                localMessage
+            } else {
+                ApiRepository.getMessage(localMessage.resource).data?.also {
+                    if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid, realm = this)?.localUuid
+                    it.fullyDownloaded = true
+                }
+            }
+        }
     }
 
     fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }

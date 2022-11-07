@@ -118,7 +118,7 @@ class NewMessageFragment : Fragment() {
             }
         })
 
-        initializeDraftAndUi()
+        initDraftAndUi()
         observeSubject()
         observeBody()
         observeMailboxes()
@@ -131,8 +131,8 @@ class NewMessageFragment : Fragment() {
         BCC.clearField()
     }
 
-    private fun initializeDraftAndUi() {
-        newMessageViewModel.initializeDraftAndUi(requireActivity().navArgs<NewMessageActivityArgs>().value)
+    private fun initDraftAndUi() {
+        newMessageViewModel.initDraftAndUi(requireActivity().navArgs<NewMessageActivityArgs>().value)
             .observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
                     observeContacts()
