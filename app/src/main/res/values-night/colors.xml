@@ -32,10 +32,10 @@
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/orca</color>
     <color name="backgroundColor">#101010</color>
-    <color name="backgroundHeaderColor">#1A1A1A</color>
+    <color name="backgroundHeaderColor">@color/bat</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundNotificationColor">@color/black</color>
-    <color name="backgroundOnBoardingColor">#1A1A1A</color>
+    <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/black</color>
     <color name="backgroundSecondaryColor">#1A1A1A</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
