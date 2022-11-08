@@ -240,14 +240,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun refreshThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter = ThreadFilter.ALL) {
         with(ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, OFFSET_FIRST_PAGE, filter)) {
-            if (isSuccess() && data != null) {
-                RealmDatabase.mailboxContent().writeBlocking {
-                    val threadsResult = data!!
-                    canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
-                    FolderController.updateFolderLastUpdatedAt(folderId, this)
-                    val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
-                    if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
-                }
+            if (isSuccess()) RealmDatabase.mailboxContent().writeBlocking {
+                val threadsResult = data!!
+                canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
+                FolderController.updateFolderLastUpdatedAt(folderId, this)
+                val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+                if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
             }
         }
         isDownloadingChanges.postValue(false)
@@ -263,7 +261,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(true)
 
         with(ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, offset, filter)) {
-            if (isSuccess() && data != null) {
+            if (isSuccess()) {
                 canPaginate = ThreadController.loadMoreThreads(data!!, mailboxUuid, folderId, offset, filter)
             }
         }

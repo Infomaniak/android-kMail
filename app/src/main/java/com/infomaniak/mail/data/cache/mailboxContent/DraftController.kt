@@ -99,7 +99,7 @@ object DraftController {
     //region Open Draft
     fun MutableRealm.fetchDraft(draftResource: String, messageUid: String): String? {
         with(ApiRepository.getDraft(draftResource)) {
-            if (isSuccess() && data != null) {
+            if (isSuccess()) {
                 val draft = data!!
                 draft.initLocalValues(messageUid)
                 upsertDraft(draft, this@fetchDraft)
