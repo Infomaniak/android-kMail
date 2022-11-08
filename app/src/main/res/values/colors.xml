@@ -40,7 +40,7 @@
     <color name="blueTextLight">#4CB7FF</color>
 
     <!-- Backgrounds -->
-    <color name="searchBarBackgroundColor">@color/hover</color>
+    <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
@@ -56,7 +56,6 @@
     <color name="tertiaryTextColor">@color/shark</color>
     <color name="snackbarTextColor">@color/elephant</color>
     <color name="hintTextColor">@color/shark</color>
-    <color name="notificationTextColor">@color/hover</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="emailChipTextColor">@color/orca</color>
 
