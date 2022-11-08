@@ -133,8 +133,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadCurrentMailbox")
         updateMailboxes()
-        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-            ?.let(::openMailbox)
+        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {

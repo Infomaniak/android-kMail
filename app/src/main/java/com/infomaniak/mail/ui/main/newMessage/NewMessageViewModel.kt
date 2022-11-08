@@ -67,23 +67,24 @@ class NewMessageViewModel : ViewModel() {
 
     fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
-            RealmDatabase.mailboxContent().writeBlocking {
+            val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
                 currentDraftLocalUuid = if (draftExists) {
                     draftLocalUuid
                         ?: fetchDraft(draftResource!!, messageUid!!)
                         ?: run {
                             // TODO: Add Loader to block UI while waiting for `fetchDraft` API call to finish
-                            shouldCloseActivity.postValue(true)
-                            return@writeBlocking
+                            return@writeBlocking false
                         }
                 } else {
                     createDraft(draftMode, previousMessageUid)
                 }.also {
                     initUiData(it)
                 }
+                true
             }
+
+            emit(isSuccess)
         }
-        emit(true)
     }
 
     private fun MutableRealm.initUiData(draftLocalUuid: String) {
