@@ -25,9 +25,9 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -35,7 +35,6 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
@@ -62,23 +61,20 @@ class NewMessageViewModel : ViewModel() {
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
-    private var currentDraftLocalUuid: String? = null
+    private lateinit var currentDraftLocalUuid: String
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
     fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             RealmDatabase.mailboxContent().writeBlocking {
-
-                currentDraftLocalUuid = when {
-                    isDraftExisting && isDraftDownloaded -> draftLocalUuid!!
-                    isDraftExisting && !isDraftDownloaded -> {
-                        DraftController.fetchDraft(draftResource!!, messageUid!!, this) ?: return@writeBlocking
-                    }
-                    else -> createDraft(draftMode, previousMessageUid)
+                currentDraftLocalUuid = if (draftExists) {
+                    draftLocalUuid ?: fetchDraft(draftResource!!, messageUid!!) ?: return@writeBlocking
+                } else {
+                    createDraft(draftMode, previousMessageUid)
+                }.also {
+                    initUiData(it)
                 }
-
-                initUiData(currentDraftLocalUuid!!)
             }
         }
         emit(true)
@@ -129,27 +125,17 @@ class NewMessageViewModel : ViewModel() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
-            val mailboxUuid = MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailbox)?.uuid!!
-
-            RealmDatabase.mailboxContent().writeBlocking {
-                saveDraftToLocal(currentDraftLocalUuid!!, DraftAction.SAVE)
-
-                val draft = DraftController.getDraft(currentDraftLocalUuid!!, this) ?: return@writeBlocking
-                DraftController.executeDraftAction(draft, mailboxUuid, this)
-            }
+            saveDraftToLocal(DraftAction.SAVE)
         }
     }
 
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
-        val draftLocalUuid = currentDraftLocalUuid ?: return@launch
-        RealmDatabase.mailboxContent().writeBlocking {
-            saveDraftToLocal(draftLocalUuid, action)
-        }
+        saveDraftToLocal(action)
         shouldCloseActivity.postValue(true)
     }
 
-    private fun MutableRealm.saveDraftToLocal(draftLocalUuid: String, action: DraftAction) {
-        DraftController.updateDraft(draftLocalUuid, this) { draft ->
+    private fun saveDraftToLocal(action: DraftAction) {
+        DraftController.updateDraft(currentDraftLocalUuid) { draft ->
             draft.to = mailTo.toRealmList()
             draft.cc = mailCc.toRealmList()
             draft.bcc = mailBcc.toRealmList()

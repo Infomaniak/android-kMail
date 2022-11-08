@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -84,10 +85,11 @@ object DraftController {
     }
 
     //region Open Draft
-    fun fetchDraft(draftResource: String, messageUid: String, realm: MutableRealm? = null): String? {
+    fun MutableRealm.fetchDraft(draftResource: String, messageUid: String): String? {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
             draft.initLocalValues(messageUid)
-            upsertDraft(draft, realm)
+            upsertDraft(draft, this)
+            getMessage(messageUid, this)?.draftLocalUuid = draft.localUuid
         }?.localUuid
     }
 
@@ -109,9 +111,7 @@ object DraftController {
     }
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
-
         when (draft.action) {
-
             DraftAction.SAVE -> {
                 val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
                 if (apiResponse.isSuccess()) with(apiResponse.data!!) {
@@ -122,12 +122,10 @@ object DraftController {
                     }
                 }
             }
-
             DraftAction.SEND -> {
                 val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
                 if (apiResponse.isSuccess()) realm.delete(draft)
             }
-
             else -> Unit
         }
     }

@@ -128,7 +128,7 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
     safeNavigate(
         R.id.newMessageActivity,
         NewMessageActivityArgs(
-            isDraftExisting = false,
+            draftExists = false,
             draftMode = draftMode,
             previousMessageUid = messageUid,
         ).toBundle(),

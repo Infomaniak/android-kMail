@@ -126,9 +126,10 @@ class ThreadFragment : Fragment() {
             onDraftClicked = { message ->
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
-                        isDraftExisting = true,
-                        isDraftDownloaded = true,
+                        draftExists = true,
                         draftLocalUuid = message.draftLocalUuid,
+                        draftResource = message.draftResource,
+                        messageUid = message.uid,
                     )
                 )
             }

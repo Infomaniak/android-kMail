@@ -24,7 +24,7 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.signature.Signature
+import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
@@ -124,7 +124,7 @@ class Draft : RealmObject {
 
         val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
         body = when (defaultSignature.position) {
-            Signature.SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
+            SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
             else -> html + body
         }
     }
