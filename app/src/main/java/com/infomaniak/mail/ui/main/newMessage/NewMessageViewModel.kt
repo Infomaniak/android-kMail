@@ -125,18 +125,17 @@ class NewMessageViewModel : ViewModel() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             delay(DELAY_BEFORE_AUTO_SAVING_DRAFT)
-            saveDraftToLocal(currentDraftLocalUuid!!, DraftAction.SAVE)
+            saveDraftToLocal(DraftAction.SAVE)
         }
     }
 
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
-        val draftLocalUuid = currentDraftLocalUuid ?: return@launch
-        saveDraftToLocal(draftLocalUuid, action)
+        saveDraftToLocal(action)
         shouldCloseActivity.postValue(true)
     }
 
-    private fun saveDraftToLocal(draftLocalUuid: String, action: DraftAction) {
-        DraftController.updateDraft(draftLocalUuid) { draft ->
+    private fun saveDraftToLocal(action: DraftAction) {
+        DraftController.updateDraft(currentDraftLocalUuid!!) { draft ->
             draft.to = mailTo.toRealmList()
             draft.cc = mailCc.toRealmList()
             draft.bcc = mailBcc.toRealmList()
