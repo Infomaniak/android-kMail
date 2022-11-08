@@ -41,7 +41,7 @@
     <color name="threadDensityBackground">#191919</color>
 
     <!-- Texts -->
-    <color name="primaryTextColor">@color/grey_border</color>
+    <color name="primaryTextColor">@color/mouse</color>
     <color name="secondaryTextColor">@color/shark</color>
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="snackbarTextColor">@color/hover</color>
@@ -52,7 +52,7 @@
     <color name="separatorLighter">@color/orca</color>
 
     <!-- Icons -->
-    <color name="iconColor">@color/grey_border</color>
+    <color name="iconColor">@color/mouse</color>
     <color name="iconSecondaryColor">@color/shark</color>
 
     <!-- Cardview -->

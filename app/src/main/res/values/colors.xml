@@ -73,10 +73,10 @@
     <color name="textButtonBlueLight">@color/blueTextLight</color>
 
     <!-- Cardview -->
-    <color name="cardViewStrokeColor">@color/border</color>
+    <color name="cardViewStrokeColor">@color/mouse</color>
 
     <!-- Progressbar -->
-    <color name="progressbarTrackColor">@color/grey_border</color>
+    <color name="progressbarTrackColor">@color/mouse</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
@@ -87,6 +87,6 @@
     <color name="swipeSpam">#FF8500</color>
     <color name="swipeArchive">#BA68C8</color>
     <color name="swipeQuickActionMenu">#85A2B6</color>
-    <color name="swipeNone">@color/border</color>
+    <color name="swipeNone">@color/progressbarTrackColor</color>
 
 </resources>
