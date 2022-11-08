@@ -42,10 +42,10 @@
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/grey_border</color>
-    <color name="secondaryTextColor">@color/secondaryText</color>
+    <color name="secondaryTextColor">@color/shark</color>
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="snackbarTextColor">@color/hover</color>
-    <color name="emailChipTextColor">@color/secondaryText</color>
+    <color name="emailChipTextColor">@color/shark</color>
 
     <!-- Separators -->
     <color name="separatorDarker">@color/bat</color>
@@ -53,7 +53,7 @@
 
     <!-- Icons -->
     <color name="iconColor">@color/grey_border</color>
-    <color name="iconSecondaryColor">@color/grey_text_secondary</color>
+    <color name="iconSecondaryColor">@color/shark</color>
 
     <!-- Cardview -->
     <color name="cardViewStrokeColor">@color/orca</color>

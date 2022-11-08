@@ -360,7 +360,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider5"
             app:placeholderText="@string/newMessagePlaceholderTitle"
-            app:placeholderTextColor="@color/secondaryText">
+            app:placeholderTextColor="@color/hintTextColor">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/bodyText"

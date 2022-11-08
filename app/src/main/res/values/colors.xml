@@ -47,15 +47,15 @@
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
     <color name="backgroundSecondaryColor">@color/lightenedGrey</color>
-    <color name="backgroundDisabledPrimaryButton">@color/grey_text_secondary</color>
+    <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadDensityBackground">#FFFFFF</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
     <color name="secondaryTextColor">@color/elephant</color>
-    <color name="tertiaryTextColor">@color/grey_text_secondary</color>
+    <color name="tertiaryTextColor">@color/shark</color>
     <color name="snackbarTextColor">@color/elephant</color>
-    <color name="hintTextColor">@color/grey_text_secondary</color>
+    <color name="hintTextColor">@color/shark</color>
     <color name="notificationTextColor">@color/hover</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="emailChipTextColor">@color/orca</color>
