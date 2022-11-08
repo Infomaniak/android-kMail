@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
@@ -34,6 +35,11 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 
 object DraftController {
+
+    private const val PREFIX_REPLY = "Re: "
+    private const val PREFIX_FORWARD = "Fw: "
+    private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
+    private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
 
     //region Queries
     private fun MutableRealm?.getDraftsQuery(): RealmQuery<Draft> {
@@ -107,7 +113,24 @@ object DraftController {
 
         draft.to = previousMessage.from
         if (draftMode == DraftMode.REPLY_ALL) draft.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
-        previousMessage.subject?.let { draft.subject = "Re: $it" }
+
+        draft.subject = formatSubject(draftMode, previousMessage.subject ?: "")
+    }
+
+    private fun formatSubject(draftMode: DraftMode, subject: String): String {
+
+        fun String.isReply(): Boolean = this in Regex(REGEX_REPLY, RegexOption.IGNORE_CASE)
+        fun String.isForward(): Boolean = this in Regex(REGEX_FORWARD, RegexOption.IGNORE_CASE)
+
+        val prefix = when (draftMode) {
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> if (subject.isReply()) "" else PREFIX_REPLY
+            DraftMode.FORWARD -> if (subject.isForward()) "" else PREFIX_FORWARD
+            DraftMode.NEW_MAIL -> {
+                throw IllegalStateException("`${DraftMode::class.simpleName}` cannot be `${DraftMode.NEW_MAIL.name}` here.")
+            }
+        }
+
+        return prefix + subject
     }
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
