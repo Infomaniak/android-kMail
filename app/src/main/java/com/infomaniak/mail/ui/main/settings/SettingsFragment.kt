@@ -109,7 +109,9 @@ class SettingsFragment : Fragment() {
         }
 
         settingsMessageDisplay.setOnClickListener {
-            animatedNavigation(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
+            notYetImplemented()
+            // TODO: Put back when we can fully create the Threads by ourself.
+            // animatedNavigation(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
         }
 
         settingsExternalContent.setOnClickListener {

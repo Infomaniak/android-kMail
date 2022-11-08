@@ -29,25 +29,46 @@ import com.infomaniak.mail.data.models.thread.ThreadsResult
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 
 object ThreadController {
 
     //region Queries
+    private fun MutableRealm?.getThreadsQuery(uids: List<String>): RealmQuery<Thread> {
+        val threads = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
+        return (this ?: RealmDatabase.mailboxContent()).query(threads)
+    }
+
     private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
         return (this ?: RealmDatabase.mailboxContent()).query<Thread>("${Thread::uid.name} = '$uid'").first()
     }
     //endregion
 
     //region Get data
+    fun getThreads(uids: List<String>, realm: MutableRealm? = null): RealmQuery<Thread> {
+        return realm.getThreadsQuery(uids)
+    }
+
     fun getThread(uid: String, realm: MutableRealm? = null): Thread? {
         return realm.getThreadQuery(uid).find()
     }
     //endregion
 
     //region Edit data
+    fun updateThread(uid: String, realm: MutableRealm? = null, onUpdate: (message: Thread) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getThread(uid, it)?.let(onUpdate) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
+    fun upsertThread(thread: Thread, realm: MutableRealm? = null) {
+        val block: (MutableRealm) -> Unit = { it.copyToRealm(thread, UpdatePolicy.ALL) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
     fun refreshThreads(
         threadsResult: ThreadsResult,
         mailboxUuid: String,

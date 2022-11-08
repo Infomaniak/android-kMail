@@ -24,23 +24,38 @@ import com.infomaniak.mail.utils.copyListToRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 
 object MessageController {
 
     //region Queries
+    private fun MutableRealm?.getMessagesQuery(uids: List<String>): RealmQuery<Message> {
+        val messages = "${Message::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
+        return (this ?: RealmDatabase.mailboxContent()).query(messages)
+    }
+
     private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
         return (realm ?: RealmDatabase.mailboxContent()).query<Message>("${Message::uid.name} = '$uid'").first()
     }
     //endregion
 
     //region Get data
+    fun getMessages(uids: List<String>, realm: MutableRealm? = null): RealmQuery<Message> {
+        return realm.getMessagesQuery(uids)
+    }
+
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
         return getMessageQuery(uid, realm).find()
     }
     //endregion
 
     //region Edit data
+    fun updateMessage(uid: String, realm: MutableRealm? = null, onUpdate: (message: Message) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getMessage(uid, it)?.let(onUpdate) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
     fun MutableRealm.update(localMessages: List<Message>, apiMessages: List<Message>) {
 
         Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")

@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.MessageFlags
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -46,6 +47,8 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import com.infomaniak.mail.utils.toRealmInstant
+import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -111,21 +114,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             currentFolderId.postValue(folderId)
 
             currentThreadUid.postValue(null)
-
-            viewModelScope.launch(Dispatchers.IO) {
-                fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
-                val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-                val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
-
-                val dateSince = threeMonthsAgo()
-                val apiResponse1 = ApiRepository.getMessagesUids(mailboxUuid, folderId, dateSince)
-
-                val messagesUids = apiResponse1.data?.messagesUids ?: return@launch
-                val apiResponse2 = ApiRepository.getMessagesByUids(mailboxUuid, folderId, messagesUids)
-
-                val signature = apiResponse1.data?.signature ?: return@launch
-                val apiResponse3 = ApiRepository.getMessagesDelta(mailboxUuid, folderId, signature)
-            }
         }
     }
 
@@ -236,24 +224,86 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // TODO: Find a way to use the `filter`
     private fun refreshThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter = ThreadFilter.ALL) {
+        RealmDatabase.mailboxContent().writeBlocking {
 
-        ApiRepository.getThreads(
-            mailboxUuid,
-            folderId,
-            localSettings.threadMode,
-            OFFSET_FIRST_PAGE,
-            filter,
-        ).data?.let { threadsResult ->
-            RealmDatabase.mailboxContent().writeBlocking {
-                canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
-                FolderController.updateFolderLastUpdatedAt(folderId, this)
-                val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
-                if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+            fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
+            fun longUid(shortUid: String, folderId: String) = "${shortUid}@${folderId}"
+
+            val folder = FolderController.getFolder(folderId, this)!!
+            val previousCursor = folder.cursor
+            var newCursor: String? = null
+
+            val addedShortUids = mutableListOf<String>()
+            val deletedUids = mutableListOf<String>()
+            val updatedMessages = mutableListOf<MessageFlags>()
+
+            if (previousCursor == null) with(ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo())) {
+                if (isSuccess()) with(data!!) {
+                    newCursor = cursor
+                    addedShortUids.addAll(shortUids)
+                }
+            } else with(ApiRepository.getMessagesDelta(mailboxUuid, folderId, previousCursor)) {
+                if (isSuccess()) with(data!!) {
+                    newCursor = cursor
+                    addedShortUids.addAll(this.addedShortUids)
+                    deletedUids.addAll(this.deletedShortUids.map { longUid(it, folderId) })
+                    updatedMessages.addAll(this.updatedMessages)
+                }
             }
-        }
 
-        isDownloadingChanges.postValue(false)
+            if (addedShortUids.isNotEmpty()) with(ApiRepository.getMessagesByUids(mailboxUuid, folderId, addedShortUids)) {
+                if (isSuccess()) folder.threads = data!!.messages.map { it.toThread(mailboxUuid) }.toRealmList()
+            }
+
+            if (deletedUids.isNotEmpty()) {
+                delete(MessageController.getMessages(deletedUids, this))
+                delete(ThreadController.getThreads(deletedUids, this))
+            }
+
+            updatedMessages.forEach {
+                val uid = longUid(it.shortUid, folderId)
+                MessageController.updateMessage(uid, this) { message ->
+                    message.answered = it.answered
+                    message.isFavorite = it.isFavorite
+                    message.forwarded = it.forwarded
+                    message.scheduled = it.scheduled
+                    message.seen = it.seen
+
+                    ThreadController.upsertThread(message.toThread(mailboxUuid), this)
+                }
+            }
+
+            if (newCursor != null) {
+                folder.lastUpdatedAt = Date().toRealmInstant()
+                folder.cursor = newCursor
+            }
+
+            // ApiRepository.getThreads(
+            //     mailboxUuid,
+            //     folderId,
+            //     localSettings.threadMode,
+            //     OFFSET_FIRST_PAGE,
+            //     filter,
+            // ).data?.let { threadsResult ->
+            //     RealmDatabase.mailboxContent().writeBlocking {
+            //         canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
+            //         FolderController.updateFolderLastUpdatedAt(folderId, this)
+            //         val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+            //         if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+            //     }
+            // }
+
+            // TODO: Handle this.
+            canPaginate = true
+
+            // TODO: Handle this.
+            // val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+            // if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+
+            isDownloadingChanges.postValue(false)
+        }
     }
 
     fun loadMoreThreads(

@@ -24,8 +24,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GetMessagesUidsResult(
     @SerialName("messages_uids")
-    val messagesUids: List<String>,
-    val signature: String,
+    val shortUids: List<String>,
+    @SerialName("signature")
+    val cursor: String,
 )
 
 @Serializable
@@ -35,8 +36,24 @@ data class GetMessagesByUidsResult(
 
 @Serializable
 data class GetMessagesDeltaResult(
-    val deleted: List<String>,
-    val added: List<String>,
-    val updated: List<Message>,
-    val signature: String,
+    @SerialName("deleted")
+    val deletedShortUids: List<String>,
+    @SerialName("added")
+    val addedShortUids: List<String>,
+    @SerialName("updated")
+    val updatedMessages: List<MessageFlags>,
+    @SerialName("signature")
+    val cursor: String,
+)
+
+@Serializable
+data class MessageFlags(
+    @SerialName("uid")
+    val shortUid: String,
+    val answered: Boolean,
+    @SerialName("flagged")
+    val isFavorite: Boolean,
+    val forwarded: Boolean,
+    val scheduled: Boolean,
+    val seen: Boolean,
 )

@@ -216,9 +216,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
 
             override fun onListScrolled(scrollDirection: ScrollDirection, distance: Int) {
-                val layoutManager = threadsList.layoutManager as LinearLayoutManager
-                layoutManager.handlePagination(scrollDirection)
-                extendCollapseFab(layoutManager, scrollDirection)
+                // TODO: Handle pagination.
+                // val layoutManager = threadsList.layoutManager as LinearLayoutManager
+                // layoutManager.handlePagination(scrollDirection)
+                // extendCollapseFab(layoutManager, scrollDirection)
             }
         }
 
@@ -273,10 +274,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun FragmentThreadListBinding.extendCollapseFab(
-        layoutManager: LinearLayoutManager,
-        scrollDirection: ScrollDirection,
-    ) {
+    private fun extendCollapseFab(layoutManager: LinearLayoutManager, scrollDirection: ScrollDirection) = with(binding) {
         if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 || scrollDirection == ScrollDirection.UP) {
             newMessageFab.extend()
         } else {

@@ -69,6 +69,8 @@ class Folder : RealmObject {
     var parentLink: Folder? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     @Transient
     var lastUpdatedAt: RealmInstant? = null
+    @Transient
+    var cursor: String? = null
     //endregion
 
     val role: FolderRole?

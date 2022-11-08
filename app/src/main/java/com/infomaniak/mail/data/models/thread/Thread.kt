@@ -61,7 +61,7 @@ class Thread : RealmObject {
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     @SerialName("date")
-    private var _date: RealmInstant = RealmInstant.MAX
+    var _date: RealmInstant = RealmInstant.MAX
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
     @SerialName("has_st_attachments")
@@ -72,6 +72,7 @@ class Thread : RealmObject {
     var isFavorite: Boolean = false
     var answered: Boolean = false
     var forwarded: Boolean = false
+    var scheduled: Boolean = false
     var size: Int = 0
     //endregion
 
