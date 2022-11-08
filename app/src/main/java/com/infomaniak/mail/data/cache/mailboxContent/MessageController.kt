@@ -72,10 +72,5 @@ object MessageController {
         }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
-
-    fun updateMessage(uid: String, realm: MutableRealm? = null, onUpdate: (message: Message) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getMessage(uid, it)?.let(onUpdate) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
     //endregion
 }

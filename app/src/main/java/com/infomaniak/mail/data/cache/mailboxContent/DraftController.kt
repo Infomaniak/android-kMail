@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -88,9 +89,7 @@ object DraftController {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
             draft.initLocalValues(messageUid)
             upsertDraft(draft, this)
-            MessageController.updateMessage(messageUid, this) {
-                it.draftLocalUuid = draft.localUuid
-            }
+            getMessage(messageUid, this)?.draftLocalUuid = draft.localUuid
         }?.localUuid
     }
 
