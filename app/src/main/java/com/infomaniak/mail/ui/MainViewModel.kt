@@ -279,15 +279,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (localMessage.fullyDownloaded) {
                 localMessage
             } else {
-                with(ApiRepository.getMessage(localMessage.resource)) {
-                    if (isSuccess()) {
-                        data?.also {
-                            if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid)?.localUuid
-                            it.fullyDownloaded = true
-                        }
-                    } else {
-                        null
-                    }
+                ApiRepository.getMessage(localMessage.resource).data?.also {
+                    if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid)?.localUuid
+                    it.fullyDownloaded = true
                 }
             }
         }
