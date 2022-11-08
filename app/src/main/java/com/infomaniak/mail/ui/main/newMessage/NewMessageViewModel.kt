@@ -61,7 +61,7 @@ class NewMessageViewModel : ViewModel() {
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
 
-    private var currentDraftLocalUuid: String? = null
+    private lateinit var currentDraftLocalUuid: String
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
@@ -135,7 +135,7 @@ class NewMessageViewModel : ViewModel() {
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
-        DraftController.updateDraft(currentDraftLocalUuid!!) { draft ->
+        DraftController.updateDraft(currentDraftLocalUuid) { draft ->
             draft.to = mailTo.toRealmList()
             draft.cc = mailCc.toRealmList()
             draft.bcc = mailBcc.toRealmList()
