@@ -21,6 +21,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.core.utils.monthsAgo
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
@@ -48,6 +49,8 @@ import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -108,6 +111,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             currentFolderId.postValue(folderId)
 
             currentThreadUid.postValue(null)
+
+            viewModelScope.launch(Dispatchers.IO) {
+                fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
+                val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
+                val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
+
+                val dateSince = threeMonthsAgo()
+                val apiResponse1 = ApiRepository.getMessagesUids(mailboxUuid, folderId, dateSince)
+
+                val messagesUids = apiResponse1.data?.messagesUids ?: return@launch
+                val apiResponse2 = ApiRepository.getMessagesByUids(mailboxUuid, folderId, messagesUids)
+
+                val signature = apiResponse1.data?.signature ?: return@launch
+                val apiResponse3 = ApiRepository.getMessagesDelta(mailboxUuid, folderId, signature)
+            }
         }
     }
 

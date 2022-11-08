@@ -157,6 +157,22 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
 
+    fun getMessagesUids(mailboxUuid: String, folderId: String, dateSince: String): ApiResponse<GetMessagesUidsResult> {
+        return callApi(url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, dateSince), method = GET)
+    }
+
+    fun getMessagesByUids(
+        mailboxUuid: String,
+        folderId: String,
+        messagesUids: List<String>,
+    ): ApiResponse<GetMessagesByUidsResult> {
+        return callApi(url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, messagesUids), method = GET)
+    }
+
+    fun getMessagesDelta(mailboxUuid: String, folderId: String, signature: String): ApiResponse<GetMessagesDeltaResult> {
+        return callApi(url = ApiRoutes.getMessagesDelta(mailboxUuid, folderId, signature), method = GET)
+    }
+
     /**
      * RealmLists cannot be null, so they have to be empty when there is no data.
      * But the kMail API doesn't support empty lists, so we have to replace them with a `null` value.

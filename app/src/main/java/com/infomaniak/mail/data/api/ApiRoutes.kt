@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.BuildConfig.MAIL_API_PREPROD
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -118,4 +119,20 @@ object ApiRoutes {
     // fun search(mailboxUuid: String, folderId: String, searchText: String): String {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
     // }
+
+    private fun getMessages(mailboxUuid: String, folderId: String): String {
+        return "$MAIL_API_PREPROD/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
+    }
+
+    fun getMessagesUids(mailboxUuid: String, folderId: String, dateSince: String): String {
+        return "${getMessages(mailboxUuid, folderId)}/messages_uids?since=${dateSince}"
+    }
+
+    fun getMessagesByUids(mailboxUuid: String, folderId: String, messagesUids: List<String>): String {
+        return "${getMessages(mailboxUuid, folderId)}/messages?uids=${messagesUids.joinToString(",")}"
+    }
+
+    fun getMessagesDelta(mailboxUuid: String, folderId: String, signature: String): String {
+        return "${getMessages(mailboxUuid, folderId)}/activities?signature=${signature}"
+    }
 }
