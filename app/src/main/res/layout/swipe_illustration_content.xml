@@ -40,7 +40,7 @@
         android:layout_width="75dp"
         android:layout_height="14dp"
         android:layout_marginStart="@dimen/marginStandard"
-        android:background="#9F9F9F"
+        android:background="@color/shark"
         app:layout_constraintStart_toEndOf="@id/avatar"
         app:layout_constraintTop_toTopOf="@id/avatar"
         app:shapeAppearanceOverlay="@style/CircleImageView" />
