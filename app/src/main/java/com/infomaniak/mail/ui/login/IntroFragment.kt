@@ -42,7 +42,6 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.observeNotNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -113,7 +112,7 @@ class IntroFragment : Fragment() {
     }
 
     private fun updateUiWhenThemeChanges(position: Int?) {
-        introViewModel.currentAccentColor.observeNotNull(viewLifecycleOwner) { accentColor ->
+        introViewModel.currentAccentColor.observe(viewLifecycleOwner) { accentColor ->
             setUi(accentColor, position, animate = true)
         }
     }

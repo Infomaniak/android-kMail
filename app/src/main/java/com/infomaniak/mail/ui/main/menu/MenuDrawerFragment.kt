@@ -180,8 +180,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeCurrentMailbox() {
-        MainViewModel.currentMailboxObjectId.observeNotNull(this) { objectId ->
-            menuDrawerViewModel.currentMailboxObjectId.value = objectId
+        MainViewModel.currentMailboxObjectId.observeNotNull(viewLifecycleOwner) { objectId ->
             mainViewModel.getMailbox(objectId).observeNotNull(viewLifecycleOwner) { mailbox ->
                 binding.mailboxSwitcherText.text = mailbox.email
             }
@@ -204,7 +203,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeCurrentFolder() {
-        MainViewModel.currentFolderId.observeNotNull(this) { folderId ->
+        MainViewModel.currentFolderId.observeNotNull(viewLifecycleOwner) { folderId ->
             mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
                 currentFolderRole = folder.role
                 binding.inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
