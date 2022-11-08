@@ -76,10 +76,11 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun initLocalValues(threads: RealmList<Thread>, parentLink: Folder?, lastUpdatedAt: RealmInstant?) {
+    fun initLocalValues(threads: RealmList<Thread>, parentLink: Folder?, lastUpdatedAt: RealmInstant?, cursor: String?) {
         this.threads = threads
         this.parentLink = parentLink
         this.lastUpdatedAt = lastUpdatedAt
+        this.cursor = cursor
     }
 
     fun getLocalizedName(context: Context): String {

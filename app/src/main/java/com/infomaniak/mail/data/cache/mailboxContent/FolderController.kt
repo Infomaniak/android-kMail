@@ -103,6 +103,7 @@ object FolderController {
                     threads = localFolder.threads.toRealmList(),
                     parentLink = localFolder.parentLink,
                     lastUpdatedAt = localFolder.lastUpdatedAt,
+                    cursor = localFolder.cursor,
                 )
             }
 
