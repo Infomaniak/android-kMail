@@ -21,6 +21,6 @@
     android:id="@+id/emailAddress"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:indent="48dp"
+    app:icon="@drawable/ic_envelope"
     tools:badge="99+"
     tools:text="myriam.rais@infomaniak.com" />

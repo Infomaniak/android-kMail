@@ -88,26 +88,29 @@
                     android:paddingVertical="@dimen/marginStandardVerySmall"
                     android:paddingStart="@dimen/marginStandardVerySmall">
 
-                    <com.infomaniak.mail.views.AvatarView
-                        android:id="@+id/userAvatar"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                    <ImageView
+                        android:id="@+id/selectedAddressIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/marginStandardVerySmall"
+                        android:src="@drawable/ic_envelope"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:src="@tools:sample/avatars[2]" />
+                        app:tint="?android:attr/colorPrimary" />
 
                     <TextView
                         android:id="@+id/mailboxSwitcherText"
                         style="@style/H4.Accent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                        android:layout_marginStart="@dimen/marginStandard"
+                        android:layout_marginEnd="@dimen/marginStandardMedium"
                         android:ellipsize="end"
                         android:lines="1"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/mailboxExpandButton"
-                        app:layout_constraintStart_toEndOf="@id/userAvatar"
+                        app:layout_constraintStart_toEndOf="@id/selectedAddressIcon"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="myriam.rais@infomaniak.com" />
 
@@ -160,15 +163,15 @@
                     android:id="@+id/manageAccount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:indent="48dp"
+                    app:icon="@drawable/ic_user_setting"
                     app:text="@string/buttonManageAccount" />
 
                 <com.infomaniak.mail.views.MenuDrawerItemView
-                    android:id="@+id/addAccount"
+                    android:id="@+id/swapAccount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:indent="48dp"
-                    app:text="@string/buttonAddAccount" />
+                    app:icon="@drawable/ic_user_swap"
+                    app:text="@string/buttonAccountSwitch" />
             </LinearLayout>
 
             <View
