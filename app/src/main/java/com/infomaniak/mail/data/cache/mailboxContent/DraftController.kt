@@ -53,15 +53,23 @@ object DraftController {
     private fun MutableRealm?.getDraftQuery(key: String, value: String): RealmSingleQuery<Draft> {
         return (this ?: RealmDatabase.mailboxContent()).query<Draft>("$key = '$value'").first()
     }
+
+    private fun MutableRealm?.getDraftsWithActionsQuery(): RealmQuery<Draft> {
+        return getDraftsQuery("${Draft::_action.name} != nil")
+    }
     //endregion
 
     //region Get data
-    fun getDrafts(realm: MutableRealm? = null): RealmResults<Draft> {
+    private fun getDrafts(realm: MutableRealm? = null): RealmResults<Draft> {
         return realm.getDraftsQuery().find()
     }
 
     fun getDraftsWithActions(realm: MutableRealm? = null): RealmResults<Draft> {
-        return realm.getDraftsQuery("${Draft::_action.name} != nil").find()
+        return realm.getDraftsWithActionsQuery().find()
+    }
+
+    fun getDraftsWithActionsCount(realm: MutableRealm? = null): Long {
+        return realm.getDraftsWithActionsQuery().count().find()
     }
 
     fun getDraft(localUuid: String, realm: MutableRealm? = null): Draft? {
