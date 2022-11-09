@@ -17,9 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
+import android.app.Application
 import android.content.ClipDescription
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.utils.SingleLiveEvent
@@ -36,6 +37,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
@@ -44,7 +46,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class NewMessageViewModel : ViewModel() {
+class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
     val mailTo = mutableListOf<Recipient>()
     val mailCc = mutableListOf<Recipient>()
@@ -153,6 +155,7 @@ class NewMessageViewModel : ViewModel() {
     }
 
     override fun onCleared() {
+        DraftsActionsWorker.scheduleWork(getApplication())
         autoSaveJob?.cancel()
         super.onCleared()
     }
