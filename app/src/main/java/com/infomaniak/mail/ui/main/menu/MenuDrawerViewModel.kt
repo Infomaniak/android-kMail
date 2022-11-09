@@ -30,11 +30,11 @@ import kotlinx.coroutines.flow.map
 class MenuDrawerViewModel : ViewModel() {
 
     val folders = Transformations.switchMap(MainViewModel.currentMailboxObjectId) {
-        liveData(Dispatchers.IO) { emitSource(FolderController.getFoldersAsync().map { it.list }.asLiveData()) }
+        liveData(Dispatchers.IO) { if (it != null) emitSource(FolderController.getFoldersAsync().map { it.list }.asLiveData()) }
     }
 
     val quotas = Transformations.switchMap(MainViewModel.currentMailboxObjectId) {
-        liveData(Dispatchers.IO) { emitSource(QuotasController.getQuotasAsync(it!!).asLiveData()) }
+        liveData(Dispatchers.IO) { if (it != null) emitSource(QuotasController.getQuotasAsync(it).asLiveData()) }
     }
 
 }
