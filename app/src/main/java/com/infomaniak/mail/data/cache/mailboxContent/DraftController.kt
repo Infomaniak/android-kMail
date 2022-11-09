@@ -55,12 +55,12 @@ object DraftController {
     }
 
     private fun getDraftsWithActionsQuery(realm: MutableRealm? = null): RealmQuery<Draft> {
-        return realm.getDraftsQuery("${Draft::_action.name} != nil")
+        return realm.getDraftsQuery("${Draft.actionPropertyName} != nil")
     }
     //endregion
 
     //region Get data
-    private fun getDrafts(realm: MutableRealm? = null): RealmResults<Draft> {
+    private fun getDrafts(realm: MutableRealm): RealmResults<Draft> {
         return realm.getDraftsQuery().find()
     }
 

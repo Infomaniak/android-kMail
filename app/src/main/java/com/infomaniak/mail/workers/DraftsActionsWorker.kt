@@ -71,7 +71,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
 
         fun scheduleWork(context: Context) {
             val hasEmptyDrafts = DraftController.getDraftsWithActionsCount() == 0L
-            if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID || hasEmptyDrafts) return
+            if (hasEmptyDrafts || AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
 
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
