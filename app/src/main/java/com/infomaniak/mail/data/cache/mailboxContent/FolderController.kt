@@ -87,7 +87,7 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteOutdatedFolders(apiFolders: List<Folder>) {
-        getFolders(apiFolders.map { it.id }, this).reversed().forEach { folder ->
+        getFolders(exceptionsFoldersIds = apiFolders.map { it.id }, this).reversed().forEach { folder ->
             folder.threads.reversed().forEach { thread ->
                 deleteMessages(thread.messages)
                 delete(thread)

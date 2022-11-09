@@ -147,14 +147,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun forceRefreshMailboxes() {
+    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshMailboxes")
         updateMailboxes()
         updateCurrentMailboxQuotas()
     }
 
-    private fun updateCurrentMailboxQuotas() = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return@launch
+    private fun updateCurrentMailboxQuotas() {
+        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
@@ -217,7 +217,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun updateMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+    private fun updateMailboxes() {
         with(ApiRepository.getMailboxes()) {
             if (isSuccess()) MailboxController.update(
                 apiMailboxes = data?.map { it.initLocalValues(AccountUtils.currentUserId) } ?: emptyList(),
@@ -239,15 +239,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun refreshThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter = ThreadFilter.ALL) {
-        with(ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, OFFSET_FIRST_PAGE, filter)) {
-            if (isSuccess()) RealmDatabase.mailboxContent().writeBlocking {
-                val threadsResult = data!!
+
+        ApiRepository.getThreads(
+            mailboxUuid,
+            folderId,
+            localSettings.threadMode,
+            OFFSET_FIRST_PAGE,
+            filter,
+        ).data?.let { threadsResult ->
+            RealmDatabase.mailboxContent().writeBlocking {
                 canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
                 FolderController.updateFolderLastUpdatedAt(folderId, this)
                 val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
                 if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
             }
         }
+
         isDownloadingChanges.postValue(false)
     }
 
@@ -260,10 +267,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         Log.i(TAG, "Load more threads: $offset")
         isDownloadingChanges.postValue(true)
 
-        with(ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, offset, filter)) {
-            if (isSuccess()) {
-                canPaginate = ThreadController.loadMoreThreads(data!!, mailboxUuid, folderId, offset, filter)
-            }
+        ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, offset, filter).data?.let { threadsResult ->
+            canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
         }
 
         isDownloadingChanges.postValue(false)
