@@ -63,7 +63,7 @@ class Draft : RealmObject {
     @SerialName("priority")
     private var _priority: String? = null
     @SerialName("action")
-    private var _action: String? = null
+    var _action: String? = null
 
     @SerialName("in_reply_to")
     var inReplyTo: String? = null

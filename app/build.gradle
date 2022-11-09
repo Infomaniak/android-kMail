@@ -63,6 +63,7 @@ dependencies {
     implementation 'com.tbuonomo:dotsindicator:4.3'
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }

@@ -44,8 +44,10 @@ object DraftController {
     private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
 
     //region Queries
-    private fun MutableRealm?.getDraftsQuery(): RealmQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent()).query()
+    private fun MutableRealm?.getDraftsQuery(query: String? = null): RealmQuery<Draft> {
+        return with(this ?: RealmDatabase.mailboxContent()) {
+            query?.let { query(it) } ?: query()
+        }
     }
 
     private fun MutableRealm?.getDraftQuery(key: String, value: String): RealmSingleQuery<Draft> {
@@ -56,6 +58,10 @@ object DraftController {
     //region Get data
     fun getDrafts(realm: MutableRealm? = null): RealmResults<Draft> {
         return realm.getDraftsQuery().find()
+    }
+
+    fun getDraftsWithActions(realm: MutableRealm? = null): RealmResults<Draft> {
+        return realm.getDraftsQuery("${Draft::_action.name} != nil").find()
     }
 
     fun getDraft(localUuid: String, realm: MutableRealm? = null): Draft? {
