@@ -18,6 +18,7 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -69,7 +70,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
         const val TAG = "DraftsActionsWorker"
 
         fun scheduleWork(context: Context) {
-            if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
+            val hasEmptyDrafts = DraftController.getDraftsWithActionsCount() == 0L
+            if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID || hasEmptyDrafts) return
 
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
@@ -79,8 +81,10 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
         }
 
-        fun cancelWork(context: Context) {
-            WorkManager.getInstance(context).cancelUniqueWork(TAG)
+        @Suppress("SpellCheckingInspection")
+        fun getRunningWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {
+            val workQuery = WorkQuery.Builder.fromUniqueWorkNames(listOf(TAG)).addStates(listOf(WorkInfo.State.RUNNING)).build()
+            return WorkManager.getInstance(context).getWorkInfosLiveData(workQuery)
         }
     }
 }
