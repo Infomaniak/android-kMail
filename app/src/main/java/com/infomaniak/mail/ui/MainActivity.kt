@@ -90,12 +90,6 @@ class MainActivity : ThemedActivity() {
         requestContactsPermission()
     }
 
-    override fun onResume() {
-        super.onResume()
-        // TODO: This is temporary, while waiting for a "DraftsManager".
-        mainViewModel.executeDraftsActions()
-    }
-
     override fun onBackPressed(): Unit = with(binding) {
         if (drawerLayout.isOpen) {
             (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
