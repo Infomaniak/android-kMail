@@ -214,10 +214,14 @@
                     android:gravity="center_vertical">
 
                     <TextView
+                        style="@style/SettingHeader"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/buttonFolders" />
+                        android:paddingVertical="0dp"
+                        android:paddingStart="0dp"
+                        android:text="@string/buttonFolders"
+                        tools:ignore="RtlSymmetry" />
 
                     <ImageView
                         android:id="@+id/expandCustomFolderButton"
@@ -278,7 +282,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/menuDrawerItemViewHeight"
                 android:gravity="center|start"
-                android:paddingHorizontal="@dimen/marginStandard"
                 android:paddingVertical="@dimen/marginStandardSmall"
                 android:text="@string/menuDrawerAdvancedActions" />
 
