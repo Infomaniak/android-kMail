@@ -28,51 +28,76 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/marginStandardVerySmall">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/marginStandardVerySmall"
+            android:layout_marginVertical="@dimen/marginStandardVerySmall"
+            android:layout_marginStart="@dimen/marginStandardSmall"
+            android:layout_marginEnd="@dimen/marginStandardVerySmall"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
             tools:src="@drawable/ic_file_pdf" />
 
-        <TextView
-            android:id="@+id/fileName"
-            style="@style/Callout"
+        <LinearLayout
+            android:id="@+id/textsLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardSmall"
+            android:layout_marginTop="@dimen/marginStandardVerySmall"
             android:layout_marginEnd="@dimen/marginStandardVerySmall"
-            android:ellipsize="middle"
-            android:lines="1"
-            android:maxWidth="250dp"
-            app:layout_constrainedWidth="true"
-            app:layout_constraintBottom_toTopOf="@id/fileDetails"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
+            android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/closeButton"
             app:layout_constraintStart_toEndOf="@id/icon"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="billet-055" />
+            app:layout_goneMarginEnd="@dimen/marginStandardSmall">
 
-        <TextView
-            android:id="@+id/fileDetails"
-            style="@style/Caption.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardSmall"
-            android:layout_marginEnd="@dimen/marginStandardVerySmall"
+            <TextView
+                android:id="@+id/fileName"
+                style="@style/Callout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:lines="1"
+                android:maxWidth="220dp"
+                app:layout_constrainedWidth="true"
+                tools:text="billet-055.pdf" />
+
+            <TextView
+                android:id="@+id/fileDetails"
+                style="@style/Caption.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="36 ko" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/closeButton"
+            style="@style/TextButton"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:visibility="gone"
+            app:cornerRadius="@dimen/smallCornerRadius"
+            app:icon="@drawable/ic_close"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="16dp"
+            app:iconTint="@color/iconSecondaryColor"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@id/icon"
-            app:layout_constraintTop_toBottomOf="@id/fileName"
-            tools:text="PDF - 36 ko" />
+            app:layout_constraintStart_toEndOf="@id/textsLayout"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
