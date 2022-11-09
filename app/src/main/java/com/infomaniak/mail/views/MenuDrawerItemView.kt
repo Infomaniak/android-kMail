@@ -85,15 +85,9 @@ class MenuDrawerItemView @JvmOverloads constructor(
 
     fun setSelectedState(isSelected: Boolean) = with(binding) {
         val (color, textAppearance) = if (isSelected) {
-            Pair(
-                context.getAttributeColor(RMaterial.attr.colorPrimaryContainer),
-                R.style.H4_Accent
-            )
+            Pair(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer), R.style.H4_Accent)
         } else {
-            Pair(
-                ContextCompat.getColor(context, R.color.backgroundColor),
-                R.style.H5
-            )
+            Pair(ContextCompat.getColor(context, R.color.backgroundColor), R.style.H5)
         }
 
         root.setCardBackgroundColor(color)

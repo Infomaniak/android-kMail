@@ -59,17 +59,9 @@ class SwitchUserMailboxesAdapter(
 
     private fun ItemSwitchUserMailboxBinding.setSelectedState(isSelected: Boolean) {
         val (color, textStyle, badgeStyle) = if (isSelected) {
-            Triple(
-                context.getAttributeColor(RMaterial.attr.colorPrimary),
-                R.style.H5_Accent,
-                R.style.CalloutMedium_Accent
-            )
+            Triple(context.getAttributeColor(RMaterial.attr.colorPrimary), R.style.H5_Accent, R.style.CalloutMedium_Accent)
         } else {
-            Triple(
-                ContextCompat.getColor(context, R.color.primaryTextColor),
-                R.style.Body,
-                R.style.Callout_Accent
-            )
+            Triple(ContextCompat.getColor(context, R.color.primaryTextColor), R.style.Body, R.style.Callout_Accent)
         }
 
         envelopeIcon.setColorFilter(color)
