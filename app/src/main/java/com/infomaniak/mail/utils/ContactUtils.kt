@@ -82,10 +82,7 @@ object ContactUtils {
         return contacts
     }
 
-    fun mergeApiContactsIntoPhoneContacts(
-        apiContacts: List<Contact>,
-        phoneMergedContacts: MutableMap<Recipient, MergedContact>,
-    ) {
+    fun mergeApiContactsIntoPhoneContacts(apiContacts: List<Contact>, phoneMergedContacts: MutableMap<Recipient, MergedContact>) {
         apiContacts.forEach { apiContact ->
             apiContact.emails.forEach { email ->
                 val key = Recipient().initLocalValues(email, apiContact.name)

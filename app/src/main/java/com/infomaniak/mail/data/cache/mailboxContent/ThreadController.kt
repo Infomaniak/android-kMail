@@ -188,8 +188,9 @@ object ThreadController {
         RealmDatabase.mailboxContent().writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
             val uid = getThreadLastMessageUid(latestThread)
-            val apiResponse = ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)
-            if (apiResponse.isSuccess()) markThreadAsUnseen(latestThread, folderId)
+            with(ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)) {
+                if (isSuccess()) markThreadAsUnseen(latestThread, folderId)
+            }
         }
     }
 
@@ -199,8 +200,9 @@ object ThreadController {
         RealmDatabase.mailboxContent().writeBlocking {
             val latestThread = findLatest(thread) ?: return@writeBlocking
             val uids = getThreadUnseenMessagesUids(latestThread)
-            val apiResponse = ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)
-            if (apiResponse.isSuccess()) markThreadAsSeen(latestThread, folderId)
+            with(ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)) {
+                if (isSuccess()) markThreadAsSeen(latestThread, folderId)
+            }
         }
     }
     //endregion

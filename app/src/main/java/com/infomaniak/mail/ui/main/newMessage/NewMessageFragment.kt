@@ -133,9 +133,13 @@ class NewMessageFragment : Fragment() {
 
     private fun initializeDraftAndUi() {
         newMessageViewModel.initializeDraftAndUi(requireActivity().navArgs<NewMessageActivityArgs>().value)
-            .observe(viewLifecycleOwner) {
-                observeContacts()
-                populateUiWithExistingDraftData()
+            .observe(viewLifecycleOwner) { isSuccess ->
+                if (isSuccess) {
+                    observeContacts()
+                    populateUiWithExistingDraftData()
+                } else {
+                    requireActivity().finish()
+                }
             }
     }
 

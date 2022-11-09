@@ -37,7 +37,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 
-// TODO: Handle all API call responses
 object ApiRepository : ApiRepositoryCore() {
 
     const val PER_PAGE = 50
@@ -128,7 +127,7 @@ object ApiRepository : ApiRepositoryCore() {
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
-    fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
+    // fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
 
     fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {
         return callApi(ApiRoutes.deleteMessage(mailboxUuid), POST, mapOf("uids" to messageUids))
@@ -156,9 +155,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
-    fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> {
-        return callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
-    }
+    // fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> = callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
 

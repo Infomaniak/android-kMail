@@ -133,8 +133,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "loadCurrentMailbox")
         updateMailboxes()
-        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
-            ?.let(::openMailbox)
+        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
@@ -156,11 +155,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateCurrentMailboxQuotas() {
         val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
-        if (mailbox.isLimited) {
-            ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName).data?.let { quotas ->
-                MailboxController.updateMailbox(mailbox.objectId) {
-                    it.quotas = quotas
-                }
+        if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
+                it.quotas = data
             }
         }
     }
@@ -194,18 +191,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateAddressBooks() {
-        val apiAddressBooks = ApiRepository.getAddressBooks().data?.addressBooks ?: emptyList()
-
-        AddressBookController.update(apiAddressBooks)
+        with(ApiRepository.getAddressBooks()) {
+            if (isSuccess()) AddressBookController.update(data?.addressBooks ?: emptyList())
+        }
     }
 
     private fun updateContacts() {
-        val apiContacts = ApiRepository.getContacts().data ?: emptyList()
-        val phoneMergedContacts = getPhoneContacts(getApplication())
-
-        mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
-
-        MergedContactController.update(phoneMergedContacts.values.toList())
+        with(ApiRepository.getContacts()) {
+            if (isSuccess()) {
+                val apiContacts = data ?: emptyList()
+                val phoneMergedContacts = getPhoneContacts(getApplication())
+                mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
+                MergedContactController.update(phoneMergedContacts.values.toList())
+            }
+        }
     }
 
     fun observeRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
@@ -219,46 +218,41 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateMailboxes() {
-        val apiMailboxes = ApiRepository.getMailboxes().data
-            ?.map { it.initLocalValues(AccountUtils.currentUserId) }
-            ?: emptyList()
-
-        MailboxController.update(apiMailboxes, AccountUtils.currentUserId)
+        with(ApiRepository.getMailboxes()) {
+            if (isSuccess()) MailboxController.update(
+                apiMailboxes = data?.map { it.initLocalValues(AccountUtils.currentUserId) } ?: emptyList(),
+                userId = AccountUtils.currentUserId,
+            )
+        }
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        val apiSignatures = ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName).data?.signatures ?: return@launch
-
-        SignatureController.update(apiSignatures)
+        with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
+            if (isSuccess()) SignatureController.update(data?.signatures ?: emptyList())
+        }
     }
 
     private fun updateFolders(mailbox: Mailbox) {
-        val apiFolders = ApiRepository.getFolders(mailbox.uuid).data?.formatFoldersListWithAllChildren() ?: emptyList()
-
-        FolderController.update(apiFolders)
+        with(ApiRepository.getFolders(mailbox.uuid)) {
+            if (isSuccess()) FolderController.update(data?.formatFoldersListWithAllChildren() ?: emptyList())
+        }
     }
 
-    private fun refreshThreads(
-        mailboxUuid: String,
-        folderId: String,
-        filter: ThreadFilter = ThreadFilter.ALL,
-    ) {
+    private fun refreshThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter = ThreadFilter.ALL) {
 
-        val threadsResult = ApiRepository.getThreads(
-            mailboxUuid = mailboxUuid,
-            folderId = folderId,
-            threadMode = localSettings.threadMode,
-            offset = OFFSET_FIRST_PAGE,
-            filter = filter,
-        ).data ?: return
-
-        RealmDatabase.mailboxContent().writeBlocking {
-            canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
-
-            FolderController.updateFolderLastUpdatedAt(folderId, this)
-
-            val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
-            if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+        ApiRepository.getThreads(
+            mailboxUuid,
+            folderId,
+            localSettings.threadMode,
+            OFFSET_FIRST_PAGE,
+            filter,
+        ).data?.let { threadsResult ->
+            RealmDatabase.mailboxContent().writeBlocking {
+                canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
+                FolderController.updateFolderLastUpdatedAt(folderId, this)
+                val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+                if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+            }
         }
 
         isDownloadingChanges.postValue(false)
@@ -270,18 +264,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         offset: Int,
         filter: ThreadFilter,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "loadMoreThreads: $offset")
+        Log.i(TAG, "Load more threads: $offset")
         isDownloadingChanges.postValue(true)
 
-        val threadsResult = ApiRepository.getThreads(
-            mailboxUuid = mailboxUuid,
-            folderId = folderId,
-            threadMode = localSettings.threadMode,
-            offset = offset,
-            filter = filter,
-        ).data ?: return@launch
+        ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, offset, filter).data?.let { threadsResult ->
+            canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
+        }
 
-        canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
         isDownloadingChanges.postValue(false)
     }
 
@@ -295,11 +284,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (localMessage.fullyDownloaded) {
                 localMessage
             } else {
-                ApiRepository.getMessage(localMessage.resource).data?.also { completedMessage ->
-                    if (completedMessage.isDraft) {
-                        completedMessage.draftLocalUuid = DraftController.getDraftByMessageUid(completedMessage.uid)?.localUuid
-                    }
-                    completedMessage.fullyDownloaded = true
+                ApiRepository.getMessage(localMessage.resource).data?.also {
+                    if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid)?.localUuid
+                    it.fullyDownloaded = true
                 }
             }
         }

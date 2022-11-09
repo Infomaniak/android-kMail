@@ -21,11 +21,13 @@ import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -87,15 +89,19 @@ object DraftController {
     //endregion
 
     fun deleteDraft(message: Message) {
-        if (ApiRepository.deleteDraft(message.draftResource).isSuccess()) MessageController.deleteMessage(message.uid)
+        val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return
+        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return
+        with(ApiRepository.deleteMessages(mailboxUuid, listOf(message.uid))) {
+            if (isSuccess()) MessageController.deleteMessage(message.uid)
+        }
     }
 
     //region Open Draft
     fun MutableRealm.fetchDraft(draftResource: String, messageUid: String): String? {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
             draft.initLocalValues(messageUid)
-            upsertDraft(draft, this)
-            getMessage(messageUid, this)?.draftLocalUuid = draft.localUuid
+            upsertDraft(draft, this@fetchDraft)
+            getMessage(messageUid, this@fetchDraft)?.draftLocalUuid = draft.localUuid
         }?.localUuid
     }
 
@@ -135,19 +141,15 @@ object DraftController {
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
         when (draft.action) {
-            DraftAction.SAVE -> {
-                val apiResponse = ApiRepository.saveDraft(mailboxUuid, draft)
-                if (apiResponse.isSuccess()) with(apiResponse.data!!) {
-                    updateDraft(draft.localUuid, realm) {
-                        it.remoteUuid = draftRemoteUuid
-                        it.messageUid = messageUid
-                        it.action = null
-                    }
+            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft)) {
+                if (isSuccess()) updateDraft(draft.localUuid, realm) {
+                    it.remoteUuid = data?.draftRemoteUuid
+                    it.messageUid = data?.messageUid
+                    it.action = null
                 }
             }
-            DraftAction.SEND -> {
-                val apiResponse = ApiRepository.sendDraft(mailboxUuid, draft)
-                if (apiResponse.isSuccess()) realm.delete(draft)
+            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft)) {
+                if (isSuccess()) realm.delete(draft)
             }
             else -> Unit
         }
