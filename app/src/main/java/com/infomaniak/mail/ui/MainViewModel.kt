@@ -175,7 +175,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         currentOffset = OFFSET_FIRST_PAGE
-        isDownloadingChanges.postValue(true)
         refreshThreads(mailboxUuid, folderId, filter)
     }
 
@@ -237,7 +236,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
         fun longUid(shortUid: String, folderId: String) = "${shortUid}@${folderId}"
 
-        val previousCursor = FolderController.getFolder(folderId)?.cursor
+        isDownloadingChanges.postValue(true)
+
+        val previousCursor = FolderController.getFolder(folderId, this)?.cursor
         var newCursor: String? = null
 
         val addedShortUids = mutableListOf<String>()
