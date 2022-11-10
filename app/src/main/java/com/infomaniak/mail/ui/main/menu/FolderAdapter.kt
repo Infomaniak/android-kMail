@@ -89,5 +89,10 @@ class FolderAdapter(
         notifyDataSetChanged()
     }
 
+    fun updateSelectedState(newCurrentFolderId: String?) {
+        currentFolderId = newCurrentFolderId
+        notifyItemRangeChanged(0, itemCount, Unit)
+    }
+
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
 }

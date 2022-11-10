@@ -198,10 +198,12 @@ class MenuDrawerFragment : Fragment() {
     private fun observeCurrentFolder() {
         MainViewModel.currentFolderId.observeNotNull(viewLifecycleOwner) { folderId ->
             mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+
                 currentFolderRole = folder.role
                 binding.inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
-                defaultFolderAdapter.notifyItemRangeChanged(0, defaultFolderAdapter.itemCount, Unit)
-                customFolderAdapter.notifyItemRangeChanged(0, customFolderAdapter.itemCount, Unit)
+
+                defaultFolderAdapter.updateSelectedState(folderId)
+                customFolderAdapter.updateSelectedState(folderId)
             }
         }
     }
