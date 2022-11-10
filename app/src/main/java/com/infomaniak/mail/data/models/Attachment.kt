@@ -24,6 +24,7 @@ import com.infomaniak.mail.R
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 class Attachment : EmbeddedRealmObject {
@@ -39,8 +40,20 @@ class Attachment : EmbeddedRealmObject {
     var resource: String = ""
     @SerialName("drive_url")
     var driveUrl: String? = null
-    var localUri: String = ""
     var thumbnail: String = ""
+
+
+    //region Local data (Transient)
+    @Transient
+    var uploadLocalUri: String? = null
+    //endregion
+
+    fun initLocalValues(newName: String, newSize: Long, newMimeType: String, uri: String) {
+        name = newName
+        size = newSize.toInt()
+        mimeType = newMimeType
+        uploadLocalUri = uri
+    }
 
     fun getDisposition(): AttachmentDisposition? = enumValueOfOrNull<AttachmentDisposition>(disposition)
 

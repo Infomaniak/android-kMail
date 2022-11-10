@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
@@ -28,10 +29,11 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
 import com.infomaniak.mail.utils.context
 
 class AttachmentAdapter(
+    private val shouldDisplayCloseButton: Boolean = false,
     private val onAttachmentClicked: ((Attachment) -> Unit)?,
 ) : RecyclerView.Adapter<AttachmentViewHolder>() {
 
-    private var attachments: List<Attachment> = emptyList()
+    private var attachments: MutableList<Attachment> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -41,16 +43,28 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         fileName.text = attachment.name
-        // TODO: Find how to add the FileType prefix before the file' size.
-        fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, attachment.size.toLong())
+        fileDetails.text = FormatterFileSize.formatShortFileSize(context, attachment.size.toLong())
         icon.load(attachment.getFileTypeFromExtension().icon)
-        root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
+
+        if (!shouldDisplayCloseButton) {
+            root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
+        } else {
+            closeButton.apply {
+                setOnClickListener { onAttachmentClicked?.invoke(attachment) }
+                isVisible = true
+            }
+        }
     }
 
     override fun getItemCount(): Int = attachments.count()
 
     fun setAttachments(newList: List<Attachment>) {
-        attachments = newList
+        attachments = newList.toMutableList()
+    }
+
+    fun add(attachment: Attachment) {
+        attachments.add(attachment)
+        notifyItemInserted(attachments.lastIndex)
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : RecyclerView.ViewHolder(binding.root)

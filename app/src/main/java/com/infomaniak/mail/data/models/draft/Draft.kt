@@ -55,7 +55,8 @@ class Draft : RealmObject {
 
     var subject: String = ""
     var body: String = ""
-    var attachments: RealmList<Attachment> = realmListOf()
+    @SerialName("attachments")
+    var attachmentsUuids: RealmList<String> = realmListOf()
 
     @SerialName("mime_type")
     var mimeType: String = ""

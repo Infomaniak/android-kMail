@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
@@ -26,10 +27,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.webkit.MimeTypeMap
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.net.toUri
 import androidx.core.view.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
@@ -38,7 +41,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.navArgs
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -47,6 +52,8 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.utils.LocalStorageUtils.copyDataToAttachmentsCache
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.setMargins
@@ -57,14 +64,18 @@ import com.infomaniak.lib.core.R as RCore
 class NewMessageFragment : Fragment() {
 
     private lateinit var binding: FragmentNewMessageBinding
+    private val newMessageActivityArgs by lazy { requireActivity().navArgs<NewMessageActivityArgs>().value }
     private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private lateinit var contactAdapter: ContactAdapter
+    private val attachmentAdapter = AttachmentAdapter(true, null)
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
     private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
+
+    private lateinit var filePicker: FilePicker
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -72,6 +83,8 @@ class NewMessageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        filePicker = FilePicker(this@NewMessageFragment)
 
         // TODO: Do we want this button?
         // toTransparentButton.setOnClickListener {
@@ -88,6 +101,7 @@ class NewMessageFragment : Fragment() {
         enableAutocomplete(CC)
         enableAutocomplete(BCC)
 
+        attachmentsRecyclerView.adapter = attachmentAdapter
         bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
 
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
@@ -99,7 +113,13 @@ class NewMessageFragment : Fragment() {
 
             when (editorAction) {
                 // TODO: Replace logs with actual code
-                EditorAction.ATTACHMENT -> Log.d("SelectedText", "ATTACHMENT")
+                EditorAction.ATTACHMENT -> {
+                    Log.d("SelectedText", "ATTACHMENT")
+                    filePicker.open { uris ->
+                        uris.forEach(::importAttachment)
+                        attachmentsRecyclerView.isVisible = attachmentAdapter.itemCount > 0
+                    }
+                }
                 EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
                 EditorAction.LINK -> Log.d("SelectedText", "LINK")
                 EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
@@ -124,6 +144,21 @@ class NewMessageFragment : Fragment() {
         observeMailboxes()
     }
 
+    private fun importAttachment(uri: Uri) {
+        val fileName = uri.lastPathSegment!!.substringAfterLast("/")
+        val draftUuid = newMessageViewModel.currentDraftLocalUuid
+
+        copyDataToAttachmentsCache(requireContext(), uri, fileName, draftUuid)?.let { file ->
+            val fileExtension = file.path.substringAfterLast(".")
+            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"
+
+            with(Attachment()) {
+                initLocalValues(file.name, file.length(), mimeType, file.toUri().toString())
+                attachmentAdapter.add(this)
+            }
+        }
+    }
+
     fun closeAutocompletion() {
         fun FieldType.clearField() = getInputView(this).setText("")
         TO.clearField()
@@ -131,8 +166,8 @@ class NewMessageFragment : Fragment() {
         BCC.clearField()
     }
 
-    private fun initDraftAndUi() {
-        newMessageViewModel.initDraftAndUi(requireActivity().navArgs<NewMessageActivityArgs>().value)
+    private fun initializeDraftAndUi() {
+        newMessageViewModel.initializeDraftAndUi(newMessageActivityArgs)
             .observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
                     observeContacts()

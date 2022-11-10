@@ -348,6 +348,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/subjectTextField" />
 
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/attachmentsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="@dimen/marginStandardMedium"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider5"
+            tools:listitem="@layout/item_attachment"
+            tools:visibility="visible" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/bodyLayout"
             android:layout_width="match_parent"
@@ -358,7 +375,7 @@
             app:boxStrokeWidth="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider5"
+            app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
             app:placeholderText="@string/newMessagePlaceholderTitle"
             app:placeholderTextColor="@color/hintTextColor">
 
