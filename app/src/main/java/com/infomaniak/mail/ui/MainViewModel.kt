@@ -234,11 +234,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     ) = viewModelScope.launch(Dispatchers.IO) {
 
         fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
-        fun longUid(shortUid: String, folderId: String) = "${shortUid}@${folderId}"
+
+        fun String.toLongUid() = "${this}@${folderId}"
+        fun String.toShortUid(): String = substringBefore('@')
+
+        fun getUniquesUidsInReverse(folder: Folder?, remoteUids: List<String>): List<String> {
+            val localUids = folder?.threads?.map { it.uid.toShortUid() }
+            val uniqueUids = if (localUids == null) {
+                remoteUids
+            } else {
+                remoteUids - localUids.intersect(remoteUids.toSet())
+            }
+            return uniqueUids.reversed()
+        }
 
         isDownloadingChanges.postValue(true)
 
-        val previousCursor = FolderController.getFolder(folderId)?.cursor
+        val folder = FolderController.getFolder(folderId)
+        val previousCursor = folder?.cursor
         var newCursor: String? = null
 
         val addedShortUids = mutableListOf<String>()
@@ -254,13 +267,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (isSuccess()) with(data!!) {
                 newCursor = cursor
                 addedShortUids.addAll(this.addedShortUids)
-                deletedUids.addAll(this.deletedShortUids.map { longUid(it, folderId) })
+                deletedUids.addAll(this.deletedShortUids.map { it.toLongUid() })
                 updatedMessages.addAll(this.updatedMessages)
             }
         }
 
         if (addedShortUids.isNotEmpty()) {
-            val reversedUids = addedShortUids.reversed()
+
+            val reversedUids = getUniquesUidsInReverse(folder, addedShortUids)
             val pageSize = PER_PAGE
             // val pageSize = 200 // TODO: Magic number
             var offset = OFFSET_FIRST_PAGE
@@ -269,9 +283,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val newList = reversedUids.subList(offset, end)
                 ApiRepository.getMessagesByUids(mailboxUuid, folderId, newList).data?.messages?.let { messages ->
                     FolderController.updateFolder(folderId) { folder ->
-                        folder.threads += messages.mapNotNull { message ->
-                            if (folder.threads.map { it.uid }.contains(message.uid)) null else message.toThread(mailboxUuid)
-                        }.toRealmList()
+                        folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
                         Log.e("TOTO", "Threads: ${folder.threads.count()}")
                     }
                 }
@@ -289,7 +301,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             updatedMessages.forEach {
-                val uid = longUid(it.shortUid, folderId)
+                val uid = it.shortUid.toLongUid()
                 MessageController.updateMessage(uid, this) { message ->
                     message.answered = it.answered
                     message.isFavorite = it.isFavorite
