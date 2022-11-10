@@ -268,7 +268,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val newList = reversedUids.subList(offset, end)
                     ApiRepository.getMessagesByUids(mailboxUuid, folderId, newList).data?.messages?.let { messages ->
                         FolderController.updateFolder(folderId, this) { folder ->
-                            folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
+                            folder.threads += messages.mapNotNull { message ->
+                                if (folder.threads.map { it.uid }.contains(message.uid)) null else message.toThread(mailboxUuid)
+                            }.toRealmList()
                             Log.e("TOTO", "Threads: ${folder.threads.count()}")
                         }
                     }
