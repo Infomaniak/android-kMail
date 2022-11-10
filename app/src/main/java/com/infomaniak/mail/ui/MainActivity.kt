@@ -38,6 +38,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -88,12 +89,7 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.observeRealmMergedContacts()
         requestContactsPermission()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // TODO: This is temporary, while waiting for a "DraftsManager".
-        mainViewModel.executeDraftsActions()
+        launchDraftsActionsWorkIfNeeded()
     }
 
     override fun onBackPressed(): Unit = with(binding) {
@@ -175,5 +171,11 @@ class MainActivity : ThemedActivity() {
 
     private fun setDrawerLockMode(isUnlocked: Boolean) {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
+    }
+
+    private fun launchDraftsActionsWorkIfNeeded() {
+        DraftsActionsWorker.getRunningWorkInfosLiveData(this).observe(this) { worksInfoList ->
+            if (worksInfoList.isEmpty()) DraftsActionsWorker.scheduleWork(this)
+        }
     }
 }

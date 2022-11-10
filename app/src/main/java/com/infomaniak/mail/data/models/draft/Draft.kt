@@ -140,4 +140,8 @@ class Draft : RealmObject {
         REPLY_ALL,
         FORWARD,
     }
+
+    companion object {
+        val actionPropertyName get() = Draft::_action.name
+    }
 }
