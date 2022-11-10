@@ -25,7 +25,6 @@ import com.infomaniak.lib.core.utils.monthsAgo
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
-import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -51,7 +50,6 @@ import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -232,56 +230,58 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         folderId: String,
         filter: ThreadFilter = ThreadFilter.ALL,
     ) = viewModelScope.launch(Dispatchers.IO) {
-
-        fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
-        fun longUid(shortUid: String, folderId: String) = "${shortUid}@${folderId}"
-
-        isDownloadingChanges.postValue(true)
-
-        val previousCursor = FolderController.getFolder(folderId, this)?.cursor
-        var newCursor: String? = null
-
-        val addedShortUids = mutableListOf<String>()
-        val deletedUids = mutableListOf<String>()
-        val updatedMessages = mutableListOf<MessageFlags>()
-
-        if (previousCursor == null) with(ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo())) {
-            if (isSuccess()) with(data!!) {
-                newCursor = cursor
-                addedShortUids.addAll(shortUids)
-            }
-        } else with(ApiRepository.getMessagesDelta(mailboxUuid, folderId, previousCursor)) {
-            if (isSuccess()) with(data!!) {
-                newCursor = cursor
-                addedShortUids.addAll(this.addedShortUids)
-                deletedUids.addAll(this.deletedShortUids.map { longUid(it, folderId) })
-                updatedMessages.addAll(this.updatedMessages)
-            }
-        }
-
-        if (addedShortUids.isNotEmpty()) {
-            val reversedUids = addedShortUids.reversed()
-            val pageSize = PER_PAGE
-            var offset = OFFSET_FIRST_PAGE
-            while (offset < reversedUids.count()) {
-                val end = min(offset + pageSize, reversedUids.count())
-                val newList = reversedUids.subList(offset, end)
-                ApiRepository.getMessagesByUids(mailboxUuid, folderId, newList).data?.messages?.let { messages ->
-                    FolderController.updateFolder(folderId) { folder ->
-                        folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
-                    }
-                }
-                delay(1_000L)
-                offset += pageSize
-            }
-        }
-
-        if (deletedUids.isNotEmpty()) RealmDatabase.mailboxContent().writeBlocking {
-            delete(MessageController.getMessages(deletedUids, this))
-            delete(ThreadController.getThreads(deletedUids, this))
-        }
-
         RealmDatabase.mailboxContent().writeBlocking {
+
+            fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
+            fun longUid(shortUid: String, folderId: String) = "${shortUid}@${folderId}"
+
+            isDownloadingChanges.postValue(true)
+
+            val previousCursor = FolderController.getFolder(folderId, this)?.cursor
+            var newCursor: String? = null
+
+            val addedShortUids = mutableListOf<String>()
+            val deletedUids = mutableListOf<String>()
+            val updatedMessages = mutableListOf<MessageFlags>()
+
+            if (previousCursor == null) with(ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo())) {
+                if (isSuccess()) with(data!!) {
+                    newCursor = cursor
+                    addedShortUids.addAll(shortUids)
+                }
+            } else with(ApiRepository.getMessagesDelta(mailboxUuid, folderId, previousCursor)) {
+                if (isSuccess()) with(data!!) {
+                    newCursor = cursor
+                    addedShortUids.addAll(this.addedShortUids)
+                    deletedUids.addAll(this.deletedShortUids.map { longUid(it, folderId) })
+                    updatedMessages.addAll(this.updatedMessages)
+                }
+            }
+
+            if (addedShortUids.isNotEmpty()) {
+                val reversedUids = addedShortUids.reversed()
+                // val pageSize = PER_PAGE
+                val pageSize = 200 // TODO: Magic number
+                var offset = OFFSET_FIRST_PAGE
+                while (offset < reversedUids.count()) {
+                    val end = min(offset + pageSize, reversedUids.count())
+                    val newList = reversedUids.subList(offset, end)
+                    ApiRepository.getMessagesByUids(mailboxUuid, folderId, newList).data?.messages?.let { messages ->
+                        FolderController.updateFolder(folderId, this) { folder ->
+                            folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
+                            Log.e("TOTO", "Threads: ${folder.threads.count()}")
+                        }
+                    }
+                    // TODO: Do we want a delay between each call, to not get blocked by the API?
+                    // delay(1_000L)
+                    offset += pageSize
+                }
+            }
+
+            if (deletedUids.isNotEmpty()) {
+                delete(MessageController.getMessages(deletedUids, this))
+                delete(ThreadController.getThreads(deletedUids, this))
+            }
 
             updatedMessages.forEach {
                 val uid = longUid(it.shortUid, folderId)
@@ -318,13 +318,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             // TODO: Handle this.
             canPaginate = true
+
+            // TODO: Handle this.
+            // val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
+            // if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+
+            isDownloadingChanges.postValue(false)
         }
-
-        // TODO: Handle this.
-        // val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
-        // if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
-
-        isDownloadingChanges.postValue(false)
     }
 
     fun loadMoreThreads(
