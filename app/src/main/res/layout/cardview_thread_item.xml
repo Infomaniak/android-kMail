@@ -120,8 +120,8 @@
 
                 <ImageView
                     android:id="@+id/iconCalendar"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionIconCalendar"
@@ -137,7 +137,6 @@
                     android:id="@+id/iconAttachment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:layout_marginBottom="@dimen/marginStandardVerySmall"
                     android:contentDescription="@string/contentDescriptionIconAttachments"
