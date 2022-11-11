@@ -49,7 +49,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.Folder.*
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -86,6 +86,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     // We want to trigger the next page loading as soon as possible so there is as little wait time as possible;
     // but not before we do any scrolling, so we don't immediately load the 2nd page when opening the Folder.
     private val offsetTrigger = max(1, PER_PAGE - ESTIMATED_PAGE_SIZE)
+    private var onResumeIsAllowedToRefreshThreads = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -110,7 +111,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onResume(): Unit = with(binding) {
         super.onResume()
+
         unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
+
+        if (onResumeIsAllowedToRefreshThreads) mainViewModel.forceRefreshThreads(filter)
+        onResumeIsAllowedToRefreshThreads = true
 
         updateSwipeActionsAccordingToSettings()
     }
