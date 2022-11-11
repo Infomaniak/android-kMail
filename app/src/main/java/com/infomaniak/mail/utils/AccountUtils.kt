@@ -82,6 +82,7 @@ object AccountUtils : CredentialManager {
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMailboxId = mailboxId }
         }
 
+    // TODO: Remove this when we will have a better way to handle the current mailbox
     inline val currentMailboxUuid
         get() = MainViewModel.currentMailboxObjectId.value?.let { MailboxController.getMailbox(it)?.uuid }
 
