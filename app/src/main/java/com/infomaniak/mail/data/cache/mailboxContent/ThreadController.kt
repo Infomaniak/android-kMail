@@ -21,6 +21,7 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import io.realm.kotlin.MutableRealm
@@ -33,8 +34,26 @@ object ThreadController {
 
     //region Queries
     private fun MutableRealm?.getThreadsQuery(uids: List<String>): RealmQuery<Thread> {
-        val threads = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxContent()).query(threads)
+        val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
+        return (this ?: RealmDatabase.mailboxContent()).query(byUids)
+    }
+
+    private fun MutableRealm?.getThreadsQuery(folderId: String, filter: ThreadFilter): RealmQuery<Thread> {
+        val byFolderId = "${Thread::folderId.name} = '$folderId'"
+        val query = (this ?: RealmDatabase.mailboxContent()).query<Thread>(byFolderId)
+        return if (filter == ThreadFilter.ALL) {
+            query
+        } else {
+            val byFilter = when (filter) {
+                ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} = 0"
+                ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
+                ThreadFilter.STARRED -> "${Thread::isFavorite.name} = true"
+                ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} = true"
+                ThreadFilter.FOLDER -> TODO()
+                else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
+            }
+            query.query(byFilter)
+        }
     }
 
     private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
@@ -45,6 +64,10 @@ object ThreadController {
     //region Get data
     fun getThreads(uids: List<String>, realm: MutableRealm? = null): RealmQuery<Thread> {
         return realm.getThreadsQuery(uids)
+    }
+
+    fun getThreads(folderId: String, filter: ThreadFilter, realm: MutableRealm? = null): RealmQuery<Thread> {
+        return realm.getThreadsQuery(folderId, filter)
     }
 
     fun getThread(uid: String, realm: MutableRealm? = null): Thread? {

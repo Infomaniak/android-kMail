@@ -42,7 +42,7 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 
 class MenuDrawerFragment : Fragment() {
 

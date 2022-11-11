@@ -129,8 +129,9 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun toThread(mailboxUuid: String) = Thread().apply {
+    fun toThread(mailboxUuid: String, folderId: String) = Thread().apply {
         this.mailboxUuid = mailboxUuid
+        this.folderId = folderId
         uid = this@Message.uid
         uniqueMessagesCount = 1
         messages = realmListOf(this@Message)

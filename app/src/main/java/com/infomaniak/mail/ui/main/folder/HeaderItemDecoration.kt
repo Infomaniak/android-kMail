@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.folder
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.RectF
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -92,12 +91,7 @@ class HeaderItemDecoration(
             INSET_TOP -> adapterIndex - 1
             CENTER -> adapterIndex
             INSET_BOTTOM -> adapterIndex + 1
-            null -> {
-                val message = "getPositionInAdapterOfFirstChild: The top most view in the " +
-                        "recyclerview does not intersects parent.paddingTop (${parent.paddingTop})"
-                Log.wtf(TAG, message)
-                null
-            }
+            null -> null
         }
     }
 

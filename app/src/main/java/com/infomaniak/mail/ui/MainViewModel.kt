@@ -38,11 +38,10 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
-import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
+import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -151,12 +150,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads(mailboxUuid, folderId)
     }
 
-    fun forceRefreshThreads(filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
+    fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshThreads")
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
         val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
-        refreshThreads(mailboxUuid, folderId, filter)
+        refreshThreads(mailboxUuid, folderId)
     }
 
     private fun updateAddressBooks() {
@@ -207,12 +206,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // TODO: Find a way to use the `filter`
-    private fun refreshThreads(
-        mailboxUuid: String,
-        folderId: String,
-        filter: ThreadFilter = ThreadFilter.ALL,
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    private fun refreshThreads(mailboxUuid: String, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
 
         isDownloadingChanges.postValue(true)
 
@@ -222,7 +216,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Delete Thread
-    fun deleteThread(thread: Thread, filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
 
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
         val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch

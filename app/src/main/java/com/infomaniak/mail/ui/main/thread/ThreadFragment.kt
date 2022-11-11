@@ -37,8 +37,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
+import com.infomaniak.mail.utils.Utils.getFormattedThreadSubject
 import kotlin.math.roundToInt
 import com.infomaniak.lib.core.R as RCore
 
