@@ -21,12 +21,6 @@
     android:id="@+id/main_navigation"
     app:startDestination="@id/threadListFragment">
 
-    <dialog
-        android:id="@+id/getMoreStorageBottomSheetDialog"
-        android:name="com.infomaniak.mail.ui.main.menu.GetMoreStorageBottomSheetDialog"
-        android:label="GetMoreStorageBottomSheetDialog"
-        tools:layout="@layout/fragment_bottom_sheet_get_more_storage" />
-
     <fragment
         android:id="@+id/threadListFragment"
         android:name="com.infomaniak.mail.ui.main.folder.ThreadListFragment"
