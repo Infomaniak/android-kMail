@@ -128,11 +128,11 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/messages_uids?since=${dateSince}"
     }
 
-    fun getMessagesByUids(mailboxUuid: String, folderId: String, messagesUids: List<String>): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages?uids=${messagesUids.joinToString(",")}"
+    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, signature: String): String {
+        return "${getMessages(mailboxUuid, folderId)}/activities?signature=${signature}"
     }
 
-    fun getMessagesDelta(mailboxUuid: String, folderId: String, signature: String): String {
-        return "${getMessages(mailboxUuid, folderId)}/activities?signature=${signature}"
+    fun getMessagesByUids(mailboxUuid: String, folderId: String, messagesUids: List<String>): String {
+        return "${getMessages(mailboxUuid, folderId)}/messages?uids=${messagesUids.joinToString(",")}"
     }
 }

@@ -161,16 +161,16 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, dateSince), method = GET)
     }
 
+    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, signature: String): ApiResponse<GetMessagesUidsDeltaResult> {
+        return callApi(url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, signature), method = GET)
+    }
+
     fun getMessagesByUids(
         mailboxUuid: String,
         folderId: String,
         messagesUids: List<String>,
     ): ApiResponse<GetMessagesByUidsResult> {
         return callApi(url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, messagesUids), method = GET)
-    }
-
-    fun getMessagesDelta(mailboxUuid: String, folderId: String, signature: String): ApiResponse<GetMessagesDeltaResult> {
-        return callApi(url = ApiRoutes.getMessagesDelta(mailboxUuid, folderId, signature), method = GET)
     }
 
     /**
