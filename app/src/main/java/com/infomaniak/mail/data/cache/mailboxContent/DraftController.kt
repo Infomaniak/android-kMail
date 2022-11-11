@@ -92,7 +92,7 @@ object DraftController {
     }
 
     fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getDraft(localUuid, it)?.let(onUpdate) }
+        val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
@@ -118,8 +118,8 @@ object DraftController {
     fun MutableRealm.fetchDraft(draftResource: String, messageUid: String): String? {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
             draft.initLocalValues(messageUid)
-            upsertDraft(draft, this@fetchDraft)
-            getMessage(messageUid, this@fetchDraft)?.draftLocalUuid = draft.localUuid
+            upsertDraft(draft, realm = this@fetchDraft)
+            getMessage(messageUid, realm = this@fetchDraft)?.draftLocalUuid = draft.localUuid
         }?.localUuid
     }
 

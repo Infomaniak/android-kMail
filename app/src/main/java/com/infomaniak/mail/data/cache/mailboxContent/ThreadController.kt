@@ -89,7 +89,7 @@ object ThreadController {
     }
 
     fun deleteThread(uid: String) {
-        RealmDatabase.mailboxContent().writeBlocking { getThread(uid, this)?.let(::delete) }
+        RealmDatabase.mailboxContent().writeBlocking { getThread(uid, realm = this)?.let(::delete) }
     }
     //endregion
 

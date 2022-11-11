@@ -62,7 +62,7 @@ object MessageController {
 
     //region Edit data
     private fun updateMessage(uid: String, realm: MutableRealm? = null, onUpdate: (message: Message) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getMessage(uid, it)?.let(onUpdate) }
+        val block: (MutableRealm) -> Unit = { getMessage(uid, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
@@ -83,14 +83,14 @@ object MessageController {
     }
 
     fun MutableRealm.deleteMessages(messages: List<Message>) {
-        messages.reversed().forEach { deleteMessage(it.uid, this) }
+        messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
     }
 
     fun deleteMessage(uid: String, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = {
-            getMessage(uid, it)
+            getMessage(uid, realm = it)
                 ?.let { message ->
-                    DraftController.getDraftByMessageUid(message.uid, it)?.let(it::delete)
+                    DraftController.getDraftByMessageUid(message.uid, realm = it)?.let(it::delete)
                     it.delete(message)
                 }
         }
@@ -123,7 +123,7 @@ object MessageController {
                 deleteMessages(deletedUids, realm = this)
                 updateMessages(updatedMessages, mailboxUuid, folderId, realm = this)
 
-                FolderController.updateFolder(folderId, this) {
+                FolderController.updateFolder(folderId, realm = this) {
                     it.lastUpdatedAt = Date().toRealmInstant()
                     it.cursor = cursor
                 }
@@ -131,8 +131,8 @@ object MessageController {
         }
 
         // TODO: Do we still need this with the new API routes?
-        // val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
-        // if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
+        // val isDraftFolder = FolderController.getFolder(folderId, realm = this)?.role == FolderRole.DRAFT
+        // if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, realm = this)
     }
 
     private suspend fun addMessages(shortUids: List<String>, folder: Folder, mailboxUuid: String) {

@@ -121,7 +121,7 @@ object RealmDatabase {
     fun removeUserData(context: Context, userId: Int) {
         closeMailboxContent()
         closeUserInfo()
-        mailboxInfo().writeBlocking { delete(MailboxController.getMailboxes(userId, this)) }
+        mailboxInfo().writeBlocking { delete(MailboxController.getMailboxes(userId, realm = this)) }
         deleteUserFiles(context, userId)
     }
 

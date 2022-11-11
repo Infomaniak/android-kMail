@@ -134,7 +134,7 @@ class ThreadListAdapter(
         expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
-        getDisplayedRecipient(this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
+        getDisplayedRecipient(thread = this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
 
         mailDate.text = formatDate(root.context)
 

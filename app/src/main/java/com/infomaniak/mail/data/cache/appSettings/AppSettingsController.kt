@@ -33,11 +33,11 @@ object AppSettingsController {
 
     //region Edit data
     fun updateAppSettings(onUpdate: (appSettings: AppSettings) -> Unit) {
-        RealmDatabase.appSettings().writeBlocking { onUpdate(getAppSettings(this)) }
+        RealmDatabase.appSettings().writeBlocking { onUpdate(getAppSettings(realm = this)) }
     }
 
     fun removeAppSettings() {
-        RealmDatabase.appSettings().writeBlocking { getAppSettings(this).let(::delete) }
+        RealmDatabase.appSettings().writeBlocking { getAppSettings(realm = this).let(::delete) }
     }
     //endregion
 }
