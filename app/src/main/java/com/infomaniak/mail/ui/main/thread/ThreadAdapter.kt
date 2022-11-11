@@ -48,7 +48,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null
     var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
-    var onDownloadAllClicked: (() -> Unit)? = null
+    var onDownloadAllClicked: ((message: Message) -> Unit)? = null
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
 
@@ -82,7 +82,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val message = messages[position]
 
         holder.bindHeader(message)
-        holder.bindAttachment(message.attachments)
+        holder.bindAttachment(message)
         loadBodyInWebView(message.body)
 
         displayExpandedCollapsedMessage(message)
@@ -190,7 +190,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
-    private fun ThreadViewHolder.bindAttachment(attachments: List<Attachment>) = with(binding) {
+    private fun ThreadViewHolder.bindAttachment(message: Message) = with(binding) {
+        val attachments = message.attachments
         val fileSize = formatAttachmentFileSize(attachments)
         attachmentsSizeText.text = context.resources.getQuantityString(
             R.plurals.attachmentQuantity,
@@ -198,7 +199,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             attachments.size,
         ) + " ($fileSize)"
         attachmentAdapter.setAttachments(attachments)
-        attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke() }
+        attachmentsDownloadAllButton.setOnClickListener { onDownloadAllClicked?.invoke(message) }
     }
 
     private fun ItemMessageBinding.formatAttachmentFileSize(attachments: List<Attachment>): String {
