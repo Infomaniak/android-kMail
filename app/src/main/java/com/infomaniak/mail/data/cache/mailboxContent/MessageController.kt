@@ -22,7 +22,7 @@ import com.infomaniak.lib.core.utils.monthsAgo
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.MessageFlags
+import com.infomaniak.mail.data.models.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.copyListToRealm
 import com.infomaniak.mail.utils.toRealmInstant
@@ -31,6 +31,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -51,8 +52,8 @@ object MessageController {
     //endregion
 
     //region Get data
-    fun getMessages(uids: List<String>, realm: MutableRealm? = null): RealmQuery<Message> {
-        return realm.getMessagesQuery(uids)
+    private fun getMessages(uids: List<String>, realm: MutableRealm? = null): RealmResults<Message> {
+        return realm.getMessagesQuery(uids).find()
     }
 
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
@@ -61,7 +62,7 @@ object MessageController {
     //endregion
 
     //region Edit data
-    fun updateMessage(uid: String, realm: MutableRealm? = null, onUpdate: (message: Message) -> Unit) {
+    private fun updateMessage(uid: String, realm: MutableRealm? = null, onUpdate: (message: Message) -> Unit) {
         val block: (MutableRealm) -> Unit = { getMessage(uid, it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
@@ -131,16 +132,16 @@ object MessageController {
         // if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
     }
 
-    private suspend fun addMessages(addedShortUids: List<String>, folder: Folder, mailboxUuid: String) {
-        if (addedShortUids.isNotEmpty()) {
-            val reversedUids = getUniquesUidsInReverse(folder, addedShortUids)
+    private suspend fun addMessages(shortUids: List<String>, folder: Folder, mailboxUuid: String) {
+        if (shortUids.isNotEmpty()) {
+            val uids = getUniquesUidsInReverse(folder, shortUids)
             val pageSize = ApiRepository.PER_PAGE
             // val pageSize = 200 // TODO: Magic number
-            var offset = ApiRepository.OFFSET_FIRST_PAGE
-            while (offset < reversedUids.count()) {
-                val end = min(offset + pageSize, reversedUids.count())
-                val newList = reversedUids.subList(offset, end)
-                ApiRepository.getMessagesByUids(mailboxUuid, folder.id, newList).data?.messages?.let { messages ->
+            var pageStart = ApiRepository.OFFSET_FIRST_PAGE
+            while (pageStart < uids.count()) {
+                val pageEnd = min(pageStart + pageSize, uids.count())
+                val page = uids.subList(pageStart, pageEnd)
+                ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page).data?.messages?.let { messages ->
                     FolderController.updateFolder(folder.id) { folder ->
                         folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
                         Log.e("TOTO", "Threads: ${folder.threads.count()}")
@@ -148,20 +149,20 @@ object MessageController {
                 }
                 // TODO: Do we want a delay between each call, to not get blocked by the API?
                 delay(500L)
-                offset += pageSize
+                pageStart += pageSize
             }
         }
     }
 
-    private fun deleteMessages(deletedUids: List<String>, realm: MutableRealm) {
-        if (deletedUids.isNotEmpty()) {
-            realm.delete(getMessages(deletedUids, realm))
-            realm.delete(ThreadController.getThreads(deletedUids, realm))
+    private fun deleteMessages(uids: List<String>, realm: MutableRealm) {
+        if (uids.isNotEmpty()) {
+            realm.deleteMessages(getMessages(uids, realm))
+            realm.delete(ThreadController.getThreads(uids, realm))
         }
     }
 
-    private fun updateMessages(updatedMessages: List<MessageFlags>, mailboxUuid: String, folderId: String, realm: MutableRealm) {
-        updatedMessages.forEach {
+    private fun updateMessages(messageFlags: List<MessageFlags>, mailboxUuid: String, folderId: String, realm: MutableRealm) {
+        messageFlags.forEach {
             val uid = it.shortUid.toLongUid(folderId)
             updateMessage(uid, realm) { message ->
                 message.answered = it.answered

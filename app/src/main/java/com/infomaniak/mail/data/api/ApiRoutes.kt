@@ -120,10 +120,6 @@ object ApiRoutes {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
     // }
 
-    private fun getMessages(mailboxUuid: String, folderId: String): String {
-        return "$MAIL_API_PREPROD/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
-    }
-
     fun getMessagesUids(mailboxUuid: String, folderId: String, dateSince: String): String {
         return "${getMessages(mailboxUuid, folderId)}/messages_uids?since=${dateSince}"
     }
@@ -134,5 +130,9 @@ object ApiRoutes {
 
     fun getMessagesByUids(mailboxUuid: String, folderId: String, messagesUids: List<String>): String {
         return "${getMessages(mailboxUuid, folderId)}/messages?uids=${messagesUids.joinToString(",")}"
+    }
+
+    private fun getMessages(mailboxUuid: String, folderId: String): String {
+        return "$MAIL_API_PREPROD/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
     }
 }

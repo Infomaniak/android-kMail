@@ -89,7 +89,7 @@ class FolderAdapter(
         notifyDataSetChanged()
     }
 
-    fun updateSelectedState(newCurrentFolderId: String?) {
+    fun updateSelectedState(newCurrentFolderId: String) {
         currentFolderId = newCurrentFolderId
         notifyItemRangeChanged(0, itemCount, Unit)
     }
