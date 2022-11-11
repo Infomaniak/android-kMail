@@ -113,6 +113,10 @@ object MessageController {
 
         with(messagesUids) {
 
+            Log.e("API", "Threads - Added   : ${addedShortUids.count()}")
+            Log.e("API", "Threads - Deleted : ${deletedUids.count()}")
+            Log.e("API", "Threads - Updated : ${updatedMessages.count()}")
+
             addMessages(addedShortUids, folder, mailboxUuid)
 
             RealmDatabase.mailboxContent().writeBlocking {
@@ -137,14 +141,13 @@ object MessageController {
             val uids = getUniquesUidsInReverse(folder, shortUids)
             val pageSize = ApiRepository.PER_PAGE
             // val pageSize = 200 // TODO: Magic number
-            var pageStart = ApiRepository.OFFSET_FIRST_PAGE
+            var pageStart = 0
             while (pageStart < uids.count()) {
                 val pageEnd = min(pageStart + pageSize, uids.count())
                 val page = uids.subList(pageStart, pageEnd)
                 ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page).data?.messages?.let { messages ->
                     FolderController.updateFolder(folder.id) { folder ->
                         folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
-                        Log.e("TOTO", "Threads: ${folder.threads.count()}")
                     }
                 }
                 // TODO: Do we want a delay between each call, to not get blocked by the API?

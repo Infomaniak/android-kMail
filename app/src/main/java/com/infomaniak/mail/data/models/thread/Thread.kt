@@ -83,13 +83,6 @@ class Thread : RealmObject {
 
     val date: Date get() = _date.toDate()
 
-    fun initLocalValues(mailboxUuid: String): Thread {
-        this.messages.removeIf { it.isDuplicate }
-        this.mailboxUuid = mailboxUuid
-
-        return this
-    }
-
     fun formatDate(context: Context): String = with(date) {
         when {
             isToday() -> format(FORMAT_DATE_HOUR_MINUTE)

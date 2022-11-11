@@ -19,10 +19,6 @@ package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
 import com.infomaniak.mail.BuildConfig.MAIL_API_PREPROD
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 
 object ApiRoutes {
 
@@ -51,38 +47,6 @@ object ApiRoutes {
     // fun readFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/read"
 
     // fun flushFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/flush"
-
-    fun threads(
-        mailboxUuid: String,
-        folderId: String,
-        threadMode: ThreadMode,
-        offset: Int,
-        filter: ThreadFilter,
-        searchText: String? = null,
-    ): String {
-
-        val folder = folder(mailboxUuid, folderId)
-
-        val message = "/message"
-
-        val page = "?offset=$offset"
-
-        val isDraftFolder = threadMode == ThreadMode.THREADS && FolderController.getFolder(folderId)?.role == FolderRole.DRAFT
-        val thread = "&thread=${(if (isDraftFolder) ThreadMode.MESSAGES else threadMode).apiCallValue}"
-
-        val urlSearch = searchText?.let { "&scontains=$it" } ?: ""
-
-        val urlAttachment = if (filter == ThreadFilter.ATTACHMENTS) "&sattachments=yes" else ""
-
-        val urlFilter = when (filter) {
-            ThreadFilter.SEEN,
-            ThreadFilter.STARRED,
-            ThreadFilter.UNSEEN -> "&filters=${filter.name.lowercase()}"
-            else -> ""
-        }
-
-        return "${folder}${message}${page}${thread}${urlSearch}${urlAttachment}${urlFilter}"
-    }
 
     fun quotas(mailboxHostingId: Int, mailboxName: String): String {
         return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
