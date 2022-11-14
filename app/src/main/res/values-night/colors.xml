@@ -39,15 +39,15 @@
     <color name="backgroundOnBoardingColor">#1A1A1A</color>
     <color name="backgroundSnackbarColor">@color/black</color>
     <color name="backgroundNewMailColor">@color/grey_title</color>
-    <color name="selectedAccountCardviewColor">#1A1A1A</color>
+    <color name="backgroundSecondaryColor">#1A1A1A</color>
     <color name="backgroundDisabledPrimaryButton">@color/grey_title</color>
-    <color name="backgroundQuickActions">#1A1A1A</color>
     <color name="threadDensityBackground">#191919</color>
 
     <!-- Texts -->
+    <color name="primaryTextColor">@color/grey_border</color>
     <color name="secondaryTextColor">@color/secondaryText</color>
+    <color name="tertiaryTextColor">@color/grey_text</color>
     <color name="snackbarTextColor">@color/hover</color>
-    <color name="sectionHeaderTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/grey_text</color>
     <color name="emailChipTextColor">@color/secondaryText</color>
 

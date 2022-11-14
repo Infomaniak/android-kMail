@@ -36,27 +36,25 @@
         <item name="android:statusBarColor">@color/backgroundColor</item>
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:textColorHint">@color/hintTextColor</item>
-        <item name="android:textColorPrimary">@color/title</item>
-        <item name="android:textColorSecondary">@color/secondaryTextColor</item>
         <item name="android:textSize">16sp</item>
         <item name="android:windowBackground">@color/backgroundColor</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="appBarLayoutStyle">@style/AppTheme.AppBarOverlay</item>
+        <item name="appBarLayoutStyle">@style/AppThemeAppBarOverlay</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
-        <item name="collapsingToolbarLayoutStyle">@style/AppTheme.CollapsingToolbarLayoutTheme</item>
+        <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorError">@color/redDestructiveAction</item>
-        <item name="extendedFloatingActionButtonStyle">@style/Widget.App.ExtendedFloatingActionButton</item>
-        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
-        <item name="snackbarButtonStyle">@style/Widget.App.SnackbarButton</item>
-        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
-        <item name="snackbarTextViewStyle">@style/Widget.App.SnackbarTextView</item>
-        <item name="toolbarStyle">@style/AppTheme.ToolbarTheme</item>
+        <item name="extendedFloatingActionButtonStyle">@style/ExtendedFloatingActionButtonStyle</item>
+        <item name="floatingActionButtonStyle">@style/FloatingActionButtonStyle</item>
+        <item name="snackbarButtonStyle">@style/SnackbarButtonStyle</item>
+        <item name="snackbarStyle">@style/SnackbarStyle</item>
+        <item name="snackbarTextViewStyle">@style/SnackbarTextViewStyle</item>
+        <item name="toolbarStyle">@style/AppThemeToolbarTheme</item>
     </style>
 
     <style name="AppTheme" parent="AppThemeBase" />
 
-    <style name="AppTheme.Pink" parent="AppTheme">
+    <style name="AppTheme.Pink">
         <item name="colorPrimary">@color/pinkMail</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
@@ -71,7 +69,7 @@
 
     </style>
 
-    <style name="AppTheme.Blue" parent="AppTheme">
+    <style name="AppTheme.Blue">
         <item name="colorPrimary">@color/blueMail</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
@@ -109,19 +107,19 @@
 
     <!-- AppBar -->
 
-    <style name="AppTheme.AppBarOverlayBase" parent="Widget.Design.AppBarLayout">
+    <style name="AppThemeAppBarOverlayBase" parent="Widget.Design.AppBarLayout">
         <item name="elevation">0dp</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="AppTheme.AppBarOverlayBase">
+    <style name="AppThemeAppBarOverlay" parent="AppThemeAppBarOverlayBase">
         <item name="android:backgroundTint">@color/backgroundHeaderColor</item>
     </style>
 
-    <style name="LoginAppBarTheme" parent="AppTheme.AppBarOverlayBase">
+    <style name="LoginAppBarTheme" parent="AppThemeAppBarOverlayBase">
         <item name="android:backgroundTint">@color/backgroundLoginWebviewColor</item>
     </style>
 
-    <style name="AppTheme.CollapsingToolbarLayoutTheme">
+    <style name="AppThemeCollapsingToolbarLayoutTheme">
         <item name="collapsedTitleGravity">center</item>
         <item name="collapsedTitleTextAppearance">@style/H2</item>
         <item name="expandedTitleGravity">bottom</item>
@@ -131,7 +129,7 @@
         <item name="maxLines">1</item>
     </style>
 
-    <style name="AppTheme.ToolbarTheme" parent="Widget.Material3.Toolbar">
+    <style name="AppThemeToolbarTheme" parent="Widget.Material3.Toolbar">
         <item name="android:backgroundTint">@color/backgroundColor</item>
         <item name="contentInsetEnd">54dp</item>
         <item name="contentInsetStartWithNavigation">0dp</item>

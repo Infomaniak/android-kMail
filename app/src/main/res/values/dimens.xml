@@ -17,11 +17,6 @@
   -->
 <resources>
 
-    <!-- Text sizes -->
-
-    <dimen name="textHintSize">14sp</dimen>
-    <dimen name="textSmallSize">12sp</dimen>
-
     <!-- View sizes -->
 
     <dimen name="attachmentChipMaxSize">160dp</dimen>

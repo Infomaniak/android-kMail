@@ -50,7 +50,7 @@
 
     <TextView
         android:id="@+id/unreadCount"
-        style="@style/MenuDrawerBadge"
+        style="@style/Callout.Accent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/marginStandardSmall"

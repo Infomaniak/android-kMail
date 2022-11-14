@@ -17,7 +17,6 @@
   -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -26,17 +25,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/marginStandardMedium"
-        tools:context=".ui.main.thread.actions.MessageActionsBottomSheetDialog">
+        android:paddingBottom="@dimen/marginStandardMedium">
 
         <include layout="@layout/view_bottom_sheet_separator" />
 
         <TextView
-            style="@style/H3"
+            style="@style/BottomSheetTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandard"
-            android:fontFamily="@font/suisseintl_medium"
             android:text="@string/actionsMenuTitle" />
 
         <com.infomaniak.mail.ui.main.thread.actions.MainActionsView

@@ -22,6 +22,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:indent="48dp"
-    app:textSize="@dimen/textHintSize"
     tools:badge="99+"
     tools:text="myriam.rais@infomaniak.com" />

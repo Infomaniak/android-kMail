@@ -49,17 +49,16 @@
     <color name="backgroundNewMailColor">@android:color/white</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
-    <color name="selectedAccountCardviewColor">@color/lightenedGrey</color>
+    <color name="backgroundSecondaryColor">@color/lightenedGrey</color>
     <color name="backgroundDisabledPrimaryButton">@color/grey_text_secondary</color>
-    <color name="backgroundQuickActions">#FCFCFC</color>
     <color name="threadDensityBackground">#FFFFFF</color>
 
     <!-- Texts -->
-    <color name="primaryTextColor">@color/title</color>
+    <color name="primaryTextColor">@color/grey_title</color>
     <color name="secondaryTextColor">@color/grey_text</color>
+    <color name="tertiaryTextColor">@color/grey_text_secondary</color>
     <color name="snackbarTextColor">@color/grey_text</color>
     <color name="hintTextColor">@color/greyTextLight</color>
-    <color name="sectionHeaderTextColor">@color/greyTextLight</color>
     <color name="notificationTextColor">@color/hover</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="emailChipTextColor">@color/grey_title</color>

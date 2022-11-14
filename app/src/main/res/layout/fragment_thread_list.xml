@@ -73,33 +73,37 @@
 
             </com.google.android.material.appbar.MaterialToolbar>
 
-            <TextView
-                android:id="@+id/noNetwork"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
-                android:drawablePadding="@dimen/marginStandardSmall"
-                android:text="@string/noNetworkTitle"
-                android:textColor="@color/orangeWarning"
-                android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_no_network"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-            <TextView
-                android:id="@+id/updatedAt"
-                style="@style/Body.Secondary"
+            <LinearLayout
+                android:id="@+id/updatedAtLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardMedium"
                 android:layout_marginBottom="@dimen/marginStandardMedium"
-                android:ellipsize="end"
-                android:lines="1"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/unreadCountChip"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/noNetwork"
-                tools:text="@string/noNetworkDescription" />
+                app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+                <TextView
+                    android:id="@+id/noNetwork"
+                    style="@style/Callout.Warning"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/marginStandardSmall"
+                    android:text="@string/noNetworkTitle"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/ic_no_network" />
+
+                <TextView
+                    android:id="@+id/updatedAt"
+                    style="@style/Callout.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    tools:text="@string/noNetworkDescription" />
+            </LinearLayout>
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/unreadCountChip"
@@ -115,9 +119,9 @@
                 app:chipCornerRadius="100dp"
                 app:chipStrokeWidth="0dp"
                 app:closeIconTint="?attr/colorOnPrimary"
-                app:layout_constraintBottom_toBottomOf="@id/updatedAt"
+                app:layout_constraintBottom_toBottomOf="@id/updatedAtLayout"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/updatedAt"
+                app:layout_constraintTop_toTopOf="@id/updatedAtLayout"
                 tools:closeIcon="@null"
                 tools:text="2 non lus"
                 tools:visibility="visible" />
@@ -212,22 +216,16 @@
 
                 <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
                     android:id="@+id/newMessageFab"
-                    style="@style/H3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandard"
                     android:layout_marginBottom="@dimen/marginStandard"
                     android:text="@string/buttonNewMessage"
-                    android:textAllCaps="false"
                     app:icon="@drawable/ic_pencil"
-                    app:iconGravity="start"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
     </com.google.android.material.card.MaterialCardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

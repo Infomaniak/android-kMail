@@ -97,7 +97,7 @@
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/plusOthers"
-            style="@style/Callout.Highlighted"
+            style="@style/CaptionMedium.Accent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
@@ -146,7 +146,6 @@
             android:imeOptions="actionDone"
             android:inputType="textEmailAddress"
             android:maxLines="1"
-            android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/divider2"
             app:layout_constraintEnd_toStartOf="@id/chevron"
             app:layout_constraintStart_toEndOf="@id/toPrefix"
@@ -223,7 +222,6 @@
             android:imeOptions="actionDone"
             android:inputType="textEmailAddress"
             android:maxLines="1"
-            android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/divider3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ccPrefix"
@@ -288,7 +286,6 @@
             android:imeOptions="actionDone"
             android:inputType="textEmailAddress"
             android:maxLines="1"
-            android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@id/divider4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/bccPrefix"
@@ -373,8 +370,7 @@
                 android:gravity="top"
                 android:hint="@string/newMessagePlaceholderTitle"
                 android:minHeight="200dp"
-                android:textColor="@color/grey_title"
-                android:textSize="16sp" />
+                android:textColor="@color/grey_title" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView

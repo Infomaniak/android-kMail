@@ -92,7 +92,7 @@ class SwitchUserAccountsAdapter(
         chevron.toggleChevron(isCollapsed)
         addressesList.isGone = isCollapsed
 
-        val backgroundColorResource = if (isCollapsed) R.color.backgroundColor else R.color.selectedAccountCardviewColor
+        val backgroundColorResource = if (isCollapsed) R.color.backgroundColor else R.color.backgroundSecondaryColor
         val backgroundColor = ContextCompat.getColor(root.context, backgroundColorResource)
         accountCardview.setCardBackgroundColor(backgroundColor)
     }

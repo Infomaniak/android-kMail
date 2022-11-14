@@ -49,8 +49,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:textColor="@color/title"
-            android:textSize="16sp"
             tools:text="@tools:sample/full_names" />
 
         <TextView

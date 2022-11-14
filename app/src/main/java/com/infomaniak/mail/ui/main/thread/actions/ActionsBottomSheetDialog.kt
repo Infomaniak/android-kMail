@@ -52,17 +52,9 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun computeFavoriteStyle(context: Context, isFavorite: Boolean): Triple<Int, Int, Int> {
         return if (isFavorite) {
-            Triple(
-                R.drawable.ic_star_filled,
-                context.getColor(R.color.favoriteYellow),
-                R.string.actionUnstar,
-            )
+            Triple(R.drawable.ic_star_filled, context.getColor(R.color.favoriteYellow), R.string.actionUnstar)
         } else {
-            Triple(
-                R.drawable.ic_star,
-                context.getAttributeColor(RMaterial.attr.colorPrimary),
-                R.string.actionStar,
-            )
+            Triple(R.drawable.ic_star, context.getAttributeColor(RMaterial.attr.colorPrimary), R.string.actionStar)
         }
     }
 

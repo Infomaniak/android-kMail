@@ -17,7 +17,7 @@
   -->
 <resources>
 
-    <!-- Texts -->
+    <!-- Text styles -->
 
     <style name="H1">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
@@ -29,75 +29,132 @@
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="H2.Secondary">
-        <item name="android:fontFamily">@font/suisseintl_regular</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+    <style name="H2.Error">
+        <item name="android:textColor">@color/redDestructiveAction</item>
     </style>
 
     <style name="H3">
-        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="Body" />
+    <style name="H3.Secondary">
+        <item name="android:textColor">@color/secondaryTextColor</item>
+    </style>
 
-    <style name="Body.Highlighted">
+    <style name="H3.Error">
+        <item name="android:textColor">@color/redDestructiveAction</item>
+    </style>
+
+    <style name="H4">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="H4.Accent">
         <item name="android:textColor">?android:attr/colorPrimary</item>
+    </style>
+    
+    <style name="H5">
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="H5.Accent">
+        <item name="android:textColor">?android:attr/colorPrimary</item>
+    </style>
+
+    <!-- H5.OnAccent is only used on FABs, see ExtendedFloatingActionButtonStyle -->
+
+    <style name="H5.Error">
+        <item name="android:textColor">@color/redDestructiveAction</item>
+    </style>
+
+    <style name="Body">
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="Body.Secondary">
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
-    <style name="ButtonPill">
+    <style name="CalloutStrong">
         <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- CalloutStrong.Accent is only used in read/unread chip, see R.id.unreadCountChip -->
+
+    <!-- CalloutStrong.OnAccent is only used in read/unread chip, see R.id.unreadCountChip -->
+
+    <style name="CalloutMedium">
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="CalloutMedium.Accent">
+        <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
     <style name="Callout">
-        <item name="android:textSize">@dimen/textHintSize</item>
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Callout.Strong">
-        <item name="android:fontFamily">@font/suisseintl_semibold</item>
+    <style name="Callout.Accent">
+        <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
     <style name="Callout.Secondary">
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
-    <style name="Callout.Light">
-        <item name="android:textColor">@color/secondaryText</item>
-    </style>
-
     <style name="Callout.Tertiary">
-        <item name="android:textColor">@color/hintTextColor</item>
+        <item name="android:textColor">@color/tertiaryTextColor</item>
     </style>
 
-    <style name="Callout.Highlighted">
+    <style name="Callout.Warning">
+        <item name="android:textColor">@color/orangeWarning</item>
+    </style>
+
+    <style name="CaptionMedium">
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="CaptionMedium.Accent">
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
-    <style name="Callout.Highlighted.Strong">
-        <item name="fontFamily">@font/suisseintl_semibold</item>
+    <!-- CaptionMedium.Secondary is only used in QuickBottomActionBar, see QuickBottomActionBarButton -->
+
+    <style name="Caption">
+        <item name="android:fontFamily">@font/suisseintl_regular</item>
+        <item name="android:textSize">12sp</item>
     </style>
+
+    <style name="Caption.Secondary">
+        <item name="android:textColor">@color/secondaryTextColor</item>
+    </style>
+
 
     <!-- Snackbar -->
 
-    <style name="Widget.App.Snackbar" parent="Widget.Material3.Snackbar">
+    <style name="SnackbarStyle" parent="Widget.Material3.Snackbar">
         <item name="actionTextColorAlpha">0.8</item>
         <item name="android:backgroundTint">@color/backgroundSnackbarColor</item>
         <item name="android:layout_margin">@dimen/marginStandard</item>
     </style>
 
-    <style name="Widget.App.SnackbarButton" parent="Widget.Material3.Button.TextButton.Snackbar">
+    <style name="SnackbarButtonStyle" parent="Widget.Material3.Button.TextButton.Snackbar">
         <item name="android:textColor">@color/textButtonBlueLight</item>
-        <item name="android:textSize">@dimen/textHintSize</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Widget.App.SnackbarTextView" parent="Widget.Material3.Snackbar.TextView">
+    <style name="SnackbarTextViewStyle" parent="Widget.Material3.Snackbar.TextView">
         <item name="android:textColor">@color/snackbarTextColor</item>
-        <item name="android:textSize">@dimen/textHintSize</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 
@@ -107,7 +164,7 @@
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">?android:attr/colorPrimary</item>
-        <item name="android:textSize">@dimen/textHintSize</item>
+        <item name="android:textSize">14sp</item>
         <item name="cornerRadius">10dp</item>
     </style>
 
@@ -127,11 +184,15 @@
         <item name="layout_constraintWidth_max">500dp</item>
     </style>
 
-    <style name="TextButtonPrimary.Error">
+    <style name="TextButtonError" parent="TextButtonPrimary">
         <item name="android:textColor">@color/redDestructiveAction</item>
         <item name="backgroundTint">@android:color/transparent</item>
-        <item name="fontFamily">@font/suisseintl_semibold</item>
         <item name="rippleColor">@color/redDestructiveActionTransparent</item>
+    </style>
+
+    <style name="TextButtonSecondary" parent="TextButton">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
     </style>
 
     <style name="IconButton" parent="Widget.Material3.Button.TextButton">
@@ -158,6 +219,42 @@
         <item name="layout_constraintWidth_max">80dp</item>
         <item name="rippleColor">?android:attr/colorControlHighlight</item>
         <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="QuickBottomActionBarButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:drawableTint">?android:attr/colorPrimary</item>
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textSize">12sp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="iconGravity">textTop</item>
+        <item name="iconPadding">@dimen/marginStandardSmall</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconTint">?android:attr/colorPrimary</item>
+        <item name="layout_constraintWidth_max">120dp</item>
+    </style>
+
+    <style name="DetailedContactButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:paddingEnd">@dimen/marginStandard</item>
+        <item name="android:paddingStart">@dimen/marginStandard</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="iconPadding">@dimen/marginStandard</item>
+        <item name="iconSize">20dp</item>
     </style>
 
 
@@ -191,11 +288,6 @@
 
     <!-- MenuDrawer -->
 
-    <style name="MenuDrawerBadge" parent="Callout.Highlighted">
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">?android:attr/colorPrimary</item>
-    </style>
-
     <style name="MenuDrawerDivider" parent="Widget.Material3.MaterialDivider">
         <item name="android:layout_marginTop">@dimen/marginStandardSmall</item>
         <item name="android:layout_marginBottom">@dimen/marginStandardSmall</item>
@@ -227,16 +319,6 @@
         <item name="cardBackgroundColor">?attr/colorPrimaryContainer</item>
     </style>
 
-    <style name="MenuDrawerItemText">
-        <item name="android:drawablePadding">@dimen/marginStandard</item>
-        <item name="android:drawableTint">?android:attr/colorPrimary</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:gravity">start|center</item>
-        <item name="android:lineSpacingMultiplier">1</item>
-        <item name="android:maxLines">2</item>
-        <item name="drawableStartCompat">@drawable/ic_folder</item>
-    </style>
-
     <!-- Chips -->
 
     <style name="EmailAddressChip" parent="Widget.Material3.Chip.Input">
@@ -266,22 +348,24 @@
     <style name="BottomSheetDialogTheme.Base" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="bottomSheetStyle">@style/BottomSheetDialogTheme.ModalStyle</item>
+        <item name="bottomSheetStyle">@style/BottomSheetDialogThemeModalStyle</item>
     </style>
 
     <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base" />
 
-    <style name="BottomSheetDialogTheme.ModalStyle" parent="Widget.Material3.BottomSheet">
+    <style name="BottomSheetDialogThemeModalStyle" parent="Widget.Material3.BottomSheet">
         <item name="backgroundTint">@color/backgroundColor</item>
-        <item name="shapeAppearanceOverlay">@style/BottomSheetDialogTheme.ShapeAppearanceOverlay</item>
+        <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
     </style>
 
-    <style name="BottomSheetDialogTheme.ShapeAppearanceOverlay">
+    <style name="BottomSheetDialogThemeShapeAppearanceOverlay">
         <item name="cornerSizeBottomLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeTopLeft">10dp</item>
         <item name="cornerSizeTopRight">10dp</item>
     </style>
+
+    <style name="BottomSheetTitle" parent="H5" />
 
     <!-- Settings -->
 
@@ -295,7 +379,7 @@
         <item name="dividerColor">@color/separatorColor</item>
     </style>
 
-    <style name="SettingHeader" parent="Callout.Tertiary">
+    <style name="SettingHeader" parent="Callout.Secondary">
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
@@ -305,18 +389,16 @@
         <item name="android:paddingTop">@dimen/marginStandardMedium</item>
     </style>
 
-    <style name="SettingButtonToggle">
+    <style name="SettingButtonToggle" parent="H5">
         <item name="android:backgroundTint">@color/button_toggle_background</item>
-        <item name="android:fontFamily">@font/suisseintl_medium</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_width">0dp</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:paddingEnd">0dp</item>
         <item name="android:paddingStart">0dp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/primaryTextColor</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:letterSpacing">0</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
         <item name="strokeColor">?android:attr/colorPrimary</item>
         <item name="strokeWidth">1dp</item>
@@ -334,15 +416,20 @@
 
     <!-- Other -->
 
-    <style name="Widget.App.ExtendedFloatingActionButton" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
+    <style name="ExtendedFloatingActionButtonStyle" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
+        <item name="android:fontFamily">@font/suisseintl_medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="iconTint">?attr/colorOnPrimary</item>
+        <item name="iconGravity">start</item>
+        <item name="materialThemeOverlay">@style/FloatingActionButtonThemeOverlay</item>
     </style>
 
-    <style name="Widget.App.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.FloatingActionButton</item>
+    <style name="FloatingActionButtonStyle" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="materialThemeOverlay">@style/FloatingActionButtonThemeOverlay</item>
     </style>
 
-    <style name="ThemeOverlay.App.FloatingActionButton" parent="">
+    <style name="FloatingActionButtonThemeOverlay" parent="">
         <item name="colorContainer">?android:attr/colorPrimary</item>
         <item name="colorOnContainer">?attr/colorOnPrimary</item>
     </style>

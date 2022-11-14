@@ -99,7 +99,7 @@
 
                     <TextView
                         android:id="@+id/mailboxSwitcherText"
-                        style="@style/Callout.Highlighted.Strong"
+                        style="@style/H4.Accent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -274,7 +274,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Callout.Tertiary"
+                style="@style/SettingHeader"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/menuDrawerItemViewHeight"
                 android:gravity="center|start"
@@ -340,6 +340,7 @@
 
                     <TextView
                         android:id="@+id/storageText"
+                        style="@style/H5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/marginStandardMedium"
@@ -350,7 +351,7 @@
 
                     <TextView
                         android:id="@+id/getMoreStorageButton"
-                        style="@style/Callout.Highlighted"
+                        style="@style/CalloutMedium.Accent"
                         android:layout_width="wrap_content"
                         android:layout_height="18dp"
                         android:layout_marginStart="@dimen/marginStandardMedium"

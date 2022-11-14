@@ -45,15 +45,12 @@
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/addAccount"
-            style="@style/H3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/marginStandard"
             android:layout_marginBottom="@dimen/marginStandard"
             android:text="@string/buttonAddAccount"
-            android:textAllCaps="false"
             app:icon="@drawable/ic_add"
-            app:iconGravity="start"
             app:iconPadding="@dimen/marginStandardSmall"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
