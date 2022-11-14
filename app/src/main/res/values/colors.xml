@@ -32,54 +32,46 @@
     <color name="redDestructiveAction">#F44336</color>
     <color name="redDestructiveActionTransparent">#1EF44336</color>
 
-    <!-- Black/Grey/White Tones -->
-    <color name="greyTextLight">#888888</color>
-    <color name="lightenedGrey">#FAFAFA</color>
-
     <!-- Color Tones -->
     <color name="blueTextLight">#4CB7FF</color>
 
     <!-- Backgrounds -->
-    <color name="backgroundCardSelectedColor">@color/hover</color>
-    <color name="backgroundChipColor">@color/background</color>
+    <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
-    <color name="backgroundNotificationColor">@color/grey_text</color>
-    <color name="backgroundNewMailColor">@android:color/white</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
-    <color name="backgroundSnackbarColor">@color/lightenedGrey</color>
-    <color name="backgroundSecondaryColor">@color/lightenedGrey</color>
-    <color name="backgroundDisabledPrimaryButton">@color/grey_text_secondary</color>
+    <color name="backgroundSnackbarColor">@color/swan</color>
+    <color name="backgroundSecondaryColor">@color/swan</color>
+    <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadDensityBackground">#FFFFFF</color>
 
     <!-- Texts -->
-    <color name="primaryTextColor">@color/grey_title</color>
-    <color name="secondaryTextColor">@color/grey_text</color>
-    <color name="tertiaryTextColor">@color/grey_text_secondary</color>
-    <color name="snackbarTextColor">@color/grey_text</color>
-    <color name="hintTextColor">@color/greyTextLight</color>
-    <color name="notificationTextColor">@color/hover</color>
+    <color name="primaryTextColor">@color/orca</color>
+    <color name="secondaryTextColor">@color/elephant</color>
+    <color name="tertiaryTextColor">@color/shark</color>
+    <color name="snackbarTextColor">@color/elephant</color>
+    <color name="hintTextColor">@color/shark</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
-    <color name="emailChipTextColor">@color/grey_title</color>
+    <color name="emailChipTextColor">@color/orca</color>
 
-    <!-- Drawables -->
-    <color name="separatorColor">#ECECEC</color>
+    <!-- Separators -->
+    <color name="separatorDarker">#ECECEC</color>
+    <color name="separatorLighter">#ECECEC</color>
 
     <!-- Icons -->
-    <color name="chevronColor">@color/grey_text</color>
-    <color name="iconColor">@color/grey_text</color>
-    <color name="iconToolbarButton">@color/primaryTextColor</color>
+    <color name="iconColor">@color/elephant</color>
+    <color name="iconSecondaryColor">@color/elephant</color>
     <color name="favoriteYellow">#F1BE41</color>
 
     <!-- Buttons -->
     <color name="textButtonBlueLight">@color/blueTextLight</color>
 
     <!-- Cardview -->
-    <color name="attachmentStrokeColor">@color/border</color>
+    <color name="cardViewStrokeColor">@color/mouse</color>
 
     <!-- Progressbar -->
-    <color name="progressbarTrackColor">@color/grey_border</color>
+    <color name="progressbarTrackColor">@color/mouse</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
@@ -90,6 +82,6 @@
     <color name="swipeSpam">#FF8500</color>
     <color name="swipeArchive">#BA68C8</color>
     <color name="swipeQuickActionMenu">#85A2B6</color>
-    <color name="swipeNone">@color/border</color>
+    <color name="swipeNone">@color/progressbarTrackColor</color>
 
 </resources>

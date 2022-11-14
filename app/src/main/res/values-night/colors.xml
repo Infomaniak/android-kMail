@@ -30,39 +30,35 @@
     <color name="redDestructiveActionTransparent">#1ED71E04</color>
 
     <!-- Backgrounds -->
-    <color name="backgroundCardSelectedColor">@color/grey_title</color>
-    <color name="backgroundChipColor">@color/grey_title</color>
+    <color name="searchBarBackgroundColor">@color/orca</color>
     <color name="backgroundColor">#101010</color>
-    <color name="backgroundHeaderColor">#1A1A1A</color>
+    <color name="backgroundHeaderColor">@color/bat</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
-    <color name="backgroundNotificationColor">@color/black</color>
-    <color name="backgroundOnBoardingColor">#1A1A1A</color>
+    <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/black</color>
-    <color name="backgroundNewMailColor">@color/grey_title</color>
     <color name="backgroundSecondaryColor">#1A1A1A</color>
-    <color name="backgroundDisabledPrimaryButton">@color/grey_title</color>
+    <color name="backgroundDisabledPrimaryButton">@color/orca</color>
     <color name="threadDensityBackground">#191919</color>
 
     <!-- Texts -->
-    <color name="primaryTextColor">@color/grey_border</color>
-    <color name="secondaryTextColor">@color/secondaryText</color>
-    <color name="tertiaryTextColor">@color/grey_text</color>
-    <color name="snackbarTextColor">@color/hover</color>
-    <color name="hintTextColor">@color/grey_text</color>
-    <color name="emailChipTextColor">@color/secondaryText</color>
+    <color name="primaryTextColor">@color/mouse</color>
+    <color name="secondaryTextColor">@color/shark</color>
+    <color name="tertiaryTextColor">@color/elephant</color>
+    <color name="snackbarTextColor">@color/polar_bear</color>
+    <color name="emailChipTextColor">@color/shark</color>
 
-    <!-- Drawables -->
-    <color name="separatorColor">@color/grey_title</color>
+    <!-- Separators -->
+    <color name="separatorDarker">@color/bat</color>
+    <color name="separatorLighter">@color/orca</color>
 
     <!-- Icons -->
-    <color name="chevronColor">@color/lightenedGrey</color>
-    <color name="iconColor">@color/lightenedGrey</color>
-    <color name="iconToolbarButton">@color/lightenedGrey</color>
+    <color name="iconColor">@color/mouse</color>
+    <color name="iconSecondaryColor">@color/shark</color>
 
     <!-- Cardview -->
-    <color name="attachmentStrokeColor">@color/grey_title</color>
+    <color name="cardViewStrokeColor">@color/orca</color>
 
     <!-- Progressbar -->
-    <color name="progressbarTrackColor">@color/grey_text</color>
+    <color name="progressbarTrackColor">@color/elephant</color>
 
 </resources>

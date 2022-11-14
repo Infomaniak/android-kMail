@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardMedium"
-            app:dividerColor="@color/separatorColor"
+            app:dividerColor="@color/separatorLighter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fromPrefix" />
@@ -169,7 +169,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardVerySmall"
-            app:dividerColor="@color/separatorColor"
+            app:dividerColor="@color/separatorLighter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toAutocompleteInput" />
@@ -233,7 +233,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardVerySmall"
-            app:dividerColor="@color/separatorColor"
+            app:dividerColor="@color/separatorLighter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ccAutocompleteInput" />
@@ -297,7 +297,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardVerySmall"
-            app:dividerColor="@color/separatorColor"
+            app:dividerColor="@color/separatorLighter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bccAutocompleteInput" />
@@ -343,7 +343,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
             android:layout_marginTop="@dimen/marginStandardVerySmall"
-            app:dividerColor="@color/separatorColor"
+            app:dividerColor="@color/separatorLighter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/subjectTextField" />
@@ -360,7 +360,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider5"
             app:placeholderText="@string/newMessagePlaceholderTitle"
-            app:placeholderTextColor="@color/secondaryText">
+            app:placeholderTextColor="@color/hintTextColor">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/bodyText"
@@ -370,7 +370,7 @@
                 android:gravity="top"
                 android:hint="@string/newMessagePlaceholderTitle"
                 android:minHeight="200dp"
-                android:textColor="@color/grey_title" />
+                android:textColor="@color/orca" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView

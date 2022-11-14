@@ -20,9 +20,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/searchViewHeight"
-    app:cardBackgroundColor="@color/backgroundCardSelectedColor"
-    app:cardCornerRadius="20dp"
-    tools:showIn="@layout/fragment_thread_list">
+    app:cardBackgroundColor="@color/searchBarBackgroundColor"
+    app:cardCornerRadius="20dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -80,7 +79,7 @@
             android:layout_marginEnd="@dimen/marginStandardMedium"
             android:contentDescription="@string/contentDescriptionButtonFilterSearch"
             app:icon="@drawable/ic_filter"
-            app:iconTint="@color/secondaryText"
+            app:iconTint="@color/shark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

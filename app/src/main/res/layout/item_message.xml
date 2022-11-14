@@ -112,6 +112,7 @@
                     android:layout_marginHorizontal="@dimen/marginStandardSmall"
                     android:src="@drawable/ic_chevron_down"
                     app:layout_constraintHorizontal_bias="0"
+                    app:tint="@color/iconSecondaryColor"
                     tools:ignore="ContentDescription" />
             </LinearLayout>
 
@@ -285,6 +286,7 @@
         app:layout_constraintBottom_toTopOf="@id/headerDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
+        app:tint="@color/iconSecondaryColor"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -310,7 +312,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
-        app:dividerColor="@color/separatorColor"
+        app:dividerColor="@color/separatorDarker"
         app:layout_constraintBottom_toTopOf="@id/attachmentsRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -370,7 +372,7 @@
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
         android:layout_marginTop="@dimen/marginStandardSmall"
         android:layout_marginBottom="@dimen/marginStandardMedium"
-        app:dividerColor="@color/separatorColor"
+        app:dividerColor="@color/separatorDarker"
         app:layout_constraintBottom_toTopOf="@id/webViewFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
