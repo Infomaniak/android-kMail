@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,16 +34,16 @@ import kotlinx.coroutines.withContext
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
+        if (runAttemptCount > MAX_RETRIES) return@withContext Result.failure()
         runCatching {
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@runCatching Result.failure()
             handleDraftsActions()
             Result.success()
         }.getOrElse { exception ->
             exception.printStackTrace()
-            if (exception is CancellationException) {
-                Result.failure()
-            } else {
-                Result.retry()
+            when (exception) {
+                is CancellationException -> Result.failure()
+                else -> Result.retry()
             }
         }
     }
@@ -56,17 +57,25 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
 
             val drafts = DraftController.getDraftsWithActions(this).ifEmpty { null } ?: return@writeBlocking Result.failure()
             val mailboxUuid = getCurrentMailboxUuid() ?: return@writeBlocking Result.failure()
+            var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
-                DraftController.executeDraftAction(draft, mailboxUuid, this)
+                try {
+                    DraftController.executeDraftAction(draft, mailboxUuid, this)
+                } catch (exception: Exception) {
+                    exception.printStackTrace()
+                    Sentry.captureException(exception)
+                    hasRemoteException = true
+                }
             }
 
-            Result.success()
+            if (hasRemoteException) Result.failure() else Result.success()
         }
     }
 
     companion object {
         const val TAG = "DraftsActionsWorker"
+        const val MAX_RETRIES = 3
 
         fun scheduleWork(context: Context) {
             val hasEmptyDrafts = DraftController.getDraftsWithActionsCount() == 0L
