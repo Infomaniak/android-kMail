@@ -40,7 +40,6 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.formatFoldersListWithAllChildren
@@ -72,7 +71,6 @@ class MenuDrawerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AccountUtils.currentUser?.let(binding.userAvatar::loadAvatar)
 
         setupAdapters()
         setupListeners()
@@ -111,7 +109,12 @@ class MenuDrawerFragment : Fragment() {
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
-        addAccount.setOnClickListener { startActivity(Intent(context, LoginActivity::class.java)) }
+        swapAccount.setOnClickListener {
+            safeNavigate(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment(),
+                currentClassName = MenuDrawerFragment::class.java.name,
+            )
+        }
         inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
         customFolders.setOnClickListener {
             customFoldersList.apply {
