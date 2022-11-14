@@ -82,12 +82,12 @@
             style="@style/TextButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:insetLeft="0dp"
-            android:insetTop="0dp"
-            android:insetRight="0dp"
-            android:insetBottom="0dp"
+            android:insetLeft="@dimen/marginStandardVerySmall"
+            android:insetTop="@dimen/marginStandardVerySmall"
+            android:insetRight="@dimen/marginStandardVerySmall"
+            android:insetBottom="@dimen/marginStandardVerySmall"
             android:visibility="gone"
-            app:cornerRadius="@dimen/smallCornerRadius"
+            app:cornerRadius="@dimen/roundCornerRadius"
             app:icon="@drawable/ic_close"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
@@ -97,7 +97,8 @@
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/textsLayout"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

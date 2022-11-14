@@ -17,7 +17,10 @@
  */
 package com.infomaniak.mail.utils
 
+import android.content.ContentResolver
 import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
 import android.os.Build
 import android.util.Patterns
 import android.util.TypedValue
@@ -139,6 +142,18 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 }
 
 fun List<Message>.getLastMessageToExecuteAction(): Message = lastOrNull { !it.isDraft } ?: last()
+
+fun Uri.getFileName(context: Context): String? = when (scheme) {
+    ContentResolver.SCHEME_CONTENT -> getContentFileName(context)
+    else -> lastPathSegment?.substringAfterLast("/")
+}
+
+private fun Uri.getContentFileName(context: Context): String? = runCatching {
+    context.contentResolver.query(this, null, null, null, null)?.use { cursor ->
+        cursor.moveToFirst()
+        return@use cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
+    }
+}.getOrNull()
 
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {

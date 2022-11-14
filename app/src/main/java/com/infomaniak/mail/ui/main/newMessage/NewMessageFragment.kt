@@ -22,10 +22,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.webkit.MimeTypeMap
 import android.widget.ArrayAdapter
@@ -53,11 +55,8 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.LocalStorageUtils.copyDataToAttachmentsCache
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.setMargins
-import com.infomaniak.mail.utils.toggleChevron
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -69,7 +68,16 @@ class NewMessageFragment : Fragment() {
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private lateinit var contactAdapter: ContactAdapter
-    private val attachmentAdapter = AttachmentAdapter(true, null)
+    private val attachmentAdapter = AttachmentAdapter(
+        shouldDisplayCloseButton = true,
+        onDelete = { itemCountLeft ->
+            if (itemCountLeft == 0) {
+                TransitionManager.beginDelayedTransition(binding.root)
+                binding.attachmentsRecyclerView.isGone = true
+            }
+        },
+        onAttachmentClicked = null,
+    )
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
@@ -116,6 +124,7 @@ class NewMessageFragment : Fragment() {
                 EditorAction.ATTACHMENT -> {
                     Log.d("SelectedText", "ATTACHMENT")
                     filePicker.open { uris ->
+                        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                         uris.forEach(::importAttachment)
                         attachmentsRecyclerView.isVisible = attachmentAdapter.itemCount > 0
                     }
@@ -145,7 +154,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun importAttachment(uri: Uri) {
-        val fileName = uri.lastPathSegment!!.substringAfterLast("/")
+        val fileName = uri.getFileName(requireContext())!!
         val draftUuid = newMessageViewModel.currentDraftLocalUuid
 
         copyDataToAttachmentsCache(requireContext(), uri, fileName, draftUuid)?.let { file ->

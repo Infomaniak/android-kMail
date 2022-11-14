@@ -356,7 +356,7 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             android:paddingHorizontal="12dp"
-            android:paddingVertical="@dimen/marginStandardMedium"
+            android:paddingTop="@dimen/marginStandardMedium"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
