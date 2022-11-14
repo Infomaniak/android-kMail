@@ -53,6 +53,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settingsButton"
                 style="@style/IconButton"
+                android:layout_height="28dp"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
                 app:icon="@drawable/ic_cog"
                 app:iconSize="24dp"
@@ -104,8 +105,7 @@
                         style="@style/H4.Accent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/marginStandard"
-                        android:layout_marginEnd="@dimen/marginStandardMedium"
+                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
                         android:ellipsize="end"
                         android:lines="1"
                         app:layout_constraintBottom_toBottomOf="parent"
