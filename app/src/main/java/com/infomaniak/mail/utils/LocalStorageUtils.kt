@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import io.sentry.Sentry
 import java.io.File
 import java.io.FileOutputStream
