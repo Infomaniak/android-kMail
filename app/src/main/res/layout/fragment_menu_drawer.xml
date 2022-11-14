@@ -213,52 +213,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.google.android.material.card.MaterialCardView
+            <com.infomaniak.mail.ui.main.menu.MenuDrawerDropdownView
                 android:id="@+id/customFolders"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/buttonFolders" />
-
-                    <ImageView
-                        android:id="@+id/expandCustomFolderButton"
-                        android:layout_width="@dimen/chevronSize"
-                        android:layout_height="@dimen/chevronSize"
-                        android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
-                        android:src="@drawable/ic_chevron_down" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:actionContentDescription="@string/buttonCreateFolder"
+                app:showIcon="true"
+                app:title="@string/buttonFolders" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/customFoldersList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"
-                android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="2"
-                tools:listitem="@layout/item_folder_menu_drawer"
-                tools:visibility="visible" />
-
-            <com.infomaniak.mail.views.MenuDrawerItemView
-                android:id="@+id/createNewFolderButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:icon="@drawable/ic_plus_rounded"
-                app:text="@string/buttonCreateFolder"
-                tools:visibility="visible" />
+                tools:listitem="@layout/item_folder_menu_drawer" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"

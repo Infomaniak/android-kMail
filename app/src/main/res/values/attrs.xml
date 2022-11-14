@@ -85,4 +85,11 @@
         <attr name="selectedBackgroundColor" format="color" />
         <attr name="selectedIconColor" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="MenuDrawerDropdownView">
+        <attr name="actionContentDescription" format="string" />
+        <attr name="collapsedByDefault" format="boolean" />
+        <attr name="showIcon" format="boolean" />
+        <attr name="title" />
+    </declare-styleable>
 </resources>

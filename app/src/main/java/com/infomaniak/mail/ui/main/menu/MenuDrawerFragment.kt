@@ -117,15 +117,9 @@ class MenuDrawerFragment : Fragment() {
         }
         inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
         customFolders.setOnClickListener {
-            customFoldersList.apply {
-                isVisible = !isVisible
-                expandCustomFolderButton.toggleChevron(!isVisible)
-            }
-            createNewFolderButton.apply {
-                isVisible = !isVisible
-            }
+            customFoldersList.apply { isGone = customFolders.isCollapsed }
         }
-        createNewFolderButton.setOnClickListener {
+        customFolders.setOnActionClickListener { // Create new folder
             // TODO
             notYetImplemented()
         }
@@ -199,8 +193,6 @@ class MenuDrawerFragment : Fragment() {
             val currentFolderId = MainViewModel.currentFolderId.value
             defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
             customFolderAdapter.setFolders(customFolders, currentFolderId)
-
-            setCustomFoldersCollapsedState()
         }
     }
 
@@ -235,29 +227,16 @@ class MenuDrawerFragment : Fragment() {
         trackScreen()
     }
 
-    private fun setCustomFoldersCollapsedState() = with(binding) {
-        val folderId = MainViewModel.currentFolderId.value
-        val isExpanded = folderId != null && (currentFolderRole == null || customFolderAdapter.itemCount == 0)
-        val angleResource = if (isExpanded) R.dimen.angleViewRotated else R.dimen.angleViewNotRotated
-        val angle = ResourcesCompat.getFloat(resources, angleResource)
-        customFoldersList.isVisible = isExpanded
-        createNewFolderButton.isVisible = isExpanded
-        expandCustomFolderButton.rotation = angle
-    }
-
     fun closeDrawer() {
         exitDrawer?.invoke()
         closeDropdowns()
     }
 
-    @Suppress("MemberVisibilityCanBePrivate")
     fun closeDropdowns(): Unit = with(binding) {
         mailboxExpandedSwitcher.isGone = true
-        mailboxExpandButton.rotation = 0.0f
-        customFoldersList.isGone = true
-        createNewFolderButton.isGone = true
-        expandCustomFolderButton.rotation = 0.0f
-        setCustomFoldersCollapsedState()
+        mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
+        customFoldersList.isVisible = true
+        customFolders.setIsCollapsed(false)
     }
 
     private fun openFolder(folderId: String) {
