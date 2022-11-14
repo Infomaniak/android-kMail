@@ -26,6 +26,7 @@
     <color name="blueMailRipple">#1E4CB7FF</color>
 
     <!-- Context / errors -->
+    <color name="orangeWarning">#FFAA4C</color>
     <color name="redDestructiveAction">#D71E04</color>
     <color name="redDestructiveActionTransparent">#1ED71E04</color>
 
