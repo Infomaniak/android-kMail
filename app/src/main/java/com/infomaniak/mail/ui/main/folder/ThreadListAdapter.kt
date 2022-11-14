@@ -120,6 +120,7 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
 
+        draftPrefix.isVisible = thread.hasDrafts
         expeditor.text = formatExpeditorNames(context)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
@@ -158,6 +159,7 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isGone = true
+        draftPrefix.setTextAppearance(R.style.H3_Error)
         expeditor.setTextAppearance(R.style.H3_Secondary)
         mailSubject.setTextAppearance(R.style.Body_Secondary)
         mailDate.setTextAppearance(R.style.Callout_Secondary)
@@ -167,6 +169,7 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
+        draftPrefix.setTextAppearance(R.style.H2_Error)
         expeditor.setTextAppearance(R.style.H2)
         mailSubject.setTextAppearance(R.style.H4)
         mailDate.setTextAppearance(R.style.CalloutStrong)
