@@ -44,6 +44,7 @@
     <color name="primaryTextColor">@color/mouse</color>
     <color name="secondaryTextColor">@color/shark</color>
     <color name="tertiaryTextColor">@color/elephant</color>
+    <color name="colorOnPrimary">@color/bat</color>
     <color name="snackbarTextColor">@color/polar_bear</color>
     <color name="emailChipTextColor">@color/shark</color>
 

@@ -162,7 +162,6 @@ class MenuDrawerFragment : Fragment() {
             // TODO: Restore mails
             notYetImplemented()
         }
-        getMoreStorageCardview.setOnClickListener { menuDrawerSafeNavigate(R.id.getMoreStorageBottomSheetDialog) }
     }
 
     private fun menuDrawerSafeNavigate(destinationResId: Int) {
@@ -220,7 +219,7 @@ class MenuDrawerFragment : Fragment() {
         menuDrawerViewModel.quotas.observe(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
-            getMoreStorageCardview.isVisible = isLimited
+            storageLayout.isVisible = isLimited
             storageDivider.isVisible = isLimited
 
             if (isLimited) {

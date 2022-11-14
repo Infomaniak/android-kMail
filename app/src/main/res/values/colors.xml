@@ -50,6 +50,7 @@
     <color name="primaryTextColor">@color/orca</color>
     <color name="secondaryTextColor">@color/elephant</color>
     <color name="tertiaryTextColor">@color/shark</color>
+    <color name="colorOnPrimary">@color/white</color>
     <color name="snackbarTextColor">@color/elephant</color>
     <color name="hintTextColor">@color/shark</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
