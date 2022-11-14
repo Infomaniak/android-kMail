@@ -31,7 +31,7 @@ import com.infomaniak.mail.utils.context
 class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
     private val onDelete: ((itemCountLeft: Int) -> Unit)? = null,
-    private val onAttachmentClicked: ((Attachment) -> Unit)?,
+    private val onAttachmentClicked: ((Attachment) -> Unit)? = null,
 ) : RecyclerView.Adapter<AttachmentViewHolder>() {
 
     private var attachments: MutableList<Attachment> = mutableListOf()

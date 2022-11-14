@@ -76,7 +76,6 @@ class NewMessageFragment : Fragment() {
                 binding.attachmentsRecyclerView.isGone = true
             }
         },
-        onAttachmentClicked = null,
     )
 
     private var mailboxes = emptyList<Mailbox>()
