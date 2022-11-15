@@ -33,6 +33,9 @@ import kotlinx.coroutines.withContext
 
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
+    private val mailboxContentRealm by lazy { RealmDatabase.newMailboxContentInstance }
+    private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
+
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (runAttemptCount > MAX_RETRIES) return@withContext Result.failure()
         runCatching {
@@ -45,6 +48,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
                 is CancellationException -> Result.failure()
                 else -> Result.retry()
             }
+        }.also {
+            mailboxContentRealm.close()
+            mailboxInfoRealm.close()
         }
     }
 

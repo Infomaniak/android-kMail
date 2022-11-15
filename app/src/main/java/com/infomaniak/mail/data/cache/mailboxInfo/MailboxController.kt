@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
@@ -53,7 +54,7 @@ object MailboxController {
         return (this ?: RealmDatabase.mailboxInfo()).query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
     }
 
-    private fun MutableRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
+    private fun TypedRealm?.getMailboxQuery(objectId: String): RealmSingleQuery<Mailbox> {
         return (this ?: RealmDatabase.mailboxInfo()).query<Mailbox>("${Mailbox::objectId.name} = '$objectId'").first()
     }
 
@@ -80,7 +81,7 @@ object MailboxController {
         return realm.getMailboxesQuery(userId).asFlow()
     }
 
-    fun getMailbox(objectId: String, realm: MutableRealm? = null): Mailbox? {
+    fun getMailbox(objectId: String, realm: TypedRealm? = null): Mailbox? {
         return realm.getMailboxQuery(objectId).find()
     }
 
@@ -88,7 +89,7 @@ object MailboxController {
         return realm.getMailboxQuery(userId, mailboxId).find() ?: realm.getMailboxesQuery(userId).first().find()
     }
 
-    fun getMailboxAsync(objectId: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Mailbox>> {
+    fun getMailboxAsync(objectId: String, realm: TypedRealm? = null): Flow<SingleQueryChange<Mailbox>> {
         return realm.getMailboxQuery(objectId).asFlow()
     }
     //endregion
