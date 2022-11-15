@@ -173,9 +173,12 @@ class MainActivity : ThemedActivity() {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
     }
 
+    @Suppress("SpellCheckingInspection")
     private fun launchDraftsActionsWorkIfNeeded() {
-        DraftsActionsWorker.getRunningWorkInfosLiveData(this).observe(this) { worksInfoList ->
+        val runningWorkInfosLiveData = DraftsActionsWorker.getRunningWorkInfosLiveData(this)
+        runningWorkInfosLiveData.observe(this) { worksInfoList ->
             if (worksInfoList.isEmpty()) DraftsActionsWorker.scheduleWork(this)
+            runningWorkInfosLiveData.removeObservers(this)
         }
     }
 }
