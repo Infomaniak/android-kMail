@@ -56,6 +56,7 @@
     <!-- Icons -->
     <color name="iconColor">@color/mouse</color>
     <color name="iconSecondaryColor">@color/shark</color>
+    <color name="swipeActionIconColor">@color/bat</color>
 
     <!-- Cardview -->
     <color name="cardViewStrokeColor">@color/orca</color>

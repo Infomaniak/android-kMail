@@ -64,6 +64,7 @@
     <color name="iconColor">@color/elephant</color>
     <color name="iconSecondaryColor">@color/elephant</color>
     <color name="favoriteYellow">#F1BE41</color>
+    <color name="swipeActionIconColor">@color/white</color>
 
     <!-- Buttons -->
     <color name="textButtonBlueLight">@color/blueTextLight</color>

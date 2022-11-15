@@ -68,6 +68,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private var folderJob: Job? = null
 
@@ -107,9 +108,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeContacts()
     }
 
-    override fun onResume() {
+    override fun onResume(): Unit = with(binding) {
         super.onResume()
-        binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
+        unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
+
+        threadsList.apply {
+            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
+            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
+            behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
+            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
+        }
     }
 
     override fun onRefresh() {
@@ -122,6 +130,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
+            context = requireContext(),
             threadDensity = LocalSettings.getInstance(requireContext()).threadDensity,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
