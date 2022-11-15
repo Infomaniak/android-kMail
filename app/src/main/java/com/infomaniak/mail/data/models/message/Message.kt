@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -129,9 +130,10 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun toThread(mailboxUuid: String, folderId: String) = Thread().apply {
+    fun toThread(mailboxUuid: String) = Thread().apply {
         this.mailboxUuid = mailboxUuid
-        this.folderId = folderId
+        foldersIds = realmSetOf(this@Message.folderId)
+        this@Message.references?.let { references = realmSetOf(it) }
         uid = this@Message.uid
         uniqueMessagesCount = 1
         messages = realmListOf(this@Message)

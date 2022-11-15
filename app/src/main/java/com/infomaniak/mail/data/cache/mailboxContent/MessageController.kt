@@ -147,7 +147,7 @@ object MessageController {
                 val page = uids.subList(pageStart, pageEnd)
                 ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page).data?.messages?.let { messages ->
                     FolderController.updateFolder(folder.id) { folder ->
-                        folder.threads += messages.map { it.toThread(mailboxUuid, folder.id) }.toRealmList()
+                        folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
                     }
                 }
 
@@ -177,7 +177,7 @@ object MessageController {
                     seen = flags.seen
                 }
 
-                ThreadController.upsertThread(message.toThread(mailboxUuid, folderId), realm)
+                ThreadController.upsertThread(message.toThread(mailboxUuid), realm)
             }
         }
     }

@@ -30,9 +30,11 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -78,7 +80,9 @@ class Thread : RealmObject {
     @Transient
     var mailboxUuid: String = ""
     @Transient
-    var folderId: String = ""
+    var foldersIds: RealmSet<String> = realmSetOf()
+    @Transient
+    var references: RealmSet<String> = realmSetOf()
     //endregion
 
     fun formatDate(context: Context): String = with(date.toDate()) {
