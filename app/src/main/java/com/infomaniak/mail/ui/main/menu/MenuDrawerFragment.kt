@@ -121,7 +121,7 @@ class MenuDrawerFragment : Fragment() {
             // TODO
             notYetImplemented()
         }
-        feedbacks.setOnClickListener {
+        feedback.setOnClickListener {
             closeDrawer()
             if (AccountUtils.currentUser?.isStaff == true) {
                 Intent(context, BugTrackerActivity::class.java).apply {
