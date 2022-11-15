@@ -27,8 +27,8 @@
 
     <!-- Context / errors -->
     <color name="orangeWarning">#FFAA4C</color>
-    <color name="redDestructiveAction">#D71E04</color>
-    <color name="redDestructiveActionTransparent">#1ED71E04</color>
+    <color name="redDestructiveAction">#FC8878</color>
+    <color name="redDestructiveActionTransparent">#1EFC8878</color>
 
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/orca</color>
@@ -62,5 +62,17 @@
 
     <!-- Progressbar -->
     <color name="progressbarTrackColor">@color/elephant</color>
+
+    <!-- Swipe actions -->
+    <color name="swipeDelete">@color/redDestructiveAction</color>
+    <color name="swipeMove">#00C7B3</color>
+    <color name="swipeReadUnread">#0AB2F5</color>
+    <color name="swipeFavorite">#FCD65A</color>
+    <color name="swipePostpone">#4CB7FF</color>
+    <color name="swipeSpam">@color/orange</color>
+    <color name="swipeArchive">#CC8FD6</color>
+    <color name="swipeQuickActionMenu">#F1F1F1</color>
+    <color name="swipeNone">@color/progressbarTrackColor</color>
+    <color name="swipeReadAndArchive">#956DDD</color>
 
 </resources>
