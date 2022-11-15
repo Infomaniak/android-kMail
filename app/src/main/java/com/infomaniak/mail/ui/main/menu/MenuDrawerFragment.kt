@@ -116,9 +116,7 @@ class MenuDrawerFragment : Fragment() {
             )
         }
         inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
-        customFolders.setOnClickListener {
-            customFoldersList.apply { isGone = customFolders.isCollapsed }
-        }
+        customFolders.setOnClickListener { customFoldersList.isGone = customFolders.isCollapsed }
         customFolders.setOnActionClickListener { // Create new folder
             // TODO
             notYetImplemented()
@@ -146,6 +144,7 @@ class MenuDrawerFragment : Fragment() {
             closeDrawer()
             menuDrawerSafeNavigate(R.id.helpFragment)
         }
+        advancedActions.setOnClickListener { advancedActionsLayout.isGone = advancedActions.isCollapsed }
         importMails.setOnClickListener {
             closeDrawer()
             // TODO: Import mails
@@ -237,6 +236,7 @@ class MenuDrawerFragment : Fragment() {
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersList.isVisible = true
         customFolders.setIsCollapsed(false)
+        advancedActionsLayout.isVisible = true
     }
 
     private fun openFolder(folderId: String) {

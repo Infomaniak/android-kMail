@@ -254,28 +254,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <TextView
-                style="@style/SettingHeader"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/menuDrawerItemViewHeight"
-                android:gravity="center|start"
-                android:paddingHorizontal="@dimen/marginStandard"
-                android:paddingVertical="@dimen/marginStandardSmall"
-                android:text="@string/menuDrawerAdvancedActions" />
-
-            <com.infomaniak.mail.views.MenuDrawerItemView
-                android:id="@+id/importMails"
+            <com.infomaniak.mail.ui.main.menu.MenuDrawerDropdownView
+                android:id="@+id/advancedActions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_drawer_download"
-                app:text="@string/buttonImportEmails" />
+                app:title="@string/menuDrawerAdvancedActions" />
 
-            <com.infomaniak.mail.views.MenuDrawerItemView
-                android:id="@+id/restoreMails"
+            <LinearLayout
+                android:id="@+id/advancedActionsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_restore_arrow"
-                app:text="@string/buttonRestoreEmails" />
+                android:orientation="vertical">
+
+                <com.infomaniak.mail.views.MenuDrawerItemView
+                    android:id="@+id/importMails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_drawer_download"
+                    app:text="@string/buttonImportEmails" />
+
+                <com.infomaniak.mail.views.MenuDrawerItemView
+                    android:id="@+id/restoreMails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_restore_arrow"
+                    app:text="@string/buttonRestoreEmails" />
+
+            </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/storageDivider"
