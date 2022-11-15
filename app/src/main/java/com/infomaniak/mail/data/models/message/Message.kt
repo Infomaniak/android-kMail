@@ -113,7 +113,7 @@ class Message : RealmObject {
     var detailsAreExpanded = false
     //endregion
 
-    inline val messageId get() = uid.split("@").first().toLong()
+    inline val shortUid get() = uid.split("@").first().toLong()
 
     var priority
         get() = enumValueOfOrNull<Priority>(_priority)

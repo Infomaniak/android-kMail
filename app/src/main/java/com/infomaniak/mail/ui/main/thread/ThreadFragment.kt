@@ -160,7 +160,7 @@ class ThreadFragment : Fragment() {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = AccountUtils.currentMailboxUuid ?: return,
             folderId = MainViewModel.currentFolderId.value ?: return,
-            messageId = message.messageId,
+            messageId = message.shortUid,
         )
         val name = "kMail-attachments-x${message.attachments.count()}.zip" // TODO : change name
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
