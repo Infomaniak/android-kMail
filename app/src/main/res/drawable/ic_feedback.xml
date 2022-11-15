@@ -1,18 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="M7.5,23C7.434,23 7.369,22.987 7.308,22.962C7.121,22.885 7,22.703 7,22.5V19H1.5C0.673,19 0,18.327 0,17.5V2.5C0,1.673 0.673,1 1.5,1H22.5C23.327,1 24,1.673 24,2.5V17.5C24,18.327 23.327,19 22.5,19H11.707L7.853,22.854C7.759,22.948 7.634,23 7.5,23ZM1.5,2C1.224,2 1,2.224 1,2.5V17.5C1,17.776 1.224,18 1.5,18H7.5C7.776,18 8,18.224 8,18.5V21.293L11.146,18.147C11.241,18.052 11.366,18 11.5,18H22.5C22.776,18 23,17.776 23,17.5V2.5C23,2.224 22.776,2 22.5,2H1.5Z"
-      android:fillColor="#000000"/>
-  <path
-      android:pathData="M6,11C4.897,11 4,10.103 4,9C4,7.897 4.897,7 6,7C7.103,7 8,7.897 8,9C8,10.103 7.103,11 6,11ZM6,8C5.449,8 5,8.449 5,9C5,9.551 5.449,10 6,10C6.551,10 7,9.551 7,9C7,8.449 6.551,8 6,8Z"
-      android:fillColor="#000000"/>
-  <path
-      android:pathData="M12,11C10.897,11 10,10.103 10,9C10,7.897 10.897,7 12,7C13.103,7 14,7.897 14,9C14,10.103 13.103,11 12,11ZM12,8C11.449,8 11,8.449 11,9C11,9.551 11.449,10 12,10C12.552,10 13,9.551 13,9C13,8.449 12.552,8 12,8Z"
-      android:fillColor="#000000"/>
-  <path
-      android:pathData="M18,11C16.897,11 16,10.103 16,9C16,7.897 16.897,7 18,7C19.103,7 20,7.897 20,9C20,10.103 19.103,11 18,11ZM18,8C17.448,8 17,8.449 17,9C17,9.551 17.448,10 18,10C18.552,10 19,9.551 19,9C19,8.449 18.552,8 18,8Z"
-      android:fillColor="#000000"/>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M7.5,23C7.434,23 7.369,22.987 7.308,22.962C7.121,22.885 7,22.703 7,22.5V19H1.5C0.673,19 0,18.327 0,17.5V2.5C0,1.673 0.673,1 1.5,1H22.5C23.327,1 24,1.673 24,2.5V17.5C24,18.327 23.327,19 22.5,19H11.707L7.853,22.854C7.759,22.948 7.634,23 7.5,23ZM1.5,2C1.224,2 1,2.224 1,2.5V17.5C1,17.776 1.224,18 1.5,18H7.5C7.776,18 8,18.224 8,18.5V21.293L11.146,18.147C11.241,18.052 11.366,18 11.5,18H22.5C22.776,18 23,17.776 23,17.5V2.5C23,2.224 22.776,2 22.5,2H1.5Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M6,11C4.897,11 4,10.103 4,9C4,7.897 4.897,7 6,7C7.103,7 8,7.897 8,9C8,10.103 7.103,11 6,11ZM6,8C5.449,8 5,8.449 5,9C5,9.551 5.449,10 6,10C6.551,10 7,9.551 7,9C7,8.449 6.551,8 6,8Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M12,11C10.897,11 10,10.103 10,9C10,7.897 10.897,7 12,7C13.103,7 14,7.897 14,9C14,10.103 13.103,11 12,11ZM12,8C11.449,8 11,8.449 11,9C11,9.551 11.449,10 12,10C12.552,10 13,9.551 13,9C13,8.449 12.552,8 12,8Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M18,11C16.897,11 16,10.103 16,9C16,7.897 16.897,7 18,7C19.103,7 20,7.897 20,9C20,10.103 19.103,11 18,11ZM18,8C17.448,8 17,8.449 17,9C17,9.551 17.448,10 18,10C18.552,10 19,9.551 19,9C19,8.449 18.552,8 18,8Z" />
 </vector>

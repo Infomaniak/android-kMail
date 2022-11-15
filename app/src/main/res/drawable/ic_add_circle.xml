@@ -1,10 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:pathData="M12,24C5.373,24 -0,18.627 -0,12C-0,5.373 5.373,0 12,-0C18.627,-0 24,5.373 24,12C23.993,18.624 18.624,23.993 12,24ZM12.503,18.545C13.06,18.545 13.51,18.095 13.51,17.538L13.51,13.762C13.51,13.623 13.623,13.51 13.762,13.51L17.538,13.51C18.095,13.51 18.545,13.06 18.545,12.503L18.545,11.497C18.545,10.94 18.095,10.49 17.538,10.49L13.762,10.49C13.623,10.49 13.51,10.377 13.51,10.238L13.51,6.462C13.51,5.905 13.06,5.455 12.503,5.455L11.497,5.455C10.94,5.455 10.49,5.905 10.49,6.462L10.49,10.238C10.49,10.377 10.377,10.49 10.238,10.49L6.462,10.49C5.905,10.49 5.455,10.94 5.455,11.497L5.455,12.503C5.455,13.06 5.905,13.51 6.462,13.51L10.238,13.51C10.377,13.51 10.49,13.623 10.49,13.762L10.49,17.538C10.49,18.095 10.94,18.545 11.497,18.545L12.503,18.545Z"
-      android:fillColor="#000000"
-      android:fillType="evenOdd"/>
+    <path
+        android:fillColor="#000000"
+        android:pathData="M12,24C5.373,24 -0,18.627 -0,12C-0,5.373 5.373,0 12,-0C18.627,-0 24,5.373 24,12C23.993,18.624 18.624,23.993 12,24ZM12.503,18.545C13.06,18.545 13.51,18.095 13.51,17.538L13.51,13.762C13.51,13.623 13.623,13.51 13.762,13.51L17.538,13.51C18.095,13.51 18.545,13.06 18.545,12.503L18.545,11.497C18.545,10.94 18.095,10.49 17.538,10.49L13.762,10.49C13.623,10.49 13.51,10.377 13.51,10.238L13.51,6.462C13.51,5.905 13.06,5.455 12.503,5.455L11.497,5.455C10.94,5.455 10.49,5.905 10.49,6.462L10.49,10.238C10.49,10.377 10.377,10.49 10.238,10.49L6.462,10.49C5.905,10.49 5.455,10.94 5.455,11.497L5.455,12.503C5.455,13.06 5.905,13.51 6.462,13.51L10.238,13.51C10.377,13.51 10.49,13.623 10.49,13.762L10.49,17.538C10.49,18.095 10.94,18.545 11.497,18.545L12.503,18.545Z" />
 </vector>
