@@ -47,6 +47,7 @@ object ApiRepository : ApiRepositoryCore() {
         method: ApiController.ApiMethod,
         body: Any? = null,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
+        throwExceptions: Boolean = false
     ): T {
         return ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
     }
@@ -121,8 +122,9 @@ object ApiRepository : ApiRepositoryCore() {
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
         val body = Json.encodeToString(draft).removeEmptyRealmLists()
 
-        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
-        fun putDraft(uuid: String): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body)
+        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, throwExceptions = true)
+        fun putDraft(uuid: String): ApiResponse<Boolean> =
+            callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, throwExceptions = true)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }

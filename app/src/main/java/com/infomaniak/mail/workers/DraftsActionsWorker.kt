@@ -20,12 +20,14 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.setExpeditedWorkRequest
 import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -41,12 +43,14 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
         runCatching {
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@runCatching Result.failure()
             handleDraftsActions()
-            Result.success()
         }.getOrElse { exception ->
             exception.printStackTrace()
             when (exception) {
                 is CancellationException -> Result.failure()
-                else -> Result.retry()
+                else -> {
+                    Sentry.captureException(exception)
+                    Result.failure()
+                }
             }
         }.also {
             mailboxContentRealm.close()
@@ -55,10 +59,11 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
     }
 
     private fun handleDraftsActions(): Result {
-        return RealmDatabase.mailboxContent().writeBlocking {
+        return mailboxContentRealm.writeBlocking {
 
             fun getCurrentMailboxUuid(): String? {
-                return MainViewModel.currentMailboxObjectId.value?.let(MailboxController::getMailbox)?.uuid
+                val mailboxObjectId = MainViewModel.currentMailboxObjectId.value
+                return mailboxObjectId?.let { MailboxController.getMailbox(it, mailboxInfoRealm) }?.uuid
             }
 
             val drafts = DraftController.getDraftsWithActions(this).ifEmpty { null } ?: return@writeBlocking Result.failure()
@@ -71,6 +76,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                     Sentry.captureException(exception)
+                    if (exception.isNetworkException()) return@writeBlocking Result.retry()
                     hasRemoteException = true
                 }
             }
