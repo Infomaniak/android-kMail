@@ -22,6 +22,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -91,6 +92,14 @@ object MailboxController {
 
     fun getMailboxAsync(objectId: String, realm: TypedRealm? = null): Flow<SingleQueryChange<Mailbox>> {
         return realm.getMailboxQuery(objectId).asFlow()
+    }
+
+    fun getCurrentMailbox(): Mailbox? {
+        return MainViewModel.currentMailboxObjectId.value?.let(::getMailbox)
+    }
+
+    fun getCurrentMailboxUuid(): String? {
+        return getCurrentMailbox()?.uuid
     }
     //endregion
 
