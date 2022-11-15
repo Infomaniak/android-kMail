@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.os.Build
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
@@ -30,6 +31,8 @@ import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OutOfQuotaPolicy
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
@@ -150,3 +153,13 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
     items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
 }
 //endregion
+
+//region WorkManager
+fun OneTimeWorkRequest.Builder.setExpeditedWorkRequest(): OneTimeWorkRequest.Builder {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+    }
+    return this
+}
+//endregion
+

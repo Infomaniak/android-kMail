@@ -83,7 +83,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
 
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setExpeditedWorkRequest()
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
