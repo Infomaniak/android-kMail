@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.getFileName
+import com.infomaniak.mail.utils.getDisplayName
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
@@ -166,7 +166,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun importAttachment(uri: Uri): Attachment {
-        val fileName = uri.getFileName(getApplication())!!
+        val fileName = uri.getDisplayName(getApplication())!!
         val draftUuid = currentDraftLocalUuid
 
         val attachment = Attachment()

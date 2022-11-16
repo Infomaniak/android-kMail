@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -49,6 +48,7 @@ import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
+import io.sentry.Sentry
 import java.util.*
 
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
@@ -143,15 +143,14 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 
 fun List<Message>.getLastMessageToExecuteAction(): Message = lastOrNull { !it.isDraft } ?: last()
 
-fun Uri.getFileName(context: Context): String? = when (scheme) {
-    ContentResolver.SCHEME_CONTENT -> getContentFileName(context)
-    else -> lastPathSegment?.substringAfterLast("/")
-}
-
-private fun Uri.getContentFileName(context: Context): String? = runCatching {
+fun Uri.getDisplayName(context: Context): String? = runCatching {
     context.contentResolver.query(this, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
-        cursor.moveToFirst()
-        return@use cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
+        if (cursor.moveToFirst()) {
+            cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
+        } else {
+            Sentry.captureException(Exception("$this has empty cursor"))
+            null
+        }
     }
 }.getOrNull()
 
