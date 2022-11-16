@@ -20,7 +20,7 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.infomaniak.lib.core.utils.isNetworkException
+import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -76,7 +76,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                     Sentry.captureException(exception)
-                    if (exception.isNetworkException()) return@writeBlocking Result.retry()
+                    if (exception is ApiController.NetworkException) return@writeBlocking Result.retry()
                     hasRemoteException = true
                 }
             }

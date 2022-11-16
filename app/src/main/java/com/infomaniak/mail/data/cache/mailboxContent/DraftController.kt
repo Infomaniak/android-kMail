@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.ApiController.json
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -35,6 +37,7 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import kotlinx.serialization.encodeToString
 
 object DraftController {
 
@@ -153,17 +156,24 @@ object DraftController {
         return prefix + subject
     }
 
+    private inline fun <reified T> ApiResponse<T>.manageUploadErrors() {
+        throw error?.exception ?: Exception(data?.let { json.encodeToString(it) })
+    }
+
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
+
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft)) {
-                if (isSuccess()) updateDraft(draft.localUuid, realm) {
-                    it.remoteUuid = data?.draftRemoteUuid
-                    it.messageUid = data?.messageUid
-                    it.action = null
-                }
+                if (isSuccess()) {
+                    updateDraft(draft.localUuid, realm) {
+                        it.remoteUuid = data?.draftRemoteUuid
+                        it.messageUid = data?.messageUid
+                        it.action = null
+                    }
+                } else manageUploadErrors()
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft)) {
-                if (isSuccess()) realm.delete(draft)
+                if (isSuccess()) realm.delete(draft) else manageUploadErrors()
             }
             else -> Unit
         }

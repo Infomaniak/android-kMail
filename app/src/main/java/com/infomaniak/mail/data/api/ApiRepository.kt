@@ -47,15 +47,7 @@ object ApiRepository : ApiRepositoryCore() {
         method: ApiController.ApiMethod,
         body: Any? = null,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-        throwExceptions: Boolean = false,
-    ): T = ApiController.callApi(
-        url,
-        method,
-        body,
-        okHttpClient,
-        useKotlinxSerialization = true,
-        throwExceptions = throwExceptions,
-    )
+    ): T = ApiController.callApi(url, method, body, okHttpClient, true)
 
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
@@ -127,9 +119,8 @@ object ApiRepository : ApiRepositoryCore() {
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
         val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
-        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, throwExceptions = true)
-        fun putDraft(uuid: String): ApiResponse<Boolean> =
-            callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, throwExceptions = true)
+        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
+        fun putDraft(uuid: String): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
