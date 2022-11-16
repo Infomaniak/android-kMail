@@ -111,7 +111,7 @@ object ApiRepository : ApiRepositoryCore() {
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
     fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<SaveDraftResult> {
-        val body = Json.encodeToString(draft).removeEmptyRealmLists()
+        val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
         fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
         fun putDraft(uuid: String): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body)
@@ -120,7 +120,7 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
-        val body = Json.encodeToString(draft).removeEmptyRealmLists()
+        val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
         fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, throwExceptions = true)
         fun putDraft(uuid: String): ApiResponse<Boolean> =

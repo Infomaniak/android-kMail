@@ -19,6 +19,7 @@
 
 package com.infomaniak.mail.data.models.draft
 
+import com.infomaniak.lib.core.utils.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
@@ -34,6 +35,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.json.*
 import java.util.*
 
 @Serializable
@@ -126,6 +128,12 @@ class Draft : RealmObject {
         body = when (defaultSignature.position) {
             SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
             else -> html + body
+        }
+    }
+
+    fun getJsonRequestBody(): MutableMap<String, JsonElement> {
+        return json.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
+            this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) })
         }
     }
 
