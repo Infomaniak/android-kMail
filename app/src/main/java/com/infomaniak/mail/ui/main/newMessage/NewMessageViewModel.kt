@@ -161,23 +161,17 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
-        uris.forEach { newAttachments.add(importAttachment(it)) }
+        uris.forEach { importAttachment(it)?.let(newAttachments::add) }
         importedAttachments.postValue(newAttachments)
     }
 
-    private fun importAttachment(uri: Uri): Attachment {
+    private fun importAttachment(uri: Uri): Attachment? {
         val fileName = uri.getDisplayName(getApplication())!!
-        val draftUuid = currentDraftLocalUuid
-
-        val attachment = Attachment()
-        LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, draftUuid)?.let { file ->
+        return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, currentDraftLocalUuid)?.let { file ->
             val fileExtension = file.path.substringAfterLast(".")
             val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"
-
-            attachment.initLocalValues(file.name, file.length(), mimeType, file.toUri().toString())
+            Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) }
         }
-
-        return attachment
     }
 
     override fun onCleared() {
