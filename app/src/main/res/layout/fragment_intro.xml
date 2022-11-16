@@ -71,7 +71,7 @@
         app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="ContentDescription" />
 
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/iconLayout"
         android:layout_width="0dp"
         android:layout_height="250dp"
@@ -79,6 +79,8 @@
         app:layout_constraintBottom_toBottomOf="@id/bottomWave"
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/illu_1"
         tools:ignore="ContentDescription" />
 
     <TextView

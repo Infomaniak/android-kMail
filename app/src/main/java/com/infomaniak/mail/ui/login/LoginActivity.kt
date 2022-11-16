@@ -88,7 +88,6 @@ class LoginActivity : AppCompatActivity() {
 
         val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, navigationArgs.isFirstAccount)
         introViewpager.apply {
-            offscreenPageLimit = 3
             adapter = introPagerAdapter
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {

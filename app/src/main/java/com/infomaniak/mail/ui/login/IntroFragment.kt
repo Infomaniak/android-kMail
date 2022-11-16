@@ -67,21 +67,25 @@ class IntroFragment : Fragment() {
                 val selectedTab = pinkBlueTabLayout.getTabAt(accentColor.introTabIndex)
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
+                iconLayout.setAnimation(R.raw.illu_1)
             }
             1 -> {
                 waveBackground.setImageResource(R.drawable.ic_back_wave_2)
                 title.setText(R.string.onBoardingTitle2)
                 description.setText(R.string.onBoardingDescription2)
+                iconLayout.setAnimation(R.raw.illu_2)
             }
             2 -> {
                 waveBackground.setImageResource(R.drawable.ic_back_wave_3)
                 title.setText(R.string.onBoardingTitle3)
                 description.setText(R.string.onBoardingDescription3)
+                iconLayout.setAnimation(R.raw.illu_3)
             }
             3 -> {
                 waveBackground.setImageResource(R.drawable.ic_back_wave_4)
                 title.setText(R.string.onBoardingTitle4)
                 description.setText(R.string.onBoardingDescription4)
+                iconLayout.setAnimation(R.raw.illu_4)
             }
         }
 
@@ -132,9 +136,6 @@ class IntroFragment : Fragment() {
         animateColorChange(animate, oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
-
-        val drawable: Drawable? = getThemedDrawable(accentColor.theme, R.drawable.ic_boarding_illu_1)
-        iconLayout.setImageDrawable(drawable)
     }
 
     private fun getThemedDrawable(theme: Int, @DrawableRes drawableRes: Int): Drawable? {

@@ -62,6 +62,7 @@ dependencies {
 
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
 
+    implementation 'com.airbnb.android:lottie:5.2.0'
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
     implementation 'com.tbuonomo:dotsindicator:4.3'
 
