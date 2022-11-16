@@ -233,7 +233,7 @@
     <string name="settingsPrivacyDeleteSearchHistory">Delete search history</string>
     <string name="settingsPrivacyViewLogs">View logs</string>
     <string name="settingsSectionAppearance">Appearance</string>
-    <string name="settingsSectionEmailAddresses">Mail addresses</string>
+    <string name="settingsSectionEmailAddresses">Email addresses</string>
     <string name="settingsSectionGeneral">General</string>
     <string name="settingsSectionPrivacy">Privacy</string>
     <string name="settingsSectionSecurity">Security</string>
