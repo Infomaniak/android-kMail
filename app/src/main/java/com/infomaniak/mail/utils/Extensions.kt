@@ -149,7 +149,7 @@ fun Uri.getFileName(context: Context): String? = when (scheme) {
 }
 
 private fun Uri.getContentFileName(context: Context): String? = runCatching {
-    context.contentResolver.query(this, null, null, null, null)?.use { cursor ->
+    context.contentResolver.query(this, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
         cursor.moveToFirst()
         return@use cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
     }
