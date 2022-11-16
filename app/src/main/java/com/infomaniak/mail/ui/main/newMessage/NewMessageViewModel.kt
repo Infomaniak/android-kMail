@@ -42,8 +42,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.getDisplayName
-import com.infomaniak.mail.utils.getFileSize
+import com.infomaniak.mail.utils.getFileNameAndSize
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
@@ -187,9 +186,9 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean> {
-        if (uri.getFileSize(getApplication())!! > availableSpace) return null to true
+        val (fileName, fileSize) = uri.getFileNameAndSize(getApplication())!!
+        if (fileSize > availableSpace) return null to true
 
-        val fileName = uri.getDisplayName(getApplication())!!
         return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, currentDraftLocalUuid)?.let { file ->
             val fileExtension = file.path.substringAfterLast(".")
             val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"

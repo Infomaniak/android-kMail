@@ -143,27 +143,24 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 
 fun List<Message>.getLastMessageToExecuteAction(): Message = lastOrNull { !it.isDraft } ?: last()
 
-fun Uri.getDisplayName(context: Context): String? = runCatching {
-    context.contentResolver.query(this, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
-        if (cursor.moveToFirst()) {
-            cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
-        } else {
-            Sentry.captureException(Exception("$this has empty cursor"))
-            null
+fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
+    return runCatching {
+        val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
+        context.contentResolver.query(this, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val displayName = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
+                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
+                displayName to size
+            } else {
+                Sentry.captureException(Exception("$this has empty cursor"))
+                null
+            }
         }
+    }.getOrElse { exception ->
+        Sentry.captureException(exception)
+        null
     }
-}.getOrNull()
-
-fun Uri.getFileSize(context: Context): Int? = runCatching {
-    context.contentResolver.query(this, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { cursor ->
-        if (cursor.moveToFirst()) {
-            cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
-        } else {
-            Sentry.captureException(Exception("$this has empty cursor"))
-            null
-        }
-    }
-}.getOrNull()
+}
 
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
