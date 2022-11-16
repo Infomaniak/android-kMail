@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.app.Application
 import android.content.ClipDescription
 import android.net.Uri
-import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import androidx.lifecycle.*
@@ -44,7 +43,10 @@ import com.infomaniak.mail.utils.getFileName
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -157,7 +159,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun importAttachments(uris: List<Uri>) = CoroutineScope(Dispatchers.IO).launch {
+    fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
         uris.forEach { newAttachments.add(importAttachment(it)) }
         importedAttachments.postValue(newAttachments)
