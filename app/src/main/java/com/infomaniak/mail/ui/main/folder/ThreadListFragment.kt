@@ -54,11 +54,8 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.toDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -226,17 +223,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsList.swipeListener = object : OnItemSwipeListener<Thread> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Thread): Boolean {
 
-                val shouldKeepItem = when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> {
-                        threadListViewModel.toggleSeenStatus(thread = item)
-                        true
-                    }
-                    SwipeDirection.RIGHT_TO_LEFT -> {
-                        mainViewModel.deleteThread(thread = item, filter)
-                        false
-                    }
+                val swipeAction = when (direction) {
+                    SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
+                    SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
+
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
@@ -249,6 +242,48 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 // swiped item should be kept or deleted from the adapter's list.
                 return shouldKeepItem
             }
+        }
+    }
+
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, item: Thread): Boolean {
+        return when (swipeAction) {
+            SwipeAction.DELETE -> {
+                mainViewModel.deleteThread(thread = item, filter)
+                false
+            }
+            SwipeAction.ARCHIVE -> {
+                notYetImplemented()
+                true
+            }
+            SwipeAction.READ_UNREAD -> {
+                threadListViewModel.toggleSeenStatus(thread = item)
+                true
+            }
+            SwipeAction.MOVE -> {
+                notYetImplemented()
+                true
+            }
+            SwipeAction.FAVORITE -> {
+                notYetImplemented()
+                true
+            }
+            SwipeAction.POSTPONE -> {
+                notYetImplemented()
+                true
+            }
+            SwipeAction.SPAM -> {
+                notYetImplemented()
+                true
+            }
+            SwipeAction.READ_AND_ARCHIVE -> {
+                notYetImplemented()
+                true
+            }
+            SwipeAction.QUICKACTIONS_MENU -> {
+                notYetImplemented()
+                true
+            }
+            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
         }
     }
 
