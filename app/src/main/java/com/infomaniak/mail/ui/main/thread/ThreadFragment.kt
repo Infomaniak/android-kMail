@@ -31,18 +31,17 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.getLastMessageToExecuteAction
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
 import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
@@ -139,8 +138,8 @@ class ThreadFragment : Fragment() {
             onAttachmentClicked = { attachment ->
                 notYetImplemented()
             }
-            onDownloadAllClicked = {
-                notYetImplemented()
+            onDownloadAllClicked = { message ->
+                downloadAllAttachments(message)
             }
             onReplyClicked = {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = it.uid))
@@ -155,6 +154,16 @@ class ThreadFragment : Fragment() {
                 )
             }
         }
+    }
+
+    private fun downloadAllAttachments(message: Message) {
+        val url = ApiRoutes.downloadAttachments(
+            mailboxUuid = AccountUtils.currentMailboxUuid ?: return,
+            folderId = MainViewModel.currentFolderId.value ?: return,
+            messageId = message.shortUid,
+        )
+        val name = allAttachmentsFileName(message.subject?.substring(0..30) ?: "")
+        DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
     private fun observeMessages() {
@@ -184,5 +193,7 @@ class ThreadFragment : Fragment() {
 
     private companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
+
+        fun allAttachmentsFileName(subject: String) = "kMail-attachments-$subject.zip"
     }
 }

@@ -103,6 +103,14 @@ object ApiRoutes {
 
     // fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
+    fun downloadAttachment(mailboxUuid: String, folderId: String, messageId: Long, attachmentId: String): String {
+        return "${folder(mailboxUuid, folderId)}/message/$messageId/attachment/$attachmentId"
+    }
+
+    fun downloadAttachments(mailboxUuid: String, folderId: String, messageId: Long): String {
+        return "${folder(mailboxUuid, folderId)}/message/$messageId/attachmentsArchive"
+    }
+
     fun starMessage(mailboxUuid: String, star: Boolean): String {
         return "$MAIL_API/api/mail/$mailboxUuid/message/${if (star) "star" else "unstar"}"
     }
