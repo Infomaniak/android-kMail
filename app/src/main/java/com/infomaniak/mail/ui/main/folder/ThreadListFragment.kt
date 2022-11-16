@@ -35,7 +35,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -45,6 +46,7 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.thread.Thread
@@ -112,11 +114,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onResume()
         unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
 
+        updateSwipeActionsWithSettings()
+    }
+
+    private fun FragmentThreadListBinding.updateSwipeActionsWithSettings() {
         threadsList.apply {
             behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
             behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
+
             behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
             behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
+
+            val leftIsSet = localSettings.swipeLeft == SwipeAction.NONE
+            if (leftIsSet) disableSwipeDirection(DirectionFlag.LEFT) else enableSwipeDirection(DirectionFlag.LEFT)
+            val rightIsSet = localSettings.swipeRight == SwipeAction.NONE
+            if (rightIsSet) disableSwipeDirection(DirectionFlag.RIGHT) else enableSwipeDirection(DirectionFlag.RIGHT)
         }
     }
 
@@ -138,11 +150,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.threadsList.apply {
             adapter = threadListAdapter
             layoutManager = LinearLayoutManager(context)
-            orientation = DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.UP)
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.DOWN)
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
+            orientation = VERTICAL_LIST_WITH_VERTICAL_DRAGGING
+            disableDragDirection(DirectionFlag.UP)
+            disableDragDirection(DirectionFlag.DOWN)
+            disableDragDirection(DirectionFlag.RIGHT)
+            disableDragDirection(DirectionFlag.LEFT)
             addItemDecoration(HeaderItemDecoration(this, false) { position ->
                 return@HeaderItemDecoration position >= 0 && threadListAdapter.dataSet[position] is String
             })

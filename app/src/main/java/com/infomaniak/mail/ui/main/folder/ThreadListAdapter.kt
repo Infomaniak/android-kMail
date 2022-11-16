@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
 import android.graphics.Canvas
+import android.os.Build
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -230,7 +231,11 @@ class ThreadListAdapter(
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
         } else if (progress > 0.5 && viewHolder.isSwipedOverHalf) {
             viewHolder.isSwipedOverHalf = false
-            root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
+            } else {
+                root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
         }
 
         val cardView = root as MaterialCardView
