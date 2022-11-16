@@ -54,6 +54,7 @@
     <string name="attachmentActionFile">Attach a file</string>
     <string name="attachmentActionPhotoLibrary">Send a photo from the photo library</string>
     <string name="attachmentActionTitle">Add an attachment</string>
+    <string name="attachmentFileLimitReached">The files that you are trying to send exceed the 25 MB attachment limit</string>
     <plurals name="attachmentQuantity">
         <item quantity="one">%d attachment</item>
         <item quantity="other">%d attachments</item>

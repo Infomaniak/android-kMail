@@ -154,6 +154,17 @@ fun Uri.getDisplayName(context: Context): String? = runCatching {
     }
 }.getOrNull()
 
+fun Uri.getFileSize(context: Context): Int? = runCatching {
+    context.contentResolver.query(this, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
+        } else {
+            Sentry.captureException(Exception("$this has empty cursor"))
+            null
+        }
+    }
+}.getOrNull()
+
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
     writeBlocking {

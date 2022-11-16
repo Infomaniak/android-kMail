@@ -20,10 +20,13 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.app.Application
 import android.content.ClipDescription
 import android.net.Uri
+import android.util.Log
 import android.webkit.MimeTypeMap
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
@@ -40,13 +43,11 @@ import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.getDisplayName
+import com.infomaniak.mail.utils.getFileSize
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -161,17 +162,39 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
-        uris.forEach { importAttachment(it)?.let(newAttachments::add) }
+        var sum = mailAttachments.sumOf { it.size }
+        run breaking@{
+            uris.forEach { uri ->
+                val availableSpace = FILE_SIZE_25_MB - sum
+                Log.e("gibran", "importAttachments - availableSpace: ${availableSpace}")
+                val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace)
+
+                if (hasSizeLimitBeenReached) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(getApplication(), R.string.attachmentFileLimitReached, Toast.LENGTH_LONG).show()
+                    }
+                    return@breaking
+                }
+
+                attachment?.let {
+                    newAttachments.add(it)
+                    sum += it.size
+                }
+            }
+        }
+        Log.e("gibran", "importAttachments - about to postValue newAttachments: ${newAttachments}")
         importedAttachments.postValue(newAttachments)
     }
 
-    private fun importAttachment(uri: Uri): Attachment? {
+    private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean> {
+        if (uri.getFileSize(getApplication())!! > availableSpace) return null to true
+
         val fileName = uri.getDisplayName(getApplication())!!
         return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, currentDraftLocalUuid)?.let { file ->
             val fileExtension = file.path.substringAfterLast(".")
             val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"
-            Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) }
-        }
+            Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
+        } ?: (null to false)
     }
 
     override fun onCleared() {
@@ -182,5 +205,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     private companion object {
         const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
+        const val FILE_SIZE_25_MB = 25 * 1024 * 1024
     }
 }

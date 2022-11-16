@@ -53,10 +53,12 @@ class AttachmentAdapter(
             closeButton.apply {
                 setOnClickListener {
                     val index = attachments.indexOf(attachment)
-                    attachments.removeAt(index)
-                    notifyItemRemoved(index)
+                    if (index != -1) {
+                        attachments.removeAt(index)
+                        notifyItemRemoved(index)
 
-                    onDelete?.invoke(index, itemCount)
+                        onDelete?.invoke(index, itemCount)
+                    }
                 }
                 isVisible = true
             }

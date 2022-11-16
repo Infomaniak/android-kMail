@@ -138,8 +138,8 @@ class NewMessageFragment : Fragment() {
         }
 
         newMessageViewModel.importedAttachments.observe(requireActivity()) {
-            attachmentsRecyclerView.isGone = it.isEmpty()
             attachmentAdapter.addAll(it)
+            attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
             newMessageViewModel.mailAttachments.addAll(it)
         }
 
