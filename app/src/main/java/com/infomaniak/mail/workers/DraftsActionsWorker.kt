@@ -101,7 +101,6 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
         }
 
-        @Suppress("SpellCheckingInspection")
         fun getRunningWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {
             val workQuery = WorkQuery.Builder.fromUniqueWorkNames(listOf(TAG)).addStates(listOf(WorkInfo.State.RUNNING)).build()
             return WorkManager.getInstance(context).getWorkInfosLiveData(workQuery)
