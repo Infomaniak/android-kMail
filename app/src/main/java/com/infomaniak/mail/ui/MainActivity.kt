@@ -174,8 +174,10 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun launchDraftsActionsWorkIfNeeded() {
-        DraftsActionsWorker.getRunningWorkInfosLiveData(this).observe(this) { worksInfoList ->
+        val runningWorkInfosLiveData = DraftsActionsWorker.getRunningWorkInfosLiveData(this)
+        runningWorkInfosLiveData.observe(this) { worksInfoList ->
             if (worksInfoList.isEmpty()) DraftsActionsWorker.scheduleWork(this)
+            runningWorkInfosLiveData.removeObservers(this)
         }
     }
 }

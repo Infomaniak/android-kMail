@@ -27,6 +27,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class Attachment : EmbeddedRealmObject {
+    var uuid: String = ""
     @SerialName("mime_type")
     var mimeType: String = ""
     var encoding: String = ""
