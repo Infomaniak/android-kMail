@@ -286,7 +286,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val toAdapter = DetailedRecipientAdapter(onContactClicked)
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
-        val attachmentAdapter = AttachmentAdapter() { onAttachmentClicked?.invoke(it) }
+        val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
 
         init {
             with(binding) {

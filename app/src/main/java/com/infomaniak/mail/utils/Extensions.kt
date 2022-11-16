@@ -19,8 +19,8 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
 import android.os.Build
+import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
