@@ -47,10 +47,15 @@ object ApiRepository : ApiRepositoryCore() {
         method: ApiController.ApiMethod,
         body: Any? = null,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-        throwExceptions: Boolean = false
-    ): T {
-        return ApiController.callApi(url, method, body, okHttpClient, useKotlinxSerialization = true)
-    }
+        throwExceptions: Boolean = false,
+    ): T = ApiController.callApi(
+        url,
+        method,
+        body,
+        okHttpClient,
+        useKotlinxSerialization = true,
+        throwExceptions = throwExceptions,
+    )
 
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
