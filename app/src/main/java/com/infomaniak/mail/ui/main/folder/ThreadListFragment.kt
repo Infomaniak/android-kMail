@@ -111,11 +111,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onResume()
         unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
 
-        updateSwipeActionsWithSettings()
+        updateSwipeActionsAccordingToSettings()
     }
 
-    private fun FragmentThreadListBinding.updateSwipeActionsWithSettings() {
-        threadsList.apply {
+    private fun updateSwipeActionsAccordingToSettings() {
+        binding.threadsList.apply {
             behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
             behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
 
@@ -251,39 +251,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 mainViewModel.deleteThread(thread = item, filter)
                 false
             }
-            SwipeAction.ARCHIVE -> {
-                notYetImplemented()
-                true
-            }
             SwipeAction.READ_UNREAD -> {
                 threadListViewModel.toggleSeenStatus(thread = item)
                 true
             }
-            SwipeAction.MOVE -> {
-                notYetImplemented()
-                true
-            }
-            SwipeAction.FAVORITE -> {
-                notYetImplemented()
-                true
-            }
-            SwipeAction.POSTPONE -> {
-                notYetImplemented()
-                true
-            }
-            SwipeAction.SPAM -> {
-                notYetImplemented()
-                true
-            }
-            SwipeAction.READ_AND_ARCHIVE -> {
-                notYetImplemented()
-                true
-            }
-            SwipeAction.QUICKACTIONS_MENU -> {
-                notYetImplemented()
-                true
-            }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
+            else -> {
+                notYetImplemented()
+                true
+            }
         }
     }
 

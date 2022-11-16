@@ -70,7 +70,7 @@
     <color name="swipeReadUnread">#0AB2F5</color>
     <color name="swipeFavorite">#FCD65A</color>
     <color name="swipePostpone">#4CB7FF</color>
-    <color name="swipeSpam">@color/orange</color>
+    <color name="swipeSpam">@color/orangeWarning</color>
     <color name="swipeArchive">#CC8FD6</color>
     <color name="swipeQuickActionMenu">#F1F1F1</color>
     <color name="swipeNone">@color/progressbarTrackColor</color>
