@@ -162,7 +162,7 @@ class ThreadFragment : Fragment() {
             folderId = MainViewModel.currentFolderId.value ?: return,
             messageId = message.shortUid,
         )
-        val name = "kMail-attachments-x${message.attachments.count()}.zip" // TODO : change name
+        val name = allAttachmentsFileName(message.subject?.substring(0..30) ?: "")
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
@@ -193,5 +193,7 @@ class ThreadFragment : Fragment() {
 
     private companion object {
         const val COLLAPSE_TITLE_THRESHOLD = 0.5
+
+        fun allAttachmentsFileName(subject: String) = "kMail-attachments-$subject.zip"
     }
 }
