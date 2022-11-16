@@ -68,11 +68,12 @@ class NewMessageFragment : Fragment() {
     private lateinit var contactAdapter: ContactAdapter
     private val attachmentAdapter = AttachmentAdapter(
         shouldDisplayCloseButton = true,
-        onDelete = { itemCountLeft ->
+        onDelete = { position, itemCountLeft ->
             if (itemCountLeft == 0) {
                 TransitionManager.beginDelayedTransition(binding.root)
                 binding.attachmentsRecyclerView.isGone = true
             }
+            newMessageViewModel.mailAttachments.removeAt(position)
         },
     )
 
@@ -136,9 +137,10 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        newMessageViewModel.attachments.observe(requireActivity()) {
+        newMessageViewModel.importedAttachments.observe(requireActivity()) {
             attachmentsRecyclerView.isGone = it.isEmpty()
             attachmentAdapter.addAll(it)
+            newMessageViewModel.mailAttachments.addAll(it)
         }
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
@@ -176,6 +178,8 @@ class NewMessageFragment : Fragment() {
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
         binding.subjectTextField.setText(mailSubject)
         binding.bodyText.setText(mailBody)
+        attachmentAdapter.addAll(mailAttachments)
+        binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
     }
 
     private fun observeSubject() {

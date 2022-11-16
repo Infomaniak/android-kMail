@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.app.Application
 import android.content.ClipDescription
 import android.net.Uri
+import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import androidx.lifecycle.*
@@ -43,7 +44,6 @@ import com.infomaniak.mail.utils.getFileName
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.*
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
@@ -53,6 +53,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val mailBcc = mutableListOf<Recipient>()
     var mailSubject = ""
     var mailBody = ""
+    val mailAttachments = mutableListOf<Attachment>()
 
     private var autoSaveJob: Job? = null
 
@@ -62,7 +63,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val attachments = MutableLiveData<MutableList<Attachment>>(mutableListOf())
+    val importedAttachments = MutableLiveData<MutableList<Attachment>>(mutableListOf())
 
     lateinit var currentDraftLocalUuid: String
 
@@ -80,23 +81,23 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                         }
                 } else {
                     createDraft(draftMode, previousMessageUid)
-                }.also {
-                    initUiData(it)
                 }
                 true
             }
 
+            if (isSuccess) initUiData()
             emit(isSuccess)
         }
     }
 
-    private fun MutableRealm.initUiData(draftLocalUuid: String) {
-        DraftController.getDraft(draftLocalUuid, this)?.let { draft ->
-            mailTo.addAll(draft.to.toRecipientsList())
-            mailCc.addAll(draft.cc.toRecipientsList())
-            mailBcc.addAll(draft.bcc.toRecipientsList())
+    private fun initUiData() {
+        DraftController.getDraft(currentDraftLocalUuid)?.let { draft ->
+            mailTo.addAll(draft.to)
+            mailCc.addAll(draft.cc)
+            mailBcc.addAll(draft.bcc)
             mailSubject = draft.subject
             mailBody = draft.body
+            mailAttachments.addAll(draft.attachments)
         }
     }
 
@@ -151,6 +152,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             draft.bcc = mailBcc.toRealmList()
             draft.subject = mailSubject
             draft.body = mailBody
+            draft.attachments = mailAttachments.toRealmList()
             draft.action = action
         }
     }
@@ -158,7 +160,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     fun importAttachments(uris: List<Uri>) = CoroutineScope(Dispatchers.IO).launch {
         val newAttachments = mutableListOf<Attachment>()
         uris.forEach { newAttachments.add(importAttachment(it)) }
-        attachments.postValue(newAttachments)
+        importedAttachments.postValue(newAttachments)
     }
 
     private fun importAttachment(uri: Uri): Attachment {
@@ -170,7 +172,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             val fileExtension = file.path.substringAfterLast(".")
             val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"
 
-
             attachment.initLocalValues(file.name, file.length(), mimeType, file.toUri().toString())
         }
 
@@ -181,10 +182,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         DraftsActionsWorker.scheduleWork(getApplication())
         autoSaveJob?.cancel()
         super.onCleared()
-    }
-
-    private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
-        return map { Recipient().initLocalValues(it.email, it.name) }
     }
 
     private companion object {
