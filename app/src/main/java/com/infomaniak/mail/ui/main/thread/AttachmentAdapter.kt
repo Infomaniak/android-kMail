@@ -69,9 +69,9 @@ class AttachmentAdapter(
         attachments = newList.toMutableList()
     }
 
-    fun add(attachment: Attachment) {
-        attachments.add(attachment)
-        notifyItemInserted(attachments.lastIndex)
+    fun addAll(newAttachments: List<Attachment>) {
+        attachments.addAll(newAttachments)
+        notifyItemRangeInserted(attachments.lastIndex, newAttachments.count())
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : RecyclerView.ViewHolder(binding.root)

@@ -23,6 +23,7 @@ import com.infomaniak.lib.core.utils.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
 import io.realm.kotlin.MutableRealm
@@ -54,8 +55,7 @@ class Draft : RealmObject {
 
     var subject: String = ""
     var body: String = ""
-    @SerialName("attachments")
-    var attachmentsUuids: RealmList<String> = realmListOf()
+    var attachments: RealmList<Attachment> = realmListOf()
 
     @SerialName("mime_type")
     var mimeType: String = ""

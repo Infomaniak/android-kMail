@@ -19,10 +19,10 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.app.Application
 import android.content.ClipDescription
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import android.net.Uri
+import android.webkit.MimeTypeMap
+import androidx.core.net.toUri
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -37,14 +38,13 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.getFileName
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.types.RealmList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -62,6 +62,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
+    val attachments = MutableLiveData<MutableList<Attachment>>(mutableListOf())
 
     lateinit var currentDraftLocalUuid: String
 
@@ -152,6 +153,28 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             draft.body = mailBody
             draft.action = action
         }
+    }
+
+    fun importAttachments(uris: List<Uri>) = CoroutineScope(Dispatchers.IO).launch {
+        val newAttachments = mutableListOf<Attachment>()
+        uris.forEach { newAttachments.add(importAttachment(it)) }
+        attachments.postValue(newAttachments)
+    }
+
+    private fun importAttachment(uri: Uri): Attachment {
+        val fileName = uri.getFileName(getApplication())!!
+        val draftUuid = currentDraftLocalUuid
+
+        val attachment = Attachment()
+        LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, draftUuid)?.let { file ->
+            val fileExtension = file.path.substringAfterLast(".")
+            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"
+
+
+            attachment.initLocalValues(file.name, file.length(), mimeType, file.toUri().toString())
+        }
+
+        return attachment
     }
 
     override fun onCleared() {

@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
@@ -29,12 +28,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
-import android.webkit.MimeTypeMap
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.net.toUri
 import androidx.core.view.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
@@ -45,7 +42,6 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -55,8 +51,10 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.LocalStorageUtils.copyDataToAttachmentsCache
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.setMargins
+import com.infomaniak.mail.utils.toggleChevron
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -124,8 +122,7 @@ class NewMessageFragment : Fragment() {
                     Log.d("SelectedText", "ATTACHMENT")
                     filePicker.open { uris ->
                         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        uris.forEach(::importAttachment)
-                        attachmentsRecyclerView.isVisible = attachmentAdapter.itemCount > 0
+                        newMessageViewModel.importAttachments(uris)
                     }
                 }
                 EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
@@ -139,6 +136,11 @@ class NewMessageFragment : Fragment() {
             }
         }
 
+        newMessageViewModel.attachments.observe(requireActivity()) {
+            attachmentsRecyclerView.isGone = it.isEmpty()
+            attachmentAdapter.addAll(it)
+        }
+
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
             override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
                 source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
@@ -150,21 +152,6 @@ class NewMessageFragment : Fragment() {
         observeSubject()
         observeBody()
         observeMailboxes()
-    }
-
-    private fun importAttachment(uri: Uri) {
-        val fileName = uri.getFileName(requireContext())!!
-        val draftUuid = newMessageViewModel.currentDraftLocalUuid
-
-        copyDataToAttachmentsCache(requireContext(), uri, fileName, draftUuid)?.let { file ->
-            val fileExtension = file.path.substringAfterLast(".")
-            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"
-
-            with(Attachment()) {
-                initLocalValues(file.name, file.length(), mimeType, file.toUri().toString())
-                attachmentAdapter.add(this)
-            }
-        }
     }
 
     fun closeAutocompletion() {
