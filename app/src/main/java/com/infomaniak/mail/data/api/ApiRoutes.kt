@@ -88,8 +88,8 @@ object ApiRoutes {
         return "${getMessages(mailboxUuid, folderId)}/messages_uids?since=${dateSince}"
     }
 
-    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, signature: String): String {
-        return "${getMessages(mailboxUuid, folderId)}/activities?signature=${signature}"
+    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): String {
+        return "${getMessages(mailboxUuid, folderId)}/activities?signature=${cursor}"
     }
 
     fun getMessagesByUids(mailboxUuid: String, folderId: String, messagesUids: List<String>): String {
