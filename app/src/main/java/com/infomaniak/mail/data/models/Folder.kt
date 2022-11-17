@@ -26,7 +26,6 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
-import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
@@ -63,8 +62,8 @@ class Folder : RealmObject {
     //endregion
 
     //region Local data (Transient)
-    @Transient
-    var threads: RealmList<Thread> = realmListOf()
+    // @Transient
+    // var threads: RealmList<Thread> = realmListOf()
     @Transient
     var parentLink: Folder? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     @Transient
@@ -76,8 +75,7 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun initLocalValues(threads: RealmList<Thread>, parentLink: Folder?, lastUpdatedAt: RealmInstant?, cursor: String?) {
-        this.threads = threads
+    fun initLocalValues(parentLink: Folder?, lastUpdatedAt: RealmInstant?, cursor: String?) {
         this.parentLink = parentLink
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor

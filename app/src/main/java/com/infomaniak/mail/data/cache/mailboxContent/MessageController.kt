@@ -49,6 +49,15 @@ object MessageController {
         return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
     }
 
+    private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
+        val byFolderId = "${Message::folderId.name} == '$folderId'"
+        return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
+    }
+
+    fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
+        return (realm ?: RealmDatabase.mailboxContent()).query()
+    }
+
     private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
         val byUid = "${Message::uid.name} == '$uid'"
         return (realm ?: RealmDatabase.mailboxContent()).query<Message>(byUid).first()
@@ -58,6 +67,10 @@ object MessageController {
     //region Get data
     private fun getMessages(uids: List<String>, realm: TypedRealm? = null): RealmResults<Message> {
         return getMessagesQuery(uids, realm).find()
+    }
+
+    fun getMessages(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
+        return getMessagesQuery(folderId, realm)
     }
 
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
@@ -297,7 +310,7 @@ object MessageController {
             deleteMessagesAsMessages(deletedUids, realm = this)
             updateMessagesAsMessages(updatedMessages, folder.id, realm = this)
 
-            if (cursor != null) FolderController.updateFolder(folder.id, realm = this) {
+            FolderController.updateFolder(folder.id, realm = this) {
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.cursor = cursor
             }
@@ -386,7 +399,7 @@ object MessageController {
     }
 
     private fun getUniquesUidsInReverse(folder: Folder, remoteUids: List<String>): List<String> {
-        val localUids = folder.threads.map { it.uid.toShortUid() }
+        val localUids = folder.id.let(ThreadController::getThreads).find().map { it.uid.toShortUid() }
         val uniqueUids = remoteUids - localUids.intersect(remoteUids.toSet())
         return uniqueUids.reversed()
     }

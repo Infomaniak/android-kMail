@@ -22,11 +22,11 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
@@ -87,12 +87,19 @@ object FolderController {
 
     private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {
         getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
-            folder.threads.reversed().forEach { thread ->
-                deleteMessages(thread.messages)
-                delete(thread)
-            }
-            delete(folder)
+            deleteLocalFolder(folder)
         }
+    }
+
+    private fun MutableRealm.deleteLocalFolder(folder: Folder) {
+
+        val messages = MessageController.getMessages(folder.id, realm = this).find()
+        deleteMessages(messages)
+
+        val threadsQuery = ThreadController.getThreads(folder.id, realm = this).query("${Thread::foldersIds.name}.@count == 1")
+        delete(threadsQuery)
+
+        delete(folder)
     }
 
     private fun MutableRealm.insertNewData(remoteFolders: List<Folder>) {
@@ -101,7 +108,6 @@ object FolderController {
 
             getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
                 remoteFolder.initLocalValues(
-                    threads = localFolder.threads.toRealmList(),
                     parentLink = localFolder.parentLink,
                     lastUpdatedAt = localFolder.lastUpdatedAt,
                     cursor = localFolder.cursor,
