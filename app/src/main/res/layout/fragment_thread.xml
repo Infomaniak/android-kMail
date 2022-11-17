@@ -96,6 +96,9 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
+            android:paddingVertical="@dimen/marginStandardVerySmall"
+            android:clipToPadding="false"
+            android:background="@color/threadBackground"
             android:id="@+id/messagesList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -97,9 +97,9 @@ class ThreadFragment : Fragment() {
             }
         }
 
-        AppCompatResources.getDrawable(context, R.drawable.mail_divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
-        }
+        // AppCompatResources.getDrawable(context, R.drawable.mail_divider)?.let {
+        //     messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
+        // }
 
         toolbarSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(context)
 

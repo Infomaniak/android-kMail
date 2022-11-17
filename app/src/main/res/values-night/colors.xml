@@ -37,9 +37,9 @@
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/black</color>
-    <color name="backgroundSecondaryColor">#1A1A1A</color>
+    <color name="backgroundSecondaryColor">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
-    <color name="threadDensityBackground">#191919</color>
+    <color name="threadBackground">@color/bat</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/mouse</color>

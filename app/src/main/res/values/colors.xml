@@ -44,7 +44,7 @@
     <color name="backgroundSnackbarColor">@color/swan</color>
     <color name="backgroundSecondaryColor">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
-    <color name="threadDensityBackground">#FFFFFF</color>
+    <color name="threadBackground">@color/rabbit</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
