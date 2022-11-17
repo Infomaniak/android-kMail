@@ -66,8 +66,6 @@
             android:insetTop="@dimen/marginStandardSmall"
             android:insetRight="@dimen/marginStandardSmall"
             android:insetBottom="@dimen/marginStandardSmall"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
             android:visibility="gone"
             app:icon="@drawable/ic_add_circle"
             app:iconSize="16dp"

@@ -55,7 +55,7 @@ class MenuDrawerDropdownView @JvmOverloads constructor(
         }
     }
 
-    fun setOnActionClickListener(listener: OnClickListener?) {
+    fun setOnActionClickListener(listener: OnClickListener) {
         binding.actionButton.setOnClickListener(listener)
     }
 }
