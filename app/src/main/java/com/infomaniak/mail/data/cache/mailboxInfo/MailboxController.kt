@@ -104,7 +104,7 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    fun update(apiMailboxes: List<Mailbox>, userId: Int) {
+    fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
@@ -113,24 +113,24 @@ object MailboxController {
         val isCurrentMailboxDeleted = RealmDatabase.mailboxInfo().writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
-            upsertMailboxes(localQuotas, apiMailboxes)
+            upsertMailboxes(localQuotas, remoteMailboxes)
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Delete outdated data")
-            return@writeBlocking deleteOutdatedData(apiMailboxes, userId)
+            return@writeBlocking deleteOutdatedData(remoteMailboxes, userId)
         }
 
         if (isCurrentMailboxDeleted) AccountUtils.reloadApp()
     }
 
-    private fun MutableRealm.upsertMailboxes(localQuotas: Map<String, Quotas?>, apiMailboxes: List<Mailbox>) {
-        apiMailboxes.forEach { apiMailbox ->
-            apiMailbox.quotas = localQuotas[apiMailbox.objectId]
-            copyToRealm(apiMailbox, UpdatePolicy.ALL)
+    private fun MutableRealm.upsertMailboxes(localQuotas: Map<String, Quotas?>, remoteMailboxes: List<Mailbox>) {
+        remoteMailboxes.forEach { remoteMailbox ->
+            remoteMailbox.quotas = localQuotas[remoteMailbox.objectId]
+            copyToRealm(remoteMailbox, UpdatePolicy.ALL)
         }
     }
 
-    private fun MutableRealm.deleteOutdatedData(apiMailboxes: List<Mailbox>, userId: Int): Boolean {
-        val outdatedMailboxes = getMailboxes(userId, apiMailboxes.map { it.mailboxId }, realm = this)
+    private fun MutableRealm.deleteOutdatedData(remoteMailboxes: List<Mailbox>, userId: Int): Boolean {
+        val outdatedMailboxes = getMailboxes(userId, remoteMailboxes.map { it.mailboxId }, realm = this)
         val isCurrentMailboxDeleted = outdatedMailboxes.any { it.mailboxId == AccountUtils.currentMailboxId }
         if (isCurrentMailboxDeleted) {
             RealmDatabase.closeMailboxContent()

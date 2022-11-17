@@ -66,19 +66,19 @@ object MessageController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun MutableRealm.update(localMessages: List<Message>, apiMessages: List<Message>) {
+    fun MutableRealm.update(localMessages: List<Message>, remoteMessages: List<Message>) {
 
         Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")
-        deleteMessages(getOutdatedMessages(localMessages, apiMessages))
+        deleteMessages(getOutdatedMessages(localMessages, remoteMessages))
 
         Log.d(RealmDatabase.TAG, "Messages: Save new data")
-        copyListToRealm(apiMessages, alsoCopyManagedItems = false)
+        copyListToRealm(remoteMessages, alsoCopyManagedItems = false)
     }
 
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    private fun getOutdatedMessages(localMessages: List<Message>, apiMessages: List<Message>): List<Message> {
+    private fun getOutdatedMessages(localMessages: List<Message>, remoteMessages: List<Message>): List<Message> {
         return localMessages.filter { localMessage ->
-            apiMessages.none { apiMessage -> apiMessage.uid == localMessage.uid }
+            remoteMessages.none { remoteMessage -> remoteMessage.uid == localMessage.uid }
         }
     }
 

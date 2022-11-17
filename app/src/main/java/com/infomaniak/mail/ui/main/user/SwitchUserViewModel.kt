@@ -53,7 +53,7 @@ class SwitchUserViewModel : ViewModel() {
         users.forEach { user ->
             with(ApiRepository.getMailboxes(createOkHttpClientForSpecificUser(user))) {
                 if (isSuccess()) MailboxController.update(
-                    apiMailboxes = data?.map { it.initLocalValues(user.id) } ?: emptyList(),
+                    remoteMailboxes = data?.map { it.initLocalValues(user.id) } ?: emptyList(),
                     userId = user.id,
                 )
             }

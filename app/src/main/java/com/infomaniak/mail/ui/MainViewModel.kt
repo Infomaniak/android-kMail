@@ -185,7 +185,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun updateMailboxes() {
         with(ApiRepository.getMailboxes()) {
             if (isSuccess()) MailboxController.update(
-                apiMailboxes = data?.map { it.initLocalValues(AccountUtils.currentUserId) } ?: emptyList(),
+                remoteMailboxes = data?.map { it.initLocalValues(AccountUtils.currentUserId) } ?: emptyList(),
                 userId = AccountUtils.currentUserId,
             )
         }
