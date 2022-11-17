@@ -31,7 +31,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -56,9 +55,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -308,29 +305,51 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             updateUpdatedAt()
             clearFilter()
 
-            folderJob?.cancel()
-            folderJob = lifecycleScope.launch(Dispatchers.Main) {
-                getFolder(folderId)
-                observeFolder(folderId)
-            }
+            // folderJob?.cancel()
+            // folderJob = lifecycleScope.launch(Dispatchers.Main) {
+            //     // getFolder(folderId)
+            //     // mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+            //     //     Log.e("TOTO", "getFolder: ${folder.name} | ${folder.unreadCount}")
+            //     //     threadListViewModel.currentFolder.value = folder
+            //     //     displayFolderName(folder)
+            //     // }
+            //     // observeFolder(folderId)
+            //     threadListViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+            //         Log.e("TOTO", "observeFolder: ${folder.name} | ${folder.unreadCount}")
+            //         displayFolderName(folder)
+            //         updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+            //         updateUnreadCount(folder.unreadCount)
+            //         threadListViewModel.startUpdatedAtJob()
+            //     }
+            // }
         }
-    }
 
-    private fun getFolder(folderId: String) {
-        mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
-            threadListViewModel.currentFolder.value = folder
+        threadListViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+            Log.e("TOTO", "observeFolder: ${folder.name} | ${folder.unreadCount}")
             displayFolderName(folder)
             threadListAdapter.updateFolderRole(folder.role)
-        }
-    }
-
-    private fun observeFolder(folderId: String) {
-        threadListViewModel.observeFolder(folderId).observe(viewLifecycleOwner) { folder ->
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
         }
     }
+
+    // private fun getFolder(folderId: String) {
+    //     mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+    //         Log.e("TOTO", "getFolder: ${folder.name} | ${folder.unreadCount}")
+    //         threadListViewModel.currentFolder.value = folder
+    //         displayFolderName(folder)
+    //     }
+    // }
+
+    // private fun observeFolder(folderId: String) {
+    //     threadListViewModel.observeFolder(folderId).observe(viewLifecycleOwner) { folder ->
+    //         Log.e("TOTO", "observeFolder: ${folder.name} | ${folder.unreadCount}")
+    //         updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+    //         updateUnreadCount(folder.unreadCount)
+    //         threadListViewModel.startUpdatedAtJob()
+    //     }
+    // }
 
     private fun observeUpdatedAtTriggers() {
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }
