@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/marginStandardSmall"
             android:layout_weight="1"
-            android:drawablePadding="@dimen/marginStandard"
+            android:drawablePadding="@dimen/marginStandardMedium"
             android:ellipsize="end"
             android:gravity="start|center_vertical"
             android:lineSpacingMultiplier="1"

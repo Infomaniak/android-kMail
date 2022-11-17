@@ -53,7 +53,16 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settingsButton"
                 style="@style/IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
+                android:insetLeft="@dimen/marginStandardVerySmall"
+                android:insetTop="@dimen/marginStandardVerySmall"
+                android:insetRight="@dimen/marginStandardVerySmall"
+                android:insetBottom="@dimen/marginStandardVerySmall"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="@dimen/marginStandardVerySmall"
                 app:icon="@drawable/ic_cog"
                 app:iconSize="24dp"
                 app:iconTint="?android:attr/colorPrimary"
@@ -104,8 +113,7 @@
                         style="@style/H4.Accent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/marginStandard"
-                        android:layout_marginEnd="@dimen/marginStandardMedium"
+                        android:layout_marginHorizontal="@dimen/marginStandardMedium"
                         android:ellipsize="end"
                         android:lines="1"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -205,52 +213,55 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.google.android.material.card.MaterialCardView
+            <com.infomaniak.mail.ui.main.menu.MenuDrawerDropdownView
                 android:id="@+id/customFolders"
-                style="@style/MenuDrawerItem">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/buttonFolders" />
-
-                    <ImageView
-                        android:id="@+id/expandCustomFolderButton"
-                        android:layout_width="@dimen/chevronSize"
-                        android:layout_height="@dimen/chevronSize"
-                        android:contentDescription="@string/contentDescriptionButtonExpandCustomFolders"
-                        android:src="@drawable/ic_chevron_down" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:actionContentDescription="@string/buttonCreateFolder"
+                app:showIcon="true"
+                app:title="@string/buttonFolders" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/customFoldersList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"
-                android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="2"
-                tools:listitem="@layout/item_folder_menu_drawer"
-                tools:visibility="visible" />
+                tools:listitem="@layout/item_folder_menu_drawer" />
 
-            <com.infomaniak.mail.views.MenuDrawerItemView
-                android:id="@+id/createNewFolderButton"
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.infomaniak.mail.ui.main.menu.MenuDrawerDropdownView
+                android:id="@+id/advancedActions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:icon="@drawable/ic_plus_rounded"
-                app:text="@string/buttonCreateFolder"
-                tools:visibility="visible" />
+                app:title="@string/menuDrawerAdvancedActions" />
+
+            <LinearLayout
+                android:id="@+id/advancedActionsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.infomaniak.mail.views.MenuDrawerItemView
+                    android:id="@+id/importMails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_drawer_download"
+                    app:text="@string/buttonImportEmails" />
+
+                <com.infomaniak.mail.views.MenuDrawerItemView
+                    android:id="@+id/restoreMails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_restore_arrow"
+                    app:text="@string/buttonRestoreEmails" />
+
+            </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
@@ -258,10 +269,10 @@
                 android:layout_height="wrap_content" />
 
             <com.infomaniak.mail.views.MenuDrawerItemView
-                android:id="@+id/feedbacks"
+                android:id="@+id/feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_feedbacks"
+                app:icon="@drawable/ic_feedback"
                 app:text="@string/buttonFeedbacks" />
 
             <com.infomaniak.mail.views.MenuDrawerItemView
@@ -270,34 +281,6 @@
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_help"
                 app:text="@string/buttonHelp" />
-
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="@style/SettingHeader"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/menuDrawerItemViewHeight"
-                android:gravity="center|start"
-                android:paddingHorizontal="@dimen/marginStandard"
-                android:paddingVertical="@dimen/marginStandardSmall"
-                android:text="@string/menuDrawerAdvancedActions" />
-
-            <com.infomaniak.mail.views.MenuDrawerItemView
-                android:id="@+id/importMails"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_drawer_download"
-                app:text="@string/buttonImportEmails" />
-
-            <com.infomaniak.mail.views.MenuDrawerItemView
-                android:id="@+id/restoreMails"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_restore_arrow"
-                app:text="@string/buttonRestoreEmails" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/storageDivider"

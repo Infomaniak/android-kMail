@@ -304,10 +304,10 @@
         <item name="android:paddingStart">@dimen/marginStandard</item>
         <item name="cardBackgroundColor">@color/backgroundColor</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
-        <item name="shapeAppearanceOverlay">@style/MenuDrawerItem.ShapeAppearance</item>
+        <item name="shapeAppearanceOverlay">@style/MenuDrawerItemShapeAppearance</item>
     </style>
 
-    <style name="MenuDrawerItem.ShapeAppearance" parent="">
+    <style name="MenuDrawerItemShapeAppearance">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopRight">0dp</item>
         <item name="cornerSizeTopLeft">10dp</item>
