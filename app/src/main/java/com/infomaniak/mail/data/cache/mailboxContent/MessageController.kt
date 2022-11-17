@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.copyListToRealm
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
@@ -199,7 +200,8 @@ object MessageController {
     }
 
     fun MutableRealm.createMultiMessagesThreads(messages: List<Message>) {
-        val threads = ThreadController.getThreads(realm = this).toMutableList()
+        val allThreads = ThreadController.getThreads(realm = this).toMutableList()
+        val threadsToUpsert = mutableListOf<Thread>()
 
         messages.forEach { message ->
 
@@ -213,10 +215,15 @@ object MessageController {
             message.inReplyTo?.let { messageIds.addAll(parseMessagesIds(it)) }
             message.messageIds = messageIds.toRealmSet()
 
-            val thread = threads.find { it.messagesIds.intersect(messageIds).isNotEmpty() }
-                ?: run { message.toThread().also(threads::add) }
+            val thread = allThreads.find { it.messagesIds.intersect(messageIds).isNotEmpty() }
+                ?: run { message.toThread().also(allThreads::add) }
             thread.addMessage(message)
-            ThreadController.upsertThread(thread, realm = this)
+            threadsToUpsert.add(thread)
+        }
+
+        threadsToUpsert.forEach {
+            it.recomputeThread()
+            ThreadController.upsertThread(it, realm = this)
         }
     }
 
@@ -251,7 +258,7 @@ object MessageController {
 
                 message.threadUid?.let {
                     ThreadController.updateThread(it, realm) { thread ->
-                        thread.recomputeData()
+                        thread.recomputeThread()
                         // ThreadController.upsertThread(thread, realm)
                     }
                 }
@@ -308,10 +315,15 @@ object MessageController {
     }
 
     fun MutableRealm.createSingleMessageThreads(messages: List<Message>) {
+        val threads = mutableListOf<Thread>()
         messages.forEach { message ->
             val thread = message.toThread()
             thread.addMessage(message)
-            ThreadController.upsertThread(thread, realm = this)
+            threads.add(thread)
+        }
+        threads.forEach {
+            it.recomputeThread()
+            ThreadController.upsertThread(it, realm = this)
         }
     }
 
@@ -334,7 +346,7 @@ object MessageController {
 
                 message.threadUid?.let {
                     ThreadController.updateThread(it, realm) { thread ->
-                        thread.recomputeData()
+                        thread.recomputeThread()
                         // ThreadController.upsertThread(thread, realm)
                     }
                 }

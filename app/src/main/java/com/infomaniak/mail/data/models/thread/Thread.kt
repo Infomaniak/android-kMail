@@ -81,11 +81,9 @@ class Thread : RealmObject {
 
     fun addMessage(message: Message) {
         message.threadUid = uid
-        messages.apply {
-            add(message)
-            sortBy { it.date }
-        }
-        recomputeData()
+        messages.add(message)
+        messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
+        // recomputeThread()
 
         // foldersIds.add(message.folderId)
         // uniqueMessagesCount++
@@ -103,7 +101,7 @@ class Thread : RealmObject {
 
     fun removeMessage(message: Message) {
         messages.removeIf { it.uid == message.uid }
-        recomputeData()
+        recomputeThread()
 
         // foldersIds = messages.map { it.folderId }.toRealmSet()
         // uniqueMessagesCount--
@@ -119,22 +117,55 @@ class Thread : RealmObject {
         // // if (message.scheduled) scheduled = true
     }
 
-    fun recomputeData() {
+    fun recomputeThread() {
+
+        messages.sortBy { it.date }
+
+        unseenMessagesCount = 0
+        size = 0
+        hasAttachments = false
+        hasDrafts = false
+        favoritesCount = 0
+        answered = false
+        forwarded = false
+        scheduled = false
+
+        messages.forEach { message ->
+            foldersIds += message.folderId
+            messagesIds += message.messageIds
+            if (!message.seen) unseenMessagesCount++
+            from += message.from
+            to += message.to
+            size += message.size
+            if (message.hasAttachments) hasAttachments = true
+            if (message.isDraft) hasDrafts = true
+            if (message.isFavorite) favoritesCount++
+            if (message.answered) answered = true
+            if (message.forwarded) forwarded = true
+            if (message.scheduled) scheduled = true
+        }
+
+        uniqueMessagesCount = messages.count() // TODO: Handle duplicates
+        date = messages.last().date!! // TODO: Remove this, and compute the Date in the UI only
+
+        from = from.toSet().toRealmList()
+        to = to.toSet().toRealmList()
+
         // Log.e("TOTO", "recomputeData: ${subject}")
-        foldersIds = messages.map { it.folderId }.toRealmSet()
-        messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
-        uniqueMessagesCount = messages.map { it.uid }.toSet().count()
-        unseenMessagesCount = messages.count { !it.seen }
-        from = messages.flatMap { it.from }.toSet().toRealmList()
-        to = messages.flatMap { it.to }.toSet().toRealmList()
-        date = messages.last().date!!
-        size = messages.sumOf { it.size }
-        hasAttachments = messages.map { it.hasAttachments }.contains(true)
-        hasDrafts = messages.map { it.isDraft }.contains(true)
-        favoritesCount = messages.count { it.isFavorite }
-        answered = messages.map { it.answered }.contains(true)
-        forwarded = messages.map { it.forwarded }.contains(true)
-        scheduled = messages.map { it.scheduled }.contains(true)
+        // foldersIds = messages.map { it.folderId }.toRealmSet()
+        // messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
+        // uniqueMessagesCount = messages.map { it.uid }.toSet().count()
+        // unseenMessagesCount = messages.count { !it.seen }
+        // from = messages.flatMap { it.from }.toSet().toRealmList()
+        // to = messages.flatMap { it.to }.toSet().toRealmList()
+        // date = messages.last().date!!
+        // size = messages.sumOf { it.size }
+        // hasAttachments = messages.map { it.hasAttachments }.contains(true)
+        // hasDrafts = messages.map { it.isDraft }.contains(true)
+        // favoritesCount = messages.count { it.isFavorite }
+        // answered = messages.map { it.answered }.contains(true)
+        // forwarded = messages.map { it.forwarded }.contains(true)
+        // scheduled = messages.map { it.scheduled }.contains(true)
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {
