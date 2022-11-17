@@ -41,6 +41,7 @@ import androidx.navigation.navArgs
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.FilePicker
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
@@ -50,6 +51,7 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isEmail
@@ -137,10 +139,12 @@ class NewMessageFragment : Fragment() {
             }
         }
 
-        newMessageViewModel.importedAttachments.observe(requireActivity()) {
-            attachmentAdapter.addAll(it)
+        newMessageViewModel.importedAttachments.observe(requireActivity()) { (attachments, importationResult) ->
+            attachmentAdapter.addAll(attachments)
             attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-            newMessageViewModel.mailAttachments.addAll(it)
+            newMessageViewModel.mailAttachments.addAll(attachments)
+
+            if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {

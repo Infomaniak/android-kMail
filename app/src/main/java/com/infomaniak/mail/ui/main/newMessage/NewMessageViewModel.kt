@@ -20,13 +20,10 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.app.Application
 import android.content.ClipDescription
 import android.net.Uri
-import android.util.Log
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
@@ -46,7 +43,10 @@ import com.infomaniak.mail.utils.getFileNameAndSize
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -65,7 +65,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val importedAttachments = MutableLiveData<MutableList<Attachment>>(mutableListOf())
+    val importedAttachments = MutableLiveData(mutableListOf<Attachment>() to ImportationResult.SUCCESS)
 
     lateinit var currentDraftLocalUuid: String
 
@@ -161,28 +161,24 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
-        var sum = mailAttachments.sumOf { it.size }
-        run breaking@{
-            uris.forEach { uri ->
-                val availableSpace = FILE_SIZE_25_MB - sum
-                Log.e("gibran", "importAttachments - availableSpace: ${availableSpace}")
-                val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace)
+        var attachmentsSize = mailAttachments.sumOf { it.size }
 
-                if (hasSizeLimitBeenReached) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(getApplication(), R.string.attachmentFileLimitReached, Toast.LENGTH_LONG).show()
-                    }
-                    return@breaking
-                }
+        uris.forEach() { uri ->
+            val availableSpace = FILE_SIZE_25_MB - attachmentsSize
+            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace)
 
-                attachment?.let {
-                    newAttachments.add(it)
-                    sum += it.size
-                }
+            if (hasSizeLimitBeenReached) {
+                importedAttachments.postValue(newAttachments to ImportationResult.FILE_SIZE_TOO_BIG)
+                return@launch
+            }
+
+            attachment?.let {
+                newAttachments.add(it)
+                attachmentsSize += it.size
             }
         }
-        Log.e("gibran", "importAttachments - about to postValue newAttachments: ${newAttachments}")
-        importedAttachments.postValue(newAttachments)
+
+        importedAttachments.postValue(newAttachments to ImportationResult.SUCCESS)
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean> {
@@ -200,6 +196,11 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         DraftsActionsWorker.scheduleWork(getApplication())
         autoSaveJob?.cancel()
         super.onCleared()
+    }
+
+    enum class ImportationResult {
+        SUCCESS,
+        FILE_SIZE_TOO_BIG,
     }
 
     private companion object {
