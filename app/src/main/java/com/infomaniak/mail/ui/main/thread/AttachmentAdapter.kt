@@ -30,7 +30,7 @@ import com.infomaniak.mail.utils.context
 
 class AttachmentAdapter(
     private val shouldDisplayCloseButton: Boolean = false,
-    private val onDelete: ((position: Int, itemCountLeft: Int) -> Unit)? = null,
+    private val onDelete: ((position: Int, fileName: String, itemCountLeft: Int) -> Unit)? = null,
     private val onAttachmentClicked: ((Attachment) -> Unit)? = null,
 ) : RecyclerView.Adapter<AttachmentViewHolder>() {
 
@@ -57,7 +57,7 @@ class AttachmentAdapter(
                         attachments.removeAt(index)
                         notifyItemRemoved(index)
 
-                        onDelete?.invoke(index, itemCount)
+                        onDelete?.invoke(index, attachment.name, itemCount)
                     }
                 }
                 isVisible = true

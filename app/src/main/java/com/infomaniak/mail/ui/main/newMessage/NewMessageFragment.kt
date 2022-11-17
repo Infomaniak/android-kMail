@@ -53,10 +53,14 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
+import com.infomaniak.mail.utils.AccountUtils.currentMailboxId
+import com.infomaniak.mail.utils.AccountUtils.currentUserId
+import com.infomaniak.mail.utils.LocalStorageUtils.getAttachmentsCacheFolder
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.setMargins
 import com.infomaniak.mail.utils.toggleChevron
+import java.io.File
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -70,12 +74,20 @@ class NewMessageFragment : Fragment() {
     private lateinit var contactAdapter: ContactAdapter
     private val attachmentAdapter = AttachmentAdapter(
         shouldDisplayCloseButton = true,
-        onDelete = { position, itemCountLeft ->
+        onDelete = { position, fileName, itemCountLeft ->
             if (itemCountLeft == 0) {
                 TransitionManager.beginDelayedTransition(binding.root)
                 binding.attachmentsRecyclerView.isGone = true
             }
             newMessageViewModel.mailAttachments.removeAt(position)
+
+            val parent = getAttachmentsCacheFolder(
+                requireContext(),
+                newMessageViewModel.currentDraftLocalUuid,
+                currentUserId,
+                currentMailboxId
+            )
+            File(parent, fileName).delete()
         },
     )
 
