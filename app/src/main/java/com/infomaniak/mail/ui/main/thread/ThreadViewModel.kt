@@ -63,14 +63,16 @@ class ThreadViewModel : ViewModel() {
             if (localMessage.fullyDownloaded) {
                 localMessage
             } else {
-                ApiRepository.getMessage(localMessage.resource).data?.also {
+                ApiRepository.getMessage(localMessage.resource).data
+                    ?.initLocalValues(localMessage.messageIds, localMessage.threadUid)
+                    ?.also {
 
-                    // If we've already got this Message's Draft beforehand, we need to save
-                    // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                    if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid, realm = this)?.localUuid
+                        // If we've already got this Message's Draft beforehand, we need to save
+                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                        if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid, realm = this)?.localUuid
 
-                    it.fullyDownloaded = true
-                }
+                        it.fullyDownloaded = true
+                    }
             }
         }
     }

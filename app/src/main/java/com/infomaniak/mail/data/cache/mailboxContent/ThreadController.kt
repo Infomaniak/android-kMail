@@ -35,6 +35,10 @@ import io.realm.kotlin.query.RealmSingleQuery
 object ThreadController {
 
     //region Queries
+    fun getThreadsQuery(realm: TypedRealm? = null): RealmQuery<Thread> {
+        return (realm ?: RealmDatabase.mailboxContent()).query()
+    }
+
     fun getThreadsQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
         val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
@@ -49,7 +53,7 @@ object ThreadController {
             val withFilter = when (filter) {
                 ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
                 ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
-                ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
+                ThreadFilter.STARRED -> "${Thread::favoritesCount.name} > 0"
                 ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
                 ThreadFilter.FOLDER -> TODO()
                 else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
@@ -64,11 +68,11 @@ object ThreadController {
     //endregion
 
     //region Get data
-    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmResults<Thread> {
-        return getThreadsQuery(uids, realm).find()
+    fun getThreads(realm: TypedRealm? = null): RealmResults<Thread> {
+        return getThreadsQuery(realm).find()
     }
 
-    fun getThreads(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
+    fun getThreads(folderId: String, filter: ThreadFilter = ThreadFilter.ALL, realm: TypedRealm? = null): RealmQuery<Thread> {
         return getThreadsQuery(folderId, filter, realm)
     }
 
@@ -80,6 +84,11 @@ object ThreadController {
     //region Edit data
     fun upsertThread(thread: Thread, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = { it.copyToRealm(thread, UpdatePolicy.ALL) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
+    fun updateThread(uid: String, realm: MutableRealm? = null, onUpdate: (thread: Thread) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getThread(uid, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 

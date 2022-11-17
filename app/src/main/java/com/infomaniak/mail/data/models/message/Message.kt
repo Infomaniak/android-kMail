@@ -31,6 +31,7 @@ import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -54,6 +55,8 @@ class Message : RealmObject {
     var to: RealmList<Recipient> = realmListOf()
     @SerialName("reply_to")
     var replyTo: RealmList<Recipient> = realmListOf()
+    @SerialName("in_reply_to")
+    var inReplyTo: String? = null
     var references: String? = null
     @SerialName("priority")
     private var _priority: String? = null
@@ -99,7 +102,9 @@ class Message : RealmObject {
     @Transient
     var hasUnsubscribeLink: Boolean = false
     @Transient
-    var parentLink: Thread? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
+    var messageIds: RealmSet<String> = realmSetOf()
+    @Transient
+    var threadUid: String? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
     //region UI data (Ignore & Transient)
@@ -130,23 +135,16 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun toThread(mailboxUuid: String) = Thread().apply {
-        this.mailboxUuid = mailboxUuid
-        foldersIds = realmSetOf(this@Message.folderId)
-        this@Message.references?.let { references = realmSetOf(it) }
+    fun initLocalValues(messageIds: RealmSet<String>, threadUid: String?): Message {
+        this.messageIds = messageIds
+        this.threadUid = threadUid
+
+        return this
+    }
+
+    fun toThread() = Thread().apply {
         uid = this@Message.uid
-        uniqueMessagesCount = 1
-        messages = realmListOf(this@Message)
-        answered = this@Message.answered
-        isFavorite = this@Message.isFavorite
-        forwarded = this@Message.forwarded
-        scheduled = this@Message.scheduled
-        unseenMessagesCount = if (this@Message.seen) 0 else 1
-        from = this@Message.from
         subject = this@Message.subject
-        this@Message.date?.let { date = it }
-        hasAttachments = this@Message.hasAttachments
-        hasDrafts = this@Message.isDraft
-        isFavorite = this@Message.isFavorite
+        // addMessage(this@Message, messagesIds)
     }
 }

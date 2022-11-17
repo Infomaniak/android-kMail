@@ -22,6 +22,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -50,6 +51,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val localSettings by lazy { LocalSettings.getInstance(application) }
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
@@ -203,7 +205,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         isDownloadingChanges.postValue(true)
 
-        MessageController.fetchMessages(mailboxUuid, folderId)
+        MessageController.fetchCurrentFolderMessages(mailboxUuid, folderId, localSettings.threadMode)
 
         isDownloadingChanges.postValue(false)
     }

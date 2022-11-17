@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -95,9 +94,9 @@ object DraftController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun cleanOrphans(threads: List<Thread>, realm: MutableRealm) {
+    fun cleanOrphans(messages: List<Message>, realm: MutableRealm) {
         // TODO: Refactor with LinkingObjects when it's available (https://github.com/realm/realm-kotlin/pull/1021)
-        val messagesUids = threads.flatMap { it.messages }.map { it.uid }
+        val messagesUids = messages.map { it.uid }
         val drafts = getDrafts(realm)
         drafts.reversed().forEach {
             if (!messagesUids.contains(it.messageUid)) realm.delete(it)
