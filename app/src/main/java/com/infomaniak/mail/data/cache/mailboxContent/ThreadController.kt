@@ -177,32 +177,30 @@ object ThreadController {
     //region Mark as seen/unseen
     fun toggleSeenStatus(thread: Thread) {
         val folderId = MainViewModel.currentFolderId.value!!
-        if (thread.unseenMessagesCount == 0) {
-            markAsUnseen(thread, folderId)
-        } else {
-            markAsSeen(thread, folderId)
-        }
-    }
-
-    private fun markAsUnseen(thread: Thread, folderId: String) {
         RealmDatabase.mailboxContent().writeBlocking {
-            val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uid = getThreadLastMessageUid(latestThread)
-            with(ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)) {
-                if (isSuccess()) markThreadAsUnseen(latestThread, folderId)
+            if (thread.unseenMessagesCount == 0) {
+                markAsUnseen(thread, folderId, realm = this)
+            } else {
+                markAsSeen(thread, folderId, realm = this)
             }
         }
     }
 
-    fun markAsSeen(thread: Thread, folderId: String) {
+    private fun markAsUnseen(thread: Thread, folderId: String, realm: MutableRealm) {
+        val latestThread = realm.findLatest(thread) ?: return
+        val uid = getThreadLastMessageUid(latestThread)
+        with(ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)) {
+            if (isSuccess()) realm.markThreadAsUnseen(latestThread, folderId)
+        }
+    }
+
+    fun markAsSeen(thread: Thread, folderId: String, realm: MutableRealm) {
         if (thread.unseenMessagesCount == 0) return
 
-        RealmDatabase.mailboxContent().writeBlocking {
-            val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uids = getThreadUnseenMessagesUids(latestThread)
-            with(ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)) {
-                if (isSuccess()) markThreadAsSeen(latestThread, folderId)
-            }
+        val latestThread = realm.findLatest(thread) ?: return
+        val uids = getThreadUnseenMessagesUids(latestThread)
+        with(ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)) {
+            if (isSuccess()) realm.markThreadAsSeen(latestThread, folderId)
         }
     }
     //endregion

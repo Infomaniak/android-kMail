@@ -67,7 +67,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
-    fun initializeDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
+    fun initDraftAndUi(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
                 currentDraftLocalUuid = if (draftExists) {

@@ -25,9 +25,12 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.*
+import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
+import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
@@ -36,7 +39,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
@@ -65,7 +67,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun resetAllCurrentLiveData() {
-        currentMessageUid.value = null
         currentThreadUid.value = null
         currentFolderId.value = null
         currentMailboxObjectId.value = null
@@ -94,7 +95,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             currentMailboxObjectId.postValue(mailbox.objectId)
 
-            currentMessageUid.postValue(null)
             currentThreadUid.postValue(null)
             currentFolderId.postValue(null)
         }
@@ -107,18 +107,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             currentFolderId.postValue(folderId)
 
-            currentMessageUid.postValue(null)
             currentThreadUid.postValue(null)
-        }
-    }
-
-    private fun selectThread(thread: Thread) {
-        if (thread.uid != currentThreadUid.value) {
-            Log.i(TAG, "selectThread: ${thread.subject}")
-
-            currentThreadUid.postValue(thread.uid)
-
-            currentMessageUid.postValue(null)
         }
     }
 
@@ -169,13 +158,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         selectFolder(folderId)
         refreshThreads(mailboxUuid, folderId)
-    }
-
-    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
-        selectThread(thread)
-        ThreadController.markAsSeen(thread, currentFolderId.value!!)
-        updateMessages(thread)
     }
 
     fun forceRefreshThreads(filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
@@ -272,24 +254,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
-    private fun updateMessages(thread: Thread) {
-        val apiMessages = fetchMessages(thread)
-        MessageController.update(thread.messages, apiMessages)
-    }
-
-    private fun fetchMessages(thread: Thread): List<Message> {
-        return thread.messages.mapNotNull { localMessage ->
-            if (localMessage.fullyDownloaded) {
-                localMessage
-            } else {
-                ApiRepository.getMessage(localMessage.resource).data?.also {
-                    if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid)?.localUuid
-                    it.fullyDownloaded = true
-                }
-            }
-        }
-    }
-
     // Delete Thread
     fun deleteThread(thread: Thread, filter: ThreadFilter) = viewModelScope.launch(Dispatchers.IO) {
 
@@ -329,6 +293,5 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val currentMailboxObjectId = MutableLiveData<String?>()
         val currentFolderId = MutableLiveData<String?>()
         val currentThreadUid = MutableLiveData<String?>()
-        val currentMessageUid = MutableLiveData<String?>()
     }
 }
