@@ -77,10 +77,9 @@ object LocalStorageUtils {
         val attachmentsDir = getAttachmentsCacheDir(context, localDraftUuid, userId, mailboxId).also {
             if (!it.exists()) return
         }
-        val mailboxDir = attachmentsDir.parentFile
-        val userDir = mailboxDir.parentFile
-        val attachmentsRootDir = userDir.parentFile
-
+        val mailboxDir = attachmentsDir.parentFile ?: return
+        val userDir = mailboxDir.parentFile ?: return
+        val attachmentsRootDir = userDir.parentFile ?: return
 
         if (attachmentsDir.hasEmptyFiles) attachmentsDir.delete()
         if (mailboxDir.hasEmptyFiles) mailboxDir.delete()

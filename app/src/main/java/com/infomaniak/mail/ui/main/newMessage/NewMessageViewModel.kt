@@ -163,7 +163,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = mailAttachments.sumOf { it.size }
 
-        uris.forEach() { uri ->
+        uris.forEach { uri ->
             val availableSpace = FILE_SIZE_25_MB - attachmentsSize
             val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace)
 
