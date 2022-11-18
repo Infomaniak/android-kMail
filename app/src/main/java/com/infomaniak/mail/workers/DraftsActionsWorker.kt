@@ -90,8 +90,11 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
         const val MAX_RETRIES = 3
 
         fun scheduleWork(context: Context) {
+
+            if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
+
             val hasEmptyDrafts = DraftController.getDraftsWithActionsCount() == 0L
-            if (hasEmptyDrafts || AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
+            if (hasEmptyDrafts) return
 
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
