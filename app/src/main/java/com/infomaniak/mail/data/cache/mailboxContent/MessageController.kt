@@ -169,8 +169,8 @@ object MessageController {
 
         RealmDatabase.mailboxContent().writeBlocking {
 
-            deleteMessagesAsThreads(deletedUids, realm = this)
-            updateMessagesAsThreads(updatedMessages, folder.id, realm = this)
+            deleteMessagesAsThreads(deletedUids)
+            updateMessagesAsThreads(updatedMessages, folder.id)
 
             FolderController.updateFolder(folder.id, realm = this) {
                 if (previousCursor != null) it.unreadCount = unreadCount
@@ -227,36 +227,39 @@ object MessageController {
         }
     }
 
-    private fun deleteMessagesAsThreads(uids: List<String>, realm: MutableRealm) {
+    private fun MutableRealm.deleteMessagesAsThreads(uids: List<String>) {
         if (uids.isNotEmpty()) {
-            val deletedMessages = getMessages(uids, realm)
+            val deletedMessages = getMessages(uids, realm = this)
 
             deletedMessages.forEach { message ->
-                val thread = ThreadController.getThread(message.threadUid!!, realm)!!
+                val thread = ThreadController.getThread(message.threadUid!!, realm = this)!!
                 if (thread.uniqueMessagesCount == 1) {
-                    realm.delete(thread)
+                    delete(thread)
                 } else {
                     thread.removeMessage(message)
-                    ThreadController.upsertThread(thread, realm)
+                    ThreadController.upsertThread(thread, realm = this)
                 }
             }
 
-            realm.deleteMessages(deletedMessages)
+            deleteMessages(deletedMessages)
         }
     }
 
-    private fun updateMessagesAsThreads(messageFlags: List<MessageFlags>, folderId: String, realm: MutableRealm) {
+    private fun MutableRealm.updateMessagesAsThreads(messageFlags: List<MessageFlags>, folderId: String) {
         messageFlags.forEach { flags ->
+
             val uid = flags.shortUid.toLongUid(folderId)
-            updateMessage(uid, realm) { message ->
+            getMessage(uid, realm = this)?.let { message ->
 
-                message.seen = flags.seen
-                message.isFavorite = flags.isFavorite
-                message.answered = flags.answered
-                message.forwarded = flags.forwarded
-                message.scheduled = flags.scheduled
+                message.apply {
+                    seen = flags.seen
+                    isFavorite = flags.isFavorite
+                    answered = flags.answered
+                    forwarded = flags.forwarded
+                    scheduled = flags.scheduled
+                }
 
-                message.threadUid?.let { ThreadController.getThread(it, realm)?.recomputeThread() }
+                message.threadUid?.let { ThreadController.getThread(it, realm = this)?.recomputeThread() }
             }
         }
     }
@@ -279,8 +282,8 @@ object MessageController {
 
         RealmDatabase.mailboxContent().writeBlocking {
 
-            deleteMessagesAsMessages(deletedUids, realm = this)
-            updateMessagesAsMessages(updatedMessages, folder.id, realm = this)
+            deleteMessagesAsMessages(deletedUids)
+            updateMessagesAsMessages(updatedMessages, folder.id)
 
             FolderController.updateFolder(folder.id, realm = this) {
                 if (previousCursor != null) it.unreadCount = unreadCount
@@ -322,29 +325,28 @@ object MessageController {
         }
     }
 
-    private fun deleteMessagesAsMessages(uids: List<String>, realm: MutableRealm) {
+    private fun MutableRealm.deleteMessagesAsMessages(uids: List<String>) {
         if (uids.isNotEmpty()) {
-            realm.deleteMessages(getMessages(uids, realm))
-            realm.delete(getThreadsQuery(uids, realm))
+            deleteMessages(getMessages(uids, realm = this))
+            delete(getThreadsQuery(uids))
         }
     }
 
-    private fun updateMessagesAsMessages(messageFlags: List<MessageFlags>, folderId: String, realm: MutableRealm) {
+    private fun MutableRealm.updateMessagesAsMessages(messageFlags: List<MessageFlags>, folderId: String) {
         messageFlags.forEach { flags ->
-            val uid = flags.shortUid.toLongUid(folderId)
-            updateMessage(uid, realm) { message ->
-                message.seen = flags.seen
-                message.isFavorite = flags.isFavorite
-                message.answered = flags.answered
-                message.forwarded = flags.forwarded
-                message.scheduled = flags.scheduled
 
-                message.threadUid?.let {
-                    ThreadController.updateThread(it, realm) { thread ->
-                        thread.recomputeThread()
-                        // ThreadController.upsertThread(thread, realm)
-                    }
+            val uid = flags.shortUid.toLongUid(folderId)
+            getMessage(uid, realm = this)?.let { message ->
+
+                message.apply {
+                    seen = flags.seen
+                    isFavorite = flags.isFavorite
+                    answered = flags.answered
+                    forwarded = flags.forwarded
+                    scheduled = flags.scheduled
                 }
+
+                message.threadUid?.let { ThreadController.getThread(it, realm = this)?.recomputeThread() }
             }
         }
     }
