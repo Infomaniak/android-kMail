@@ -66,7 +66,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/quickActionBar"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
@@ -108,16 +108,13 @@
             app:layout_constraintTop_toBottomOf="@id/appBar"
             tools:listitem="@layout/item_message" />
 
+        <com.infomaniak.mail.views.BottomQuickActionBarView
+            android:id="@+id/quickActionBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+            app:menu="@menu/message_menu" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-    <com.infomaniak.mail.views.BottomQuickActionBarView
-        android:id="@+id/quickActionBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/message_menu" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
