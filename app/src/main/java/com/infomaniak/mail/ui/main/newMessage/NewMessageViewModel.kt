@@ -65,7 +65,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
-    val importedAttachments = MutableLiveData(mutableListOf<Attachment>() to ImportationResult.SUCCESS)
+    val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
 
     lateinit var currentDraftLocalUuid: String
 
