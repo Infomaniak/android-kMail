@@ -37,6 +37,7 @@ import androidx.work.OutOfQuotaPolicy
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
@@ -46,6 +47,7 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmInstant
+import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import java.util.*
@@ -158,6 +160,10 @@ inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
 // TODO: There is currently no way to insert multiple objects in one call (https://github.com/realm/realm-kotlin/issues/938)
 fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems: Boolean = true) {
     items.forEach { if (alsoCopyManagedItems || !it.isManaged()) copyToRealm(it, UpdatePolicy.ALL) }
+}
+
+fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
+    return map { Recipient().initLocalValues(it.email, it.name) }
 }
 //endregion
 

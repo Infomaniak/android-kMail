@@ -256,12 +256,7 @@ object MessageController {
                 message.forwarded = flags.forwarded
                 message.scheduled = flags.scheduled
 
-                message.threadUid?.let {
-                    ThreadController.updateThread(it, realm) { thread ->
-                        thread.recomputeThread()
-                        // ThreadController.upsertThread(thread, realm)
-                    }
-                }
+                message.threadUid?.let { ThreadController.getThread(it, realm)?.recomputeThread() }
             }
         }
     }

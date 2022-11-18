@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.toRecipientsList
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.ext.toRealmList
@@ -148,8 +149,8 @@ class Thread : RealmObject {
         uniqueMessagesCount = messages.count() // TODO: Handle duplicates
         date = messages.last().date!! // TODO: Remove this, and compute the Date in the UI only
 
-        from = from.toSet().toRealmList()
-        to = to.toSet().toRealmList()
+        from = from.toRecipientsList().distinct().toRealmList()
+        to = to.toRecipientsList().distinct().toRealmList()
 
         // Log.e("TOTO", "recomputeData: ${subject}")
         // foldersIds = messages.map { it.folderId }.toRealmSet()
