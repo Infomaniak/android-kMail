@@ -26,11 +26,11 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getAttributeColor
-import com.infomaniak.mail.utils.setMargins
 import com.google.android.material.R as RMaterial
 
 class MenuDrawerItemView @JvmOverloads constructor(
@@ -56,7 +56,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     var indent: Int = 0
         set(value) {
             field = value
-            binding.itemName.setMargins(start = value)
+            binding.itemName.setMarginsRelative(start = value)
         }
 
     var text: CharSequence? = null
