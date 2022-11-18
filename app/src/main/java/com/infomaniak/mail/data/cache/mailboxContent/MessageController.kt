@@ -165,14 +165,18 @@ object MessageController {
     }
 
     private fun updateMessages(messageFlags: List<MessageFlags>, mailboxUuid: String, folderId: String, realm: MutableRealm) {
-        messageFlags.forEach {
-            val uid = it.shortUid.toLongUid(folderId)
-            updateMessage(uid, realm) { message ->
-                message.answered = it.answered
-                message.isFavorite = it.isFavorite
-                message.forwarded = it.forwarded
-                message.scheduled = it.scheduled
-                message.seen = it.seen
+        messageFlags.forEach { flags ->
+
+            val uid = flags.shortUid.toLongUid(folderId)
+            getMessage(uid, realm)?.let { message ->
+
+                message.apply {
+                    answered = flags.answered
+                    isFavorite = flags.isFavorite
+                    forwarded = flags.forwarded
+                    scheduled = flags.scheduled
+                    seen = flags.seen
+                }
 
                 ThreadController.upsertThread(message.toThread(mailboxUuid), realm)
             }
