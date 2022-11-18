@@ -131,19 +131,19 @@ class Message : RealmObject {
 
     fun toThread(mailboxUuid: String) = Thread().apply {
         this.mailboxUuid = mailboxUuid
-        this.uid = this@Message.uid
-        this.uniqueMessagesCount = 1
-        this.messages = realmListOf(this@Message)
-        this.answered = this@Message.answered
-        this.isFavorite = this@Message.isFavorite
-        this.forwarded = this@Message.forwarded
-        this.scheduled = this@Message.scheduled
-        this.unseenMessagesCount = if (this@Message.seen) 0 else 1
-        this.from = this@Message.from
-        this.subject = this@Message.subject
+        uid = this@Message.uid
+        uniqueMessagesCount = 1
+        messages = realmListOf(this@Message)
+        answered = this@Message.answered
+        isFavorite = this@Message.isFavorite
+        forwarded = this@Message.forwarded
+        scheduled = this@Message.scheduled
+        unseenMessagesCount = if (this@Message.seen) 0 else 1
+        from = this@Message.from
+        subject = this@Message.subject
         this@Message.date?.let { date = it }
-        this.hasAttachments = this@Message.hasAttachments
-        this.hasDrafts = this@Message.isDraft
-        this.isFavorite = this@Message.isFavorite
+        hasAttachments = this@Message.hasAttachments
+        hasDrafts = this@Message.isDraft
+        isFavorite = this@Message.isFavorite
     }
 }
