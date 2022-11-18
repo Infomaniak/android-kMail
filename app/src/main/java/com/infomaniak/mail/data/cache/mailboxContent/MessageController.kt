@@ -109,7 +109,7 @@ object MessageController {
             getMessagesUids(mailboxUuid, folderId)
         } else {
             getMessagesUidsDelta(mailboxUuid, folderId, previousCursor)
-        }
+        } ?: return
 
         with(messagesUids) {
 
@@ -124,7 +124,7 @@ object MessageController {
                 deleteMessages(deletedUids, realm = this)
                 updateMessages(updatedMessages, mailboxUuid, folderId, realm = this)
 
-                if (cursor != null) FolderController.updateFolder(folderId, this) {
+                FolderController.updateFolder(folderId, this) {
                     it.lastUpdatedAt = Date().toRealmInstant()
                     it.cursor = cursor
                 }
@@ -189,26 +189,30 @@ object MessageController {
 
     private fun String.toShortUid(): String = substringBefore('@')
 
-    private fun getMessagesUids(mailboxUuid: String, folderId: String): MessagesUids {
-        return MessagesUids().apply {
-            with(ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo())) {
-                if (isSuccess()) with(data!!) {
-                    this@apply.addedShortUids = addedShortUids
-                    this@apply.cursor = cursor
-                }
+    private fun getMessagesUids(mailboxUuid: String, folderId: String): MessagesUids? {
+        return with(ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo())) {
+            if (isSuccess()) with(data!!) {
+                MessagesUids(
+                    addedShortUids = addedShortUids,
+                    cursor = cursor,
+                )
+            } else {
+                null
             }
         }
     }
 
-    private fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, previousCursor: String): MessagesUids {
-        return MessagesUids().apply {
-            with(ApiRepository.getMessagesUidsDelta(mailboxUuid, folderId, previousCursor)) {
-                if (isSuccess()) with(data!!) {
-                    this@apply.addedShortUids = addedShortUids
-                    this@apply.deletedUids = deletedShortUids.map { it.toLongUid(folderId) }
-                    this@apply.updatedMessages = updatedMessages
-                    this@apply.cursor = cursor
-                }
+    private fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, previousCursor: String): MessagesUids? {
+        return with(ApiRepository.getMessagesUidsDelta(mailboxUuid, folderId, previousCursor)) {
+            if (isSuccess()) with(data!!) {
+                MessagesUids(
+                    addedShortUids = addedShortUids,
+                    deletedUids = deletedShortUids.map { it.toLongUid(folderId) },
+                    updatedMessages = updatedMessages,
+                    cursor = cursor,
+                )
+            } else {
+                null
             }
         }
     }
@@ -223,7 +227,7 @@ object MessageController {
         var addedShortUids: List<String> = emptyList(),
         var deletedUids: List<String> = emptyList(),
         var updatedMessages: List<MessageFlags> = emptyList(),
-        var cursor: String? = null,
+        var cursor: String,
     )
     //endregion
 }
