@@ -15,43 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.getMessages
 
 import com.infomaniak.mail.data.models.message.Message
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-@Serializable
-data class GetMessagesUidsResult(
-    @SerialName("messages_uids")
-    val addedShortUids: List<String>,
-    @SerialName("signature")
-    val cursor: String,
-)
-
-@Serializable
-data class GetMessagesUidsDeltaResult(
-    @SerialName("deleted")
-    val deletedShortUids: List<String>,
-    @SerialName("added")
-    val addedShortUids: List<String>,
-    @SerialName("updated")
-    val updatedMessages: List<MessageFlags>,
-    @SerialName("signature")
-    val cursor: String,
-) {
-    @Serializable
-    data class MessageFlags(
-        @SerialName("uid")
-        val shortUid: String,
-        val answered: Boolean,
-        @SerialName("flagged")
-        val isFavorite: Boolean,
-        val forwarded: Boolean,
-        val scheduled: Boolean,
-        val seen: Boolean,
-    )
-}
 
 @Serializable
 data class GetMessagesByUidsResult(

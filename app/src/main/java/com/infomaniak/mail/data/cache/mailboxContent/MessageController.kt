@@ -22,7 +22,7 @@ import com.infomaniak.lib.core.utils.monthsAgo
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.GetMessagesUidsDeltaResult.MessageFlags
+import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.copyListToRealm
 import com.infomaniak.mail.utils.toRealmInstant
