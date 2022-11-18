@@ -141,7 +141,7 @@ class Message : RealmObject {
         this.unseenMessagesCount = if (this@Message.seen) 0 else 1
         this.from = this@Message.from
         this.subject = this@Message.subject
-        this@Message.date?.let { _date = it }
+        this@Message.date?.let { date = it }
         this.hasAttachments = this@Message.hasAttachments
         this.hasDrafts = this@Message.isDraft
         this.isFavorite = this@Message.isFavorite

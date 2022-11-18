@@ -38,7 +38,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
-import java.util.*
 
 @Serializable
 class Thread : RealmObject {
@@ -60,8 +59,7 @@ class Thread : RealmObject {
     var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
-    @SerialName("date")
-    var _date: RealmInstant = RealmInstant.MAX
+    var date: RealmInstant = RealmInstant.MAX
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
     @SerialName("has_st_attachments")
@@ -81,9 +79,7 @@ class Thread : RealmObject {
     var mailboxUuid: String = ""
     //endregion
 
-    val date: Date get() = _date.toDate()
-
-    fun formatDate(context: Context): String = with(date) {
+    fun formatDate(context: Context): String = with(date.toDate()) {
         when {
             isToday() -> format(FORMAT_DATE_HOUR_MINUTE)
             isYesterday() -> context.getString(R.string.messageDetailsYesterday)
