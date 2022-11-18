@@ -146,7 +146,7 @@ class ThreadListAdapter(
 
     private fun Thread.formatExpeditorNames(context: Context): String {
         return if (from.count() == 1) {
-            from.first().displayedName(context)
+            from.single().displayedName(context)
         } else {
             from.joinToString(", ") {
                 with(it.displayedName(context)) {
