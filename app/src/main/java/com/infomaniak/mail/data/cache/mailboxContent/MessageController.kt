@@ -209,13 +209,9 @@ object MessageController {
         }
     }
 
-    private fun getUniquesUidsInReverse(folder: Folder?, remoteUids: List<String>): List<String> {
-        val localUids = folder?.threads?.map { it.uid.toShortUid() }
-        val uniqueUids = if (localUids == null) {
-            remoteUids
-        } else {
-            remoteUids - localUids.intersect(remoteUids.toSet())
-        }
+    private fun getUniquesUidsInReverse(folder: Folder, remoteUids: List<String>): List<String> {
+        val localUids = folder.threads.map { it.uid.toShortUid() }
+        val uniqueUids = remoteUids - localUids.intersect(remoteUids.toSet())
         return uniqueUids.reversed()
     }
 
