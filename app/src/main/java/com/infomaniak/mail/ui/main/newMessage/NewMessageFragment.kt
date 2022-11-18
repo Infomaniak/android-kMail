@@ -428,7 +428,7 @@ class NewMessageFragment : Fragment() {
 
         fun updateToAutocompleteInputMargins() {
             val margin = resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt()
-            toAutocompleteInput.setMargins(top = margin, left = margin, right = margin)
+            toAutocompleteInput.setMargins(top = margin, start = margin, end = margin)
         }
 
         updateToAutocompleteInputConstraints()

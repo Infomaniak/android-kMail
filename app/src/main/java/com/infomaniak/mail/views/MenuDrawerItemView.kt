@@ -56,7 +56,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     var indent: Int = 0
         set(value) {
             field = value
-            binding.itemName.setMargins(left = value)
+            binding.itemName.setMargins(start = value)
         }
 
     var text: CharSequence? = null

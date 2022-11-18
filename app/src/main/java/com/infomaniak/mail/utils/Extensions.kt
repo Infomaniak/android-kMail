@@ -82,15 +82,13 @@ fun View.toggleChevron(
     animate().rotation(angle).setDuration(duration).start()
 }
 
-fun View.setMargins(left: Int? = null, top: Int? = null, right: Int? = null, bottom: Int? = null) {
+fun View.setMargins(start: Int? = null, top: Int? = null, end: Int? = null, bottom: Int? = null) {
     if (layoutParams is ViewGroup.MarginLayoutParams) {
         (layoutParams as ViewGroup.MarginLayoutParams).apply {
-            setMargins(
-                left ?: leftMargin,
-                top ?: topMargin,
-                right ?: rightMargin,
-                bottom ?: bottomMargin,
-            )
+            start?.let { marginStart = it }
+            top?.let { topMargin = it }
+            end?.let { marginEnd = it }
+            bottom?.let { bottomMargin = it }
         }
         requestLayout()
     }
