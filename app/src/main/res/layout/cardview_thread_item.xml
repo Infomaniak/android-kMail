@@ -33,7 +33,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/marginStandardSmall"
+        android:layout_marginVertical="12dp"
         android:paddingHorizontal="@dimen/marginStandardSmall">
 
         <com.google.android.material.imageview.ShapeableImageView
@@ -78,7 +78,7 @@
 
                 <TextView
                     android:id="@+id/draftPrefix"
-                    style="@style/H3.Error"
+                    style="@style/Body.Error"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardVerySmall"
@@ -93,7 +93,7 @@
 
                 <TextView
                     android:id="@+id/expeditor"
-                    style="@style/H3.Secondary"
+                    style="@style/H5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/marginStandardSmall"
@@ -114,7 +114,7 @@
                     android:visibility="gone"
                     app:cardCornerRadius="3dp"
                     app:layout_constraintBottom_toBottomOf="@id/expeditor"
-                    app:layout_constraintEnd_toStartOf="@id/iconCalendar"
+                    app:layout_constraintEnd_toStartOf="@id/mailDate"
                     app:layout_constraintStart_toEndOf="@id/expeditor"
                     app:layout_constraintTop_toTopOf="@id/expeditor"
                     app:strokeColor="@color/progressbarTrackColor"
@@ -131,36 +131,6 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <ImageView
-                    android:id="@+id/iconCalendar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                    android:contentDescription="@string/contentDescriptionIconCalendar"
-                    android:src="@drawable/ic_calendar"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/mailDate"
-                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
-                    app:layout_constraintTop_toTopOf="@id/mailDate"
-                    app:tint="@color/iconSecondaryColor"
-                    tools:visibility="visible" />
-
-                <ImageView
-                    android:id="@+id/iconAttachment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                    android:contentDescription="@string/contentDescriptionIconAttachments"
-                    android:src="@drawable/ic_attachment"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/mailDate"
-                    app:layout_constraintEnd_toStartOf="@id/mailDate"
-                    app:layout_constraintTop_toTopOf="@id/mailDate"
-                    app:tint="@color/iconSecondaryColor"
-                    tools:visibility="visible" />
-
                 <TextView
                     android:id="@+id/mailDate"
                     style="@style/Callout.Secondary"
@@ -174,36 +144,67 @@
 
                 <TextView
                     android:id="@+id/mailSubject"
-                    style="@style/Body.Secondary"
+                    style="@style/Callout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
                     android:ellipsize="end"
                     android:lines="1"
-                    app:layout_constraintEnd_toStartOf="@id/iconFavorite"
+                    app:layout_constraintEnd_toStartOf="@id/iconCalendar"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/expeditor"
-                    tools:text="@tools:sample/lorem[2]" />
+                    tools:text="@tools:sample/lorem[10]" />
+
+                <ImageView
+                    android:id="@+id/iconCalendar"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionIconCalendar"
+                    android:src="@drawable/ic_calendar"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
+                    app:layout_constraintEnd_toStartOf="@id/iconAttachment"
+                    app:layout_constraintStart_toEndOf="@id/mailSubject"
+                    app:layout_constraintTop_toTopOf="@id/iconFavorite"
+                    app:tint="@color/primaryTextColor"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/iconAttachment"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:contentDescription="@string/contentDescriptionIconAttachments"
+                    android:src="@drawable/ic_attachment"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/iconFavorite"
+                    app:layout_constraintEnd_toStartOf="@id/iconFavorite"
+                    app:layout_constraintStart_toEndOf="@id/iconCalendar"
+                    app:layout_constraintTop_toTopOf="@id/iconFavorite"
+                    app:tint="@color/primaryTextColor"
+                    tools:visibility="visible" />
 
                 <ImageView
                     android:id="@+id/iconFavorite"
                     android:layout_width="18dp"
                     android:layout_height="18dp"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
                     android:contentDescription="@string/contentDescriptionIconFavorite"
                     android:src="@drawable/ic_star_filled"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/mailSubject"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/iconAttachment"
                     app:layout_constraintTop_toTopOf="@id/mailSubject"
                     tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/mailBodyPreview"
-                    style="@style/Body.Secondary"
+                    style="@style/Callout.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
+                    android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:ellipsize="end"
                     android:lines="1"
                     app:layout_constrainedWidth="true"
