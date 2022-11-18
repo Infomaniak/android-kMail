@@ -27,13 +27,17 @@ object LocalStorageUtils {
 
     private const val ATTACHMENTS_UPLOAD_FOLDER = "attachments_upload"
 
+    private inline val Context.attachmentsRoot get() = File(filesDir, ATTACHMENTS_UPLOAD_FOLDER)
+
+    private inline val File.hasEmptyFiles get() = listFiles().isNullOrEmpty()
+
     private fun getAttachmentsCacheFolder(
         context: Context,
         localDraftUuid: String,
         userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId
+        mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
-        return File(context.filesDir, "$ATTACHMENTS_UPLOAD_FOLDER/$userId-$mailboxId/$localDraftUuid")
+        return File(context.attachmentsRoot, "$userId/$mailboxId/$localDraftUuid")
     }
 
     fun copyDataToAttachmentsCache(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {
@@ -59,16 +63,35 @@ object LocalStorageUtils {
         localDraftUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
-        fileName: String
+        fileName: String,
     ) {
-        val parentDraft = getAttachmentsCacheFolder(context, localDraftUuid, userId, mailboxId)
-        File(parentDraft, fileName).delete()
+        File(getAttachmentsCacheFolder(context, localDraftUuid, userId, mailboxId), fileName).delete()
+    }
 
-        if (parentDraft.listFiles()?.isEmpty() == true) {
-            val parentMailbox = parentDraft.parentFile
-            parentDraft.delete()
+    fun deleteAttachmentsDirIfEmpty(
+        context: Context,
+        localDraftUuid: String,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+    ) {
+        val attachmentsFolder = getAttachmentsCacheFolder(context, localDraftUuid, userId, mailboxId).also {
+            if (!it.exists()) return
+        }
+        val mailboxFolder = attachmentsFolder.parentFile
+        val userFolder = mailboxFolder.parentFile
+        val attachmentsRoot = userFolder.parentFile
 
-            if (parentMailbox?.listFiles()?.isEmpty() == true) parentMailbox.delete()
+
+        if (attachmentsFolder.hasEmptyFiles) attachmentsFolder.delete()
+        if (mailboxFolder.hasEmptyFiles) mailboxFolder.delete()
+        if (userFolder.hasEmptyFiles) userFolder.delete()
+        if (attachmentsRoot.hasEmptyFiles) attachmentsRoot.delete()
+    }
+
+    fun deleteUserData(context: Context, userId: Int) {
+        with(context.attachmentsRoot) {
+            File(this, "$userId").deleteRecursively()
+            if (this.listFiles()?.isEmpty() == true) deleteRecursively()
         }
     }
 }
