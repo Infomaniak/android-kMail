@@ -37,6 +37,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
@@ -81,11 +82,32 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
         val message = messages[position]
 
+        setStyleIfSingleMail(position)
+
         holder.bindHeader(message)
         holder.bindAttachment(message)
         loadBodyInWebView(message.body)
 
         displayExpandedCollapsedMessage(message)
+    }
+
+    private fun ItemMessageBinding.setStyleIfSingleMail(position: Int) {
+        if (itemCount == 1) {
+            root.apply {
+                setMarginsRelative(0, 0, 0, 0)
+                radius = 0f
+            }
+        } else {
+            root.apply {
+                val vertical = resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt()
+                val horizontal = resources.getDimension(RCore.dimen.marginStandardSmall).toInt()
+                val topMargin = if (position == 0) 2 * vertical else vertical
+                val bottomMargin = if (position == lastIndex()) 2 * vertical else vertical
+                setMarginsRelative(horizontal, topMargin, horizontal, bottomMargin)
+
+                radius = 8.toPx().toFloat()
+            }
+        }
     }
 
     private fun ItemMessageBinding.loadBodyInWebView(body: Body?) {
