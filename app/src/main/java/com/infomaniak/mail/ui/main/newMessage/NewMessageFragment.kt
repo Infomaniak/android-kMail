@@ -55,12 +55,11 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationRes
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.AccountUtils.currentMailboxId
 import com.infomaniak.mail.utils.AccountUtils.currentUserId
-import com.infomaniak.mail.utils.LocalStorageUtils.getAttachmentsCacheFolder
+import com.infomaniak.mail.utils.LocalStorageUtils.deleteAttachmentFromCache
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.setMargins
 import com.infomaniak.mail.utils.toggleChevron
-import java.io.File
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -81,13 +80,13 @@ class NewMessageFragment : Fragment() {
             }
             newMessageViewModel.mailAttachments.removeAt(position)
 
-            val parent = getAttachmentsCacheFolder(
+            deleteAttachmentFromCache(
                 requireContext(),
                 newMessageViewModel.currentDraftLocalUuid,
                 currentUserId,
-                currentMailboxId
+                currentMailboxId,
+                fileName
             )
-            File(parent, fileName).delete()
         },
     )
 
@@ -179,8 +178,8 @@ class NewMessageFragment : Fragment() {
         BCC.clearField()
     }
 
-    private fun initializeDraftAndUi() {
-        newMessageViewModel.initializeDraftAndUi(newMessageActivityArgs)
+    private fun initDraftAndUi() {
+        newMessageViewModel.initDraftAndUi(newMessageActivityArgs)
             .observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
                     observeContacts()

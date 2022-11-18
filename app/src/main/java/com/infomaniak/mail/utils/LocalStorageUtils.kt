@@ -27,7 +27,7 @@ object LocalStorageUtils {
 
     private const val ATTACHMENTS_UPLOAD_FOLDER = "attachments_upload"
 
-    fun getAttachmentsCacheFolder(
+    private fun getAttachmentsCacheFolder(
         context: Context,
         localDraftUuid: String,
         userId: Int = AccountUtils.currentUserId,
@@ -51,6 +51,24 @@ object LocalStorageUtils {
                 Sentry.captureMessage("failed to access uri")
             }
             null
+        }
+    }
+
+    fun deleteAttachmentFromCache(
+        context: Context,
+        localDraftUuid: String,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+        fileName: String
+    ) {
+        val parentDraft = getAttachmentsCacheFolder(context, localDraftUuid, userId, mailboxId)
+        File(parentDraft, fileName).delete()
+
+        if (parentDraft.listFiles()?.isEmpty() == true) {
+            val parentMailbox = parentDraft.parentFile
+            parentDraft.delete()
+
+            if (parentMailbox?.listFiles()?.isEmpty() == true) parentMailbox.delete()
         }
     }
 }
