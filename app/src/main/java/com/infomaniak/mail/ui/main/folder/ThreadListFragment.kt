@@ -80,7 +80,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     var filter: ThreadFilter = ThreadFilter.ALL
     private var lastUnreadCount = 0
-    private var onResumeIsAllowedToRefreshThreads = false
+    private var canRefreshThreads = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -107,8 +107,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
 
-        if (onResumeIsAllowedToRefreshThreads) mainViewModel.forceRefreshThreads(filter)
-        onResumeIsAllowedToRefreshThreads = true
+        if (canRefreshThreads) mainViewModel.forceRefreshThreads(filter)
+        canRefreshThreads = true
 
         updateSwipeActionsAccordingToSettings()
     }
