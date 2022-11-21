@@ -20,10 +20,10 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.app.Application
 import android.content.ClipDescription
 import android.net.Uri
-import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
@@ -165,7 +165,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
         uris.forEach { uri ->
             val availableSpace = FILE_SIZE_25_MB - attachmentsSize
-            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace)
+            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
 
             if (hasSizeLimitBeenReached) {
                 importedAttachments.postValue(newAttachments to ImportationResult.FILE_SIZE_TOO_BIG)
@@ -181,13 +181,12 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         importedAttachments.postValue(newAttachments to ImportationResult.SUCCESS)
     }
 
-    private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean> {
-        val (fileName, fileSize) = uri.getFileNameAndSize(getApplication())!!
+    private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean>? {
+        val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
         if (fileSize > availableSpace) return null to true
 
         return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, currentDraftLocalUuid)?.let { file ->
-            val fileExtension = file.path.substringAfterLast(".")
-            val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension) ?: "*/*"
+            val mimeType = file.path.guessMimeType()
             Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
         } ?: (null to false)
     }

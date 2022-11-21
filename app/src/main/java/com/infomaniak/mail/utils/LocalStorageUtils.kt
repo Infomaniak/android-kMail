@@ -87,10 +87,8 @@ object LocalStorageUtils {
         if (attachmentsRootDir.hasEmptyFiles) attachmentsRootDir.delete()
     }
 
-    fun deleteUserData(context: Context, userId: Int) {
-        with(context.attachmentsRootDir) {
-            File(this, "$userId").deleteRecursively()
-            if (this.listFiles()?.isEmpty() == true) deleteRecursively()
-        }
+    fun deleteUserData(context: Context, userId: Int) = with(context.attachmentsRootDir) {
+        File(this, "$userId").deleteRecursively()
+        if (this.listFiles()?.isEmpty() == true) deleteRecursively()
     }
 }
