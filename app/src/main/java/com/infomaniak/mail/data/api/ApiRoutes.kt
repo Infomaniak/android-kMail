@@ -101,7 +101,7 @@ object ApiRoutes {
 
     // fun messageSafe(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/safe"
 
-    // fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
+    fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
     fun downloadAttachment(mailboxUuid: String, folderId: String, messageId: Long, attachmentId: String): String {
         return "${folder(mailboxUuid, folderId)}/message/$messageId/attachment/$attachmentId"
