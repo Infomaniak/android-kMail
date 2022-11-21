@@ -53,7 +53,10 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.isEmail
+import com.infomaniak.mail.utils.setMargins
+import com.infomaniak.mail.utils.toggleChevron
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -167,20 +170,13 @@ class NewMessageFragment : Fragment() {
             }
     }
 
-    private fun onDeleteAttachment(position: Int, fileName: String, itemCountLeft: Int) {
+    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
         if (itemCountLeft == 0) {
             TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isGone = true
         }
-        newMessageViewModel.mailAttachments.removeAt(position)
-
-        LocalStorageUtils.deleteAttachmentFromCache(
-            requireContext(),
-            newMessageViewModel.currentDraftLocalUuid,
-            AccountUtils.currentUserId,
-            AccountUtils.currentMailboxId,
-            fileName
-        )
+        mailAttachments[position].getUploadLocalFile(requireContext(), currentDraftLocalUuid).delete()
+        mailAttachments.removeAt(position)
     }
 
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {

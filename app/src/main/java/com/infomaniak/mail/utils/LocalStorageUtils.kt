@@ -31,7 +31,7 @@ object LocalStorageUtils {
 
     private inline val File.hasEmptyFiles get() = listFiles().isNullOrEmpty()
 
-    private fun getAttachmentsCacheDir(
+    fun getAttachmentsCacheDir(
         context: Context,
         localDraftUuid: String,
         userId: Int = AccountUtils.currentUserId,
@@ -56,16 +56,6 @@ object LocalStorageUtils {
             }
             null
         }
-    }
-
-    fun deleteAttachmentFromCache(
-        context: Context,
-        localDraftUuid: String,
-        userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId,
-        fileName: String,
-    ) {
-        File(getAttachmentsCacheDir(context, localDraftUuid, userId, mailboxId), fileName).delete()
     }
 
     fun deleteAttachmentsDirIfEmpty(

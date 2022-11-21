@@ -17,14 +17,18 @@
  */
 package com.infomaniak.mail.data.models
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import java.io.File
 
 @Serializable
 class Attachment : EmbeddedRealmObject {
@@ -66,6 +70,15 @@ class Attachment : EmbeddedRealmObject {
         in Regex("document|text/plain|msword") -> AttachmentType.TEXT
         in Regex("video/") -> AttachmentType.VIDEO
         else -> AttachmentType.UNKNOWN
+    }
+
+    fun getUploadLocalFile(
+        context: Context, localDraftUuid: String,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId
+    ): File {
+        val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, localDraftUuid, userId, mailboxId)
+        return File(cacheFolder, name)
     }
 
     enum class AttachmentDisposition {
