@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
@@ -53,8 +54,8 @@ object DraftController {
         }
     }
 
-    private fun MutableRealm?.getDraftQuery(key: String, value: String): RealmSingleQuery<Draft> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Draft>("$key = '$value'").first()
+    private fun getDraftQuery(key: String, value: String, realm: TypedRealm? = null): RealmSingleQuery<Draft> {
+        return (realm ?: RealmDatabase.mailboxContent()).query<Draft>("$key = '$value'").first()
     }
 
     private fun getDraftsWithActionsQuery(realm: MutableRealm? = null): RealmQuery<Draft> {
@@ -75,12 +76,12 @@ object DraftController {
         return getDraftsWithActionsQuery().count().find()
     }
 
-    fun getDraft(localUuid: String, realm: MutableRealm? = null): Draft? {
-        return realm.getDraftQuery(Draft::localUuid.name, localUuid).find()
+    fun getDraft(localUuid: String, realm: TypedRealm? = null): Draft? {
+        return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
     }
 
-    fun getDraftByMessageUid(messageUid: String, realm: MutableRealm? = null): Draft? {
-        return realm.getDraftQuery(Draft::messageUid.name, messageUid).find()
+    fun getDraftByMessageUid(messageUid: String, realm: TypedRealm? = null): Draft? {
+        return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
     }
     //endregion
 
