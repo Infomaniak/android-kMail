@@ -67,6 +67,7 @@
         <item name="colorControlNormal">@color/pinkMail</item>
         <item name="colorControlHighlight">@color/pinkMailRipple</item>
 
+        <item name="customGrdientColor">#FF4388</item>
     </style>
 
     <style name="AppTheme.Blue">
@@ -81,6 +82,8 @@
 
         <item name="colorControlNormal">@color/blueMail</item>
         <item name="colorControlHighlight">@color/blueMailRipple</item>
+
+        <item name="customGrdientColor">#89CFFF</item>
     </style>
 
     <!-- Login -->

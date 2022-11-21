@@ -380,12 +380,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayNoEmailView() = with(binding) {
         threadsList.isGone = true
-        noMailLayoutGroup.isVisible = true
+        emptyState.isVisible = true
     }
 
     private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
-        noMailLayoutGroup.isGone = true
+        emptyState.isGone = true
     }
 
     private fun firstMessageHasChanged(threads: List<Thread>): Boolean {
