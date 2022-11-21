@@ -53,13 +53,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.utils.AccountUtils.currentMailboxId
-import com.infomaniak.mail.utils.AccountUtils.currentUserId
-import com.infomaniak.mail.utils.LocalStorageUtils.deleteAttachmentFromCache
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.setMargins
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.*
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -70,31 +64,14 @@ class NewMessageFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
-    private lateinit var contactAdapter: ContactAdapter
-    private val attachmentAdapter = AttachmentAdapter(
-        shouldDisplayCloseButton = true,
-        onDelete = { position, fileName, itemCountLeft ->
-            if (itemCountLeft == 0) {
-                TransitionManager.beginDelayedTransition(binding.root)
-                binding.attachmentsRecyclerView.isGone = true
-            }
-            newMessageViewModel.mailAttachments.removeAt(position)
+    private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
+    private lateinit var filePicker: FilePicker
 
-            deleteAttachmentFromCache(
-                requireContext(),
-                newMessageViewModel.currentDraftLocalUuid,
-                currentUserId,
-                currentMailboxId,
-                fileName
-            )
-        },
-    )
+    private lateinit var contactAdapter: ContactAdapter
+    private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
-    private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
-
-    private lateinit var filePicker: FilePicker
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -188,6 +165,22 @@ class NewMessageFragment : Fragment() {
                     requireActivity().finish()
                 }
             }
+    }
+
+    private fun onDeleteAttachment(position: Int, fileName: String, itemCountLeft: Int) {
+        if (itemCountLeft == 0) {
+            TransitionManager.beginDelayedTransition(binding.root)
+            binding.attachmentsRecyclerView.isGone = true
+        }
+        newMessageViewModel.mailAttachments.removeAt(position)
+
+        LocalStorageUtils.deleteAttachmentFromCache(
+            requireContext(),
+            newMessageViewModel.currentDraftLocalUuid,
+            AccountUtils.currentUserId,
+            AccountUtils.currentMailboxId,
+            fileName
+        )
     }
 
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
