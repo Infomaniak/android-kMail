@@ -25,53 +25,55 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 
 object ThreadController {
 
     //region Queries
-    private fun MutableRealm?.getThreadsQuery(uids: List<String>): RealmQuery<Thread> {
+    fun getThreadsQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
         val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxContent()).query(byUids)
+        return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
     }
 
-    private fun MutableRealm?.getThreadsQuery(folderId: String, filter: ThreadFilter): RealmQuery<Thread> {
-        val byFolderId = "${Thread::folderId.name} = '$folderId'"
-        val query = (this ?: RealmDatabase.mailboxContent()).query<Thread>(byFolderId)
+    private fun getThreadsQuery(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
+        val byFolderId = "${Thread::folderId.name} == '$folderId'"
+        val query = (realm ?: RealmDatabase.mailboxContent()).query<Thread>(byFolderId)
         return if (filter == ThreadFilter.ALL) {
             query
         } else {
-            val byFilter = when (filter) {
-                ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} = 0"
+            val withFilter = when (filter) {
+                ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
                 ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
-                ThreadFilter.STARRED -> "${Thread::isFavorite.name} = true"
-                ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} = true"
+                ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
+                ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
                 ThreadFilter.FOLDER -> TODO()
                 else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
             }
-            query.query(byFilter)
+            query.query(withFilter)
         }
     }
 
-    private fun MutableRealm?.getThreadQuery(uid: String): RealmSingleQuery<Thread> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Thread>("${Thread::uid.name} = '$uid'").first()
+    private fun getThreadQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Thread> {
+        return (realm ?: RealmDatabase.mailboxContent()).query<Thread>("${Thread::uid.name} == '$uid'").first()
     }
     //endregion
 
     //region Get data
-    fun getThreads(uids: List<String>, realm: MutableRealm? = null): RealmQuery<Thread> {
-        return realm.getThreadsQuery(uids)
+    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmResults<Thread> {
+        return getThreadsQuery(uids, realm).find()
     }
 
-    fun getThreads(folderId: String, filter: ThreadFilter, realm: MutableRealm? = null): RealmQuery<Thread> {
-        return realm.getThreadsQuery(folderId, filter)
+    fun getThreads(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
+        return getThreadsQuery(folderId, filter, realm)
     }
 
-    fun getThread(uid: String, realm: MutableRealm? = null): Thread? {
-        return realm.getThreadQuery(uid).find()
+    fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
+        return getThreadQuery(uid, realm).find()
     }
     //endregion
 
