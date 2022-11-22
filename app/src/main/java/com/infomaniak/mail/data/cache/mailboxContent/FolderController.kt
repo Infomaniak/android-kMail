@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMes
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
@@ -36,39 +37,39 @@ import kotlinx.coroutines.flow.Flow
 object FolderController {
 
     //region Queries
-    private fun MutableRealm?.getFoldersQuery(): RealmQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent()).query()
+    private fun getFoldersQuery(realm: TypedRealm? = null): RealmQuery<Folder> {
+        return (realm ?: RealmDatabase.mailboxContent()).query()
     }
 
-    private fun MutableRealm?.getFoldersQuery(exceptionsFoldersIds: List<String>): RealmQuery<Folder> {
+    private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm? = null): RealmQuery<Folder> {
         val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxContent()).query(checkIsNotInExceptions)
+        return (realm ?: RealmDatabase.mailboxContent()).query(checkIsNotInExceptions)
     }
 
-    private fun MutableRealm?.getFolderQuery(key: String, value: String): RealmSingleQuery<Folder> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Folder>("$key = '$value'").first()
+    private fun getFolderQuery(key: String, value: String, realm: TypedRealm? = null): RealmSingleQuery<Folder> {
+        return (realm ?: RealmDatabase.mailboxContent()).query<Folder>("$key == '$value'").first()
     }
     //endregion
 
     //region Get data
-    private fun getFolders(exceptionsFoldersIds: List<String>, realm: MutableRealm? = null): RealmResults<Folder> {
-        return realm.getFoldersQuery(exceptionsFoldersIds).find()
+    private fun getFolders(exceptionsFoldersIds: List<String>, realm: TypedRealm? = null): RealmResults<Folder> {
+        return getFoldersQuery(exceptionsFoldersIds, realm).find()
     }
 
-    fun getFoldersAsync(realm: MutableRealm? = null): Flow<ResultsChange<Folder>> {
-        return realm.getFoldersQuery().asFlow()
+    fun getFoldersAsync(realm: TypedRealm? = null): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery(realm).asFlow()
     }
 
-    fun getFolder(id: String, realm: MutableRealm? = null): Folder? {
-        return realm.getFolderQuery(Folder::id.name, id).find()
+    fun getFolder(id: String, realm: TypedRealm? = null): Folder? {
+        return getFolderQuery(Folder::id.name, id, realm).find()
     }
 
-    fun getFolder(role: FolderRole, realm: MutableRealm? = null): Folder? {
-        return realm.getFolderQuery(Folder::_role.name, role.name).find()
+    fun getFolder(role: FolderRole, realm: TypedRealm? = null): Folder? {
+        return getFolderQuery(Folder::_role.name, role.name, realm).find()
     }
 
-    fun getFolderAsync(id: String, realm: MutableRealm? = null): Flow<SingleQueryChange<Folder>> {
-        return realm.getFolderQuery(Folder::id.name, id).asFlow()
+    fun getFolderAsync(id: String, realm: TypedRealm? = null): Flow<SingleQueryChange<Folder>> {
+        return getFolderQuery(Folder::id.name, id, realm).asFlow()
     }
     //endregion
 
