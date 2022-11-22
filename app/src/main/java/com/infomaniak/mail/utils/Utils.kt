@@ -21,8 +21,6 @@ import android.content.Context
 import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpanned
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 
@@ -46,12 +44,5 @@ object Utils {
         }
 
         return map(::formatFolderWithAllChildren).flatten()
-    }
-
-    class PairTrigger<A, B>(a: LiveData<A>, b: LiveData<B>) : MediatorLiveData<Pair<A?, B?>>() {
-        init {
-            addSource(a) { value = it to b.value }
-            addSource(b) { value = a.value to it }
-        }
     }
 }

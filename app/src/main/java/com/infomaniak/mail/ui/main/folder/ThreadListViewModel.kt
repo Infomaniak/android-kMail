@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.utils.Utils.PairTrigger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -81,4 +80,11 @@ class ThreadListViewModel : ViewModel() {
         val draftResource: String?,
         val messageUid: String?,
     )
+
+    private class PairTrigger<A, B>(a: LiveData<A>, b: LiveData<B>) : MediatorLiveData<Pair<A?, B?>>() {
+        init {
+            addSource(a) { value = it to b.value }
+            addSource(b) { value = a.value to it }
+        }
+    }
 }
