@@ -29,14 +29,14 @@ import io.realm.kotlin.query.RealmSingleQuery
 object MessageController {
 
     //region Queries
-    private fun TypedRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Message>("${Message::uid.name} = '$uid'").first()
+    private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
+        return (realm ?: RealmDatabase.mailboxContent()).query<Message>("${Message::uid.name} = '$uid'").first()
     }
     //endregion
 
     //region Get data
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
-        return realm.getMessageQuery(uid).find()
+        return getMessageQuery(uid, realm).find()
     }
     //endregion
 
