@@ -19,12 +19,13 @@ package com.infomaniak.mail.ui
 
 import android.Manifest
 import android.graphics.Color
+import android.graphics.ColorSpace
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
-import androidx.core.graphics.toColor
+import androidx.annotation.ColorInt
 import androidx.core.graphics.toColorInt
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
@@ -53,12 +54,12 @@ class MainActivity : ThemedActivity() {
         if (isGranted) mainViewModel.updateUserInfo()
     }
 
-    private val backgroundColor: Color by lazy { getColor(R.color.backgroundColor).toColor() }
-    private val backgroundHeaderColor: Color by lazy { getColor(R.color.backgroundHeaderColor).toColor() }
+    private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
+    private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset).toColorInt()
+            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset)
         }
 
         override fun onDrawerOpened(drawerView: View) {
