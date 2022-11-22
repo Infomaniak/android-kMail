@@ -21,7 +21,7 @@ import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.utils.update
-import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
@@ -31,18 +31,18 @@ import kotlinx.coroutines.flow.Flow
 object MergedContactController {
 
     //region Queries
-    private fun MutableRealm?.getMergedContactsQuery(): RealmQuery<MergedContact> {
-        return (this ?: RealmDatabase.userInfo()).query()
+    private fun getMergedContactsQuery(realm: TypedRealm? = null): RealmQuery<MergedContact> {
+        return (realm ?: RealmDatabase.userInfo()).query()
     }
     //endregion
 
     //region Get data
-    fun getMergedContacts(realm: MutableRealm? = null): RealmResults<MergedContact> {
-        return realm.getMergedContactsQuery().find()
+    fun getMergedContacts(realm: TypedRealm? = null): RealmResults<MergedContact> {
+        return getMergedContactsQuery(realm).find()
     }
 
-    fun getMergedContactsAsync(realm: MutableRealm? = null): Flow<ResultsChange<MergedContact>> {
-        return realm.getMergedContactsQuery().asFlow()
+    fun getMergedContactsAsync(realm: TypedRealm? = null): Flow<ResultsChange<MergedContact>> {
+        return getMergedContactsQuery(realm).asFlow()
     }
     //endregion
 
