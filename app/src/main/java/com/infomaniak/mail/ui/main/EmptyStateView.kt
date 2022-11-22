@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.view.isGone
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ViewEmptyStateBinding
@@ -37,8 +38,20 @@ class EmptyStateView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.EmptyStateView) {
             with(binding) {
                 illustration.setImageDrawable(getDrawable(R.styleable.EmptyStateView_icon))
-                title.text = getText(R.styleable.EmptyStateView_title) ?: ""
-                description.text = getText(R.styleable.EmptyStateView_description) ?: ""
+
+                getString(R.styleable.EmptyStateView_title).let {
+                    title.apply {
+                        text = it
+                        isGone = it == null
+                    }
+                }
+
+                getString(R.styleable.EmptyStateView_description).let {
+                    description.apply {
+                        text = it
+                        isGone = it == null
+                    }
+                }
             }
         }
     }

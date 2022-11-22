@@ -16,7 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <attr name="customGrdientColor" format="color" />
+    <attr name="customGradientColor" format="color" />
 
     <declare-styleable name="CommonAttributes">
         <attr name="icon" format="reference" />
