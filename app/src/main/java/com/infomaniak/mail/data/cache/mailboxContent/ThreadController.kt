@@ -31,6 +31,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 
 object ThreadController {
 
@@ -47,7 +48,9 @@ object ThreadController {
     private fun getThreadsQuery(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
 
         val byFolderId = "ANY ${Thread::foldersIds.name} == '$folderId'"
-        val query = (realm ?: RealmDatabase.mailboxContent()).query<Thread>(byFolderId)
+        val query = (realm ?: RealmDatabase.mailboxContent())
+            .query<Thread>(byFolderId)
+            .sort(Thread::date.name, Sort.DESCENDING)
 
         return if (filter == ThreadFilter.ALL) {
             query
