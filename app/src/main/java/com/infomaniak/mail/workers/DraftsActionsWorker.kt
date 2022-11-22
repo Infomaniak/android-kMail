@@ -108,7 +108,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
             } else {
                 // Begin unique chain work, upload attachments before save current draft
                 val uploadAttachmentsWorkRequest = UploadAttachmentsWorker.getWorkRequest(localDraftUuid) ?: return
-                workManager.beginUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, uploadAttachmentsWorkRequest)
+                workManager.beginUniqueWork(WORK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, uploadAttachmentsWorkRequest)
                     .then(workRequest)
                     .enqueue()
             }
