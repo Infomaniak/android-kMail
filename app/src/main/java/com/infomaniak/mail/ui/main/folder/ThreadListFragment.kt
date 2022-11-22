@@ -123,6 +123,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
             threadDensity = LocalSettings.getInstance(requireContext()).threadDensity,
+            folderRole = Folder.FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
@@ -315,6 +316,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeFolder(folderId: String) {
         threadListViewModel.observeFolder(folderId).observe(viewLifecycleOwner) { folder ->
+            threadListAdapter.updateFolderRole(folder.role)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
