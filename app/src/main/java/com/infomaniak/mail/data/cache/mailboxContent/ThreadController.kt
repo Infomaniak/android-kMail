@@ -45,8 +45,10 @@ object ThreadController {
     }
 
     private fun getThreadsQuery(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
-        val byFolderId = "ANY ${Thread::foldersIds.name} = '$folderId'"
+
+        val byFolderId = "ANY ${Thread::foldersIds.name} == '$folderId'"
         val query = (realm ?: RealmDatabase.mailboxContent()).query<Thread>(byFolderId)
+
         return if (filter == ThreadFilter.ALL) {
             query
         } else {

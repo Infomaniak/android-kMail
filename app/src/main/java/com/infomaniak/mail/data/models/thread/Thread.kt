@@ -15,16 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
-
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.RealmInstantSerializer
-import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
@@ -39,44 +35,27 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.UseSerializers
 
-@Serializable
 class Thread : RealmObject {
 
-    //region API data
     @PrimaryKey
     var uid: String = ""
     var messages: RealmList<Message> = realmListOf()
-    @SerialName("unique_messages_count")
     var uniqueMessagesCount: Int = 0
-    @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     var date: RealmInstant = RealmInstant.MAX
     var size: Int = 0
-    @SerialName("has_attachments")
     var hasAttachments: Boolean = false
-    @SerialName("has_drafts")
     var hasDrafts: Boolean = false
-    // @SerialName("flagged")
     var favoritesCount: Int = 0
     var answered: Boolean = false
     var forwarded: Boolean = false
     var scheduled: Boolean = false
-    //endregion
-
-    //region Local data (Transient)
-    @Transient
     var foldersIds: RealmSet<String> = realmSetOf()
-    @Transient
     var messagesIds: RealmSet<String> = realmSetOf()
-    //endregion
 
     val isFavorite: Boolean get() = favoritesCount > 0
 
@@ -84,38 +63,11 @@ class Thread : RealmObject {
         message.threadUid = uid
         messages.add(message)
         messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
-        // recomputeThread()
-
-        // foldersIds.add(message.folderId)
-        // uniqueMessagesCount++
-        // if (!message.seen) unseenMessagesCount++
-        // from = messages.flatMap { it.from }.toSet().toRealmList()
-        // if (messages.last().uid == message.uid) message.date?.let { _date = it }
-        // size += message.size
-        // if (message.hasAttachments) hasAttachments = true
-        // if (message.isDraft) hasDrafts = true
-        // if (message.isFavorite) favoritesCount++
-        // if (message.answered) answered = true
-        // if (message.forwarded) forwarded = true
-        // if (message.scheduled) scheduled = true
     }
 
     fun removeMessage(message: Message) {
         messages.removeIf { it.uid == message.uid }
         recomputeThread()
-
-        // foldersIds = messages.map { it.folderId }.toRealmSet()
-        // uniqueMessagesCount--
-        // if (!message.seen) unseenMessagesCount--
-        // from = messages.flatMap { it.from }.toSet().toRealmList()
-        // _date = messages.last().date!!
-        // size -= message.size
-        // // if (message.hasAttachments) hasAttachments = true
-        // // if (message.isDraft) hasDrafts = true
-        // if (message.isFavorite) favoritesCount--
-        // // if (message.answered) answered = true
-        // // if (message.forwarded) forwarded = true
-        // // if (message.scheduled) scheduled = true
     }
 
     fun recomputeThread() {
@@ -151,22 +103,6 @@ class Thread : RealmObject {
 
         from = from.toRecipientsList().distinct().toRealmList()
         to = to.toRecipientsList().distinct().toRealmList()
-
-        // Log.e("TOTO", "recomputeData: ${subject}")
-        // foldersIds = messages.map { it.folderId }.toRealmSet()
-        // messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
-        // uniqueMessagesCount = messages.map { it.uid }.toSet().count()
-        // unseenMessagesCount = messages.count { !it.seen }
-        // from = messages.flatMap { it.from }.toSet().toRealmList()
-        // to = messages.flatMap { it.to }.toSet().toRealmList()
-        // date = messages.last().date!!
-        // size = messages.sumOf { it.size }
-        // hasAttachments = messages.map { it.hasAttachments }.contains(true)
-        // hasDrafts = messages.map { it.isDraft }.contains(true)
-        // favoritesCount = messages.count { it.isFavorite }
-        // answered = messages.map { it.answered }.contains(true)
-        // forwarded = messages.map { it.forwarded }.contains(true)
-        // scheduled = messages.map { it.scheduled }.contains(true)
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {

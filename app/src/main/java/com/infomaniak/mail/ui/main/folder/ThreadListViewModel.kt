@@ -61,14 +61,6 @@ class ThreadListViewModel : ViewModel() {
         addSource(currentFilter) { value = value?.first to it }
     }
 
-    // fun observeFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
-    //     emitSource(
-    //         FolderController.getFolderAsync(folderId)
-    //             .mapNotNull { it.obj }
-    //             .asLiveData()
-    //     )
-    // }
-
     fun startUpdatedAtJob() {
         updatedAtJob?.cancel()
         updatedAtJob = viewModelScope.launch(Dispatchers.IO) {

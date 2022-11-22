@@ -210,7 +210,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
-    // Delete Thread
     fun deleteThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
 
         val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
@@ -234,7 +233,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-    //endregion
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName

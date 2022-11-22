@@ -145,6 +145,5 @@ class Message : RealmObject {
     fun toThread() = Thread().apply {
         uid = this@Message.uid
         subject = this@Message.subject
-        // addMessage(this@Message, messagesIds)
     }
 }

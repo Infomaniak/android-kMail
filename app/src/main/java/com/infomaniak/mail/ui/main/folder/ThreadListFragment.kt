@@ -299,29 +299,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolder() {
-        MainViewModel.currentFolderId.observeNotNull(viewLifecycleOwner) { folderId ->
-
+        MainViewModel.currentFolderId.observeNotNull(viewLifecycleOwner) {
             lastUpdatedDate = null
             updateUpdatedAt()
             clearFilter()
-
-            // folderJob?.cancel()
-            // folderJob = lifecycleScope.launch(Dispatchers.Main) {
-            //     // getFolder(folderId)
-            //     // mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
-            //     //     Log.e("TOTO", "getFolder: ${folder.name} | ${folder.unreadCount}")
-            //     //     threadListViewModel.currentFolder.value = folder
-            //     //     displayFolderName(folder)
-            //     // }
-            //     // observeFolder(folderId)
-            //     threadListViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
-            //         Log.e("TOTO", "observeFolder: ${folder.name} | ${folder.unreadCount}")
-            //         displayFolderName(folder)
-            //         updateUpdatedAt(folder.lastUpdatedAt?.toDate())
-            //         updateUnreadCount(folder.unreadCount)
-            //         threadListViewModel.startUpdatedAtJob()
-            //     }
-            // }
         }
 
         threadListViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
@@ -333,23 +314,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             threadListViewModel.startUpdatedAtJob()
         }
     }
-
-    // private fun getFolder(folderId: String) {
-    //     mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
-    //         Log.e("TOTO", "getFolder: ${folder.name} | ${folder.unreadCount}")
-    //         threadListViewModel.currentFolder.value = folder
-    //         displayFolderName(folder)
-    //     }
-    // }
-
-    // private fun observeFolder(folderId: String) {
-    //     threadListViewModel.observeFolder(folderId).observe(viewLifecycleOwner) { folder ->
-    //         Log.e("TOTO", "observeFolder: ${folder.name} | ${folder.unreadCount}")
-    //         updateUpdatedAt(folder.lastUpdatedAt?.toDate())
-    //         updateUnreadCount(folder.unreadCount)
-    //         threadListViewModel.startUpdatedAtJob()
-    //     }
-    // }
 
     private fun observeUpdatedAtTriggers() {
         threadListViewModel.updatedAtTrigger.observe(viewLifecycleOwner) { updateUpdatedAt() }

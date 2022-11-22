@@ -62,8 +62,6 @@ class Folder : RealmObject {
     //endregion
 
     //region Local data (Transient)
-    // @Transient
-    // var threads: RealmList<Thread> = realmListOf()
     @Transient
     var parentLink: Folder? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     @Transient
