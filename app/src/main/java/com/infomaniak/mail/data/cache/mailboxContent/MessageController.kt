@@ -33,7 +33,6 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.min
@@ -150,8 +149,7 @@ object MessageController {
                         folder.threads += messages.map { it.toThread(mailboxUuid) }.toRealmList()
                     }
                 }
-                // TODO: Do we want a delay between each call, to not get blocked by the API?
-                delay(500L)
+
                 pageStart += pageSize
             }
         }
