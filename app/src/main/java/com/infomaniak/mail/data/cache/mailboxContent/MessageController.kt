@@ -40,19 +40,20 @@ import kotlin.math.min
 object MessageController {
 
     //region Queries
-    private fun MutableRealm?.getMessagesQuery(uids: List<String>): RealmQuery<Message> {
-        val messages = "${Message::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
-        return (this ?: RealmDatabase.mailboxContent()).query(messages)
+    private fun getMessagesQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Message> {
+        val byUids = "${Message::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
+        return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
-        return (realm ?: RealmDatabase.mailboxContent()).query<Message>("${Message::uid.name} = '$uid'").first()
+        val byUid = "${Message::uid.name} == '$uid'"
+        return (realm ?: RealmDatabase.mailboxContent()).query<Message>(byUid).first()
     }
     //endregion
 
     //region Get data
-    private fun getMessages(uids: List<String>, realm: MutableRealm? = null): RealmResults<Message> {
-        return realm.getMessagesQuery(uids).find()
+    private fun getMessages(uids: List<String>, realm: TypedRealm? = null): RealmResults<Message> {
+        return getMessagesQuery(uids, realm).find()
     }
 
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
