@@ -122,10 +122,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
             behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
 
-            val leftIsSet = localSettings.swipeLeft == SwipeAction.NONE
-            if (leftIsSet) disableSwipeDirection(DirectionFlag.LEFT) else enableSwipeDirection(DirectionFlag.LEFT)
-            val rightIsSet = localSettings.swipeRight == SwipeAction.NONE
-            if (rightIsSet) disableSwipeDirection(DirectionFlag.RIGHT) else enableSwipeDirection(DirectionFlag.RIGHT)
+            val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
+            if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+            val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
+            if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
         }
     }
 
@@ -245,14 +245,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, item: Thread): Boolean {
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
         return when (swipeAction) {
             SwipeAction.DELETE -> {
-                mainViewModel.deleteThread(thread = item, filter)
+                mainViewModel.deleteThread(thread, filter)
                 false
             }
             SwipeAction.READ_UNREAD -> {
-                threadListViewModel.toggleSeenStatus(thread = item)
+                threadListViewModel.toggleSeenStatus(thread)
                 true
             }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
