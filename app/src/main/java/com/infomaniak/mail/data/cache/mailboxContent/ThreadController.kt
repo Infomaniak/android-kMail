@@ -106,47 +106,43 @@ object ThreadController {
     private fun markAsUnseen(thread: Thread) {
 
         val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
+        val uid = getThreadLastMessageUid(thread)
 
-        RealmDatabase.mailboxContent().writeBlocking {
-            val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uid = getThreadLastMessageUid(latestThread)
-            with(ApiRepository.markMessagesAsUnseen(mailboxUuid, uid)) {
-                if (isSuccess()) markThreadAsUnseen(latestThread)
-            }
-        }
+        if (ApiRepository.markMessagesAsUnseen(mailboxUuid, uid).isSuccess()) markThreadAsUnseen(thread.uid)
     }
 
     fun markAsSeen(thread: Thread) {
         if (thread.unseenMessagesCount == 0) return
 
         val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
+        val uids = getThreadUnseenMessagesUids(thread)
 
+        if (ApiRepository.markMessagesAsSeen(mailboxUuid, uids).isSuccess()) markThreadAsSeen(thread.uid)
+    }
+
+    private fun markThreadAsUnseen(threadUid: String) {
         RealmDatabase.mailboxContent().writeBlocking {
-            val latestThread = findLatest(thread) ?: return@writeBlocking
-            val uids = getThreadUnseenMessagesUids(latestThread)
-            with(ApiRepository.markMessagesAsSeen(mailboxUuid, uids)) {
-                if (isSuccess()) markThreadAsSeen(latestThread)
-            }
+            val thread = getThread(threadUid, realm = this) ?: return@writeBlocking
+            val message = thread.messages.getLastMessageToExecuteAction()
+            message.seen = false
+            thread.unseenMessagesCount++
+
+            incrementFolderUnreadCount(message.folderId, 1)
         }
     }
 
-    private fun MutableRealm.markThreadAsUnseen(thread: Thread) {
-        val message = thread.messages.getLastMessageToExecuteAction()
-        message.seen = false
-        thread.unseenMessagesCount++
-
-        incrementFolderUnreadCount(message.folderId, 1)
-    }
-
-    private fun MutableRealm.markThreadAsSeen(thread: Thread) {
-        thread.messages.forEach {
-            if (!it.seen) {
-                incrementFolderUnreadCount(it.folderId, -1)
-                it.seen = true
+    private fun markThreadAsSeen(threadUid: String) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val thread = getThread(threadUid, realm = this) ?: return@writeBlocking
+            thread.messages.forEach {
+                if (!it.seen) {
+                    incrementFolderUnreadCount(it.folderId, -1)
+                    it.seen = true
+                }
             }
-        }
 
-        thread.unseenMessagesCount = 0
+            thread.unseenMessagesCount = 0
+        }
     }
     //endregion
 }
