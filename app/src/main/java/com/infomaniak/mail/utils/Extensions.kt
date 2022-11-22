@@ -24,7 +24,6 @@ import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -83,20 +82,6 @@ fun View.toggleChevron(
         expandedAngle ?: ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
     }
     animate().rotation(angle).setDuration(duration).start()
-}
-
-fun View.setMargins(left: Int? = null, top: Int? = null, right: Int? = null, bottom: Int? = null) {
-    if (layoutParams is ViewGroup.MarginLayoutParams) {
-        (layoutParams as ViewGroup.MarginLayoutParams).apply {
-            setMargins(
-                left ?: leftMargin,
-                top ?: topMargin,
-                right ?: rightMargin,
-                bottom ?: bottomMargin,
-            )
-        }
-        requestLayout()
-    }
 }
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()

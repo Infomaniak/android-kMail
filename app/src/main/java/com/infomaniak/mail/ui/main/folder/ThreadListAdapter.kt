@@ -149,7 +149,7 @@ class ThreadListAdapter(
 
     private fun Thread.formatExpeditorNames(context: Context): String {
         return if (from.count() == 1) {
-            from.first().displayedName(context)
+            from.single().displayedName(context)
         } else {
             from.joinToString(", ") {
                 with(it.displayedName(context)) {
@@ -162,22 +162,10 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isGone = true
-        draftPrefix.setTextAppearance(R.style.H3_Error)
-        expeditor.setTextAppearance(R.style.H3_Secondary)
-        mailSubject.setTextAppearance(R.style.Body_Secondary)
-        mailDate.setTextAppearance(R.style.Callout_Secondary)
-        iconAttachment.setDrawableColor(root.context, R.color.secondaryTextColor)
-        iconCalendar.setDrawableColor(root.context, R.color.secondaryTextColor)
     }
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
-        draftPrefix.setTextAppearance(R.style.H2_Error)
-        expeditor.setTextAppearance(R.style.H2)
-        mailSubject.setTextAppearance(R.style.H4)
-        mailDate.setTextAppearance(R.style.CalloutStrong)
-        iconAttachment.setDrawableColor(root.context, R.color.primaryTextColor)
-        iconCalendar.setDrawableColor(root.context, R.color.primaryTextColor)
     }
 
     private fun ImageView.setDrawableColor(context: Context, @ColorRes color: Int) = drawable.setTint(context.getColor(color))
