@@ -23,7 +23,6 @@
     android:viewportHeight="75">
     <group>
         <path
-            android:fillColor="#00000000"
             android:pathData="M8.5,12.5C8.5,11.671 8.829,10.876 9.415,10.29C10.001,9.704 10.796,9.375 11.625,9.375H64.75C65.579,9.375 66.374,9.704 66.96,10.29C67.546,10.876 67.875,11.671 67.875,12.5V21.875"
             android:strokeWidth="4"
             android:strokeColor="?attr/colorPrimary"
