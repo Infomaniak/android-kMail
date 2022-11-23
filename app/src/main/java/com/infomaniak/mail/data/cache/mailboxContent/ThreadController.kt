@@ -20,9 +20,9 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
@@ -81,24 +81,6 @@ object ThreadController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    private fun MutableRealm.markThreadAsUnseen(thread: Thread, folderId: String) {
-        thread.apply {
-            messages.getLastMessageToExecuteAction().seen = false
-            unseenMessagesCount++
-        }
-
-        incrementFolderUnreadCount(folderId, thread.unseenMessagesCount)
-    }
-
-    private fun MutableRealm.markThreadAsSeen(thread: Thread, folderId: String) {
-        incrementFolderUnreadCount(folderId, -thread.unseenMessagesCount)
-
-        thread.apply {
-            messages.forEach { it.seen = true }
-            unseenMessagesCount = 0
-        }
-    }
-
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     private fun getThreadLastMessageUid(thread: Thread): List<String> {
         return listOf(thread.messages.getLastMessageToExecuteAction().uid)
@@ -118,31 +100,48 @@ object ThreadController {
 
     //region Mark as seen/unseen
     fun toggleSeenStatus(thread: Thread) {
-        val folderId = MainViewModel.currentFolderId.value!!
-        RealmDatabase.mailboxContent().writeBlocking {
-            if (thread.unseenMessagesCount == 0) {
-                markAsUnseen(thread, folderId, realm = this)
-            } else {
-                markAsSeen(thread, folderId, realm = this)
-            }
-        }
+        if (thread.unseenMessagesCount == 0) markAsUnseen(thread) else markAsSeen(thread)
     }
 
-    private fun markAsUnseen(thread: Thread, folderId: String, realm: MutableRealm) {
-        val latestThread = realm.findLatest(thread) ?: return
-        val uid = getThreadLastMessageUid(latestThread)
-        with(ApiRepository.markMessagesAsUnseen(latestThread.mailboxUuid, uid)) {
-            if (isSuccess()) realm.markThreadAsUnseen(latestThread, folderId)
-        }
+    private fun markAsUnseen(thread: Thread) {
+
+        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
+        val uid = getThreadLastMessageUid(thread)
+
+        if (ApiRepository.markMessagesAsUnseen(mailboxUuid, uid).isSuccess()) markThreadAsUnseen(thread.uid)
     }
 
-    fun markAsSeen(thread: Thread, folderId: String, realm: MutableRealm) {
+    fun markAsSeen(thread: Thread) {
         if (thread.unseenMessagesCount == 0) return
 
-        val latestThread = realm.findLatest(thread) ?: return
-        val uids = getThreadUnseenMessagesUids(latestThread)
-        with(ApiRepository.markMessagesAsSeen(latestThread.mailboxUuid, uids)) {
-            if (isSuccess()) realm.markThreadAsSeen(latestThread, folderId)
+        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
+        val uids = getThreadUnseenMessagesUids(thread)
+
+        if (ApiRepository.markMessagesAsSeen(mailboxUuid, uids).isSuccess()) markThreadAsSeen(thread.uid)
+    }
+
+    private fun markThreadAsUnseen(threadUid: String) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val thread = getThread(threadUid, realm = this) ?: return@writeBlocking
+            val message = thread.messages.getLastMessageToExecuteAction()
+            message.seen = false
+            thread.unseenMessagesCount++
+
+            incrementFolderUnreadCount(message.folderId, 1)
+        }
+    }
+
+    private fun markThreadAsSeen(threadUid: String) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val thread = getThread(threadUid, realm = this) ?: return@writeBlocking
+            thread.messages.forEach {
+                if (!it.seen) {
+                    incrementFolderUnreadCount(it.folderId, -1)
+                    it.seen = true
+                }
+            }
+
+            thread.unseenMessagesCount = 0
         }
     }
     //endregion

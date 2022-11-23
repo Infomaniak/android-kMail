@@ -42,10 +42,8 @@ class ThreadViewModel : ViewModel() {
         ThreadController.getThread(threadUid)?.let { thread ->
             selectThread(thread)
             currentThread.postValue(thread)
-            RealmDatabase.mailboxContent().writeBlocking {
-                markAsSeen(thread, MainViewModel.currentFolderId.value!!, realm = this)
-                updateMessages(thread)
-            }
+            markAsSeen(thread)
+            updateMessages(thread)
         }
     }
 
@@ -53,9 +51,11 @@ class ThreadViewModel : ViewModel() {
         if (thread.uid != MainViewModel.currentThreadUid.value) MainViewModel.currentThreadUid.postValue(thread.uid)
     }
 
-    private fun MutableRealm.updateMessages(thread: Thread) {
-        val apiMessages = fetchMessages(thread)
-        update(thread.messages, apiMessages)
+    private fun updateMessages(thread: Thread) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val remoteMessages = fetchMessages(thread)
+            update(thread.messages, remoteMessages)
+        }
     }
 
     private fun MutableRealm.fetchMessages(thread: Thread): List<Message> {
