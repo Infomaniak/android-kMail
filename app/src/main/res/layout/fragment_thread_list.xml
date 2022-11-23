@@ -155,9 +155,6 @@
                     android:clipToPadding="false"
                     android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                     android:visibility="gone"
-                    app:behind_swiped_item_bg_color="@color/redDestructiveAction"
-                    app:behind_swiped_item_bg_color_secondary="@color/swipeReadUnread"
-                    app:behind_swiped_item_icon="@drawable/ic_bin"
                     app:behind_swiped_item_icon_margin="@dimen/marginStandard"
                     tools:listitem="@layout/cardview_thread_item"
                     tools:visibility="visible" />

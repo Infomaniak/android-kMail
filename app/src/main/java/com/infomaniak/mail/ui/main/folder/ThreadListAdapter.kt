@@ -19,12 +19,15 @@ package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
 import android.graphics.Canvas
+import android.os.Build
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +38,8 @@ import com.ernestoyaquello.dragdropswiperecyclerview.util.DragDropSwipeDiffCallb
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.LARGE
@@ -56,6 +61,7 @@ import kotlin.math.abs
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
+    private val context: Context,
     private val threadDensity: ThreadDensity,
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
@@ -63,6 +69,8 @@ class ThreadListAdapter(
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private lateinit var recyclerView: RecyclerView
+
+    private val localSettings by lazy { LocalSettings.getInstance(context) }
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -184,13 +192,29 @@ class ThreadListAdapter(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) {
-        (recyclerView as DragDropSwipeRecyclerView).apply {
-            behindSwipedItemIconSecondaryDrawableId = if ((item as Thread).unseenMessagesCount > 0) {
-                R.drawable.ic_envelope_open
-            } else {
-                R.drawable.ic_envelope
+    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) = updateDynamicIcons(item)
+
+    private fun updateDynamicIcons(item: Any) {
+
+        fun swipeActionIs(swipeAction: SwipeAction): Boolean {
+            return localSettings.swipeLeft == swipeAction || localSettings.swipeRight == swipeAction
+        }
+
+        fun DragDropSwipeRecyclerView.updateSwipeIconWith(swipeAction: SwipeAction, @DrawableRes drawable: Int) {
+            when (swipeAction) {
+                localSettings.swipeRight -> behindSwipedItemIconSecondaryDrawableId = drawable
+                localSettings.swipeLeft -> behindSwipedItemIconDrawableId = drawable
+                else -> Log.w(
+                    "SwipeAction",
+                    "updateSwipeIconWith: Can't find which direction should update for ${swipeAction.name}"
+                )
             }
+        }
+
+        if (swipeActionIs(SwipeAction.READ_UNREAD)) {
+            item as Thread
+            val newDrawable = if (item.unseenMessagesCount > 0) R.drawable.ic_envelope_open else R.drawable.ic_envelope
+            (recyclerView as DragDropSwipeRecyclerView).updateSwipeIconWith(SwipeAction.READ_UNREAD, newDrawable)
         }
     }
 
@@ -211,7 +235,11 @@ class ThreadListAdapter(
             root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
         } else if (progress > 0.5 && viewHolder.isSwipedOverHalf) {
             viewHolder.isSwipedOverHalf = false
-            root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY_RELEASE)
+            } else {
+                root.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
         }
 
         val cardView = root as MaterialCardView

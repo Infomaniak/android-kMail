@@ -64,6 +64,7 @@
     <color name="iconColor">@color/elephant</color>
     <color name="iconSecondaryColor">@color/elephant</color>
     <color name="favoriteYellow">#F1BE41</color>
+    <color name="swipeActionIconColor">@color/white</color>
 
     <!-- Buttons -->
     <color name="textButtonBlueLight">@color/blueTextLight</color>
@@ -80,9 +81,10 @@
     <color name="swipeReadUnread">#006AB2</color>
     <color name="swipeFavorite">#FFC10A</color>
     <color name="swipePostpone">#4CB7FF</color>
-    <color name="swipeSpam">#FF8500</color>
+    <color name="swipeSpam">@color/orangeWarning</color>
     <color name="swipeArchive">#BA68C8</color>
     <color name="swipeQuickActionMenu">#85A2B6</color>
     <color name="swipeNone">@color/progressbarTrackColor</color>
+    <color name="swipeReadAndArchive">#673AB7</color>
 
 </resources>
