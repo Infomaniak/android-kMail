@@ -50,14 +50,12 @@ class Thread : RealmObject {
     var size: Int = 0
     var hasAttachments: Boolean = false
     var hasDrafts: Boolean = false
-    var favoritesCount: Int = 0
+    var isFavorite: Boolean = false
     var answered: Boolean = false
     var forwarded: Boolean = false
     var scheduled: Boolean = false
     var foldersIds: RealmSet<String> = realmSetOf()
     var messagesIds: RealmSet<String> = realmSetOf()
-
-    val isFavorite: Boolean get() = favoritesCount > 0
 
     fun addMessage(message: Message) {
         message.threadUid = uid
@@ -78,7 +76,7 @@ class Thread : RealmObject {
         size = 0
         hasAttachments = false
         hasDrafts = false
-        favoritesCount = 0
+        isFavorite = false
         answered = false
         forwarded = false
         scheduled = false
@@ -92,7 +90,7 @@ class Thread : RealmObject {
             size += message.size
             if (message.hasAttachments) hasAttachments = true
             if (message.isDraft) hasDrafts = true
-            if (message.isFavorite) favoritesCount++
+            if (message.isFavorite) isFavorite = true
             if (message.answered) answered = true
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true

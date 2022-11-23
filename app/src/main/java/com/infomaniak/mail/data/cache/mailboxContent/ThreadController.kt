@@ -58,7 +58,7 @@ object ThreadController {
             val withFilter = when (filter) {
                 ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
                 ThreadFilter.UNSEEN -> "${Thread::unseenMessagesCount.name} > 0"
-                ThreadFilter.STARRED -> "${Thread::favoritesCount.name} > 0"
+                ThreadFilter.STARRED -> "${Thread::isFavorite.name} == true"
                 ThreadFilter.ATTACHMENTS -> "${Thread::hasAttachments.name} == true"
                 ThreadFilter.FOLDER -> TODO()
                 else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
