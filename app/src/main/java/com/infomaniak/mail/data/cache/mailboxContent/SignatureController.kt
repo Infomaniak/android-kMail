@@ -21,21 +21,21 @@ import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.update
-import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmSingleQuery
 
 object SignatureController {
 
     //region Queries
-    private fun MutableRealm?.getDefaultSignatureQuery(): RealmSingleQuery<Signature> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Signature>("${Signature::isDefault.name} = true").first()
+    private fun getDefaultSignatureQuery(realm: TypedRealm? = null): RealmSingleQuery<Signature> {
+        return (realm ?: RealmDatabase.mailboxContent()).query<Signature>("${Signature::isDefault.name} == true").first()
     }
     //endregion
 
     //region Get data
-    fun getDefaultSignature(realm: MutableRealm? = null): Signature? {
-        return realm.getDefaultSignatureQuery().find()
+    fun getDefaultSignature(realm: TypedRealm? = null): Signature? {
+        return getDefaultSignatureQuery(realm).find()
     }
     //endregion
 

@@ -47,27 +47,27 @@ object DraftController {
     private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
 
     //region Queries
-    private fun MutableRealm?.getDraftsQuery(query: String? = null): RealmQuery<Draft> {
-        return with(this ?: RealmDatabase.mailboxContent()) {
+    private fun getDraftsQuery(query: String? = null, realm: TypedRealm? = null): RealmQuery<Draft> {
+        return with(realm ?: RealmDatabase.mailboxContent()) {
             query?.let { query(it) } ?: query()
         }
     }
 
     private fun getDraftQuery(key: String, value: String, realm: TypedRealm? = null): RealmSingleQuery<Draft> {
-        return (realm ?: RealmDatabase.mailboxContent()).query<Draft>("$key = '$value'").first()
+        return (realm ?: RealmDatabase.mailboxContent()).query<Draft>("$key == '$value'").first()
     }
 
-    private fun getDraftsWithActionsQuery(realm: MutableRealm? = null): RealmQuery<Draft> {
-        return realm.getDraftsQuery("${Draft.actionPropertyName} != nil")
+    private fun getDraftsWithActionsQuery(realm: TypedRealm? = null): RealmQuery<Draft> {
+        return getDraftsQuery("${Draft.actionPropertyName} != nil", realm)
     }
     //endregion
 
     //region Get data
-    private fun getDrafts(realm: MutableRealm): RealmResults<Draft> {
-        return realm.getDraftsQuery().find()
+    private fun getDrafts(realm: TypedRealm): RealmResults<Draft> {
+        return getDraftsQuery(realm = realm).find()
     }
 
-    fun getDraftsWithActions(realm: MutableRealm): RealmResults<Draft> {
+    fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
         return getDraftsWithActionsQuery(realm).find()
     }
 
