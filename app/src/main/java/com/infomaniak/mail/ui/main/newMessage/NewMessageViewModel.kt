@@ -106,13 +106,13 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
         return Draft().apply {
             initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
-            initSignature(this@createDraft)
+            initSignature(realm = this@createDraft)
             if (draftMode != DraftMode.NEW_MAIL) {
                 previousMessageUid
-                    ?.let { uid -> MessageController.getMessage(uid, this@createDraft) }
-                    ?.let { message -> setPreviousMessage(this, draftMode, message) }
+                    ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
+                    ?.let { message -> setPreviousMessage(draft = this, draftMode, message) }
             }
-            DraftController.upsertDraft(this, this@createDraft)
+            DraftController.upsertDraft(draft = this, realm = this@createDraft)
         }.localUuid
     }
 

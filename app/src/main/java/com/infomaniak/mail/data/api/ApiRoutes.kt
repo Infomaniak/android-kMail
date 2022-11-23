@@ -76,9 +76,9 @@ object ApiRoutes {
         return "${folder(mailboxUuid, folderId)}/message/$messageId/attachmentsArchive"
     }
 
-    fun starMessage(mailboxUuid: String, star: Boolean): String {
-        return "$MAIL_API/api/mail/$mailboxUuid/message/${if (star) "star" else "unstar"}"
-    }
+    // fun starMessage(mailboxUuid: String, star: Boolean): String {
+    //     return "$MAIL_API/api/mail/$mailboxUuid/message/${if (star) "star" else "unstar"}"
+    // }
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): String {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"

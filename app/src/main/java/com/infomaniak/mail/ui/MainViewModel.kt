@@ -229,20 +229,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val currentFolderId = currentFolderId.value ?: return@launch
 
         RealmDatabase.mailboxContent().writeBlocking {
-            val currentFolderRole = FolderController.getFolder(currentFolderId, this)?.role
+            val currentFolderRole = FolderController.getFolder(currentFolderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
 
             val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
                 ApiRepository.deleteMessages(mailboxUuid, messagesUids).isSuccess()
             } else {
-                val trashId = FolderController.getFolder(FolderRole.TRASH, this)!!.id
+                val trashId = FolderController.getFolder(FolderRole.TRASH, realm = this)!!.id
                 ApiRepository.moveMessages(mailboxUuid, messagesUids, trashId).isSuccess()
             }
 
             if (isSuccess) {
                 incrementFolderUnreadCount(currentFolderId, -thread.unseenMessagesCount)
                 deleteMessages(thread.messages)
-                ThreadController.getThread(thread.uid, this)?.let(::delete)
+                ThreadController.getThread(thread.uid, realm = this)?.let(::delete)
             }
         }
     }

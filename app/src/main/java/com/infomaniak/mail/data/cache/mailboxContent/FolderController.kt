@@ -85,7 +85,7 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteOutdatedFolders(apiFolders: List<Folder>) {
-        getFolders(exceptionsFoldersIds = apiFolders.map { it.id }, this).reversed().forEach { folder ->
+        getFolders(exceptionsFoldersIds = apiFolders.map { it.id }, realm = this).reversed().forEach { folder ->
             folder.threads.reversed().forEach { thread ->
                 deleteMessages(thread.messages)
                 delete(thread)
@@ -98,7 +98,7 @@ object FolderController {
 
         apiFolders.forEach { apiFolder ->
 
-            getFolder(apiFolder.id, this)?.let { localFolder ->
+            getFolder(apiFolder.id, realm = this)?.let { localFolder ->
                 apiFolder.initLocalValues(
                     threads = localFolder.threads.toRealmList(),
                     parentLink = localFolder.parentLink,
@@ -112,12 +112,12 @@ object FolderController {
     }
 
     fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getFolder(id, it)?.let(onUpdate) }
+        val block: (MutableRealm) -> Unit = { getFolder(id, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
     fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int) {
-        updateFolder(folderId, this) {
+        updateFolder(folderId, realm = this) {
             it.unreadCount += unseenMessagesCount
         }
     }

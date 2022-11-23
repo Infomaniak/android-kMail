@@ -66,13 +66,14 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
                 return mailboxObjectId?.let { MailboxController.getMailbox(it, mailboxInfoRealm) }?.uuid
             }
 
-            val drafts = DraftController.getDraftsWithActions(this).ifEmpty { null } ?: return@writeBlocking Result.failure()
+            val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { null }
+                ?: return@writeBlocking Result.failure()
             val mailboxUuid = getCurrentMailboxUuid() ?: return@writeBlocking Result.failure()
             var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
                 try {
-                    DraftController.executeDraftAction(draft, mailboxUuid, this)
+                    DraftController.executeDraftAction(draft, mailboxUuid, realm = this)
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                     Sentry.captureException(exception)

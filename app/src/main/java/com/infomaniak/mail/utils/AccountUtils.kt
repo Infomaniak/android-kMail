@@ -110,7 +110,7 @@ object AccountUtils : CredentialManager {
                 user.apply {
                     organizations = arrayListOf()
                     requestCurrentUser()?.let { user ->
-                        setUserToken(this, user.apiToken)
+                        setUserToken(user = this, user.apiToken)
                         currentUser = this
                     }
                 }

@@ -153,7 +153,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 format(FORMAT_EMAIL_DATE_SHORT_DATE),
                 format(FORMAT_EMAIL_DATE_HOUR),
             )
-            else -> this@mailFormattedDate.mostDetailedDate(this@with)
+            else -> this@mailFormattedDate.mostDetailedDate(date = this@with)
         }
     }
 
@@ -169,13 +169,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         messageHeader.setOnClickListener {
             if (isExpanded) {
                 isExpanded = false
-                displayExpandedCollapsedMessage(this@with)
+                displayExpandedCollapsedMessage(message = this@with)
             } else {
                 if (isDraft) {
                     onDraftClicked?.invoke(this@with)
                 } else {
                     isExpanded = true
-                    displayExpandedCollapsedMessage(this@with)
+                    displayExpandedCollapsedMessage(message = this@with)
                 }
             }
         }
@@ -276,7 +276,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
-        recipient.text = if (isExpanded) getAllRecipientsFormatted(this@with) else subject
+        recipient.text = if (isExpanded) getAllRecipientsFormatted(message = this@with) else subject
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
     }
