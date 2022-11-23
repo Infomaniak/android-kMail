@@ -38,6 +38,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.LARGE
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
@@ -56,6 +57,7 @@ import kotlin.math.abs
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
+    private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
     private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
@@ -124,7 +126,7 @@ class ThreadListAdapter(
     private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
 
         draftPrefix.isVisible = thread.hasDrafts
-        expeditor.text = formatExpeditorNames(context)
+        expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
         mailSubject.text = subject.getFormattedThreadSubject(root.context)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
         getDisplayedRecipient(this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
@@ -147,14 +149,16 @@ class ThreadListAdapter(
         mailSubject.setMarginsRelative(top = if (threadDensity == COMPACT) 0 else 4.toPx())
     }
 
-    private fun Thread.formatExpeditorNames(context: Context): String {
-        return if (from.count() == 1) {
-            from.single().displayedName(context)
-        } else {
-            from.joinToString(", ") {
-                with(it.displayedName(context)) {
-                    val delimiter = if (isEmail()) "@" else " "
-                    substringBefore(delimiter)
+    private fun formatRecipientNames(context: Context, recipients: List<Recipient>): String {
+        return when (recipients.count()) {
+            0 -> context.getString(R.string.unknownRecipientTitle)
+            1 -> recipients.single().displayedName(context)
+            else -> {
+                recipients.joinToString(", ") {
+                    with(it.displayedName(context)) {
+                        val delimiter = if (isEmail()) "@" else " "
+                        substringBefore(delimiter)
+                    }
                 }
             }
         }
@@ -255,6 +259,10 @@ class ThreadListAdapter(
     fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
         contacts = newContacts
         notifyItemRangeChanged(0, itemCount, Unit)
+    }
+
+    fun updateFolderRole(newRole: FolderRole?) {
+        folderRole = newRole
     }
 
     private enum class DisplayType(val layout: Int) {

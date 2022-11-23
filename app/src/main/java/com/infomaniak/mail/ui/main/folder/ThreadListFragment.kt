@@ -47,6 +47,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -123,6 +124,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
             threadDensity = LocalSettings.getInstance(requireContext()).threadDensity,
+            folderRole = FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
@@ -310,6 +312,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
             threadListViewModel.currentFolder.value = folder
             displayFolderName(folder)
+            threadListAdapter.updateFolderRole(folder.role)
         }
     }
 
