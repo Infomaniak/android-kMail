@@ -37,9 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
         android:gravity="center"
-        android:visibility="gone"
-        tools:text="@string/noEmailTitle"
-        tools:visibility="visible" />
+        tools:text="@string/noEmailTitle" />
 
     <TextView
         android:id="@+id/description"
@@ -49,8 +47,6 @@
         android:layout_marginTop="@dimen/marginStandardVerySmall"
         android:gravity="center"
         android:lineSpacingMultiplier="1"
-        android:visibility="gone"
-        tools:text="@string/noEmailDescription"
-        tools:visibility="visible" />
+        tools:text="@string/noEmailDescription" />
 
 </LinearLayout>
