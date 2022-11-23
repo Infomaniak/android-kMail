@@ -152,9 +152,9 @@ object MessageController {
         threadMode: ThreadMode,
     ) = with(messagesUids) {
 
-        Log.e(
+        Log.i(
             "API",
-            "As threads | A: ${addedShortUids.count()} | D: ${deletedUids.count()} | U: ${updatedMessages.count()} | ${folder.name}",
+            "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
         add(addedShortUids, folder, mailboxUuid, threadMode)

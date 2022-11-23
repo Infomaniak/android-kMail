@@ -306,7 +306,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         threadListViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
-            Log.e("TOTO", "observeFolder: ${folder.name} | ${folder.unreadCount}")
             displayFolderName(folder)
             threadListAdapter.updateFolderRole(folder.role)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
@@ -352,12 +351,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayFolderName(folder: Folder) {
         val folderName = folder.getLocalizedName(binding.context)
-        Log.i("UI", "Received folder name (${folderName})")
+        Log.d("UI", "Received folder name (${folderName})")
         binding.toolbar.title = folderName
     }
 
     private fun onThreadsUpdate(threads: List<Thread>) {
-        Log.i("UI", "Received threads (${threads.size})")
+        Log.d("UI", "Received threads (${threads.size})")
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
     }
 
