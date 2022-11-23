@@ -16,6 +16,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
+    <attr name="customGradientColor" format="color" />
+
     <declare-styleable name="CommonAttributes">
         <attr name="icon" format="reference" />
         <attr name="text" format="string" />
@@ -90,6 +92,12 @@
         <attr name="actionContentDescription" format="string" />
         <attr name="collapsedByDefault" format="boolean" />
         <attr name="showIcon" format="boolean" />
+        <attr name="title" />
+    </declare-styleable>
+
+    <declare-styleable name="EmptyStateView">
+        <attr name="description" format="string" />
+        <attr name="icon" />
         <attr name="title" />
     </declare-styleable>
 </resources>
