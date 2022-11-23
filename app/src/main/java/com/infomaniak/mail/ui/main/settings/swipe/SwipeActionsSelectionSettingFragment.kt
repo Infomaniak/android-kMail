@@ -64,8 +64,14 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
             check(localSettings.getSwipeAction(actionResId))
 
             onItemCheckedListener { _, _, swipeAction ->
-                notYetImplemented()
-                saveAction(swipeAction as SwipeAction)
+                swipeAction as SwipeAction
+
+                when (swipeAction) {
+                    DELETE, READ_UNREAD -> Unit
+                    else -> notYetImplemented()
+                }
+
+                saveAction(swipeAction)
             }
         }
     }
