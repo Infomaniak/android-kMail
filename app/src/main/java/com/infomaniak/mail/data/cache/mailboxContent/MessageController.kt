@@ -22,20 +22,21 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.copyListToRealm
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmSingleQuery
 
 object MessageController {
 
     //region Queries
-    private fun MutableRealm?.getMessageQuery(uid: String): RealmSingleQuery<Message> {
-        return (this ?: RealmDatabase.mailboxContent()).query<Message>("${Message::uid.name} = '$uid'").first()
+    private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
+        return (realm ?: RealmDatabase.mailboxContent()).query<Message>("${Message::uid.name} = '$uid'").first()
     }
     //endregion
 
     //region Get data
-    fun getMessage(uid: String, realm: MutableRealm? = null): Message? {
-        return realm.getMessageQuery(uid).find()
+    fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
+        return getMessageQuery(uid, realm).find()
     }
     //endregion
 

@@ -86,26 +86,37 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
     }
 
     companion object {
-        const val TAG = "DraftsActionsWorker"
-        const val MAX_RETRIES = 3
+        private const val TAG = "DraftsActionsWorker"
+        private const val WORK_NAME = "SaveDraftWithAttachments"
+        private const val MAX_RETRIES = 3
 
-        fun scheduleWork(context: Context) {
+        fun scheduleWork(context: Context, localDraftUuid: String? = null) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
-
-            val hasEmptyDrafts = DraftController.getDraftsWithActionsCount() == 0L
-            if (hasEmptyDrafts) return
+            if (DraftController.getDraftsWithActionsCount() == 0L) return
 
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
+                .addTag(TAG)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setExpeditedWorkRequest()
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
+            val workManager = WorkManager.getInstance(context)
+
+            if (localDraftUuid == null) {
+                // Begin unique work, only start DraftActionsWorker
+                workManager.enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
+            } else {
+                // Begin unique chain work, upload attachments before save current draft
+                val uploadAttachmentsWorkRequest = UploadAttachmentsWorker.getWorkRequest(localDraftUuid) ?: return
+                workManager.beginUniqueWork(WORK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, uploadAttachmentsWorkRequest)
+                    .then(workRequest)
+                    .enqueue()
+            }
         }
 
         fun getRunningWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {
-            val workQuery = WorkQuery.Builder.fromUniqueWorkNames(listOf(TAG)).addStates(listOf(WorkInfo.State.RUNNING)).build()
+            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(listOf(WorkInfo.State.RUNNING)).build()
             return WorkManager.getInstance(context).getWorkInfosLiveData(workQuery)
         }
     }

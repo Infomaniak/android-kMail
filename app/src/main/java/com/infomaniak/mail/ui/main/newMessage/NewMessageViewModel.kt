@@ -192,7 +192,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     override fun onCleared() {
-        DraftsActionsWorker.scheduleWork(getApplication())
+        DraftsActionsWorker.scheduleWork(getApplication(), currentDraftLocalUuid)
         LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), currentDraftLocalUuid)
         autoSaveJob?.cancel()
         super.onCleared()
