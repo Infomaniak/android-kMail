@@ -52,7 +52,7 @@ import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
+import com.infomaniak.mail.utils.Utils.getFormattedThreadSubject
 import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?

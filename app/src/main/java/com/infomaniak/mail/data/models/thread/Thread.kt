@@ -77,6 +77,8 @@ class Thread : RealmObject {
     //region Local data (Transient)
     @Transient
     var mailboxUuid: String = ""
+    @Transient
+    var folderId: String = ""
     //endregion
 
     fun formatDate(context: Context): String = with(date.toDate()) {

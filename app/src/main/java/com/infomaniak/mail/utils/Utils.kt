@@ -24,7 +24,7 @@ import androidx.core.text.toSpanned
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 
-object ModelsUtils {
+object Utils {
 
     fun String?.getFormattedThreadSubject(context: Context): Spanned {
         return this?.replace("\n+".toRegex(), " ")?.toSpanned()

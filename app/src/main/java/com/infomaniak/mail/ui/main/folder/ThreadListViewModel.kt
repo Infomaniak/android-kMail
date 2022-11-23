@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -39,9 +40,18 @@ class ThreadListViewModel : ViewModel() {
     val isRecoveringFinished = MutableLiveData(true)
     val updatedAtTrigger = MutableLiveData<Unit>()
 
-    val currentFolder = SingleLiveEvent<Folder>()
-    val currentFolderThreads = Transformations.switchMap(currentFolder) { folder ->
-        liveData(Dispatchers.IO) { emitSource(folder.threads.asFlow().asLiveData()) }
+    val currentFolder = SingleLiveEvent<Folder?>(null)
+    val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
+    val currentThreads = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
+        liveData(Dispatchers.IO) {
+            if (folder != null) emitSource(ThreadController.getThreads(folder.id, filter).asFlow().asLiveData())
+        }
+    }
+
+    private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
+        value = currentFolder.value to currentFilter.value!!
+        addSource(currentFolder) { value = it to value!!.second }
+        addSource(currentFilter) { value = value?.first to it }
     }
 
     fun observeFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {

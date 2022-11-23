@@ -55,7 +55,7 @@ import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
+import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -78,8 +78,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    var filter: ThreadFilter = ThreadFilter.ALL
-    private var lastUnreadCount = 0
     private var canRefreshThreads = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -107,7 +105,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
 
-        if (canRefreshThreads) mainViewModel.forceRefreshThreads(filter)
+        if (canRefreshThreads) mainViewModel.forceRefreshThreads()
         canRefreshThreads = true
 
         updateSwipeActionsAccordingToSettings()
@@ -129,7 +127,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        mainViewModel.forceRefreshThreads(filter)
+        mainViewModel.forceRefreshThreads()
     }
 
     private fun setupOnRefresh() {
@@ -246,7 +244,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
         return when (swipeAction) {
             SwipeAction.DELETE -> {
-                mainViewModel.deleteThread(thread, filter)
+                mainViewModel.deleteThread(thread)
                 false
             }
             SwipeAction.READ_UNREAD -> {
@@ -278,14 +276,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         unreadCountChip.apply {
             setOnClickListener {
                 isCloseIconVisible = isChecked
-                filter = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
-                mainViewModel.forceRefreshThreads(filter)
+                threadListViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
             }
         }
     }
 
     private fun observeCurrentFolderThreads() {
-        threadListViewModel.currentFolderThreads.bindListChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
+        threadListViewModel.currentThreads.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
             beforeUpdateAdapter = ::onThreadsUpdate
@@ -309,6 +306,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             lastUpdatedDate = null
             updateUpdatedAt()
+            clearFilter()
 
             folderJob?.cancel()
             folderJob = lifecycleScope.launch(Dispatchers.Main) {
@@ -360,12 +358,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
-        if (unreadCount == 0 && lastUnreadCount > 0 && filter != ThreadFilter.ALL) {
-            clearFilter()
-            mainViewModel.forceRefreshThreads(filter)
-        }
 
-        lastUnreadCount = unreadCount
+        if (threadListViewModel.currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) clearFilter()
 
         unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
@@ -402,7 +396,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun clearFilter() = with(binding.unreadCountChip) {
-        filter = ThreadFilter.ALL
+        threadListViewModel.currentFilter.value = ThreadFilter.ALL
         isChecked = false
         isCloseIconVisible = false
     }
