@@ -203,6 +203,5 @@ object RealmDatabase {
                 .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
         //endregion
-
     }
 }

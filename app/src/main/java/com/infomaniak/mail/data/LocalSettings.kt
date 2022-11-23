@@ -207,7 +207,7 @@ class LocalSettings private constructor(context: Context) {
         private val DEFAULT_THEME = Theme.SYSTEM
         val DEFAULT_ACCENT_COLOR = AccentColor.PINK
         private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
-        private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
+        private val DEFAULT_THREAD_MODE = ThreadMode.MESSAGES
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
         //endregion
 

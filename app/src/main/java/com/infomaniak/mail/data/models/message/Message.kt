@@ -128,4 +128,22 @@ class Message : RealmObject {
         NOT_VALID,
         NOT_SIGNED,
     }
+
+    fun toThread(mailboxUuid: String) = Thread().apply {
+        this.mailboxUuid = mailboxUuid
+        uid = this@Message.uid
+        uniqueMessagesCount = 1
+        messages = realmListOf(this@Message)
+        answered = this@Message.answered
+        isFavorite = this@Message.isFavorite
+        forwarded = this@Message.forwarded
+        scheduled = this@Message.scheduled
+        unseenMessagesCount = if (this@Message.seen) 0 else 1
+        from = this@Message.from
+        subject = this@Message.subject
+        this@Message.date?.let { date = it }
+        hasAttachments = this@Message.hasAttachments
+        hasDrafts = this@Message.isDraft
+        isFavorite = this@Message.isFavorite
+    }
 }

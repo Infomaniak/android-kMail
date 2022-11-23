@@ -51,11 +51,8 @@ import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
-import com.infomaniak.mail.utils.RealmChangesBinding
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.isEmail
-import com.infomaniak.mail.utils.isLastWeek
 import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
@@ -329,7 +326,7 @@ class ThreadListAdapter(
             return formattedList
         }
 
-        private fun Thread.getSectionTitle(context: Context): String = with(date) {
+        private fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
             return when {
                 isToday() -> context.getString(R.string.threadListSectionToday)
                 isYesterday() -> context.getString(R.string.messageDetailsYesterday)

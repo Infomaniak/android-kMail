@@ -22,7 +22,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -33,7 +32,6 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
-import java.util.*
 
 object FolderController {
 
@@ -105,6 +103,7 @@ object FolderController {
                     threads = localFolder.threads.toRealmList(),
                     parentLink = localFolder.parentLink,
                     lastUpdatedAt = localFolder.lastUpdatedAt,
+                    cursor = localFolder.cursor,
                 )
             }
 
@@ -115,12 +114,6 @@ object FolderController {
     fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
         val block: (MutableRealm) -> Unit = { getFolder(id, it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
-
-    fun updateFolderLastUpdatedAt(id: String, realm: MutableRealm) {
-        updateFolder(id, realm) {
-            it.lastUpdatedAt = Date().toRealmInstant()
-        }
     }
 
     fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int) {

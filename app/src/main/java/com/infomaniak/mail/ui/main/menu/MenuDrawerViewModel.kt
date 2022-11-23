@@ -36,5 +36,4 @@ class MenuDrawerViewModel : ViewModel() {
     val quotas = Transformations.switchMap(MainViewModel.currentMailboxObjectId) {
         liveData(Dispatchers.IO) { if (it != null) emitSource(QuotasController.getQuotasAsync(it).asLiveData()) }
     }
-
 }

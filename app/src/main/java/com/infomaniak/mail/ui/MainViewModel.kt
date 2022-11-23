@@ -21,13 +21,11 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.api.ApiRepository.OFFSET_FIRST_PAGE
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -51,13 +49,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val localSettings by lazy { LocalSettings.getInstance(application) }
-
     val isInternetAvailable = SingleLiveEvent<Boolean>()
-    var canPaginate = true
-    var currentOffset = OFFSET_FIRST_PAGE
     var isDownloadingChanges = MutableLiveData(false)
-
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
 
     fun close() {
@@ -103,8 +96,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun selectFolder(folderId: String) {
         if (folderId != currentFolderId.value) {
             Log.i(TAG, "selectFolder: $folderId")
-            currentOffset = OFFSET_FIRST_PAGE
-
             currentFolderId.postValue(folderId)
 
             currentThreadUid.postValue(null)
@@ -165,8 +156,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
         val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
-        currentOffset = OFFSET_FIRST_PAGE
-        isDownloadingChanges.postValue(true)
         refreshThreads(mailboxUuid, folderId, filter)
     }
 
@@ -218,38 +207,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun refreshThreads(mailboxUuid: String, folderId: String, filter: ThreadFilter = ThreadFilter.ALL) {
-
-        ApiRepository.getThreads(
-            mailboxUuid,
-            folderId,
-            localSettings.threadMode,
-            OFFSET_FIRST_PAGE,
-            filter,
-        ).data?.let { threadsResult ->
-            RealmDatabase.mailboxContent().writeBlocking {
-                canPaginate = ThreadController.refreshThreads(threadsResult, mailboxUuid, folderId, filter, this)
-                FolderController.updateFolderLastUpdatedAt(folderId, this)
-                val isDraftFolder = FolderController.getFolder(folderId, this)?.role == FolderRole.DRAFT
-                if (isDraftFolder) DraftController.cleanOrphans(threadsResult.threads, this)
-            }
-        }
-
-        isDownloadingChanges.postValue(false)
-    }
-
-    fun loadMoreThreads(
+    // TODO: Find a way to use the `filter`
+    private fun refreshThreads(
         mailboxUuid: String,
         folderId: String,
-        offset: Int,
-        filter: ThreadFilter,
+        filter: ThreadFilter = ThreadFilter.ALL,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "Load more threads: $offset")
+
         isDownloadingChanges.postValue(true)
 
-        ApiRepository.getThreads(mailboxUuid, folderId, localSettings.threadMode, offset, filter).data?.let { threadsResult ->
-            canPaginate = ThreadController.loadMoreThreads(threadsResult, mailboxUuid, folderId, offset, filter)
-        }
+        MessageController.fetchMessages(mailboxUuid, folderId)
 
         isDownloadingChanges.postValue(false)
     }
@@ -276,11 +243,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 incrementFolderUnreadCount(currentFolderId, -thread.unseenMessagesCount)
                 deleteMessages(thread.messages)
                 ThreadController.getThread(thread.uid, this)?.let(::delete)
-            } else {
-                // When the swiped animation finished, the Thread has been removed from the UI.
-                // So if the API call failed, we need to put back this Thread in the UI.
-                // Force-refreshing Realm will do that.
-                forceRefreshThreads(filter)
             }
         }
     }

@@ -22,17 +22,17 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.ApiController.ApiMethod.*
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
+import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
+import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult
+import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
 import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.data.models.thread.ThreadsResult
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -40,7 +40,6 @@ import okhttp3.OkHttpClient
 object ApiRepository : ApiRepositoryCore() {
 
     const val PER_PAGE = 50
-    const val OFFSET_FIRST_PAGE = 0
 
     private inline fun <reified T> callApi(
         url: String,
@@ -76,16 +75,6 @@ object ApiRepository : ApiRepositoryCore() {
     // fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
-
-    fun getThreads(
-        mailboxUuid: String,
-        folderId: String,
-        threadMode: ThreadMode,
-        offset: Int,
-        filter: ThreadFilter,
-    ): ApiResponse<ThreadsResult> {
-        return callApi(ApiRoutes.threads(mailboxUuid, folderId, threadMode, offset, filter), GET)
-    }
 
     fun getMessage(messageResource: String): ApiResponse<Message> {
         return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
@@ -156,6 +145,22 @@ object ApiRepository : ApiRepositoryCore() {
     // fun starMessage(star: Boolean, mailboxUuid: String, messageIds: List<String>): ApiResponse<StarMessageResult> = callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
+
+    fun getMessagesUids(mailboxUuid: String, folderId: String, dateSince: String): ApiResponse<GetMessagesUidsResult> {
+        return callApi(url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, dateSince), method = GET)
+    }
+
+    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, signature: String): ApiResponse<GetMessagesUidsDeltaResult> {
+        return callApi(url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, signature), method = GET)
+    }
+
+    fun getMessagesByUids(
+        mailboxUuid: String,
+        folderId: String,
+        messagesUids: List<String>,
+    ): ApiResponse<GetMessagesByUidsResult> {
+        return callApi(url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, messagesUids), method = GET)
+    }
 
     /**
      * RealmLists cannot be null, so they have to be empty when there is no data.

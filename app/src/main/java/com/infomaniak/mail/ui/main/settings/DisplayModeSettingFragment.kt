@@ -28,7 +28,6 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.MESSAGES
 import com.infomaniak.mail.data.LocalSettings.ThreadMode.THREADS
 import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
-import com.infomaniak.mail.utils.notYetImplemented
 
 class DisplayModeSettingFragment : Fragment() {
 
@@ -51,7 +50,6 @@ class DisplayModeSettingFragment : Fragment() {
         check(localSettings.threadMode)
 
         onItemCheckedListener { _, _, threadMode ->
-            notYetImplemented()
             localSettings.threadMode = threadMode as ThreadMode
         }
     }

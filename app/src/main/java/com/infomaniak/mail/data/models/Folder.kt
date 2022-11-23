@@ -69,15 +69,18 @@ class Folder : RealmObject {
     var parentLink: Folder? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     @Transient
     var lastUpdatedAt: RealmInstant? = null
+    @Transient
+    var cursor: String? = null
     //endregion
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun initLocalValues(threads: RealmList<Thread>, parentLink: Folder?, lastUpdatedAt: RealmInstant?) {
+    fun initLocalValues(threads: RealmList<Thread>, parentLink: Folder?, lastUpdatedAt: RealmInstant?, cursor: String?) {
         this.threads = threads
         this.parentLink = parentLink
         this.lastUpdatedAt = lastUpdatedAt
+        this.cursor = cursor
     }
 
     fun getLocalizedName(context: Context): String {

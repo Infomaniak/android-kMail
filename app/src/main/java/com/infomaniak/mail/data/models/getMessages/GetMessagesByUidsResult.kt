@@ -15,26 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.thread
+package com.infomaniak.mail.data.models.getMessages
 
-import kotlinx.serialization.SerialName
+import com.infomaniak.mail.data.models.message.Message
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ThreadsResult(
-    val threads: List<Thread> = emptyList(),
-    @SerialName("total_messages_count")
-    val totalMessagesCount: Int = 0,
-    @SerialName("messages_count")
-    val messagesCount: Int = 0,
-    @SerialName("current_offset")
-    val currentOffset: Int = 0,
-    @SerialName("thread_mode")
-    val threadMode: String = "on",
-    @SerialName("folder_unseen_messages")
-    val folderUnseenMessage: Int = 0,
-    @SerialName("resource_previous")
-    val resourcePrevious: String? = null,
-    @SerialName("resource_next")
-    val resourceNext: String? = null,
+data class GetMessagesByUidsResult(
+    val messages: List<Message>,
 )
