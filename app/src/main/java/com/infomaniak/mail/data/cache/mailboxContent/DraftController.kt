@@ -62,10 +62,6 @@ object DraftController {
     //endregion
 
     //region Get data
-    private fun getDrafts(realm: TypedRealm): RealmResults<Draft> {
-        return getDraftsQuery(realm = realm).find()
-    }
-
     fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
         return getDraftsWithActionsQuery(realm).find()
     }
