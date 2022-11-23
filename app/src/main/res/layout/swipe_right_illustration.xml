@@ -56,7 +56,6 @@
             android:id="@+id/swipeIcon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            app:tint="@color/white"
             tools:ignore="ContentDescription"
             tools:src="@drawable/ic_bin"
             tools:visibility="gone" />

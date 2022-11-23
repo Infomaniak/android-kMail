@@ -35,7 +35,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener.SwipeDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
@@ -45,18 +46,17 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.api.ApiRepository.PER_PAGE
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.toDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -68,6 +68,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private var folderJob: Job? = null
 
@@ -107,9 +108,26 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeContacts()
     }
 
-    override fun onResume() {
+    override fun onResume(): Unit = with(binding) {
         super.onResume()
-        binding.unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
+        unreadCountChip.apply { isCloseIconVisible = isChecked } // TODO: Do we need this? If yes, do we need it HERE?
+
+        updateSwipeActionsAccordingToSettings()
+    }
+
+    private fun updateSwipeActionsAccordingToSettings() {
+        binding.threadsList.apply {
+            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
+            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
+
+            behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
+            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
+
+            val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
+            if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+            val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
+            if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
+        }
     }
 
     override fun onRefresh() {
@@ -122,18 +140,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupAdapter() {
         threadListAdapter = ThreadListAdapter(
+            context = requireContext(),
             threadDensity = LocalSettings.getInstance(requireContext()).threadDensity,
+            folderRole = FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
         )
         binding.threadsList.apply {
             adapter = threadListAdapter
             layoutManager = LinearLayoutManager(context)
-            orientation = DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.UP)
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.DOWN)
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
-            disableDragDirection(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
+            orientation = VERTICAL_LIST_WITH_VERTICAL_DRAGGING
+            disableDragDirection(DirectionFlag.UP)
+            disableDragDirection(DirectionFlag.DOWN)
+            disableDragDirection(DirectionFlag.RIGHT)
+            disableDragDirection(DirectionFlag.LEFT)
             addItemDecoration(HeaderItemDecoration(this, false) { position ->
                 return@HeaderItemDecoration position >= 0 && threadListAdapter.dataSet[position] is String
             })
@@ -205,17 +225,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadsList.swipeListener = object : OnItemSwipeListener<Thread> {
             override fun onItemSwiped(position: Int, direction: SwipeDirection, item: Thread): Boolean {
 
-                val shouldKeepItem = when (direction) {
-                    SwipeDirection.LEFT_TO_RIGHT -> {
-                        threadListViewModel.toggleSeenStatus(thread = item)
-                        true
-                    }
-                    SwipeDirection.RIGHT_TO_LEFT -> {
-                        mainViewModel.deleteThread(thread = item, filter)
-                        false
-                    }
+                val swipeAction = when (direction) {
+                    SwipeDirection.LEFT_TO_RIGHT -> localSettings.swipeRight
+                    SwipeDirection.RIGHT_TO_LEFT -> localSettings.swipeLeft
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
+
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
@@ -227,6 +243,24 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 // The return value of this callback is used to determine if the
                 // swiped item should be kept or deleted from the adapter's list.
                 return shouldKeepItem
+            }
+        }
+    }
+
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
+        return when (swipeAction) {
+            SwipeAction.DELETE -> {
+                mainViewModel.deleteThread(thread, filter)
+                false
+            }
+            SwipeAction.READ_UNREAD -> {
+                threadListViewModel.toggleSeenStatus(thread)
+                true
+            }
+            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
+            else -> {
+                notYetImplemented()
+                true
             }
         }
     }
@@ -310,6 +344,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
             threadListViewModel.currentFolder.value = folder
             displayFolderName(folder)
+            threadListAdapter.updateFolderRole(folder.role)
         }
     }
 
@@ -380,12 +415,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayNoEmailView() = with(binding) {
         threadsList.isGone = true
-        noMailLayoutGroup.isVisible = true
+        emptyState.isVisible = true
     }
 
     private fun displayThreadList() = with(binding) {
         threadsList.isVisible = true
-        noMailLayoutGroup.isGone = true
+        emptyState.isGone = true
     }
 
     private fun firstMessageHasChanged(threads: List<Thread>): Boolean {

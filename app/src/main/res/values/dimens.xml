@@ -23,7 +23,6 @@
     <dimen name="chevronSize">12dp</dimen>
     <dimen name="iconButtonSize">32dp</dimen>
     <dimen name="iconImageSize">20dp</dimen>
-    <dimen name="noMailIlluViewSize">180dp</dimen>
     <dimen name="noMailTextViewSize">300dp</dimen>
     <dimen name="searchViewHeight">40dp</dimen>
     <dimen name="smallCornerRadius">6dp</dimen>

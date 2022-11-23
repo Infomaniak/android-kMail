@@ -140,12 +140,12 @@
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="true">
 
                 <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
@@ -155,76 +155,31 @@
                     android:clipToPadding="false"
                     android:paddingBottom="@dimen/recyclerViewPaddingBottom"
                     android:visibility="gone"
-                    app:behind_swiped_item_bg_color="@color/redDestructiveAction"
-                    app:behind_swiped_item_bg_color_secondary="@color/swipeReadUnread"
-                    app:behind_swiped_item_icon="@drawable/ic_bin"
                     app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     tools:listitem="@layout/cardview_thread_item"
                     tools:visibility="visible" />
 
-                <ImageView
-                    android:id="@+id/illuNoMail"
-                    android:layout_width="@dimen/noMailIlluViewSize"
-                    android:layout_height="@dimen/noMailIlluViewSize"
-                    android:src="@drawable/ic_zero_mail"
-                    app:layout_constraintBottom_toTopOf="@id/noMailTitle"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_chainStyle="packed"
-                    app:tint="?android:attr/colorPrimary"
-                    tools:ignore="ContentDescription" />
+                <com.infomaniak.mail.ui.main.EmptyStateView
+                    android:id="@+id/emptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:description="@string/noEmailDescription"
+                    app:icon="@drawable/ic_empty_state_no_mail"
+                    app:title="@string/noEmailTitle" />
 
-                <TextView
-                    android:id="@+id/noMailTitle"
-                    style="@style/H2"
-                    android:layout_width="@dimen/noMailTextViewSize"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandard"
-                    android:gravity="center"
-                    android:text="@string/noEmailTitle"
-                    app:layout_constraintBottom_toTopOf="@id/noMailDescription"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/illuNoMail"
-                    app:layout_constraintVertical_chainStyle="packed" />
+            </FrameLayout>
 
-                <TextView
-                    android:id="@+id/noMailDescription"
-                    style="@style/Body.Secondary"
-                    android:layout_width="@dimen/noMailTextViewSize"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandardVerySmall"
-                    android:gravity="center"
-                    android:lineSpacingMultiplier="1"
-                    android:text="@string/noEmailDescription"
-                    app:layout_constraintBottom_toTopOf="@id/newMessageFab"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/noMailTitle"
-                    app:layout_constraintVertical_chainStyle="packed" />
-
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/noMailLayoutGroup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="illuNoMail,noMailTitle,noMailDescription"
-                    tools:visibility="gone" />
-
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/newMessageFab"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/marginStandard"
-                    android:layout_marginBottom="@dimen/marginStandard"
-                    android:text="@string/buttonNewMessage"
-                    app:icon="@drawable/ic_pencil"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/newMessageFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/marginStandard"
+        android:layout_marginBottom="@dimen/marginStandard"
+        android:text="@string/buttonNewMessage"
+        app:icon="@drawable/ic_pencil"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

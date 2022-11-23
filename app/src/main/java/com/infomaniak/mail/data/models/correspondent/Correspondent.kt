@@ -37,7 +37,7 @@ interface Correspondent : Parcelable {
 
         return when (words.count()) {
             0 -> ""
-            1 -> words.first().first().toString()
+            1 -> words.single().first().toString()
             else -> "${words.first().first()}${words.last().first()}"
         }.uppercase()
     }
