@@ -40,12 +40,18 @@ class ThreadListViewModel : ViewModel() {
     val isRecoveringFinished = MutableLiveData(true)
     val updatedAtTrigger = MutableLiveData<Unit>()
 
-    val currentFolder = SingleLiveEvent<Folder>()
+    val currentFolder = SingleLiveEvent<Folder?>(null)
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
-    val currentThreads = Transformations.switchMap(PairTrigger(currentFolder, currentFilter)) { (folder, filter) ->
+    val currentThreads = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
         liveData(Dispatchers.IO) {
-            if (folder != null && filter != null) emitSource(ThreadController.getThreads(folder.id, filter).asFlow().asLiveData())
+            if (folder != null) emitSource(ThreadController.getThreads(folder.id, filter).asFlow().asLiveData())
         }
+    }
+
+    private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
+        value = currentFolder.value to currentFilter.value!!
+        addSource(currentFolder) { value = it to value!!.second }
+        addSource(currentFilter) { value = value?.first to it }
     }
 
     fun observeFolder(folderId: String): LiveData<Folder> = liveData(Dispatchers.IO) {
@@ -80,11 +86,4 @@ class ThreadListViewModel : ViewModel() {
         val draftResource: String?,
         val messageUid: String?,
     )
-
-    private class PairTrigger<A, B>(a: LiveData<A>, b: LiveData<B>) : MediatorLiveData<Pair<A?, B?>>() {
-        init {
-            addSource(a) { value = it to b.value }
-            addSource(b) { value = a.value to it }
-        }
-    }
 }
