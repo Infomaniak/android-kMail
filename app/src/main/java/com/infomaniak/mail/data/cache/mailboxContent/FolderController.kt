@@ -73,19 +73,19 @@ object FolderController {
     //endregion
 
     //region Edit data
-    fun update(apiFolders: List<Folder>) {
+    fun update(remoteFolders: List<Folder>) {
         RealmDatabase.mailboxContent().writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Folders: Delete outdated data")
-            deleteOutdatedFolders(apiFolders)
+            deleteOutdatedFolders(remoteFolders)
 
             Log.d(RealmDatabase.TAG, "Folders: Save new data")
-            insertNewData(apiFolders)
+            insertNewData(remoteFolders)
         }
     }
 
-    private fun MutableRealm.deleteOutdatedFolders(apiFolders: List<Folder>) {
-        getFolders(exceptionsFoldersIds = apiFolders.map { it.id }, realm = this).reversed().forEach { folder ->
+    private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {
+        getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
             folder.threads.reversed().forEach { thread ->
                 deleteMessages(thread.messages)
                 delete(thread)
@@ -94,12 +94,12 @@ object FolderController {
         }
     }
 
-    private fun MutableRealm.insertNewData(apiFolders: List<Folder>) {
+    private fun MutableRealm.insertNewData(remoteFolders: List<Folder>) {
 
-        apiFolders.forEach { apiFolder ->
+        remoteFolders.forEach { remoteFolder ->
 
-            getFolder(apiFolder.id, realm = this)?.let { localFolder ->
-                apiFolder.initLocalValues(
+            getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
+                remoteFolder.initLocalValues(
                     threads = localFolder.threads.toRealmList(),
                     parentLink = localFolder.parentLink,
                     lastUpdatedAt = localFolder.lastUpdatedAt,
@@ -107,7 +107,7 @@ object FolderController {
                 )
             }
 
-            copyToRealm(apiFolder, UpdatePolicy.ALL)
+            copyToRealm(remoteFolder, UpdatePolicy.ALL)
         }
     }
 
