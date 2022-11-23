@@ -84,7 +84,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (mailbox.objectId != currentMailboxObjectId.value) {
             Log.i(TAG, "selectMailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
-
             currentMailboxObjectId.postValue(mailbox.objectId)
 
             currentThreadUid.postValue(null)
@@ -131,7 +130,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateCurrentMailboxQuotas() {
-        val mailbox = currentMailboxObjectId.value?.let(MailboxController::getMailbox) ?: return
+        val mailbox = MailboxController.getCurrentMailbox() ?: return
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
@@ -140,8 +139,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
+        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
         if (folderId == currentFolderId.value) return@launch
 
         Log.i(TAG, "openFolder: $folderId")
@@ -152,8 +150,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
         Log.i(TAG, "forceRefreshThreads")
-        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
+        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         refreshThreads(mailboxUuid, folderId)
     }
@@ -218,12 +215,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Delete Thread
     fun deleteThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
 
-        val mailboxObjectId = currentMailboxObjectId.value ?: return@launch
-        val mailboxUuid = MailboxController.getMailbox(mailboxObjectId)?.uuid ?: return@launch
-        val currentFolderId = currentFolderId.value ?: return@launch
+        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
+        val folderId = currentFolderId.value ?: return@launch
 
         RealmDatabase.mailboxContent().writeBlocking {
-            val currentFolderRole = FolderController.getFolder(currentFolderId, realm = this)?.role
+            val currentFolderRole = FolderController.getFolder(folderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
 
             val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
@@ -234,7 +230,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             if (isSuccess) {
-                incrementFolderUnreadCount(currentFolderId, -thread.unseenMessagesCount)
+                incrementFolderUnreadCount(folderId, -thread.unseenMessagesCount)
                 deleteMessages(thread.messages)
                 ThreadController.getThread(thread.uid, realm = this)?.let(::delete)
             }
