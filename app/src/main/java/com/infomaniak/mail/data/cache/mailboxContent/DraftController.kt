@@ -93,15 +93,6 @@ object DraftController {
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
-
-    fun cleanOrphans(messages: List<Message>, realm: MutableRealm) {
-        // TODO: Refactor with LinkingObjects when it's available (https://github.com/realm/realm-kotlin/pull/1021)
-        val messagesUids = messages.map { it.uid }
-        val drafts = getDrafts(realm)
-        drafts.reversed().forEach {
-            if (!messagesUids.contains(it.messageUid)) realm.delete(it)
-        }
-    }
     //endregion
 
     fun deleteDraft(message: Message) {

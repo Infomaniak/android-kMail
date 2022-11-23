@@ -142,15 +142,6 @@ object MessageController {
         } ?: return
 
         handleMessagesUids(messagesUids, folder, mailboxUuid, previousCursor, threadMode)
-
-        // TODO: Do we still need this with the new API routes?
-        // RealmDatabase.mailboxContent().writeBlocking {
-        //     val isDraftFolder = FolderController.getFolder(folderId, realm = this)?.role == FolderRole.DRAFT
-        //     if (isDraftFolder) {
-        //         val messages = getMessages(folderId, realm = this).find()
-        //         DraftController.cleanOrphans(messages, realm = this)
-        //     }
-        // }
     }
 
     private suspend fun handleMessagesUids(
