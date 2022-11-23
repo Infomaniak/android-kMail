@@ -17,13 +17,11 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -33,7 +31,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
-import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.message.Message
@@ -43,6 +40,7 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ModelsUtils.getFormattedThreadSubject
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import kotlin.math.roundToInt
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
@@ -96,11 +94,7 @@ class ThreadFragment : Fragment() {
                 }
             }
         }
-
-        AppCompatResources.getDrawable(context, R.drawable.mail_divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
-        }
-
+        
         toolbarSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(context)
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
@@ -176,6 +170,7 @@ class ThreadFragment : Fragment() {
     private fun onMessagesUpdate(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
         if (messages.isEmpty()) leaveThread()
+        binding.messagesList.setBackgroundResource(if (messages.count() == 1) RCore.color.white else R.color.threadBackground)
     }
 
     private fun observeContacts() {

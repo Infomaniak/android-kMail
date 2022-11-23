@@ -71,7 +71,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
                 android:layout_marginBottom="30dp"
-                app:cardBackgroundColor="@color/threadDensityBackground"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 

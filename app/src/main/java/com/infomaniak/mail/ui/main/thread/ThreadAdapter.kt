@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
@@ -37,6 +38,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
@@ -81,11 +83,29 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
         val message = messages[position]
 
+        root.setStyleIfSingleMail(position)
+
         holder.bindHeader(message)
         holder.bindAttachment(message)
         loadBodyInWebView(message.body)
 
         displayExpandedCollapsedMessage(message)
+    }
+
+    private fun MaterialCardView.setStyleIfSingleMail(position: Int) {
+        @Suppress("LiftReturnOrAssignment")
+        if (itemCount == 1) {
+            setMarginsRelative(0, 0, 0, 0)
+            radius = 0f
+        } else {
+            val vertical = resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt()
+            val horizontal = resources.getDimension(RCore.dimen.marginStandardSmall).toInt()
+            val topMargin = if (position == 0) 2 * vertical else vertical
+            val bottomMargin = if (position == lastIndex()) 2 * vertical else vertical
+            setMarginsRelative(horizontal, topMargin, horizontal, bottomMargin)
+
+            radius = 8.toPx().toFloat()
+        }
     }
 
     private fun ItemMessageBinding.loadBodyInWebView(body: Body?) {
