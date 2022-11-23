@@ -78,7 +78,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    private var lastUnreadCount = 0
     private var canRefreshThreads = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -360,9 +359,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun updateUnreadCount(unreadCount: Int) = with(binding) {
 
-        if (unreadCount == 0 && lastUnreadCount > 0 && threadListViewModel.currentFilter.value != ThreadFilter.ALL) clearFilter()
-
-        lastUnreadCount = unreadCount
+        if (threadListViewModel.currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) clearFilter()
 
         unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
