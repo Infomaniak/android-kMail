@@ -19,17 +19,18 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.app.Application
 import android.content.ClipDescription
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import android.net.Uri
+import androidx.core.net.toUri
+import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.lib.core.utils.guessMimeType
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -37,10 +38,11 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.getFileNameAndSize
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.types.RealmList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -53,6 +55,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val mailBcc = mutableListOf<Recipient>()
     var mailSubject = ""
     var mailBody = ""
+    val mailAttachments = mutableListOf<Attachment>()
 
     private var autoSaveJob: Job? = null
 
@@ -62,8 +65,9 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
+    val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
 
-    private lateinit var currentDraftLocalUuid: String
+    lateinit var currentDraftLocalUuid: String
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
@@ -79,23 +83,23 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                         }
                 } else {
                     createDraft(draftMode, previousMessageUid)
-                }.also {
-                    initUiData(it)
                 }
                 true
             }
 
+            if (isSuccess) initUiData()
             emit(isSuccess)
         }
     }
 
-    private fun MutableRealm.initUiData(draftLocalUuid: String) {
-        DraftController.getDraft(draftLocalUuid, this)?.let { draft ->
-            mailTo.addAll(draft.to.toRecipientsList())
-            mailCc.addAll(draft.cc.toRecipientsList())
-            mailBcc.addAll(draft.bcc.toRecipientsList())
+    private fun initUiData() {
+        DraftController.getDraft(currentDraftLocalUuid)?.let { draft ->
+            mailTo.addAll(draft.to)
+            mailCc.addAll(draft.cc)
+            mailBcc.addAll(draft.bcc)
             mailSubject = draft.subject
             mailBody = draft.body
+            mailAttachments.addAll(draft.attachments)
         }
     }
 
@@ -150,21 +154,57 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             draft.bcc = mailBcc.toRealmList()
             draft.subject = mailSubject
             draft.body = mailBody
+            draft.attachments = mailAttachments.toRealmList()
             draft.action = action
         }
     }
 
+    fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
+        val newAttachments = mutableListOf<Attachment>()
+        var attachmentsSize = mailAttachments.sumOf { it.size }
+
+        uris.forEach { uri ->
+            val availableSpace = FILE_SIZE_25_MB - attachmentsSize
+            val (attachment, hasSizeLimitBeenReached) = importAttachment(uri, availableSpace) ?: return@forEach
+
+            if (hasSizeLimitBeenReached) {
+                importedAttachments.postValue(newAttachments to ImportationResult.FILE_SIZE_TOO_BIG)
+                return@launch
+            }
+
+            attachment?.let {
+                newAttachments.add(it)
+                attachmentsSize += it.size
+            }
+        }
+
+        importedAttachments.postValue(newAttachments to ImportationResult.SUCCESS)
+    }
+
+    private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean>? {
+        val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
+        if (fileSize > availableSpace) return null to true
+
+        return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, currentDraftLocalUuid)?.let { file ->
+            val mimeType = file.path.guessMimeType()
+            Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
+        } ?: (null to false)
+    }
+
     override fun onCleared() {
         DraftsActionsWorker.scheduleWork(getApplication())
+        LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), currentDraftLocalUuid)
         autoSaveJob?.cancel()
         super.onCleared()
     }
 
-    private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
-        return map { Recipient().initLocalValues(it.email, it.name) }
+    enum class ImportationResult {
+        SUCCESS,
+        FILE_SIZE_TOO_BIG,
     }
 
     private companion object {
         const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
+        const val FILE_SIZE_25_MB = 25 * 1024 * 1024
     }
 }

@@ -49,6 +49,7 @@
     <string name="attachmentActionFile">Joindre un fichier</string>
     <string name="attachmentActionPhotoLibrary">Envoyer une photo depuis la photothèque</string>
     <string name="attachmentActionTitle">Ajouter une pièce jointe</string>
+    <string name="attachmentFileLimitReached">Les fichiers que vous essayez d’envoyer dépassent la limite de 25 Mo pour les pièces jointes</string>
     <plurals name="attachmentQuantity">
         <item quantity="one">%d pièce jointe</item>
         <item quantity="other">%d pièces jointes</item>

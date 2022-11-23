@@ -18,7 +18,9 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
+import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
@@ -45,6 +47,7 @@ import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
+import io.sentry.Sentry
 import java.util.*
 
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
@@ -124,6 +127,25 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 }
 
 fun List<Message>.getLastMessageToExecuteAction(): Message = lastOrNull { !it.isDraft } ?: last()
+
+fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
+    return runCatching {
+        val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
+        context.contentResolver.query(this, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val displayName = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
+                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
+                displayName to size
+            } else {
+                Sentry.captureException(Exception("$this has empty cursor"))
+                null
+            }
+        }
+    }.getOrElse { exception ->
+        Sentry.captureException(exception)
+        null
+    }
+}
 
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {

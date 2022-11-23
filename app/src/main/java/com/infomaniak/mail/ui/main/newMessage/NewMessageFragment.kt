@@ -21,10 +21,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
@@ -38,7 +40,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.navArgs
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.setMarginsRelative
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
@@ -48,6 +52,8 @@ import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
+import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
@@ -57,14 +63,18 @@ import com.infomaniak.lib.core.R as RCore
 class NewMessageFragment : Fragment() {
 
     private lateinit var binding: FragmentNewMessageBinding
+    private val newMessageActivityArgs by lazy { requireActivity().navArgs<NewMessageActivityArgs>().value }
     private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
+    private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
+    private lateinit var filePicker: FilePicker
+
     private lateinit var contactAdapter: ContactAdapter
+    private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
     private var mailboxes = emptyList<Mailbox>()
     private var selectedMailboxIndex = 0
-    private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentNewMessageBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -72,6 +82,8 @@ class NewMessageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
+        filePicker = FilePicker(this@NewMessageFragment)
 
         // TODO: Do we want this button?
         // toTransparentButton.setOnClickListener {
@@ -88,6 +100,7 @@ class NewMessageFragment : Fragment() {
         enableAutocomplete(CC)
         enableAutocomplete(BCC)
 
+        attachmentsRecyclerView.adapter = attachmentAdapter
         bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
 
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
@@ -99,7 +112,13 @@ class NewMessageFragment : Fragment() {
 
             when (editorAction) {
                 // TODO: Replace logs with actual code
-                EditorAction.ATTACHMENT -> Log.d("SelectedText", "ATTACHMENT")
+                EditorAction.ATTACHMENT -> {
+                    Log.d("SelectedText", "ATTACHMENT")
+                    filePicker.open { uris ->
+                        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                        newMessageViewModel.importAttachments(uris)
+                    }
+                }
                 EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
                 EditorAction.LINK -> Log.d("SelectedText", "LINK")
                 EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
@@ -109,6 +128,14 @@ class NewMessageFragment : Fragment() {
                 EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH: $isToggled")
                 EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
             }
+        }
+
+        newMessageViewModel.importedAttachments.observe(requireActivity()) { (attachments, importationResult) ->
+            attachmentAdapter.addAll(attachments)
+            attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+            newMessageViewModel.mailAttachments.addAll(attachments)
+
+            if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
 
         subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
@@ -132,7 +159,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndUi() {
-        newMessageViewModel.initDraftAndUi(requireActivity().navArgs<NewMessageActivityArgs>().value)
+        newMessageViewModel.initDraftAndUi(newMessageActivityArgs)
             .observe(viewLifecycleOwner) { isSuccess ->
                 if (isSuccess) {
                     observeContacts()
@@ -143,9 +170,20 @@ class NewMessageFragment : Fragment() {
             }
     }
 
+    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
+        if (itemCountLeft == 0) {
+            TransitionManager.beginDelayedTransition(binding.root)
+            binding.attachmentsRecyclerView.isGone = true
+        }
+        mailAttachments[position].getUploadLocalFile(requireContext(), currentDraftLocalUuid).delete()
+        mailAttachments.removeAt(position)
+    }
+
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
         binding.subjectTextField.setText(mailSubject)
         binding.bodyText.setText(mailBody)
+        attachmentAdapter.addAll(mailAttachments)
+        binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
     }
 
     private fun observeSubject() {

@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.data.models.signature.SignatureEmail
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.LocalStorageUtils
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.Dispatchers
@@ -125,6 +126,7 @@ object RealmDatabase {
     }
 
     private fun deleteUserFiles(context: Context, userId: Int) {
+        LocalStorageUtils.deleteUserData(context, userId)
         context.filesDir.listFiles()?.forEach { file ->
             val isMailboxContent = file.name.startsWith(RealmConfig.mailboxContentDbNamePrefix(userId))
             val isUserInfo = file.name.startsWith(RealmConfig.userInfoDbName(userId))

@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.infomaniak.lib.core.utils.FormatterFileSize
@@ -28,10 +29,12 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter.AttachmentViewHolder
 import com.infomaniak.mail.utils.context
 
 class AttachmentAdapter(
-    private val onAttachmentClicked: ((Attachment) -> Unit)?,
+    private val shouldDisplayCloseButton: Boolean = false,
+    private val onDelete: ((position: Int, itemCountLeft: Int) -> Unit)? = null,
+    private val onAttachmentClicked: ((Attachment) -> Unit)? = null,
 ) : RecyclerView.Adapter<AttachmentViewHolder>() {
 
-    private var attachments: List<Attachment> = emptyList()
+    private var attachments: MutableList<Attachment> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttachmentViewHolder {
         return AttachmentViewHolder(ItemAttachmentBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -41,16 +44,41 @@ class AttachmentAdapter(
         val attachment = attachments[position]
 
         fileName.text = attachment.name
-        // TODO: Find how to add the FileType prefix before the file' size.
-        fileDetails.text = /*item.mimeType + " - " + */FormatterFileSize.formatShortFileSize(context, attachment.size.toLong())
+        fileDetails.text = FormatterFileSize.formatShortFileSize(context, attachment.size.toLong())
         icon.load(attachment.getFileTypeFromExtension().icon)
-        root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
+
+        if (!shouldDisplayCloseButton) {
+            root.setOnClickListener { onAttachmentClicked?.invoke(attachment) }
+        } else {
+            closeButton.apply {
+                setOnClickListener {
+                    val index = attachments.indexOf(attachment)
+
+                    // When clicking on the the attachment in order to delete it, we remove the attachment from the list
+                    // successfully which means that during the fade out animation, if we click again on the little cross the
+                    // attachment is not in the list anymore yet the cross has been clicked. This results in a negative index
+                    // which is why this check is for.
+                    if (index != -1) {
+                        attachments.removeAt(index)
+                        notifyItemRemoved(index)
+
+                        onDelete?.invoke(index, itemCount)
+                    }
+                }
+                isVisible = true
+            }
+        }
     }
 
     override fun getItemCount(): Int = attachments.count()
 
     fun setAttachments(newList: List<Attachment>) {
-        attachments = newList
+        attachments = newList.toMutableList()
+    }
+
+    fun addAll(newAttachments: List<Attachment>) {
+        attachments.addAll(newAttachments)
+        notifyItemRangeInserted(attachments.lastIndex, newAttachments.count())
     }
 
     class AttachmentViewHolder(val binding: ItemAttachmentBinding) : RecyclerView.ViewHolder(binding.root)
