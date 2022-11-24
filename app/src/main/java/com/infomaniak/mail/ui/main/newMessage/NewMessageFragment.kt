@@ -57,6 +57,7 @@ import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
@@ -133,7 +134,6 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.importedAttachments.observe(requireActivity()) { (attachments, importationResult) ->
             attachmentAdapter.addAll(attachments)
             attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-            newMessageViewModel.mailAttachments.addAll(attachments)
 
             if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
         }
@@ -149,6 +149,11 @@ class NewMessageFragment : Fragment() {
         observeSubject()
         observeBody()
         observeMailboxes()
+    }
+
+    override fun onStop() {
+        DraftsActionsWorker.scheduleWork(requireContext(), newMessageViewModel.currentDraftLocalUuid)
+        super.onStop()
     }
 
     fun closeAutocompletion() {
