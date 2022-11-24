@@ -250,42 +250,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/bccPrefix"
-                style="@style/Callout.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/marginStandardMedium"
-                android:text="@string/bccTitle"
-                app:layout_constraintBottom_toBottomOf="parent"
+            <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
+                android:id="@+id/bccField"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/bccItemsChipGroup"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                android:animateLayoutChanges="true"
-                app:chipSpacingVertical="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/bccPrefix"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/bccAutocompleteInput"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-                android:layout_marginTop="@dimen/marginStandardVerySmall"
-                android:backgroundTint="@android:color/transparent"
-                android:imeOptions="actionDone"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                app:layout_constraintBottom_toTopOf="@id/divider4"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/bccPrefix"
-                app:layout_constraintTop_toBottomOf="@id/bccItemsChipGroup" />
+                app:title="@string/bccTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider4"
@@ -296,7 +268,7 @@
                 app:dividerColor="@color/separatorLighter"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bccAutocompleteInput" />
+                app:layout_constraintTop_toBottomOf="@id/bccField" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -353,6 +325,28 @@
                 app:layout_constraintTop_toBottomOf="@id/subjectTextField" />
 
 
+            <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
+                android:id="@+id/testField"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider5"
+                app:title="Test2: " />
+
+
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/divider6T"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
+                app:dividerColor="@color/separatorLighter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/testField" />
+
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/attachmentsRecyclerView"
                 android:layout_width="match_parent"
@@ -365,7 +359,7 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider5"
+                app:layout_constraintTop_toBottomOf="@id/divider6T"
                 tools:listitem="@layout/item_attachment"
                 tools:visibility="visible" />
 
@@ -436,11 +430,8 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bodyLayout"
             tools:itemCount="5"
             tools:listitem="@layout/item_contact" />
-        
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -98,7 +98,7 @@ class NewMessageFragment : Fragment() {
 
         enableAutocomplete(TO)
         enableAutocomplete(CC)
-        enableAutocomplete(BCC)
+        // enableAutocomplete(BCC)
 
         attachmentsRecyclerView.adapter = attachmentAdapter
         bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
@@ -214,6 +214,7 @@ class NewMessageFragment : Fragment() {
         getInputView(field).apply {
 
             doOnTextChanged { text, _, _, _ ->
+                Log.e("gibran", "TO/CC/BCC enableAutocomplete - text: ${text}")
                 if (text?.isNotEmpty() == true) {
                     if ((text.trim().count()) > 0) contactAdapter.filterField(field, text) else contactAdapter.clear()
                     if (!isAutocompletionOpened) openAutocompletionView(field)
@@ -278,6 +279,14 @@ class NewMessageFragment : Fragment() {
         val bccUsedEmails = mailBcc.map { it.email }.toMutableList()
 
         displayChips()
+
+        binding.testField.initContacts(allContacts, mutableListOf())
+        binding.bccField.apply {
+            initContacts(allContacts, mutableListOf())
+            onAutoCompletionToggled { hasOpened ->
+                toggleAutocompletion2(BCC, hasOpened)
+            }
+        }
 
         contactAdapter = ContactAdapter(
             allContacts = allContacts,
@@ -345,13 +354,13 @@ class NewMessageFragment : Fragment() {
     private fun getChipGroup(field: FieldType): ChipGroup = when (field) {
         TO -> binding.toItemsChipGroup
         CC -> binding.ccItemsChipGroup
-        BCC -> binding.bccItemsChipGroup
+        BCC -> binding.ccItemsChipGroup // binding.bccItemsChipGroup
     }
 
     private fun getInputView(field: FieldType): MaterialAutoCompleteTextView = when (field) {
         TO -> binding.toAutocompleteInput
         CC -> binding.ccAutocompleteInput
-        BCC -> binding.bccAutocompleteInput
+        BCC -> binding.ccAutocompleteInput // binding.bccAutocompleteInput
     }
 
     private fun displayChips() {
@@ -388,7 +397,7 @@ class NewMessageFragment : Fragment() {
     private fun refreshChips() = with(binding) {
         toItemsChipGroup.removeAllViews()
         ccItemsChipGroup.removeAllViews()
-        bccItemsChipGroup.removeAllViews()
+        // bccItemsChipGroup.removeAllViews()
         newMessageViewModel.mailTo.forEach { createChip(TO, it) }
         newMessageViewModel.mailCc.forEach { createChip(CC, it) }
         newMessageViewModel.mailBcc.forEach { createChip(BCC, it) }
@@ -441,6 +450,17 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun toggleAutocompletion(field: FieldType? = null) = with(newMessageViewModel) {
+        binding.preFields.isGone = isAutocompletionOpened
+
+        binding.to.isVisible = !isAutocompletionOpened || field == TO
+        binding.cc.isVisible = !isAutocompletionOpened || field == CC
+        binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
+        binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
+
+        binding.postFields.isGone = isAutocompletionOpened
+    }
+
+    private fun toggleAutocompletion2(field: FieldType? = null, isAutocompletionOpened: Boolean) = with(newMessageViewModel) {
         binding.preFields.isGone = isAutocompletionOpened
 
         binding.to.isVisible = !isAutocompletionOpened || field == TO

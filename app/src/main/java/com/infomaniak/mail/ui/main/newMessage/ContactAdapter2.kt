@@ -25,23 +25,17 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
-import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.main.newMessage.ContactAdapter2.ContactViewHolder
 import com.infomaniak.mail.utils.isEmail
-import kotlin.math.log
 
-class ContactAdapter(
-    private val allContacts: List<MergedContact> = emptyList(),
-    private val toUsedEmails: MutableList<String> = mutableListOf(),
-    private val ccUsedEmails: MutableList<String> = mutableListOf(),
-    private val bccUsedEmails: MutableList<String> = mutableListOf(),
-    private val onItemClick: (item: MergedContact, field: FieldType) -> Unit,
-    private val addUnrecognizedContact: (field: FieldType) -> Unit,
+class ContactAdapter2(
+    private val allContacts: List<MergedContact>,
+    private val usedContacts: MutableList<String>,
+    private val onContactClicked: (item: MergedContact) -> Unit,
+    private val onAddUnrecognizedContact: () -> Unit,
 ) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
 
     private var contacts = mutableListOf<MergedContact>()
-    private var currentField: FieldType = TO
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder(ItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -58,7 +52,7 @@ class ContactAdapter(
     override fun getItemCount(): Int = contacts.count()
 
     fun addFirstAvailableItem() {
-        contacts.firstOrNull()?.let(::selectContact) ?: addUnrecognizedContact(currentField)
+        contacts.firstOrNull()?.let(::selectContact) ?: onAddUnrecognizedContact()
     }
 
     fun clear() {
@@ -68,27 +62,22 @@ class ContactAdapter(
 
     private fun orderItemList() = contacts.sortBy { it.name }
 
-    fun getUsedEmails(field: FieldType) = when (field) {
-        TO -> toUsedEmails
-        CC -> ccUsedEmails
-        BCC -> bccUsedEmails
-    }
-
     private fun selectContact(contact: MergedContact) {
-        onItemClick(contact, currentField)
-        getUsedEmails(currentField).add(contact.email)
+        onContactClicked(contact)
+        usedContacts.add(contact.email)
     }
 
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val searchTerm = constraint?.standardize() ?: ""
-                Log.e("gibran", "performFiltering To/Cc/Bcc - searchTerm: ${searchTerm}")
+                Log.e("gibran", "performFiltering - searchTerm: ${searchTerm}")
                 val finalUserList = allContacts
                     .filter { it.name.standardize().contains(searchTerm) || it.email.standardize().contains(searchTerm) }
-                    .filterNot { displayedItem -> getUsedEmails(currentField).any { it == displayedItem.email } }
+                    .filterNot { displayedItem -> usedContacts.any { it == displayedItem.email } }
 
-                Log.e("gibran", "performFiltering To/Cc/Bcc - finalUserList: ${finalUserList}")
+                Log.e("gibran", "performFiltering - finalUserList: ${finalUserList}")
+
                 return FilterResults().apply {
                     values = finalUserList
                     count = finalUserList.size
@@ -97,34 +86,32 @@ class ContactAdapter(
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                 val searchTerm = constraint?.standardize()
-                Log.e("gibran", "publishResults To/Cc/Bcc - searchTerm: ${searchTerm}")
+                Log.e("gibran", "publishResults - searchTerm: ${searchTerm}")
                 contacts = if (searchTerm?.isEmail() == true && !searchTerm.existsInAvailableItems()) {
                     mutableListOf()
                 } else {
                     @Suppress("UNCHECKED_CAST")
                     results.values as MutableList<MergedContact>
                 }
-                Log.e("gibran", "publishResults To/Cc/Bcc - contacts: ${contacts}")
+                Log.e("gibran", "publishResults - contacts: ${contacts}")
                 orderItemList()
                 notifyDataSetChanged()
             }
         }
     }
 
-    fun filterField(selectedField: FieldType, text: CharSequence) {
-        Log.e("gibran", "filterField To/Cc/Bcc: ", );
-        currentField = selectedField
+    fun filterField(text: CharSequence) {
         filter.filter(text)
     }
 
-    fun removeEmail(field: FieldType, email: String) {
-        getUsedEmails(field).remove(email)
+    fun removeEmail(email: String) {
+        usedContacts.remove(email)
     }
 
     private fun CharSequence.standardize(): String = this.toString().trim().lowercase()
 
     private fun String.existsInAvailableItems(): Boolean {
-        return allContacts.any { availableItem -> availableItem.email.standardize() == this }
+        return allContacts.any { availableItem -> availableItem.email.standardize() == this } // TODO : Opti
     }
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
