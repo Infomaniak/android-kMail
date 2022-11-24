@@ -40,7 +40,6 @@ import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.getFileNameAndSize
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.Dispatchers
@@ -174,9 +173,12 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
             attachment?.let {
                 newAttachments.add(it)
+                mailAttachments.add(it)
                 attachmentsSize += it.size
             }
         }
+
+        saveDraftToLocal(DraftAction.SAVE)
 
         importedAttachments.postValue(newAttachments to ImportationResult.SUCCESS)
     }
@@ -192,7 +194,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     override fun onCleared() {
-        DraftsActionsWorker.scheduleWork(getApplication(), currentDraftLocalUuid)
         LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), currentDraftLocalUuid)
         autoSaveJob?.cancel()
         super.onCleared()
