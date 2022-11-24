@@ -310,7 +310,7 @@ class ThreadListAdapter(
             var previousSectionTitle = ""
             val formattedList = mutableListOf<Any>()
 
-            threads.forEachIndexed { _, thread ->
+            threads.forEach { thread ->
                 val sectionTitle = thread.getSectionTitle(context)
                 when {
                     sectionTitle != previousSectionTitle -> {
