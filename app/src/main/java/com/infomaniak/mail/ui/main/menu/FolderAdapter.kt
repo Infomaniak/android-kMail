@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
@@ -83,6 +84,7 @@ class FolderAdapter(
         setOnClickListener { openFolder.invoke(id) }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setFolders(newFolders: List<Folder>, newCurrentFolderId: String?) {
         currentFolderId = newCurrentFolderId
         folders = newFolders
@@ -90,9 +92,16 @@ class FolderAdapter(
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
+        notifyCurrentItem()
         currentFolderId = newCurrentFolderId
-        notifyItemRangeChanged(0, itemCount, Unit)
+        notifyCurrentItem()
     }
+
+    private fun notifyCurrentItem() {
+        val position = folders.indexOfFirst { it.id == currentFolderId }
+        notifyItemChanged(position)
+    }
+
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
 }
