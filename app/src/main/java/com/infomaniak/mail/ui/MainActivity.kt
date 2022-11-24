@@ -18,15 +18,11 @@
 package com.infomaniak.mail.ui
 
 import android.Manifest
-import android.graphics.Color
-import android.graphics.ColorSpace
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
-import androidx.annotation.ColorInt
-import androidx.core.graphics.toColorInt
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
@@ -39,7 +35,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -90,7 +85,6 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.observeRealmMergedContacts()
         requestContactsPermission()
-        launchDraftsActionsWorkIfNeeded()
     }
 
     override fun onBackPressed(): Unit = with(binding) {
@@ -174,11 +168,4 @@ class MainActivity : ThemedActivity() {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
     }
 
-    private fun launchDraftsActionsWorkIfNeeded() {
-        val runningWorkInfosLiveData = DraftsActionsWorker.getRunningWorkInfosLiveData(this)
-        runningWorkInfosLiveData.observe(this) { worksInfoList ->
-            if (worksInfoList.isEmpty()) DraftsActionsWorker.scheduleWork(this)
-            runningWorkInfosLiveData.removeObservers(this)
-        }
-    }
 }

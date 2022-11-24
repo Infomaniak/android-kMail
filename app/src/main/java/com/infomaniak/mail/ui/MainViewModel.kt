@@ -42,6 +42,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -121,6 +122,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             selectFolder(folder.id)
             refreshThreads(mailbox.uuid, folder.id)
         }
+        DraftsActionsWorker.scheduleWork(getApplication())
     }
 
     fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
