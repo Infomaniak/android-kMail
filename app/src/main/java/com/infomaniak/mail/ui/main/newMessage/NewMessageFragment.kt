@@ -423,7 +423,8 @@ class NewMessageFragment : Fragment() {
 
         binding.plusOthersChip.root.text = "+${mailToCount - 1}"
 
-        binding.advancedFields.isVisible = areAdvancedFieldsOpened
+        binding.cc.isVisible = areAdvancedFieldsOpened
+        binding.bcc.isVisible = areAdvancedFieldsOpened
     }
 
     private fun openAutocompletionView(field: FieldType) = with(newMessageViewModel) {
@@ -440,24 +441,22 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun toggleAutocompletion(field: FieldType? = null) = with(newMessageViewModel) {
-        binding.fromGroup.isGone = isAutocompletionOpened
-        binding.subjectGroup.isGone = isAutocompletionOpened
-        binding.bodyLayout.isGone = isAutocompletionOpened
-        binding.separatedSignature.isGone = isAutocompletionOpened
-        binding.chevron.isGone = isAutocompletionOpened
+        binding.preFields.isGone = isAutocompletionOpened
 
-        binding.toGroup.isVisible = !isAutocompletionOpened || field == TO
-        binding.ccGroup.isVisible = !isAutocompletionOpened || field == CC
-        binding.bccGroup.isVisible = !isAutocompletionOpened || field == BCC
-
+        binding.to.isVisible = !isAutocompletionOpened || field == TO
+        binding.cc.isVisible = !isAutocompletionOpened || field == CC
+        binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
         binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
+
+        binding.postFields.isGone = isAutocompletionOpened
     }
 
     private fun openAdvancedFields() = with(newMessageViewModel) {
 
         updateToAutocompleteInputLayout()
 
-        binding.advancedFields.isVisible = areAdvancedFieldsOpened
+        binding.cc.isVisible = areAdvancedFieldsOpened
+        binding.bcc.isVisible = areAdvancedFieldsOpened
         binding.chevron.toggleChevron(!areAdvancedFieldsOpened)
 
         refreshChips()
@@ -469,14 +468,14 @@ class NewMessageFragment : Fragment() {
 
         fun updateToAutocompleteInputConstraints() {
             ConstraintSet().apply {
-                clone(constraintLayout)
+                clone(to)
                 val topView = when {
                     newMessageViewModel.areAdvancedFieldsOpened -> R.id.toItemsChipGroup
                     newMessageViewModel.mailTo.isEmpty() -> R.id.divider1
                     else -> R.id.singleChipGroup
                 }
                 connect(R.id.toAutocompleteInput, ConstraintSet.TOP, topView, ConstraintSet.BOTTOM, 0)
-                applyTo(constraintLayout)
+                applyTo(to)
             }
         }
 
