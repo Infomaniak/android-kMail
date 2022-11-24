@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
-import com.infomaniak.mail.utils.toRecipientsList
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.ext.toRealmList
@@ -114,6 +113,10 @@ class Thread : RealmObject {
     }
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
+
+    private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
+        return map { Recipient().initLocalValues(it.email, it.name) }
+    }
 
     enum class ThreadFilter(@IdRes val filterNameRes: Int) {
         ALL(R.string.searchAllMessages),
