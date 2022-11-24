@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.MainViewModel
+import io.realm.kotlin.ext.isValid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -51,7 +52,9 @@ class ThreadListViewModel : ViewModel() {
 
     val currentThreads = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
         liveData(Dispatchers.IO) {
-            if (folder != null) emitSource(ThreadController.getThreads(folder.id, filter).asFlow().asLiveData())
+            if (folder != null && folder.isValid()) {
+                emitSource(ThreadController.getThreads(folder.id, filter).asFlow().asLiveData())
+            }
         }
     }
 
