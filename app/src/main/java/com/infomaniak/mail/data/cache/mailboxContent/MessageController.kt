@@ -54,7 +54,7 @@ object MessageController {
         return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
     }
 
-    fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
+    private fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
         return (realm ?: RealmDatabase.mailboxContent()).query()
     }
 
@@ -65,6 +65,10 @@ object MessageController {
     //endregion
 
     //region Get data
+    fun getMessages(realm: TypedRealm? = null): RealmResults<Message> {
+        return getMessagesQuery(realm).find()
+    }
+
     private fun getMessages(uids: List<String>, realm: TypedRealm? = null): RealmResults<Message> {
         return getMessagesQuery(uids, realm).find()
     }

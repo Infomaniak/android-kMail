@@ -36,7 +36,7 @@ import io.realm.kotlin.query.Sort
 object ThreadController {
 
     //region Queries
-    fun getThreadsQuery(realm: TypedRealm? = null): RealmQuery<Thread> {
+    private fun getThreadsQuery(realm: TypedRealm? = null): RealmQuery<Thread> {
         return (realm ?: RealmDatabase.mailboxContent()).query()
     }
 
@@ -106,6 +106,10 @@ object ThreadController {
 
     fun deleteThread(uid: String) {
         RealmDatabase.mailboxContent().writeBlocking { getThread(uid, realm = this)?.let(::delete) }
+    }
+
+    fun deleteAllThreads(realm: MutableRealm) {
+        realm.delete(getThreads(realm))
     }
     //endregion
 
