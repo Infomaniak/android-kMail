@@ -94,7 +94,7 @@ class ThreadFragment : Fragment() {
                 }
             }
         }
-        
+
         toolbarSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(context)
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
