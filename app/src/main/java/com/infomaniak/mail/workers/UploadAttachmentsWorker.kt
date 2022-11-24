@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.work.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.ApiController.json
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.api.ApiRoutes
@@ -59,23 +60,29 @@ class UploadAttachmentsWorker(appContext: Context, params: WorkerParameters) : C
         if (runAttemptCount > MAX_RETRY) return@withContext Result.failure()
 
         runCatching {
+            if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser() ?: return@withContext Result.failure()
             // Get input data
-            val localDraftUuid = inputData.getString(LOCAL_DRAFT_UUID_KEY) ?: return@withContext Result.failure()
+            val localDraftUuid = inputData.getString(LOCAL_DRAFT_UUID_KEY)
             val mailboxObjectId = inputData.getString(MAILBOX_OBJECT_ID_KEY) ?: return@withContext Result.failure()
             userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
 
-            // Get needed realm data
-            val draft = DraftController.getDraft(localDraftUuid, mailboxContentRealm) ?: return@runCatching Result.failure()
             mailbox = MailboxController.getMailbox(mailboxObjectId, mailboxInfoRealm) ?: return@runCatching Result.failure()
-
-            // Start upload
             okHttpClient = KMailHttpClient.getHttpClient(userId)
-            startUploads(draft, localDraftUuid)
+
+            // Start uploads
+            if (localDraftUuid == null) {
+                uploadAllPendingDraftsAttachments()
+            } else {
+                uploadCurrentDraftAttachments(localDraftUuid)
+            }
+
+            Result.success()
 
         }.getOrElse { exception ->
             exception.printStackTrace()
             when (exception) {
                 is CancellationException -> Result.failure()
+                is ApiController.NetworkException -> Result.retry()
                 else -> {
                     Sentry.captureException(exception)
                     Result.failure()
@@ -87,13 +94,22 @@ class UploadAttachmentsWorker(appContext: Context, params: WorkerParameters) : C
         }
     }
 
-    private fun startUploads(draft: Draft, localDraftUuid: String): Result {
+    private fun uploadAllPendingDraftsAttachments() {
+        DraftController.getDraftsWithActions(mailboxContentRealm).forEach { draft -> startUploads(draft) }
+    }
+
+    private fun uploadCurrentDraftAttachments(localDraftUuid: String) {
+        val draft = DraftController.getDraft(localDraftUuid, mailboxContentRealm) ?: throw CancellationException()
+        startUploads(draft)
+    }
+
+    private fun startUploads(draft: Draft): Result {
         getNotUploadedAttachments(draft).forEach { attachment ->
             try {
-                attachment.startUpload(localDraftUuid)
+                attachment.startUpload(draft.localUuid)
             } catch (exception: Exception) {
                 exception.printStackTrace()
-                if (exception.isNetworkException()) return Result.retry()
+                if (exception.isNetworkException()) throw ApiController.NetworkException()
                 Sentry.captureException(exception)
             }
         }
@@ -143,7 +159,7 @@ class UploadAttachmentsWorker(appContext: Context, params: WorkerParameters) : C
         private const val MAILBOX_OBJECT_ID_KEY = "mailboxObjectId"
         private const val USER_ID_KEY = "userId"
 
-        fun getWorkRequest(localDraftUuid: String): OneTimeWorkRequest? {
+        fun getWorkRequest(localDraftUuid: String? = null): OneTimeWorkRequest? {
             val mailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return null
 
             val inputData = workDataOf(
@@ -154,7 +170,7 @@ class UploadAttachmentsWorker(appContext: Context, params: WorkerParameters) : C
 
             return OneTimeWorkRequestBuilder<UploadAttachmentsWorker>()
                 .addTag(TAG)
-                .addTag(localDraftUuid)
+                .apply { localDraftUuid?.let { addTag(it) } }
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setInputData(inputData)
                 .setExpeditedWorkRequest()
