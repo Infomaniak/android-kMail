@@ -22,7 +22,6 @@ import com.infomaniak.lib.core.utils.monthsAgo
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.getThreadsQuery
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
@@ -33,10 +32,11 @@ import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.toRealmSet
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.types.RealmSet
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.min
@@ -73,8 +73,8 @@ object MessageController {
         return getMessagesQuery(uids, realm).find()
     }
 
-    fun getMessages(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
-        return getMessagesQuery(folderId, realm)
+    fun getMessages(folderId: String, realm: TypedRealm? = null): RealmResults<Message> {
+        return getMessagesQuery(folderId, realm).find()
     }
 
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
@@ -116,7 +116,7 @@ object MessageController {
     //endregion
 
     //region New API routes
-    suspend fun fetchCurrentFolderMessages(mailboxUuid: String, folderId: String, threadMode: ThreadMode) {
+    fun fetchCurrentFolderMessages(mailboxUuid: String, folderId: String, threadMode: ThreadMode) {
 
         val folder = FolderController.getFolder(folderId) ?: return
 
@@ -136,7 +136,7 @@ object MessageController {
         }
     }
 
-    private suspend fun fetchFolderMessages(mailboxUuid: String, folder: Folder, threadMode: ThreadMode) {
+    private fun fetchFolderMessages(mailboxUuid: String, folder: Folder, threadMode: ThreadMode) {
         val previousCursor = folder.cursor
 
         val messagesUids = if (previousCursor == null) {
@@ -148,7 +148,7 @@ object MessageController {
         handleMessagesUids(messagesUids, folder, mailboxUuid, previousCursor, threadMode)
     }
 
-    private suspend fun handleMessagesUids(
+    private fun handleMessagesUids(
         messagesUids: MessagesUids,
         folder: Folder,
         mailboxUuid: String,
@@ -161,12 +161,12 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        add(addedShortUids, folder, mailboxUuid, threadMode)
+        handleAddedUids(addedShortUids, folder, mailboxUuid, threadMode)
 
         RealmDatabase.mailboxContent().writeBlocking {
 
-            delete(deletedUids, threadMode)
-            update(updatedMessages, folder.id)
+            handleDeletedUids(deletedUids, threadMode)
+            handleUpdatedUids(updatedMessages, folder.id)
 
             FolderController.getFolder(folder.id, realm = this)?.let {
                 if (previousCursor != null) it.unreadCount = unreadCount
@@ -176,7 +176,7 @@ object MessageController {
         }
     }
 
-    private suspend fun add(
+    private fun handleAddedUids(
         shortUids: List<String>,
         folder: Folder,
         mailboxUuid: String,
@@ -214,9 +214,9 @@ object MessageController {
         messages.forEach { message ->
 
             val messageIds = getMessageIds(message)
-            message.messageIds = messageIds.toRealmSet()
+            message.messageIds = messageIds
 
-            val thread = allThreads.find { it.messagesIds.intersect(messageIds).isNotEmpty() }
+            val thread = allThreads.find { it.messagesIds.any { id -> messageIds.contains(id) } }
                 ?: run { message.toThread().also(allThreads::add) }
 
             thread.addMessage(message)
@@ -242,7 +242,7 @@ object MessageController {
         }
     }
 
-    private fun MutableRealm.delete(uids: List<String>, threadMode: ThreadMode) {
+    private fun MutableRealm.handleDeletedUids(uids: List<String>, threadMode: ThreadMode) {
         if (uids.isNotEmpty()) {
 
             val deletedMessages = getMessages(uids, realm = this)
@@ -256,39 +256,31 @@ object MessageController {
                         thread.removeMessage(message)
                     }
                 }
-                ThreadMode.MESSAGES -> delete(getThreadsQuery(uids))
+                ThreadMode.MESSAGES -> delete(ThreadController.getThreads(uids, realm = this))
             }
 
             deleteMessages(deletedMessages)
         }
     }
 
-    private fun MutableRealm.update(messageFlags: List<MessageFlags>, folderId: String) {
+    private fun MutableRealm.handleUpdatedUids(messageFlags: List<MessageFlags>, folderId: String) {
         messageFlags.forEach { flags ->
 
             val uid = flags.shortUid.toLongUid(folderId)
             getMessage(uid, realm = this)?.let { message ->
-
-                message.apply {
-                    seen = flags.seen
-                    isFavorite = flags.isFavorite
-                    answered = flags.answered
-                    forwarded = flags.forwarded
-                    scheduled = flags.scheduled
-                }
-
+                message.updateFlags(flags)
                 message.threadUid?.let { ThreadController.getThread(it, realm = this)?.recomputeThread() }
             }
         }
     }
 
-    private fun getMessageIds(message: Message): Set<String> {
+    private fun getMessageIds(message: Message): RealmSet<String> {
 
         fun parseMessagesIds(messageId: String): List<String> {
             return messageId.removePrefix("<").removeSuffix(">").split("><")
         }
 
-        return mutableSetOf<String>().apply {
+        return realmSetOf<String>().apply {
             addAll(parseMessagesIds(message.msgId))
             message.references?.let { addAll(parseMessagesIds(it)) }
             message.inReplyTo?.let { addAll(parseMessagesIds(it)) }
@@ -323,8 +315,8 @@ object MessageController {
     }
 
     private fun getUniquesUidsInReverse(folder: Folder, remoteUids: List<String>): List<String> {
-        val localUids = folder.id.let(ThreadController::getThreads).find().map { it.uid.toShortUid() }
-        val uniqueUids = remoteUids - localUids.intersect(remoteUids.toSet())
+        val localUids = folder.id.let(ThreadController::getThreads).map { it.uid.toShortUid() }
+        val uniqueUids = remoteUids.subtract(localUids.intersect(remoteUids.toSet()))
         return uniqueUids.reversed()
     }
 

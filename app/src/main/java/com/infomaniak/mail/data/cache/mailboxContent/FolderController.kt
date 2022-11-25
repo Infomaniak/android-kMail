@@ -22,7 +22,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -92,13 +91,8 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteLocalFolder(folder: Folder) {
-
-        val messages = MessageController.getMessages(folder.id, realm = this).find()
-        deleteMessages(messages)
-
-        val threadsQuery = ThreadController.getThreads(folder.id, realm = this).query("${Thread::foldersIds.name}.@count == 1")
-        delete(threadsQuery)
-
+        deleteMessages(MessageController.getMessages(folder.id, realm = this))
+        ThreadController.deleteThreadsOnlyInThisFolder(folder.id, realm = this)
         delete(folder)
     }
 

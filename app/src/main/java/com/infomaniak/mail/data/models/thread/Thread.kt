@@ -69,8 +69,8 @@ class Thread : RealmObject {
 
     fun recomputeThread() {
 
+        // Clean the Thread before updating it
         messages.sortBy { it.date }
-
         unseenMessagesCount = 0
         size = 0
         hasAttachments = false
@@ -80,6 +80,7 @@ class Thread : RealmObject {
         forwarded = false
         scheduled = false
 
+        // Update the Thread depending on its Messages data
         messages.forEach { message ->
             foldersIds += message.folderId
             messagesIds += message.messageIds
@@ -94,10 +95,10 @@ class Thread : RealmObject {
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true
         }
-
         uniqueMessagesCount = messages.count() // TODO: Handle duplicates
         date = messages.last().date!! // TODO: Remove this, and compute the Date in the UI only
 
+        // Remove duplicates in Recipients lists
         from = from.toRecipientsList().distinct().toRealmList()
         to = to.toRecipientsList().distinct().toRealmList()
     }

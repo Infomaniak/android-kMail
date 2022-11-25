@@ -40,14 +40,18 @@ object ThreadController {
         return (realm ?: RealmDatabase.mailboxContent()).query()
     }
 
-    fun getThreadsQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
+    private fun getThreadsQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
         val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
     }
 
-    private fun getThreadsQuery(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
+    private fun getThreadsQuery(
+        folderId: String,
+        filter: ThreadFilter = ThreadFilter.ALL,
+        realm: TypedRealm? = null
+    ): RealmQuery<Thread> {
 
-        val byFolderId = "ANY ${Thread::foldersIds.name} == '$folderId'"
+        val byFolderId = "${Thread::foldersIds.name} == '$folderId'"
         val query = (realm ?: RealmDatabase.mailboxContent())
             .query<Thread>(byFolderId)
             .sort(Thread::date.name, Sort.DESCENDING)
@@ -77,8 +81,12 @@ object ThreadController {
         return getThreadsQuery(realm).find()
     }
 
-    fun getThreads(folderId: String, filter: ThreadFilter = ThreadFilter.ALL, realm: TypedRealm? = null): RealmQuery<Thread> {
-        return getThreadsQuery(folderId, filter, realm)
+    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
+        return getThreadsQuery(uids, realm)
+    }
+
+    fun getThreads(folderId: String, filter: ThreadFilter = ThreadFilter.ALL, realm: TypedRealm? = null): RealmResults<Thread> {
+        return getThreadsQuery(folderId, filter, realm).find()
     }
 
     fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
@@ -110,6 +118,10 @@ object ThreadController {
 
     fun deleteAllThreads(realm: MutableRealm) {
         realm.delete(getThreads(realm))
+    }
+
+    fun deleteThreadsOnlyInThisFolder(folderId: String, realm: MutableRealm) {
+        realm.delete(getThreadsQuery(folderId, realm = realm).query("${Thread::foldersIds.name}.@count == 1"))
     }
     //endregion
 

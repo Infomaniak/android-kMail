@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
+import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
@@ -140,6 +141,14 @@ class Message : RealmObject {
         this.threadUid = threadUid
 
         return this
+    }
+
+    fun updateFlags(flags: MessageFlags) {
+        seen = flags.seen
+        isFavorite = flags.isFavorite
+        answered = flags.answered
+        forwarded = flags.forwarded
+        scheduled = flags.scheduled
     }
 
     fun toThread() = Thread().apply {
