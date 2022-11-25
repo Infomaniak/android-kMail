@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
+import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.RealmInstant
@@ -104,8 +105,6 @@ class Message : RealmObject {
     var hasUnsubscribeLink: Boolean = false
     @Transient
     var messageIds: RealmSet<String> = realmSetOf()
-    @Transient
-    var threadUid: String? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
     //endregion
 
     //region UI data (Ignore & Transient)
@@ -122,6 +121,8 @@ class Message : RealmObject {
 
     inline val shortUid get() = uid.split("@").first().toLong()
 
+    val parentThread by backlinks(Thread::messages)
+
     var priority
         get() = enumValueOfOrNull<Priority>(_priority)
         set(value) {
@@ -134,13 +135,6 @@ class Message : RealmObject {
         VALID,
         NOT_VALID,
         NOT_SIGNED,
-    }
-
-    fun initLocalValues(messageIds: RealmSet<String>, threadUid: String?): Message {
-        this.messageIds = messageIds
-        this.threadUid = threadUid
-
-        return this
     }
 
     fun updateFlags(flags: MessageFlags) {

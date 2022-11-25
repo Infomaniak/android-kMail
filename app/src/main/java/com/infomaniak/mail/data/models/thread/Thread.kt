@@ -57,7 +57,6 @@ class Thread : RealmObject {
     var messagesIds: RealmSet<String> = realmSetOf()
 
     fun addMessage(message: Message) {
-        message.threadUid = uid
         messages.add(message)
         messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
     }

@@ -249,11 +249,12 @@ object MessageController {
 
             when (threadMode) {
                 ThreadMode.THREADS -> deletedMessages.forEach { message ->
-                    val thread = ThreadController.getThread(message.threadUid!!, realm = this)!!
-                    if (thread.uniqueMessagesCount == 1) {
-                        delete(thread)
-                    } else {
-                        thread.removeMessage(message)
+                    message.parentThread.firstOrNull()?.let { thread ->
+                        if (thread.uniqueMessagesCount == 1) {
+                            delete(thread)
+                        } else {
+                            thread.removeMessage(message)
+                        }
                     }
                 }
                 ThreadMode.MESSAGES -> delete(ThreadController.getThreads(uids, realm = this))
@@ -269,7 +270,7 @@ object MessageController {
             val uid = flags.shortUid.toLongUid(folderId)
             getMessage(uid, realm = this)?.let { message ->
                 message.updateFlags(flags)
-                message.threadUid?.let { ThreadController.getThread(it, realm = this)?.recomputeThread() }
+                message.parentThread.firstOrNull()?.recomputeThread()
             }
         }
     }
