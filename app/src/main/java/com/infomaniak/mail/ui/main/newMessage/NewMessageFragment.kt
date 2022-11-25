@@ -186,10 +186,12 @@ class NewMessageFragment : Fragment() {
         binding.subjectTextField.setText(mailSubject)
         binding.bodyText.setText(mailBody)
         mailSignature?.let {
-            binding.signatureWebView.apply {
-                isVisible = true
-                loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, "utf-8", "")
+            binding.signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, "utf-8", "")
+            binding.removeSignature.setOnClickListener {
+                mailSignature = null
+                binding.separatedSignature.isVisible = false
             }
+            binding.separatedSignature.isVisible = true
         }
     }
 
@@ -435,7 +437,7 @@ class NewMessageFragment : Fragment() {
         binding.fromGroup.isGone = isAutocompletionOpened
         binding.subjectGroup.isGone = isAutocompletionOpened
         binding.bodyLayout.isGone = isAutocompletionOpened
-        binding.signatureWebView.isGone = isAutocompletionOpened
+        binding.separatedSignature.isGone = isAutocompletionOpened
         binding.chevron.isGone = isAutocompletionOpened
 
         binding.toGroup.isVisible = !isAutocompletionOpened || field == TO

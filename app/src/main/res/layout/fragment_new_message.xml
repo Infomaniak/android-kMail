@@ -394,10 +394,34 @@
             android:id="@+id/signatureWebView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bodyLayout" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/removeSignature"
+            style="@style/IconButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:insetLeft="@dimen/marginStandardVerySmall"
+            android:insetTop="@dimen/marginStandardVerySmall"
+            android:insetRight="@dimen/marginStandardVerySmall"
+            android:insetBottom="@dimen/marginStandardVerySmall"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="@dimen/marginStandardVerySmall"
+            app:icon="@drawable/ic_close"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toEndOf="@id/signatureWebView"
+            app:layout_constraintTop_toTopOf="@id/signatureWebView" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/separatedSignature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="signatureWebView,removeSignature"
+            tools:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/autoCompleteRecyclerView"

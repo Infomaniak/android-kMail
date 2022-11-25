@@ -112,7 +112,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         val doc = Jsoup.parse(mailBody)
         return doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).lastOrNull()?.let {
             it.remove()
-            doc.body().html() to it.outerHtml()
+            val signature = if (it.html().isBlank()) null else it.outerHtml()
+            doc.body().html() to signature
         } ?: (mailBody to null)
     }
 
