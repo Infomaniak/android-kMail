@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
+import android.content.ClipDescription
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.Spanned
@@ -180,10 +181,16 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
-        binding.subjectTextField.setText(mailSubject)
-        binding.bodyText.setText(mailBody)
         attachmentAdapter.addAll(mailAttachments)
         binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+        binding.subjectTextField.setText(mailSubject)
+        binding.bodyText.setText(mailBody)
+        mailSignature?.let {
+            binding.signatureWebView.apply {
+                isVisible = true
+                loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, "utf-8", "")
+            }
+        }
     }
 
     private fun observeSubject() {
@@ -428,6 +435,7 @@ class NewMessageFragment : Fragment() {
         binding.fromGroup.isGone = isAutocompletionOpened
         binding.subjectGroup.isGone = isAutocompletionOpened
         binding.bodyLayout.isGone = isAutocompletionOpened
+        binding.signatureWebView.isGone = isAutocompletionOpened
         binding.chevron.isGone = isAutocompletionOpened
 
         binding.toGroup.isVisible = !isAutocompletionOpened || field == TO

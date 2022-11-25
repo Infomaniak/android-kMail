@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -55,6 +56,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val mailBcc = mutableListOf<Recipient>()
     var mailSubject = ""
     var mailBody = ""
+    var mailSignature: String? = null
     val mailAttachments = mutableListOf<Attachment>()
 
     private var autoSaveJob: Job? = null
@@ -98,9 +100,20 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             mailCc.addAll(draft.cc)
             mailBcc.addAll(draft.bcc)
             mailSubject = draft.subject
-            mailBody = draft.body
             mailAttachments.addAll(draft.attachments)
+
+            val (body, signature) = splitSignatureFromBody(draft.body)
+            mailBody = body
+            mailSignature = signature
         }
+    }
+
+    private fun splitSignatureFromBody(mailBody: String): Pair<String, String?> {
+        val doc = Jsoup.parse(mailBody)
+        return doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).lastOrNull()?.let {
+            it.remove()
+            doc.body().html() to it.outerHtml()
+        } ?: (mailBody to null)
     }
 
     private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
@@ -153,7 +166,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             draft.cc = mailCc.toRealmList()
             draft.bcc = mailBcc.toRealmList()
             draft.subject = mailSubject
-            draft.body = mailBody
+            draft.body = mailBody + (mailSignature ?: "")
             draft.attachments = mailAttachments.toRealmList()
             draft.action = action
         }
@@ -206,5 +219,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private companion object {
         const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
         const val FILE_SIZE_25_MB = 25 * 1024 * 1024
+
+        const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
     }
 }

@@ -26,7 +26,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/fromPrefix"
@@ -387,9 +387,17 @@
                 android:background="@color/white"
                 android:gravity="top"
                 android:hint="@string/newMessagePlaceholderTitle"
-                android:minHeight="200dp"
                 android:textColor="@color/orca" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <WebView
+            android:id="@+id/signatureWebView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bodyLayout" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/autoCompleteRecyclerView"
