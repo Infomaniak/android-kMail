@@ -160,10 +160,9 @@ object DraftController {
     }
 
     fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
-
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft)) {
-                if (isSuccess()) {
+                if (data != null) {
                     updateDraft(draft.localUuid, realm) {
                         it.remoteUuid = data?.draftRemoteUuid
                         it.messageUid = data?.messageUid

@@ -156,19 +156,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateAddressBooks() {
-        with(ApiRepository.getAddressBooks()) {
-            if (isSuccess()) AddressBookController.update(data?.addressBooks ?: emptyList())
-        }
+        ApiRepository.getAddressBooks().data?.addressBooks?.let(AddressBookController::update)
     }
 
     private fun updateContacts() {
-        with(ApiRepository.getContacts()) {
-            if (isSuccess()) {
-                val apiContacts = data ?: emptyList()
-                val phoneMergedContacts = getPhoneContacts(getApplication())
-                mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
-                MergedContactController.update(phoneMergedContacts.values.toList())
-            }
+        ApiRepository.getContacts().data?.let { apiContacts ->
+            val phoneMergedContacts = getPhoneContacts(getApplication())
+            mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
+            MergedContactController.update(phoneMergedContacts.values.toList())
         }
     }
 
@@ -183,23 +178,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateMailboxes() {
-        with(ApiRepository.getMailboxes()) {
-            if (isSuccess()) MailboxController.update(
-                remoteMailboxes = data?.map { it.initLocalValues(AccountUtils.currentUserId) } ?: emptyList(),
+        ApiRepository.getMailboxes().data?.let { mailboxes ->
+            MailboxController.update(
+                remoteMailboxes = mailboxes.map { it.initLocalValues(AccountUtils.currentUserId) },
                 userId = AccountUtils.currentUserId,
             )
         }
     }
 
     private fun updateSignatures(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        with(ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName)) {
-            if (isSuccess()) SignatureController.update(data?.signatures ?: emptyList())
-        }
+        ApiRepository.getSignatures(mailbox.hostingId, mailbox.mailboxName).data?.signatures?.let(SignatureController::update)
     }
 
     private fun updateFolders(mailbox: Mailbox) {
-        with(ApiRepository.getFolders(mailbox.uuid)) {
-            if (isSuccess()) FolderController.update(data?.formatFoldersListWithAllChildren() ?: emptyList())
+        ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
+            FolderController.update(folders.formatFoldersListWithAllChildren())
         }
     }
 

@@ -189,30 +189,22 @@ object MessageController {
     private fun String.toShortUid(): String = substringBefore('@')
 
     private fun getMessagesUids(mailboxUuid: String, folderId: String): MessagesUids? {
-        return with(ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo())) {
-            if (isSuccess()) with(data!!) {
-                MessagesUids(
-                    addedShortUids = addedShortUids,
-                    cursor = cursor,
-                )
-            } else {
-                null
-            }
+        return ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo()).data?.let {
+            MessagesUids(
+                addedShortUids = it.addedShortUids,
+                cursor = it.cursor,
+            )
         }
     }
 
     private fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, previousCursor: String): MessagesUids? {
-        return with(ApiRepository.getMessagesUidsDelta(mailboxUuid, folderId, previousCursor)) {
-            if (isSuccess()) with(data!!) {
-                MessagesUids(
-                    addedShortUids = addedShortUids,
-                    deletedUids = deletedShortUids.map { it.toLongUid(folderId) },
-                    updatedMessages = updatedMessages,
-                    cursor = cursor,
-                )
-            } else {
-                null
-            }
+        return ApiRepository.getMessagesUidsDelta(mailboxUuid, folderId, previousCursor).data?.let {
+            MessagesUids(
+                addedShortUids = it.addedShortUids,
+                deletedUids = it.deletedShortUids.map { shortUid -> shortUid.toLongUid(folderId) },
+                updatedMessages = it.updatedMessages,
+                cursor = it.cursor,
+            )
         }
     }
 
