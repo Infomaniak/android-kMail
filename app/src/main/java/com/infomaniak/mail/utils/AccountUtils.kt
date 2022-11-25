@@ -18,17 +18,11 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
-import com.infomaniak.lib.core.auth.TokenInterceptor
-import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
-import com.infomaniak.lib.login.ApiToken
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -41,13 +35,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import java.util.concurrent.TimeUnit
 import io.sentry.protocol.User as SentryUser
 
-object AccountUtils : CredentialManager {
+object AccountUtils : CredentialManager() {
 
-    private lateinit var userDatabase: UserDatabase
+    override lateinit var userDatabase: UserDatabase
 
     var reloadApp: (() -> Unit)? = null
 
@@ -57,7 +49,7 @@ object AccountUtils : CredentialManager {
         Sentry.setUser(SentryUser().apply { id = currentUserId.toString() })
     }
 
-    var currentUser: User? = null
+    override var currentUser: User? = null
         set(user) {
             field = user
             currentUserId = user?.id ?: AppSettings.DEFAULT_ID
@@ -68,7 +60,7 @@ object AccountUtils : CredentialManager {
             InfomaniakCore.bearerToken = user?.apiToken?.accessToken.toString()
         }
 
-    var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
+    override var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
             RealmDatabase.closeUserInfo()
@@ -133,10 +125,6 @@ object AccountUtils : CredentialManager {
         AppSettingsController.removeAppSettings()
         LocalSettings.getInstance(context).removeSettings()
     }
-
-    override fun getAllUsers(): LiveData<List<User>> = userDatabase.userDao().getAll()
-
-    private fun getAllUserCount(): Int = userDatabase.userDao().count()
 
     fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
 
