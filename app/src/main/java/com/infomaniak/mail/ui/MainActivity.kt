@@ -18,15 +18,11 @@
 package com.infomaniak.mail.ui
 
 import android.Manifest
-import android.graphics.Color
-import android.graphics.ColorSpace
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
-import androidx.annotation.ColorInt
-import androidx.core.graphics.toColorInt
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
