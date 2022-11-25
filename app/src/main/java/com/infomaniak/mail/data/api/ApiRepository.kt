@@ -96,20 +96,21 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
-    fun saveDraft(mailboxUuid: String, draft: Draft): ApiResponse<SaveDraftResult> {
+    fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
         val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
-        fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
-        fun putDraft(uuid: String): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body)
+        fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+        fun putDraft(uuid: String): ApiResponse<SaveDraftResult> =
+            callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
-    fun sendDraft(mailboxUuid: String, draft: Draft): ApiResponse<Boolean> {
+    fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
         val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
-        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body)
-        fun putDraft(uuid: String): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body)
+        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+        fun putDraft(uuid: String): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }

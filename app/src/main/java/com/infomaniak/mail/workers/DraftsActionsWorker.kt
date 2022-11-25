@@ -32,22 +32,26 @@ import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
     private val mailboxContentRealm by lazy { RealmDatabase.newMailboxContentInstance }
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
+    private lateinit var okHttpClient: OkHttpClient
     private lateinit var mailboxObjectId: String
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (runAttemptCount > MAX_RETRIES) return@withContext Result.failure()
         runCatching {
 
-            if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser() ?: return@runCatching Result.failure()
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@runCatching Result.failure()
+            val userId = inputData.getInt(USER_ID_KEY, -1)
+            if (userId == -1) return@runCatching Result.failure()
 
             mailboxObjectId = inputData.getString(MAILBOX_OBJECT_ID_KEY) ?: return@runCatching Result.failure()
+            okHttpClient = AccountUtils.getHttpClient(userId)
 
             handleDraftsActions()
         }.getOrElse { exception ->
@@ -80,7 +84,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
 
             drafts.reversed().forEach { draft ->
                 try {
-                    DraftController.executeDraftAction(draft, mailboxUuid, realm = this)
+                    DraftController.executeDraftAction(draft, mailboxUuid, realm = this, okHttpClient)
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                     Sentry.captureException(exception)
@@ -98,6 +102,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
         private const val WORK_NAME = "SaveDraftWithAttachments"
         private const val MAX_RETRIES = 3
 
+        private const val USER_ID_KEY = "userId"
         private const val MAILBOX_OBJECT_ID_KEY = "mailboxObjectIdKey"
 
         fun scheduleWork(context: Context, localDraftUuid: String? = null) {
@@ -107,9 +112,10 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
 
             val currentMailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return
             val uploadAttachmentsWorkRequest = UploadAttachmentsWorker.getWorkRequest(localDraftUuid) ?: return
+            val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_OBJECT_ID_KEY to currentMailboxObjectId)
             val draftActionsWorkRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
-                .setInputData(workDataOf(MAILBOX_OBJECT_ID_KEY to currentMailboxObjectId))
+                .setInputData(workData)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setExpeditedWorkRequest()
                 .build()

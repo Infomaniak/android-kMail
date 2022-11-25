@@ -59,7 +59,6 @@ class UploadAttachmentsWorker(appContext: Context, params: WorkerParameters) : C
         if (runAttemptCount > MAX_RETRY) return@withContext Result.failure()
 
         runCatching {
-            if (AccountUtils.currentUser == null) AccountUtils.requestCurrentUser() ?: return@withContext Result.failure()
             // Get input data
             val localDraftUuid = inputData.getString(LOCAL_DRAFT_UUID_KEY)
             val mailboxObjectId = inputData.getString(MAILBOX_OBJECT_ID_KEY) ?: return@withContext Result.failure()
