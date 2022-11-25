@@ -33,7 +33,6 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.KMailHttpClient
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.setExpeditedWorkRequest
 import io.sentry.Sentry
@@ -67,7 +66,7 @@ class UploadAttachmentsWorker(appContext: Context, params: WorkerParameters) : C
             userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
 
             mailbox = MailboxController.getMailbox(mailboxObjectId, mailboxInfoRealm) ?: return@runCatching Result.failure()
-            okHttpClient = KMailHttpClient.getHttpClient(userId)
+            okHttpClient = AccountUtils.getHttpClient(userId)
 
             // Start uploads
             if (localDraftUuid == null) {
