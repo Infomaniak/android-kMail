@@ -101,11 +101,7 @@ object FolderController {
         remoteFolders.forEach { remoteFolder ->
 
             getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
-                remoteFolder.initLocalValues(
-                    parentLink = localFolder.parentLink,
-                    lastUpdatedAt = localFolder.lastUpdatedAt,
-                    cursor = localFolder.cursor,
-                )
+                remoteFolder.initLocalValues(lastUpdatedAt = localFolder.lastUpdatedAt, cursor = localFolder.cursor)
             }
 
             copyToRealm(remoteFolder, UpdatePolicy.ALL)

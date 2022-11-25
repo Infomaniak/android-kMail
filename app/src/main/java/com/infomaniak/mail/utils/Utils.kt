@@ -37,7 +37,6 @@ object Utils {
             return mutableListOf<Folder>().apply {
                 add(parent)
                 parent.children.forEach { child ->
-                    child.parentLink = parent
                     addAll(formatFolderWithAllChildren(child))
                 }
             }

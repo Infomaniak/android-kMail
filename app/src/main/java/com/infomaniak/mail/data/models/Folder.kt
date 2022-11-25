@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
+import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
@@ -63,18 +64,17 @@ class Folder : RealmObject {
 
     //region Local data (Transient)
     @Transient
-    var parentLink: Folder? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
-    @Transient
     var lastUpdatedAt: RealmInstant? = null
     @Transient
     var cursor: String? = null
     //endregion
 
+    val parentFolder by backlinks(Folder::children)
+
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun initLocalValues(parentLink: Folder?, lastUpdatedAt: RealmInstant?, cursor: String?) {
-        this.parentLink = parentLink
+    fun initLocalValues(lastUpdatedAt: RealmInstant?, cursor: String?) {
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor
     }
