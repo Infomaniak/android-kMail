@@ -128,48 +128,4 @@ object AccountUtils : CredentialManager() {
 
     fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
 
-    suspend fun setUserToken(user: User?, apiToken: ApiToken) {
-        user?.let {
-            it.apiToken = apiToken
-            userDatabase.userDao().update(it)
-        }
-    }
-
-    suspend fun getHttpClientUser(userId: Int, timeout: Long?, onRefreshTokenError: (user: User) -> Unit): OkHttpClient {
-        var user = getUserById(userId)
-        return OkHttpClient.Builder().apply {
-            if (BuildConfig.DEBUG) {
-                addNetworkInterceptor(StethoInterceptor())
-            }
-            timeout?.let {
-                callTimeout(timeout, TimeUnit.SECONDS)
-                readTimeout(timeout, TimeUnit.SECONDS)
-                writeTimeout(timeout, TimeUnit.SECONDS)
-                connectTimeout(timeout, TimeUnit.SECONDS)
-            }
-            val tokenInterceptorListener = object : TokenInterceptorListener {
-                override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
-                    setUserToken(user, apiToken)
-                    if (currentUserId == userId) {
-                        currentUser = user
-                    }
-                }
-
-                override suspend fun onRefreshTokenError() {
-                    user?.let { onRefreshTokenError(it) }
-                }
-
-                override suspend fun getApiToken(): ApiToken {
-                    user = getUserById(userId)
-                    return user?.apiToken!!
-                }
-            }
-            addInterceptor(TokenInterceptor(tokenInterceptorListener))
-            authenticator(TokenAuthenticator(tokenInterceptorListener))
-        }.run {
-            build()
-        }
-    }
-
-    suspend fun getUserById(id: Int): User? = userDatabase.userDao().findById(id)
 }
