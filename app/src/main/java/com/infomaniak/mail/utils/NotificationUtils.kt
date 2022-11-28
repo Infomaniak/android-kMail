@@ -31,19 +31,14 @@ object NotificationUtils {
 
     private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
 
-    fun Context.initNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelList = mutableListOf<NotificationChannel>()
+    const val DRAFT_ACTIONS_ID = 1
 
-            val generalChannel = createNotificationChannel(
-                getString(R.string.notification_channel_id_general),
-                getString(R.string.notificationGeneralChannelName),
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            channelList.add(generalChannel)
-
-            val notificationManager = getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannels(channelList)
+    fun Context.showDraftActionsNotification(): NotificationCompat.Builder {
+        val channelId = getString(R.string.notification_channel_id_general) // TODO : need changes
+        return NotificationCompat.Builder(this, channelId).apply {
+            setContentTitle("Sauvegarde des brouillons...") // TODO : need changes
+            setSmallIcon(DEFAULT_SMALL_ICON)
+            setProgress(100, 0, true)
         }
     }
 
@@ -58,6 +53,22 @@ object NotificationUtils {
             setContentTitle(title)
             description?.let { setStyle(NotificationCompat.BigTextStyle().bigText(it)) }
             setSmallIcon(DEFAULT_SMALL_ICON)
+        }
+    }
+
+    fun Context.initNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelList = mutableListOf<NotificationChannel>()
+
+            val generalChannel = createNotificationChannel(
+                getString(R.string.notification_channel_id_general),
+                getString(R.string.notificationGeneralChannelName),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
+            channelList.add(generalChannel)
+
+            val notificationManager = getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannels(channelList)
         }
     }
 
