@@ -64,6 +64,8 @@ dependencies {
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
     implementation 'com.tbuonomo:dotsindicator:4.3'
 
+    implementation 'org.jsoup:jsoup:1.15.3'
+
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
