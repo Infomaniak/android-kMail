@@ -92,16 +92,16 @@ class FolderAdapter(
     }
 
     fun updateSelectedState(newCurrentFolderId: String) {
-        notifyCurrentItem()
+        val previousCurrentFolderId = currentFolderId
         currentFolderId = newCurrentFolderId
-        notifyCurrentItem()
+        previousCurrentFolderId?.let(::notifyCurrentItem)
+        notifyCurrentItem(newCurrentFolderId)
     }
 
-    private fun notifyCurrentItem() {
-        val position = folders.indexOfFirst { it.id == currentFolderId }
+    private fun notifyCurrentItem(folderId: String) {
+        val position = folders.indexOfFirst { it.id == folderId }
         notifyItemChanged(position)
     }
-
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
 }
