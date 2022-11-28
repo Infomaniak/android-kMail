@@ -79,6 +79,8 @@ class Mailbox : RealmObject {
     var quotas: Quotas? = null
     //endregion
 
+    inline val channelId get() = "${mailboxId}_channel_id"
+
     fun initLocalValues(userId: Int): Mailbox {
         this.objectId = "${userId}_${mailboxId}"
         this.userId = userId

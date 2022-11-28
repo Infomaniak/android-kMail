@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.models.signature.SignatureEmail
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.NotificationUtils.deleteMailNotificationChannel
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.Dispatchers
@@ -121,7 +122,11 @@ object RealmDatabase {
     fun removeUserData(context: Context, userId: Int) {
         closeMailboxContent()
         closeUserInfo()
-        mailboxInfo().writeBlocking { delete(MailboxController.getMailboxes(userId, realm = this)) }
+        mailboxInfo().writeBlocking {
+            val mailboxes = MailboxController.getMailboxes(userId, realm = this)
+            context.deleteMailNotificationChannel(mailboxes)
+            delete(mailboxes)
+        }
         deleteUserFiles(context, userId)
     }
 

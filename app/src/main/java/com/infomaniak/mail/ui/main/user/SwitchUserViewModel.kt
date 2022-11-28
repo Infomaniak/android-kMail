@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.ui.main.user
 
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.*
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.BuildConfig
@@ -29,12 +31,13 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
-class SwitchUserViewModel : ViewModel() {
+class SwitchUserViewModel(application: Application) : AndroidViewModel(application) {
 
     fun observeAccounts(): LiveData<List<UiAccount>> = liveData(Dispatchers.IO) {
 
@@ -52,6 +55,7 @@ class SwitchUserViewModel : ViewModel() {
     private fun updateMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
         users.forEach { user ->
             ApiRepository.getMailboxes(createOkHttpClientForSpecificUser(user)).data?.let { mailboxes ->
+                (getApplication() as Context).initMailNotificationChannel(mailboxes)
                 MailboxController.update(
                     remoteMailboxes = mailboxes.map { it.initLocalValues(user.id) },
                     userId = user.id,
