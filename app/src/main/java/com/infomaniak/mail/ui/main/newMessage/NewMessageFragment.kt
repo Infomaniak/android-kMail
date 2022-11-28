@@ -43,7 +43,6 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
@@ -77,20 +76,13 @@ class NewMessageFragment : Fragment() {
 
         filePicker = FilePicker(this@NewMessageFragment)
 
+        toField.setOnToggleListener(::openAdvancedFields)
+
         // TODO: Do we want this button?
         // toTransparentButton.setOnClickListener {
         //     viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
         //     openAdvancedFields()
         // }
-
-        // chevron.setOnClickListener {
-        //     newMessageViewModel.areAdvancedFieldsOpened = !newMessageViewModel.areAdvancedFieldsOpened
-        //     openAdvancedFields()
-        // }
-
-        // enableAutocomplete(TO)
-        // enableAutocomplete(CC)
-        // enableAutocomplete(BCC)
 
         attachmentsRecyclerView.adapter = attachmentAdapter
         bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
@@ -148,10 +140,6 @@ class NewMessageFragment : Fragment() {
     }
 
     fun closeAutocompletion() = with(binding) {
-        // fun FieldType.clearField() = getInputView(this).setText("")
-        // TO.clearField()
-        // CC.clearField()
-        // BCC.clearField()
         toField.clearField()
         ccField.clearField()
         bccField.clearField()
@@ -269,51 +257,20 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
-        // val toUsedEmails = mailTo.map { it.email }.toMutableList()
-        // val ccUsedEmails = mailCc.map { it.email }.toMutableList()
-        // val bccUsedEmails = mailBcc.map { it.email }.toMutableList()
-
-        // displayChips()
-
         binding.toField.apply {
             initContacts(allContacts, mutableListOf())
-            onAutoCompletionToggled { hasOpened ->
-                toggleAutoCompletion2(TO, hasOpened)
-            }
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion2(TO, hasOpened) }
         }
 
         binding.ccField.apply {
             initContacts(allContacts, mutableListOf())
-            onAutoCompletionToggled { hasOpened ->
-                toggleAutoCompletion2(CC, hasOpened)
-            }
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion2(CC, hasOpened) }
         }
 
         binding.bccField.apply {
             initContacts(allContacts, mutableListOf())
-            onAutoCompletionToggled { hasOpened ->
-                toggleAutoCompletion2(BCC, hasOpened)
-            }
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion2(BCC, hasOpened) }
         }
-
-        // contactAdapter = ContactAdapter(
-        //     allContacts = allContacts,
-        //     toUsedEmails = toUsedEmails,
-        //     ccUsedEmails = ccUsedEmails,
-        //     bccUsedEmails = bccUsedEmails,
-        //     onItemClick = { contact, field ->
-        //         // getInputView(field).setText("")
-        //         val recipient = Recipient().initLocalValues(email = contact.email, name = contact.name)
-        //         addRecipientToField(field, recipient)
-        //         // createChip(field, recipient)
-        //     },
-        //     addUnrecognizedContact = { field ->
-        //         // val isEmail = addUnrecognizedMail(field)
-        //         // if (isEmail) getInputView(field).setText("")
-        //     },
-        // )
-        //
-        // binding.autoCompleteRecyclerView.adapter = contactAdapter
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
@@ -353,34 +310,6 @@ class NewMessageFragment : Fragment() {
     // }
 
     //region Chips behavior
-    private fun getRecipients(field: FieldType): MutableList<Recipient> = when (field) {
-        TO -> newMessageViewModel.mailTo
-        CC -> newMessageViewModel.mailCc
-        BCC -> newMessageViewModel.mailBcc
-    }
-
-    // private fun getChipGroup(field: FieldType): ChipGroup = when (field) {
-    //     TO -> binding.toItemsChipGroup
-    //     CC -> binding.ccItemsChipGroup
-    //     BCC -> binding.ccItemsChipGroup // binding.bccItemsChipGroup
-    // }
-
-    // private fun getInputView(field: FieldType): MaterialAutoCompleteTextView = when (field) {
-    //     TO -> binding.toAutocompleteInput
-    //     CC -> binding.toAutocompleteInput
-    //     BCC -> binding.toAutocompleteInput // binding.bccAutocompleteInput
-    // }
-
-    // private fun displayChips() {
-    //     refreshChips()
-    //     updateSingleChipText()
-    //     updateChipVisibility()
-    //
-    //     binding.singleChip.root.setOnClickListener {
-    //         removeEmail(TO, 0)
-    //         updateChipVisibility()
-    //     }
-    // }
 
     // private fun removeEmail(field: FieldType, recipient: Recipient) {
     //     val index = getRecipients(field).indexOfFirst { it.email == recipient.email }
@@ -395,27 +324,6 @@ class NewMessageFragment : Fragment() {
     //     if (field == TO) {
     //         updateSingleChipText()
     //         updateToAutocompleteInputLayout()
-    //     }
-    // }
-
-    // private fun updateSingleChipText() {
-    //     newMessageViewModel.mailTo.firstOrNull()?.let { binding.singleChip.root.text = it.getNameOrEmail() }
-    // }
-
-    // private fun refreshChips() = with(binding) {
-    //     toItemsChipGroup.removeAllViews()
-    //     ccItemsChipGroup.removeAllViews()
-    //     // bccItemsChipGroup.removeAllViews()
-    //     newMessageViewModel.mailTo.forEach { createChip(TO, it) }
-    //     newMessageViewModel.mailCc.forEach { createChip(CC, it) }
-    //     newMessageViewModel.mailBcc.forEach { createChip(BCC, it) }
-    // }
-
-    // private fun createChip(field: FieldType, recipient: Recipient) {
-    //     ChipContactBinding.inflate(layoutInflater).root.apply {
-    //         text = recipient.getNameOrEmail()
-    //         setOnClickListener { removeEmail(field, recipient) }
-    //         getChipGroup(field).addView(this)
     //     }
     // }
 
@@ -457,16 +365,16 @@ class NewMessageFragment : Fragment() {
     //     toggleAutocompletion()
     // }
 
-    private fun toggleAutocompletion(field: FieldType? = null) = with(newMessageViewModel) {
-        binding.preFields.isGone = isAutocompletionOpened
-
-        binding.to.isVisible = !isAutocompletionOpened || field == TO
-        binding.cc.isVisible = !isAutocompletionOpened || field == CC
-        binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
-        binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
-
-        binding.postFields.isGone = isAutocompletionOpened
-    }
+    // private fun toggleAutocompletion(field: FieldType? = null) = with(newMessageViewModel) {
+    //     binding.preFields.isGone = isAutocompletionOpened
+    //
+    //     binding.to.isVisible = !isAutocompletionOpened || field == TO
+    //     binding.cc.isVisible = !isAutocompletionOpened || field == CC
+    //     binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
+    //     binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
+    //
+    //     binding.postFields.isGone = isAutocompletionOpened
+    // }
 
     private fun toggleAutoCompletion2(field: FieldType? = null, isAutocompletionOpened: Boolean) = with(newMessageViewModel) {
         binding.preFields.isGone = isAutocompletionOpened
@@ -479,17 +387,9 @@ class NewMessageFragment : Fragment() {
         binding.postFields.isGone = isAutocompletionOpened
     }
 
-    private fun openAdvancedFields() = with(newMessageViewModel) {
-
-        // updateToAutocompleteInputLayout()
-
-        binding.cc.isVisible = areAdvancedFieldsOpened
-        binding.bcc.isVisible = areAdvancedFieldsOpened
-        // binding.chevron.toggleChevron(!areAdvancedFieldsOpened)
-
-        // refreshChips()
-        // updateSingleChipText()
-        // updateChipVisibility()
+    private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
+        cc.isGone = isCollapsed
+        bcc.isGone = isCollapsed
     }
 
     // private fun updateToAutocompleteInputLayout() = with(binding) {

@@ -74,19 +74,19 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/to"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
                 android:id="@+id/toField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:title="@string/toTitle" />
+                android:layout_marginVertical="@dimen/marginStandardVerySmall"
+                app:title="@string/toTitle"
+                app:toggleable="true" />
 
             <!--<TextView-->
             <!--    android:id="@+id/toPrefix"-->
@@ -188,70 +188,62 @@
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider2"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginTop="@dimen/marginStandardVerySmall"
-                app:dividerColor="@color/separatorLighter"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toField" />
+                app:dividerColor="@color/separatorLighter" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/cc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
                 android:id="@+id/ccField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:title="@string/ccTitle" />
+                android:layout_marginVertical="@dimen/marginStandardVerySmall"
+                app:title="@string/ccTitle"
+                app:toggleable="false" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider3"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginTop="@dimen/marginStandardVerySmall"
-                app:dividerColor="@color/separatorLighter"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ccField" />
+                app:dividerColor="@color/separatorLighter" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:id="@+id/bcc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <com.infomaniak.mail.ui.main.newMessage.RecipientFieldView
                 android:id="@+id/bccField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:title="@string/bccTitle" />
+                android:layout_marginVertical="@dimen/marginStandardVerySmall"
+                app:title="@string/bccTitle"
+                app:toggleable="false" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider4"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginTop="@dimen/marginStandardVerySmall"
-                app:dividerColor="@color/separatorLighter"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bccField" />
+                app:dividerColor="@color/separatorLighter" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/postFields"

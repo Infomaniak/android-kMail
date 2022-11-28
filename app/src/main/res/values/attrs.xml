@@ -105,5 +105,6 @@
 
     <declare-styleable name="RecipientFieldView">
         <attr name="title" />
+        <attr name="toggleable" format="boolean" />
     </declare-styleable>
 </resources>

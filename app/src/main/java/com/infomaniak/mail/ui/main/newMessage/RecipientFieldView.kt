@@ -23,6 +23,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import com.infomaniak.lib.core.utils.getAttributes
@@ -31,6 +32,7 @@ import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
+import com.infomaniak.mail.utils.toggleChevron
 
 class RecipientFieldView @JvmOverloads constructor(
     context: Context,
@@ -43,6 +45,14 @@ class RecipientFieldView @JvmOverloads constructor(
     private var contactAdapter: ContactAdapter2? = null
     private val recipients = mutableSetOf<Recipient>()
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
+    private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
+    private var isToggleable = false
+    private var isCollapsed = true
+        set(value) {
+            if (value == field) return
+            field = value
+            updateCollapsedUiState(value)
+        }
 
     private var isAutocompletionOpened
         get() = binding.autoCompletedContacts.isVisible
@@ -54,8 +64,53 @@ class RecipientFieldView @JvmOverloads constructor(
         with(binding) {
             attrs?.getAttributes(context, R.styleable.RecipientFieldView) {
                 prefix.text = getText(R.styleable.RecipientFieldView_title)
+                isToggleable = getBoolean(R.styleable.RecipientFieldView_toggleable, isToggleable)
+            }
+
+            chevron.isVisible = isToggleable
+
+            if (isToggleable) {
+                chevron.setOnClickListener { isCollapsed = !isCollapsed }
+                plusChip.setOnClickListener { isCollapsed = !isCollapsed }
+                transparentButton.setOnClickListener { isCollapsed = !isCollapsed }
+
+                singleChip.root.setOnClickListener {
+                    removeRecipient(recipients.first())
+                    updateCollapsedChipValues(!isCollapsed)
+                }
+            }
+
+            if (isInEditMode) {
+                singleChip.root.isVisible = isToggleable
+                plusChip.isVisible = isToggleable
             }
         }
+    }
+
+    private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
+        chevron.toggleChevron(isCollapsed)
+
+        updateCollapsedChipValues(!isCollapsed)
+        itemsChipGroup.isGone = isCollapsed
+
+        onToggle?.invoke(isCollapsed)
+    }
+
+    private fun updateCollapsedChipValues(isExpanded: Boolean) = with(binding) {
+        val isTextInputAccessible = isExpanded || recipients.isEmpty()
+
+        singleChip.root.apply {
+            isGone = isTextInputAccessible
+            text = recipients.firstOrNull()?.getNameOrEmail() ?: ""
+        }
+        plusChip.apply {
+            isGone = isExpanded || recipients.count() <= 1
+            text = "+${recipients.count() - 1}"
+        }
+
+        transparentButton.isGone = isTextInputAccessible
+        autocompleteInput.isClickable = isTextInputAccessible
+        autocompleteInput.isFocusable = isTextInputAccessible
     }
 
     fun initContacts(allContacts: List<MergedContact>, usedContacts: MutableList<String>) = with(binding) {
@@ -104,6 +159,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addContact(contact: MergedContact) {
+        if (recipients.isEmpty()) isCollapsed = false
         val recipient = Recipient().initLocalValues(contact.email, contact.name)
         val recipientIsNew = recipients.add(recipient)
         if (recipientIsNew) createChip(recipient)
@@ -117,15 +173,19 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    private fun removeRecipient(recipient: Recipient) {
+    private fun removeRecipient(recipient: Recipient) = with(binding) {
         val index = recipients.indexOf(recipient)
         contactAdapter?.removeEmail(recipient.email)
         val successfullyRemoved = recipients.remove(recipient)
-        if (successfullyRemoved) binding.itemsChipGroup.removeViewAt(index)
+        if (successfullyRemoved) itemsChipGroup.removeViewAt(index)
     }
 
     fun onAutoCompletionToggled(callback: (hasOpened: Boolean) -> Unit) {
         onAutoCompletionToggled = callback
+    }
+
+    fun setOnToggleListener(listener: ((isCollapsed: Boolean) -> Unit)?) {
+        onToggle = listener
     }
 
     fun clearField() {
