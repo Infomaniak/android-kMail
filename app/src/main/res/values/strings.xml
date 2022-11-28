@@ -82,7 +82,7 @@
     <string name="buttonCreateFolder">Add a folder</string>
     <string name="buttonDownload">Download</string>
     <string name="buttonDownloadAll">Download all</string>
-    <string name="buttonFeedbacks">Feedback</string>
+    <string name="buttonFeedback">Feedback</string>
     <string name="buttonFolders">Folders</string>
     <string name="buttonHelp">Help</string>
     <string name="buttonHyperlink">Add a hyperlink</string>
@@ -174,6 +174,7 @@
     <string name="noConversationSelected">No conversation selected in %s</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
     <string name="noEmailTitle">You don’t have any emails</string>
+    <string name="noFolderTitle">You don’t have any folder yet...</string>
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
     <string name="noMailboxTitle">No email address associated with this account</string>
     <string name="noNetworkDescription">Your emails may not be up to date</string>
@@ -207,6 +208,7 @@
     <string name="searchFilterFolder">All folders</string>
     <string name="searchFilterRead">Read</string>
     <string name="searchFilterUnread">Unread</string>
+    <string name="searchNoHistoryDescription">Search by contact or keywords</string>
     <string name="searchNoResultsDescription">No messages matching your search</string>
     <string name="searchNoResultsTitle">No results</string>
     <string name="searchViewHint">Search for a message</string>

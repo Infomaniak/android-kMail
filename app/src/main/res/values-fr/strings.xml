@@ -75,7 +75,7 @@
     <string name="buttonCreateFolder">Ajouter un dossier</string>
     <string name="buttonDownload">Télécharger</string>
     <string name="buttonDownloadAll">Tout télécharger</string>
-    <string name="buttonFeedbacks">Feedback</string>
+    <string name="buttonFeedback">Feedback</string>
     <string name="buttonFolders">Dossiers</string>
     <string name="buttonHelp">Aide</string>
     <string name="buttonHyperlink">Ajouter un lien hypertexte</string>
@@ -167,6 +167,7 @@
     <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noEmailDescription">Composez un nouvel e-mail en cliquant sur \"Nouveau message\" en bas à droite</string>
     <string name="noEmailTitle">Vous n’avez pas d’e-mails</string>
+    <string name="noFolderTitle">Vous n’avez pas encore de dossier...</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
     <string name="noMailboxTitle">Pas d’adresse mail associée à ce compte</string>
     <string name="noNetworkDescription">Vos e-mails pourraient ne pas être à jour</string>
@@ -200,6 +201,7 @@
     <string name="searchFilterFolder">Tous les dossiers</string>
     <string name="searchFilterRead">Lus</string>
     <string name="searchFilterUnread">Non lus</string>
+    <string name="searchNoHistoryDescription">Lancez votre recherche par contact ou par mots clés</string>
     <string name="searchNoResultsDescription">Nous n‘avons rien trouvé correspondant à votre recherche</string>
     <string name="searchNoResultsTitle">Aucun résultats</string>
     <string name="searchViewHint">Rechercher un message</string>
