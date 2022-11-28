@@ -69,6 +69,7 @@ class Thread : RealmObject {
     fun recomputeThread() {
 
         // Clean the Thread before updating it
+        // TODO: Remove this `sortBy`, and get the Messages in the right order via Realm query (but before, fix the `Thread.date`)
         messages.sortBy { it.date }
         unseenMessagesCount = 0
         size = 0
