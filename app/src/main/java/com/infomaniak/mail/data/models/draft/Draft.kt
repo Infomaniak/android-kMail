@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.signature.Signature.SignaturePosition
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
@@ -124,11 +123,12 @@ class Draft : RealmObject {
             this.name = ""
         })
 
-        val html = "<div class=\"editorUserSignature\">${defaultSignature.content}</div>"
-        body = when (defaultSignature.position) {
-            SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
-            else -> html + body
-        }
+        body += "<div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+        // TODO: Handle SignaturePosition feature.
+        // body = when (defaultSignature.position) {
+        //     SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
+        //     else -> html + body
+        // }
     }
 
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
