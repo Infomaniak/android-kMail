@@ -186,7 +186,7 @@ object MessageController {
 
             var pageStart = 0
             val pageSize = ApiRepository.PER_PAGE
-            val uids = getUniquesUidsInReverse(folder, shortUids)
+            val uids = getUniquesUidsWithNewestFirst(folder, shortUids)
 
             while (pageStart < uids.count()) {
 
@@ -311,9 +311,9 @@ object MessageController {
         }
     }
 
-    private fun getUniquesUidsInReverse(folder: Folder, remoteUids: List<String>): List<String> {
-        val localUids = folder.id.let(ThreadController::getThreads).map { it.uid.toShortUid() }
-        val uniqueUids = remoteUids.subtract(localUids.intersect(remoteUids.toSet()))
+    private fun getUniquesUidsWithNewestFirst(folder: Folder, remoteUids: List<String>): List<String> {
+        val localUids = getMessages(folder.id).map { it.uid.toShortUid() }.toSet()
+        val uniqueUids = remoteUids.subtract(localUids)
         return uniqueUids.reversed()
     }
 
