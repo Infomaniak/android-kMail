@@ -124,7 +124,7 @@ class Draft : RealmObject {
             this.name = ""
         })
 
-        val html = "<br/><br/><div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+        val html = "<div class=\"editorUserSignature\">${defaultSignature.content}</div>"
         body = when (defaultSignature.position) {
             SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
             else -> html + body

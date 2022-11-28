@@ -164,7 +164,7 @@ object DraftController {
 
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
-                if (isSuccess()) {
+                if (data != null) {
                     updateDraft(draft.localUuid, realm) {
                         it.remoteUuid = data?.draftRemoteUuid
                         it.messageUid = data?.messageUid

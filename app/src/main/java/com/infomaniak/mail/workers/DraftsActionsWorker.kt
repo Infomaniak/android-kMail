@@ -93,9 +93,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
                 return MailboxController.getMailbox(mailboxObjectId, mailboxInfoRealm)?.uuid
             }
 
+            val mailboxUuid = getCurrentMailboxUuid() ?: return@writeBlocking Result.failure()
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { null }
                 ?: return@writeBlocking Result.failure()
-            val mailboxUuid = getCurrentMailboxUuid() ?: return@writeBlocking Result.failure()
             var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
