@@ -20,9 +20,9 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.lib.core.utils.ApiController
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase

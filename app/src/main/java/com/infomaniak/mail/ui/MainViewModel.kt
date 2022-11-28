@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
@@ -41,6 +42,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
+import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import kotlinx.coroutines.Dispatchers
@@ -181,6 +183,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateMailboxes() {
         ApiRepository.getMailboxes().data?.let { mailboxes ->
+            (getApplication() as Context).initMailNotificationChannel(mailboxes)
             MailboxController.update(
                 remoteMailboxes = mailboxes.map { it.initLocalValues(AccountUtils.currentUserId) },
                 userId = AccountUtils.currentUserId,

@@ -173,6 +173,9 @@
     <string name="noNetworkTitle">No signal</string>
     <string name="noSubjectTitle">(no subject)</string>
     <string name="notificationGeneralChannelName">Notifiche generali</string>
+    <string name="notificationNewMessagesChannelName">New emails</string>
+    <string name="notificationSyncDraftChannelName">Saving drafts</string>
+    <string name="notificationSyncMessagesChannelName">Retrieving new emails</string>
     <string name="onBoardingDescription2">Define the actions you perform most often when swiping left and right, and save valuable time</string>
     <string name="onBoardingDescription3">Take action on multiple messages simultaneously</string>
     <string name="onBoardingDescription4">Manage all your Infomaniak emails from the app!</string>

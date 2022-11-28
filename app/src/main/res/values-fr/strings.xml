@@ -173,6 +173,9 @@
     <string name="noNetworkTitle">Pas de signal</string>
     <string name="noSubjectTitle">(aucun sujet)</string>
     <string name="notificationGeneralChannelName">Notification générales</string>
+    <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
+    <string name="notificationSyncDraftChannelName">Sauvegarde des brouillons</string>
+    <string name="notificationSyncMessagesChannelName">Récupération des nouveaux e-mails</string>
     <string name="onBoardingDescription2">Définissez les actions que vous effectuez le plus souvent au balayage vers la droite et la gauche, et gagnez un temps précieux</string>
     <string name="onBoardingDescription3">Effectuez des actions sur de multiples messages simultanément</string>
     <string name="onBoardingDescription4">Gérez tous vos e-mails Infomaniak depuis l’app !</string>

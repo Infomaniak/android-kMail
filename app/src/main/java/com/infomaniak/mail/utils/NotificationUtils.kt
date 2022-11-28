@@ -17,28 +17,76 @@
  */
 package com.infomaniak.mail.utils
 
-import android.app.Application
 import android.app.NotificationChannel
+import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.mail.R
-import com.infomaniak.lib.core.R as RCore
+import com.infomaniak.mail.data.models.Mailbox
 
-object NotificationUtils {
+object NotificationUtils : NotificationUtilsCore() {
 
     private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
 
     const val DRAFT_ACTIONS_ID = 1
 
-    fun Context.showDraftActionsNotification(): NotificationCompat.Builder {
-        val channelId = getString(R.string.notification_channel_id_general) // TODO : need changes
-        return NotificationCompat.Builder(this, channelId).apply {
-            setContentTitle("Sauvegarde des brouillons...") // TODO : need changes
-            setSmallIcon(DEFAULT_SMALL_ICON)
-            setProgress(100, 0, true)
+    fun Context.initNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelList = mutableListOf<NotificationChannel>()
+
+            val generalChannel = buildNotificationChannel(
+                getString(R.string.notification_channel_id_general),
+                getString(R.string.notificationGeneralChannelName),
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            channelList.add(generalChannel)
+
+            val draftChannel = buildNotificationChannel(
+                getString(R.string.notification_channel_id_draft_service),
+                getString(R.string.notificationSyncDraftChannelName),
+                NotificationManager.IMPORTANCE_MIN
+            )
+            channelList.add(draftChannel)
+
+            val syncMessagesChannel = buildNotificationChannel(
+                getString(R.string.notification_channel_id_sync_messages_service),
+                getString(R.string.notificationSyncMessagesChannelName),
+                NotificationManager.IMPORTANCE_MIN
+            )
+            channelList.add(syncMessagesChannel)
+
+            createNotificationChannels(channelList)
+        }
+    }
+
+    fun Context.initMailNotificationChannel(mailbox: List<Mailbox>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelList = mutableListOf<NotificationChannel>()
+            val groupList = mutableListOf<NotificationChannelGroup>()
+
+            mailbox.forEach {
+                val channelGroup = NotificationChannelGroup(it.mailboxId.toString(), it.email)
+                groupList.add(channelGroup)
+
+                val notificationChannel = buildNotificationChannel(
+                    it.channelId,
+                    getString(R.string.notificationNewMessagesChannelName),
+                    NotificationManager.IMPORTANCE_HIGH,
+                    groupId = channelGroup.id
+                )
+                channelList.add(notificationChannel)
+            }
+
+            createNotificationChannels(channelList, groupList)
+        }
+    }
+
+    fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            deleteNotificationChannels(mailbox.map { it.channelId })
         }
     }
 
@@ -46,51 +94,20 @@ object NotificationUtils {
         title: String,
         description: String? = null,
     ): NotificationCompat.Builder {
-        val channelId = getString(R.string.notification_channel_id_general)
+        return buildNotification(
+            channelId = getString(R.string.notification_channel_id_general),
+            icon = DEFAULT_SMALL_ICON,
+            title = title,
+            description = description
+        )
+    }
+
+    fun Context.showDraftActionsNotification(): NotificationCompat.Builder {
+        val channelId = getString(R.string.notification_channel_id_draft_service)
         return NotificationCompat.Builder(this, channelId).apply {
-            setTicker(title)
-            setAutoCancel(true)
-            setContentTitle(title)
-            description?.let { setStyle(NotificationCompat.BigTextStyle().bigText(it)) }
+            setContentTitle(getString(R.string.notificationSyncDraftChannelName))
             setSmallIcon(DEFAULT_SMALL_ICON)
-        }
-    }
-
-    fun Context.initNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelList = mutableListOf<NotificationChannel>()
-
-            val generalChannel = createNotificationChannel(
-                getString(R.string.notification_channel_id_general),
-                getString(R.string.notificationGeneralChannelName),
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            channelList.add(generalChannel)
-
-            val notificationManager = getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannels(channelList)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun Context.createNotificationChannel(
-        channelId: String,
-        name: String,
-        importance: Int,
-    ): NotificationChannel {
-        return NotificationChannel(channelId, name, importance).apply {
-            when (importance) {
-                NotificationManager.IMPORTANCE_HIGH -> {
-                    enableLights(true)
-                    setShowBadge(true)
-                    lightColor = getColor(RCore.color.primary)
-                }
-                else -> {
-                    enableLights(false)
-                    setShowBadge(false)
-                    enableVibration(false)
-                }
-            }
+            setProgress(100, 0, true)
         }
     }
 }
