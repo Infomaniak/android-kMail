@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models.draft
 
-import com.infomaniak.lib.core.utils.ApiController.json
+import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
