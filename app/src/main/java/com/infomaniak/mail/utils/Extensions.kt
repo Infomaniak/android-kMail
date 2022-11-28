@@ -34,6 +34,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
+import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
@@ -48,6 +50,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
+import kotlinx.serialization.encodeToString
 import java.util.*
 
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
@@ -145,6 +148,10 @@ fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
         Sentry.captureException(exception)
         null
     }
+}
+
+inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
+    throw error?.exception ?: Exception(data?.let { ApiController.json.encodeToString(it) })
 }
 
 //region Realm
