@@ -84,11 +84,7 @@ object NotificationUtils : NotificationUtilsCore() {
 
     fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelList = mutableListOf<String>()
-
-            mailbox.forEach { channelList.add(it.channelId) }
-
-            deleteNotificationChannels(channelList)
+            deleteNotificationChannels(mailbox.map { it.channelId })
         }
     }
 
