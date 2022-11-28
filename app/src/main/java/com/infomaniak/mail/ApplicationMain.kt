@@ -42,7 +42,6 @@ import com.infomaniak.mail.MatomoMail.buildTracker
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.KMailHttpClient
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
 import io.sentry.SentryEvent
@@ -124,7 +123,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     private fun configureHttpClient() {
-        KMailHttpClient.onRefreshTokenError = refreshTokenError
+        AccountUtils.onRefreshTokenError = refreshTokenError
         HttpClient.init(tokenInterceptorListener())
     }
 

@@ -18,17 +18,11 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
-import com.infomaniak.lib.core.auth.TokenInterceptor
-import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.room.UserDatabase
-import com.infomaniak.lib.login.ApiToken
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
@@ -41,13 +35,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import java.util.concurrent.TimeUnit
 import io.sentry.protocol.User as SentryUser
 
-object AccountUtils : CredentialManager {
+object AccountUtils : CredentialManager() {
 
-    private lateinit var userDatabase: UserDatabase
+    override lateinit var userDatabase: UserDatabase
 
     var reloadApp: (() -> Unit)? = null
 
@@ -57,7 +49,7 @@ object AccountUtils : CredentialManager {
         Sentry.setUser(SentryUser().apply { id = currentUserId.toString() })
     }
 
-    var currentUser: User? = null
+    override var currentUser: User? = null
         set(user) {
             field = user
             currentUserId = user?.id ?: AppSettings.DEFAULT_ID
@@ -68,7 +60,7 @@ object AccountUtils : CredentialManager {
             InfomaniakCore.bearerToken = user?.apiToken?.accessToken.toString()
         }
 
-    var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
+    override var currentUserId: Int = AppSettingsController.getAppSettings().currentUserId
         set(userId) {
             field = userId
             RealmDatabase.closeUserInfo()
@@ -134,54 +126,6 @@ object AccountUtils : CredentialManager {
         LocalSettings.getInstance(context).removeSettings()
     }
 
-    override fun getAllUsers(): LiveData<List<User>> = userDatabase.userDao().getAll()
-
-    private fun getAllUserCount(): Int = userDatabase.userDao().count()
-
     fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
 
-    suspend fun setUserToken(user: User?, apiToken: ApiToken) {
-        user?.let {
-            it.apiToken = apiToken
-            userDatabase.userDao().update(it)
-        }
-    }
-
-    suspend fun getHttpClientUser(userId: Int, timeout: Long?, onRefreshTokenError: (user: User) -> Unit): OkHttpClient {
-        var user = getUserById(userId)
-        return OkHttpClient.Builder().apply {
-            if (BuildConfig.DEBUG) {
-                addNetworkInterceptor(StethoInterceptor())
-            }
-            timeout?.let {
-                callTimeout(timeout, TimeUnit.SECONDS)
-                readTimeout(timeout, TimeUnit.SECONDS)
-                writeTimeout(timeout, TimeUnit.SECONDS)
-                connectTimeout(timeout, TimeUnit.SECONDS)
-            }
-            val tokenInterceptorListener = object : TokenInterceptorListener {
-                override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
-                    setUserToken(user, apiToken)
-                    if (currentUserId == userId) {
-                        currentUser = user
-                    }
-                }
-
-                override suspend fun onRefreshTokenError() {
-                    user?.let { onRefreshTokenError(it) }
-                }
-
-                override suspend fun getApiToken(): ApiToken {
-                    user = getUserById(userId)
-                    return user?.apiToken!!
-                }
-            }
-            addInterceptor(TokenInterceptor(tokenInterceptorListener))
-            authenticator(TokenAuthenticator(tokenInterceptorListener))
-        }.run {
-            build()
-        }
-    }
-
-    suspend fun getUserById(id: Int): User? = userDatabase.userDao().findById(id)
 }
