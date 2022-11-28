@@ -128,6 +128,10 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled = callback
     }
 
+    fun clearField() {
+        binding.autocompleteInput.setText("")
+    }
+
     // TODO : fun onContactRemoved() {}
 
     // TODO : fun onContactAdded() {}
