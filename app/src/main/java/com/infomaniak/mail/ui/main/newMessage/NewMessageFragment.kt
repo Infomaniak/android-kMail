@@ -189,7 +189,7 @@ class NewMessageFragment : Fragment() {
             binding.signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, "utf-8", "")
             binding.removeSignature.setOnClickListener {
                 mailSignature = null
-                binding.separatedSignature.isVisible = false
+                binding.separatedSignature.isGone = true
             }
             binding.separatedSignature.isVisible = true
         }
