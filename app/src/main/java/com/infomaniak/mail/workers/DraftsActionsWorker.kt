@@ -20,7 +20,7 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.infomaniak.lib.core.utils.ApiController
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
