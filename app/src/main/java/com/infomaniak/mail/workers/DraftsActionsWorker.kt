@@ -35,6 +35,8 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
+import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import com.infomaniak.mail.utils.setExpeditedWorkRequest
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
@@ -62,12 +64,15 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
         if (runAttemptCount > MAX_RETRIES) return@withContext Result.failure()
 
         runCatching {
+            if (DraftController.getDraftsWithActionsCount() == 0L) return@runCatching Result.success()
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@runCatching Result.failure()
             userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@runCatching Result.failure()
 
             mailboxObjectId = inputData.getString(MAILBOX_OBJECT_ID_KEY) ?: return@runCatching Result.failure()
             mailbox = MailboxController.getMailbox(mailboxObjectId, mailboxInfoRealm) ?: return@runCatching Result.failure()
             okHttpClient = AccountUtils.getHttpClient(userId)
+
+            moveServiceToForeground()
 
             handleDraftsActions()
         }.getOrElse { exception ->
@@ -83,6 +88,12 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
         }.also {
             mailboxContentRealm.close()
             mailboxInfoRealm.close()
+        }
+    }
+
+    private suspend fun moveServiceToForeground() {
+        applicationContext.showDraftActionsNotification().apply {
+            setForeground(ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, build()))
         }
     }
 
