@@ -60,8 +60,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (runAttemptCount > MAX_RETRIES) return@withContext Result.failure()
-        runCatching {
 
+        runCatching {
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@runCatching Result.failure()
             userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@runCatching Result.failure()
 
