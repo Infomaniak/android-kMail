@@ -20,19 +20,33 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.ApiController
+import com.infomaniak.lib.core.utils.isNetworkException
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.setExpeditedWorkRequest
+import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
+import kotlin.properties.Delegates
 
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(appContext, params) {
 
@@ -41,16 +55,18 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
 
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var mailboxObjectId: String
+    private lateinit var mailbox: Mailbox
+    private var userId: Int by Delegates.notNull()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (runAttemptCount > MAX_RETRIES) return@withContext Result.failure()
         runCatching {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@runCatching Result.failure()
-            val userId = inputData.getInt(USER_ID_KEY, -1)
-            if (userId == -1) return@runCatching Result.failure()
+            userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@runCatching Result.failure()
 
             mailboxObjectId = inputData.getString(MAILBOX_OBJECT_ID_KEY) ?: return@runCatching Result.failure()
+            mailbox = MailboxController.getMailbox(mailboxObjectId, mailboxInfoRealm) ?: return@runCatching Result.failure()
             okHttpClient = AccountUtils.getHttpClient(userId)
 
             handleDraftsActions()
@@ -58,6 +74,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
             exception.printStackTrace()
             when (exception) {
                 is CancellationException -> Result.failure()
+                is ApiController.NetworkException -> Result.retry()
                 else -> {
                     Sentry.captureException(exception)
                     Result.failure()
@@ -81,14 +98,14 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
             val mailboxUuid = getCurrentMailboxUuid() ?: return@writeBlocking Result.failure()
             var hasRemoteException = false
 
-
             drafts.reversed().forEach { draft ->
                 try {
+                    draft.uploadAttachments(this)
                     DraftController.executeDraftAction(draft, mailboxUuid, realm = this, okHttpClient)
                 } catch (exception: Exception) {
                     exception.printStackTrace()
+                    if (exception is ApiController.NetworkException) throw exception
                     Sentry.captureException(exception)
-                    if (exception is ApiController.NetworkException) return@writeBlocking Result.retry()
                     hasRemoteException = true
                 }
             }
@@ -97,33 +114,73 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : Corou
         }
     }
 
+    private fun Draft.uploadAttachments(realm: MutableRealm): Result {
+        getNotUploadedAttachments(this).forEach { attachment ->
+            try {
+                attachment.startUpload(this.localUuid, realm)
+            } catch (exception: Exception) {
+                if (exception.isNetworkException()) throw ApiController.NetworkException()
+                throw exception
+            }
+        }
+        return Result.success()
+    }
+
+    private fun getNotUploadedAttachments(draft: Draft): List<Attachment> {
+        return draft.attachments.filter { attachment -> attachment.uploadLocalUri != null }
+    }
+
+    private fun Attachment.startUpload(localDraftUuid: String, realm: MutableRealm) {
+        val attachmentFile = getUploadLocalFile(applicationContext, localDraftUuid).also { if (!it.exists()) return }
+        val request = Request.Builder().url(ApiRoutes.createAttachment(mailbox.uuid))
+            .headers(HttpUtils.getHeaders(contentType = null))
+            .addHeader("x-ws-attachment-filename", name)
+            .addHeader("x-ws-attachment-mime-type", mimeType)
+            .addHeader("x-ws-attachment-disposition", "attachment")
+            .post(attachmentFile.asRequestBody(mimeType.toMediaType()))
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+
+        val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
+        if (apiResponse.isSuccess() && apiResponse.data != null) {
+            attachmentFile.delete()
+            LocalStorageUtils.deleteAttachmentsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
+            updateLocalAttachment(localDraftUuid, apiResponse.data!!, realm)
+        }
+    }
+
+    private fun Attachment.updateLocalAttachment(localDraftUuid: String, attachment: Attachment, realm: MutableRealm) {
+        DraftController.updateDraft(localDraftUuid, realm) {
+            realm.delete(it.attachments.first { attachment -> attachment.uuid == uuid })
+            it.attachments.add(attachment)
+        }
+    }
+
+    private fun Data.getIntOrNull(key: String) = getInt(key, 0).run { if (this == 0) null else this }
+
     companion object {
         private const val TAG = "DraftsActionsWorker"
-        private const val WORK_NAME = "SaveDraftWithAttachments"
         private const val MAX_RETRIES = 3
 
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_OBJECT_ID_KEY = "mailboxObjectIdKey"
 
-        fun scheduleWork(context: Context, localDraftUuid: String? = null) {
+        fun scheduleWork(context: Context) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (DraftController.getDraftsWithActionsCount() == 0L) return
 
             val currentMailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return
-            val uploadAttachmentsWorkRequest = UploadAttachmentsWorker.getWorkRequest(localDraftUuid) ?: return
             val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_OBJECT_ID_KEY to currentMailboxObjectId)
-            val draftActionsWorkRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
+            val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
                 .setInputData(workData)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setExpeditedWorkRequest()
                 .build()
 
-            WorkManager.getInstance(context)
-                .beginUniqueWork(WORK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, uploadAttachmentsWorkRequest)
-                .then(draftActionsWorkRequest)
-                .enqueue()
+            WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
         fun getRunningWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {

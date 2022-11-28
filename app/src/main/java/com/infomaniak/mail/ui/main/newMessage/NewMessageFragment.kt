@@ -152,7 +152,7 @@ class NewMessageFragment : Fragment() {
     }
 
     override fun onStop() {
-        DraftsActionsWorker.scheduleWork(requireContext(), newMessageViewModel.currentDraftLocalUuid)
+        DraftsActionsWorker.scheduleWork(requireContext())
         super.onStop()
     }
 
