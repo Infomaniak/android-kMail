@@ -230,15 +230,11 @@ object MessageController {
     }
 
     fun MutableRealm.createSingleMessageThreads(messages: List<Message>) {
-        val threads = mutableListOf<Thread>()
         messages.forEach { message ->
             val thread = message.toThread()
             thread.addMessage(message)
-            threads.add(thread)
-        }
-        threads.forEach {
-            it.recomputeThread()
-            ThreadController.upsertThread(it, realm = this)
+            thread.recomputeThread()
+            ThreadController.upsertThread(thread, realm = this)
         }
     }
 
