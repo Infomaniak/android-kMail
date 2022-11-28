@@ -40,7 +40,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.Utils.getFormattedThreadSubject
 import kotlin.math.roundToInt
-import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
@@ -170,7 +169,7 @@ class ThreadFragment : Fragment() {
     private fun onMessagesUpdate(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
         if (messages.isEmpty()) leaveThread()
-        binding.messagesList.setBackgroundResource(if (messages.count() == 1) RCore.color.white else R.color.threadBackground)
+        binding.messagesList.setBackgroundResource(if (messages.count() == 1) R.color.backgroundColor else R.color.threadBackground)
     }
 
     private fun observeContacts() {
