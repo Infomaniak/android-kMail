@@ -209,7 +209,9 @@ object MessageController {
 
     fun MutableRealm.createMultiMessagesThreads(messages: List<Message>) {
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
-        val threadsToUpsert = mutableListOf<Thread>()
+
+        // Here, we use a Set instead of a List, so we can't add multiple times the same Thread to it.
+        val threadsToUpsert = mutableSetOf<Thread>()
 
         messages.forEach { message ->
 
