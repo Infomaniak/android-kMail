@@ -17,11 +17,11 @@
  */
 package com.infomaniak.mail.data.api
 
+import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.api.ApiController.ApiMethod.*
 import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.api.ApiController
-import com.infomaniak.lib.core.api.ApiController.ApiMethod.*
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact

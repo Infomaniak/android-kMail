@@ -18,12 +18,14 @@
 package com.infomaniak.mail.utils
 
 import android.app.NotificationChannel
+import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.infomaniak.lib.core.utils.NotificationUtilsCore
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Mailbox
 
 object NotificationUtils : NotificationUtilsCore() {
 
@@ -36,11 +38,57 @@ object NotificationUtils : NotificationUtilsCore() {
             val generalChannel = buildNotificationChannel(
                 getString(R.string.notification_channel_id_general),
                 getString(R.string.notificationGeneralChannelName),
-                NotificationManager.IMPORTANCE_DEFAULT,
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             channelList.add(generalChannel)
 
+            val draftChannel = buildNotificationChannel(
+                getString(R.string.notification_channel_id_draft_service),
+                getString(R.string.notificationSyncDraftChannelName),
+                NotificationManager.IMPORTANCE_MIN
+            )
+            channelList.add(draftChannel)
+
+            val syncMessagesChannel = buildNotificationChannel(
+                getString(R.string.notification_channel_id_sync_messages_service),
+                getString(R.string.notificationSyncMessagesChannelName),
+                NotificationManager.IMPORTANCE_MIN
+            )
+            channelList.add(syncMessagesChannel)
+
             createNotificationChannels(channelList)
+        }
+    }
+
+    fun Context.initMailNotificationChannel(mailbox: List<Mailbox>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelList = mutableListOf<NotificationChannel>()
+            val groupList = mutableListOf<NotificationChannelGroup>()
+
+            mailbox.forEach {
+                val channelGroup = NotificationChannelGroup(it.mailboxId.toString(), it.email)
+                groupList.add(channelGroup)
+
+                val notificationChannel = buildNotificationChannel(
+                    it.channelId,
+                    getString(R.string.notificationNewMessagesChannelName),
+                    NotificationManager.IMPORTANCE_HIGH,
+                    groupId = channelGroup.id
+                )
+                channelList.add(notificationChannel)
+            }
+
+            createNotificationChannels(channelList, groupList)
+        }
+    }
+
+    fun Context.deleteMailNotificationChannel(mailbox: List<Mailbox>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelList = mutableListOf<String>()
+
+            mailbox.forEach { channelList.add(it.channelId) }
+
+            deleteNotificationChannels(channelList)
         }
     }
 

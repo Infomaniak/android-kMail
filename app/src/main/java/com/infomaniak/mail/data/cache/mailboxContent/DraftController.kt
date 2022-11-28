@@ -17,8 +17,8 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.api.ApiController.json
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
