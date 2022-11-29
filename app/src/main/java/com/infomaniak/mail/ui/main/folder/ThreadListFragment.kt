@@ -31,7 +31,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -56,9 +55,6 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -67,8 +63,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
-
-    private var folderJob: Job? = null
 
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
@@ -308,24 +302,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             updateUpdatedAt()
             clearFilter()
 
-            folderJob?.cancel()
-            folderJob = lifecycleScope.launch(Dispatchers.Main) {
-                getFolder(folderId)
-                observeFolder(folderId)
+            mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
+                displayFolderName(folder)
+                threadListAdapter.updateFolderRole(folder.role)
             }
         }
-    }
 
-    private fun getFolder(folderId: String) {
-        mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
-            threadListViewModel.currentFolder.value = folder
-            displayFolderName(folder)
-            threadListAdapter.updateFolderRole(folder.role)
-        }
-    }
-
-    private fun observeFolder(folderId: String) {
-        threadListViewModel.observeFolder(folderId).observe(viewLifecycleOwner) { folder ->
+        threadListViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
@@ -369,12 +352,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayFolderName(folder: Folder) {
         val folderName = folder.getLocalizedName(binding.context)
-        Log.i("UI", "Received folder name (${folderName})")
+        Log.d("UI", "Received folder name (${folderName})")
         binding.toolbar.title = folderName
     }
 
     private fun onThreadsUpdate(threads: List<Thread>) {
-        Log.i("UI", "Received threads (${threads.size})")
+        Log.d("UI", "Received threads (${threads.size})")
         if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
     }
 
@@ -395,10 +378,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun clearFilter() = with(binding.unreadCountChip) {
-        threadListViewModel.currentFilter.value = ThreadFilter.ALL
-        isChecked = false
-        isCloseIconVisible = false
+    private fun clearFilter() {
+        with(threadListViewModel.currentFilter) {
+            if (value != ThreadFilter.ALL) value = ThreadFilter.ALL
+        }
+
+        with(binding.unreadCountChip) {
+            isChecked = false
+            isCloseIconVisible = false
+        }
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)

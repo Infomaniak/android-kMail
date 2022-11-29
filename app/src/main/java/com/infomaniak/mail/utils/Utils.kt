@@ -33,16 +33,20 @@ object Utils {
 
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
 
-        fun formatFolderWithAllChildren(parent: Folder): List<Folder> {
-            return mutableListOf<Folder>().apply {
-                add(parent)
-                parent.children.forEach { child ->
-                    child.parentLink = parent
-                    addAll(formatFolderWithAllChildren(child))
-                }
-            }
+        if (isEmpty()) return this
+
+        tailrec fun formatFolderWithAllChildren(
+            inputList: MutableList<Folder>,
+            outputList: MutableList<Folder> = mutableListOf(),
+        ): List<Folder> {
+
+            val firstFolder = inputList.removeFirst()
+            outputList.add(firstFolder)
+            inputList.addAll(0, firstFolder.children)
+
+            return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
         }
 
-        return map(::formatFolderWithAllChildren).flatten()
+        return formatFolderWithAllChildren(toMutableList())
     }
 }

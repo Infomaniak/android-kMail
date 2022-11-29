@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.throwErrorAsException
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -62,10 +61,6 @@ object DraftController {
     //endregion
 
     //region Get data
-    private fun getDrafts(realm: TypedRealm): RealmResults<Draft> {
-        return getDraftsQuery(realm = realm).find()
-    }
-
     fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
         return getDraftsWithActionsQuery(realm).find()
     }
@@ -92,15 +87,6 @@ object DraftController {
     fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
-
-    fun cleanOrphans(threads: List<Thread>, realm: MutableRealm) {
-        // TODO: Refactor with LinkingObjects when it's available (https://github.com/realm/realm-kotlin/pull/1021)
-        val messagesUids = threads.flatMap { it.messages }.map { it.uid }
-        val drafts = getDrafts(realm)
-        drafts.reversed().forEach {
-            if (!messagesUids.contains(it.messageUid)) realm.delete(it)
-        }
     }
     //endregion
 

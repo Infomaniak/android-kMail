@@ -64,6 +64,7 @@ class ThreadViewModel : ViewModel() {
                 localMessage
             } else {
                 ApiRepository.getMessage(localMessage.resource).data?.also {
+                    it.messageIds = localMessage.messageIds
 
                     // If we've already got this Message's Draft beforehand, we need to save
                     // its `draftLocalUuid`, otherwise we'll lose the link between them.

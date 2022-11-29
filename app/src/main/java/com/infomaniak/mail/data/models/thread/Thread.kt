@@ -15,71 +15,93 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
-
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.RealmInstantSerializer
-import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.realmSetOf
+import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.ext.toRealmSet
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.UseSerializers
 
-@Serializable
 class Thread : RealmObject {
 
-    //region API data
     @PrimaryKey
     var uid: String = ""
-    @SerialName("messages_count")
-    var messagesCount: Int = 0
-    @SerialName("unique_messages_count")
-    var uniqueMessagesCount: Int = 0
-    @SerialName("deleted_messages_count")
-    var deletedMessagesCount: Int = 0
     var messages: RealmList<Message> = realmListOf()
-    @SerialName("unseen_messages")
+    var uniqueMessagesCount: Int = 0
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
-    var cc: RealmList<Recipient> = realmListOf()
-    var bcc: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     var date: RealmInstant = RealmInstant.MAX
-    @SerialName("has_attachments")
+    var size: Int = 0
     var hasAttachments: Boolean = false
-    @SerialName("has_st_attachments")
-    var hasStAttachments: Boolean = false
-    @SerialName("has_drafts")
     var hasDrafts: Boolean = false
-    @SerialName("flagged")
     var isFavorite: Boolean = false
     var answered: Boolean = false
     var forwarded: Boolean = false
     var scheduled: Boolean = false
-    var size: Int = 0
-    //endregion
+    var foldersIds: RealmSet<String> = realmSetOf()
+    var messagesIds: RealmSet<String> = realmSetOf()
 
-    //region Local data (Transient)
-    @Transient
-    var mailboxUuid: String = ""
-    @Transient
-    var folderId: String = ""
-    //endregion
+    fun addMessage(message: Message) {
+        messages.add(message)
+        messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
+    }
+
+    fun removeMessage(message: Message) {
+        messages.removeIf { it.uid == message.uid }
+        recomputeThread()
+    }
+
+    fun recomputeThread() {
+
+        // Clean the Thread before updating it
+        // TODO: Remove this `sortBy`, and get the Messages in the right order via Realm query (but before, fix the `Thread.date`)
+        messages.sortBy { it.date }
+        unseenMessagesCount = 0
+        size = 0
+        hasAttachments = false
+        hasDrafts = false
+        isFavorite = false
+        answered = false
+        forwarded = false
+        scheduled = false
+
+        // Update the Thread depending on its Messages data
+        messages.forEach { message ->
+            foldersIds += message.folderId
+            messagesIds += message.messageIds
+            if (!message.seen) unseenMessagesCount++
+            from += message.from
+            to += message.to
+            size += message.size
+            if (message.hasAttachments) hasAttachments = true
+            if (message.isDraft) hasDrafts = true
+            if (message.isFavorite) isFavorite = true
+            if (message.answered) answered = true
+            if (message.forwarded) forwarded = true
+            if (message.scheduled) scheduled = true
+        }
+        uniqueMessagesCount = messages.count() // TODO: Handle duplicates
+        date = messages.last().date!! // TODO: Remove this, and compute the Date in the UI only
+
+        // Remove duplicates in Recipients lists
+        from = from.toRecipientsList().distinct().toRealmList()
+        to = to.toRecipientsList().distinct().toRealmList()
+    }
 
     fun formatDate(context: Context): String = with(date.toDate()) {
         when {
@@ -92,6 +114,10 @@ class Thread : RealmObject {
     }
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
+
+    private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
+        return map { Recipient().initLocalValues(it.email, it.name) }
+    }
 
     enum class ThreadFilter(@IdRes val filterNameRes: Int) {
         ALL(R.string.searchAllMessages),
