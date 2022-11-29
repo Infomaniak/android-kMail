@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
@@ -33,6 +35,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -67,31 +70,60 @@ class IntroFragment : Fragment() {
                 val selectedTab = pinkBlueTabLayout.getTabAt(accentColor.introTabIndex)
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
-                iconLayout.setAnimation(R.raw.illu_1)
+                iconLayout.apply {
+                    setAnimation(R.raw.illu_1)
+                    repeatFrame(53, 138)
+                }
             }
             1 -> {
                 waveBackground.setImageResource(R.drawable.ic_back_wave_2)
                 title.setText(R.string.onBoardingTitle2)
                 description.setText(R.string.onBoardingDescription2)
-                iconLayout.setAnimation(R.raw.illu_2)
+                iconLayout.apply {
+                    setAnimation(R.raw.illu_2)
+                    repeatFrame(108, 253)
+                }
             }
             2 -> {
                 waveBackground.setImageResource(R.drawable.ic_back_wave_3)
                 title.setText(R.string.onBoardingTitle3)
                 description.setText(R.string.onBoardingDescription3)
-                iconLayout.setAnimation(R.raw.illu_3)
+                iconLayout.apply {
+                    setAnimation(R.raw.illu_3)
+                    repeatFrame(113, 243)
+                }
             }
             3 -> {
                 waveBackground.setImageResource(R.drawable.ic_back_wave_4)
                 title.setText(R.string.onBoardingTitle4)
                 description.setText(R.string.onBoardingDescription4)
-                iconLayout.setAnimation(R.raw.illu_4)
+                iconLayout.apply {
+                    setAnimation(R.raw.illu_4)
+                    repeatFrame(127, 236)
+                }
             }
         }
 
         updateUiWhenThemeChanges(navigationArgs.position)
 
-        setUi(localSettings.accentColor, navigationArgs.position, animate = false)
+        setUi(localSettings.accentColor, navigationArgs.position)
+    }
+
+    private fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
+        addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) = Unit
+
+            override fun onAnimationEnd(animation: Animator) {
+                removeAllAnimatorListeners()
+                repeatCount = ValueAnimator.INFINITE
+                setMinAndMaxFrame(firstFrame, lastFrame)
+                playAnimation()
+            }
+
+            override fun onAnimationCancel(animation: Animator) = Unit
+
+            override fun onAnimationRepeat(animation: Animator) = Unit
+        })
     }
 
     private fun setTabSelectedListener() = with(binding) {
@@ -115,25 +147,24 @@ class IntroFragment : Fragment() {
         }
     }
 
-    private fun updateUiWhenThemeChanges(position: Int?) {
+    private fun updateUiWhenThemeChanges(position: Int) {
         introViewModel.currentAccentColor.observe(viewLifecycleOwner) { accentColor ->
-            setUi(accentColor, position, animate = true)
+            setUi(accentColor, position)
         }
     }
 
     /**
      * `animate` is necessary because when the activity is started, we want to avoid animating the color change the first time.
      */
-    private fun setUi(accentColor: AccentColor, position: Int?, animate: Boolean) = with(binding) {
-        updateEachPageUi(accentColor, animate)
-        if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(accentColor, animate)
-        if (position == LOGIN_BUTTON_PAGE) updateActivityUi(accentColor, animate)
+    private fun setUi(accentColor: AccentColor, position: Int) = with(binding) {
+        updateEachPageUi(accentColor)
+        if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(accentColor)
     }
 
-    private fun updateEachPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
+    private fun updateEachPageUi(accentColor: AccentColor) = with(binding) {
         val newColor = accentColor.getSecondaryBackground(requireContext())
         val oldColor = requireActivity().window.statusBarColor
-        animateColorChange(animate, oldColor, newColor) { color ->
+        animateColorChange(oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
     }
@@ -142,26 +173,26 @@ class IntroFragment : Fragment() {
         return VectorDrawableCompat.create(resources, drawableRes, ContextThemeWrapper(context, theme).theme)
     }
 
-    private fun updateAccentColorPickerPageUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
-        animateTabIndicatorAndTextColor(accentColor, requireContext(), animate)
-        animateTabBackgroundColor(accentColor, requireContext(), animate)
+    private fun updateAccentColorPickerPageUi(accentColor: AccentColor) = with(binding) {
+        animateTabIndicatorAndTextColor(accentColor, requireContext())
+        animateTabBackgroundColor(accentColor, requireContext())
     }
 
-    private fun animateTabIndicatorAndTextColor(accentColor: AccentColor, context: Context, animate: Boolean) = with(binding) {
+    private fun animateTabIndicatorAndTextColor(accentColor: AccentColor, context: Context) = with(binding) {
         val isPink = accentColor == PINK
         val newPrimary = accentColor.getPrimary(context)
         val colorOnPrimary = context.getAttributeColor(RMaterial.attr.colorOnPrimary)
         val oldPrimary = if (isPink) BLUE.getPrimary(context) else PINK.getPrimary(context)
 
-        animateColorChange(animate, oldPrimary, newPrimary) { color ->
+        animateColorChange(oldPrimary, newPrimary) { color ->
             pinkBlueTabLayout.setSelectedTabIndicatorColor(color)
         }
-        animateColorChange(animate, newPrimary, oldPrimary) { color ->
+        animateColorChange(newPrimary, oldPrimary) { color ->
             pinkBlueTabLayout.setTabTextColors(color, colorOnPrimary)
         }
     }
 
-    private fun animateTabBackgroundColor(accentColor: AccentColor, context: Context, animate: Boolean) = with(binding) {
+    private fun animateTabBackgroundColor(accentColor: AccentColor, context: Context) = with(binding) {
         val isPink = accentColor == PINK
         val tabBackgroundRes = if (isPink) R.color.blueBoardingSecondaryBackground else R.color.pinkBoardingSecondaryBackground
         val tabBackground = ContextCompat.getColor(context, tabBackgroundRes)
@@ -171,13 +202,9 @@ class IntroFragment : Fragment() {
             PINK.getSecondaryBackground(context)
         }
 
-        animateColorChange(animate, oldBackground, tabBackground) { color ->
+        animateColorChange(oldBackground, tabBackground) { color ->
             pinkBlueTabLayout.setBackgroundColor(color)
         }
-    }
-
-    private fun updateActivityUi(accentColor: AccentColor, animate: Boolean) {
-        (requireActivity() as LoginActivity).updateUi(accentColor, animate)
     }
 
     private companion object {
