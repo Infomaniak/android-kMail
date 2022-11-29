@@ -31,6 +31,8 @@ object NotificationUtils : NotificationUtilsCore() {
 
     private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
 
+    const val DRAFT_ACTIONS_ID = 1
+
     fun Context.initNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelList = mutableListOf<NotificationChannel>()
@@ -98,5 +100,14 @@ object NotificationUtils : NotificationUtilsCore() {
             title = title,
             description = description
         )
+    }
+
+    fun Context.showDraftActionsNotification(): NotificationCompat.Builder {
+        val channelId = getString(R.string.notification_channel_id_draft_service)
+        return NotificationCompat.Builder(this, channelId).apply {
+            setContentTitle(getString(R.string.notificationSyncDraftChannelName))
+            setSmallIcon(DEFAULT_SMALL_ICON)
+            setProgress(100, 0, true)
+        }
     }
 }

@@ -34,8 +34,8 @@ import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
+import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -45,6 +45,7 @@ class MainActivity : ThemedActivity() {
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
+    private val permissionUtils by lazy { PermissionUtils(this).also { it.registerNotificationPermission {} } }
 
     private var contactPermissionResultLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
         if (isGranted) mainViewModel.updateUserInfo()
@@ -85,8 +86,8 @@ class MainActivity : ThemedActivity() {
         mainViewModel.loadCurrentMailbox()
 
         mainViewModel.observeRealmMergedContacts()
+        permissionUtils.requestNotificationPermissionIfNeeded()
         requestContactsPermission()
-        launchDraftsActionsWorkIfNeeded()
     }
 
     override fun onBackPressed(): Unit = with(binding) {
@@ -170,11 +171,4 @@ class MainActivity : ThemedActivity() {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
     }
 
-    private fun launchDraftsActionsWorkIfNeeded() {
-        val runningWorkInfosLiveData = DraftsActionsWorker.getRunningWorkInfosLiveData(this)
-        runningWorkInfosLiveData.observe(this) { worksInfoList ->
-            if (worksInfoList.isEmpty()) DraftsActionsWorker.scheduleWork(this)
-            runningWorkInfosLiveData.removeObservers(this)
-        }
-    }
 }

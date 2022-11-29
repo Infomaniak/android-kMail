@@ -37,6 +37,7 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.serialization.encodeToString
+import okhttp3.OkHttpClient
 
 object DraftController {
 
@@ -145,9 +146,10 @@ object DraftController {
         throw error?.exception ?: Exception(data?.let { json.encodeToString(it) })
     }
 
-    fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm) {
+    fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm, okHttpClient: OkHttpClient) {
+
         when (draft.action) {
-            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft)) {
+            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
                 if (data != null) {
                     updateDraft(draft.localUuid, realm) {
                         it.remoteUuid = data?.draftRemoteUuid
@@ -156,7 +158,7 @@ object DraftController {
                     }
                 } else manageUploadErrors()
             }
-            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft)) {
+            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
                 if (isSuccess()) realm.delete(draft) else manageUploadErrors()
             }
             else -> Unit
