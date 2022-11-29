@@ -23,12 +23,10 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.MainViewModel
-import io.realm.kotlin.ext.isValid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -50,17 +48,15 @@ class ThreadListViewModel : ViewModel() {
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    val currentThreads = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
+    val currentThreads = Transformations.switchMap(observeFolderAndFilter()) { (folderId, filter) ->
         liveData(Dispatchers.IO) {
-            if (folder != null && folder.isValid()) {
-                emitSource(ThreadController.getThreads(folder.id, filter).asFlow().asLiveData())
-            }
+            if (folderId != null) emitSource(ThreadController.getThreads(folderId, filter).asFlow().asLiveData())
         }
     }
 
-    private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
-        value = currentFolder.value to currentFilter.value!!
-        addSource(currentFolder) { value = it to value!!.second }
+    private fun observeFolderAndFilter() = MediatorLiveData<Pair<String?, ThreadFilter>>().apply {
+        value = MainViewModel.currentFolderId.value to currentFilter.value!!
+        addSource(MainViewModel.currentFolderId) { value = it to value!!.second }
         addSource(currentFilter) { value = value?.first to it }
     }
 
