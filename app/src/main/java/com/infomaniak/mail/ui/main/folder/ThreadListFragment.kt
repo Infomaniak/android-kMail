@@ -378,10 +378,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun clearFilter() = with(binding.unreadCountChip) {
-        threadListViewModel.currentFilter.value = ThreadFilter.ALL
-        isChecked = false
-        isCloseIconVisible = false
+    private fun clearFilter() {
+        with(threadListViewModel.currentFilter) {
+            if (value != ThreadFilter.ALL) value = ThreadFilter.ALL
+        }
+
+        with(binding.unreadCountChip) {
+            isChecked = false
+            isCloseIconVisible = false
+        }
     }
 
     private fun scrollToTop() = binding.threadsList.layoutManager?.scrollToPosition(0)
