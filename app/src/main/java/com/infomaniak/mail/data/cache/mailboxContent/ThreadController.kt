@@ -31,18 +31,31 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 
 object ThreadController {
 
     //region Queries
-    fun getThreadsQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
+    private fun getThreadsQuery(realm: TypedRealm? = null): RealmQuery<Thread> {
+        return (realm ?: RealmDatabase.mailboxContent()).query()
+    }
+
+    private fun getThreadsQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
         val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
     }
 
-    private fun getThreadsQuery(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
-        val byFolderId = "${Thread::folderId.name} == '$folderId'"
-        val query = (realm ?: RealmDatabase.mailboxContent()).query<Thread>(byFolderId)
+    private fun getThreadsQuery(
+        folderId: String,
+        filter: ThreadFilter = ThreadFilter.ALL,
+        realm: TypedRealm? = null
+    ): RealmQuery<Thread> {
+
+        val byFolderId = "${Thread::foldersIds.name} == '$folderId'"
+        val query = (realm ?: RealmDatabase.mailboxContent())
+            .query<Thread>(byFolderId)
+            .sort(Thread::date.name, Sort.DESCENDING)
+
         return if (filter == ThreadFilter.ALL) {
             query
         } else {
@@ -64,12 +77,16 @@ object ThreadController {
     //endregion
 
     //region Get data
-    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmResults<Thread> {
-        return getThreadsQuery(uids, realm).find()
+    fun getThreads(realm: TypedRealm? = null): RealmResults<Thread> {
+        return getThreadsQuery(realm).find()
     }
 
-    fun getThreads(folderId: String, filter: ThreadFilter, realm: TypedRealm? = null): RealmQuery<Thread> {
-        return getThreadsQuery(folderId, filter, realm)
+    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
+        return getThreadsQuery(uids, realm)
+    }
+
+    fun getThreads(folderId: String, filter: ThreadFilter = ThreadFilter.ALL, realm: TypedRealm? = null): RealmResults<Thread> {
+        return getThreadsQuery(folderId, filter, realm).find()
     }
 
     fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
@@ -97,6 +114,14 @@ object ThreadController {
 
     fun deleteThread(uid: String) {
         RealmDatabase.mailboxContent().writeBlocking { getThread(uid, realm = this)?.let(::delete) }
+    }
+
+    fun deleteAllThreads(realm: MutableRealm) {
+        realm.delete(getThreads(realm))
+    }
+
+    fun deleteThreadsOnlyInThisFolder(folderId: String, realm: MutableRealm) {
+        realm.delete(getThreadsQuery(folderId, realm = realm).query("${Thread::foldersIds.name}.@count == 1"))
     }
     //endregion
 

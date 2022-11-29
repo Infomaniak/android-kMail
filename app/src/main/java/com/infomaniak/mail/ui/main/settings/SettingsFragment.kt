@@ -110,7 +110,6 @@ class SettingsFragment : Fragment() {
 
         settingsMessageDisplay.setOnClickListener {
             notYetImplemented()
-            // TODO: Put back when we can fully create the Threads by ourself.
             // animatedNavigation(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
         }
 

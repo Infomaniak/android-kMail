@@ -22,6 +22,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -50,12 +51,13 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val localSettings by lazy { LocalSettings.getInstance(application) }
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
 
     fun close() {
-        Log.i(TAG, "close")
+        Log.i(TAG, "Close")
         RealmDatabase.close()
         resetAllCurrentLiveData()
     }
@@ -84,7 +86,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != currentMailboxObjectId.value) {
-            Log.i(TAG, "selectMailbox: ${mailbox.email}")
+            Log.d(TAG, "Select mailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
             currentMailboxObjectId.postValue(mailbox.objectId)
 
@@ -95,7 +97,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun selectFolder(folderId: String) {
         if (folderId != currentFolderId.value) {
-            Log.i(TAG, "selectFolder: $folderId")
+            Log.d(TAG, "Select folder: $folderId")
             currentFolderId.postValue(folderId)
 
             currentThreadUid.postValue(null)
@@ -103,19 +105,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateUserInfo() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "updateUserInfo")
+        Log.d(TAG, "Update user info")
         updateAddressBooks()
         updateContacts()
     }
 
     fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "loadCurrentMailbox")
+        Log.d(TAG, "Load current mailbox")
         updateMailboxes()
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
     fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "switchToMailbox: ${mailbox.email}")
         selectMailbox(mailbox)
         updateSignatures(mailbox)
         updateFolders(mailbox)
@@ -126,7 +127,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "forceRefreshMailboxes")
+        Log.d(TAG, "Force refresh mailboxes")
         updateMailboxes()
         updateCurrentMailboxQuotas()
     }
@@ -144,14 +145,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
         if (folderId == currentFolderId.value) return@launch
 
-        Log.i(TAG, "openFolder: $folderId")
-
         selectFolder(folderId)
         refreshThreads(mailboxUuid, folderId)
     }
 
     fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
-        Log.i(TAG, "forceRefreshThreads")
+        Log.d(TAG, "Force refresh threads")
         val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
         val folderId = currentFolderId.value ?: return@launch
         refreshThreads(mailboxUuid, folderId)
@@ -203,12 +202,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         isDownloadingChanges.postValue(true)
 
-        MessageController.fetchMessages(mailboxUuid, folderId)
+        MessageController.fetchCurrentFolderMessages(mailboxUuid, folderId, localSettings.threadMode)
 
         isDownloadingChanges.postValue(false)
     }
 
-    // Delete Thread
     fun deleteThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
 
         val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
@@ -232,7 +230,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-    //endregion
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName

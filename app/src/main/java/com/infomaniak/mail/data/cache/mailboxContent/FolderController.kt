@@ -26,7 +26,6 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
@@ -87,12 +86,14 @@ object FolderController {
 
     private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {
         getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
-            folder.threads.reversed().forEach { thread ->
-                deleteMessages(thread.messages)
-                delete(thread)
-            }
-            delete(folder)
+            deleteLocalFolder(folder)
         }
+    }
+
+    private fun MutableRealm.deleteLocalFolder(folder: Folder) {
+        deleteMessages(MessageController.getMessages(folder.id, realm = this))
+        ThreadController.deleteThreadsOnlyInThisFolder(folder.id, realm = this)
+        delete(folder)
     }
 
     private fun MutableRealm.insertNewData(remoteFolders: List<Folder>) {
@@ -100,19 +101,14 @@ object FolderController {
         remoteFolders.forEach { remoteFolder ->
 
             getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
-                remoteFolder.initLocalValues(
-                    threads = localFolder.threads.toRealmList(),
-                    parentLink = localFolder.parentLink,
-                    lastUpdatedAt = localFolder.lastUpdatedAt,
-                    cursor = localFolder.cursor,
-                )
+                remoteFolder.initLocalValues(lastUpdatedAt = localFolder.lastUpdatedAt, cursor = localFolder.cursor)
             }
 
             copyToRealm(remoteFolder, UpdatePolicy.ALL)
         }
     }
 
-    fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
+    private fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
         val block: (MutableRealm) -> Unit = { getFolder(id, realm = it)?.let(onUpdate) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
