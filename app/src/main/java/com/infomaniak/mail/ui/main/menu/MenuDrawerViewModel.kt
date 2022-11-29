@@ -25,11 +25,12 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.ui.MainViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 
 class MenuDrawerViewModel : ViewModel() {
 
     val folders = Transformations.switchMap(MainViewModel.currentMailboxObjectId) {
-        liveData(Dispatchers.IO) { if (it != null) emit(FolderController.getFolders()) }
+        liveData(Dispatchers.IO) { if (it != null) emitSource(FolderController.getFoldersAsync().map { it.list }.asLiveData()) }
     }
 
     val quotas = Transformations.switchMap(MainViewModel.currentMailboxObjectId) {
