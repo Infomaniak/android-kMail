@@ -39,13 +39,14 @@ class RecipientFieldView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
-
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var contactAdapter: ContactAdapter2? = null
     private val recipients = mutableSetOf<Recipient>()
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
+    private var onFocusNext: (() -> Unit)? = null
+    private var onFocusPrevious: (() -> Unit)? = null
     private var isToggleable = false
     private var isCollapsed = true
         set(value) {
@@ -60,11 +61,33 @@ class RecipientFieldView @JvmOverloads constructor(
             binding.autoCompletedContacts.isVisible = value
         }
 
+    // override fun onFocusChanged(gainFocus: Boolean, direction: Int, preRviouslyFocusedRect: Rect?) {
+    //     Log.e("gibran", "onFocusChanged: ${binding.prefix.text}", );
+    //     super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+    //     binding.autocompleteInput.requestFocus()
+    // }
+    //
+    // override fun onRequestFocusInDescendants(direction: Int, previouslyFocusedRect: Rect?): Boolean {
+    //     Log.e("gibran", "onRequestFocusInDescendants: ${binding.prefix.text}", );
+    //     return super.onRequestFocusInDescendants(direction, previouslyFocusedRect)
+    // }
+    //
+    // override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+    //     Log.e("gibran", "onWindowFocusChanged: ${binding.prefix.text}", );
+    //     super.onWindowFocusChanged(hasWindowFocus)
+    // }
+
     init {
+        // isFocusable = true
+        // isClickable = true
+
         with(binding) {
             attrs?.getAttributes(context, R.styleable.RecipientFieldView) {
                 prefix.text = getText(R.styleable.RecipientFieldView_title)
                 isToggleable = getBoolean(R.styleable.RecipientFieldView_toggleable, isToggleable)
+
+                autocompleteInput.nextFocusForwardId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
+                autocompleteInput.nextFocusDownId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
             }
 
             chevron.isVisible = isToggleable
@@ -143,6 +166,8 @@ class RecipientFieldView @JvmOverloads constructor(
 
             setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) contactAdapter!!.addFirstAvailableItem()
+                // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
+                // if (actionId == EditorInfo.IME_ACTION_PREVIOUS) onFocusPrevious?.invoke()
                 true // Keep keyboard open
             }
         }
@@ -183,6 +208,14 @@ class RecipientFieldView @JvmOverloads constructor(
     fun onAutoCompletionToggled(callback: (hasOpened: Boolean) -> Unit) {
         onAutoCompletionToggled = callback
     }
+
+    // fun onFocusNext(callback: () -> Unit) {
+    //     onFocusNext = callback
+    // }
+    //
+    // fun onFocusPrevious(callback: () -> Unit) {
+    //     onFocusPrevious = callback
+    // }
 
     fun setOnToggleListener(listener: ((isCollapsed: Boolean) -> Unit)?) {
         onToggle = listener

@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.newMessage
 import android.content.ClipDescription
 import android.os.Bundle
 import android.text.InputFilter
+import android.text.InputType
 import android.text.Spanned
 import android.transition.TransitionManager
 import android.util.Log
@@ -76,94 +77,83 @@ class NewMessageFragment : Fragment() {
 
         filePicker = FilePicker(this@NewMessageFragment)
 
-        toField.setOnToggleListener(::openAdvancedFields)
-
-        // TODO: Do we want this button?
-        // toTransparentButton.setOnClickListener {
-        //     viewModel.areAdvancedFieldsOpened = !viewModel.areAdvancedFieldsOpened
-        //     openAdvancedFields()
-        // }
-
-        attachmentsRecyclerView.adapter = attachmentAdapter
-        bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
-
-        setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
-
-        newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, isToggled) ->
-
-            val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) }
-            // TODO: Do stuff here with this `selectedText`?
-
-            when (editorAction) {
-                // TODO: Replace logs with actual code
-                EditorAction.ATTACHMENT -> {
-                    Log.d("SelectedText", "ATTACHMENT")
-                    filePicker.open { uris ->
-                        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                        newMessageViewModel.importAttachments(uris)
-                    }
-                }
-                EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
-                EditorAction.LINK -> Log.d("SelectedText", "LINK")
-                EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
-                EditorAction.BOLD -> Log.d("SelectedText", "BOLD: $isToggled")
-                EditorAction.ITALIC -> Log.d("SelectedText", "ITALIC: $isToggled")
-                EditorAction.UNDERLINE -> Log.d("SelectedText", "UNDERLINE: $isToggled")
-                EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH: $isToggled")
-                EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
-            }
-        }
-
-        newMessageViewModel.importedAttachments.observe(requireActivity()) { (attachments, importationResult) ->
-            attachmentAdapter.addAll(attachments)
-            attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-
-            if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
-        }
-
-        subjectTextField.filters = arrayOf<InputFilter>(object : InputFilter {
-            override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
-                source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
-                return null
-            }
-        })
-
         initDraftAndUi()
         observeSubject()
         observeBody()
         observeMailboxes()
+
+        observeEditorActions()
+        observeNewAttachments()
     }
 
-    override fun onStop() {
-        DraftsActionsWorker.scheduleWork(requireContext())
-        super.onStop()
-    }
+    private fun initDraftAndUi() = with(binding) {
+        attachmentsRecyclerView.adapter = attachmentAdapter
 
-    fun closeAutocompletion() = with(binding) {
-        toField.clearField()
-        ccField.clearField()
-        bccField.clearField()
-    }
+        setupAutoCompletionFields()
 
-    private fun initDraftAndUi() {
-        newMessageViewModel.initDraftAndUi(newMessageActivityArgs)
-            .observe(viewLifecycleOwner) { isSuccess ->
-                if (isSuccess) {
-                    observeContacts()
-                    populateUiWithExistingDraftData()
-                } else {
-                    requireActivity().finish()
+        subjectTextField.apply {
+            // Enables having imeOptions="actionNext" and inputType="textMultiLine" at the same time
+            setRawInputType(InputType.TYPE_CLASS_TEXT)
+
+            filters = arrayOf<InputFilter>(object : InputFilter {
+                override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
+                    source?.toString()?.let { if (it.contains("\n")) return it.replace("\n", "") }
+                    return null
                 }
+            })
+        }
+
+        bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
+        setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
+
+        newMessageViewModel.initDraftAndUi(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess) {
+                observeContacts()
+                populateUiWithExistingDraftData()
+            } else {
+                requireActivity().finish()
             }
+        }
     }
 
-    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
-        if (itemCountLeft == 0) {
-            TransitionManager.beginDelayedTransition(binding.root)
-            binding.attachmentsRecyclerView.isGone = true
+    private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
+        ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->
+            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            callback(isKeyboardVisible)
+            insets
         }
-        mailAttachments[position].getUploadLocalFile(requireContext(), currentDraftLocalUuid).delete()
-        mailAttachments.removeAt(position)
+    }
+
+    private fun observeContacts() {
+        newMessageViewModel.getMergedContacts().observe(viewLifecycleOwner, ::setupContactsAdapter)
+    }
+
+    private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
+        binding.toField.apply {
+            initContacts(allContacts, mutableListOf())
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(TO, hasOpened) }
+        }
+
+        binding.ccField.apply {
+            initContacts(allContacts, mutableListOf())
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(CC, hasOpened) }
+        }
+
+        binding.bccField.apply {
+            initContacts(allContacts, mutableListOf())
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(BCC, hasOpened) }
+        }
+    }
+
+    private fun toggleAutoCompletion(field: FieldType? = null, isAutocompletionOpened: Boolean) = with(newMessageViewModel) {
+        binding.preFields.isGone = isAutocompletionOpened
+
+        binding.to.isVisible = !isAutocompletionOpened || field == TO
+        binding.cc.isVisible = !isAutocompletionOpened || field == CC
+        binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
+        binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
+
+        binding.postFields.isGone = isAutocompletionOpened
     }
 
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
@@ -181,6 +171,31 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun setupAutoCompletionFields() = with(binding) {
+        toField.apply {
+            setOnToggleListener(::openAdvancedFields)
+            // onFocusNext {
+            //     openAdvancedFields(false)
+            //     ccField.requestFocus()
+            // }
+        }
+
+        // ccField.apply {
+        //     onFocusNext { bccField.requestFocus() }
+        //     onFocusPrevious { toField.requestFocus() }
+        // }
+        //
+        // bccField.apply {
+        //     onFocusNext { subjectTextField.requestFocus() }
+        //     onFocusPrevious { ccField.requestFocus() }
+        // }
+    }
+
+    private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
+        cc.isGone = isCollapsed
+        bcc.isGone = isCollapsed
+    }
+
     private fun observeSubject() {
         binding.subjectTextField.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailSubject)
@@ -191,30 +206,6 @@ class NewMessageFragment : Fragment() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
         }
-    }
-
-    // private fun enableAutocomplete(field: FieldType) = with(newMessageViewModel) {
-    //     getInputView(field).apply {
-    //
-    //         doOnTextChanged { text, _, _, _ ->
-    //             Log.e("gibran", "TO/CC/BCC enableAutocomplete - text: ${text}")
-    //             if (text?.isNotEmpty() == true) {
-    //                 if ((text.trim().count()) > 0) contactAdapter.filterField(field, text) else contactAdapter.clear()
-    //                 if (!isAutocompletionOpened) openAutocompletionView(field)
-    //             } else if (isAutocompletionOpened) {
-    //                 closeAutocompletionView()
-    //             }
-    //         }
-    //
-    //         setOnEditorActionListener { _, actionId, _ ->
-    //             if (actionId == EditorInfo.IME_ACTION_DONE) contactAdapter.addFirstAvailableItem()
-    //             true // Keep keyboard open
-    //         }
-    //     }
-    // }
-
-    private fun observeContacts() {
-        newMessageViewModel.getMergedContacts().observe(viewLifecycleOwner, ::setupContactsAdapter)
     }
 
     private fun observeMailboxes() {
@@ -256,32 +247,63 @@ class NewMessageFragment : Fragment() {
         // }
     }
 
-    private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
-        binding.toField.apply {
-            initContacts(allContacts, mutableListOf())
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion2(TO, hasOpened) }
-        }
+    private fun observeEditorActions() = with(binding) {
+        newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, isToggled) ->
 
-        binding.ccField.apply {
-            initContacts(allContacts, mutableListOf())
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion2(CC, hasOpened) }
-        }
+            val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) }
+            // TODO: Do stuff here with this `selectedText`?
 
-        binding.bccField.apply {
-            initContacts(allContacts, mutableListOf())
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion2(BCC, hasOpened) }
+            when (editorAction) {
+                // TODO: Replace logs with actual code
+                EditorAction.ATTACHMENT -> {
+                    Log.d("SelectedText", "ATTACHMENT")
+                    filePicker.open { uris ->
+                        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                        newMessageViewModel.importAttachments(uris)
+                    }
+                }
+                EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
+                EditorAction.LINK -> Log.d("SelectedText", "LINK")
+                EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
+                EditorAction.BOLD -> Log.d("SelectedText", "BOLD: $isToggled")
+                EditorAction.ITALIC -> Log.d("SelectedText", "ITALIC: $isToggled")
+                EditorAction.UNDERLINE -> Log.d("SelectedText", "UNDERLINE: $isToggled")
+                EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH: $isToggled")
+                EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
+            }
         }
+    }
+
+    private fun observeNewAttachments() = with(binding) {
+        newMessageViewModel.importedAttachments.observe(requireActivity()) { (attachments, importationResult) ->
+            attachmentAdapter.addAll(attachments)
+            attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+
+            if (importationResult == ImportationResult.FILE_SIZE_TOO_BIG) showSnackbar(R.string.attachmentFileLimitReached)
+        }
+    }
+
+    override fun onStop() {
+        DraftsActionsWorker.scheduleWork(requireContext())
+        super.onStop()
+    }
+
+    fun closeAutocompletion() = with(binding) {
+        toField.clearField()
+        ccField.clearField()
+        bccField.clearField()
+    }
+
+    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
+        if (itemCountLeft == 0) {
+            TransitionManager.beginDelayedTransition(binding.root)
+            binding.attachmentsRecyclerView.isGone = true
+        }
+        mailAttachments[position].getUploadLocalFile(requireContext(), currentDraftLocalUuid).delete()
+        mailAttachments.removeAt(position)
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
-
-    private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
-        ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->
-            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            callback(isKeyboardVisible)
-            insets
-        }
-    }
 
     // private fun addUnrecognizedMail(field: FieldType): Boolean {
     //     val input = getInputView(field).text.toString().trim()
@@ -299,33 +321,7 @@ class NewMessageFragment : Fragment() {
     //     return isEmail
     // }
 
-    // private fun addRecipientToField(field: FieldType, recipient: Recipient) {
-    //     getRecipients(field).add(recipient)
-    //     newMessageViewModel.saveDraftDebouncing()
-    // }
-    //
-    // private fun removeRecipientFromField(field: FieldType, index: Int) {
-    //     getRecipients(field).removeAt(index)
-    //     newMessageViewModel.saveDraftDebouncing()
-    // }
-
     //region Chips behavior
-
-    // private fun removeEmail(field: FieldType, recipient: Recipient) {
-    //     val index = getRecipients(field).indexOfFirst { it.email == recipient.email }
-    //     removeEmail(field, index)
-    // }
-
-    // private fun removeEmail(field: FieldType, index: Int) {
-    //     val email = getRecipients(field)[index].email
-    //     contactAdapter.removeEmail(field, email)
-    //     removeRecipientFromField(field, index)
-    //     getChipGroup(field).removeViewAt(index)
-    //     if (field == TO) {
-    //         updateSingleChipText()
-    //         updateToAutocompleteInputLayout()
-    //     }
-    // }
 
     // @SuppressLint("SetTextI18n")
     // private fun updateChipVisibility() = with(newMessageViewModel) {
@@ -375,22 +371,6 @@ class NewMessageFragment : Fragment() {
     //
     //     binding.postFields.isGone = isAutocompletionOpened
     // }
-
-    private fun toggleAutoCompletion2(field: FieldType? = null, isAutocompletionOpened: Boolean) = with(newMessageViewModel) {
-        binding.preFields.isGone = isAutocompletionOpened
-
-        binding.to.isVisible = !isAutocompletionOpened || field == TO
-        binding.cc.isVisible = !isAutocompletionOpened || field == CC
-        binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
-        binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
-
-        binding.postFields.isGone = isAutocompletionOpened
-    }
-
-    private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
-        cc.isGone = isCollapsed
-        bcc.isGone = isCollapsed
-    }
 
     // private fun updateToAutocompleteInputLayout() = with(binding) {
     //
