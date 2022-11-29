@@ -17,13 +17,23 @@
  */
 package com.infomaniak.mail.data.cache.mailboxInfo
 
+import android.content.Context
 import android.util.Log
+import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.infomaniak.lib.core.BuildConfig
+import com.infomaniak.lib.core.auth.TokenAuthenticator
+import com.infomaniak.lib.core.auth.TokenInterceptor
+import com.infomaniak.lib.core.auth.TokenInterceptorListener
+import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.login.ApiToken
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -35,6 +45,7 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
+import okhttp3.OkHttpClient
 
 object MailboxController {
 
@@ -104,7 +115,50 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
+    fun updateMailboxes(context: Context, user: User? = null) {
+        (if (user != null) ApiRepository.getMailboxes(createOkHttpClientForSpecificUser(user))
+        else ApiRepository.getMailboxes())
+            .data?.let { mailboxes ->
+
+                context.initMailNotificationChannel(mailboxes)
+
+                val userId = user?.id ?: AccountUtils.currentUserId
+
+                val remoteMailboxes = RealmDatabase.mailboxInfo().writeBlocking {
+                    mailboxes.map {
+                        val mailboxObjectId = it.createObjectId(userId)
+                        val unseenMessages = getMailbox(mailboxObjectId, realm = this)?.unseenMessages ?: 0
+                        it.initLocalValues(userId, unseenMessages)
+                    }
+                }
+
+                update(remoteMailboxes, userId)
+            }
+    }
+
+    private fun createOkHttpClientForSpecificUser(user: User): OkHttpClient {
+
+        val tokenInterceptorListener = object : TokenInterceptorListener {
+            override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
+                AccountUtils.setUserToken(user, apiToken)
+            }
+
+            override suspend fun onRefreshTokenError() {
+                // TODO?
+            }
+
+            override suspend fun getApiToken(): ApiToken = user.apiToken
+        }
+
+        return OkHttpClient.Builder()
+            .apply {
+                if (BuildConfig.DEBUG) addNetworkInterceptor(StethoInterceptor())
+                addInterceptor(TokenInterceptor(tokenInterceptorListener))
+                authenticator(TokenAuthenticator(tokenInterceptorListener))
+            }.build()
+    }
+
+    private fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")

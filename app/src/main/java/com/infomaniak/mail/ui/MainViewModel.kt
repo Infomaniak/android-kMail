@@ -43,7 +43,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
-import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import kotlinx.coroutines.Dispatchers
@@ -113,7 +112,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "Load current mailbox")
-        updateMailboxes()
+        MailboxController.updateMailboxes(getApplication() as Context)
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
@@ -130,7 +129,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "Force refresh mailboxes")
-        updateMailboxes()
+        MailboxController.updateMailboxes(getApplication() as Context)
         updateCurrentMailboxQuotas()
     }
 
@@ -176,16 +175,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 it.list.associateBy { mergedContact ->
                     Recipient().initLocalValues(mergedContact.email, mergedContact.name)
                 }
-            )
-        }
-    }
-
-    private fun updateMailboxes() {
-        ApiRepository.getMailboxes().data?.let { mailboxes ->
-            (getApplication() as Context).initMailNotificationChannel(mailboxes)
-            MailboxController.update(
-                remoteMailboxes = mailboxes.map { it.initLocalValues(AccountUtils.currentUserId) },
-                userId = AccountUtils.currentUserId,
             )
         }
     }
