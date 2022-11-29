@@ -25,9 +25,10 @@
     </declare-styleable>
 
     <declare-styleable name="MenuDrawerItemView">
-        <attr name="badge" format="string" />
+        <attr name="badge" format="integer" />
         <attr name="icon" />
         <attr name="indent" format="dimension" />
+        <attr name="isBadgeCapped" format="boolean" />
         <attr name="text" />
         <attr name="textSize" format="dimension" />
     </declare-styleable>

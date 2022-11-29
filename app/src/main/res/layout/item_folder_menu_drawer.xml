@@ -22,5 +22,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:icon="@drawable/ic_folder"
-    tools:badge="99+"
+    tools:badge="42"
     tools:text="Folder (Default/Custom)" />

@@ -187,7 +187,7 @@ class MenuDrawerFragment : Fragment() {
             val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
 
             inboxFolderId = inbox?.id
-            binding.inboxFolder.badge = inbox?.getUnreadCountOrNull()
+            inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
 
             val currentFolderId = MainViewModel.currentFolderId.value
             defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
