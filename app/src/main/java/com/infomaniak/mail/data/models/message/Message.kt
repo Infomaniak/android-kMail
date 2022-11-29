@@ -25,11 +25,15 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
+import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
+import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -53,6 +57,8 @@ class Message : RealmObject {
     var to: RealmList<Recipient> = realmListOf()
     @SerialName("reply_to")
     var replyTo: RealmList<Recipient> = realmListOf()
+    @SerialName("in_reply_to")
+    var inReplyTo: String? = null
     var references: String? = null
     @SerialName("priority")
     private var _priority: String? = null
@@ -98,7 +104,7 @@ class Message : RealmObject {
     @Transient
     var hasUnsubscribeLink: Boolean = false
     @Transient
-    var parentLink: Thread? = null // TODO: Use inverse relationship instead (https://github.com/realm/realm-kotlin/issues/591)
+    var messageIds: RealmSet<String> = realmSetOf()
     //endregion
 
     //region UI data (Ignore & Transient)
@@ -115,6 +121,8 @@ class Message : RealmObject {
 
     inline val shortUid get() = uid.split("@").first().toLong()
 
+    val parentThread by backlinks(Thread::messages)
+
     var priority
         get() = enumValueOfOrNull<Priority>(_priority)
         set(value) {
@@ -129,22 +137,16 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun toThread(mailboxUuid: String, folderId: String) = Thread().apply {
-        this.mailboxUuid = mailboxUuid
-        this.folderId = folderId
+    fun updateFlags(flags: MessageFlags) {
+        seen = flags.seen
+        isFavorite = flags.isFavorite
+        answered = flags.answered
+        forwarded = flags.forwarded
+        scheduled = flags.scheduled
+    }
+
+    fun toThread() = Thread().apply {
         uid = this@Message.uid
-        uniqueMessagesCount = 1
-        messages = realmListOf(this@Message)
-        answered = this@Message.answered
-        isFavorite = this@Message.isFavorite
-        forwarded = this@Message.forwarded
-        scheduled = this@Message.scheduled
-        unseenMessagesCount = if (this@Message.seen) 0 else 1
-        from = this@Message.from
         subject = this@Message.subject
-        this@Message.date?.let { date = it }
-        hasAttachments = this@Message.hasAttachments
-        hasDrafts = this@Message.isDraft
-        isFavorite = this@Message.isFavorite
     }
 }

@@ -116,7 +116,7 @@ class MenuDrawerFragment : Fragment() {
             )
         }
         inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
-        customFolders.setOnClickListener { customFoldersList.isGone = customFolders.isCollapsed }
+        customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
         customFolders.setOnActionClickListener { // Create new folder
             // TODO
             notYetImplemented()
@@ -192,6 +192,8 @@ class MenuDrawerFragment : Fragment() {
             val currentFolderId = MainViewModel.currentFolderId.value
             defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
             customFolderAdapter.setFolders(customFolders, currentFolderId)
+
+            binding.noFolderText.isVisible = customFolders.isEmpty()
         }
     }
 
@@ -236,7 +238,7 @@ class MenuDrawerFragment : Fragment() {
     fun closeDropdowns(): Unit = with(binding) {
         mailboxExpandedSwitcher.isGone = true
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
-        customFoldersList.isVisible = true
+        customFoldersLayout.isVisible = true
         customFolders.setIsCollapsed(false)
         advancedActionsLayout.isVisible = true
     }
@@ -259,7 +261,7 @@ class MenuDrawerFragment : Fragment() {
                 .also(list::removeAll)
 
             val customFolders = list
-                .filter { it.parentLink == null }
+                .filter { it.parentFolder.isEmpty() }
                 .sortedByDescending { it.isFavorite }
                 .formatFoldersListWithAllChildren()
 

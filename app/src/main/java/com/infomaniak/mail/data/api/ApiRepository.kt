@@ -151,8 +151,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, dateSince), method = GET)
     }
 
-    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, signature: String): ApiResponse<GetMessagesUidsDeltaResult> {
-        return callApi(url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, signature), method = GET)
+    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): ApiResponse<GetMessagesUidsDeltaResult> {
+        return callApi(url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor), method = GET)
     }
 
     fun getMessagesByUids(

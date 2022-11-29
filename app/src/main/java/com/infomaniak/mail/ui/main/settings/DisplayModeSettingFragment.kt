@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
@@ -32,6 +33,7 @@ import com.infomaniak.mail.databinding.FragmentDisplayModeSettingBinding
 class DisplayModeSettingFragment : Fragment() {
 
     private lateinit var binding: FragmentDisplayModeSettingBinding
+    private val displayModeSettingViewModel: DisplayModeSettingViewModel by viewModels()
 
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
@@ -51,6 +53,7 @@ class DisplayModeSettingFragment : Fragment() {
 
         onItemCheckedListener { _, _, threadMode ->
             localSettings.threadMode = threadMode as ThreadMode
+            displayModeSettingViewModel.dropThreads(threadMode)
         }
     }
 }
