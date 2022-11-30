@@ -78,6 +78,7 @@ object RealmDatabase {
     }
 
     val newMailboxContentInstance get() = Realm.open(RealmConfig.mailboxContent(AccountUtils.currentMailboxId))
+    fun newMailboxContentInstance(mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(mailboxId))
     fun mailboxContent(): Realm = runBlocking(Dispatchers.IO) {
         mailboxContentMutex.withLock {
             _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
