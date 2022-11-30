@@ -78,8 +78,12 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getMessage(messageResource: String): ApiResponse<Message> {
-        return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
+    fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
+        return callApi(
+            ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),
+            GET,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClient
+        )
     }
 
     fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {

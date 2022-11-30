@@ -20,9 +20,11 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.text.HtmlCompat
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -35,6 +37,7 @@ import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
 class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
@@ -60,7 +63,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                     MessageController.fetchCurrentFolderMessages(mailbox.uuid, folder.id, threadMode, okHttpClient, realm)
 
                 newMessagesThreads.forEach { thread ->
-                    thread.showNotification(folder.id, mailbox, realm)
+                    thread.showNotification(folder.id, mailbox, realm, okHttpClient)
                 }
 
                 realm.close()
@@ -72,9 +75,12 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         Result.success()
     }
 
-    private fun Thread.showNotification(folderId: String, mailbox: Mailbox, realm: Realm) {
+    private fun Thread.showNotification(folderId: String, mailbox: Mailbox, realm: Realm, okHttpClient: OkHttpClient) {
         MessageController.getLastMessage(uid, folderId, realm)?.let { message ->
-            val description = "${message.subject}\n${message.preview}"
+            val preview = ApiRepository.getMessage(message.resource, okHttpClient).data?.body?.value?.let {
+                HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_COMPACT)
+            } ?: message.preview
+            val description = "${message.subject}\n${preview}"
             applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
                 setSubText(mailbox.email)
                 setContentText(message.subject)
