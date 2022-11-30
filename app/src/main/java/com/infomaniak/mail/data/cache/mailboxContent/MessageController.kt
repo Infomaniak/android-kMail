@@ -86,6 +86,11 @@ object MessageController {
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
         return getMessageQuery(uid, realm).find()
     }
+
+    fun getLastMessage(threadUid: String, folderId: String, realm: TypedRealm): Message? {
+        val query = "parentThread.uid == '$threadUid' AND folderId == '$folderId'"
+        return realm.query<Message>(query).sort("date", Sort.DESCENDING).first().find()
+    }
     //endregion
 
     //region Edit data
