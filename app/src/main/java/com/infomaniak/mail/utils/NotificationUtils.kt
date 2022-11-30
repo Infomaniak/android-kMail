@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
 import android.app.NotificationManager
@@ -32,6 +33,8 @@ object NotificationUtils : NotificationUtilsCore() {
     private const val DEFAULT_SMALL_ICON = R.drawable.ic_logo_notification
 
     const val DRAFT_ACTIONS_ID = 1
+
+    private const val GROUP_KEY_WORK_EMAIL = "com.infomaniak.mail.WORK_EMAIL"
 
     fun Context.initNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -108,6 +111,13 @@ object NotificationUtils : NotificationUtilsCore() {
             setContentTitle(getString(R.string.notificationSyncDraftChannelName))
             setSmallIcon(DEFAULT_SMALL_ICON)
             setProgress(100, 0, true)
+        }
+    }
+
+    fun Context.showNewMessageNotification(channelId: String, title: String, description: String): NotificationCompat.Builder {
+        return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description).apply {
+            setCategory(Notification.CATEGORY_EMAIL)
+            // setGroup(GROUP_KEY_WORK_EMAIL) TODO handle group
         }
     }
 }
