@@ -36,6 +36,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.workers.SyncMessagesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -88,6 +89,16 @@ class MainActivity : ThemedActivity() {
         mainViewModel.observeRealmMergedContacts()
         permissionUtils.requestNotificationPermissionIfNeeded()
         requestContactsPermission()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        SyncMessagesWorker.cancelWork(this)
+    }
+
+    override fun onStop() {
+        SyncMessagesWorker.scheduleWork(this)
+        super.onStop()
     }
 
     override fun onBackPressed(): Unit = with(binding) {
