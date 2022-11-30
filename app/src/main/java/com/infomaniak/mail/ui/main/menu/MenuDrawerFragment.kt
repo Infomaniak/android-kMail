@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -72,6 +73,8 @@ class MenuDrawerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        displayVersion()
+
         setupAdapters()
         setupListeners()
 
@@ -80,6 +83,11 @@ class MenuDrawerFragment : Fragment() {
         observeFolders()
         observeCurrentFolder()
         observeQuotas()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun displayVersion() {
+        binding.appVersionName.text = "kMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     }
 
     private fun setupAdapters() = with(binding) {
