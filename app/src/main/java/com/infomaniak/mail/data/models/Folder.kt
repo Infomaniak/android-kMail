@@ -84,8 +84,6 @@ class Folder : RealmObject {
         return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name
     }
 
-    fun getUnreadCountOrNull(): String? = if (unreadCount > 0) unreadCount.toString() else null
-
     enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
         INBOX(R.string.inboxFolder, R.drawable.ic_drawer_mailbox, 0),
         DRAFT(R.string.draftFolder, R.drawable.ic_edit_draft, 4),

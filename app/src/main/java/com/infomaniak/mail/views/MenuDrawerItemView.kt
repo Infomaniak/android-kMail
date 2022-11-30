@@ -25,10 +25,12 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
+import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
@@ -41,10 +43,15 @@ class MenuDrawerItemView @JvmOverloads constructor(
 
     val binding by lazy { ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    var badge: CharSequence? = null
+    var isBadgeCapped: Boolean = false
+
+    var badge: Int = 0
         set(value) {
             field = value
-            binding.itemBadge.text = value
+            binding.itemBadge.apply {
+                isVisible = value > 0
+                text = if (isBadgeCapped) formatUnreadCount(value) else value.toString()
+            }
         }
 
     var icon: Drawable? = null
@@ -75,10 +82,11 @@ class MenuDrawerItemView @JvmOverloads constructor(
         attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
             val defaultTextSize = binding.itemName.textSize.toInt()
 
+            badge = getInteger(R.styleable.MenuDrawerItemView_badge, badge)
             icon = getDrawable(R.styleable.MenuDrawerItemView_icon)
+            indent = getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, indent)
+            isBadgeCapped = getBoolean(R.styleable.MenuDrawerItemView_isBadgeCapped, isBadgeCapped)
             text = getString(R.styleable.MenuDrawerItemView_text)
-            badge = getString(R.styleable.MenuDrawerItemView_badge)
-            indent = getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, 0)
             textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
         }
     }

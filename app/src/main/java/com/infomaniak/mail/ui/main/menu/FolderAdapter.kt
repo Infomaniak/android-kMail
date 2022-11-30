@@ -52,15 +52,14 @@ class FolderAdapter(
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
         val folder = folders[position]
-        val badgeText = folder.getUnreadCountOrNull()
 
         folder.role?.let {
-            setFolderUi(folder.id, context.getString(it.folderNameRes), it.folderIconRes, badgeText)
+            setFolderUi(folder.id, context.getString(it.folderNameRes), it.folderIconRes, folder.unreadCount)
         } ?: setFolderUi(
             id = folder.id,
             name = folder.name,
             iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-            badgeText = badgeText,
+            badgeText = folder.unreadCount,
             folderIndent = folder.path.split(folder.separator).size - 1,
         )
     }
@@ -71,13 +70,13 @@ class FolderAdapter(
         id: String,
         name: String,
         @DrawableRes iconId: Int,
-        badgeText: String? = null,
+        badgeText: Int,
         folderIndent: Int? = null,
     ) = with(item) {
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
-        badge = badgeText ?: ""
+        badge = badgeText
 
         setSelectedState(currentFolderId == id)
 
