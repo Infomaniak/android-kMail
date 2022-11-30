@@ -46,34 +46,30 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
         Log.d(TAG, "SyncMessagesWorker>launchWork: launched")
-        val userId = AccountUtils.currentUser?.id ?: return@withContext stopPeriodicWork()
 
-        MailboxController.getMailboxes(userId).forEach { mailbox ->
+        AccountUtils.getAllUsersSync().forEach loopUsers@{ user ->
+            MailboxController.getMailboxes(user.id).forEach loopMailboxes@{ mailbox ->
 
-            val realm = RealmDatabase.newMailboxContentInstance(mailbox.mailboxId)
-            val folder = FolderController.getFolder(Folder.FolderRole.INBOX) ?: return@withContext stopPeriodicWork()
-            if (folder.cursor == null) return@withContext stopPeriodicWork()
+                val realm = RealmDatabase.newMailboxContentInstance(user.id, mailbox.mailboxId)
+                val folder = FolderController.getFolder(Folder.FolderRole.INBOX) ?: return@loopMailboxes
+                if (folder.cursor == null) return@loopMailboxes
 
-            val okHttpClient = AccountUtils.getHttpClient(userId)
+                val okHttpClient = AccountUtils.getHttpClient(user.id)
 
-            val newMessagesThreads =
-                MessageController.fetchCurrentFolderMessages(mailbox.uuid, folder.id, threadMode, okHttpClient, realm)
+                val newMessagesThreads =
+                    MessageController.fetchCurrentFolderMessages(mailbox.uuid, folder.id, threadMode, okHttpClient, realm)
 
-            newMessagesThreads.forEach { thread ->
-                thread.showNotification(folder.id, mailbox, realm)
+                newMessagesThreads.forEach { thread ->
+                    thread.showNotification(folder.id, mailbox, realm)
+                }
+
+                realm.close()
             }
-
-            realm.close()
         }
 
         Log.d(TAG, "SyncMessagesWorker>launchWork: finished")
 
         Result.success()
-    }
-
-    private fun stopPeriodicWork(): Result {
-        cancelWork(applicationContext)
-        return Result.failure()
     }
 
     private fun Thread.showNotification(folderId: String, mailbox: Mailbox, realm: Realm) {

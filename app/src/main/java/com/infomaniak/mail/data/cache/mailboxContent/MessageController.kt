@@ -135,7 +135,7 @@ object MessageController {
         realm: Realm? = null,
     ): List<Thread> {
 
-        val folder = FolderController.getFolder(folderId) ?: return emptyList()
+        val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
 
         val newMessagesThreads = fetchFolderMessages(mailboxUuid, folder, threadMode, okHttpClient, realm)
 
