@@ -49,8 +49,7 @@ abstract class BaseCoroutineWorker(appContext: Context, params: WorkerParameters
         }
     }
 
-    companion object {
-        private const val MAX_RETRIES = 3
+    private companion object {
+        const val MAX_RETRIES = 3
     }
-
 }
