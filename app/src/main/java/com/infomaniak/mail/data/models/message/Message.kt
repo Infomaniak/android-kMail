@@ -120,6 +120,7 @@ class Message : RealmObject {
     //endregion
 
     inline val shortUid get() = uid.split("@").first().toLong()
+    inline val sender get() = from.first()
 
     val parentThread by backlinks(Thread::messages)
 
