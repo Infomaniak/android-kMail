@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.getMessage
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -93,7 +92,13 @@ object DraftController {
     fun deleteDraft(message: Message) {
         val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
         with(ApiRepository.deleteMessages(mailboxUuid, listOf(message.uid))) {
-            if (isSuccess()) MessageController.deleteMessage(message.uid)
+            if (isSuccess()) {
+                RealmDatabase.mailboxContent().writeBlocking {
+                    val parentThread = message.parentThread.firstOrNull()
+                    MessageController.deleteMessage(message.uid, realm = this)
+                    parentThread?.let(::findLatest)?.recomputeThread()
+                }
+            }
         }
     }
 
@@ -102,7 +107,7 @@ object DraftController {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->
             draft.initLocalValues(messageUid)
             upsertDraft(draft, realm = this@fetchDraft)
-            getMessage(messageUid, realm = this@fetchDraft)?.draftLocalUuid = draft.localUuid
+            MessageController.getMessage(messageUid, realm = this@fetchDraft)?.draftLocalUuid = draft.localUuid
         }?.localUuid
     }
 
