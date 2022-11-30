@@ -28,8 +28,6 @@ data class GetMessagesUidsDeltaResult(
     val addedShortUids: List<String>,
     @SerialName("updated")
     val updatedMessages: List<MessageFlags>,
-    @SerialName("unread_count")
-    var unreadCount: Int = 0,
     @SerialName("signature")
     val cursor: String,
 ) {

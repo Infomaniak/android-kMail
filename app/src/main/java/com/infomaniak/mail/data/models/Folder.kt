@@ -48,8 +48,6 @@ class Folder : RealmObject {
     @Suppress("PropertyName")
     @SerialName("role")
     var _role: String? = null
-    @SerialName("unread_count")
-    var unreadCount: Int = 0
     @SerialName("total_count")
     var totalCount: Int = 0
     @SerialName("is_fake")
@@ -67,6 +65,8 @@ class Folder : RealmObject {
     var lastUpdatedAt: RealmInstant? = null
     @Transient
     var cursor: String? = null
+    @Transient
+    var unreadCount: Int = 0
     //endregion
 
     val parentFolder by backlinks(Folder::children)
@@ -74,9 +74,10 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun initLocalValues(lastUpdatedAt: RealmInstant?, cursor: String?) {
+    fun initLocalValues(lastUpdatedAt: RealmInstant?, cursor: String?, unreadCount: Int) {
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor
+        this.unreadCount = unreadCount
     }
 
     fun getLocalizedName(context: Context): String {

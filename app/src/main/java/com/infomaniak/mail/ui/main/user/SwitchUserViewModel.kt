@@ -18,24 +18,14 @@
 package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.*
-import com.facebook.stetho.okhttp3.StethoInterceptor
-import com.infomaniak.lib.core.BuildConfig
-import com.infomaniak.lib.core.auth.TokenAuthenticator
-import com.infomaniak.lib.core.auth.TokenInterceptor
-import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.lib.login.ApiToken
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.UiAccount
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 
 class SwitchUserViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -53,37 +43,7 @@ class SwitchUserViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun updateMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
-        users.forEach { user ->
-            ApiRepository.getMailboxes(createOkHttpClientForSpecificUser(user)).data?.let { mailboxes ->
-                (getApplication() as Context).initMailNotificationChannel(mailboxes)
-                MailboxController.update(
-                    remoteMailboxes = mailboxes.map { it.initLocalValues(user.id) },
-                    userId = user.id,
-                )
-            }
-        }
-    }
-
-    private fun createOkHttpClientForSpecificUser(user: User): OkHttpClient {
-
-        val tokenInterceptorListener = object : TokenInterceptorListener {
-            override suspend fun onRefreshTokenSuccess(apiToken: ApiToken) {
-                AccountUtils.setUserToken(user, apiToken)
-            }
-
-            override suspend fun onRefreshTokenError() {
-                // TODO?
-            }
-
-            override suspend fun getApiToken(): ApiToken = user.apiToken
-        }
-
-        return OkHttpClient.Builder()
-            .apply {
-                if (BuildConfig.DEBUG) addNetworkInterceptor(StethoInterceptor())
-                addInterceptor(TokenInterceptor(tokenInterceptorListener))
-                authenticator(TokenAuthenticator(tokenInterceptorListener))
-            }.build()
+        users.forEach { user -> MailboxController.updateMailboxes(getApplication(), user) }
     }
 
     private fun List<UiAccount>.sortAccounts(): MutableList<UiAccount> {

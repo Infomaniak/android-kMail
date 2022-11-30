@@ -22,6 +22,7 @@ import com.infomaniak.lib.core.utils.monthsAgo
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
@@ -145,14 +146,13 @@ object MessageController {
             getMessagesUidsDelta(mailboxUuid, folder.id, previousCursor)
         } ?: return
 
-        handleMessagesUids(messagesUids, folder, mailboxUuid, previousCursor, threadMode)
+        handleMessagesUids(messagesUids, folder, mailboxUuid, threadMode)
     }
 
     private fun handleMessagesUids(
         messagesUids: MessagesUids,
         folder: Folder,
         mailboxUuid: String,
-        previousCursor: String?,
         threadMode: ThreadMode,
     ) = with(messagesUids) {
 
@@ -165,11 +165,10 @@ object MessageController {
 
         RealmDatabase.mailboxContent().writeBlocking {
 
-            handleDeletedUids(deletedUids, threadMode)
+            handleDeletedUids(deletedUids, folder.id, threadMode)
             handleUpdatedUids(updatedMessages, folder.id)
 
             FolderController.getFolder(folder.id, realm = this)?.let {
-                if (previousCursor != null) it.unreadCount = unreadCount
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.cursor = cursor
             }
@@ -215,6 +214,8 @@ object MessageController {
 
         messages.forEach { message ->
 
+            if (!message.seen) incrementFolderUnreadCount(message.folderId, 1)
+
             val messageIds = getMessageIds(message)
             message.messageIds = messageIds
 
@@ -233,6 +234,7 @@ object MessageController {
 
     fun MutableRealm.createSingleMessageThreads(messages: List<Message>) {
         messages.forEach { message ->
+            if (!message.seen) incrementFolderUnreadCount(message.folderId, 1)
             val thread = message.toThread()
             thread.addMessage(message)
             thread.recomputeThread()
@@ -240,13 +242,18 @@ object MessageController {
         }
     }
 
-    private fun MutableRealm.handleDeletedUids(uids: List<String>, threadMode: ThreadMode) {
+    private fun MutableRealm.handleDeletedUids(uids: List<String>, folderId: String, threadMode: ThreadMode) {
         if (uids.isNotEmpty()) {
 
             val deletedMessages = getMessages(uids, realm = this)
 
+            var unreadCount = 0
+
             when (threadMode) {
                 ThreadMode.THREADS -> deletedMessages.forEach { message ->
+
+                    if (!message.seen) unreadCount--
+
                     message.parentThread.firstOrNull()?.let { thread ->
                         if (thread.uniqueMessagesCount == 1) {
                             delete(thread)
@@ -255,22 +262,38 @@ object MessageController {
                         }
                     }
                 }
-                ThreadMode.MESSAGES -> delete(ThreadController.getThreads(uids, realm = this))
+                ThreadMode.MESSAGES -> {
+                    deletedMessages.forEach { if (!it.seen) unreadCount-- }
+                    delete(ThreadController.getThreads(uids, realm = this))
+                }
             }
 
+            incrementFolderUnreadCount(folderId, unreadCount)
             deleteMessages(deletedMessages)
         }
     }
 
     private fun MutableRealm.handleUpdatedUids(messageFlags: List<MessageFlags>, folderId: String) {
+
+        var unreadCount = 0
+
         messageFlags.forEach { flags ->
 
             val uid = flags.shortUid.toLongUid(folderId)
             getMessage(uid, realm = this)?.let { message ->
+
+                val wasRead = message.seen
                 message.updateFlags(flags)
+                val isRead = message.seen
+
+                if (!wasRead && isRead) unreadCount--
+                if (wasRead && !isRead) unreadCount++
+
                 message.parentThread.firstOrNull()?.recomputeThread()
             }
         }
+
+        incrementFolderUnreadCount(folderId, unreadCount)
     }
 
     private fun getMessageIds(message: Message): RealmSet<String> {
@@ -307,7 +330,6 @@ object MessageController {
                 addedShortUids = it.addedShortUids,
                 deletedUids = it.deletedShortUids.map { shortUid -> shortUid.toLongUid(folderId) },
                 updatedMessages = it.updatedMessages,
-                unreadCount = it.unreadCount,
                 cursor = it.cursor,
             )
         }
@@ -323,7 +345,6 @@ object MessageController {
         var addedShortUids: List<String> = emptyList(),
         var deletedUids: List<String> = emptyList(),
         var updatedMessages: List<MessageFlags> = emptyList(),
-        var unreadCount: Int = 0,
         var cursor: String,
     )
     //endregion

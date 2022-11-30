@@ -20,8 +20,10 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -101,7 +103,7 @@ object FolderController {
         remoteFolders.forEach { remoteFolder ->
 
             getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
-                remoteFolder.initLocalValues(lastUpdatedAt = localFolder.lastUpdatedAt, cursor = localFolder.cursor)
+                remoteFolder.initLocalValues(localFolder.lastUpdatedAt, localFolder.cursor, localFolder.unreadCount)
             }
 
             copyToRealm(remoteFolder, UpdatePolicy.ALL)
@@ -114,8 +116,20 @@ object FolderController {
     }
 
     fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int) {
-        updateFolder(folderId, realm = this) {
-            it.unreadCount += unseenMessagesCount
+
+        var inboxUnreadCount: Int? = null
+
+        updateFolder(folderId, realm = this) { folder ->
+
+            folder.unreadCount += unseenMessagesCount
+
+            if (folder.role == FolderRole.INBOX) inboxUnreadCount = folder.unreadCount
+        }
+
+        inboxUnreadCount?.let { unseenMessages ->
+            MailboxController.updateMailbox(MainViewModel.currentMailboxObjectId.value!!) { mailbox ->
+                mailbox.unseenMessages = unseenMessages
+            }
         }
     }
     //endregion
