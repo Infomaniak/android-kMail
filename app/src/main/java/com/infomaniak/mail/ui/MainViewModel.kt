@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
@@ -112,7 +111,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "Load current mailbox")
-        MailboxController.updateMailboxes(getApplication() as Context)
+        MailboxController.updateMailboxes(getApplication())
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
@@ -129,7 +128,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "Force refresh mailboxes")
-        MailboxController.updateMailboxes(getApplication() as Context)
+        MailboxController.updateMailboxes(getApplication())
         updateCurrentMailboxQuotas()
     }
 

@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -44,8 +43,7 @@ class SwitchUserViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun updateMailboxes(users: List<User>) = viewModelScope.launch(Dispatchers.IO) {
-        val context = getApplication() as Context
-        users.forEach { user -> MailboxController.updateMailboxes(context, user) }
+        users.forEach { user -> MailboxController.updateMailboxes(getApplication(), user) }
     }
 
     private fun List<UiAccount>.sortAccounts(): MutableList<UiAccount> {
