@@ -28,11 +28,11 @@ class IntroPagerAdapter(
     private val isFirstAccount: Boolean,
 ) : FragmentStateAdapter(manager, lifecycle) {
 
-    override fun getItemCount() = if (isFirstAccount) 4 else 3
+    override fun getItemCount() = if (isFirstAccount) 4 else 1
 
     override fun createFragment(position: Int): Fragment {
         return IntroFragment().apply {
-            arguments = IntroFragmentArgs(isFirstAccount, if (isFirstAccount) position else position + 1).toBundle()
+            arguments = IntroFragmentArgs(isFirstAccount, if (isFirstAccount) position else 3).toBundle()
         }
     }
 }
