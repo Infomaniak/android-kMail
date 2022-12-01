@@ -57,7 +57,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 val okHttpClient = AccountUtils.getHttpClient(user.id)
 
                 val newMessagesThreads =
-                    MessageController.fetchCurrentFolderMessages(mailbox.uuid, folder.id, threadMode, okHttpClient, realm)
+                    MessageController.fetchCurrentFolderMessages(mailbox, folder.id, threadMode, okHttpClient, realm)
 
                 newMessagesThreads.forEach { thread ->
                     thread.showNotification(folder.id, mailbox, realm)

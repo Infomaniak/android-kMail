@@ -124,7 +124,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateFolders(mailbox)
         FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
             selectFolder(folder.id)
-            refreshThreads(mailbox.uuid, folder.id)
+            refreshThreads(mailbox, folder.id)
         }
         DraftsActionsWorker.scheduleWork(getApplication())
     }
@@ -145,20 +145,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
+        val mailbox = MailboxController.getCurrentMailbox() ?: return@launch
         if (folderId == currentFolderId.value) return@launch
 
         selectFolder(folderId)
-        refreshThreads(mailboxUuid, folderId)
+        refreshThreads(mailbox, folderId)
     }
 
     fun forceRefreshThreads() {
         forceRefreshJob?.cancel()
         forceRefreshJob = viewModelScope.launch(Dispatchers.IO) {
             Log.d(TAG, "Force refresh threads")
-            val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
+            val mailbox = MailboxController.getCurrentMailbox() ?: return@launch
             val folderId = currentFolderId.value ?: return@launch
-            refreshThreads(mailboxUuid, folderId)
+            refreshThreads(mailbox, folderId)
         }
     }
 
@@ -194,11 +194,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun refreshThreads(mailboxUuid: String, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
+    private fun refreshThreads(mailbox: Mailbox, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
 
         isDownloadingChanges.postValue(true)
 
-        MessageController.fetchCurrentFolderMessages(mailboxUuid, folderId, localSettings.threadMode)
+        MessageController.fetchCurrentFolderMessages(mailbox, folderId, localSettings.threadMode)
 
         isDownloadingChanges.postValue(false)
     }
