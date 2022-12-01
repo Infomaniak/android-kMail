@@ -34,6 +34,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.work.Operation
+import androidx.work.WorkManager
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemSwipeListener
@@ -55,6 +57,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.workers.DraftsActionsWorker
 import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -92,6 +95,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeCurrentFolder()
         observeUpdatedAtTriggers()
         observeContacts()
+        observerDraftsActionsCompletedWorks()
     }
 
     override fun onResume(): Unit = with(binding) {
@@ -321,6 +325,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadListAdapter::updateContacts)
+    }
+
+    private fun observerDraftsActionsCompletedWorks() {
+        fun observeDraftsActions() {
+            DraftsActionsWorker.getCompletedWorkInfosLiveData(requireContext()).observe(viewLifecycleOwner) {
+                if (threadListViewModel.currentFolder.value?.role == FolderRole.DRAFT) {
+                    mainViewModel.forceRefreshThreads()
+                }
+            }
+        }
+
+        WorkManager.getInstance(requireContext()).pruneWork().state.observe(viewLifecycleOwner) {
+            if (it is Operation.State.FAILURE || it is Operation.State.SUCCESS) observeDraftsActions()
+        }
     }
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
