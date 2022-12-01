@@ -180,9 +180,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         }
 
         fun getRunningWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {
-            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG))
-                .addStates(listOf(WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED, WorkInfo.State.RUNNING))
-                .build()
+            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(WORK_RUNNING_STATES).build()
             return WorkManager.getInstance(context).getWorkInfosLiveData(workQuery)
         }
     }

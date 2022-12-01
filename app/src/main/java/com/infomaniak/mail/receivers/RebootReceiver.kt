@@ -30,7 +30,8 @@ class RebootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
 
         CoroutineScope(Dispatchers.IO).launch {
-            if (intent?.action == Intent.ACTION_BOOT_COMPLETED && AccountUtils.getAllUsersCount() > 0) {
+            val appNotStarted = AccountUtils.currentUser == null
+            if (intent?.action == Intent.ACTION_BOOT_COMPLETED && appNotStarted && AccountUtils.getAllUsersCount() > 0) {
                 SyncMessagesWorker.scheduleWork(context)
             }
         }
