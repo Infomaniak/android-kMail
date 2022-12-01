@@ -88,8 +88,11 @@ object MessageController {
     }
 
     fun getLastMessage(threadUid: String, folderId: String, realm: TypedRealm): Message? {
-        val query = "parentThread.uid == '$threadUid' AND folderId == '$folderId'"
-        return realm.query<Message>(query).sort("date", Sort.DESCENDING).first().find()
+        val parentThreadUidProperty = "${Message::parentThread.name}.${Thread::uid.name}"
+        val folderIdProperty = Message::folderId.name
+        val dateProperty = Message::date.name
+        val query = "$parentThreadUidProperty == '$threadUid' AND $folderIdProperty == '$folderId'"
+        return realm.query<Message>(query).sort(dateProperty, Sort.DESCENDING).first().find()
     }
     //endregion
 
