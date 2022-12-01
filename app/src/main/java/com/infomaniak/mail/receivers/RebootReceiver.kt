@@ -28,13 +28,11 @@ import kotlinx.coroutines.launch
 
 class RebootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
-
         CoroutineScope(Dispatchers.IO).launch {
             val appNotStarted = AccountUtils.currentUser == null
             if (intent?.action == Intent.ACTION_BOOT_COMPLETED && appNotStarted && AccountUtils.getAllUsersCount() > 0) {
                 SyncMessagesWorker.scheduleWork(context)
             }
         }
-
     }
 }
