@@ -342,7 +342,7 @@ object MessageController {
     private fun getMessageIds(message: Message): RealmSet<String> {
 
         fun parseMessagesIds(messageId: String): List<String> {
-            return messageId.removePrefix("<").removeSuffix(">").split("><")
+            return messageId.removePrefix("<").removeSuffix(">").split("><", "> <")
         }
 
         return realmSetOf<String>().apply {
