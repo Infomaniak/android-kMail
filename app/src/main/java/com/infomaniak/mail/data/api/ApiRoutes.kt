@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
-import com.infomaniak.mail.BuildConfig.MAIL_API_PREPROD
 
 object ApiRoutes {
 
@@ -97,6 +96,6 @@ object ApiRoutes {
     }
 
     private fun getMessages(mailboxUuid: String, folderId: String): String {
-        return "$MAIL_API_PREPROD/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
+        return "$MAIL_API/api/mail/${mailboxUuid}/folder/${folderId}/mobile"
     }
 }
