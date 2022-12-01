@@ -39,6 +39,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.Utils.getFormattedThreadSubject
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 class ThreadFragment : Fragment() {
@@ -155,7 +156,8 @@ class ThreadFragment : Fragment() {
             folderId = MainViewModel.currentFolderId.value ?: return,
             messageId = message.shortUid,
         )
-        val name = allAttachmentsFileName(message.subject?.substring(0..30) ?: "")
+        val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }
+        val name = allAttachmentsFileName(truncatedSubject ?: "")
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
