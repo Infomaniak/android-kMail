@@ -17,12 +17,12 @@
  */
 package com.infomaniak.mail.ui.login
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -37,6 +37,10 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.hideProgress
+import com.infomaniak.lib.core.utils.initProgress
+import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
@@ -55,6 +59,7 @@ import com.infomaniak.lib.core.R as RCore
 
 class LoginActivity : AppCompatActivity() {
 
+    private val introViewModel: IntroViewModel by viewModels()
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(intent.extras ?: bundleOf()) }
 
@@ -70,6 +75,8 @@ class LoginActivity : AppCompatActivity() {
                     authCode?.isNotBlank() == true -> authenticateUser(authCode)
                     else -> showError(getString(RCore.string.anErrorHasOccurred))
                 }
+            } else {
+                enableConnectButtons()
             }
         }
     }
@@ -88,7 +95,6 @@ class LoginActivity : AppCompatActivity() {
 
         val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, navigationArgs.isFirstAccount)
         introViewpager.apply {
-            offscreenPageLimit = 3
             adapter = introPagerAdapter
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -112,7 +118,24 @@ class LoginActivity : AppCompatActivity() {
 
         nextButton.setOnClickListener { introViewpager.currentItem += 1 }
 
-        connectButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
+        connectButton.apply {
+            initProgress(this@LoginActivity)
+            setOnClickListener {
+                signInButton.isEnabled = false
+                showProgress()
+                trackAccountEvent("openLoginWebview")
+                infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
+            }
+        }
+
+        signInButton.setOnClickListener {
+            trackAccountEvent("openCreationWebview")
+            openUrl("https://www.infomaniak.com/fr/hebergement/service-mail/") // TODO
+        }
+
+        introViewModel.currentAccentColor.observe(this@LoginActivity) { accentColor ->
+            updateUi(accentColor)
+        }
 
         trackScreen()
     }
@@ -121,9 +144,9 @@ class LoginActivity : AppCompatActivity() {
         if (introViewpager.currentItem == 0) super.onBackPressed() else introViewpager.currentItem -= 1
     }
 
-    fun updateUi(accentColor: AccentColor, animate: Boolean) = with(binding) {
-        animatePrimaryColorElements(accentColor, animate)
-        animateSecondaryColorElements(accentColor, animate)
+    private fun updateUi(accentColor: AccentColor) = with(binding) {
+        animatePrimaryColorElements(accentColor)
+        animateSecondaryColorElements(accentColor)
     }
 
     private fun authenticateUser(authCode: String) {
@@ -133,7 +156,7 @@ class LoginActivity : AppCompatActivity() {
                 code = authCode,
                 onSuccess = {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        when (val user = authenticateUser(this@LoginActivity, it)) {
+                        when (val user = authenticateUser(it)) {
                             is User -> {
                                 trackAccountEvent("loggedIn")
                                 AccountUtils.reloadApp?.invoke()
@@ -157,14 +180,20 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showError(error: String) {
         showSnackbar(error)
+        enableConnectButtons()
     }
 
-    private fun animatePrimaryColorElements(accentColor: AccentColor, animate: Boolean) = with(binding) {
+    private fun enableConnectButtons() = with(binding) {
+        connectButton.hideProgress(RCore.string.connect)
+        signInButton.isEnabled = true
+    }
+
+    private fun animatePrimaryColorElements(accentColor: AccentColor) = with(binding) {
         val newPrimary = accentColor.getPrimary(this@LoginActivity)
         val oldPrimary = dotsIndicator.selectedDotColor
         val ripple = accentColor.getRipple(this@LoginActivity)
 
-        animateColorChange(animate, oldPrimary, newPrimary) { color ->
+        animateColorChange(oldPrimary, newPrimary) { color ->
             val singleColorStateList = ColorStateList.valueOf(color)
             dotsIndicator.selectedDotColor = color
             connectButton.setBackgroundColor(color)
@@ -174,10 +203,10 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun animateSecondaryColorElements(accentColor: AccentColor, animate: Boolean) {
+    private fun animateSecondaryColorElements(accentColor: AccentColor) {
         val newSecondaryBackground = accentColor.getSecondaryBackground(this@LoginActivity)
         val oldSecondaryBackground = window.statusBarColor
-        animateColorChange(animate, oldSecondaryBackground, newSecondaryBackground) { color ->
+        animateColorChange(oldSecondaryBackground, newSecondaryBackground) { color ->
             window.statusBarColor = color
         }
     }
@@ -187,7 +216,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
-        suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
+        suspend fun authenticateUser(apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {
                 InfomaniakCore.bearerToken = apiToken.accessToken

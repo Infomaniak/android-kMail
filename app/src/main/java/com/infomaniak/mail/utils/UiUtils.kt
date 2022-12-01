@@ -105,10 +105,10 @@ object UiUtils {
     }
 
     fun animateColorChange(
-        animate: Boolean,
         @ColorInt oldColor: Int,
         @ColorInt newColor: Int,
         duration: Long = 150L,
+        animate: Boolean = true,
         setColor: (Int) -> Unit,
     ) {
         if (animate) {

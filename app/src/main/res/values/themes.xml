@@ -22,7 +22,7 @@
     <style name="AppTheme.LauncherBase">
         <item name="android:navigationBarColor">@color/backgroundColor</item>
         <item name="android:statusBarColor">@color/backgroundColor</item>
-        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="android:windowBackground">@drawable/splashscreen_legacy</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
