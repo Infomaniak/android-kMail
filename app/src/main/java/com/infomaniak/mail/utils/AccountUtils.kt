@@ -18,6 +18,7 @@
 package com.infomaniak.mail.utils
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
@@ -124,6 +125,10 @@ object AccountUtils : CredentialManager() {
     private fun resetSettings(context: Context) {
         AppSettingsController.removeAppSettings()
         LocalSettings.getInstance(context).removeSettings()
+        with(WorkManager.getInstance(context)) {
+            cancelAllWork()
+            pruneWork()
+        }
     }
 
     fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
