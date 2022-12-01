@@ -340,11 +340,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun updateUnreadCount(unreadCount: Int) = with(binding) {
+    private fun updateUnreadCount(unreadCount: Int) {
 
         if (threadListViewModel.currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) clearFilter()
 
-        unreadCountChip.apply {
+        binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
             isVisible = unreadCount > 0
         }
