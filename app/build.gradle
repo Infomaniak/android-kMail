@@ -24,7 +24,7 @@ android {
         minSdk 25
         targetSdk 33
         versionCode 1
-        versionName '1.0-Alpha'
+        versionName '1.0-Alpha1'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "kmail-" + getVersionName()
