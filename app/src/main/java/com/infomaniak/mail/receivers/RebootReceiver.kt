@@ -22,12 +22,17 @@ import android.content.Context
 import android.content.Intent
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.workers.SyncMessagesWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RebootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
 
-        if (intent?.action == Intent.ACTION_BOOT_COMPLETED && AccountUtils.getAllUsersCount() > 0) {
-            SyncMessagesWorker.scheduleWork(context)
+        CoroutineScope(Dispatchers.IO).launch {
+            if (intent?.action == Intent.ACTION_BOOT_COMPLETED && AccountUtils.getAllUsersCount() > 0) {
+                SyncMessagesWorker.scheduleWork(context)
+            }
         }
 
     }
