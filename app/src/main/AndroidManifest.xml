@@ -20,9 +20,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission
-        android:name="android.permission.POST_NOTIFICATIONS"
-        android:minSdkVersion="33" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" android:minSdkVersion="33" />
 
     <application
         android:name=".ApplicationMain"
@@ -48,20 +46,19 @@
 
         <activity
             android:name=".ui.LaunchActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:noHistory="true"
             android:theme="@style/AppTheme.Launcher">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <activity
             android:name=".ui.login.LoginActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false"
             android:theme="@style/AppTheme.Login" />
 
@@ -72,20 +69,22 @@
 
         <activity
             android:name="com.infomaniak.lib.bugtracker.BugTrackerActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false" />
 
         <activity
             android:name=".ui.MainActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false" />
 
         <activity
             android:name=".ui.main.newMessage.NewMessageActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
 
             <intent-filter>
                 <action android:name="android.intent.action.SENDTO" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="mailto" />
             </intent-filter>
@@ -93,7 +92,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="*/*" />
             </intent-filter>
@@ -101,5 +99,4 @@
         </activity>
 
     </application>
-
 </manifest>
