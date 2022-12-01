@@ -47,7 +47,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
         Log.d(TAG, "SyncMessagesWorker>launchWork: launched")
 
-        AccountUtils.getAllUsersSync().forEach loopUsers@{ user ->
+        AccountUtils.getAllUsersSync().forEach { user ->
             MailboxController.getMailboxes(user.id).forEach loopMailboxes@{ mailbox ->
 
                 val realm = RealmDatabase.newMailboxContentInstance(user.id, mailbox.mailboxId)
