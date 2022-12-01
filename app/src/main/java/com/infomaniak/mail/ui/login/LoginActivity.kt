@@ -27,6 +27,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -104,7 +105,10 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        dotsIndicator.attachTo(introViewpager)
+        dotsIndicator.apply {
+            attachTo(introViewpager)
+            isVisible = navigationArgs.isFirstAccount
+        }
 
         nextButton.setOnClickListener { introViewpager.currentItem += 1 }
 
