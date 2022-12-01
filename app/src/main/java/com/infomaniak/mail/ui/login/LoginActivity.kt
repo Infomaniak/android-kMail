@@ -37,6 +37,10 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
+import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.hideProgress
+import com.infomaniak.lib.core.utils.initProgress
+import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
@@ -71,6 +75,8 @@ class LoginActivity : AppCompatActivity() {
                     authCode?.isNotBlank() == true -> authenticateUser(authCode)
                     else -> showError(getString(RCore.string.anErrorHasOccurred))
                 }
+            } else {
+                enableConnectButtons()
             }
         }
     }
@@ -112,7 +118,20 @@ class LoginActivity : AppCompatActivity() {
 
         nextButton.setOnClickListener { introViewpager.currentItem += 1 }
 
-        connectButton.setOnClickListener { infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher) }
+        connectButton.apply {
+            initProgress(this@LoginActivity)
+            setOnClickListener {
+                signInButton.isEnabled = false
+                showProgress()
+                trackAccountEvent("openLoginWebview")
+                infomaniakLogin.startWebViewLogin(webViewLoginResultLauncher)
+            }
+        }
+
+        signInButton.setOnClickListener {
+            trackAccountEvent("openCreationWebview")
+            openUrl("https://www.infomaniak.com/fr/hebergement/service-mail/") // TODO
+        }
 
         introViewModel.currentAccentColor.observe(this@LoginActivity) { accentColor ->
             updateUi(accentColor)
@@ -161,6 +180,12 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showError(error: String) {
         showSnackbar(error)
+        enableConnectButtons()
+    }
+
+    private fun enableConnectButtons() = with(binding) {
+        connectButton.hideProgress(RCore.string.connect)
+        signInButton.isEnabled = true
     }
 
     private fun animatePrimaryColorElements(accentColor: AccentColor) = with(binding) {
