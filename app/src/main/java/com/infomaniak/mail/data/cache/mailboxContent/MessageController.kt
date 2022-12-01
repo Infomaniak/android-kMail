@@ -163,7 +163,7 @@ object MessageController {
         folder: Folder,
         threadMode: ThreadMode,
         okHttpClient: OkHttpClient?,
-        realm: Realm?
+        realm: Realm?,
     ): List<Thread> {
         val previousCursor = folder.cursor
 
@@ -182,7 +182,7 @@ object MessageController {
         mailboxUuid: String,
         threadMode: ThreadMode,
         okHttpClient: OkHttpClient?,
-        realm: Realm?
+        realm: Realm?,
     ) = with(messagesUids) {
 
         Log.i(

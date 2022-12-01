@@ -80,9 +80,9 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
         return callApi(
-            ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),
-            GET,
-            okHttpClient = okHttpClient ?: HttpClient.okHttpClient
+            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),
+            method = GET,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )
     }
 
