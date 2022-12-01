@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Infomaniak kMail - Android
+  ~ Infomaniak kDrive - Android
   ~ Copyright (C) 2022 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -15,21 +15,20 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme.LauncherBase27" parent="AppTheme.LauncherBase">
-        <item name="android:windowLightNavigationBar">true</item>
-    </style>
+    <item android:drawable="@color/background" />
 
-    <style name="AppTheme.Launcher" parent="AppTheme.LauncherBase27" />
+    <item android:bottom="50dp">
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/splashscreen_icon_legacy" />
+    </item>
 
-    <style name="AppTheme" parent="AppThemeBase">
-        <item name="android:navigationBarColor">@color/backgroundColor</item>
-        <item name="android:windowLightNavigationBar">true</item>
-    </style>
+    <item android:bottom="60dp">
+        <bitmap
+            android:gravity="bottom"
+            android:src="@drawable/splashscreen_branding_image_legacy" />
+    </item>
 
-    <style name="AppTheme.Login" parent="AppTheme.LoginBase">
-        <item name="android:windowLightNavigationBar">true</item>
-    </style>
-
-</resources>
+</layer-list>
