@@ -78,8 +78,12 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun deleteFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> = callKotlinxApi(ApiRoutes.folder(mailboxUuid, folderId), DELETE)
 
-    fun getMessage(messageResource: String): ApiResponse<Message> {
-        return callApi(ApiRoutes.resource("$messageResource?name=prefered_format&value=html"), GET)
+    fun getMessage(messageResource: String, okHttpClient: OkHttpClient? = null): ApiResponse<Message> {
+        return callApi(
+            url = ApiRoutes.resource("$messageResource?name=prefered_format&value=html"),
+            method = GET,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+        )
     }
 
     fun getQuotas(mailboxHostingId: Int, mailboxName: String): ApiResponse<Quotas> {
@@ -149,20 +153,43 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, dateSince: String): ApiResponse<GetMessagesUidsResult> {
-        return callApi(url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, dateSince), method = GET)
+    fun getMessagesUids(
+        mailboxUuid: String,
+        folderId: String,
+        dateSince: String,
+        okHttpClient: OkHttpClient?,
+    ): ApiResponse<GetMessagesUidsResult> {
+        return callApi(
+            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, dateSince),
+            method = GET,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+        )
     }
 
-    fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): ApiResponse<GetMessagesUidsDeltaResult> {
-        return callApi(url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor), method = GET)
+    fun getMessagesUidsDelta(
+        mailboxUuid: String,
+        folderId: String,
+        cursor: String,
+        okHttpClient: OkHttpClient?,
+    ): ApiResponse<GetMessagesUidsDeltaResult> {
+        return callApi(
+            url = ApiRoutes.getMessagesUidsDelta(mailboxUuid, folderId, cursor),
+            method = GET,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+        )
     }
 
     fun getMessagesByUids(
         mailboxUuid: String,
         folderId: String,
         messagesUids: List<String>,
+        okHttpClient: OkHttpClient?,
     ): ApiResponse<GetMessagesByUidsResult> {
-        return callApi(url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, messagesUids), method = GET)
+        return callApi(
+            url = ApiRoutes.getMessagesByUids(mailboxUuid, folderId, messagesUids),
+            method = GET,
+            okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
+        )
     }
 
     /**

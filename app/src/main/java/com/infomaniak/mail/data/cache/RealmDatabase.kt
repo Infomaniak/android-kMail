@@ -78,6 +78,7 @@ object RealmDatabase {
     }
 
     val newMailboxContentInstance get() = Realm.open(RealmConfig.mailboxContent(AccountUtils.currentMailboxId))
+    fun newMailboxContentInstance(userId: Int, mailboxId: Int) = Realm.open(RealmConfig.mailboxContent(mailboxId, userId))
     fun mailboxContent(): Realm = runBlocking(Dispatchers.IO) {
         mailboxContentMutex.withLock {
             _mailboxContent ?: newMailboxContentInstance.also { _mailboxContent = it }
@@ -201,10 +202,10 @@ object RealmDatabase {
                 .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
 
-        fun mailboxContent(mailboxId: Int) =
+        fun mailboxContent(mailboxId: Int, userId: Int = AccountUtils.currentUserId) =
             RealmConfiguration
                 .Builder(mailboxContentSet)
-                .name(mailboxContentDbName(AccountUtils.currentUserId, mailboxId))
+                .name(mailboxContentDbName(userId, mailboxId))
                 .deleteRealmIfMigrationNeeded() // TODO: Handle migration in production.
                 .build()
         //endregion

@@ -5,13 +5,13 @@ plugins {
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
     // Realm Kotlin PRODUCTION
-    id 'io.realm.kotlin'
+    // id 'io.realm.kotlin'
 }
 
 // Realm Kotlin SNAPSHOT
-// configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
+configurations.all { resolutionStrategy.cacheChangingModulesFor 0, 'seconds' } // Don't cache SNAPSHOT (changing) dependencies.
 // Realm Kotlin SNAPSHOT
-// apply plugin: "io.realm.kotlin"
+apply plugin: "io.realm.kotlin"
 
 android {
 
