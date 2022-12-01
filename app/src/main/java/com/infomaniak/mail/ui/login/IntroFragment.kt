@@ -21,20 +21,16 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.mail.R
@@ -49,6 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.google.android.material.R as RMaterial
+
 
 class IntroFragment : Fragment() {
 
@@ -72,7 +69,7 @@ class IntroFragment : Fragment() {
                 setTabSelectedListener()
                 iconLayout.apply {
                     setAnimation(R.raw.illu_1)
-                    repeatFrame(53, 138)
+                    repeatFrame(54, 138)
                 }
             }
             1 -> {
@@ -90,7 +87,7 @@ class IntroFragment : Fragment() {
                 description.setText(R.string.onBoardingDescription3)
                 iconLayout.apply {
                     setAnimation(R.raw.illu_3)
-                    repeatFrame(113, 243)
+                    repeatFrame(118, 225)
                 }
             }
             3 -> {
@@ -167,10 +164,6 @@ class IntroFragment : Fragment() {
         animateColorChange(oldColor, newColor) { color ->
             waveBackground.imageTintList = ColorStateList.valueOf(color)
         }
-    }
-
-    private fun getThemedDrawable(theme: Int, @DrawableRes drawableRes: Int): Drawable? {
-        return VectorDrawableCompat.create(resources, drawableRes, ContextThemeWrapper(context, theme).theme)
     }
 
     private fun updateAccentColorPickerPageUi(accentColor: AccentColor) = with(binding) {
