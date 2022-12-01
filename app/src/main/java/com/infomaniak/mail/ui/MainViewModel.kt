@@ -45,6 +45,7 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -54,6 +55,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+
+    private var forceRefreshJob: Job? = null
 
     fun close() {
         Log.i(TAG, "Close")
@@ -149,11 +152,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads(mailboxUuid, folderId)
     }
 
-    fun forceRefreshThreads() = viewModelScope.launch(Dispatchers.IO) {
-        Log.d(TAG, "Force refresh threads")
-        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
-        val folderId = currentFolderId.value ?: return@launch
-        refreshThreads(mailboxUuid, folderId)
+    fun forceRefreshThreads() {
+        forceRefreshJob?.cancel()
+        forceRefreshJob = viewModelScope.launch(Dispatchers.IO) {
+            Log.d(TAG, "Force refresh threads")
+            val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
+            val folderId = currentFolderId.value ?: return@launch
+            refreshThreads(mailboxUuid, folderId)
+        }
     }
 
     private fun updateAddressBooks() {

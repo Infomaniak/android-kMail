@@ -179,9 +179,10 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
-        fun getRunningWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {
-            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(WORK_RUNNING_STATES).build()
+        fun getCompletedWorkInfosLiveData(context: Context): LiveData<MutableList<WorkInfo>> {
+            val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(listOf(WorkInfo.State.SUCCEEDED)).build()
             return WorkManager.getInstance(context).getWorkInfosLiveData(workQuery)
         }
+
     }
 }
