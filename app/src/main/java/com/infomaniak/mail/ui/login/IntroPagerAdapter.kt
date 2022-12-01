@@ -32,7 +32,11 @@ class IntroPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         return IntroFragment().apply {
-            arguments = IntroFragmentArgs(isFirstAccount, if (isFirstAccount) position else 3).toBundle()
+            arguments = IntroFragmentArgs(isFirstAccount, if (isFirstAccount) position else LOGIN_SCREEN).toBundle()
         }
+    }
+
+    private companion object {
+        const val LOGIN_SCREEN = 3
     }
 }
