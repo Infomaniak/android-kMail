@@ -115,7 +115,7 @@ object FolderController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int) {
+    fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, mailboxObjectId: String? = null) {
 
         var inboxUnreadCount: Int? = null
 
@@ -127,7 +127,7 @@ object FolderController {
         }
 
         inboxUnreadCount?.let { unseenMessages ->
-            MailboxController.updateMailbox(MainViewModel.currentMailboxObjectId.value!!) { mailbox ->
+            MailboxController.updateMailbox(mailboxObjectId ?: MainViewModel.currentMailboxObjectId.value!!) { mailbox ->
                 mailbox.unseenMessages = unseenMessages
             }
         }
