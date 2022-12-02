@@ -242,7 +242,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
         return when (swipeAction) {
             SwipeAction.TUTORIAL -> {
