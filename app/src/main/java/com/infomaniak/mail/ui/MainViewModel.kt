@@ -95,6 +95,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+    val snackbarFeedbackMove = MutableLiveData<Pair<String, String?>>()
 
     private var forceRefreshJob: Job? = null
 
@@ -240,12 +241,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
-    fun deleteThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
 
         val mailbox = currentMailbox.value ?: return@launch
         val folderId = currentFolder.value?.id ?: return@launch
 
         RealmDatabase.mailboxContent().writeBlocking {
+            val thread = ThreadController.getThread(threadUid, realm = this) ?: return@writeBlocking
             val currentFolderRole = FolderController.getFolder(folderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
 
@@ -258,7 +260,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             if (isSuccess) {
                 deleteMessages(thread.messages)
-                ThreadController.getThread(thread.uid, realm = this)?.let(::delete)
+                delete(thread)
+                val folderName = getApplication<Application>().getString(FolderRole.TRASH.folderNameRes)
+                snackbarFeedbackMove.postValue(folderName to null) // TODO : Get undo resId
             }
         }
 

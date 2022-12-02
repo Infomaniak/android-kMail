@@ -34,7 +34,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
-import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.pointBetweenColors
 import com.infomaniak.mail.workers.SyncMessagesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
@@ -53,7 +53,7 @@ class MainActivity : ThemedActivity() {
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset)
+            window.statusBarColor = pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset)
         }
 
         override fun onDrawerOpened(drawerView: View) {
