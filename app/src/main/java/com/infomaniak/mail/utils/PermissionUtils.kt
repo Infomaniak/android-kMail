@@ -21,7 +21,6 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.infomaniak.lib.core.utils.hasPermissions
@@ -30,7 +29,7 @@ class PermissionUtils {
 
     private var activity: FragmentActivity
 
-    private lateinit var notificationForActivityResult: ActivityResultLauncher<String>
+    private lateinit var mainForActivityResult: ActivityResultLauncher<Array<String>>
 
     constructor(activity: FragmentActivity) {
         this.activity = activity
@@ -40,21 +39,27 @@ class PermissionUtils {
         this.activity = fragment.requireActivity()
     }
 
-    fun registerNotificationPermission(onPermissionResult: ((authorized: Boolean) -> Unit)? = null) = with(activity) {
-        notificationForActivityResult = registerForActivityResult(ActivityResultContracts.RequestPermission()) { authorized ->
-            onPermissionResult?.invoke(authorized)
-        }
+    fun registerMainPermissions(onPermissionResult: ((permissions: Map<String, Boolean>) -> Unit)? = null) {
+        mainForActivityResult =
+            activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { authorizedPermissions ->
+                onPermissionResult?.invoke(authorizedPermissions)
+            }
     }
 
-    fun requestNotificationPermissionIfNeeded() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !activity.hasPermissions(arrayOf(NOTIFICATION_PERMISSION))) {
-            notificationForActivityResult.launch(NOTIFICATION_PERMISSION)
+    fun requestMainPermissionsIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !activity.hasPermissions(mainPermissions)) {
+            mainForActivityResult.launch(mainPermissions)
         }
     }
 
     companion object {
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-        const val NOTIFICATION_PERMISSION = Manifest.permission.POST_NOTIFICATIONS
+        val mainPermissions = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
+                Manifest.permission.POST_NOTIFICATIONS,
+                Manifest.permission.READ_CONTACTS
+            )
+            else -> arrayOf(Manifest.permission.READ_CONTACTS)
+        }
     }
 
 }
