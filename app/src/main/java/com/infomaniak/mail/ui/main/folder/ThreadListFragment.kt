@@ -31,6 +31,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -47,6 +48,8 @@ import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
+import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -239,8 +242,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
         return when (swipeAction) {
+            SwipeAction.TUTORIAL -> {
+                setDefaultSwipeActions()
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
+                findNavController().navigate(R.id.swipeActionsSettingsFragment, null, getAnimatedNavOptions())
+                true
+            }
             SwipeAction.DELETE -> {
                 mainViewModel.deleteThread(thread)
                 false
@@ -255,6 +265,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
         }
+    }
+
+    private fun setDefaultSwipeActions() = with(localSettings) {
+        if (swipeRight == SwipeAction.TUTORIAL) swipeRight = DEFAULT_SWIPE_ACTION_RIGHT
+        if (swipeLeft == SwipeAction.TUTORIAL) swipeLeft = DEFAULT_SWIPE_ACTION_LEFT
     }
 
     private fun extendCollapseFab(scrollDirection: ScrollDirection) = with(binding) {
