@@ -51,7 +51,7 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.animateColorChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

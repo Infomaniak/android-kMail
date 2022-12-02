@@ -66,6 +66,7 @@ class ThreadFragment : Fragment() {
         observeThreadLive()
         observeMessagesLive()
         observeContacts()
+        // observeSnackbar()
     }
 
     private fun setupUi() = with(binding) {
@@ -93,7 +94,7 @@ class ThreadFragment : Fragment() {
                 )
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
-                R.id.quickActionDelete -> notYetImplemented()
+                R.id.quickActionDelete -> mainViewModel.deleteThread(navigationArgs.threadUid)
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                         messageUid = lastMessageUid,
