@@ -106,17 +106,16 @@ fun Fragment.notYetImplemented() {
 }
 
 fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: String? = null) {
-    if (canNavigate(currentClassName)) {
-        val navOptions = NavOptions
-            .Builder()
-            .setEnterAnim(R.anim.fragment_swipe_enter)
-            .setExitAnim(R.anim.fragment_swipe_exit)
-            .setPopEnterAnim(R.anim.fragment_swipe_pop_enter)
-            .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
-            .build()
-        findNavController().navigate(directions, navOptions)
-    }
+    if (canNavigate(currentClassName)) findNavController().navigate(directions, getAnimatedNavOptions())
 }
+
+fun getAnimatedNavOptions() = NavOptions
+    .Builder()
+    .setEnterAnim(R.anim.fragment_swipe_enter)
+    .setExitAnim(R.anim.fragment_swipe_exit)
+    .setPopEnterAnim(R.anim.fragment_swipe_pop_enter)
+    .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
+    .build()
 
 fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: String) {
     safeNavigate(

@@ -129,11 +129,11 @@ class LocalSettings private constructor(context: Context) {
 
     //region Swipe actions
     var swipeRight: SwipeAction
-        get() = getEnum(SWIPE_RIGHT_KEY, DEFAULT_SWIPE_ACTION)
+        get() = getEnum(SWIPE_RIGHT_KEY, INITIAL_SWIPE_ACTION)
         set(value) = putEnum(SWIPE_RIGHT_KEY, value)
 
     var swipeLeft: SwipeAction
-        get() = getEnum(SWIPE_LEFT_KEY, DEFAULT_SWIPE_ACTION)
+        get() = getEnum(SWIPE_LEFT_KEY, INITIAL_SWIPE_ACTION)
         set(value) = putEnum(SWIPE_LEFT_KEY, value)
 
     enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes private val colorRes: Int, @DrawableRes val iconRes: Int?) {
@@ -146,6 +146,7 @@ class LocalSettings private constructor(context: Context) {
         SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam),
         READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive, R.color.swipeReadAndArchive, R.drawable.ic_drawer_mailbox),
         QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu, R.color.swipeQuickActionMenu, R.drawable.ic_param_dots),
+        TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null),
         NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null);
 
         @ColorInt
@@ -206,7 +207,9 @@ class LocalSettings private constructor(context: Context) {
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
         private val DEFAULT_THEME = Theme.SYSTEM
         val DEFAULT_ACCENT_COLOR = AccentColor.PINK
-        private val DEFAULT_SWIPE_ACTION = SwipeAction.NONE
+        private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
+        val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
+        val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
         private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
         //endregion
