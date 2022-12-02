@@ -21,7 +21,6 @@ import android.Manifest
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.viewModels
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
@@ -46,11 +45,7 @@ class MainActivity : ThemedActivity() {
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
-    private val permissionUtils by lazy { PermissionUtils(this).also { it.registerNotificationPermission {} } }
-
-    private var contactPermissionResultLauncher = registerForActivityResult(RequestPermission()) { isGranted ->
-        if (isGranted) mainViewModel.updateUserInfo()
-    }
+    private val permissionUtils by lazy { PermissionUtils(this).also { registerMainPermissions() } }
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
@@ -87,8 +82,7 @@ class MainActivity : ThemedActivity() {
         mainViewModel.loadCurrentMailbox()
 
         mainViewModel.observeRealmMergedContacts()
-        permissionUtils.requestNotificationPermissionIfNeeded()
-        requestContactsPermission()
+        permissionUtils.requestMainPermissionsIfNeeded()
     }
 
     override fun onStart() {
@@ -142,8 +136,10 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-    private fun requestContactsPermission() {
-        contactPermissionResultLauncher.launch(Manifest.permission.READ_CONTACTS)
+    private fun registerMainPermissions() {
+        permissionUtils.registerMainPermissions { permissionsResults ->
+            if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
+        }
     }
 
     private fun onDestinationChanged(destination: NavDestination) {
