@@ -91,6 +91,8 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         fun scheduleWork(context: Context) {
             val workRequest = PeriodicWorkRequestBuilder<SyncMessagesWorker>(MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                // We start with a delayed duration, so that when the app is rebooted the service is not launched
+                .setInitialDelay(2, TimeUnit.MINUTES)
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.REPLACE, workRequest)
