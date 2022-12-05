@@ -45,7 +45,7 @@ class MainActivity : ThemedActivity() {
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
-    private val permissionUtils by lazy { PermissionUtils(this).also { registerMainPermissions() } }
+    private val permissionUtils by lazy { PermissionUtils(this).also { registerMainPermissions(it) } }
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
@@ -136,7 +136,7 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-    private fun registerMainPermissions() {
+    private fun registerMainPermissions(permissionUtils: PermissionUtils) {
         permissionUtils.registerMainPermissions { permissionsResults ->
             if (permissionsResults[Manifest.permission.READ_CONTACTS] == true) mainViewModel.updateUserInfo()
         }
