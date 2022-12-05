@@ -91,7 +91,8 @@ class MainActivity : ThemedActivity() {
     }
 
     override fun onStop() {
-        SyncMessagesWorker.scheduleWork(this)
+        // When you change user you don't want to launch the work
+        if (!isFinishing) SyncMessagesWorker.scheduleWork(this)
         super.onStop()
     }
 
