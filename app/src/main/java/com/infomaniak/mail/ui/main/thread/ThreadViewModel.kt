@@ -18,7 +18,6 @@
 package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
@@ -32,7 +31,6 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
@@ -41,9 +39,10 @@ class ThreadViewModel : ViewModel() {
     val thread: Thread? get() = _thread
 
     fun observeThread(threadUid: String) = liveData(Dispatchers.IO) {
-        emitSource(ThreadController.getThreadAsync(threadUid)
-            .mapNotNull { queryResult -> queryResult.obj.also { _thread = it } }
-            .asLiveData())
+        ThreadController.getThread(threadUid)?.let {
+            _thread = it
+            emit(it)
+        }
     }
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
