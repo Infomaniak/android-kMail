@@ -95,7 +95,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
-    val snackbarFeedbackMove = MutableLiveData<Pair<String, String?>>()
+    val snackbarFeedbackMove = SingleLiveEvent<Pair<String, String?>>()
 
     private var forceRefreshJob: Job? = null
 
