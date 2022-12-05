@@ -121,17 +121,6 @@
         <argument
             android:name="threadUid"
             app:argType="string" />
-        <argument
-            android:name="threadSubject"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="threadIsFavorite"
-            android:defaultValue="false"
-            app:argType="boolean" />
-        <argument
-            android:name="unseenMessagesCount"
-            app:argType="integer" />
         <action
             android:id="@+id/action_threadFragment_to_messageActionBottomSheetDialog"
             app:destination="@id/messageActionBottomSheetDialog" />

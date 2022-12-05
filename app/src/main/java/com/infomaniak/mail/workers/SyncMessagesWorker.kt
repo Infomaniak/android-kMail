@@ -29,7 +29,7 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -53,7 +53,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
             MailboxController.getMailboxes(user.id).forEach loopMailboxes@{ mailbox ->
 
                 val realm = RealmDatabase.newMailboxContentInstance(user.id, mailbox.mailboxId)
-                val folder = FolderController.getFolder(Folder.FolderRole.INBOX) ?: return@loopMailboxes
+                val folder = FolderController.getFolder(FolderRole.INBOX) ?: return@loopMailboxes
                 if (folder.cursor == null) return@loopMailboxes
 
                 val okHttpClient = AccountUtils.getHttpClient(user.id)

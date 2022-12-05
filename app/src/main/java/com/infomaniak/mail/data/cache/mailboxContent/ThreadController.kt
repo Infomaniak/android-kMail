@@ -28,10 +28,12 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import kotlinx.coroutines.flow.Flow
 
 object ThreadController {
 
@@ -91,6 +93,10 @@ object ThreadController {
 
     fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
         return getThreadQuery(uid, realm).find()
+    }
+
+    fun getThreadAsync(uid: String, realm: TypedRealm? = null): Flow<SingleQueryChange<Thread>> {
+        return getThreadQuery(uid, realm).asFlow()
     }
     //endregion
 

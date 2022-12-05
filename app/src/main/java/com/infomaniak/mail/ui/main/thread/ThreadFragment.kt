@@ -26,6 +26,7 @@ import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +35,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
@@ -57,20 +59,24 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
+
         setupAdapter()
-        threadViewModel.openThread(navigationArgs.threadUid)
-        observeMessages()
         observeContacts()
+
+        threadViewModel.observeThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { thread ->
+            threadViewModel.openThread(thread)
+            setupUi(thread)
+            observeMessages(thread)
+        }
     }
 
-    private fun setupUi() = with(binding) {
+    private fun setupUi(thread: Thread) = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
-        threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
+        threadSubject.text = thread.subject.getFormattedThreadSubject(requireContext())
         iconFavorite.apply {
-            setIconResource(if (navigationArgs.threadIsFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
-            setIconTintResource(if (navigationArgs.threadIsFavorite) R.color.favoriteYellow else R.color.iconColor)
+            setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
+            setIconTintResource(if (thread.isFavorite) R.color.favoriteYellow else R.color.iconColor)
             setOnClickListener { notYetImplemented() }
         }
 
@@ -87,15 +93,15 @@ class ThreadFragment : Fragment() {
                     safeNavigate(
                         ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                             messageUid = lastMessageUid,
-                            isFavorite = navigationArgs.threadIsFavorite,
-                            unseenMessagesCount = navigationArgs.unseenMessagesCount,
+                            isFavorite = thread.isFavorite,
+                            unseenMessagesCount = thread.unseenMessagesCount,
                         )
                     )
                 }
             }
         }
 
-        toolbarSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(context)
+        toolbarSubject.text = thread.subject.getFormattedThreadSubject(context)
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -161,8 +167,8 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun observeMessages() {
-        threadViewModel.messages.bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+    private fun observeMessages(thread: Thread) {
+        thread.messages.asFlow().asLiveData().bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
         }

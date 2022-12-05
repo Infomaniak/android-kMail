@@ -17,7 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -29,22 +32,19 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    private val currentThread = MutableLiveData<Thread>()
-    val messages = Transformations.switchMap(currentThread) { thread ->
-        liveData(Dispatchers.IO) { emitSource(thread.messages.asFlow().asLiveData()) }
+    fun observeThread(threadUid: String) = liveData(Dispatchers.IO) {
+        emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }
 
-    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        ThreadController.getThread(threadUid)?.let { thread ->
-            selectThread(thread)
-            currentThread.postValue(thread)
-            markAsSeen(thread)
-            updateMessages(thread)
-        }
+    fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+        selectThread(thread)
+        markAsSeen(thread)
+        updateMessages(thread)
     }
 
     private fun selectThread(thread: Thread) {
