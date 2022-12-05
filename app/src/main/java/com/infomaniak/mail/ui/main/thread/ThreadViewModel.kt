@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
@@ -31,24 +32,30 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    private var _thread: Thread? = null
-    val thread: Thread? get() = _thread
+    var thread: Thread? = null
+        private set
 
-    fun observeThread(threadUid: String) = liveData(Dispatchers.IO) {
-        ThreadController.getThread(threadUid)?.let {
-            _thread = it
-            emit(it)
-        }
+    fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
+        emitSource(ThreadController.getThreadAsync(threadUid)
+            .mapNotNull { queryResult -> queryResult.obj.also { thread = it } }
+            .asLiveData())
     }
 
-    fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
-        selectThread(thread)
-        markAsSeen(thread)
-        updateMessages(thread)
+    fun messagesLive(threadUid: String) = liveData(Dispatchers.IO) {
+        ThreadController.getThread(threadUid)?.messages?.asFlow()?.asLiveData()?.let { emitSource(it) }
+    }
+
+    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        ThreadController.getThread(threadUid)?.let { thread ->
+            selectThread(thread)
+            markAsSeen(thread)
+            updateMessages(thread)
+        }
     }
 
     private fun selectThread(thread: Thread) {
