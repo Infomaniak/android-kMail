@@ -26,7 +26,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class MergedContact : RealmObject, Correspondent {
     @PrimaryKey
-    var id = ""
+    var id: Long = -1
     override var email: String = ""
     override var name: String = ""
     var avatar: String? = null
@@ -34,7 +34,7 @@ class MergedContact : RealmObject, Correspondent {
     override val initials by lazy { computeInitials() }
 
     fun initLocalValues(email: String, name: String, avatar: String? = null): MergedContact {
-        if (this.id.isEmpty()) this.id = "${email.hashCode()}_$name"
+        id = (email.hashCode().toLong() shl 32) + name.hashCode()
         this.email = email
         this.name = name
         avatar?.let { this.avatar = it }

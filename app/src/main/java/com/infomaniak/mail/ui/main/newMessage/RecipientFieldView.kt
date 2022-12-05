@@ -19,13 +19,13 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MergedContact
@@ -55,10 +55,14 @@ class RecipientFieldView @JvmOverloads constructor(
             updateCollapsedUiState(value)
         }
 
+    private lateinit var autoCompletedContacts: RecyclerView
+
     private var isAutocompletionOpened
-        get() = binding.autoCompletedContacts.isVisible
+        get() = autoCompletedContacts.isVisible
         set(value) {
-            binding.autoCompletedContacts.isVisible = value
+            autoCompletedContacts.isVisible = value
+            binding.chevron.isGone = value
+            binding.itemsChipGroup.isGone = value
         }
 
     // override fun onFocusChanged(gainFocus: Boolean, direction: Int, preRviouslyFocusedRect: Rect?) {
@@ -86,8 +90,8 @@ class RecipientFieldView @JvmOverloads constructor(
                 prefix.text = getText(R.styleable.RecipientFieldView_title)
                 isToggleable = getBoolean(R.styleable.RecipientFieldView_toggleable, isToggleable)
 
-                autocompleteInput.nextFocusForwardId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
-                autocompleteInput.nextFocusDownId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
+                // autocompleteInput.nextFocusForwardId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
+                // autocompleteInput.nextFocusDownId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
             }
 
             chevron.isVisible = isToggleable
@@ -136,42 +140,43 @@ class RecipientFieldView @JvmOverloads constructor(
         autocompleteInput.isFocusable = isTextInputAccessible
     }
 
-    fun initContacts(allContacts: List<MergedContact>, usedContacts: MutableList<String>) = with(binding) {
-        Log.e("gibran", "initContacts: Initializing with contacts: $allContacts")
+    fun initContacts(autoComplete: RecyclerView?, allContacts: List<MergedContact>, usedContacts: MutableSet<String>) =
+        with(binding) {
+            contactAdapter = ContactAdapter2(
+                allContacts = allContacts,
+                usedContacts = usedContacts,
+                onContactClicked = {
+                    addContact(it)
+                    autocompleteInput.setText("")
+                },
+                onAddUnrecognizedContact = {
+                    TODO()
+                }
+            )
 
-        contactAdapter = ContactAdapter2(
-            allContacts = allContacts,
-            usedContacts = usedContacts,
-            onContactClicked = {
-                addContact(it)
-                autocompleteInput.setText("")
-            },
-            onAddUnrecognizedContact = {
-                TODO()
+            autoComplete?.let {
+                autoCompletedContacts = it
+                autoCompletedContacts.adapter = contactAdapter!!
             }
-        )
 
-        autoCompletedContacts.adapter = contactAdapter!!
+            autocompleteInput.apply {
+                doOnTextChanged { text, _, _, _ ->
+                    if (text?.isNotEmpty() == true) {
+                        if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
+                        if (!isAutocompletionOpened) openAutoCompletion()
+                    } else if (isAutocompletionOpened) {
+                        closeAutoCompletion()
+                    }
+                }
 
-        autocompleteInput.apply {
-            doOnTextChanged { text, _, _, _ ->
-                Log.e("gibran", "doOnTextChanged - text: ${text}")
-                if (text?.isNotEmpty() == true) {
-                    if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
-                    if (!isAutocompletionOpened) openAutoCompletion()
-                } else if (isAutocompletionOpened) {
-                    closeAutoCompletion()
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) contactAdapter!!.addFirstAvailableItem()
+                    // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
+                    // if (actionId == EditorInfo.IME_ACTION_PREVIOUS) onFocusPrevious?.invoke()
+                    true // Keep keyboard open
                 }
             }
-
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) contactAdapter!!.addFirstAvailableItem()
-                // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
-                // if (actionId == EditorInfo.IME_ACTION_PREVIOUS) onFocusPrevious?.invoke()
-                true // Keep keyboard open
-            }
         }
-    }
 
     private fun openAutoCompletion() {
         isAutocompletionOpened = true

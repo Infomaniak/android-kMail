@@ -62,7 +62,7 @@ class NewMessageFragment : Fragment() {
     private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
     private lateinit var filePicker: FilePicker
 
-    private lateinit var contactAdapter: ContactAdapter
+    // private lateinit var contactAdapter: ContactAdapter
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
     private var mailboxes = emptyList<Mailbox>()
@@ -130,30 +130,29 @@ class NewMessageFragment : Fragment() {
 
     private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
         binding.toField.apply {
-            initContacts(allContacts, mutableListOf())
+            initContacts(binding.autoCompleteTo, allContacts, mutableSetOf())
             onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(TO, hasOpened) }
         }
 
         binding.ccField.apply {
-            initContacts(allContacts, mutableListOf())
+            initContacts(binding.autoCompleteCc, allContacts, mutableSetOf())
             onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(CC, hasOpened) }
         }
 
         binding.bccField.apply {
-            initContacts(allContacts, mutableListOf())
+            initContacts(binding.autoCompleteBcc, allContacts, mutableSetOf())
             onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(BCC, hasOpened) }
         }
     }
 
     private fun toggleAutoCompletion(field: FieldType? = null, isAutocompletionOpened: Boolean) = with(newMessageViewModel) {
         binding.preFields.isGone = isAutocompletionOpened
-
         binding.to.isVisible = !isAutocompletionOpened || field == TO
         binding.cc.isVisible = !isAutocompletionOpened || field == CC
         binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
-        binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
-
         binding.postFields.isGone = isAutocompletionOpened
+
+        newMessageViewModel.isAutocompletionOpened = isAutocompletionOpened
     }
 
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
@@ -367,7 +366,7 @@ class NewMessageFragment : Fragment() {
     //     binding.to.isVisible = !isAutocompletionOpened || field == TO
     //     binding.cc.isVisible = !isAutocompletionOpened || field == CC
     //     binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
-    //     binding.autoCompleteRecyclerView.isVisible = isAutocompletionOpened
+    //     binding.autoComplete.isVisible = isAutocompletionOpened
     //
     //     binding.postFields.isGone = isAutocompletionOpened
     // }

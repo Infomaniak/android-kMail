@@ -133,7 +133,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
-        emit(MergedContactController.getMergedContacts())
+        emit(MergedContactController.getMergedContacts(sorted = true))
     }
 
     fun observeMailboxes(): LiveData<Pair<List<Mailbox>, Int>> = liveData(Dispatchers.IO) {

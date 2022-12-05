@@ -83,12 +83,10 @@ class ContactAdapter(
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val searchTerm = constraint?.standardize() ?: ""
-                Log.e("gibran", "performFiltering To/Cc/Bcc - searchTerm: ${searchTerm}")
                 val finalUserList = allContacts
                     .filter { it.name.standardize().contains(searchTerm) || it.email.standardize().contains(searchTerm) }
                     .filterNot { displayedItem -> getUsedEmails(currentField).any { it == displayedItem.email } }
 
-                Log.e("gibran", "performFiltering To/Cc/Bcc - finalUserList: ${finalUserList}")
                 return FilterResults().apply {
                     values = finalUserList
                     count = finalUserList.size
@@ -97,14 +95,12 @@ class ContactAdapter(
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                 val searchTerm = constraint?.standardize()
-                Log.e("gibran", "publishResults To/Cc/Bcc - searchTerm: ${searchTerm}")
                 contacts = if (searchTerm?.isEmail() == true && !searchTerm.existsInAvailableItems()) {
                     mutableListOf()
                 } else {
                     @Suppress("UNCHECKED_CAST")
                     results.values as MutableList<MergedContact>
                 }
-                Log.e("gibran", "publishResults To/Cc/Bcc - contacts: ${contacts}")
                 orderItemList()
                 notifyDataSetChanged()
             }
@@ -112,7 +108,6 @@ class ContactAdapter(
     }
 
     fun filterField(selectedField: FieldType, text: CharSequence) {
-        Log.e("gibran", "filterField To/Cc/Bcc: ", );
         currentField = selectedField
         filter.filter(text)
     }

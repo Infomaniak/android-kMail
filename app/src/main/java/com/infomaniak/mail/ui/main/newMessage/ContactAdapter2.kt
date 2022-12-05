@@ -22,20 +22,24 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter2.ContactViewHolder
-import com.infomaniak.mail.utils.isEmail
 
 class ContactAdapter2(
     private val allContacts: List<MergedContact>,
-    private val usedContacts: MutableList<String>,
+    private val usedContacts: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
 ) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
 
     private var contacts = mutableListOf<MergedContact>()
+
+    init {
+        setHasStableIds(true)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder(ItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -51,6 +55,8 @@ class ContactAdapter2(
 
     override fun getItemCount(): Int = contacts.count()
 
+    override fun getItemId(position: Int): Long = contacts[position].id
+
     fun addFirstAvailableItem() {
         contacts.firstOrNull()?.let(::selectContact) ?: onAddUnrecognizedContact()
     }
@@ -64,37 +70,36 @@ class ContactAdapter2(
 
     private fun selectContact(contact: MergedContact) {
         onContactClicked(contact)
-        usedContacts.add(contact.email)
+        usedContacts.add(contact.email.standardize())
     }
 
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val s = System.nanoTime()
                 val searchTerm = constraint?.standardize() ?: ""
-                Log.e("gibran", "performFiltering - searchTerm: ${searchTerm}")
                 val finalUserList = allContacts
-                    .filter { it.name.standardize().contains(searchTerm) || it.email.standardize().contains(searchTerm) }
-                    .filterNot { displayedItem -> usedContacts.any { it == displayedItem.email } }
+                    .filter {
+                        val standardizedEmail = it.email.standardize()
+                        (it.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm))
+                                && !usedContacts.contains(standardizedEmail)
+                    }
 
-                Log.e("gibran", "performFiltering - finalUserList: ${finalUserList}")
 
                 return FilterResults().apply {
                     values = finalUserList
-                    count = finalUserList.size
+                    count = finalUserList.count()
                 }
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                val searchTerm = constraint?.standardize()
-                Log.e("gibran", "publishResults - searchTerm: ${searchTerm}")
-                contacts = if (searchTerm?.isEmail() == true && !searchTerm.existsInAvailableItems()) {
-                    mutableListOf()
-                } else {
-                    @Suppress("UNCHECKED_CAST")
-                    results.values as MutableList<MergedContact>
-                }
-                Log.e("gibran", "publishResults - contacts: ${contacts}")
-                orderItemList()
+                val s = System.nanoTime()
+
+                @Suppress("UNCHECKED_CAST")
+                contacts = results.values as MutableList<MergedContact>
+
+                // DiffUtil.calculateDiff(MergedContactsCallback(contacts, newContacts)).dispatchUpdatesTo(this@ContactAdapter2)
+                // contacts = newContacts
                 notifyDataSetChanged()
             }
         }
@@ -110,9 +115,16 @@ class ContactAdapter2(
 
     private fun CharSequence.standardize(): String = this.toString().trim().lowercase()
 
-    private fun String.existsInAvailableItems(): Boolean {
-        return allContacts.any { availableItem -> availableItem.email.standardize() == this } // TODO : Opti
-    }
+    // class MergedContactsCallback(private val oldList: List<MergedContact>, private val newList: List<MergedContact>) : DiffUtil.Callback() {
+    //     override fun getOldListSize(): Int = oldList.count()
+    //     override fun getNewListSize(): Int = newList.count()
+    //
+    //     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+    //         return oldList[oldItemPosition].id == newList[newItemPosition].id
+    //     }
+    //
+    //     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean = true
+    // }
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 }
