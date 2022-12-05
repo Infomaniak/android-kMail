@@ -37,8 +37,13 @@ import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
+    private var _thread: Thread? = null
+    val thread: Thread? get() = _thread
+
     fun observeThread(threadUid: String) = liveData(Dispatchers.IO) {
-        emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
+        emitSource(ThreadController.getThreadAsync(threadUid)
+            .mapNotNull { queryResult -> queryResult.obj.also { _thread = it } }
+            .asLiveData())
     }
 
     fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
