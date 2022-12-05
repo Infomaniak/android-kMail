@@ -20,8 +20,10 @@ package com.infomaniak.mail.workers
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -75,10 +77,15 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
     private fun Thread.showNotification(folderId: String, mailbox: Mailbox, realm: Realm) {
         MessageController.getLastMessage(uid, folderId, realm)?.let { message ->
             val description = "${message.subject}\n${message.preview}"
+            val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                .setGraph(R.navigation.main_navigation)
+                .setDestination(R.id.threadListFragment) // TODO : navigate to the message
+                .createPendingIntent()
             applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
                 setSubText(mailbox.email)
                 setContentText(message.subject)
                 setColorized(true)
+                setContentIntent(pendingIntent)
                 color = localSettings.accentColor.getPrimary(applicationContext)
                 notificationManagerCompat.notify(uid.hashCode(), build())
             }
