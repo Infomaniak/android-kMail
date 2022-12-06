@@ -87,7 +87,5 @@ class ThreadViewModel : ViewModel() {
         }
     }
 
-    fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) { ThreadController.deleteThread(threadUid) }
-
     fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) { DraftController.deleteDraft(message) }
 }

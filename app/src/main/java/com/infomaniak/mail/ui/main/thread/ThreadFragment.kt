@@ -193,7 +193,6 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
-        threadViewModel.deleteThread(navigationArgs.threadUid)
         // TODO: The day we'll have the Notifications, this `popBackStack` will probably fail to execute correctly.
         // TODO: When opening a Thread via a Notification, the action of leaving this fragment
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably

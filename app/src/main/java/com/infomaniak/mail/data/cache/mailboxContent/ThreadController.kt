@@ -118,10 +118,6 @@ object ThreadController {
         }
     }
 
-    fun deleteThread(uid: String) {
-        RealmDatabase.mailboxContent().writeBlocking { getThread(uid, realm = this)?.let(::delete) }
-    }
-
     fun deleteAllThreads(realm: MutableRealm) {
         realm.delete(getThreads(realm))
     }
