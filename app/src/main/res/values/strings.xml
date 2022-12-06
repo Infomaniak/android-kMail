@@ -174,7 +174,7 @@
     <string name="noConversationSelected">No conversation selected in %s</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
     <string name="noEmailTitle">You don’t have any emails</string>
-    <string name="noFolderTitle">You don’t have any folder yet...</string>
+    <string name="noFolderTitle">You don’t have any folder yet…</string>
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
     <string name="noMailboxTitle">No email address associated with this account</string>
     <string name="noNetworkDescription">Your emails may not be up to date</string>
@@ -283,13 +283,23 @@
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarEmailCopiedToClipboard">Email address copied to the clipboard</string>
     <string name="snackbarInvalidUrl">Invalid URL</string>
+    <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
-    <string name="snackbarSenderBlacklisted">Sender(s) successfully blacklisted</string>
+    <plurals name="snackbarSenderBlacklisted">
+        <item quantity="one">Sender successfully blacklisted</item>
+        <item quantity="other">Senders successfully blacklisted</item>
+    </plurals>
     <string name="snackbarSuccessfulRestoration">Restoration successfully completed</string>
-    <string name="snackbarThreadMoved">Conversation moved to %s</string>
-    <string name="snackbarThreadsMoved">Conversations moved to %s</string>
+    <plurals name="snackbarThreadDeletedPermanently">
+        <item quantity="one">Conversation deleted</item>
+        <item quantity="other">Conversations deleted</item>
+    </plurals>
+    <plurals name="snackbarThreadMoved">
+        <item quantity="one">Conversation moved to %s</item>
+        <item quantity="other">Conversations moved to %s</item>
+    </plurals>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Subject:</string>

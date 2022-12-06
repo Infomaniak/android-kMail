@@ -155,7 +155,7 @@
     <string name="messageIsDraftOption">Draft</string>
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
     <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
-    <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, ...)</string>
+    <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, …)</string>
     <string name="moreStorageTitle">Is your box full? Get more storage!</string>
     <string name="moveTitle">Which folder do you want to move your email to?</string>
     <plurals name="multipleSelectionCount">
@@ -276,13 +276,23 @@
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarEmailCopiedToClipboard">Email address copied to the clipboard</string>
     <string name="snackbarInvalidUrl">Invalid URL</string>
+    <string name="snackbarMessageDeletedPermanently">Message deleted</string>
     <string name="snackbarMessageMoved">Message moved to %s</string>
     <string name="snackbarMoveCancelled">Move cancelled</string>
     <string name="snackbarReportPhishingConfirmation">Successfully reported</string>
-    <string name="snackbarSenderBlacklisted">Sender(s) successfully blacklisted</string>
+    <plurals name="snackbarSenderBlacklisted">
+        <item quantity="one">Sender successfully blacklisted</item>
+        <item quantity="other">Senders successfully blacklisted</item>
+    </plurals>
     <string name="snackbarSuccessfulRestoration">Restoration successfully completed</string>
-    <string name="snackbarThreadMoved">Conversation moved to %s</string>
-    <string name="snackbarThreadsMoved">Conversations moved to %s</string>
+    <plurals name="snackbarThreadDeletedPermanently">
+        <item quantity="one">Conversation deleted</item>
+        <item quantity="other">Conversations deleted</item>
+    </plurals>
+    <plurals name="snackbarThreadMoved">
+        <item quantity="one">Conversation moved to %s</item>
+        <item quantity="other">Conversations moved to %s</item>
+    </plurals>
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Subject:</string>

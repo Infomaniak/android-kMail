@@ -15,7 +15,7 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" tools:ignore="ImpliedQuantity">
     <string name="accentColorBlueTitle">Bleu</string>
     <string name="accentColorPinkTitle">Rose</string>
     <string name="actionArchive">Archiver</string>
@@ -53,6 +53,7 @@
     <plurals name="attachmentQuantity">
         <item quantity="one">%d pièce jointe</item>
         <item quantity="other">%d pièces jointes</item>
+        <item quantity="many">%d de pièces jointes</item>
     </plurals>
     <string name="bccTitle">Cci :</string>
     <string name="buttonAccept">Accepter</string>
@@ -139,6 +140,7 @@
     <plurals name="folderMessageCount">
         <item quantity="one">Ce dossier contient %d message</item>
         <item quantity="other">Ce dossier contient %d messages</item>
+        <item quantity="many">Ce dossier contient %d de messages</item>
     </plurals>
     <string name="folderNoMessageCount">Ce dossier ne contient aucun message</string>
     <string name="fromTitle">De :</string>
@@ -155,19 +157,20 @@
     <string name="messageIsDraftOption">Brouillon</string>
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
     <string name="moreStorageText1">Votre boite est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
-    <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, ...)</string>
+    <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
     <string name="moreStorageTitle">Votre boite est pleine ? Obtenez plus de stockage !</string>
     <string name="moveTitle">Dans quel dossier souhaitez-vous déplacer votre e-mail ?</string>
     <plurals name="multipleSelectionCount">
         <item quantity="one">%d sélectionné</item>
         <item quantity="other">%d sélectionnés</item>
+        <item quantity="many">%d de sélectionnés</item>
     </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="noBodyTitle">Ce message est vide.</string>
     <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noEmailDescription">Composez un nouvel e-mail en cliquant sur \"Nouveau message\" en bas à droite</string>
     <string name="noEmailTitle">Vous n’avez pas d’e-mails</string>
-    <string name="noFolderTitle">Vous n’avez pas encore de dossier...</string>
+    <string name="noFolderTitle">Vous n’avez pas encore de dossier…</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
     <string name="noMailboxTitle">Pas d’adresse mail associée à ce compte</string>
     <string name="noNetworkDescription">Vos e-mails pourraient ne pas être à jour</string>
@@ -176,7 +179,7 @@
     <string name="notificationGeneralChannelName">Notification générales</string>
     <string name="notificationNewMessagesChannelName">Nouveaux e-mails</string>
     <string name="notificationSyncDraftChannelName">Sauvegarde des brouillons</string>
-    <string name="notificationSyncMessagesChannelName">Récupération des nouveaux e-mails</string>
+    <string name="notificationSyncMessagesChannelName">Récupération des nouveaux emails</string>
     <string name="onBoardingDescription2">Définissez les actions que vous effectuez le plus souvent au balayage vers la droite et la gauche, et gagnez un temps précieux</string>
     <string name="onBoardingDescription3">Effectuez des actions sur de multiples messages simultanément</string>
     <string name="onBoardingDescription4">Gérez tous vos e-mails Infomaniak depuis l’app !</string>
@@ -276,13 +279,26 @@
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarEmailCopiedToClipboard">Adresse mail copiée dans le presse papier</string>
     <string name="snackbarInvalidUrl">URL invalide</string>
+    <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
     <string name="snackbarMoveCancelled">Déplacement annulé</string>
     <string name="snackbarReportPhishingConfirmation">Signalement effectué avec succès</string>
-    <string name="snackbarSenderBlacklisted">Expéditeur(s) blacklisté(s) avec succès</string>
+    <plurals name="snackbarSenderBlacklisted">
+        <item quantity="one">Expéditeur blacklisté avec succès</item>
+        <item quantity="other">Expéditeurs blacklistés avec succès</item>
+        <item quantity="many">Expéditeurs blacklistés avec succès</item>
+    </plurals>
     <string name="snackbarSuccessfulRestoration">Restauration effectuée avec succès</string>
-    <string name="snackbarThreadMoved">Conversation déplacée vers %s</string>
-    <string name="snackbarThreadsMoved">Conversations déplacées vers %s</string>
+    <plurals name="snackbarThreadDeletedPermanently">
+        <item quantity="one">Conversation supprimée</item>
+        <item quantity="other">Conversations supprimées</item>
+        <item quantity="many">Conversations supprimées</item>
+    </plurals>
+    <plurals name="snackbarThreadMoved">
+        <item quantity="one">Conversation déplacée vers %s</item>
+        <item quantity="other">Conversations déplacées vers %s</item>
+        <item quantity="many">Conversations déplacées vers %s</item>
+    </plurals>
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Objet :</string>
@@ -291,6 +307,7 @@
     <plurals name="threadListHeaderUnreadCount">
         <item quantity="one">%d non lu</item>
         <item quantity="other">%d non lus</item>
+        <item quantity="many">%d non lus</item>
     </plurals>
     <string name="threadListSectionLastWeek">La semaine dernière</string>
     <string name="threadListSectionThisMonth">Ce mois-ci</string>
