@@ -26,7 +26,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -52,7 +51,6 @@ import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import kotlin.math.abs
-import com.infomaniak.lib.core.R as RCore
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
@@ -132,14 +130,7 @@ class ThreadListAdapter(
         draftPrefix.isVisible = hasDrafts
         expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
 
-        val (text, isItalic) = getFormattedSubject(context)
-        mailSubject.text = text
-        if (isItalic) {
-            mailSubject.typeface = ResourcesCompat.getFont(context, RCore.font.suisseintl_regular_italic)
-        } else {
-            mailSubject.setTextAppearance(R.style.Callout)
-        }
-
+        mailSubject.setFormattedSubject(R.style.Callout)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
         getDisplayedRecipient(thread = this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
 

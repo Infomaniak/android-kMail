@@ -22,7 +22,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -42,7 +41,6 @@ import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import kotlin.math.min
 import kotlin.math.roundToInt
-import com.infomaniak.lib.core.R as RCore
 
 class ThreadFragment : Fragment() {
 
@@ -172,14 +170,8 @@ class ThreadFragment : Fragment() {
 
     private fun onThreadUpdate(thread: Thread) = with(binding) {
 
-        val (text, isItalic) = thread.getFormattedSubject(context)
-        threadSubject.text = text
-        toolbarSubject.text = text
-        if (isItalic) {
-            val font = ResourcesCompat.getFont(context, RCore.font.suisseintl_regular_italic)
-            threadSubject.typeface = font
-            toolbarSubject.typeface = font
-        }
+        threadSubject.setFormattedSubject(R.style.H2)
+        toolbarSubject.setFormattedSubject(R.style.H2)
 
         iconFavorite.apply {
             setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
