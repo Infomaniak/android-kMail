@@ -114,18 +114,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="getMoreStorageBottomSheetDialog">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="12" />
-                            <option name="y" value="12" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="helpFragment">
                     <value>
                       <LayoutPositions>
@@ -144,6 +132,18 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="744" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="launchActivity">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
                             <option name="y" value="12" />
                           </Point>
                         </option>
@@ -235,6 +235,15 @@
                             <option name="y" value="4817" />
                           </Point>
                         </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_messageActionsBottomSheet_to_newMessageActivity">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -270,6 +279,15 @@
                             <option name="x" value="1476" />
                             <option name="y" value="5173" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_replyBottomSheetDialog_to_newMessageActivity">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -467,6 +485,15 @@
                             <option name="y" value="5529" />
                           </Point>
                         </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_threadActionsBottomSheet_to_newMessageActivity">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -534,11 +561,6 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_homeFragment_to_newMessageActivity">
-                              <value>
-                                <LayoutPositions />
-                              </value>
-                            </entry>
                             <entry key="action_threadListFragment_to_helpFragment">
                               <value>
                                 <LayoutPositions />
@@ -550,6 +572,11 @@
                               </value>
                             </entry>
                             <entry key="action_threadListFragment_to_newFolderDialog">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_threadListFragment_to_newMessageActivity">
                               <value>
                                 <LayoutPositions />
                               </value>
