@@ -21,17 +21,28 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.mail.MatomoMail.trackUserId
+import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import com.infomaniak.mail.utils.AccountUtils
+import io.sentry.Breadcrumb
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LaunchActivity : AppCompatActivity() {
 
+    private val navigationArgs: LaunchActivityArgs? by lazy { intent?.extras?.let { LaunchActivityArgs.fromBundle(it) } }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        handleNotificationDestinationIntent()
+
         lifecycleScope.launch(Dispatchers.IO) {
             val user = AccountUtils.requestCurrentUser()
             trackUserId(AccountUtils.currentUserId)
@@ -40,13 +51,36 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun startApp() {
-        startActivity(Intent(this, MainActivity::class.java))
+        navigationArgs?.openThreadUid?.let {
+            NavDeepLinkBuilder(this)
+                .setGraph(R.navigation.main_navigation)
+                .setDestination(R.id.threadFragment, ThreadFragmentArgs(it).toBundle())
+                .setComponentName(MainActivity::class.java)
+                .createTaskStackBuilder().startActivities()
+        } ?: run {
+            startActivity(Intent(this, MainActivity::class.java))
+        }
     }
 
     private fun loginUser() {
         Intent(this, LoginActivity::class.java).apply {
             putExtras(LoginActivityArgs(isFirstAccount = true).toBundle())
             startActivity(this)
+        }
+    }
+
+    private fun handleNotificationDestinationIntent() {
+        navigationArgs?.let {
+            if (it.userId > 0 && it.mailboxId > 0) {
+                if (AccountUtils.currentUserId != it.userId) AccountUtils.currentUserId = it.userId
+                if (AccountUtils.currentMailboxId != it.mailboxId) AccountUtils.currentMailboxId = it.mailboxId
+
+                Sentry.addBreadcrumb(Breadcrumb().apply {
+                    category = "Notification"
+                    message = "SyncMessages notification has been clicked"
+                    level = SentryLevel.INFO
+                })
+            }
         }
     }
 }
