@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -102,6 +103,10 @@ fun Context.getAttributeColor(attribute: Int): Int {
 }
 
 fun Fragment.notYetImplemented() {
+    showSnackbar("This feature is currently under development.")
+}
+
+fun Activity.notYetImplemented() {
     showSnackbar("This feature is currently under development.")
 }
 

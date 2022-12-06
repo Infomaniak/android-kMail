@@ -101,7 +101,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
-        observeSnackbar()
     }
 
     override fun onResume(): Unit = with(binding) {
@@ -348,8 +347,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             if (it is Operation.State.FAILURE || it is Operation.State.SUCCESS) observeDraftsActions()
         }
     }
-
-    private fun observeSnackbar() = mainViewModel.snackbarFeedbackMove.observe(viewLifecycleOwner, ::showSnackbarThreadMove)
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {
 
