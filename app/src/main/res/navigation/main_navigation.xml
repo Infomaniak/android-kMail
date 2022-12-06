@@ -369,6 +369,25 @@
     </fragment>
 
     <activity
+        android:id="@+id/launchActivity"
+        android:name="com.infomaniak.mail.ui.LaunchActivity"
+        android:label="LaunchActivity">
+        <argument
+            android:name="openThreadUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="userId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="mailboxId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </activity>
+
+    <activity
         android:id="@+id/mainActivity"
         android:name="com.infomaniak.mail.ui.MainActivity"
         android:label="MainActivity"

@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.workers
 
+import android.app.PendingIntent
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkInfo
@@ -52,6 +53,8 @@ abstract class BaseCoroutineWorker(appContext: Context, params: WorkerParameters
 
     companion object {
         private const val MAX_RETRIES = 3
+
+        const val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         val WORK_RUNNING_STATES = listOf(WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED, WorkInfo.State.RUNNING)
     }

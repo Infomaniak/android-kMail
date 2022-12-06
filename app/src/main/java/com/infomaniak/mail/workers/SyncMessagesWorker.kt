@@ -17,13 +17,14 @@
  */
 package com.infomaniak.mail.workers
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
-import com.infomaniak.mail.R
+import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -32,6 +33,8 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.ui.LaunchActivity
+import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
@@ -62,7 +65,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                     MessageController.fetchCurrentFolderMessages(mailbox, folder.id, threadMode, okHttpClient, realm)
 
                 newMessagesThreads.forEach { thread ->
-                    thread.showNotification(folder.id, mailbox, realm)
+                    thread.showNotification(folder.id, user.id, mailbox, realm)
                 }
 
                 realm.close()
@@ -74,23 +77,23 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         Result.success()
     }
 
-    private fun Thread.showNotification(folderId: String, mailbox: Mailbox, realm: Realm) {
+    private fun Thread.showNotification(folderId: String, userId: Int, mailbox: Mailbox, realm: Realm) {
         MessageController.getLastMessage(uid, folderId, realm)?.let { message ->
 
             val subject = message.getFormattedSubject(applicationContext)
             val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
             val description = "$subject$preview"
 
-            val pendingIntent = NavDeepLinkBuilder(applicationContext)
-                .setGraph(R.navigation.main_navigation)
-                .setDestination(R.id.threadListFragment) // TODO : navigate to the message
-                .createPendingIntent()
+            val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
+                putExtras(LaunchActivityArgs(uid, userId, mailbox.mailboxId).toBundle())
+            }
+            val contentIntent = PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags)
 
             applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
                 setSubText(mailbox.email)
                 setContentText(message.subject)
                 setColorized(true)
-                setContentIntent(pendingIntent)
+                setContentIntent(contentIntent)
                 color = localSettings.accentColor.getPrimary(applicationContext)
                 notificationManagerCompat.notify(uid.hashCode(), build())
             }
