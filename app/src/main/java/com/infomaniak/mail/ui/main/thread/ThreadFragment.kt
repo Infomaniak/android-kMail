@@ -28,12 +28,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
@@ -60,42 +61,14 @@ class ThreadFragment : Fragment() {
         setupUi()
         setupAdapter()
         threadViewModel.openThread(navigationArgs.threadUid)
-        observeMessages()
+        observeThreadLive()
+        observeMessagesLive()
         observeContacts()
     }
 
     private fun setupUi() = with(binding) {
+
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-
-        threadSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(requireContext())
-        iconFavorite.apply {
-            setIconResource(if (navigationArgs.threadIsFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
-            setIconTintResource(if (navigationArgs.threadIsFavorite) R.color.favoriteYellow else R.color.iconColor)
-            setOnClickListener { notYetImplemented() }
-        }
-
-        quickActionBar.setOnItemClickListener { menuId ->
-            val lastMessageUid = threadAdapter.messages.getLastMessageToExecuteAction().uid
-            when (menuId) {
-                R.id.quickActionReply -> safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUid)
-                )
-                R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> notYetImplemented()
-                R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> {
-                    safeNavigate(
-                        ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                            messageUid = lastMessageUid,
-                            isFavorite = navigationArgs.threadIsFavorite,
-                            unseenMessagesCount = navigationArgs.unseenMessagesCount,
-                        )
-                    )
-                }
-            }
-        }
-
-        toolbarSubject.text = navigationArgs.threadSubject.getFormattedThreadSubject(context)
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -107,11 +80,31 @@ class ThreadFragment : Fragment() {
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
             toolbarSubject.setTextColor(textColor)
         }
+
+        iconFavorite.setOnClickListener { notYetImplemented() }
+
+        quickActionBar.setOnItemClickListener { menuId ->
+            val lastMessageUid = threadAdapter.messages.getLastMessageToExecuteAction().uid
+            when (menuId) {
+                R.id.quickActionReply -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUid)
+                )
+                R.id.quickActionForward -> notYetImplemented()
+                R.id.quickActionArchive -> notYetImplemented()
+                R.id.quickActionDelete -> notYetImplemented()
+                R.id.quickActionMenu -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                        messageUid = lastMessageUid,
+                        threadUid = navigationArgs.threadUid,
+                    )
+                )
+            }
+        }
     }
 
     private fun setupAdapter() = with(binding) {
         messagesList.adapter = threadAdapter.apply {
-            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             contacts = mainViewModel.mergedContacts.value ?: emptyMap()
             onContactClicked = { contact ->
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
@@ -150,6 +143,21 @@ class ThreadFragment : Fragment() {
         }
     }
 
+    private fun observeThreadLive() {
+        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner, ::onThreadUpdate)
+    }
+
+    private fun observeMessagesLive() {
+        threadViewModel.messagesLive(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+            beforeUpdateAdapter = ::onMessagesUpdate
+            afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+        }
+    }
+
+    private fun observeContacts() {
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
+    }
+
     private fun downloadAllAttachments(message: Message) {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = AccountUtils.currentMailboxUuid ?: return,
@@ -161,10 +169,15 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun observeMessages() {
-        threadViewModel.messages.bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
-            beforeUpdateAdapter = ::onMessagesUpdate
-            afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+    private fun onThreadUpdate(thread: Thread) = with(binding) {
+
+        val subject = thread.subject.getFormattedThreadSubject(context)
+        threadSubject.text = subject
+        toolbarSubject.text = subject
+
+        iconFavorite.apply {
+            setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
+            setIconTintResource(if (thread.isFavorite) R.color.favoriteYellow else R.color.iconColor)
         }
     }
 
@@ -174,12 +187,7 @@ class ThreadFragment : Fragment() {
         binding.messagesList.setBackgroundResource(if (messages.count() == 1) R.color.backgroundColor else R.color.threadBackground)
     }
 
-    private fun observeContacts() {
-        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
-    }
-
     private fun leaveThread() {
-        threadViewModel.deleteThread(navigationArgs.threadUid)
         // TODO: The day we'll have the Notifications, this `popBackStack` will probably fail to execute correctly.
         // TODO: When opening a Thread via a Notification, the action of leaving this fragment
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably

@@ -180,14 +180,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         )
                     }
                 } else {
-                    safeNavigate(
-                        ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(
-                            threadUid = thread.uid,
-                            threadSubject = thread.subject,
-                            threadIsFavorite = thread.isFavorite,
-                            unseenMessagesCount = thread.unseenMessagesCount,
-                        )
-                    )
+                    safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(thread.uid))
                 }
             }
         }
