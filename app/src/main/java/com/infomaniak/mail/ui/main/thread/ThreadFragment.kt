@@ -170,8 +170,9 @@ class ThreadFragment : Fragment() {
 
     private fun onThreadUpdate(thread: Thread) = with(binding) {
 
-        thread.setFormattedSubject(threadSubject, R.style.H2)
-        thread.setFormattedSubject(toolbarSubject, R.style.H2)
+        val subject = thread.getFormattedSubject(context)
+        threadSubject.text = subject
+        toolbarSubject.text = subject
 
         iconFavorite.apply {
             setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)

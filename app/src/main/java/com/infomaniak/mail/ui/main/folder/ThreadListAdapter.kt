@@ -130,7 +130,7 @@ class ThreadListAdapter(
         draftPrefix.isVisible = hasDrafts
         expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
 
-        setFormattedSubject(mailSubject, R.style.Callout)
+        mailSubject.text = getFormattedSubject(context)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
         getDisplayedRecipient(thread = this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
 
