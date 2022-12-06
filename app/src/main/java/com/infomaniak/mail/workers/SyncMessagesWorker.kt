@@ -79,7 +79,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
             val subject = message.getFormattedSubject(applicationContext)
             val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
-            val description = subject + preview
+            val description = "$subject$preview"
 
             val pendingIntent = NavDeepLinkBuilder(applicationContext)
                 .setGraph(R.navigation.main_navigation)
