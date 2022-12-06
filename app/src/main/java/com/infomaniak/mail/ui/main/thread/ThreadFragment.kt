@@ -92,15 +92,12 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionDelete -> notYetImplemented()
-                R.id.quickActionMenu -> threadViewModel.thread?.let {
-                    safeNavigate(
-                        ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                            messageUid = lastMessageUid,
-                            isFavorite = it.isFavorite,
-                            unseenMessagesCount = it.unseenMessagesCount,
-                        )
+                R.id.quickActionMenu -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
+                        messageUid = lastMessageUid,
+                        threadUid = navigationArgs.threadUid,
                     )
-                }
+                )
             }
         }
     }
@@ -147,9 +144,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeThreadLive() {
-        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner) { thread ->
-            updateThreadUi(thread)
-        }
+        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner, ::onThreadUpdate)
     }
 
     private fun observeMessagesLive() {
@@ -174,7 +169,7 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun updateThreadUi(thread: Thread) = with(binding) {
+    private fun onThreadUpdate(thread: Thread) = with(binding) {
 
         val subject = thread.subject.getFormattedThreadSubject(context)
         threadSubject.text = subject

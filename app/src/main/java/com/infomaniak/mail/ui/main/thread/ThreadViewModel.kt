@@ -37,13 +37,8 @@ import kotlinx.coroutines.launch
 
 class ThreadViewModel : ViewModel() {
 
-    var thread: Thread? = null
-        private set
-
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
-        emitSource(ThreadController.getThreadAsync(threadUid)
-            .mapNotNull { queryResult -> queryResult.obj.also { thread = it } }
-            .asLiveData())
+        emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }
 
     fun messagesLive(threadUid: String) = liveData(Dispatchers.IO) {
