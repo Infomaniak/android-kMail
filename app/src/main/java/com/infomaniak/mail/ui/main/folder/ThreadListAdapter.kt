@@ -125,12 +125,12 @@ class ThreadListAdapter(
 
     private fun getDisplayedRecipient(thread: Thread): Recipient? = thread.messages.lastOrNull()?.from?.firstOrNull()
 
-    private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
+    private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
 
         draftPrefix.isVisible = hasDrafts
         expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
 
-        mailSubject.setFormattedSubject(R.style.Callout)
+        setFormattedSubject(mailSubject, R.style.Callout)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
         getDisplayedRecipient(thread = this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
 

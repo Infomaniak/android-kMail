@@ -152,12 +152,12 @@ class Message : RealmObject {
         }
     }
 
-    fun TextView.setFormattedSubject(@StyleRes resId: Int) {
-        text = getFormattedSubject(context)
+    fun setFormattedSubject(textView: TextView, @StyleRes resId: Int) {
+        textView.text = getFormattedSubject(textView.context)
         if (subject.isNullOrBlank()) {
-            typeface = ResourcesCompat.getFont(context, RCore.font.suisseintl_regular_italic)
+            textView.typeface = ResourcesCompat.getFont(textView.context, RCore.font.suisseintl_regular_italic)
         } else {
-            setTextAppearance(resId)
+            textView.setTextAppearance(resId)
         }
     }
 

@@ -117,7 +117,7 @@ class Thread : RealmObject {
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
-    fun TextView.setFormattedSubject(@StyleRes resId: Int) = with(messages.first()) { setFormattedSubject(resId) }
+    fun setFormattedSubject(textView: TextView, @StyleRes resId: Int) = messages.first().setFormattedSubject(textView, resId)
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

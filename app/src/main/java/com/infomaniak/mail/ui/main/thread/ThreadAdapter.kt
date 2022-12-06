@@ -280,7 +280,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             recipient.text = getAllRecipientsFormatted(message = this@with)
             recipient.setTextAppearance(R.style.Callout_Secondary)
         } else {
-            recipient.setFormattedSubject(R.style.Callout_Secondary)
+            setFormattedSubject(recipient, R.style.Callout_Secondary)
         }
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
