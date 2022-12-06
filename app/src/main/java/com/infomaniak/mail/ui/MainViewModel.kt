@@ -21,6 +21,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -50,6 +51,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -95,7 +97,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
-    val snackbarFeedbackMove = SingleLiveEvent<Pair<String, String?>>()
+    val snackbarFeedback = SingleLiveEvent<Pair<String, String?>>()
 
     private var forceRefreshJob: Job? = null
 
@@ -251,19 +253,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val currentFolderRole = FolderController.getFolder(folderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
 
-            val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
+            val hardDeletesMessage = currentFolderRole == FolderRole.TRASH
+            val isSuccess = if (hardDeletesMessage) {
                 ApiRepository.deleteMessages(mailbox.uuid, messagesUids).isSuccess()
             } else {
                 val trashId = FolderController.getFolder(FolderRole.TRASH, realm = this)!!.id
                 ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId).isSuccess()
             }
 
-            if (isSuccess) {
+            val context = getApplication<Application>()
+            val snackbarMessage = if (isSuccess) {
                 deleteMessages(thread.messages)
                 delete(thread)
-                val folderName = getApplication<Application>().getString(FolderRole.TRASH.folderNameRes)
-                snackbarFeedbackMove.postValue(folderName to null) // TODO : Get undo resId
+
+                if (hardDeletesMessage) {
+                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1) to null
+                } else {
+                    val destination = context.getString(FolderRole.TRASH.folderNameRes)
+                    val title = context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+                    title to "" // TODO : Get undo resId
+                }
+            } else {
+                context.getString(RCore.string.anErrorHasOccurred) to null
             }
+
+            snackbarFeedback.postValue(snackbarMessage)
         }
 
         refreshThreads()

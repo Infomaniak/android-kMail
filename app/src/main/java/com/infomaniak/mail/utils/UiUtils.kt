@@ -123,9 +123,14 @@ fun animateColorChange(
     }
 }
 
-fun Fragment.showSnackbarThreadMove(data: Pair<String, String?>) {
-    val (destination, undoResource) = data
-    showSnackbar(requireContext().getString(R.string.snackbarThreadMoved, destination), null, R.string.buttonCancel)
+fun Fragment.showSnackbarThreadMove(destination: String, undoResource: String?) {
+    val title = resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+    showSnackbar(title, null, R.string.buttonCancel)
+}
+
+fun Fragment.showSnackbarThreadDeleted() {
+    val title = resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1)
+    showSnackbar(title, null, R.string.buttonCancel)
 }
 
 fun Fragment.showSnackbarMessageMove(data: Pair<String, String?>) {
