@@ -60,7 +60,6 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        setupThreadUi()
         threadViewModel.openThread(navigationArgs.threadUid)
         observeThreadLive()
         observeMessagesLive()
@@ -81,15 +80,6 @@ class ThreadFragment : Fragment() {
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
             toolbarSubject.setTextColor(textColor)
         }
-    }
-
-    private fun observeThreadLive() {
-        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner) { thread ->
-            updateThreadUi(thread)
-        }
-    }
-
-    private fun setupThreadUi() = with(binding) {
 
         iconFavorite.setOnClickListener { notYetImplemented() }
 
@@ -112,18 +102,6 @@ class ThreadFragment : Fragment() {
                     )
                 }
             }
-        }
-    }
-
-    private fun updateThreadUi(thread: Thread) = with(binding) {
-
-        val subject = thread.subject.getFormattedThreadSubject(context)
-        threadSubject.text = subject
-        toolbarSubject.text = subject
-
-        iconFavorite.apply {
-            setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
-            setIconTintResource(if (thread.isFavorite) R.color.favoriteYellow else R.color.iconColor)
         }
     }
 
@@ -168,6 +146,23 @@ class ThreadFragment : Fragment() {
         }
     }
 
+    private fun observeThreadLive() {
+        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner) { thread ->
+            updateThreadUi(thread)
+        }
+    }
+
+    private fun observeMessagesLive() {
+        threadViewModel.messagesLive(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
+            beforeUpdateAdapter = ::onMessagesUpdate
+            afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+        }
+    }
+
+    private fun observeContacts() {
+        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
+    }
+
     private fun downloadAllAttachments(message: Message) {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = AccountUtils.currentMailboxUuid ?: return,
@@ -179,10 +174,15 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun observeMessagesLive() {
-        threadViewModel.messagesLive(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
-            beforeUpdateAdapter = ::onMessagesUpdate
-            afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+    private fun updateThreadUi(thread: Thread) = with(binding) {
+
+        val subject = thread.subject.getFormattedThreadSubject(context)
+        threadSubject.text = subject
+        toolbarSubject.text = subject
+
+        iconFavorite.apply {
+            setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
+            setIconTintResource(if (thread.isFavorite) R.color.favoriteYellow else R.color.iconColor)
         }
     }
 
@@ -190,10 +190,6 @@ class ThreadFragment : Fragment() {
         Log.i("UI", "Received messages (${messages.size})")
         if (messages.isEmpty()) leaveThread()
         binding.messagesList.setBackgroundResource(if (messages.count() == 1) R.color.backgroundColor else R.color.threadBackground)
-    }
-
-    private fun observeContacts() {
-        mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner, threadAdapter::updateContacts)
     }
 
     private fun leaveThread() {
