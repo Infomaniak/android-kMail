@@ -125,7 +125,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
-            AccountUtils.currentMailboxId = mailbox.mailboxId
+            if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxObjectId = mailbox.objectId
             currentMailboxObjectId.postValue(mailbox.objectId)
             currentFolderId.postValue(null)
