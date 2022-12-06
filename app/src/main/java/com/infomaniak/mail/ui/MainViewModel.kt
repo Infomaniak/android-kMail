@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -48,6 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -86,23 +88,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         emit(FolderController.getFolder(folderId))
     }
 
-    private fun selectMailbox(mailbox: Mailbox) {
+    private suspend fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
-            currentMailboxObjectId.postValue(mailbox.objectId)
+            withContext(Dispatchers.Main) {
+                currentMailboxObjectId.value = mailbox.objectId
 
-            currentThreadUid.postValue(null)
-            currentFolderId.postValue(null)
+                currentThreadUid.value = null
+                currentFolderId.value = null
+            }
         }
     }
 
-    private fun selectFolder(folderId: String) {
+    private suspend fun selectFolder(folderId: String) {
         if (folderId != currentFolderId.value) {
             Log.d(TAG, "Select folder: $folderId")
-            currentFolderId.postValue(folderId)
+            withContext(Dispatchers.Main) {
+                currentFolderId.value = folderId
 
-            currentThreadUid.postValue(null)
+                currentThreadUid.value = null
+            }
         }
     }
 
@@ -113,7 +119,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
-        Log.d(TAG, "Load current mailbox")
+        loadCurrentMailboxFromLocal()
+        loadCurrentMailboxFromRemote()
+    }
+
+    private suspend fun loadCurrentMailboxFromLocal() {
+        Log.d(TAG, "Load current mailbox from local")
+        val userId = AccountUtils.currentUserId
+        val mailboxId = AccountUtils.currentMailboxId
+        if (userId != AppSettings.DEFAULT_ID && mailboxId != AppSettings.DEFAULT_ID) {
+            val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
+            selectMailbox(mailbox)
+            val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
+            selectFolder(folder.id)
+        }
+    }
+
+    private suspend fun loadCurrentMailboxFromRemote() {
+        Log.d(TAG, "Load current mailbox from remote")
         MailboxController.updateMailboxes(getApplication())
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }

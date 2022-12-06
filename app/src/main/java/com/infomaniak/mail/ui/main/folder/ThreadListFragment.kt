@@ -392,8 +392,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun displayThreadList() = with(binding) {
-        threadsList.isVisible = true
         emptyState.isGone = true
+        threadsList.isVisible = true
     }
 
     private fun firstMessageHasChanged(threads: List<Thread>): Boolean {
