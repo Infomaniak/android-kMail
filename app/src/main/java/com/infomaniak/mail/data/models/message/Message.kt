@@ -19,7 +19,9 @@
 
 package com.infomaniak.mail.data.models.message
 
+import android.content.Context
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.Attachment
@@ -138,6 +140,14 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
+    fun getFormattedSubject(context: Context): Pair<String, Boolean> {
+        return if (subject.isNullOrBlank()) {
+            context.getString(R.string.noSubjectTitle) to true
+        } else {
+            subject!!.replace("\n+".toRegex(), " ") to false
+        }
+    }
+
     fun updateFlags(flags: MessageFlags) {
         seen = flags.seen
         isFavorite = flags.isFavorite
@@ -148,6 +158,5 @@ class Message : RealmObject {
 
     fun toThread() = Thread().apply {
         uid = this@Message.uid
-        subject = this@Message.subject
     }
 }

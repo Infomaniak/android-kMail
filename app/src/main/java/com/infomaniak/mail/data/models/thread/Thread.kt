@@ -44,7 +44,6 @@ class Thread : RealmObject {
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
-    var subject: String? = null
     var date: RealmInstant = RealmInstant.MAX
     var size: Int = 0
     var hasAttachments: Boolean = false
@@ -115,6 +114,8 @@ class Thread : RealmObject {
     }
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
+
+    fun getFormattedSubject(context: Context): Pair<String, Boolean> = messages.first().getFormattedSubject(context)
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

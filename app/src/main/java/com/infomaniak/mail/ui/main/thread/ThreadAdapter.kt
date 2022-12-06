@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -276,7 +277,20 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
-        recipient.text = if (isExpanded) getAllRecipientsFormatted(message = this@with) else subject
+        val defaultTextAppearance = R.style.Callout_Secondary
+        if (isExpanded) {
+            recipient.text = getAllRecipientsFormatted(message = this@with)
+            recipient.setTextAppearance(defaultTextAppearance)
+        } else {
+            val (text, isItalic) = getFormattedSubject(context)
+            recipient.text = text
+            if (isItalic) {
+                recipient.typeface = ResourcesCompat.getFont(context, RCore.font.suisseintl_regular_italic)
+            } else {
+                recipient.setTextAppearance(defaultTextAppearance)
+            }
+        }
+
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
     }

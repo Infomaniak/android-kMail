@@ -76,7 +76,8 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
     private fun Thread.showNotification(folderId: String, mailbox: Mailbox, realm: Realm) {
         MessageController.getLastMessage(uid, folderId, realm)?.let { message ->
-            val description = "${message.subject}\n${message.preview}"
+            val description = message.getFormattedSubject(applicationContext).first +
+                    if (message.preview.isEmpty()) "" else "\n${message.preview}"
             val pendingIntent = NavDeepLinkBuilder(applicationContext)
                 .setGraph(R.navigation.main_navigation)
                 .setDestination(R.id.threadListFragment) // TODO : navigate to the message

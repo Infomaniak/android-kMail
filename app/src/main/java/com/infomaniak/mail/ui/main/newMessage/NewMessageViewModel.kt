@@ -53,7 +53,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val mailTo = mutableListOf<Recipient>()
     val mailCc = mutableListOf<Recipient>()
     val mailBcc = mutableListOf<Recipient>()
-    var mailSubject = ""
+    var mailSubject: String? = null
     var mailBody = ""
     var mailSignature: String? = null
     val mailAttachments = mutableListOf<Attachment>()
