@@ -20,9 +20,6 @@
 package com.infomaniak.mail.data.models.message
 
 import android.content.Context
-import android.widget.TextView
-import androidx.annotation.StyleRes
-import androidx.core.content.res.ResourcesCompat
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
@@ -45,7 +42,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
-import com.infomaniak.lib.core.R as RCore
 
 @Serializable
 class Message : RealmObject {
@@ -149,15 +145,6 @@ class Message : RealmObject {
             context.getString(R.string.noSubjectTitle)
         } else {
             subject!!.replace("\n+".toRegex(), " ")
-        }
-    }
-
-    fun setFormattedSubject(textView: TextView, @StyleRes resId: Int) {
-        textView.text = getFormattedSubject(textView.context)
-        if (subject.isNullOrBlank()) {
-            textView.typeface = ResourcesCompat.getFont(textView.context, RCore.font.suisseintl_regular_italic)
-        } else {
-            textView.setTextAppearance(resId)
         }
     }
 
