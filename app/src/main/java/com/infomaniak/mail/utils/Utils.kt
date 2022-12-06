@@ -17,19 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Context
-import android.text.Spanned
-import androidx.core.text.HtmlCompat
-import androidx.core.text.toSpanned
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 
 object Utils {
-
-    fun String?.getFormattedThreadSubject(context: Context): Spanned {
-        return this?.replace("\n+".toRegex(), " ")?.toSpanned()
-            ?: HtmlCompat.fromHtml("<i>${context.getString(R.string.noSubjectTitle)}</i>", HtmlCompat.FROM_HTML_MODE_COMPACT)
-    }
 
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
 

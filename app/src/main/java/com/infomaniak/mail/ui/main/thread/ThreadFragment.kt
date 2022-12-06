@@ -39,7 +39,6 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
-import com.infomaniak.mail.utils.Utils.getFormattedThreadSubject
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -171,9 +170,8 @@ class ThreadFragment : Fragment() {
 
     private fun onThreadUpdate(thread: Thread) = with(binding) {
 
-        val subject = thread.subject.getFormattedThreadSubject(context)
-        threadSubject.text = subject
-        toolbarSubject.text = subject
+        thread.setFormattedSubject(threadSubject, R.style.H2)
+        thread.setFormattedSubject(toolbarSubject, R.style.H2)
 
         iconFavorite.apply {
             setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)

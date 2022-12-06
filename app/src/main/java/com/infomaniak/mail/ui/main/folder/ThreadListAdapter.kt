@@ -50,7 +50,6 @@ import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.Utils.getFormattedThreadSubject
 import kotlin.math.abs
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
@@ -126,11 +125,12 @@ class ThreadListAdapter(
 
     private fun getDisplayedRecipient(thread: Thread): Recipient? = thread.messages.lastOrNull()?.from?.firstOrNull()
 
-    private fun CardviewThreadItemBinding.displayThread(thread: Thread): Unit = with(thread) {
+    private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
 
-        draftPrefix.isVisible = thread.hasDrafts
+        draftPrefix.isVisible = hasDrafts
         expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
-        mailSubject.text = subject.getFormattedThreadSubject(root.context)
+
+        setFormattedSubject(mailSubject, R.style.Callout)
         mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
         getDisplayedRecipient(thread = this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
 

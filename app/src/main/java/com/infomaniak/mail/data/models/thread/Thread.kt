@@ -18,7 +18,9 @@
 package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
+import android.widget.TextView
 import androidx.annotation.IdRes
+import androidx.annotation.StyleRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -44,7 +46,6 @@ class Thread : RealmObject {
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
-    var subject: String? = null
     var date: RealmInstant = RealmInstant.MAX
     var size: Int = 0
     var hasAttachments: Boolean = false
@@ -115,6 +116,8 @@ class Thread : RealmObject {
     }
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
+
+    fun setFormattedSubject(textView: TextView, @StyleRes resId: Int) = messages.first().setFormattedSubject(textView, resId)
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

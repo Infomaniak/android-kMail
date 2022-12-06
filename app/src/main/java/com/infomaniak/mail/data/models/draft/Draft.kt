@@ -52,7 +52,7 @@ class Draft : RealmObject {
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
 
-    var subject: String = ""
+    var subject: String? = null
     var body: String = ""
     var attachments: RealmList<Attachment> = realmListOf()
 

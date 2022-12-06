@@ -276,7 +276,12 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
-        recipient.text = if (isExpanded) getAllRecipientsFormatted(message = this@with) else subject
+        if (isExpanded) {
+            recipient.text = getAllRecipientsFormatted(message = this@with)
+            recipient.setTextAppearance(R.style.Callout_Secondary)
+        } else {
+            setFormattedSubject(recipient, R.style.Callout_Secondary)
+        }
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
     }
