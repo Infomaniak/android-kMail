@@ -46,6 +46,7 @@ import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.toggleChevron
+import io.realm.kotlin.ext.isValid
 
 class MenuDrawerFragment : Fragment() {
 
@@ -206,9 +207,10 @@ class MenuDrawerFragment : Fragment() {
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolderId = mainViewModel.currentFolder.value?.id
-            defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
-            customFolderAdapter.setFolders(customFolders, currentFolderId)
+            val currentFolder = mainViewModel.currentFolder.value ?: return@observe
+            if (!currentFolder.isValid()) return@observe
+            defaultFolderAdapter.setFolders(defaultFolders, currentFolder.id)
+            customFolderAdapter.setFolders(customFolders, currentFolder.id)
         }
     }
 

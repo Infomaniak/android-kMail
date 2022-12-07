@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
+import io.realm.kotlin.ext.isValid
 import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
@@ -98,6 +99,7 @@ class FolderAdapter(
     }
 
     private fun notifyCurrentItem(folderId: String) {
+        if (folders.firstOrNull()?.isValid() == false) return
         val position = folders.indexOfFirst { it.id == folderId }
         notifyItemChanged(position)
     }
