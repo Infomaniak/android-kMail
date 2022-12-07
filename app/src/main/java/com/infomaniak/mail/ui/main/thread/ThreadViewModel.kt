@@ -26,9 +26,10 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.update
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.MutableRealm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
@@ -44,7 +45,8 @@ class ThreadViewModel : ViewModel() {
         ThreadController.getThread(threadUid)?.messages?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
-    fun openThread(threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return@launch
         ThreadController.getThread(threadUid)?.let { thread ->
             ThreadController.markAsSeen(thread, mailbox)
             updateMessages(thread)

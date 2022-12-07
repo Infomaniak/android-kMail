@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDeepLinkBuilder
 import com.infomaniak.mail.MatomoMail.trackUserId
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.ui.login.LoginActivityArgs
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
@@ -71,7 +72,7 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun handleNotificationDestinationIntent() {
         navigationArgs?.let {
-            if (it.userId > 0 && it.mailboxId > 0) {
+            if (it.userId != AppSettings.DEFAULT_ID && it.mailboxId != AppSettings.DEFAULT_ID) {
                 if (AccountUtils.currentUserId != it.userId) AccountUtils.currentUserId = it.userId
                 if (AccountUtils.currentMailboxId != it.mailboxId) AccountUtils.currentMailboxId = it.mailboxId
 
