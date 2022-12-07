@@ -100,6 +100,8 @@ class MainActivity : ThemedActivity() {
         if (drawerLayout.isOpen) {
             (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
         } else {
+            // Schedule here because the activity is in finishing state and it'll be ignore by the stop lifecycle
+            SyncMessagesWorker.scheduleWork(this@MainActivity)
             super.onBackPressed()
         }
     }
