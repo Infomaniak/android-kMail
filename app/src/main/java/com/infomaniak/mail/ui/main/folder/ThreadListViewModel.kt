@@ -18,19 +18,18 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.text.format.DateUtils
-import androidx.lifecycle.*
-import com.infomaniak.lib.core.utils.SingleLiveEvent
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.ui.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
@@ -39,26 +38,6 @@ class ThreadListViewModel : ViewModel() {
 
     val isRecoveringFinished = MutableLiveData(true)
     val updatedAtTrigger = MutableLiveData<Unit>()
-
-    val currentFolder = Transformations.switchMap(MainViewModel.currentFolderId) { folderId ->
-        liveData(Dispatchers.IO) {
-            if (folderId != null) emitSource(FolderController.getFolderAsync(folderId).mapNotNull { it.obj }.asLiveData())
-        }
-    }
-
-    val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
-
-    val currentThreads = Transformations.switchMap(observeFolderAndFilter()) { (folderId, filter) ->
-        liveData(Dispatchers.IO) {
-            if (folderId != null) emitSource(ThreadController.getThreads(folderId, filter).asFlow().asLiveData())
-        }
-    }
-
-    private fun observeFolderAndFilter() = MediatorLiveData<Pair<String?, ThreadFilter>>().apply {
-        value = MainViewModel.currentFolderId.value to currentFilter.value!!
-        addSource(MainViewModel.currentFolderId) { value = it to value!!.second }
-        addSource(currentFilter) { value = value?.first to it }
-    }
 
     fun startUpdatedAtJob() {
         updatedAtJob?.cancel()
@@ -70,8 +49,8 @@ class ThreadListViewModel : ViewModel() {
         }
     }
 
-    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
-        ThreadController.toggleSeenStatus(thread)
+    fun toggleSeenStatus(thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+        ThreadController.toggleSeenStatus(thread, mailbox)
     }
 
     fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {

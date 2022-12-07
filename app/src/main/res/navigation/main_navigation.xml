@@ -64,6 +64,10 @@
         android:label="NewMessageActivity"
         tools:layout="@layout/activity_new_message">
 
+        <argument
+            android:name="currentMailboxObjectId"
+            app:argType="string" />
+
         <!-- Region Current draft status -->
         <argument
             android:name="draftExists"

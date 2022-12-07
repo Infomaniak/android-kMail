@@ -82,6 +82,9 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun observeAccounts() {
-        switchUserViewModel.observeAccounts().observe(viewLifecycleOwner, accountsAdapter::notifyAdapter)
+        switchUserViewModel.observeAccounts().observe(viewLifecycleOwner) { uiAccounts ->
+            val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@observe
+            accountsAdapter.notifyAdapter(uiAccounts, mailboxObjectId)
+        }
     }
 }

@@ -23,17 +23,16 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMes
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.notifications.ResultsChange
-import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 object FolderController {
 
@@ -57,8 +56,8 @@ object FolderController {
         return getFoldersQuery(exceptionsFoldersIds, realm).find()
     }
 
-    fun getFoldersAsync(realm: TypedRealm? = null): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(realm).asFlow()
+    fun getFoldersAsync(realm: TypedRealm? = null): Flow<RealmResults<Folder>> {
+        return getFoldersQuery(realm).asFlow().map { it.list }
     }
 
     fun getFolder(id: String, realm: TypedRealm? = null): Folder? {
@@ -69,8 +68,8 @@ object FolderController {
         return getFolderQuery(Folder::_role.name, role.name, realm).find()
     }
 
-    fun getFolderAsync(id: String, realm: TypedRealm? = null): Flow<SingleQueryChange<Folder>> {
-        return getFolderQuery(Folder::id.name, id, realm).asFlow()
+    fun getFolderAsync(id: String, realm: TypedRealm? = null): Flow<Folder> {
+        return getFolderQuery(Folder::id.name, id, realm).asFlow().mapNotNull { it.obj }
     }
     //endregion
 
@@ -115,7 +114,7 @@ object FolderController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, mailboxObjectId: String? = null) {
+    fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, mailboxObjectId: String) {
 
         var inboxUnreadCount: Int? = null
 
@@ -127,7 +126,7 @@ object FolderController {
         }
 
         inboxUnreadCount?.let { unseenMessages ->
-            MailboxController.updateMailbox(mailboxObjectId ?: MainViewModel.currentMailboxObjectId.value!!) { mailbox ->
+            MailboxController.updateMailbox(mailboxObjectId) { mailbox ->
                 mailbox.unseenMessages = unseenMessages
             }
         }

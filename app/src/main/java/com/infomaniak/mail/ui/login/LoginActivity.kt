@@ -59,9 +59,9 @@ import com.infomaniak.lib.core.R as RCore
 
 class LoginActivity : AppCompatActivity() {
 
-    private val introViewModel: IntroViewModel by viewModels()
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     private val navigationArgs by lazy { LoginActivityArgs.fromBundle(intent.extras ?: bundleOf()) }
+    private val introViewModel: IntroViewModel by viewModels()
 
     private lateinit var infomaniakLogin: InfomaniakLogin
 

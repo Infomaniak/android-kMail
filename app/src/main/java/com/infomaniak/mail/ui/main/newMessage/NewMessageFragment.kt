@@ -236,13 +236,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeMailboxes() {
-        mainViewModel.observeMailboxes().observe(viewLifecycleOwner, ::setupFromField)
+        mainViewModel.observeMailboxesLive().observe(viewLifecycleOwner, ::setupFromField)
     }
 
     private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {
 
         this@NewMessageFragment.mailboxes = mailboxes
-        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxObjectId.value }
+        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == newMessageActivityArgs.currentMailboxObjectId }
         val mails = mailboxes.map { it.email }
 
         fromMailAddress.text = mailboxes[selectedMailboxIndex].email
