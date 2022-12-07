@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
 import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
-import com.infomaniak.mail.utils.animateColorChange
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

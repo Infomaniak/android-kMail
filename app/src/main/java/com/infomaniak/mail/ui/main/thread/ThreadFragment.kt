@@ -66,7 +66,6 @@ class ThreadFragment : Fragment() {
         observeThreadLive()
         observeMessagesLive()
         observeContacts()
-        // observeSnackbar()
     }
 
     private fun setupUi() = with(binding) {

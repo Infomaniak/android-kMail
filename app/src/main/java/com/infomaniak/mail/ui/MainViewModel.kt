@@ -252,31 +252,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val currentFolderRole = FolderController.getFolder(folderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
 
-            val hardDeletesMessage = currentFolderRole == FolderRole.TRASH
-            val isSuccess = if (hardDeletesMessage) {
+            var undoResource: String? = null
+
+            val shouldPermanentlyDeleteMessage = currentFolderRole == FolderRole.TRASH
+            val isSuccess = if (shouldPermanentlyDeleteMessage) {
                 ApiRepository.deleteMessages(mailbox.uuid, messagesUids).isSuccess()
             } else {
                 val trashId = FolderController.getFolder(FolderRole.TRASH, realm = this)!!.id
-                ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId).isSuccess()
+                val response = ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId)
+                undoResource = response.data?.undoResource
+                response.isSuccess()
             }
 
             val context = getApplication<Application>()
-            val snackbarMessage = if (isSuccess) {
+            val snackbarTitle = if (isSuccess) {
                 deleteMessages(thread.messages)
                 delete(thread)
 
-                if (hardDeletesMessage) {
-                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1) to null
+                if (shouldPermanentlyDeleteMessage) {
+                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1)
                 } else {
                     val destination = context.getString(FolderRole.TRASH.folderNameRes)
-                    val title = context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
-                    title to "" // TODO : Get undo resId
+                    context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
                 }
             } else {
-                context.getString(RCore.string.anErrorHasOccurred) to null
+                context.getString(RCore.string.anErrorHasOccurred)
             }
 
-            snackbarFeedback.postValue(snackbarMessage)
+            snackbarFeedback.postValue(snackbarTitle to undoResource)
         }
 
         refreshThreads()

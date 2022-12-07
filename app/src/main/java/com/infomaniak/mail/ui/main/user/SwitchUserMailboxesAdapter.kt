@@ -26,8 +26,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserMailboxBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserMailboxesAdapter.SwitchUserMailboxViewHolder
+import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.formatUnreadCount
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
 
