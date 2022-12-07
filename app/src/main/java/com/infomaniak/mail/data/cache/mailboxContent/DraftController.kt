@@ -20,7 +20,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -89,8 +88,7 @@ object DraftController {
     }
     //endregion
 
-    fun deleteDraft(message: Message) {
-        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
+    fun deleteDraft(message: Message, mailboxUuid: String) {
         with(ApiRepository.deleteMessages(mailboxUuid, listOf(message.uid))) {
             if (isSuccess()) {
                 RealmDatabase.mailboxContent().writeBlocking {

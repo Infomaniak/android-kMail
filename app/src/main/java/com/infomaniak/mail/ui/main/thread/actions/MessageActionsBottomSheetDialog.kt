@@ -19,15 +19,18 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -51,8 +54,14 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         mainActions.setClosingOnClickListener { id: Int ->
             when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, navigationArgs.messageUid)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, navigationArgs.messageUid)
+                R.id.actionReply -> {
+                    val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@setClosingOnClickListener
+                    safeNavigateToNewMessageActivity(mailboxObjectId, DraftMode.REPLY, navigationArgs.messageUid)
+                }
+                R.id.actionReplyAll -> {
+                    val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@setClosingOnClickListener
+                    safeNavigateToNewMessageActivity(mailboxObjectId, DraftMode.REPLY_ALL, navigationArgs.messageUid)
+                }
                 R.id.actionForward -> notYetImplemented()
                 R.id.actionDelete -> notYetImplemented()
             }
