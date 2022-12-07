@@ -184,7 +184,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         )
                     }
                 } else {
-                    mainViewModel.selectThread(thread.uid)
                     safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(thread.uid))
                 }
             }
