@@ -133,18 +133,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun close() {
-        Log.i(TAG, "Close")
-        RealmDatabase.close()
-        resetAllCurrentLiveData()
-    }
-
-    fun resetAllCurrentLiveData() {
-        currentThreadUid.value = null
-        currentFolderId.value = null
-        currentMailboxObjectId.value = null
-    }
-
     fun observeMailboxesLive(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
         emitSource(MailboxController.getMailboxesAsync(userId).asLiveData())
     }
