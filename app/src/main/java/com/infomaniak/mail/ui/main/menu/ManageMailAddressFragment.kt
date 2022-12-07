@@ -50,13 +50,7 @@ class ManageMailAddressFragment : Fragment() {
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
         associatedEmailAddresses.setOnClickListener { notYetImplemented() }
-        disconnectAccountButton.setOnClickListener { logout() }
-    }
-
-    private fun logout() {
-        // TODO : Remove this call when liveData are not in the companion object of the viewModel anymore
-        mainViewModel.resetAllCurrentLiveData()
-        removeCurrentUser()
+        disconnectAccountButton.setOnClickListener { removeCurrentUser() }
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {

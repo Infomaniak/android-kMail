@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.LoginActivity
@@ -52,12 +53,8 @@ class SwitchUserFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
             AccountUtils.currentMailboxId = selectedMailbox.mailboxId
-
-            withContext(Dispatchers.Main) {
-                mainViewModel.close()
-
-                AccountUtils.reloadApp?.invoke()
-            }
+            RealmDatabase.close()
+            withContext(Dispatchers.Main) { AccountUtils.reloadApp?.invoke() }
         }
         // }
     }
