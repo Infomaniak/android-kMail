@@ -20,7 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
@@ -28,6 +28,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
@@ -87,8 +88,12 @@ object ThreadController {
         return getThreadsQuery(uids, realm)
     }
 
-    fun getThreads(folderId: String, filter: ThreadFilter = ThreadFilter.ALL, realm: TypedRealm? = null): RealmResults<Thread> {
-        return getThreadsQuery(folderId, filter, realm).find()
+    fun getThreadsAsync(
+        folderId: String,
+        filter: ThreadFilter = ThreadFilter.ALL,
+        realm: TypedRealm? = null,
+    ): Flow<ResultsChange<Thread>> {
+        return getThreadsQuery(folderId, filter, realm).asFlow()
     }
 
     fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
@@ -128,44 +133,42 @@ object ThreadController {
     //endregion
 
     //region Mark as seen/unseen
-    fun toggleSeenStatus(thread: Thread) {
-        if (thread.unseenMessagesCount == 0) markAsUnseen(thread) else markAsSeen(thread)
+    fun toggleSeenStatus(thread: Thread, mailbox: Mailbox) {
+        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailbox) else markAsSeen(thread, mailbox)
     }
 
-    private fun markAsUnseen(thread: Thread) {
+    private fun markAsUnseen(thread: Thread, mailbox: Mailbox) {
 
-        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
         val uid = getThreadLastMessageUid(thread)
 
-        if (ApiRepository.markMessagesAsUnseen(mailboxUuid, uid).isSuccess()) markThreadAsUnseen(thread.uid)
+        if (ApiRepository.markMessagesAsUnseen(mailbox.uuid, uid).isSuccess()) markThreadAsUnseen(thread.uid, mailbox.objectId)
     }
 
-    fun markAsSeen(thread: Thread) {
+    fun markAsSeen(thread: Thread, mailbox: Mailbox) {
         if (thread.unseenMessagesCount == 0) return
 
-        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return
         val uids = getThreadUnseenMessagesUids(thread)
 
-        if (ApiRepository.markMessagesAsSeen(mailboxUuid, uids).isSuccess()) markThreadAsSeen(thread.uid)
+        if (ApiRepository.markMessagesAsSeen(mailbox.uuid, uids).isSuccess()) markThreadAsSeen(thread.uid, mailbox.objectId)
     }
 
-    private fun markThreadAsUnseen(threadUid: String) {
+    private fun markThreadAsUnseen(threadUid: String, mailboxObjectId: String) {
         RealmDatabase.mailboxContent().writeBlocking {
             val thread = getThread(threadUid, realm = this) ?: return@writeBlocking
             val message = thread.messages.getLastMessageToExecuteAction()
             message.seen = false
             thread.unseenMessagesCount++
 
-            incrementFolderUnreadCount(message.folderId, 1)
+            incrementFolderUnreadCount(message.folderId, 1, mailboxObjectId)
         }
     }
 
-    private fun markThreadAsSeen(threadUid: String) {
+    private fun markThreadAsSeen(threadUid: String, mailboxObjectId: String) {
         RealmDatabase.mailboxContent().writeBlocking {
             val thread = getThread(threadUid, realm = this) ?: return@writeBlocking
             thread.messages.forEach {
                 if (!it.seen) {
-                    incrementFolderUnreadCount(it.folderId, -1)
+                    incrementFolderUnreadCount(it.folderId, -1, mailboxObjectId)
                     it.seen = true
                 }
             }

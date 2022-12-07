@@ -45,6 +45,7 @@ class MainActivity : ThemedActivity() {
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val mainViewModel: MainViewModel by viewModels()
+
     private val permissionUtils by lazy { PermissionUtils(this).also { registerMainPermissions(it) } }
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
@@ -78,6 +79,7 @@ class MainActivity : ThemedActivity() {
         setupNavController()
         setupMenuDrawerCallbacks()
 
+        mainViewModel.collectCurrentData()
         mainViewModel.updateUserInfo()
         mainViewModel.loadCurrentMailbox()
 
