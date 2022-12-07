@@ -45,7 +45,6 @@ class Thread : RealmObject {
     var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
     var duplicates: RealmList<Message> = realmListOf()
-    var uniqueMessagesCount: Int = 0
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
@@ -145,7 +144,6 @@ class Thread : RealmObject {
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true
         }
-        uniqueMessagesCount = messages.count() // TODO: Handle duplicates
         date = messages.findLast { it.folderId == folderId }?.date!!
     }
 

@@ -140,8 +140,9 @@ class ThreadListAdapter(
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
         iconFavorite.isVisible = isFavorite
 
-        threadCount.text = uniqueMessagesCount.toString()
-        threadCountCardview.isVisible = uniqueMessagesCount > 1
+        val messagesCount = thread.messages.count()
+        threadCount.text = messagesCount.toString()
+        threadCountCardview.isVisible = messagesCount > 1
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
