@@ -87,12 +87,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
-    //region Current Thread
-    private val currentThreadUid = MutableLiveData<String?>(null)
-
-    val currentThread = MutableLiveData<Thread>()
-    //endregion
-
     private val localSettings by lazy { LocalSettings.getInstance(application) }
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
@@ -123,14 +117,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            currentThreadUid.asFlow().distinctUntilChanged().collect { threadUid ->
-                threadUid?.let(ThreadController::getThread)?.let {
-                    currentThread.postValue(it)
-                }
-            }
-        }
     }
 
     fun observeMailboxesLive(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
@@ -143,7 +129,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxObjectId = mailbox.objectId
             currentMailboxObjectId.postValue(mailbox.objectId)
-            currentThreadUid.postValue(null)
             currentFolderId.postValue(null)
         }
     }
@@ -152,12 +137,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (folderId != currentFolderId.value) {
             Log.d(TAG, "Select folder: $folderId")
             currentFolderId.postValue(folderId)
-            currentThreadUid.postValue(null)
         }
-    }
-
-    fun selectThread(threadUid: String) {
-        if (threadUid != currentThreadUid.value) currentThreadUid.value = threadUid
     }
 
     fun updateUserInfo() = viewModelScope.launch(Dispatchers.IO) {
