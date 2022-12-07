@@ -52,7 +52,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -150,26 +149,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         emitSource(MailboxController.getMailboxesAsync(userId).asLiveData())
     }
 
-    private suspend fun selectMailbox(mailbox: Mailbox) {
+    private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxObjectId = mailbox.objectId
-            withContext(Dispatchers.Main) {
-                currentMailboxObjectId.value = mailbox.objectId
-                currentThreadUid.value = null
-                currentFolderId.value = null
-            }
+            currentMailboxObjectId.postValue(mailbox.objectId)
+            currentThreadUid.postValue(null)
+            currentFolderId.postValue(null)
         }
     }
 
-    private suspend fun selectFolder(folderId: String) {
+    private fun selectFolder(folderId: String) {
         if (folderId != currentFolderId.value) {
             Log.d(TAG, "Select folder: $folderId")
-            withContext(Dispatchers.Main) {
-                currentFolderId.value = folderId
-                currentThreadUid.value = null
-            }
+            currentFolderId.postValue(folderId)
+            currentThreadUid.postValue(null)
         }
     }
 
@@ -188,7 +183,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         loadCurrentMailboxFromRemote()
     }
 
-    private suspend fun loadCurrentMailboxFromLocal() {
+    private fun loadCurrentMailboxFromLocal() {
         Log.d(TAG, "Load current mailbox from local")
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
