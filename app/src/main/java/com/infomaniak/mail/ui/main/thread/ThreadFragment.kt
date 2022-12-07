@@ -37,8 +37,11 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.getLastMessageToExecuteAction
+import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.observeNotNull
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -59,7 +62,7 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        threadViewModel.openThread(navigationArgs.threadUid)
+        openThread()
         observeThreadLive()
         observeMessagesLive()
         observeContacts()
@@ -109,17 +112,22 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
-                safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
-                        draftExists = true,
-                        draftLocalUuid = message.draftLocalUuid,
-                        draftResource = message.draftResource,
-                        messageUid = message.uid,
+                mainViewModel.currentMailbox.value?.objectId?.let { mailboxObjectId ->
+                    safeNavigate(
+                        ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
+                            currentMailboxObjectId = mailboxObjectId,
+                            draftExists = true,
+                            draftLocalUuid = message.draftLocalUuid,
+                            draftResource = message.draftResource,
+                            messageUid = message.uid,
+                        )
                     )
-                )
+                }
             }
             onDeleteDraftClicked = { message ->
-                threadViewModel.deleteDraft(message)
+                mainViewModel.currentMailbox.value?.uuid?.let { mailboxUuid ->
+                    threadViewModel.deleteDraft(message, mailboxUuid)
+                }
             }
             onAttachmentClicked = { attachment ->
                 notYetImplemented()
@@ -142,6 +150,11 @@ class ThreadFragment : Fragment() {
         }
     }
 
+    private fun openThread() {
+        val mailbox = mainViewModel.currentMailbox.value ?: return
+        threadViewModel.openThread(navigationArgs.threadUid, mailbox)
+    }
+
     private fun observeThreadLive() {
         threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner, ::onThreadUpdate)
     }
@@ -159,8 +172,8 @@ class ThreadFragment : Fragment() {
 
     private fun downloadAllAttachments(message: Message) {
         val url = ApiRoutes.downloadAttachments(
-            mailboxUuid = AccountUtils.currentMailboxUuid ?: return,
-            folderId = MainViewModel.currentFolderId.value ?: return,
+            mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return,
+            folderId = mainViewModel.currentFolder.value?.id ?: return,
             messageId = message.shortUid,
         )
         val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }

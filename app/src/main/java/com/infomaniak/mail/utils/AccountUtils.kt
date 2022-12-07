@@ -27,9 +27,7 @@ import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.appSettings.AppSettingsController
-import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.ui.MainViewModel
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,9 +73,7 @@ object AccountUtils : CredentialManager() {
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMailboxId = mailboxId }
         }
 
-    // TODO: Remove this when we will have a better way to handle the current mailbox
-    inline val currentMailboxUuid
-        get() = MainViewModel.currentMailboxObjectId.value?.let { MailboxController.getMailbox(it)?.uuid }
+    var currentMailboxObjectId: String? = null
 
     suspend fun requestCurrentUser(): User? {
         currentUser = getUserById(currentUserId)

@@ -22,11 +22,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -39,6 +39,7 @@ import com.google.android.material.R as RMaterial
 open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     lateinit var binding: BottomSheetActionsMenuBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetActionsMenuBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -73,8 +74,7 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     fun setSpamUi() = with(binding.spam) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val currentFolderRole = MainViewModel.currentFolderId.value?.let(FolderController::getFolder)?.role
-            val currentFolderIsSpam = currentFolderRole == FolderRole.SPAM
+            val currentFolderIsSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
             withContext(Dispatchers.Main) { setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam) }
         }
     }

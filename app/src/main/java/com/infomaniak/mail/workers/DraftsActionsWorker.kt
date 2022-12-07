@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -167,7 +166,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (DraftController.getDraftsWithActionsCount() == 0L) return
 
-            val currentMailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return
+            val currentMailboxObjectId = AccountUtils.currentMailboxObjectId ?: return
             val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_OBJECT_ID_KEY to currentMailboxObjectId)
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)

@@ -68,6 +68,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var binding: FragmentThreadListBinding
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadListViewModel: ThreadListViewModel by viewModels()
+
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private lateinit var threadListAdapter: ThreadListAdapter
@@ -93,9 +94,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUserAvatar()
         setupUnreadCountChip()
 
-        observeCurrentFolderThreads()
+        observeCurrentThreads()
         observeDownloadState()
         observeCurrentFolder()
+        observeCurrentFolderLive()
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
@@ -170,8 +172,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             onThreadClicked = { thread ->
                 if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
                     threadListViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+                        val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@observe
                         safeNavigate(
                             ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
+                                currentMailboxObjectId = mailboxObjectId,
                                 draftExists = true,
                                 draftLocalUuid = it.draftLocalUuid,
                                 draftResource = it.draftResource,
@@ -180,6 +184,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         )
                     }
                 } else {
+                    mainViewModel.selectThread(thread.uid)
                     safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(thread.uid))
                 }
             }
@@ -199,7 +204,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         newMessageFab.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
+            val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@setOnClickListener
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(mailboxObjectId))
         }
 
         threadsList.scrollListener = object : OnListScrollListener {
@@ -248,7 +254,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 false
             }
             SwipeAction.READ_UNREAD -> {
-                threadListViewModel.toggleSeenStatus(thread)
+                mainViewModel.currentMailbox.value?.let { mailbox ->
+                    threadListViewModel.toggleSeenStatus(thread, mailbox)
+                }
                 true
             }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
@@ -281,13 +289,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         unreadCountChip.apply {
             setOnClickListener {
                 isCloseIconVisible = isChecked
-                threadListViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
+                mainViewModel.currentFilter.value = if (isChecked) ThreadFilter.UNSEEN else ThreadFilter.ALL
             }
         }
     }
 
-    private fun observeCurrentFolderThreads() {
-        threadListViewModel.currentThreads.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
+    private fun observeCurrentThreads() {
+        mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
             beforeUpdateAdapter = ::onThreadsUpdate
@@ -307,19 +315,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolder() {
-        MainViewModel.currentFolderId.observeNotNull(viewLifecycleOwner) { folderId ->
-
+        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
             lastUpdatedDate = null
             updateUpdatedAt()
             clearFilter()
-
-            mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
-                displayFolderName(folder)
-                threadListAdapter.updateFolderRole(folder.role)
-            }
+            displayFolderName(folder)
+            threadListAdapter.updateFolderRole(folder.role)
         }
+    }
 
-        threadListViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+    private fun observeCurrentFolderLive() {
+        mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
@@ -337,7 +343,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
             DraftsActionsWorker.getCompletedWorkInfosLiveData(requireContext()).observe(viewLifecycleOwner) {
-                if (threadListViewModel.currentFolder.value?.role == FolderRole.DRAFT) {
+                if (mainViewModel.currentFolder.value?.role == FolderRole.DRAFT) {
                     mainViewModel.forceRefreshThreads()
                 }
             }
@@ -367,7 +373,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun updateUnreadCount(unreadCount: Int) {
 
-        if (threadListViewModel.currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) clearFilter()
+        if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) clearFilter()
 
         binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
@@ -404,7 +410,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun clearFilter() {
-        with(threadListViewModel.currentFilter) {
+        with(mainViewModel.currentFilter) {
             if (value != ThreadFilter.ALL) value = ThreadFilter.ALL
         }
 
