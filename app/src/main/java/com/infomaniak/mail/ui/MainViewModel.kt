@@ -40,7 +40,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
@@ -278,7 +277,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads(mailbox, folderId)
     }
 
-    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+
         val mailbox = currentMailbox.value ?: return@launch
         ThreadController.toggleSeenStatus(thread, mailbox)
 

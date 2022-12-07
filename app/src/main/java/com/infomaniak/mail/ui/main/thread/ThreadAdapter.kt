@@ -36,7 +36,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.fillInUserNameAndEmail
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
