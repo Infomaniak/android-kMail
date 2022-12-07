@@ -50,7 +50,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
     private val notificationManagerCompat by lazy { NotificationManagerCompat.from(applicationContext) }
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
-        Log.d(TAG, "SyncMessagesWorker>launchWork: launched")
+        Log.d(TAG, "Work launched")
 
         AccountUtils.getAllUsersSync().forEach { user ->
             MailboxController.getMailboxes(user.id).forEach loopMailboxes@{ mailbox ->
@@ -72,7 +72,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
             }
         }
 
-        Log.d(TAG, "SyncMessagesWorker>launchWork: finished")
+        Log.d(TAG, "Work finished")
 
         Result.success()
     }
@@ -105,6 +105,8 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         private const val TAG = "SyncMessagesWorker"
 
         fun scheduleWork(context: Context) {
+            Log.d(TAG, "Work scheduled")
+
             val workRequest = PeriodicWorkRequestBuilder<SyncMessagesWorker>(MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 // We start with a delayed duration, so that when the app is rebooted the service is not launched
@@ -115,6 +117,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         }
 
         fun cancelWork(context: Context) {
+            Log.d(TAG, "Work cancelled")
             WorkManager.getInstance(context).cancelUniqueWork(TAG)
         }
     }
