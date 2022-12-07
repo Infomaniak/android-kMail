@@ -35,8 +35,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
+import com.infomaniak.mail.utils.UiUtils.pointBetweenColors
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.pointBetweenColors
 import com.infomaniak.mail.workers.SyncMessagesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
@@ -188,11 +188,8 @@ class MainActivity : ThemedActivity() {
 
     private fun observeSnackbar() {
         mainViewModel.snackbarFeedback.observe(this) { (title, undoResource) ->
-            if (undoResource == null) {
-                showSnackbar(title)
-            } else {
-                showSnackbar(title, onActionClicked = { notYetImplemented() })
-            }
+            val onActionClicked = undoResource?.let { { notYetImplemented() } }
+            showSnackbar(title, onActionClicked = onActionClicked)
         }
     }
 

@@ -30,8 +30,8 @@ import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemMenuDrawerBinding
+import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.formatUnreadCount
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
 

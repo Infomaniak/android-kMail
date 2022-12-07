@@ -26,114 +26,99 @@ import androidx.annotation.ColorInt
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
-import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
 
+object UiUtils {
 
-@ColorInt
-fun pointBetweenColors(@ColorInt from: Int, @ColorInt to: Int, percent: Float): Int {
-    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-        pointBetweenColors25(from, to, percent)
-    } else {
-        val fromColor = from.toColor()
-        val toColor = to.toColor()
-        Color.pack(
-            pointBetweenColor(fromColor.red(), toColor.red(), percent),
-            pointBetweenColor(fromColor.green(), toColor.green(), percent),
-            pointBetweenColor(fromColor.blue(), toColor.blue(), percent),
-            pointBetweenColor(fromColor.alpha(), toColor.alpha(), percent),
+    @ColorInt
+    fun pointBetweenColors(@ColorInt from: Int, @ColorInt to: Int, percent: Float): Int {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            pointBetweenColors25(from, to, percent)
+        } else {
+            val fromColor = from.toColor()
+            val toColor = to.toColor()
+            Color.pack(
+                pointBetweenColor(fromColor.red(), toColor.red(), percent),
+                pointBetweenColor(fromColor.green(), toColor.green(), percent),
+                pointBetweenColor(fromColor.blue(), toColor.blue(), percent),
+                pointBetweenColor(fromColor.alpha(), toColor.alpha(), percent),
+            ).toColorInt()
+        }
+    }
+
+    private fun pointBetweenColor(from: Float, to: Float, percent: Float): Float = from + percent * (to - from)
+
+    // Delete everything when api 25 is not supported anymore
+    private fun pointBetweenColors25(from: Int, to: Int, percent: Float): Int {
+        data class Color(
+            @ColorInt val a: Int,
+            @ColorInt val r: Int,
+            @ColorInt val g: Int,
+            @ColorInt val b: Int,
+        ) {
+            fun toColorInt(): Int = (a shl 24) or (r shl 16) or (g shl 8) or b
+        }
+
+        fun toColor(@ColorInt color: Int): Color {
+            val r = (color shr 16 and 0xff)
+            val g = (color shr 8 and 0xff)
+            val b = (color and 0xff)
+            val a = (color shr 24 and 0xff)
+            return Color(a, r, g, b)
+        }
+
+        fun pointBetweenColor(from: Int, to: Int, percent: Float): Int = (from + percent * (to - from)).toInt()
+
+        val fromColor = toColor(from)
+        val toColor = toColor(to)
+
+        return Color(
+            pointBetweenColor(fromColor.a, toColor.a, percent),
+            pointBetweenColor(fromColor.r, toColor.r, percent),
+            pointBetweenColor(fromColor.g, toColor.g, percent),
+            pointBetweenColor(fromColor.b, toColor.b, percent),
         ).toColorInt()
     }
-}
 
-private fun pointBetweenColor(from: Float, to: Float, percent: Float): Float = from + percent * (to - from)
+    fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
 
-// Delete everything when api 25 is not supported anymore
-private fun pointBetweenColors25(from: Int, to: Int, percent: Float): Int {
-    data class Color(
-        @ColorInt val a: Int,
-        @ColorInt val r: Int,
-        @ColorInt val g: Int,
-        @ColorInt val b: Int,
+    fun fillInUserNameAndEmail(
+        correspondent: Correspondent,
+        nameTextView: TextView,
+        emailTextView: TextView? = null,
+    ) = with(correspondent) {
+        when {
+            isMe() -> {
+                nameTextView.setText(R.string.contactMe)
+                emailTextView?.text = email
+            }
+            name.isBlank() || name == email -> {
+                nameTextView.text = email
+                emailTextView?.isGone = true
+            }
+            else -> {
+                nameTextView.text = name
+                emailTextView?.text = email
+            }
+        }
+    }
+
+    fun animateColorChange(
+        @ColorInt oldColor: Int,
+        @ColorInt newColor: Int,
+        duration: Long = 150L,
+        animate: Boolean = true,
+        setColor: (Int) -> Unit,
     ) {
-        fun toColorInt(): Int = (a shl 24) or (r shl 16) or (g shl 8) or b
-    }
-
-    fun toColor(@ColorInt color: Int): Color {
-        val r = (color shr 16 and 0xff)
-        val g = (color shr 8 and 0xff)
-        val b = (color and 0xff)
-        val a = (color shr 24 and 0xff)
-        return Color(a, r, g, b)
-    }
-
-    fun pointBetweenColor(from: Int, to: Int, percent: Float): Int = (from + percent * (to - from)).toInt()
-
-    val fromColor = toColor(from)
-    val toColor = toColor(to)
-
-    return Color(
-        pointBetweenColor(fromColor.a, toColor.a, percent),
-        pointBetweenColor(fromColor.r, toColor.r, percent),
-        pointBetweenColor(fromColor.g, toColor.g, percent),
-        pointBetweenColor(fromColor.b, toColor.b, percent),
-    ).toColorInt()
-}
-
-fun formatUnreadCount(unread: Int) = if (unread >= 100) "99+" else unread.toString()
-
-fun fillInUserNameAndEmail(
-    correspondent: Correspondent,
-    nameTextView: TextView,
-    emailTextView: TextView? = null,
-) = with(correspondent) {
-    when {
-        isMe() -> {
-            nameTextView.setText(R.string.contactMe)
-            emailTextView?.text = email
-        }
-        name.isBlank() || name == email -> {
-            nameTextView.text = email
-            emailTextView?.isGone = true
-        }
-        else -> {
-            nameTextView.text = name
-            emailTextView?.text = email
+        if (animate) {
+            ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
+                setDuration(duration)
+                addUpdateListener { animator -> setColor(animator.animatedValue as Int) }
+                start()
+            }
+        } else {
+            setColor(newColor)
         }
     }
-}
-
-fun animateColorChange(
-    @ColorInt oldColor: Int,
-    @ColorInt newColor: Int,
-    duration: Long = 150L,
-    animate: Boolean = true,
-    setColor: (Int) -> Unit,
-) {
-    if (animate) {
-        ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
-            setDuration(duration)
-            addUpdateListener { animator -> setColor(animator.animatedValue as Int) }
-            start()
-        }
-    } else {
-        setColor(newColor)
-    }
-}
-
-fun Fragment.showSnackbarThreadMove(destination: String, undoResource: String?) {
-    val title = resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
-    showSnackbar(title, null, R.string.buttonCancel)
-}
-
-fun Fragment.showSnackbarThreadDeleted() {
-    val title = resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1)
-    showSnackbar(title, null, R.string.buttonCancel)
-}
-
-fun Fragment.showSnackbarMessageMove(data: Pair<String, String?>) {
-    val (destination, undoResource) = data
-    showSnackbar(requireContext().getString(R.string.snackbarMessageMoved, destination), null, R.string.buttonCancel)
 }
