@@ -76,6 +76,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
     private fun Thread.showNotification(folderId: String, mailbox: Mailbox, realm: Realm) {
         MessageController.getLastMessage(uid, folderId, realm)?.let { message ->
+            if (message.seen) return // Ignore if it has already been seen
 
             val subject = message.getFormattedSubject(applicationContext)
             val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
