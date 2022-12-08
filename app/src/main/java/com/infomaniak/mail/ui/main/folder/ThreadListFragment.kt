@@ -172,10 +172,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             onThreadClicked = { thread ->
                 if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
                     threadListViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-                        val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@observe
                         safeNavigate(
                             ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
-                                currentMailboxObjectId = mailboxObjectId,
                                 draftExists = true,
                                 draftLocalUuid = it.draftLocalUuid,
                                 draftResource = it.draftResource,
@@ -203,8 +201,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         newMessageFab.setOnClickListener {
-            val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@setOnClickListener
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(mailboxObjectId))
+            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity())
         }
 
         threadsList.scrollListener = object : OnListScrollListener {

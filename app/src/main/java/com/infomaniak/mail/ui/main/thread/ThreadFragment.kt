@@ -112,17 +112,14 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
-                mainViewModel.currentMailbox.value?.objectId?.let { mailboxObjectId ->
-                    safeNavigate(
-                        ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
-                            currentMailboxObjectId = mailboxObjectId,
-                            draftExists = true,
-                            draftLocalUuid = message.draftLocalUuid,
-                            draftResource = message.draftResource,
-                            messageUid = message.uid,
-                        )
+                safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
+                        draftExists = true,
+                        draftLocalUuid = message.draftLocalUuid,
+                        draftResource = message.draftResource,
+                        messageUid = message.uid,
                     )
-                }
+                )
             }
             onDeleteDraftClicked = { message ->
                 mainViewModel.currentMailbox.value?.uuid?.let { mailboxUuid ->
