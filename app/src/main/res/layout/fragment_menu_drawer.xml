@@ -109,7 +109,7 @@
 
                     <TextView
                         android:id="@+id/mailboxSwitcherText"
-                        style="@style/H4.Accent"
+                        style="@style/H5.Accent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
