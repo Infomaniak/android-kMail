@@ -49,7 +49,6 @@ import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -57,24 +56,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Current Mailbox
     private val currentMailboxObjectId = MutableLiveData<String?>(null)
 
-    val currentMailbox = MutableLiveData<Mailbox>()
-
-    val currentFoldersLive = Transformations.switchMap(currentMailbox) {
-        liveData(Dispatchers.IO) { emitSource(FolderController.getFoldersAsync().asLiveData()) }
+    val currentMailbox = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
     }
 
-    val currentQuotasLive = Transformations.switchMap(currentMailbox) {
-        liveData(Dispatchers.IO) { emitSource(QuotasController.getQuotasAsync(it.objectId).asLiveData()) }
+    val currentFoldersLive = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(FolderController.getFoldersAsync().asLiveData()) } }
+    }
+
+    val currentQuotasLive = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
     }
     //endregion
 
     //region Current Folder
     private val currentFolderId = MutableLiveData<String?>(null)
 
-    val currentFolder = MutableLiveData<Folder>()
+    val currentFolder = Transformations.switchMap(currentFolderId) { folderId ->
+        liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
+    }
 
-    val currentFolderLive = Transformations.switchMap(currentFolder) {
-        liveData(Dispatchers.IO) { emitSource(FolderController.getFolderAsync(it.id).asLiveData()) }
+    val currentFolderLive = Transformations.switchMap(currentFolderId) { folderId ->
+        liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
     }
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
@@ -97,25 +100,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
         addSource(currentFilter) { value = value?.first to it }
-    }
-
-    fun collectCurrentData() {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            currentMailboxObjectId.asFlow().distinctUntilChanged().collect { mailboxObjectId ->
-                mailboxObjectId?.let(MailboxController::getMailbox)?.let {
-                    currentMailbox.postValue(it)
-                }
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            currentFolderId.asFlow().distinctUntilChanged().collect { folderId ->
-                folderId?.let(FolderController::getFolder)?.let {
-                    currentFolder.postValue(it)
-                }
-            }
-        }
     }
 
     fun observeMailboxesLive(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
