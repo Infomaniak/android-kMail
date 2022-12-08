@@ -126,7 +126,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             val firstSender = message.from.first()
             userAvatar.loadAvatar(firstSender, contacts)
             expeditorName.apply {
-                fillInUserNameAndEmail(firstSender, this)
+                UiUtils.fillInUserNameAndEmail(firstSender, this)
                 setTextAppearance(R.style.H5)
             }
             shortMessageDate.text = messageDate?.let { context.mailFormattedDate(it) } ?: ""
