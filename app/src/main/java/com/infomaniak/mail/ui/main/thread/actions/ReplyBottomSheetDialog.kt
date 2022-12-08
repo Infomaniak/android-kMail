@@ -21,21 +21,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetReplyBinding
     private val navigationArgs: ReplyBottomSheetDialogArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetReplyBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -45,18 +42,9 @@ open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainActions.setOnItemClickListener { id: Int ->
-            val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@setOnItemClickListener
             when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(
-                    currentMailboxObjectId = mailboxObjectId,
-                    draftMode = DraftMode.REPLY,
-                    messageUid = navigationArgs.messageUid,
-                )
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(
-                    currentMailboxObjectId = mailboxObjectId,
-                    draftMode = DraftMode.REPLY_ALL,
-                    messageUid = navigationArgs.messageUid,
-                )
+                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, navigationArgs.messageUid)
+                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, navigationArgs.messageUid)
             }
             findNavController().popBackStack()
         }

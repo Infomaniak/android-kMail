@@ -117,11 +117,10 @@ fun getAnimatedNavOptions() = NavOptions
     .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
     .build()
 
-fun Fragment.safeNavigateToNewMessageActivity(currentMailboxObjectId: String, draftMode: DraftMode, messageUid: String) {
+fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: String) {
     safeNavigate(
         R.id.newMessageActivity,
         NewMessageActivityArgs(
-            currentMailboxObjectId = currentMailboxObjectId,
             draftExists = false,
             draftMode = draftMode,
             previousMessageUid = messageUid,
