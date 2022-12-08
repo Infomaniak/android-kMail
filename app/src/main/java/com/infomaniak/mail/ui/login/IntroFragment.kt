@@ -21,7 +21,9 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +34,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
+import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -100,6 +105,12 @@ class IntroFragment : Fragment() {
             }
         }
 
+        iconLayout.addLottieOnCompositionLoadedListener {
+            iconLayout.resolveKeyPath(KeyPath("**")).forEach {
+                Log.d("keypath", it.keysToString())
+            }
+        }
+
         updateUiWhenThemeChanges(navigationArgs.position)
 
         setUi(localSettings.accentColor, navigationArgs.position)
@@ -154,7 +165,23 @@ class IntroFragment : Fragment() {
      */
     private fun setUi(accentColor: AccentColor, position: Int) = with(binding) {
         updateEachPageUi(accentColor)
+        val isPink = accentColor == PINK
+        when (position) {
+            0 -> illu1Colors.forEach { iconLayout.changePathColor(it, isPink) }
+            1 -> illu2Colors.forEach { iconLayout.changePathColor(it, isPink) }
+            2 -> illu3Colors.forEach { iconLayout.changePathColor(it, isPink) }
+            3 -> illu4Colors.forEach { iconLayout.changePathColor(it, isPink) }
+        }
+
         if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(accentColor)
+    }
+
+    private fun LottieAnimationView.changePathColor(illuColors: IlluColors, isPink: Boolean) {
+        val color = if (isPink) illuColors.getPinkColor() else illuColors.getBlueColor()
+        addValueCallback(
+            illuColors.keyPath,
+            LottieProperty.COLOR_FILTER
+        ) { SimpleColorFilter(color) }
     }
 
     private fun updateEachPageUi(accentColor: AccentColor) = with(binding) {
@@ -199,8 +226,135 @@ class IntroFragment : Fragment() {
         }
     }
 
+    class IlluColors(val keyPath: KeyPath, val pinkColor: String, val blueColor: String) {
+        fun getPinkColor() = Color.parseColor(pinkColor)
+        fun getBlueColor() = Color.parseColor(blueColor)
+    }
+
     private companion object {
         const val ACCENT_COLOR_PICKER_PAGE = 0
-        const val LOGIN_BUTTON_PAGE = 3
+
+        val illu1Colors = arrayOf(
+            IlluColors(KeyPath("CHAT 1", "Groupe 1", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("CHAT 2", "Groupe 1", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 1", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 12", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 15", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 19", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 2", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 20", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 23", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 24", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 3", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 43", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 48", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 5", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 55", "Fond 1"), pinkColor = "#DFBDCC", blueColor = "#84BAD8"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 6", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 61", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 66", "Fond 1"), pinkColor = "#824D65", blueColor = "#10405B"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 9", "Fond 1"), pinkColor = "#FF5B97", blueColor = "#69C9FF"),
+        )
+
+        val illu2Colors = arrayOf(
+            IlluColors(KeyPath("NOTIFICATION", "Groupe 4", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("NOTIFICATION", "Groupe 11", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 1", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 12", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 15", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 19", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 2", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 20", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 23", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 24", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 3", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 43", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 48", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 5", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 6", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 61", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 67", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 72", "Fond 1"), pinkColor = "#824D65", blueColor = "#10405B"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 9", "Fond 1"), pinkColor = "#FF5B97", blueColor = "#69C9FF"),
+            IlluColors(KeyPath("HAND", "Groupe 1", "Fond 1"), pinkColor = "#824D65", blueColor = "#10405B"),
+            IlluColors(KeyPath("HAND", "Groupe 4", "Fond 1"), pinkColor = "#693D51", blueColor = "#0B3547"),
+            IlluColors(KeyPath("HAND", "Groupe 5", "Fond 1"), pinkColor = "#693D51", blueColor = "#0B3547"),
+            IlluColors(KeyPath("MOVING NOTIF 1", "Groupe 15", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("MOVING NOTIF 2", "Groupe 4", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("MOVING NOTIF 2", "Groupe 11", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+        )
+
+        val illu3Colors = arrayOf(
+            IlluColors(KeyPath("NOTIFICATION 2", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("NOTIFICATION 3", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("NOTIFICATION 4", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("NOTIFICATION 2", "Groupe 5", "Fond 1"), pinkColor = "#F7E8EF", blueColor = "#EAF8FE"),
+            IlluColors(KeyPath("NOTIFICATION 3", "Groupe 5", "Fond 1"), pinkColor = "#F7E8EF", blueColor = "#EAF8FE"),
+            IlluColors(KeyPath("NOTIFICATION 4", "Groupe 5", "Fond 1"), pinkColor = "#F7E8EF", blueColor = "#EAF8FE"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 1", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 12", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 15", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 19", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 2", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 20", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 23", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 24", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 3", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 43", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 48", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 5", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 6", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 61", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 67", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 72", "Fond 1"), pinkColor = "#824D65", blueColor = "#10405B"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 9", "Fond 1"), pinkColor = "#FF5B97", blueColor = "#69C9FF"),
+            IlluColors(KeyPath("STAR", "Groupe 1", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("BEN", "Groupe 1", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("BEN", "Groupe 2", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("BEN", "Groupe 3", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("BEN", "Groupe 4", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("BEN", "Groupe 5", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("BEN", "Groupe 6", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("BEN", "Groupe 7", "Contour 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("RING", "Groupe 1", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("RING", "Groupe 2", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("RING", "Groupe 3", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("RING", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+        )
+
+        val illu4Colors = arrayOf(
+            IlluColors(KeyPath("WOMAN", "Groupe 4", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("MEN", "Groupe 5", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("POINT 1", "Groupe 1", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("POINT 2", "Groupe 1", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("POINT 3", "Groupe 1", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("POINT 4", "Groupe 1", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 1", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 12", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 15", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 19", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 2", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 20", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 23", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 24", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 3", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 4", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 43", "Fond 1"), pinkColor = "#BD95A7", blueColor = "#3981AA"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 48", "Fond 1"), pinkColor = "#BF4C80", blueColor = "#289CDD"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 5", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 6", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 61", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 67", "Fond 1"), pinkColor = "#BC0055", blueColor = "#0098FF"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 72", "Fond 1"), pinkColor = "#824D65", blueColor = "#10405B"),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 9", "Fond 1"), pinkColor = "#FF5B97", blueColor = "#69C9FF"),
+            IlluColors(KeyPath("LETTER", "Groupe 1", "Fond 1"), pinkColor = "#FF4388", blueColor = "#4CB7FF"),
+            IlluColors(KeyPath("LETTER", "Groupe 2", "Fond 1"), pinkColor = "#D81B60", blueColor = "#006AB2"),
+            IlluColors(KeyPath("LETTER", "Groupe 5", "Fond 1"), pinkColor = "#FAF0F0", blueColor = "#F7FCFF"),
+            IlluColors(KeyPath("LETTER", "Groupe 6", "Fond 1"), pinkColor = "#E10B59", blueColor = "#0098FF"),
+            IlluColors(KeyPath("LETTER", "Groupe 7", "Fond 1"), pinkColor = "#E10B59", blueColor = "#0098FF"),
+        )
     }
 }
