@@ -166,7 +166,11 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (DraftController.getDraftsWithActionsCount() == 0L) return
 
-            val currentMailboxObjectId = AccountUtils.currentMailboxObjectId ?: return
+            val currentMailboxObjectId = MailboxController.getMailbox(
+                userId = AccountUtils.currentUserId,
+                mailboxId = AccountUtils.currentMailboxId,
+            )?.objectId ?: return
+
             val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_OBJECT_ID_KEY to currentMailboxObjectId)
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
