@@ -36,6 +36,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
@@ -46,7 +47,6 @@ import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.toggleChevron
-import io.realm.kotlin.ext.isValid
 
 class MenuDrawerFragment : Fragment() {
 
@@ -60,8 +60,10 @@ class MenuDrawerFragment : Fragment() {
     private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
-        mainViewModel.openMailbox(selectedMailbox)
-        closeDrawer()
+        // TODO: This works, but... The splashscreen blinks.
+        AccountUtils.currentMailboxId = selectedMailbox.mailboxId
+        RealmDatabase.close()
+        AccountUtils.reloadApp?.invoke()
     }
 
     private val defaultFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
@@ -208,7 +210,6 @@ class MenuDrawerFragment : Fragment() {
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
             val currentFolder = mainViewModel.currentFolder.value ?: return@observe
-            if (!currentFolder.isValid()) return@observe
             defaultFolderAdapter.setFolders(defaultFolders, currentFolder.id)
             customFolderAdapter.setFolders(customFolders, currentFolder.id)
         }

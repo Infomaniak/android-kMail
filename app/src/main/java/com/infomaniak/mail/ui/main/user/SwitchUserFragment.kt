@@ -52,6 +52,7 @@ class SwitchUserFragment : Fragment() {
         // } else {
         lifecycleScope.launch(Dispatchers.IO) {
             AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
+            // TODO: This works, but... The splashscreen blinks.
             AccountUtils.currentMailboxId = selectedMailbox.mailboxId
             RealmDatabase.close()
             withContext(Dispatchers.Main) { AccountUtils.reloadApp?.invoke() }
