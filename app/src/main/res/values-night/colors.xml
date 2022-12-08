@@ -16,11 +16,13 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <color name="pinkMail">#E07FA3</color>
+    <color name="pinkMail">@color/mail_pink_dark</color>
+    <color name="pinkMailInverse">@color/mail_pink_light</color>
     <color name="pinkMailSecondary">#2A0F1B</color>
     <color name="pinkBoardingSecondaryBackground">@color/black</color>
     <color name="pinkMailRipple">#1EE07FA3</color>
-    <color name="blueMail">@color/blueTextLight</color>
+    <color name="blueMail">@color/mail_blue_dark</color>
+    <color name="blueMailInverse">@color/mail_blue_light</color>
     <color name="blueMailSecondary">#292E3D</color>
     <color name="blueBoardingSecondaryBackground">@color/black</color>
     <color name="blueMailRipple">#1E4CB7FF</color>
@@ -36,7 +38,7 @@
     <color name="backgroundHeaderColor">@color/bat</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/bat</color>
-    <color name="backgroundSnackbarColor">@color/black</color>
+    <color name="backgroundSnackbarColor">@color/rabbit</color>
     <color name="backgroundSecondaryColor">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
     <color name="threadBackground">@color/bat</color>
@@ -46,7 +48,7 @@
     <color name="secondaryTextColor">@color/shark</color>
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="colorOnPrimary">@color/bat</color>
-    <color name="snackbarTextColor">@color/polar_bear</color>
+    <color name="snackbarTextColor">@color/orca</color>
     <color name="emailChipTextColor">@color/shark</color>
 
     <!-- Separators -->
