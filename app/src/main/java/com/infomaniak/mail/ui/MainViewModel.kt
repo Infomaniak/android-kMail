@@ -294,6 +294,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads()
     }
 
+    fun markAsSeen(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        ThreadController.markAsSeen(thread)
+    }
+
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
         return folders.toMutableList().let { list ->
 
