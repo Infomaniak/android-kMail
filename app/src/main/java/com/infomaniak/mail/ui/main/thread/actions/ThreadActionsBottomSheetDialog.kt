@@ -51,7 +51,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         rule.isGone = true
 
         archive.setClosingOnClickListener { notYetImplemented() }
-        markAsRead.setClosingOnClickListener { mainViewModel.markAsSeen(navigationArgs.threadUid) }
+        markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(navigationArgs.threadUid) }
         move.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { notYetImplemented() }
         spam.setClosingOnClickListener { notYetImplemented() }

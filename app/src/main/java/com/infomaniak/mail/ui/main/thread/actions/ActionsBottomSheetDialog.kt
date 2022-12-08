@@ -59,7 +59,7 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
-    fun setMarkAsReadUi(isSeen: Boolean) = with(binding.markAsRead) {
+    fun setMarkAsReadUi(isSeen: Boolean) = with(binding.markAsReadUnread) {
         val (readIconRes, readTextRes) = computeUnreadStyle(isSeen)
         setIconResource(readIconRes)
         setText(readTextRes)

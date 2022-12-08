@@ -290,11 +290,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads(mailbox, folderId)
     }
 
-    fun markAsSeen(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
-        ThreadController.markAsSeen(thread)
-    }
-
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
