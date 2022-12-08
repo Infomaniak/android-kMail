@@ -79,7 +79,6 @@ class MainActivity : ThemedActivity() {
         setupNavController()
         setupMenuDrawerCallbacks()
 
-        mainViewModel.collectCurrentData()
         mainViewModel.updateUserInfo()
         mainViewModel.loadCurrentMailbox()
 
