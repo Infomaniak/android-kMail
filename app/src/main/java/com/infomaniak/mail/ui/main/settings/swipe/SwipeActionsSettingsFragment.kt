@@ -60,8 +60,8 @@ class SwipeActionsSettingsFragment : Fragment() {
             }
         }
 
-        swipeRightView.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeRight) }
-        swipeLeftView.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLeft) }
+        swipeRightCardview.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeRight) }
+        swipeLeftCardview.setOnClickListener { navigateToSwipeActionSelection(R.string.settingsSwipeLeft) }
     }
 
     private fun navigateToSwipeActionSelection(@StringRes resId: Int) {
