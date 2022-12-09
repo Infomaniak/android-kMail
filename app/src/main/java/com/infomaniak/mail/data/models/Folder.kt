@@ -67,9 +67,11 @@ class Folder : RealmObject {
     var cursor: String? = null
     @Transient
     var unreadCount: Int = 0
+    // @Transient
+    // var threads: RealmList<Thread> = realmListOf()
     //endregion
 
-    val parentFolder by backlinks(Folder::children)
+    val parentFolders by backlinks(Folder::children)
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)

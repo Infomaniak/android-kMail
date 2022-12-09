@@ -268,7 +268,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return folders.toMutableList().let { list ->
 
             val inbox = list
-                .find { it.role == Folder.FolderRole.INBOX }
+                .find { it.role == FolderRole.INBOX }
                 ?.also(list::remove)
 
             val defaultFolders = list
@@ -277,7 +277,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 .also(list::removeAll)
 
             val customFolders = list
-                .filter { it.parentFolder.isEmpty() }
+                .filter { it.parentFolders.isEmpty() }
                 .sortedByDescending { it.isFavorite }
                 .formatFoldersListWithAllChildren()
 
