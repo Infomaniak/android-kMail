@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -256,8 +255,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             if (isSuccess) {
-                incrementFolderUnreadCount(folderId, -thread.unseenMessagesCount, mailbox.objectId)
-                deleteMessages(thread.messages)
+                thread.messages.reversed().forEach {
+                    if (!it.seen) incrementFolderUnreadCount(it.folderId, -1, mailbox.objectId)
+                    MessageController.deleteMessage(it.uid, realm = this)
+                }
                 ThreadController.getThread(thread.uid, realm = this)?.let(::delete)
             }
         }
