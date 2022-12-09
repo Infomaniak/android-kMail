@@ -239,10 +239,11 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun setupFromField(mailboxes: List<Mailbox>, currentMailboxObjectId: String?) = with(binding) {
+    // TODO: Since we don't want to allow changing email & signature, maybe this code could be simplified?
+    private fun setupFromField(mailboxes: List<Mailbox>, currentMailboxIndex: Int) = with(binding) {
 
         this@NewMessageFragment.mailboxes = mailboxes
-        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == currentMailboxObjectId }
+        selectedMailboxIndex = currentMailboxIndex
         val mails = mailboxes.map { it.email }
 
         fromMailAddress.text = mailboxes[selectedMailboxIndex].email

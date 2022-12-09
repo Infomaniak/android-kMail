@@ -136,16 +136,15 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         emit(MergedContactController.getMergedContacts())
     }
 
-    fun observeMailboxes(): LiveData<Pair<List<Mailbox>, String?>> = liveData(Dispatchers.IO) {
+    fun observeMailboxes(): LiveData<Pair<List<Mailbox>, Int>> = liveData(Dispatchers.IO) {
 
         val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
 
-        val currentMailboxObjectId = MailboxController.getMailbox(
-            userId = AccountUtils.currentUserId,
-            mailboxId = AccountUtils.currentMailboxId,
-        )?.objectId
+        val currentMailboxIndex = mailboxes.indexOfFirst {
+            it.userId == AccountUtils.currentUserId && it.mailboxId == AccountUtils.currentMailboxId
+        }
 
-        emit(mailboxes to currentMailboxObjectId)
+        emit(mailboxes to currentMailboxIndex)
     }
 
     fun updateMailSubject(subject: String) {
