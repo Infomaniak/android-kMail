@@ -71,9 +71,6 @@
     <color name="favoriteYellow">#F1BE41</color>
     <color name="swipeActionIconColor">@color/white</color>
 
-    <!-- Buttons -->
-    <!--<color name="textButtonBlueLight">@color/blueTextLight</color>-->
-
     <!-- Cardview -->
     <color name="cardViewStrokeColor">@color/mouse</color>
 
