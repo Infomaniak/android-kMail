@@ -64,8 +64,8 @@ class MenuDrawerFragment : Fragment() {
         AccountUtils.reloadApp?.invoke()
     }
 
-    private val defaultFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
-    private val customFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val defaultFoldersAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val customFoldersAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -93,8 +93,8 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupAdapters() = with(binding) {
         addressesList.adapter = addressAdapter
-        defaultFoldersList.adapter = defaultFolderAdapter
-        customFoldersList.adapter = customFolderAdapter
+        defaultFoldersList.adapter = defaultFoldersAdapter
+        customFoldersList.adapter = customFoldersAdapter
     }
 
     private fun setupListeners() = with(binding) {
@@ -193,8 +193,8 @@ class MenuDrawerFragment : Fragment() {
         mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
             binding.inboxFolder.setSelectedState(folder.role == FolderRole.INBOX)
 
-            defaultFolderAdapter.updateSelectedState(folder.id)
-            customFolderAdapter.updateSelectedState(folder.id)
+            defaultFoldersAdapter.updateSelectedState(folder.id)
+            customFoldersAdapter.updateSelectedState(folder.id)
         }
     }
 
@@ -207,8 +207,8 @@ class MenuDrawerFragment : Fragment() {
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
             val currentFolder = mainViewModel.currentFolder.value ?: return@observe
-            defaultFolderAdapter.setFolders(defaultFolders, currentFolder.id)
-            customFolderAdapter.setFolders(customFolders, currentFolder.id)
+            defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
+            customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }
     }
 
