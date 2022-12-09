@@ -54,7 +54,7 @@ object ThreadController {
         realm: TypedRealm? = null
     ): RealmQuery<Thread> {
 
-        val byFolderId = "${Thread::foldersIds.name} == '$folderId'"
+        val byFolderId = "${Thread::folderId.name} == '$folderId'"
         val query = (realm ?: RealmDatabase.mailboxContent())
             .query<Thread>(byFolderId)
             .sort(Thread::date.name, Sort.DESCENDING)
@@ -111,6 +111,11 @@ object ThreadController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
+    fun updateThread(uid: String, realm: MutableRealm? = null, onUpdate: (thread: Thread) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getThread(uid, realm = it)?.let(onUpdate) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     private fun getThreadLastMessageUid(thread: Thread): List<String> {
         return listOf(thread.messages.getLastMessageToExecuteAction().uid)
@@ -123,12 +128,12 @@ object ThreadController {
         }
     }
 
-    fun deleteAllThreads(realm: MutableRealm) {
+    fun deleteThreads(realm: MutableRealm) {
         realm.delete(getThreads(realm))
     }
 
-    fun deleteThreadsOnlyInThisFolder(folderId: String, realm: MutableRealm) {
-        realm.delete(getThreadsQuery(folderId, realm = realm).query("${Thread::foldersIds.name}.@count == 1"))
+    fun deleteThreads(folderId: String, realm: MutableRealm) {
+        realm.delete(getThreadsQuery(folderId, realm = realm))
     }
     //endregion
 

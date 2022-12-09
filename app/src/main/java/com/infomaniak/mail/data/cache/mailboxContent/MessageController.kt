@@ -41,7 +41,6 @@ import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmSet
 import okhttp3.OkHttpClient
 import java.text.SimpleDateFormat
@@ -88,13 +87,13 @@ object MessageController {
         return getMessageQuery(uid, realm).find()
     }
 
-    fun getLastMessage(threadUid: String, folderId: String, realm: TypedRealm): Message? {
-        val parentThreadUidProperty = "${Message::parentThread.name}.${Thread::uid.name}"
-        val folderIdProperty = Message::folderId.name
-        val dateProperty = Message::date.name
-        val query = "$parentThreadUidProperty == '$threadUid' AND $folderIdProperty == '$folderId'"
-        return realm.query<Message>(query).sort(dateProperty, Sort.DESCENDING).first().find()
-    }
+    // fun getLastMessage(threadUid: String, folderId: String, realm: TypedRealm): Message? {
+    //     val parentThreadUidProperty = "${Message::parentThread.name}.${Thread::uid.name}"
+    //     val folderIdProperty = Message::folderId.name
+    //     val dateProperty = Message::date.name
+    //     val query = "$parentThreadUidProperty == '$threadUid' AND $folderIdProperty == '$folderId'"
+    //     return realm.query<Message>(query).sort(dateProperty, Sort.DESCENDING).first().find()
+    // }
     //endregion
 
     //region Edit data
@@ -250,7 +249,7 @@ object MessageController {
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
 
         // Here, we use a Set instead of a List, so we can't add multiple times the same Thread to it.
-        val threadsToUpsert = mutableSetOf<Thread>()
+        val threadsToUpsert = mutableMapOf<String, Thread>()
 
         messages.forEach { message ->
 
@@ -259,31 +258,46 @@ object MessageController {
             val messageIds = getMessageIds(message)
             message.messageIds = messageIds
 
-            val thread = allThreads.find { it.messagesIds.any { id -> messageIds.contains(id) } }
-                ?: run { message.toThread().also(allThreads::add) }
+            val existingThreads = allThreads.filter { it.messagesIds.any { id -> messageIds.contains(id) } }
+            existingThreads.forEach { it.addMessage(message) } // TODO: Merge this loop with the `filter` one?
 
-            thread.addMessage(message)
-            threadsToUpsert.add(thread)
+            if (existingThreads.none { it.folderId == message.folderId }) {
+
+                val newThread = message.toThread()
+                val existingThread = existingThreads.firstOrNull()
+
+                if (existingThread == null) {
+                    newThread.addMessage(message)
+                } else {
+                    newThread.messages.addAll(existingThread.messages)
+                    newThread.messagesIds = existingThread.messagesIds
+                }
+
+                allThreads.add(newThread)
+                // threadsToUpsert.add(newThread)
+                threadsToUpsert[newThread.uid] = newThread
+            }
+
+            existingThreads.forEach { threadsToUpsert[it.uid] = it }
+            // threadsToUpsert += existingThreads
         }
 
-        return threadsToUpsert.map { thread ->
-            thread.recomputeThread()
+        return threadsToUpsert.map { (_, thread) ->
+            thread.recomputeThread(realm = this)
             ThreadController.upsertThread(thread, realm = this)
             if (thread.isManaged()) copyFromRealm(thread, 0u) else thread
         }
     }
 
-    fun MutableRealm.createSingleMessageThreads(messages: List<Message>, mailboxObjectId: String): Set<Thread> {
-        val threads = mutableSetOf<Thread>()
-        messages.forEach { message ->
+    fun MutableRealm.createSingleMessageThreads(messages: List<Message>, mailboxObjectId: String): List<Thread> {
+        return messages.map { message ->
             if (!message.seen) incrementFolderUnreadCount(message.folderId, 1, mailboxObjectId)
-            val thread = message.toThread()
-            thread.addMessage(message)
-            thread.recomputeThread()
-            ThreadController.upsertThread(thread, realm = this)
-            threads.add(thread)
+            message.toThread().also { thread ->
+                thread.addMessage(message)
+                thread.recomputeThread(realm = this)
+                ThreadController.upsertThread(thread, realm = this)
+            }
         }
-        return threads
     }
 
     private fun MutableRealm.handleDeletedUids(
@@ -299,17 +313,20 @@ object MessageController {
             var unreadCount = 0
 
             when (threadMode) {
-                ThreadMode.THREADS -> deletedMessages.forEach { message ->
-
-                    if (!message.seen) unreadCount--
-
-                    message.parentThread.firstOrNull()?.let { thread ->
-                        if (thread.uniqueMessagesCount == 1) {
-                            delete(thread)
-                        } else {
-                            thread.removeMessage(message)
+                ThreadMode.THREADS -> {
+                    val threads = mutableSetOf<Thread>()
+                    deletedMessages.forEach { message ->
+                        if (!message.seen) unreadCount--
+                        message.parentThreads.forEach { thread ->
+                            if (thread.uniqueMessagesCount == 1) {
+                                delete(thread)
+                            } else {
+                                thread.messages.removeIf { it.uid == message.uid }
+                                threads += thread
+                            }
                         }
                     }
+                    threads.forEach { it.recomputeThread(realm = this) }
                 }
                 ThreadMode.MESSAGES -> {
                     deletedMessages.forEach { if (!it.seen) unreadCount-- }
@@ -325,6 +342,7 @@ object MessageController {
     private fun MutableRealm.handleUpdatedUids(messageFlags: List<MessageFlags>, folderId: String, mailboxObjectId: String) {
 
         var unreadCount = 0
+        val threads = mutableSetOf<Thread>()
 
         messageFlags.forEach { flags ->
 
@@ -338,10 +356,11 @@ object MessageController {
                 if (!wasRead && isRead) unreadCount--
                 if (wasRead && !isRead) unreadCount++
 
-                message.parentThread.firstOrNull()?.recomputeThread()
+                threads += message.parentThreads
             }
         }
 
+        threads.forEach { it.recomputeThread(realm = this) }
         incrementFolderUnreadCount(folderId, unreadCount, mailboxObjectId)
     }
 

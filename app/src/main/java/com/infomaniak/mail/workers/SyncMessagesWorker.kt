@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -66,7 +67,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                     MessageController.fetchCurrentFolderMessages(mailbox, folder.id, threadMode, okHttpClient, realm)
 
                 newMessagesThreads.forEach { thread ->
-                    thread.showNotification(folder.id, user.id, mailbox, realm)
+                    thread.showNotification(user.id, mailbox, realm)
                 }
 
                 realm.close()
@@ -78,8 +79,8 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         Result.success()
     }
 
-    private fun Thread.showNotification(folderId: String, userId: Int, mailbox: Mailbox, realm: Realm) {
-        MessageController.getLastMessage(uid, folderId, realm)?.let { message ->
+    private fun Thread.showNotification(userId: Int, mailbox: Mailbox, realm: Realm) {
+        ThreadController.getThread(uid, realm)?.messages?.lastOrNull()?.let { message ->
             if (message.seen) return // Ignore if it has already been seen
 
             val subject = message.getFormattedSubject(applicationContext)
