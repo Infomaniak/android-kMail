@@ -35,7 +35,6 @@ import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
-import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.query.RealmQuery
@@ -269,7 +268,9 @@ object MessageController {
         return threadsToUpsert.map { thread ->
             thread.recomputeThread()
             ThreadController.upsertThread(thread, realm = this)
-            if (thread.isManaged()) copyFromRealm(thread, 0u) else thread
+            // TODO: Put back when `copyFromRealm` is back.
+            // if (thread.isManaged()) copyFromRealm(thread, 0u) else thread
+            thread
         }
     }
 
