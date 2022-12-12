@@ -55,17 +55,10 @@ class Thread : RealmObject {
     var scheduled: Boolean = false
     var messagesIds: RealmSet<String> = realmSetOf()
 
-    // val parentFolder by backlinks(Folder::threads)
-
     fun addMessage(message: Message) {
         messages.add(message)
         messagesIds += message.messageIds
     }
-
-    // fun removeMessage(message: Message) {
-    //     messages.removeIf { it.uid == message.uid }
-    //     recomputeThread()
-    // }
 
     fun recomputeThread(realm: MutableRealm) {
 
