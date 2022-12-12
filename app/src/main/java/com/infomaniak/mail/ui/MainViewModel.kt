@@ -25,8 +25,8 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -252,13 +252,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             if (isSuccess) {
-                thread.messages.reversed().forEach {
-                    if (!it.seen) incrementFolderUnreadCount(it.folderId, -1, mailbox.objectId)
-                    MessageController.deleteMessage(it.uid, realm = this)
-                }
+                deleteMessages(thread.messages)
                 ThreadController.getThread(thread.uid, realm = this)?.let(::delete)
             }
         }
+
+        refreshThreads(mailbox, folderId)
+    }
+
+    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value ?: return@launch
+        ThreadController.toggleSeenStatus(thread, mailbox)
+
+        val folderId = currentFolderId.value ?: return@launch
+        refreshThreads(mailbox, folderId)
     }
 
     companion object {

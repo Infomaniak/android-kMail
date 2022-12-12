@@ -46,12 +46,12 @@ object MailboxController {
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
     private fun getMailboxesQuery(realm: TypedRealm? = null): RealmQuery<Mailbox> {
-        return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>().sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
+        return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>().sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
     }
 
     private fun getMailboxesQuery(userId: Int, realm: TypedRealm? = null): RealmQuery<Mailbox> {
         return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>(checkHasUserId(userId))
-            .sort(Mailbox::unseenMessages.name, Sort.DESCENDING)
+            .sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
     }
 
     private fun getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm? = null): RealmQuery<Mailbox> {
@@ -110,8 +110,8 @@ object MailboxController {
             val remoteMailboxes = RealmDatabase.mailboxInfo().writeBlocking {
                 mailboxes.map {
                     val mailboxObjectId = it.createObjectId(userId)
-                    val unseenMessages = getMailbox(mailboxObjectId, realm = this)?.unseenMessages ?: 0
-                    it.initLocalValues(userId, unseenMessages)
+                    val inboxUnreadCount = getMailbox(mailboxObjectId, realm = this)?.inboxUnreadCount ?: 0
+                    it.initLocalValues(userId, inboxUnreadCount)
                 }
             }
 

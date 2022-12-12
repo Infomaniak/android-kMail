@@ -133,7 +133,7 @@ class SwitchUserAccountsAdapter(
             return if (oldItem.mailboxes.size == newItem.mailboxes.size) {
                 var areContentsTheSame = true
                 oldItem.mailboxes.forEachIndexed { index, oldMailbox ->
-                    if (oldMailbox.unseenMessages != newItem.mailboxes[index].unseenMessages) {
+                    if (oldMailbox.inboxUnreadCount != newItem.mailboxes[index].inboxUnreadCount) {
                         areContentsTheSame = false
                         return@forEachIndexed
                     }
