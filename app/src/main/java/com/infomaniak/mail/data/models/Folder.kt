@@ -67,8 +67,6 @@ class Folder : RealmObject {
     var cursor: String? = null
     @Transient
     var unreadCount: Int = 0
-    // @Transient
-    // var threads: RealmList<Thread> = realmListOf()
     //endregion
 
     val parentFolders by backlinks(Folder::children)

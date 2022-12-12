@@ -86,14 +86,6 @@ object MessageController {
     fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
         return getMessageQuery(uid, realm).find()
     }
-
-    // fun getLastMessage(threadUid: String, folderId: String, realm: TypedRealm): Message? {
-    //     val parentThreadUidProperty = "${Message::parentThread.name}.${Thread::uid.name}"
-    //     val folderIdProperty = Message::folderId.name
-    //     val dateProperty = Message::date.name
-    //     val query = "$parentThreadUidProperty == '$threadUid' AND $folderIdProperty == '$folderId'"
-    //     return realm.query<Message>(query).sort(dateProperty, Sort.DESCENDING).first().find()
-    // }
     //endregion
 
     //region Edit data
@@ -259,7 +251,7 @@ object MessageController {
             message.messageIds = messageIds
 
             val existingThreads = allThreads.filter { it.messagesIds.any { id -> messageIds.contains(id) } }
-            existingThreads.forEach { it.addMessage(message) } // TODO: Merge this loop with the `filter` one?
+            existingThreads.forEach { it.addMessage(message) }
 
             if (existingThreads.none { it.folderId == message.folderId }) {
 
@@ -274,12 +266,10 @@ object MessageController {
                 }
 
                 allThreads.add(newThread)
-                // threadsToUpsert.add(newThread)
                 threadsToUpsert[newThread.uid] = newThread
             }
 
             existingThreads.forEach { threadsToUpsert[it.uid] = it }
-            // threadsToUpsert += existingThreads
         }
 
         return threadsToUpsert.map { (_, thread) ->
