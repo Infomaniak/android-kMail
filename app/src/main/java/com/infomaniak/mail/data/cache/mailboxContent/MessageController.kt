@@ -181,7 +181,7 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val newMessagesThreads = handleAddedUids(addedShortUids, folder.id, mailbox.uuid, threadMode, okHttpClient, realm)
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, threadMode, okHttpClient, realm)
 
         (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
 
@@ -205,7 +205,7 @@ object MessageController {
 
     private fun handleAddedUids(
         shortUids: List<String>,
-        folderId: String,
+        folder: Folder,
         mailboxUuid: String,
         threadMode: ThreadMode,
         okHttpClient: OkHttpClient?,
@@ -216,19 +216,19 @@ object MessageController {
 
             var pageStart = 0
             val pageSize = ApiRepository.PER_PAGE
-            val uids = getUniquesUidsWithNewestFirst(folderId, shortUids)
+            val uids = getUniquesUidsWithNewestFirst(folder.id, shortUids)
 
             while (pageStart < uids.count()) {
 
                 val pageEnd = min(pageStart + pageSize, uids.count())
                 val page = uids.subList(pageStart, pageEnd)
 
-                val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folderId, page, okHttpClient)
+                val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page, okHttpClient)
                 if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
                 apiResponse.data?.messages?.let { messages ->
                     (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
                         val threads = when (threadMode) {
-                            ThreadMode.THREADS -> createMultiMessagesThreads(messages)
+                            ThreadMode.THREADS -> createMultiMessagesThreads(messages, folder.role)
                             ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
                         }
                         newMessagesThreads.addAll(threads)
@@ -242,7 +242,7 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>): List<Thread> {
+    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderRole: FolderRole? = null): List<Thread> {
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
 
         // Here, we use a Set instead of a List, so we can't add multiple times the same Thread to it.
@@ -254,7 +254,7 @@ object MessageController {
             message.messageIds = messageIds
 
             val existingThreads = allThreads.filter { it.messagesIds.any { id -> messageIds.contains(id) } }
-            existingThreads.forEach { it.addMessage(message) }
+            existingThreads.forEach { it.addMessageWithConditions(message, realm = this) }
 
             createNewThreadIfRequired(existingThreads, message)?.let { newThread ->
                 allThreads.add(newThread)
@@ -271,7 +271,7 @@ object MessageController {
         }
     }
 
-    private fun createNewThreadIfRequired(existingThreads: List<Thread>, message: Message): Thread? {
+    private fun TypedRealm.createNewThreadIfRequired(existingThreads: List<Thread>, message: Message): Thread? {
         var newThread: Thread? = null
 
         if (existingThreads.none { it.folderId == message.folderId }) {
@@ -280,10 +280,9 @@ object MessageController {
             val existingThread = existingThreads.firstOrNull()
 
             if (existingThread == null) {
-                newThread.addMessage(message)
+                newThread.addFirstMessage(message)
             } else {
-                newThread.messages.addAll(existingThread.messages)
-                newThread.messagesIds = existingThread.messagesIds
+                existingThread.messages.forEach { newThread.addMessageWithConditions(it, realm = this) }
             }
         }
 
@@ -293,7 +292,7 @@ object MessageController {
     fun MutableRealm.createSingleMessageThreads(messages: List<Message>): List<Thread> {
         return messages.map { message ->
             message.toThread().also { thread ->
-                thread.addMessage(message)
+                thread.addFirstMessage(message)
                 thread.recomputeThread(realm = this)
                 ThreadController.upsertThread(thread, realm = this)
             }
@@ -312,14 +311,20 @@ object MessageController {
                 ThreadMode.THREADS -> {
                     val threads = mutableSetOf<Thread>()
                     deletedMessages.forEach { message ->
-                        message.parentThreads.forEach { thread ->
-                            impactedFolders.add(thread.folderId)
-                            if (thread.uniqueMessagesCount == 1) {
+                        for (thread in message.parentThreads) {
+
+                            val isSuccess = thread.messages.removeIf { it.uid == message.uid }
+                            val nbMessagesInSameFolder = thread.messages.count { it.folderId == thread.folderId }
+
+                            if (nbMessagesInSameFolder == 0) {
                                 delete(thread)
-                            } else {
-                                thread.messages.removeIf { it.uid == message.uid }
+                            } else if (isSuccess) {
                                 threads += thread
+                            } else {
+                                continue
                             }
+
+                            impactedFolders.add(thread.folderId)
                         }
                     }
                     threads.forEach { it.recomputeThread(realm = this) }

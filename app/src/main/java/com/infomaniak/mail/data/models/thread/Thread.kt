@@ -21,11 +21,14 @@ import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.ext.toRealmList
@@ -55,9 +58,25 @@ class Thread : RealmObject {
     var scheduled: Boolean = false
     var messagesIds: RealmSet<String> = realmSetOf()
 
-    fun addMessage(message: Message) {
-        messages.add(message)
+    fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
+        messages.add(message)
+    }
+
+    fun addMessageWithConditions(message: Message, realm: TypedRealm) {
+        messagesIds += message.messageIds
+
+        val folderRole = FolderController.getFolder(folderId, realm)?.role
+
+        if (folderRole != FolderRole.TRASH && message.isInTrash(realm)) return
+
+        val shouldAddMessage = when (folderRole) {
+            FolderRole.DRAFT -> message.isDraft
+            FolderRole.TRASH -> message.isInTrash(realm)
+            else -> true
+        }
+
+        if (shouldAddMessage) messages.add(message)
     }
 
     fun recomputeThread(realm: MutableRealm) {
