@@ -18,11 +18,13 @@
 <resources>
 
     <!-- Primary colors -->
-    <color name="pinkMail">#BC0055</color>
+    <color name="pinkMail">@color/mail_pink_light</color>
+    <color name="pinkMailInverse">@color/mail_pink_dark</color>
     <color name="pinkMailSecondary">#F7E8EF</color>
     <color name="pinkBoardingSecondaryBackground">@color/pinkMailSecondary</color>
     <color name="pinkMailRipple">#1EBC0055</color>
     <color name="blueMail">@color/primary</color>
+    <color name="blueMailInverse">@color/mail_blue_dark</color>
     <color name="blueMailSecondary">#F4F6FD</color>
     <color name="blueBoardingSecondaryBackground">@color/blueMailSecondary</color>
     <color name="blueMailRipple">#1E0098FF</color>
@@ -33,7 +35,10 @@
     <color name="redDestructiveActionTransparent">#1EF44336</color>
 
     <!-- Color Tones -->
-    <color name="blueTextLight">#4CB7FF</color>
+    <color name="mail_pink_light">#BC0055</color>
+    <color name="mail_pink_dark">#E07FA3</color>
+    <color name="mail_blue_light">@color/infomaniak</color>
+    <color name="mail_blue_dark">#4CB7FF</color>
 
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
@@ -41,7 +46,7 @@
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
-    <color name="backgroundSnackbarColor">@color/swan</color>
+    <color name="backgroundSnackbarColor">@color/orca</color>
     <color name="backgroundSecondaryColor">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadBackground">@color/rabbit</color>
@@ -51,7 +56,7 @@
     <color name="secondaryTextColor">@color/elephant</color>
     <color name="tertiaryTextColor">@color/shark</color>
     <color name="colorOnPrimary">@color/white</color>
-    <color name="snackbarTextColor">@color/elephant</color>
+    <color name="snackbarTextColor">@color/mouse</color>
     <color name="hintTextColor">@color/shark</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="emailChipTextColor">@color/orca</color>
@@ -65,9 +70,6 @@
     <color name="iconSecondaryColor">@color/elephant</color>
     <color name="favoriteYellow">#F1BE41</color>
     <color name="swipeActionIconColor">@color/white</color>
-
-    <!-- Buttons -->
-    <color name="textButtonBlueLight">@color/blueTextLight</color>
 
     <!-- Cardview -->
     <color name="cardViewStrokeColor">@color/mouse</color>

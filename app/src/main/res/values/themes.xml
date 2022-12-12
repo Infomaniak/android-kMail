@@ -42,8 +42,10 @@
         <item name="appBarLayoutStyle">@style/AppThemeAppBarOverlay</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
-        <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorError">@color/redDestructiveAction</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorOnSurfaceInverse">@color/snackbarTextColor</item>
+        <item name="colorSurfaceInverse">@color/backgroundSnackbarColor</item>
         <item name="extendedFloatingActionButtonStyle">@style/ExtendedFloatingActionButtonStyle</item>
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonStyle</item>
         <item name="snackbarButtonStyle">@style/SnackbarButtonStyle</item>
@@ -56,13 +58,14 @@
 
     <style name="AppTheme.Pink">
         <item name="colorPrimary">@color/pinkMail</item>
+        <item name="colorPrimaryInverse">@color/pinkMailInverse</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
         <item name="colorPrimaryContainer">@color/pinkMailSecondary</item>
         <item name="colorOnPrimaryContainer">@color/pinkMail</item>
 
         <item name="colorAccent">@color/pinkMail</item>
-        <item name="colorSecondary">@color/pinkMail</item>
+        <item name="colorSecondary">#00FF00</item>
 
         <item name="colorControlNormal">@color/pinkMail</item>
         <item name="colorControlHighlight">@color/pinkMailRipple</item>
@@ -72,13 +75,14 @@
 
     <style name="AppTheme.Blue">
         <item name="colorPrimary">@color/blueMail</item>
+        <item name="colorPrimaryInverse">@color/blueMailInverse</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
         <item name="colorPrimaryContainer">@color/blueMailSecondary</item>
         <item name="colorOnPrimaryContainer">@color/blueMail</item>
 
         <item name="colorAccent">@color/blueMail</item>
-        <item name="colorSecondary">@color/blueMail</item>
+        <item name="colorSecondary">#00FF00</item>
 
         <item name="colorControlNormal">@color/blueMail</item>
         <item name="colorControlHighlight">@color/blueMailRipple</item>

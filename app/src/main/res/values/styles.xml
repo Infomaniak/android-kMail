@@ -142,18 +142,15 @@
     <!-- Snackbar -->
 
     <style name="SnackbarStyle" parent="Widget.Material3.Snackbar">
-        <item name="actionTextColorAlpha">0.8</item>
-        <item name="android:backgroundTint">@color/backgroundSnackbarColor</item>
         <item name="android:layout_margin">@dimen/marginStandard</item>
     </style>
 
     <style name="SnackbarButtonStyle" parent="Widget.Material3.Button.TextButton.Snackbar">
-        <item name="android:textColor">@color/textButtonBlueLight</item>
+        <item name="android:fontFamily">@font/suisseintl_medium</item>>
         <item name="android:textSize">14sp</item>
     </style>
 
     <style name="SnackbarTextViewStyle" parent="Widget.Material3.Snackbar.TextView">
-        <item name="android:textColor">@color/snackbarTextColor</item>
         <item name="android:textSize">14sp</item>
     </style>
 
