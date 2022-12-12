@@ -111,11 +111,6 @@ object ThreadController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun updateThread(uid: String, realm: MutableRealm? = null, onUpdate: (thread: Thread) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getThread(uid, realm = it)?.let(onUpdate) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
-
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     private fun getThreadLastMessageUid(thread: Thread): List<String> {
         return listOf(thread.messages.getLastMessageToExecuteAction().uid)
