@@ -49,10 +49,6 @@ class ThreadListViewModel : ViewModel() {
         }
     }
 
-    fun toggleSeenStatus(thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        ThreadController.toggleSeenStatus(thread, mailbox)
-    }
-
     fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(SelectedDraft(localUuid, message.draftResource, message.uid))

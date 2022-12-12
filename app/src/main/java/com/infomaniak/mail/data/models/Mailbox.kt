@@ -76,7 +76,7 @@ class Mailbox : RealmObject {
     @Transient
     var quotas: Quotas? = null
     @Transient
-    var unseenMessages: Int = 0
+    var inboxUnreadCount: Int = 0
     //endregion
 
     inline val channelId get() = "${mailboxId}_channel_id"
@@ -85,10 +85,10 @@ class Mailbox : RealmObject {
         return "${userId}_${this.mailboxId}"
     }
 
-    fun initLocalValues(userId: Int, unseenMessages: Int): Mailbox {
+    fun initLocalValues(userId: Int, inboxUnreadCount: Int): Mailbox {
         this.objectId = createObjectId(userId)
         this.userId = userId
-        this.unseenMessages = unseenMessages
+        this.inboxUnreadCount = inboxUnreadCount
 
         return this
     }
