@@ -75,7 +75,6 @@
         android:id="@+id/iconLayout"
         android:layout_width="0dp"
         android:layout_height="250dp"
-        android:src="@drawable/ic_boarding_illu_1"
         app:layout_constraintBottom_toBottomOf="@id/bottomWave"
         app:layout_constraintEnd_toStartOf="@id/end"
         app:layout_constraintStart_toEndOf="@id/start"
