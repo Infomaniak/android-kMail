@@ -44,6 +44,7 @@ class Thread : RealmObject {
     var uid: String = ""
     var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
+    var duplicates: RealmList<Message> = realmListOf()
     var uniqueMessagesCount: Int = 0
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
@@ -63,20 +64,41 @@ class Thread : RealmObject {
         messages.add(message)
     }
 
-    fun addMessageWithConditions(message: Message, realm: TypedRealm) {
-        messagesIds += message.messageIds
+    fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
+        messagesIds += newMessage.messageIds
 
         val folderRole = FolderController.getFolder(folderId, realm)?.role
 
-        if (folderRole != FolderRole.TRASH && message.isInTrash(realm)) return
+        val isInTrash = newMessage.isInTrash(realm)
+
+        // If the Message is deleted, but we are not in the Trash: ignore it, just leave.
+        if (folderRole != FolderRole.TRASH && isInTrash) return
 
         val shouldAddMessage = when (folderRole) {
-            FolderRole.DRAFT -> message.isDraft
-            FolderRole.TRASH -> message.isInTrash(realm)
+            FolderRole.DRAFT -> newMessage.isDraft // Only add draft Messages in Draft folder
+            FolderRole.TRASH -> isInTrash // Only add deleted Messages in Trash folder
             else -> true
         }
 
-        if (shouldAddMessage) messages.add(message)
+        if (shouldAddMessage) {
+            val twinMessage = messages.firstOrNull { it.msgId == newMessage.msgId }
+            if (twinMessage != null) {
+                addDuplicatedMessage(twinMessage, newMessage)
+            } else {
+                messages.add(newMessage)
+            }
+        }
+    }
+
+    private fun addDuplicatedMessage(twinMessage: Message, newMessage: Message) {
+        val isTwinTheRealMessage = twinMessage.folderId == folderId
+        if (isTwinTheRealMessage) {
+            duplicates.add(newMessage)
+        } else {
+            messages.remove(twinMessage)
+            duplicates.add(twinMessage)
+            messages.add(newMessage)
+        }
     }
 
     fun recomputeThread(realm: MutableRealm) {

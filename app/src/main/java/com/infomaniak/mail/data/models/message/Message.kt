@@ -97,8 +97,6 @@ class Message : RealmObject {
     var size: Int = 0
     @SerialName("safe_display")
     var safeDisplay: Boolean = false
-    @SerialName("is_duplicate")
-    var isDuplicate: Boolean = false
     //endregion
 
     //region Local data (Transient)

@@ -49,6 +49,10 @@ import kotlin.math.min
 object MessageController {
 
     //region Queries
+    private fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
+        return (realm ?: RealmDatabase.mailboxContent()).query()
+    }
+
     private fun getMessagesQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Message> {
         val byUids = "${Message::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
@@ -57,10 +61,6 @@ object MessageController {
     private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
         val byFolderId = "${Message::folderId.name} == '$folderId'"
         return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
-    }
-
-    private fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
-        return (realm ?: RealmDatabase.mailboxContent()).query()
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
@@ -181,7 +181,7 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, threadMode, okHttpClient, realm)
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder.id, mailbox.uuid, threadMode, okHttpClient, realm)
 
         (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
 
@@ -205,7 +205,7 @@ object MessageController {
 
     private fun handleAddedUids(
         shortUids: List<String>,
-        folder: Folder,
+        folderId: String,
         mailboxUuid: String,
         threadMode: ThreadMode,
         okHttpClient: OkHttpClient?,
@@ -216,19 +216,19 @@ object MessageController {
 
             var pageStart = 0
             val pageSize = ApiRepository.PER_PAGE
-            val uids = getUniquesUidsWithNewestFirst(folder.id, shortUids)
+            val uids = getUniquesUidsWithNewestFirst(folderId, shortUids)
 
             while (pageStart < uids.count()) {
 
                 val pageEnd = min(pageStart + pageSize, uids.count())
                 val page = uids.subList(pageStart, pageEnd)
 
-                val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page, okHttpClient)
+                val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folderId, page, okHttpClient)
                 if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
                 apiResponse.data?.messages?.let { messages ->
                     (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
                         val threads = when (threadMode) {
-                            ThreadMode.THREADS -> createMultiMessagesThreads(messages, folder.role)
+                            ThreadMode.THREADS -> createMultiMessagesThreads(messages)
                             ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
                         }
                         newMessagesThreads.addAll(threads)
@@ -242,7 +242,7 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderRole: FolderRole? = null): List<Thread> {
+    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>): List<Thread> {
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
 
         // Here, we use a Set instead of a List, so we can't add multiple times the same Thread to it.
@@ -277,12 +277,16 @@ object MessageController {
         if (existingThreads.none { it.folderId == message.folderId }) {
 
             newThread = message.toThread()
-            val existingThread = existingThreads.firstOrNull()
+            newThread.addFirstMessage(message)
 
-            if (existingThread == null) {
-                newThread.addFirstMessage(message)
-            } else {
-                existingThread.messages.forEach { newThread.addMessageWithConditions(it, realm = this) }
+            val encounteredMessages = mutableSetOf<String>()
+            existingThreads.forEach { thread ->
+                thread.messages.forEach { message ->
+                    if (!encounteredMessages.contains(message.uid)) {
+                        newThread.addMessageWithConditions(message, realm = this)
+                        encounteredMessages.add(message.uid)
+                    }
+                }
             }
         }
 
