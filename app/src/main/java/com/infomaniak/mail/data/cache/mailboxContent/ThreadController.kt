@@ -87,8 +87,8 @@ object ThreadController {
         return getThreadsQuery(realm).find()
     }
 
-    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
-        return getThreadsQuery(uids, realm)
+    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmResults<Thread> {
+        return getThreadsQuery(uids, realm).find()
     }
 
     fun getUnreadThreadsCount(folderId: String, realm: TypedRealm? = null): Int {

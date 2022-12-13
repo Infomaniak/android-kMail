@@ -185,10 +185,14 @@ object MessageController {
 
         (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
 
-            handleDeletedUids(deletedUids, threadMode)
-            handleUpdatedUids(updatedMessages, folder.id)
+            val impactedFolders = newMessagesThreads.map { it.folderId }.toMutableSet()
 
-            FolderController.refreshUnreadCount(folder.id, mailbox.objectId, realm = this)
+            impactedFolders += handleDeletedUids(deletedUids, threadMode)
+            impactedFolders += handleUpdatedUids(updatedMessages, folder.id)
+
+            impactedFolders.forEach { folderId ->
+                FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
+            }
 
             FolderController.getFolder(folder.id, realm = this)?.let {
                 it.lastUpdatedAt = Date().toRealmInstant()
@@ -296,7 +300,10 @@ object MessageController {
         }
     }
 
-    private fun MutableRealm.handleDeletedUids(uids: List<String>, threadMode: ThreadMode) {
+    private fun MutableRealm.handleDeletedUids(uids: List<String>, threadMode: ThreadMode): Set<String> {
+
+        val impactedFolders = mutableSetOf<String>()
+
         if (uids.isNotEmpty()) {
 
             val deletedMessages = getMessages(uids, realm = this)
@@ -306,6 +313,7 @@ object MessageController {
                     val threads = mutableSetOf<Thread>()
                     deletedMessages.forEach { message ->
                         message.parentThreads.forEach { thread ->
+                            impactedFolders.add(thread.folderId)
                             if (thread.uniqueMessagesCount == 1) {
                                 delete(thread)
                             } else {
@@ -317,16 +325,21 @@ object MessageController {
                     threads.forEach { it.recomputeThread(realm = this) }
                 }
                 ThreadMode.MESSAGES -> {
-                    delete(ThreadController.getThreads(uids, realm = this))
+                    val threads = ThreadController.getThreads(uids, realm = this)
+                    impactedFolders.addAll(threads.map { it.folderId })
+                    delete(threads)
                 }
             }
 
             deleteMessages(deletedMessages)
         }
+
+        return impactedFolders
     }
 
-    private fun MutableRealm.handleUpdatedUids(messageFlags: List<MessageFlags>, folderId: String) {
+    private fun MutableRealm.handleUpdatedUids(messageFlags: List<MessageFlags>, folderId: String): Set<String> {
 
+        val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
 
         messageFlags.forEach { flags ->
@@ -338,7 +351,12 @@ object MessageController {
             }
         }
 
-        threads.forEach { it.recomputeThread(realm = this) }
+        threads.forEach { thread ->
+            impactedFolders.add(thread.folderId)
+            thread.recomputeThread(realm = this)
+        }
+
+        return impactedFolders
     }
 
     private fun getMessageIds(message: Message): RealmSet<String> {
