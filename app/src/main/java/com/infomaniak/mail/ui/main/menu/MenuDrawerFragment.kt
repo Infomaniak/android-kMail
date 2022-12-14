@@ -37,13 +37,11 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 
 class MenuDrawerFragment : Fragment() {
 
@@ -191,8 +189,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeFolders() {
-        menuDrawerViewModel.folders.observe(viewLifecycleOwner) { folders ->
-            val (inbox, defaultFolders, customFolders) = getMenuFolders(folders)
+        menuDrawerViewModel.folders.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
@@ -254,26 +251,5 @@ class MenuDrawerFragment : Fragment() {
     private fun openFolder(folderId: String) {
         mainViewModel.openFolder(folderId)
         closeDrawer()
-    }
-
-    private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
-        return folders.toMutableList().let { list ->
-
-            val inbox = list
-                .find { it.role == FolderRole.INBOX }
-                ?.also(list::remove)
-
-            val defaultFolders = list
-                .filter { it.role != null }
-                .sortedBy { it.role?.order }
-                .also(list::removeAll)
-
-            val customFolders = list
-                .filter { it.parentFolder.isEmpty() }
-                .sortedByDescending { it.isFavorite }
-                .formatFoldersListWithAllChildren()
-
-            Triple(inbox, defaultFolders, customFolders)
-        }
     }
 }

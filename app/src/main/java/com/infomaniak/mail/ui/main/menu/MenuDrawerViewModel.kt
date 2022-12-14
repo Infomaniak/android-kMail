@@ -23,17 +23,42 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 
 class MenuDrawerViewModel : ViewModel() {
 
     val folders = Transformations.switchMap(MainViewModel.currentMailboxObjectId) {
-        liveData(Dispatchers.IO) { if (it != null) emitSource(FolderController.getFoldersAsync().map { it.list }.asLiveData()) }
+        liveData(Dispatchers.IO) {
+            if (it != null) emitSource(FolderController.getFoldersAsync().map { getMenuFolders(it.list) }.asLiveData())
+        }
     }
 
     val quotas = Transformations.switchMap(MainViewModel.currentMailboxObjectId) {
         liveData(Dispatchers.IO) { if (it != null) emitSource(QuotasController.getQuotasAsync(it).asLiveData()) }
+    }
+
+    private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
+        return folders.toMutableList().let { list ->
+
+            val inbox = list
+                .find { it.role == Folder.FolderRole.INBOX }
+                ?.also(list::remove)
+
+            val defaultFolders = list
+                .filter { it.role != null }
+                .sortedBy { it.role?.order }
+                .also(list::removeAll)
+
+            val customFolders = list
+                .filter { it.parentFolder.isEmpty() }
+                .sortedByDescending { it.isFavorite }
+                .formatFoldersListWithAllChildren()
+
+            Triple(inbox, defaultFolders, customFolders)
+        }
     }
 }
