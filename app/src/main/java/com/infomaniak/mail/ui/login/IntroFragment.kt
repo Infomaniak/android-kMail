@@ -42,7 +42,9 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
 import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu123Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234PinkColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1Colors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1PinkColors
@@ -55,7 +57,9 @@ import com.infomaniak.mail.ui.login.IlluColors.Companion.illu3PinkColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4Colors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuBlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuPinkColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
 import kotlinx.coroutines.Dispatchers
@@ -182,7 +186,7 @@ class IntroFragment : Fragment() {
 
         illuColors.forEach { changePathColor(it, isDark) }
         when (position) {
-            1, 2, 3 -> illu123Colors.forEach { changePathColor(it, isDark) }
+            1, 2, 3 -> illu234Colors.forEach { changePathColor(it, isDark) }
         }
 
         when (position) {
@@ -193,6 +197,10 @@ class IntroFragment : Fragment() {
         }
 
         if (accentColor == PINK) {
+            illuPinkColors.forEach { changePathColor(it, isDark) }
+            when (position) {
+                1, 2, 3 -> illu234PinkColors.forEach { changePathColor(it, isDark) }
+            }
             when (position) {
                 0 -> illu1PinkColors.forEach { changePathColor(it, isDark) }
                 1 -> illu2PinkColors.forEach { changePathColor(it, isDark) }
@@ -200,6 +208,10 @@ class IntroFragment : Fragment() {
                 3 -> illu4PinkColors.forEach { changePathColor(it, isDark) }
             }
         } else {
+            illuBlueColors.forEach { changePathColor(it, isDark) }
+            when (position) {
+                1, 2, 3 -> illu234BlueColors.forEach { changePathColor(it, isDark) }
+            }
             when (position) {
                 0 -> illu1BlueColors.forEach { changePathColor(it, isDark) }
                 1 -> illu2BlueColors.forEach { changePathColor(it, isDark) }
