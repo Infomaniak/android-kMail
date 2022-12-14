@@ -153,7 +153,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
-    fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    private fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         selectMailbox(mailbox)
         updateSignatures(mailbox)
         updateFolders(mailbox)
@@ -180,20 +180,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
         if (folderId == currentFolder.value?.id) return@launch
 
         selectFolder(folderId)
-        refreshThreads(mailbox, folderId)
+        refreshThreads(folderId = folderId)
     }
 
     fun forceRefreshThreads() {
         forceRefreshJob?.cancel()
         forceRefreshJob = viewModelScope.launch(Dispatchers.IO) {
             Log.d(TAG, "Force refresh threads")
-            val mailbox = currentMailbox.value ?: return@launch
-            val folderId = currentFolder.value?.id ?: return@launch
-            refreshThreads(mailbox, folderId)
+            refreshThreads()
         }
     }
 
@@ -229,7 +226,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun refreshThreads(mailbox: Mailbox, folderId: String) = viewModelScope.launch(Dispatchers.IO) {
+    private fun refreshThreads(
+        mailbox: Mailbox? = currentMailbox.value,
+        folderId: String? = currentFolder.value?.id,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+
+        if (mailbox == null || folderId == null) return@launch
 
         isDownloadingChanges.postValue(true)
 
@@ -260,15 +262,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        refreshThreads(mailbox, folderId)
+        refreshThreads()
     }
 
     fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         ThreadController.toggleSeenStatus(thread, mailbox)
 
-        val folderId = currentFolderId.value ?: return@launch
-        refreshThreads(mailbox, folderId)
+        refreshThreads()
     }
 
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
