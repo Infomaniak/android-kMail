@@ -69,7 +69,7 @@ class Folder : RealmObject {
     var unreadCount: Int = 0
     //endregion
 
-    val parentFolders by backlinks(Folder::children)
+    val parentFolder by backlinks(Folder::children)
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)

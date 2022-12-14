@@ -277,7 +277,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 .also(list::removeAll)
 
             val customFolders = list
-                .filter { it.parentFolders.isEmpty() }
+                .filter { it.parentFolder.isEmpty() }
                 .sortedByDescending { it.isFavorite }
                 .formatFoldersListWithAllChildren()
 
