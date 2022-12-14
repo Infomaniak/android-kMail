@@ -253,18 +253,7 @@ object MessageController {
             val existingThreads = allThreads.filter { it.messagesIds.any { id -> messageIds.contains(id) } }
             existingThreads.forEach { it.addMessage(message) }
 
-            if (existingThreads.none { it.folderId == message.folderId }) {
-
-                val newThread = message.toThread()
-                val existingThread = existingThreads.firstOrNull()
-
-                if (existingThread == null) {
-                    newThread.addMessage(message)
-                } else {
-                    newThread.messages.addAll(existingThread.messages)
-                    newThread.messagesIds = existingThread.messagesIds
-                }
-
+            createNewThreadIfRequired(existingThreads, message)?.let { newThread ->
                 allThreads.add(newThread)
                 threadsToUpsert[newThread.uid] = newThread
             }
@@ -277,6 +266,25 @@ object MessageController {
             ThreadController.upsertThread(thread, realm = this)
             if (thread.isManaged()) copyFromRealm(thread, 0u) else thread
         }
+    }
+
+    private fun createNewThreadIfRequired(existingThreads: List<Thread>, message: Message): Thread? {
+        var newThread: Thread? = null
+
+        if (existingThreads.none { it.folderId == message.folderId }) {
+
+            newThread = message.toThread()
+            val existingThread = existingThreads.firstOrNull()
+
+            if (existingThread == null) {
+                newThread.addMessage(message)
+            } else {
+                newThread.messages.addAll(existingThread.messages)
+                newThread.messagesIds = existingThread.messagesIds
+            }
+        }
+
+        return newThread
     }
 
     fun MutableRealm.createSingleMessageThreads(messages: List<Message>, mailboxObjectId: String): List<Thread> {
