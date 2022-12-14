@@ -106,7 +106,7 @@ object MessageController {
         messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
     }
 
-    fun deleteMessage(uid: String, realm: MutableRealm? = null) {
+    private fun deleteMessage(uid: String, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = {
             getMessage(uid, realm = it)
                 ?.let { message ->
@@ -312,12 +312,16 @@ object MessageController {
                 ThreadMode.THREADS -> {
                     val threads = mutableSetOf<Thread>()
                     deletedMessages.forEach { message ->
-                        for (thread in message.parentThreads) {
+                        for (thread in message.parentThreads.reversed()) {
 
                             val isSuccess = thread.messages.removeIf { it.uid == message.uid }
                             val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
 
+                            // We need to save this value because the Thread could be deleted before we use this `folderId`.
+                            val threadFolderId = thread.folderId
+
                             if (numberOfMessagesInFolder == 0) {
+                                threads.removeIf { it.uid == thread.uid }
                                 delete(thread)
                             } else if (isSuccess) {
                                 threads += thread
@@ -325,7 +329,7 @@ object MessageController {
                                 continue
                             }
 
-                            impactedFolders.add(thread.folderId)
+                            impactedFolders.add(threadFolderId)
                         }
                     }
                     threads.forEach { it.recomputeThread(realm = this) }

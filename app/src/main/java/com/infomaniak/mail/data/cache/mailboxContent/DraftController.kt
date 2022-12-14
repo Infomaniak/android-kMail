@@ -88,22 +88,6 @@ object DraftController {
     }
     //endregion
 
-    fun deleteDraft(message: Message, mailboxUuid: String) {
-        with(ApiRepository.deleteMessages(mailboxUuid, listOf(message.uid))) {
-            if (isSuccess()) {
-                RealmDatabase.mailboxContent().writeBlocking {
-                    message.parentThreads.forEach { thread ->
-                        findLatest(thread)?.let { latestThread ->
-                            latestThread.messages.removeIf { it.uid == message.uid }
-                            latestThread.recomputeThread(realm = this)
-                        }
-                    }
-                    MessageController.deleteMessage(message.uid, realm = this)
-                }
-            }
-        }
-    }
-
     //region Open Draft
     fun MutableRealm.fetchDraft(draftResource: String, messageUid: String): String? {
         return ApiRepository.getDraft(draftResource).data?.also { draft ->

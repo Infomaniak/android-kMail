@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.update
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
@@ -86,7 +87,12 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun deleteDraft(message: Message, mailboxUuid: String) = viewModelScope.launch(Dispatchers.IO) {
-        DraftController.deleteDraft(message, mailboxUuid)
+    fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val uids = listOf(message.uid) + thread.getMessageDuplicates(message.messageId)
+
+        if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
+            MessageController.fetchCurrentFolderMessages(mailbox, message.folderId, localSettings.threadMode)
+        }
     }
 }
