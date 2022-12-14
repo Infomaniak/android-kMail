@@ -47,10 +47,9 @@ class SwitchUserMailboxesAdapter(
         val mailbox = mailboxes[position]
         emailAddress.text = mailbox.email
 
-        val unreadCount = mailbox.inboxUnreadCount
-        this.unreadCount.apply {
-            isGone = unreadCount == 0
-            text = formatUnreadCount(unreadCount)
+        unreadCount.apply {
+            isGone = mailbox.inboxUnreadCount == 0
+            text = formatUnreadCount(mailbox.inboxUnreadCount)
         }
 
         setSelectedState(currentMailboxObjectId == mailbox.objectId)
