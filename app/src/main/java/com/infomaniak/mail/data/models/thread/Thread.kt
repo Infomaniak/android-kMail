@@ -62,14 +62,22 @@ class Thread : RealmObject {
 
     fun recomputeThread(realm: MutableRealm) {
 
-        //region Delete Thread if empty
+        // Delete Thread if empty
         if (messages.none { it.folderId == folderId }) {
             realm.delete(this)
             return
         }
-        //endregion
 
-        //region Clean Thread before updating
+        resetThread()
+
+        updateThread()
+
+        // Remove duplicates in Recipients lists
+        from = from.toRecipientsList().distinct().toRealmList()
+        to = to.toRecipientsList().distinct().toRealmList()
+    }
+
+    private fun resetThread() {
         // TODO: Remove this `sortBy`, and get the Messages in the right order via Realm query (but before, fix the `Thread.date`)
         messages.sortBy { it.date }
         unseenMessagesCount = 0
@@ -80,9 +88,9 @@ class Thread : RealmObject {
         answered = false
         forwarded = false
         scheduled = false
-        //endregion
+    }
 
-        //region Update Thread depending on its Messages data
+    private fun updateThread() {
         messages.forEach { message ->
             messagesIds += message.messageIds
             if (!message.seen) unseenMessagesCount++
@@ -98,11 +106,6 @@ class Thread : RealmObject {
         }
         uniqueMessagesCount = messages.count() // TODO: Handle duplicates
         date = messages.findLast { it.folderId == folderId }?.date!!
-        //endregion
-
-        // Remove duplicates in Recipients lists
-        from = from.toRecipientsList().distinct().toRealmList()
-        to = to.toRecipientsList().distinct().toRealmList()
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {
