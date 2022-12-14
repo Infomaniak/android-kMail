@@ -266,7 +266,7 @@ class MenuDrawerFragment : Fragment() {
                 .also(list::removeAll)
 
             val customFolders = list
-                .filter { it.parentFolders.isEmpty() }
+                .filter { it.parentFolder.isEmpty() }
                 .sortedByDescending { it.isFavorite }
                 .formatFoldersListWithAllChildren()
 
