@@ -318,9 +318,9 @@ object MessageController {
                         for (thread in message.parentThreads) {
 
                             val isSuccess = thread.messages.removeIf { it.uid == message.uid }
-                            val nbMessagesInSameFolder = thread.messages.count { it.folderId == thread.folderId }
+                            val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
 
-                            if (nbMessagesInSameFolder == 0) {
+                            if (numberOfMessagesInFolder == 0) {
                                 delete(thread)
                             } else if (isSuccess) {
                                 threads += thread
