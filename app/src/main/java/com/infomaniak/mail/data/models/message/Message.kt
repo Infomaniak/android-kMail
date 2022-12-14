@@ -141,6 +141,17 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
+    fun initMessageIds() {
+
+        fun parseMessagesIds(id: String): List<String> = id.removePrefix("<").removeSuffix(">").split("><", "> <")
+
+        messageIds = realmSetOf<String>().apply {
+            addAll(parseMessagesIds(messageId))
+            references?.let { addAll(parseMessagesIds(it)) }
+            inReplyTo?.let { addAll(parseMessagesIds(it)) }
+        }
+    }
+
     fun getFormattedSubject(context: Context): String {
         return if (subject.isNullOrBlank()) {
             context.getString(R.string.noSubjectTitle)

@@ -36,11 +36,9 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.types.RealmSet
 import okhttp3.OkHttpClient
 import java.text.SimpleDateFormat
 import java.util.*
@@ -250,10 +248,9 @@ object MessageController {
 
         messages.forEach { message ->
 
-            val messageIds = getMessageIds(message)
-            message.messageIds = messageIds
+            message.initMessageIds()
 
-            val existingThreads = allThreads.filter { it.messagesIds.any { id -> messageIds.contains(id) } }
+            val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
             existingThreads.forEach { it.addMessageWithConditions(message, realm = this) }
 
             createNewThreadIfRequired(existingThreads, message)?.let { newThread ->
@@ -366,19 +363,6 @@ object MessageController {
         }
 
         return impactedFolders
-    }
-
-    private fun getMessageIds(message: Message): RealmSet<String> {
-
-        fun parseMessagesIds(messageId: String): List<String> {
-            return messageId.removePrefix("<").removeSuffix(">").split("><", "> <")
-        }
-
-        return realmSetOf<String>().apply {
-            addAll(parseMessagesIds(message.messageId))
-            message.references?.let { addAll(parseMessagesIds(it)) }
-            message.inReplyTo?.let { addAll(parseMessagesIds(it)) }
-        }
     }
 
     private fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
