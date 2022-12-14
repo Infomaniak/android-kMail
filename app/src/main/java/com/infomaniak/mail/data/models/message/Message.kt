@@ -53,7 +53,7 @@ class Message : RealmObject {
     @PrimaryKey
     var uid: String = ""
     @SerialName("msg_id")
-    var msgId: String = ""
+    var messageId: String = ""
     var date: RealmInstant? = null
     var subject: String? = null
     var from: RealmList<Recipient> = realmListOf()

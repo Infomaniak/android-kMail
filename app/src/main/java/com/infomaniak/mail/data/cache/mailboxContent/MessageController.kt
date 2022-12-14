@@ -375,7 +375,7 @@ object MessageController {
         }
 
         return realmSetOf<String>().apply {
-            addAll(parseMessagesIds(message.msgId))
+            addAll(parseMessagesIds(message.messageId))
             message.references?.let { addAll(parseMessagesIds(it)) }
             message.inReplyTo?.let { addAll(parseMessagesIds(it)) }
         }

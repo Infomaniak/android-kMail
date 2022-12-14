@@ -114,7 +114,7 @@ object DraftController {
     }
 
     fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
-        previousMessage.msgId.let {
+        previousMessage.messageId.let {
             draft.inReplyTo = it
             draft.references = it
         }

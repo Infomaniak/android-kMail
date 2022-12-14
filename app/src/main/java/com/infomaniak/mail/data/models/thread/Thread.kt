@@ -80,7 +80,7 @@ class Thread : RealmObject {
         }
 
         if (shouldAddMessage) {
-            val twinMessage = messages.firstOrNull { it.msgId == newMessage.msgId }
+            val twinMessage = messages.firstOrNull { it.messageId == newMessage.messageId }
             if (twinMessage != null) {
                 addDuplicatedMessage(twinMessage, newMessage)
             } else {
