@@ -116,6 +116,40 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    private fun setupAutoCompletionFields() = with(binding) {
+        toField.apply {
+            setOnToggleListener(::openAdvancedFields)
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(TO, hasOpened) }
+            onContactAdded(newMessageViewModel.mailTo::add)
+            onContactRemoved(newMessageViewModel.mailTo::remove)
+            // onFocusNext {
+            //     openAdvancedFields(false)
+            //     ccField.requestFocus()
+            // }
+        }
+
+        ccField.apply {
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(CC, hasOpened) }
+            onContactAdded(newMessageViewModel.mailCc::add)
+            onContactRemoved(newMessageViewModel.mailCc::remove)
+            //     onFocusNext { bccField.requestFocus() }
+            //     onFocusPrevious { toField.requestFocus() }
+        }
+
+        bccField.apply {
+            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(BCC, hasOpened) }
+            onContactAdded(newMessageViewModel.mailBcc::add)
+            onContactRemoved(newMessageViewModel.mailBcc::remove)
+            //     onFocusNext { subjectTextField.requestFocus() }
+            //     onFocusPrevious { ccField.requestFocus() }
+        }
+    }
+
+    private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
+        cc.isGone = isCollapsed
+        bcc.isGone = isCollapsed
+    }
+
     private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
         ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->
             val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
@@ -129,20 +163,9 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
-        binding.toField.apply {
-            initContacts(binding.autoCompleteTo, allContacts, mutableSetOf())
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(TO, hasOpened) }
-        }
-
-        binding.ccField.apply {
-            initContacts(binding.autoCompleteCc, allContacts, mutableSetOf())
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(CC, hasOpened) }
-        }
-
-        binding.bccField.apply {
-            initContacts(binding.autoCompleteBcc, allContacts, mutableSetOf())
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(BCC, hasOpened) }
-        }
+        binding.toField.initContacts(binding.autoCompleteTo, allContacts, mutableSetOf())
+        binding.ccField.initContacts(binding.autoCompleteCc, allContacts, mutableSetOf())
+        binding.bccField.initContacts(binding.autoCompleteBcc, allContacts, mutableSetOf())
     }
 
     private fun toggleAutoCompletion(field: FieldType? = null, isAutocompletionOpened: Boolean) = with(newMessageViewModel) {
@@ -168,31 +191,9 @@ class NewMessageFragment : Fragment() {
             }
             binding.separatedSignature.isVisible = true
         }
-    }
-
-    private fun setupAutoCompletionFields() = with(binding) {
-        toField.apply {
-            setOnToggleListener(::openAdvancedFields)
-            // onFocusNext {
-            //     openAdvancedFields(false)
-            //     ccField.requestFocus()
-            // }
-        }
-
-        // ccField.apply {
-        //     onFocusNext { bccField.requestFocus() }
-        //     onFocusPrevious { toField.requestFocus() }
-        // }
-        //
-        // bccField.apply {
-        //     onFocusNext { subjectTextField.requestFocus() }
-        //     onFocusPrevious { ccField.requestFocus() }
-        // }
-    }
-
-    private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
-        cc.isGone = isCollapsed
-        bcc.isGone = isCollapsed
+        binding.toField.initRecipients(mailTo)
+        binding.ccField.initRecipients(mailCc)
+        binding.bccField.initRecipients(mailBcc)
     }
 
     private fun observeSubject() {

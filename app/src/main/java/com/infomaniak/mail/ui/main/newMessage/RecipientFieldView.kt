@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -47,6 +48,8 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
     private var onFocusNext: (() -> Unit)? = null
     private var onFocusPrevious: (() -> Unit)? = null
+    private var onContactRemoved: ((Recipient) -> Unit)? = null
+    private var onContactAdded: ((Recipient) -> Unit)? = null
     private var isToggleable = false
     private var isCollapsed = true
         set(value) {
@@ -61,14 +64,15 @@ class RecipientFieldView @JvmOverloads constructor(
         get() = autoCompletedContacts.isVisible
         set(value) {
             autoCompletedContacts.isVisible = value
-            binding.chevron.isGone = value
+            binding.chevron.isGone = value || !isToggleable
             binding.itemsChipGroup.isGone = value
         }
 
-    // override fun onFocusChanged(gainFocus: Boolean, direction: Int, preRviouslyFocusedRect: Rect?) {
-    //     Log.e("gibran", "onFocusChanged: ${binding.prefix.text}", );
+    // TODO : Think about the textfield focus rather than the linearLayout focus
+    // override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+    //     Log.e("gibran", "onFocusChanged: ${binding.prefix.text}, gainFocus: $gainFocus", );
     //     super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
-    //     binding.autocompleteInput.requestFocus()
+    //     // binding.autocompleteInput.requestFocus()
     // }
     //
     // override fun onRequestFocusInDescendants(direction: Int, previouslyFocusedRect: Rect?): Boolean {
@@ -77,7 +81,7 @@ class RecipientFieldView @JvmOverloads constructor(
     // }
     //
     // override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-    //     Log.e("gibran", "onWindowFocusChanged: ${binding.prefix.text}", );
+    //     Log.e("gibran", "onWindowFocusChanged: ${binding.prefix.text}, hasWindowFocus: $hasWindowFocus", );
     //     super.onWindowFocusChanged(hasWindowFocus)
     // }
 
@@ -99,11 +103,14 @@ class RecipientFieldView @JvmOverloads constructor(
             if (isToggleable) {
                 chevron.setOnClickListener { isCollapsed = !isCollapsed }
                 plusChip.setOnClickListener { isCollapsed = !isCollapsed }
-                transparentButton.setOnClickListener { isCollapsed = !isCollapsed }
+                transparentButton.setOnClickListener {
+                    isCollapsed = !isCollapsed
+                    autocompleteInput.showKeyboard()
+                }
 
                 singleChip.root.setOnClickListener {
                     removeRecipient(recipients.first())
-                    updateCollapsedChipValues(!isCollapsed)
+                    updateCollapsedChipValues(isCollapsed)
                 }
             }
 
@@ -117,30 +124,29 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun updateCollapsedUiState(isCollapsed: Boolean) = with(binding) {
         chevron.toggleChevron(isCollapsed)
 
-        updateCollapsedChipValues(!isCollapsed)
+        updateCollapsedChipValues(isCollapsed)
         itemsChipGroup.isGone = isCollapsed
 
         onToggle?.invoke(isCollapsed)
     }
 
-    private fun updateCollapsedChipValues(isExpanded: Boolean) = with(binding) {
-        val isTextInputAccessible = isExpanded || recipients.isEmpty()
+    private fun updateCollapsedChipValues(isCollapsed: Boolean) = with(binding) {
+        val isTextInputAccessible = !isCollapsed || recipients.isEmpty()
 
         singleChip.root.apply {
             isGone = isTextInputAccessible
             text = recipients.firstOrNull()?.getNameOrEmail() ?: ""
         }
         plusChip.apply {
-            isGone = isExpanded || recipients.count() <= 1
+            isGone = !isCollapsed || recipients.count() <= 1
             text = "+${recipients.count() - 1}"
         }
 
         transparentButton.isGone = isTextInputAccessible
-        autocompleteInput.isClickable = isTextInputAccessible
-        autocompleteInput.isFocusable = isTextInputAccessible
+        autocompleteInput.isVisible = isTextInputAccessible
     }
 
-    fun initContacts(autoComplete: RecyclerView?, allContacts: List<MergedContact>, usedContacts: MutableSet<String>) =
+    fun initContacts(autoComplete: RecyclerView?, allContacts: List<MergedContact>, usedContacts: MutableSet<String>) {
         with(binding) {
             contactAdapter = ContactAdapter2(
                 allContacts = allContacts,
@@ -177,6 +183,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
             }
         }
+    }
 
     private fun openAutoCompletion() {
         isAutocompletionOpened = true
@@ -192,7 +199,10 @@ class RecipientFieldView @JvmOverloads constructor(
         if (recipients.isEmpty()) isCollapsed = false
         val recipient = Recipient().initLocalValues(contact.email, contact.name)
         val recipientIsNew = recipients.add(recipient)
-        if (recipientIsNew) createChip(recipient)
+        if (recipientIsNew) {
+            createChip(recipient)
+            onContactAdded?.invoke(recipient)
+        }
     }
 
     private fun createChip(recipient: Recipient) {
@@ -207,7 +217,10 @@ class RecipientFieldView @JvmOverloads constructor(
         val index = recipients.indexOf(recipient)
         contactAdapter?.removeEmail(recipient.email)
         val successfullyRemoved = recipients.remove(recipient)
-        if (successfullyRemoved) itemsChipGroup.removeViewAt(index)
+        if (successfullyRemoved) {
+            itemsChipGroup.removeViewAt(index)
+            onContactRemoved?.invoke(recipient)
+        }
     }
 
     fun onAutoCompletionToggled(callback: (hasOpened: Boolean) -> Unit) {
@@ -230,9 +243,18 @@ class RecipientFieldView @JvmOverloads constructor(
         binding.autocompleteInput.setText("")
     }
 
-    // TODO : fun onContactRemoved() {}
+    fun onContactRemoved(callback: ((Recipient) -> Unit)) {
+        onContactRemoved = callback
+    }
 
-    // TODO : fun onContactAdded() {}
+    fun onContactAdded(callback: ((Recipient) -> Unit)) {
+        onContactAdded = callback
+    }
+
+    fun initRecipients(initialRecipients: List<Recipient>) {
+        recipients.addAll(initialRecipients)
+        updateCollapsedChipValues(isCollapsed)
+    }
 
     // fun getRecipients(): Set<Recipient> = recipients
 }

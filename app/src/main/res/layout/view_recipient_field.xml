@@ -34,23 +34,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/guideTextInput"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/singleLineGuide"
+                style="@style/EmailAddressChip"
                 android:layout_width="1dp"
                 android:layout_height="wrap_content"
-                android:clickable="false"
-                android:focusable="false"
-                android:lines="1"
                 android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/itemsChipGroup" />
-
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/bottomBarrier"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="guideTextInput,itemsChipGroup" />
+                app:layout_constraintTop_toTopOf="@id/itemsChipGroup"
+                tools:text="+2"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/prefix"
@@ -59,9 +52,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardMedium"
                 android:gravity="center_horizontal"
-                app:layout_constraintBottom_toBottomOf="@id/bottomBarrier"
+                app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@id/singleLineGuide"
                 tools:text="@string/bccTitle" />
 
             <com.google.android.material.chip.ChipGroup
@@ -70,13 +63,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardVerySmall"
                 android:animateLayoutChanges="true"
+                android:visibility="gone"
                 app:chipSpacingVertical="0dp"
                 app:layout_constraintEnd_toStartOf="@id/chevron"
                 app:layout_constraintStart_toEndOf="@id/prefix"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <!--<TextView-->
-                <!--    android:text="SAluzt commment 4a va  ?"-->
+                <!--    android:text="SAluzt commment 4a va SAluzt commment 4a vaSAluzt commment 4a vaSAluzt commment 4a vaSAluzt commment 4a vaSAluzt commment 4a vaSAluzt commment 4a va ?"-->
                 <!--    android:layout_width="wrap_content"-->
                 <!--    android:layout_height="wrap_content" />-->
 
@@ -91,6 +85,7 @@
                 android:imeOptions="actionDone"
                 android:inputType="textEmailAddress"
                 android:lines="1"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/chevron"
                 app:layout_constraintStart_toEndOf="@id/prefix"
                 app:layout_constraintTop_toBottomOf="@id/itemsChipGroup" />
@@ -100,14 +95,15 @@
                 layout="@layout/chip_contact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardVerySmall"
                 android:visibility="gone"
                 app:layout_constrainedWidth="true"
-                app:layout_constraintBottom_toBottomOf="@id/autocompleteInput"
+                app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
                 app:layout_constraintEnd_toStartOf="@id/plusChip"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toStartOf="@id/autocompleteInput"
-                app:layout_constraintTop_toTopOf="@id/autocompleteInput"
+                app:layout_constraintStart_toEndOf="@id/prefix"
+                app:layout_constraintTop_toTopOf="@id/singleLineGuide"
                 tools:visibility="visible" />
 
             <com.google.android.material.chip.Chip
@@ -117,10 +113,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStandardVerySmall"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/autocompleteInput"
-                app:layout_constraintEnd_toEndOf="@id/autocompleteInput"
+                app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
+                app:layout_constraintEnd_toStartOf="@id/transparentButton"
                 app:layout_constraintStart_toEndOf="@id/singleChip"
-                app:layout_constraintTop_toTopOf="@id/autocompleteInput"
+                app:layout_constraintTop_toTopOf="@id/singleLineGuide"
                 tools:text="+2"
                 tools:visibility="visible" />
 
@@ -130,19 +126,20 @@
                 android:layout_height="0dp"
                 android:background="@android:color/transparent"
                 android:focusable="false"
-                app:layout_constraintBottom_toBottomOf="@id/singleChip"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
                 app:layout_constraintEnd_toStartOf="@id/chevron"
                 app:layout_constraintStart_toEndOf="@id/plusChip"
-                app:layout_constraintTop_toTopOf="@id/singleChip" />
+                app:layout_constraintTop_toTopOf="@id/singleLineGuide" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/chevron"
                 style="@style/IconButton"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 app:icon="@drawable/ic_chevron_down"
-                app:layout_constraintBottom_toBottomOf="@id/bottomBarrier"
+                app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@id/singleLineGuide" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>

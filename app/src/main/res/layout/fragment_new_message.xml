@@ -175,7 +175,7 @@
                     android:layout_marginStart="@dimen/marginStandardVerySmall"
                     android:layout_marginTop="@dimen/marginStandardVerySmall"
                     android:imeOptions="actionNext"
-                    android:inputType="textMultiLine|textEmailSubject"
+                    android:inputType="textMultiLine|textEmailSubject|textCapSentences"
                     android:maxLines="@null"
                     app:layout_constraintEnd_toEndOf="@id/divider5"
                     app:layout_constraintStart_toEndOf="@id/subjectPrefix"
@@ -241,6 +241,8 @@
                         android:background="@color/white"
                         android:gravity="top"
                         android:hint="@string/newMessagePlaceholderTitle"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:minHeight="200dp"
                         android:nextFocusUp="@id/subjectTextField"
                         android:textColor="@color/orca" />
 

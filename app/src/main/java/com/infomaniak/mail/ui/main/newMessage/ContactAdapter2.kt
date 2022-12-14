@@ -76,7 +76,6 @@ class ContactAdapter2(
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val s = System.nanoTime()
                 val searchTerm = constraint?.standardize() ?: ""
                 val finalUserList = allContacts
                     .filter {
@@ -93,8 +92,6 @@ class ContactAdapter2(
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                val s = System.nanoTime()
-
                 @Suppress("UNCHECKED_CAST")
                 contacts = results.values as MutableList<MergedContact>
 
