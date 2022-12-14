@@ -80,26 +80,27 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
     }
 
     private fun Thread.showNotification(userId: Int, mailbox: Mailbox, realm: Realm) {
-        ThreadController.getThread(uid, realm)?.messages?.lastOrNull()?.let { message ->
-            if (message.seen) return // Ignore if it has already been seen
 
-            val subject = message.getFormattedSubject(applicationContext)
-            val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
-            val description = "$subject$preview"
+        val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
 
-            val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
-                putExtras(LaunchActivityArgs(uid, userId, mailbox.mailboxId).toBundle())
-            }
-            val contentIntent = PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags)
+        if (message.seen) return // Ignore if it has already been seen
 
-            applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
-                setSubText(mailbox.email)
-                setContentText(message.subject)
-                setColorized(true)
-                setContentIntent(contentIntent)
-                color = localSettings.accentColor.getPrimary(applicationContext)
-                notificationManagerCompat.notify(uid.hashCode(), build())
-            }
+        val subject = message.getFormattedSubject(applicationContext)
+        val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
+        val description = "$subject$preview"
+
+        val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
+            putExtras(LaunchActivityArgs(uid, userId, mailbox.mailboxId).toBundle())
+        }
+        val contentIntent = PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags)
+
+        applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
+            setSubText(mailbox.email)
+            setContentText(message.subject)
+            setColorized(true)
+            setContentIntent(contentIntent)
+            color = localSettings.accentColor.getPrimary(applicationContext)
+            notificationManagerCompat.notify(uid.hashCode(), build())
         }
     }
 
