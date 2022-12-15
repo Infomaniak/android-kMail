@@ -249,7 +249,7 @@ object MessageController {
 
             message.initMessageIds()
 
-            val existingThreads = ThreadController.getThreads(message.messageIds, realm = this)
+            val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
 
             createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
                 ThreadController.upsertThread(newThread, realm = this)
