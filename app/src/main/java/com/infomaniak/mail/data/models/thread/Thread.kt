@@ -21,11 +21,14 @@ import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.ext.toRealmList
@@ -41,7 +44,7 @@ class Thread : RealmObject {
     var uid: String = ""
     var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
-    var uniqueMessagesCount: Int = 0
+    var duplicates: RealmList<Message> = realmListOf()
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
@@ -55,9 +58,46 @@ class Thread : RealmObject {
     var scheduled: Boolean = false
     var messagesIds: RealmSet<String> = realmSetOf()
 
-    fun addMessage(message: Message) {
-        messages.add(message)
+    fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
+        messages.add(message)
+    }
+
+    fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
+        messagesIds += newMessage.messageIds
+
+        val folderRole = FolderController.getFolder(folderId, realm)?.role
+
+        val isInTrash = newMessage.isInTrash(realm)
+
+        // If the Message is deleted, but we are not in the Trash: ignore it, just leave.
+        if (folderRole != FolderRole.TRASH && isInTrash) return
+
+        val shouldAddMessage = when (folderRole) {
+            FolderRole.DRAFT -> newMessage.isDraft // Only add draft Messages in Draft folder
+            FolderRole.TRASH -> isInTrash // Only add deleted Messages in Trash folder
+            else -> true
+        }
+
+        if (shouldAddMessage) {
+            val twinMessage = messages.firstOrNull { it.messageId == newMessage.messageId }
+            if (twinMessage != null) {
+                addDuplicatedMessage(twinMessage, newMessage)
+            } else {
+                messages.add(newMessage)
+            }
+        }
+    }
+
+    private fun addDuplicatedMessage(twinMessage: Message, newMessage: Message) {
+        val isTwinTheRealMessage = twinMessage.folderId == folderId
+        if (isTwinTheRealMessage) {
+            duplicates.add(newMessage)
+        } else {
+            messages.remove(twinMessage)
+            duplicates.add(twinMessage)
+            messages.add(newMessage)
+        }
     }
 
     fun recomputeThread(realm: MutableRealm) {
@@ -104,7 +144,6 @@ class Thread : RealmObject {
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true
         }
-        uniqueMessagesCount = messages.count() // TODO: Handle duplicates
         date = messages.findLast { it.folderId == folderId }?.date!!
     }
 

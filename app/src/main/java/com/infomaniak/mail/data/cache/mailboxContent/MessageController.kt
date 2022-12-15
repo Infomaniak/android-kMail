@@ -36,11 +36,9 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import io.realm.kotlin.types.RealmSet
 import okhttp3.OkHttpClient
 import java.text.SimpleDateFormat
 import java.util.*
@@ -49,6 +47,10 @@ import kotlin.math.min
 object MessageController {
 
     //region Queries
+    private fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
+        return (realm ?: RealmDatabase.mailboxContent()).query()
+    }
+
     private fun getMessagesQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Message> {
         val byUids = "${Message::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
@@ -57,10 +59,6 @@ object MessageController {
     private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
         val byFolderId = "${Message::folderId.name} == '$folderId'"
         return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
-    }
-
-    private fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
-        return (realm ?: RealmDatabase.mailboxContent()).query()
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
@@ -250,11 +248,10 @@ object MessageController {
 
         messages.forEach { message ->
 
-            val messageIds = getMessageIds(message)
-            message.messageIds = messageIds
+            message.initMessageIds()
 
-            val existingThreads = allThreads.filter { it.messagesIds.any { id -> messageIds.contains(id) } }
-            existingThreads.forEach { it.addMessage(message) }
+            val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
+            existingThreads.forEach { it.addMessageWithConditions(message, realm = this) }
 
             createNewThreadIfRequired(existingThreads, message)?.let { newThread ->
                 allThreads.add(newThread)
@@ -271,19 +268,22 @@ object MessageController {
         }
     }
 
-    private fun createNewThreadIfRequired(existingThreads: List<Thread>, message: Message): Thread? {
+    private fun TypedRealm.createNewThreadIfRequired(existingThreads: List<Thread>, message: Message): Thread? {
         var newThread: Thread? = null
 
         if (existingThreads.none { it.folderId == message.folderId }) {
 
             newThread = message.toThread()
-            val existingThread = existingThreads.firstOrNull()
+            newThread.addFirstMessage(message)
 
-            if (existingThread == null) {
-                newThread.addMessage(message)
-            } else {
-                newThread.messages.addAll(existingThread.messages)
-                newThread.messagesIds = existingThread.messagesIds
+            val encounteredMessages = mutableSetOf<String>()
+            existingThreads.forEach { thread ->
+                thread.messages.forEach { message ->
+                    if (!encounteredMessages.contains(message.uid)) {
+                        newThread.addMessageWithConditions(message, realm = this)
+                        encounteredMessages.add(message.uid)
+                    }
+                }
             }
         }
 
@@ -293,7 +293,7 @@ object MessageController {
     fun MutableRealm.createSingleMessageThreads(messages: List<Message>): List<Thread> {
         return messages.map { message ->
             message.toThread().also { thread ->
-                thread.addMessage(message)
+                thread.addFirstMessage(message)
                 thread.recomputeThread(realm = this)
                 ThreadController.upsertThread(thread, realm = this)
             }
@@ -312,14 +312,20 @@ object MessageController {
                 ThreadMode.THREADS -> {
                     val threads = mutableSetOf<Thread>()
                     deletedMessages.forEach { message ->
-                        message.parentThreads.forEach { thread ->
-                            impactedFolders.add(thread.folderId)
-                            if (thread.uniqueMessagesCount == 1) {
+                        for (thread in message.parentThreads) {
+
+                            val isSuccess = thread.messages.removeIf { it.uid == message.uid }
+                            val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+
+                            if (numberOfMessagesInFolder == 0) {
                                 delete(thread)
-                            } else {
-                                thread.messages.removeIf { it.uid == message.uid }
+                            } else if (isSuccess) {
                                 threads += thread
+                            } else {
+                                continue
                             }
+
+                            impactedFolders.add(thread.folderId)
                         }
                     }
                     threads.forEach { it.recomputeThread(realm = this) }
@@ -357,19 +363,6 @@ object MessageController {
         }
 
         return impactedFolders
-    }
-
-    private fun getMessageIds(message: Message): RealmSet<String> {
-
-        fun parseMessagesIds(messageId: String): List<String> {
-            return messageId.removePrefix("<").removeSuffix(">").split("><", "> <")
-        }
-
-        return realmSetOf<String>().apply {
-            addAll(parseMessagesIds(message.msgId))
-            message.references?.let { addAll(parseMessagesIds(it)) }
-            message.inReplyTo?.let { addAll(parseMessagesIds(it)) }
-        }
     }
 
     private fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
