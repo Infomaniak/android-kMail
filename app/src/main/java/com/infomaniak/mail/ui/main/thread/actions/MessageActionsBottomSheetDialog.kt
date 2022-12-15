@@ -37,7 +37,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         setSpamUi()
 
         archive.setClosingOnClickListener { notYetImplemented() }
-        markAsRead.setClosingOnClickListener { notYetImplemented() }
+        markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
         move.setClosingOnClickListener { notYetImplemented() }
         postpone.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { notYetImplemented() }

@@ -52,7 +52,7 @@
             app:text="@string/actionArchive" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/markAsRead"
+            android:id="@+id/markAsReadUnread"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_envelope"

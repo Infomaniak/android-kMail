@@ -246,11 +246,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.DELETE -> {
-                mainViewModel.deleteThread(thread)
+                mainViewModel.deleteThread(thread.uid)
                 false
             }
             SwipeAction.READ_UNREAD -> {
-                mainViewModel.toggleSeenStatus(thread)
+                mainViewModel.toggleSeenStatus(thread.uid)
                 true
             }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")

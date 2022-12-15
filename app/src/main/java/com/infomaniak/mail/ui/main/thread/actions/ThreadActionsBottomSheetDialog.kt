@@ -20,22 +20,25 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.thread(navigationArgs.threadUid).observe(viewLifecycleOwner) { thread ->
+        threadActionsViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
@@ -48,7 +51,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         rule.isGone = true
 
         archive.setClosingOnClickListener { notYetImplemented() }
-        markAsRead.setClosingOnClickListener { notYetImplemented() }
+        markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(navigationArgs.threadUid) }
         move.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { notYetImplemented() }
         spam.setClosingOnClickListener { notYetImplemented() }
@@ -61,7 +64,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, navigationArgs.messageUid)
                 R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, navigationArgs.messageUid)
                 R.id.actionForward -> notYetImplemented()
-                R.id.actionDelete -> notYetImplemented()
+                R.id.actionDelete -> mainViewModel.deleteThread(navigationArgs.threadUid)
             }
         }
     }

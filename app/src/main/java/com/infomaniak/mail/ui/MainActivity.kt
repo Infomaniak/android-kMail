@@ -28,6 +28,7 @@ import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
@@ -35,6 +36,7 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.SyncMessagesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
@@ -84,6 +86,8 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.observeRealmMergedContacts()
         permissionUtils.requestMainPermissionsIfNeeded()
+
+        observeSnackbar()
     }
 
     override fun onStart() {
@@ -182,4 +186,10 @@ class MainActivity : ThemedActivity() {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
     }
 
+    private fun observeSnackbar() {
+        mainViewModel.snackbarFeedback.observe(this) { (title, undoResource) ->
+            val onActionClicked = undoResource?.let { { notYetImplemented() } }
+            showSnackbar(title, onActionClicked = onActionClicked)
+        }
+    }
 }

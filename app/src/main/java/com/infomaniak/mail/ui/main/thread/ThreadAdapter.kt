@@ -36,7 +36,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
@@ -127,7 +126,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             val firstSender = message.from.first()
             userAvatar.loadAvatar(firstSender, contacts)
             expeditorName.apply {
-                fillInUserNameAndEmail(firstSender, this)
+                UiUtils.fillInUserNameAndEmail(firstSender, this)
                 setTextAppearance(R.style.H5)
             }
             shortMessageDate.text = messageDate?.let { context.mailFormattedDate(it) } ?: ""

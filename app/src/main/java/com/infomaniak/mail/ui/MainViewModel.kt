@@ -21,6 +21,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -39,7 +40,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
@@ -50,6 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import com.infomaniak.lib.core.R as RCore
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -95,6 +96,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+    val snackbarFeedback = SingleLiveEvent<Pair<String, String?>>()
 
     private var forceRefreshJob: Job? = null
 
@@ -240,32 +242,52 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
-    fun deleteThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
 
         val mailbox = currentMailbox.value ?: return@launch
         val folderId = currentFolder.value?.id ?: return@launch
 
         RealmDatabase.mailboxContent().writeBlocking {
+            val thread = ThreadController.getThread(threadUid, realm = this) ?: return@writeBlocking
             val currentFolderRole = FolderController.getFolder(folderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
 
-            val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
+            var undoResource: String? = null
+
+            val shouldPermanentlyDeleteMessage = currentFolderRole == FolderRole.TRASH
+            val isSuccess = if (shouldPermanentlyDeleteMessage) {
                 ApiRepository.deleteMessages(mailbox.uuid, messagesUids).isSuccess()
             } else {
                 val trashId = FolderController.getFolder(FolderRole.TRASH, realm = this)!!.id
-                ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId).isSuccess()
+                val response = ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId)
+                undoResource = response.data?.undoResource
+                response.isSuccess()
             }
 
-            if (isSuccess) {
+            val context = getApplication<Application>()
+            val snackbarTitle = if (isSuccess) {
                 deleteMessages(thread.messages)
-                ThreadController.getThread(thread.uid, realm = this)?.let(::delete)
+                delete(thread)
+
+                if (shouldPermanentlyDeleteMessage) {
+                    context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1)
+                } else {
+                    val destination = context.getString(FolderRole.TRASH.folderNameRes)
+                    context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+                }
+            } else {
+                context.getString(RCore.string.anErrorHasOccurred)
             }
+
+            snackbarFeedback.postValue(snackbarTitle to undoResource)
         }
 
         refreshThreads()
     }
 
-    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+
         val mailbox = currentMailbox.value ?: return@launch
         ThreadController.toggleSeenStatus(thread, mailbox)
 
