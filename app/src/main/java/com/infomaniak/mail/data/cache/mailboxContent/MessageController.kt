@@ -129,16 +129,7 @@ object MessageController {
 
         val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
 
-        val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm)
-
-        val newMessagesThreads = fetchFolderMessages(
-            mailbox,
-            folder,
-            threadMode,
-            idsOfFoldersWithSpecificBehavior,
-            okHttpClient,
-            realm,
-        )
+        val newMessagesThreads = fetchFolderMessages(mailbox, folder, threadMode, okHttpClient, realm)
 
         val roles = when (folder.role) {
             FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT)
@@ -149,7 +140,7 @@ object MessageController {
 
         roles.forEach { role ->
             FolderController.getFolder(role)?.let { folder ->
-                fetchFolderMessages(mailbox, folder, threadMode, idsOfFoldersWithSpecificBehavior, okHttpClient, realm)
+                fetchFolderMessages(mailbox, folder, threadMode, okHttpClient, realm)
             }
         }
 
@@ -160,7 +151,6 @@ object MessageController {
         mailbox: Mailbox,
         folder: Folder,
         threadMode: ThreadMode,
-        idsOfFoldersWithSpecificBehavior: List<String>,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ): List<Thread> {
@@ -172,15 +162,7 @@ object MessageController {
             getMessagesUidsDelta(mailbox.uuid, folder.id, previousCursor, okHttpClient)
         } ?: return emptyList()
 
-        return handleMessagesUids(
-            messagesUids,
-            folder,
-            mailbox,
-            threadMode,
-            idsOfFoldersWithSpecificBehavior,
-            okHttpClient,
-            realm
-        )
+        return handleMessagesUids(messagesUids, folder, mailbox, threadMode, okHttpClient, realm)
     }
 
     private fun handleMessagesUids(
@@ -188,7 +170,6 @@ object MessageController {
         folder: Folder,
         mailbox: Mailbox,
         threadMode: ThreadMode,
-        idsOfFoldersWithSpecificBehavior: List<String>,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ) = with(messagesUids) {
@@ -198,15 +179,7 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val newMessagesThreads = handleAddedUids(
-            addedShortUids,
-            folder.id,
-            mailbox.uuid,
-            threadMode,
-            idsOfFoldersWithSpecificBehavior,
-            okHttpClient,
-            realm,
-        )
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder.id, mailbox.uuid, threadMode, okHttpClient, realm)
 
         (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
 
@@ -233,7 +206,6 @@ object MessageController {
         folderId: String,
         mailboxUuid: String,
         threadMode: ThreadMode,
-        idsOfFoldersWithSpecificBehavior: List<String>,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ): List<Thread> {
@@ -254,7 +226,7 @@ object MessageController {
                 apiResponse.data?.messages?.let { messages ->
                     (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
                         val threads = when (threadMode) {
-                            ThreadMode.THREADS -> createMultiMessagesThreads(messages, idsOfFoldersWithSpecificBehavior)
+                            ThreadMode.THREADS -> createMultiMessagesThreads(messages)
                             ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
                         }
                         newMessagesThreads.addAll(threads)
@@ -268,11 +240,9 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    fun MutableRealm.createMultiMessagesThreads(
-        messages: List<Message>,
-        idsOfFoldersWithSpecificBehavior: List<String>,
-    ): List<Thread> {
+    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>): List<Thread> {
 
+        val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm = this)
         val threadsToUpsert = mutableMapOf<String, Thread>()
 
         messages.forEach { message ->

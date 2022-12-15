@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createMultiMessagesThreads
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createSingleMessageThreads
@@ -35,11 +34,11 @@ class DisplayModeSettingViewModel : ViewModel() {
         RealmDatabase.mailboxContent().writeBlocking {
 
             ThreadController.deleteThreads(realm = this)
-            val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm = this)
+
             val messages = MessageController.getMessages(realm = this)
 
             when (threadMode) {
-                ThreadMode.THREADS -> createMultiMessagesThreads(messages, idsOfFoldersWithSpecificBehavior)
+                ThreadMode.THREADS -> createMultiMessagesThreads(messages)
                 ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
             }
         }
