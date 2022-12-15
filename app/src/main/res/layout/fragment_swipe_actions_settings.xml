@@ -39,40 +39,61 @@
                 android:layout_marginTop="@dimen/marginStandardMedium"
                 android:text="@string/settingsSwipeDescription" />
 
-            <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/swipeRightView"
+            <LinearLayout
+                android:id="@+id/swipeRightCardview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/ic_swipe_right_long_pink"
-                app:itemAction="chevron"
-                app:title="@string/settingsSwipeRight"
-                tools:subtitle="@string/settingsSwipeActionNone" />
+                android:background="?selectableItemBackground"
+                android:clipChildren="false"
+                android:orientation="vertical">
 
-            <include
-                android:id="@+id/swipeRightIllustration"
-                layout="@layout/swipe_right_illustration"
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                    android:id="@+id/swipeRightView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_swipe_right_long_pink"
+                    app:itemAction="chevron"
+                    app:ripple="false"
+                    app:title="@string/settingsSwipeRight"
+                    tools:subtitle="@string/settingsSwipeActionNone" />
+
+                <include
+                    android:id="@+id/swipeRightIllustration"
+                    layout="@layout/swipe_right_illustration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardMedium" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:layout_marginVertical="0dp" />
+
+            <LinearLayout
+                android:id="@+id/swipeLeftCardview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/marginStandardSmall" />
+                android:background="?selectableItemBackground"
+                android:clipChildren="false"
+                android:orientation="vertical">
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+                <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                    android:id="@+id/swipeLeftView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_swipe_left_long_pink"
+                    app:itemAction="chevron"
+                    app:ripple="false"
+                    app:title="@string/settingsSwipeLeft"
+                    tools:subtitle="@string/settingsSwipeActionNone" />
 
-            <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/swipeLeftView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/ic_swipe_left_long_pink"
-                app:itemAction="chevron"
-                app:title="@string/settingsSwipeLeft"
-                tools:subtitle="@string/settingsSwipeActionNone" />
-
-            <include
-                android:id="@+id/swipeLeftIllustration"
-                layout="@layout/swipe_left_illustration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/marginStandardSmall"
-                android:layout_marginBottom="@dimen/marginStandard" />
+                <include
+                    android:id="@+id/swipeLeftIllustration"
+                    layout="@layout/swipe_left_illustration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/marginStandardMedium" />
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
