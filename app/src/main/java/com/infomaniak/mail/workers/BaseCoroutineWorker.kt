@@ -19,7 +19,6 @@ package com.infomaniak.mail.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import com.infomaniak.lib.core.api.ApiController
 import io.sentry.Sentry
@@ -52,7 +51,5 @@ abstract class BaseCoroutineWorker(appContext: Context, params: WorkerParameters
 
     companion object {
         private const val MAX_RETRIES = 3
-
-        val WORK_RUNNING_STATES = listOf(WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED, WorkInfo.State.RUNNING)
     }
 }

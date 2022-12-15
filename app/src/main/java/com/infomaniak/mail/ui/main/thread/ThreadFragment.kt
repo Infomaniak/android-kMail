@@ -62,7 +62,7 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        openThread()
+        threadViewModel.openThread(navigationArgs.threadUid)
         observeThreadLive()
         observeMessagesLive()
         observeContacts()
@@ -145,11 +145,6 @@ class ThreadFragment : Fragment() {
                 )
             }
         }
-    }
-
-    private fun openThread() {
-        val mailbox = mainViewModel.currentMailbox.value ?: return
-        threadViewModel.openThread(navigationArgs.threadUid, mailbox)
     }
 
     private fun observeThreadLive() {
