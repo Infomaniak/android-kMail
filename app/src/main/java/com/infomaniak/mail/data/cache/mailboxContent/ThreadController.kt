@@ -54,7 +54,7 @@ object ThreadController {
         realm: TypedRealm? = null
     ): RealmQuery<Thread> {
 
-        val byFolderId = "${Thread::foldersIds.name} == '$folderId'"
+        val byFolderId = "${Thread::folderId.name} == '$folderId'"
         val query = (realm ?: RealmDatabase.mailboxContent())
             .query<Thread>(byFolderId)
             .sort(Thread::date.name, Sort.DESCENDING)
@@ -123,12 +123,12 @@ object ThreadController {
         }
     }
 
-    fun deleteAllThreads(realm: MutableRealm) {
+    fun deleteThreads(realm: MutableRealm) {
         realm.delete(getThreads(realm))
     }
 
-    fun deleteThreadsOnlyInThisFolder(folderId: String, realm: MutableRealm) {
-        realm.delete(getThreadsQuery(folderId, realm = realm).query("${Thread::foldersIds.name}.@count == 1"))
+    fun deleteThreads(folderId: String, realm: MutableRealm) {
+        realm.delete(getThreadsQuery(folderId, realm = realm))
     }
     //endregion
 

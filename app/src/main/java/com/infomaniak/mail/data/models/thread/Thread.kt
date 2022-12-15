@@ -25,10 +25,10 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.ext.toRealmList
-import io.realm.kotlin.ext.toRealmSet
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -39,6 +39,7 @@ class Thread : RealmObject {
 
     @PrimaryKey
     var uid: String = ""
+    var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
     var uniqueMessagesCount: Int = 0
     var unseenMessagesCount: Int = 0
@@ -52,25 +53,33 @@ class Thread : RealmObject {
     var answered: Boolean = false
     var forwarded: Boolean = false
     var scheduled: Boolean = false
-    var foldersIds: RealmSet<String> = realmSetOf()
     var messagesIds: RealmSet<String> = realmSetOf()
 
     fun addMessage(message: Message) {
         messages.add(message)
-        messagesIds = messages.flatMap { it.messageIds }.toRealmSet()
+        messagesIds += message.messageIds
     }
 
-    fun removeMessage(message: Message) {
-        messages.removeIf { it.uid == message.uid }
-        recomputeThread()
+    fun recomputeThread(realm: MutableRealm) {
+
+        // Delete Thread if empty
+        if (messages.none { it.folderId == folderId }) {
+            realm.delete(this)
+            return
+        }
+
+        resetThread()
+
+        updateThread()
+
+        // Remove duplicates in Recipients lists
+        from = from.toRecipientsList().distinct().toRealmList()
+        to = to.toRecipientsList().distinct().toRealmList()
     }
 
-    fun recomputeThread() {
-
-        // Clean the Thread before updating it
+    private fun resetThread() {
         // TODO: Remove this `sortBy`, and get the Messages in the right order via Realm query (but before, fix the `Thread.date`)
         messages.sortBy { it.date }
-        foldersIds.clear()
         unseenMessagesCount = 0
         size = 0
         hasAttachments = false
@@ -79,10 +88,10 @@ class Thread : RealmObject {
         answered = false
         forwarded = false
         scheduled = false
+    }
 
-        // Update the Thread depending on its Messages data
+    private fun updateThread() {
         messages.forEach { message ->
-            foldersIds += message.folderId
             messagesIds += message.messageIds
             if (!message.seen) unseenMessagesCount++
             from += message.from
@@ -96,11 +105,7 @@ class Thread : RealmObject {
             if (message.scheduled) scheduled = true
         }
         uniqueMessagesCount = messages.count() // TODO: Handle duplicates
-        date = messages.last().date!! // TODO: Remove this, and compute the Date in the UI only
-
-        // Remove duplicates in Recipients lists
-        from = from.toRecipientsList().distinct().toRealmList()
-        to = to.toRecipientsList().distinct().toRealmList()
+        date = messages.findLast { it.folderId == folderId }?.date!!
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {

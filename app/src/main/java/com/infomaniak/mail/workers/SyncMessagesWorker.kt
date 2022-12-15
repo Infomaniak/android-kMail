@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -66,7 +67,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                     MessageController.fetchCurrentFolderMessages(mailbox, folder.id, threadMode, okHttpClient, realm)
 
                 newMessagesThreads.forEach { thread ->
-                    thread.showNotification(folder.id, user.id, mailbox, realm)
+                    thread.showNotification(user.id, mailbox, realm)
                 }
 
                 realm.close()
@@ -78,27 +79,28 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         Result.success()
     }
 
-    private fun Thread.showNotification(folderId: String, userId: Int, mailbox: Mailbox, realm: Realm) {
-        MessageController.getLastMessage(uid, folderId, realm)?.let { message ->
-            if (message.seen) return // Ignore if it has already been seen
+    private fun Thread.showNotification(userId: Int, mailbox: Mailbox, realm: Realm) {
 
-            val subject = message.getFormattedSubject(applicationContext)
-            val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
-            val description = "$subject$preview"
+        val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
 
-            val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
-                putExtras(LaunchActivityArgs(uid, userId, mailbox.mailboxId).toBundle())
-            }
-            val contentIntent = PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags)
+        if (message.seen) return // Ignore if it has already been seen
 
-            applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
-                setSubText(mailbox.email)
-                setContentText(message.subject)
-                setColorized(true)
-                setContentIntent(contentIntent)
-                color = localSettings.accentColor.getPrimary(applicationContext)
-                notificationManagerCompat.notify(uid.hashCode(), build())
-            }
+        val subject = message.getFormattedSubject(applicationContext)
+        val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
+        val description = "$subject$preview"
+
+        val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
+            putExtras(LaunchActivityArgs(uid, userId, mailbox.mailboxId).toBundle())
+        }
+        val contentIntent = PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags)
+
+        applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
+            setSubText(mailbox.email)
+            setContentText(message.subject)
+            setColorized(true)
+            setContentIntent(contentIntent)
+            color = localSettings.accentColor.getPrimary(applicationContext)
+            notificationManagerCompat.notify(uid.hashCode(), build())
         }
     }
 

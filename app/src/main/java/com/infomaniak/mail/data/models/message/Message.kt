@@ -121,10 +121,10 @@ class Message : RealmObject {
     var detailsAreExpanded = false
     //endregion
 
+    val parentThreads by backlinks(Thread::messages)
+
     inline val shortUid get() = uid.split("@").first().toLong()
     inline val sender get() = from.first()
-
-    val parentThread by backlinks(Thread::messages)
 
     var priority
         get() = enumValueOfOrNull<Priority>(_priority)
@@ -158,5 +158,6 @@ class Message : RealmObject {
 
     fun toThread() = Thread().apply {
         uid = this@Message.uid
+        folderId = this@Message.folderId
     }
 }

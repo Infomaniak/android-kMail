@@ -92,9 +92,13 @@ object DraftController {
         with(ApiRepository.deleteMessages(mailboxUuid, listOf(message.uid))) {
             if (isSuccess()) {
                 RealmDatabase.mailboxContent().writeBlocking {
-                    val parentThread = message.parentThread.firstOrNull()
+                    message.parentThreads.forEach { thread ->
+                        findLatest(thread)?.let { latestThread ->
+                            latestThread.messages.removeIf { it.uid == message.uid }
+                            latestThread.recomputeThread(realm = this)
+                        }
+                    }
                     MessageController.deleteMessage(message.uid, realm = this)
-                    parentThread?.let(::findLatest)?.recomputeThread()
                 }
             }
         }

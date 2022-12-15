@@ -33,7 +33,7 @@ class DisplayModeSettingViewModel : ViewModel() {
     fun dropThreads(threadMode: ThreadMode, mailboxObjectId: String) = viewModelScope.launch(Dispatchers.IO) {
         RealmDatabase.mailboxContent().write {
 
-            ThreadController.deleteAllThreads(realm = this)
+            ThreadController.deleteThreads(realm = this)
 
             val messages = MessageController.getMessages(realm = this)
             when (threadMode) {
