@@ -23,10 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -47,10 +44,6 @@ class ThreadListViewModel : ViewModel() {
                 updatedAtTrigger.postValue(Unit)
             }
         }
-    }
-
-    fun toggleSeenStatus(thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        ThreadController.toggleSeenStatus(thread, mailbox)
     }
 
     fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {

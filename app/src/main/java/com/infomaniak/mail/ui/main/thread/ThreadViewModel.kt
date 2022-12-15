@@ -17,13 +17,16 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.update
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -35,7 +38,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
-class ThreadViewModel : ViewModel() {
+class ThreadViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val localSettings by lazy { LocalSettings.getInstance(application) }
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
@@ -48,7 +53,10 @@ class ThreadViewModel : ViewModel() {
     fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return@launch
         ThreadController.getThread(threadUid)?.let { thread ->
-            ThreadController.markAsSeen(thread, mailbox)
+            if (thread.unseenMessagesCount > 0) {
+                ThreadController.markAsSeen(thread, mailbox)
+                MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
+            }
             updateMessages(thread)
         }
     }

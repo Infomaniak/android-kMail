@@ -30,15 +30,15 @@ import kotlinx.coroutines.launch
 
 class DisplayModeSettingViewModel : ViewModel() {
 
-    fun dropThreads(threadMode: ThreadMode, mailboxObjectId: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun dropThreads(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
         RealmDatabase.mailboxContent().write {
 
             ThreadController.deleteThreads(realm = this)
 
             val messages = MessageController.getMessages(realm = this)
             when (threadMode) {
-                ThreadMode.THREADS -> createMultiMessagesThreads(messages, mailboxObjectId)
-                ThreadMode.MESSAGES -> createSingleMessageThreads(messages, mailboxObjectId)
+                ThreadMode.THREADS -> createMultiMessagesThreads(messages)
+                ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
             }
         }
     }

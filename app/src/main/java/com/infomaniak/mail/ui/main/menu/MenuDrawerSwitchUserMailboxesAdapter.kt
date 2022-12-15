@@ -41,7 +41,7 @@ class MenuDrawerSwitchUserMailboxesAdapter(
     ): Unit = with(holder.binding.emailAddress) {
         val mailbox = mailboxes[position]
         text = mailbox.email
-        badge = mailbox.unseenMessages
+        badge = mailbox.inboxUnreadCount
 
         setOnClickListener { onMailboxSelected(mailbox) }
     }

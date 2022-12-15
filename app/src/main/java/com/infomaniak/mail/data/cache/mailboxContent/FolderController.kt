@@ -109,25 +109,16 @@ object FolderController {
         }
     }
 
-    private fun updateFolder(id: String, realm: MutableRealm? = null, onUpdate: (folder: Folder) -> Unit) {
-        val block: (MutableRealm) -> Unit = { getFolder(id, realm = it)?.let(onUpdate) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
+    fun refreshUnreadCount(id: String, mailboxObjectId: String, realm: MutableRealm) {
 
-    fun MutableRealm.incrementFolderUnreadCount(folderId: String, unseenMessagesCount: Int, mailboxObjectId: String) {
+        val folder = getFolder(id, realm) ?: return
 
-        var inboxUnreadCount: Int? = null
+        val unreadCount = ThreadController.getUnreadThreadsCount(id, realm)
+        folder.unreadCount = unreadCount
 
-        updateFolder(folderId, realm = this) { folder ->
-
-            folder.unreadCount += unseenMessagesCount
-
-            if (folder.role == FolderRole.INBOX) inboxUnreadCount = folder.unreadCount
-        }
-
-        inboxUnreadCount?.let { unseenMessages ->
+        if (folder.role == FolderRole.INBOX) {
             MailboxController.updateMailbox(mailboxObjectId) { mailbox ->
-                mailbox.unseenMessages = unseenMessages
+                mailbox.inboxUnreadCount = unreadCount
             }
         }
     }
