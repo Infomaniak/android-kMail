@@ -161,6 +161,8 @@ class Thread : RealmObject {
 
     fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
 
+    fun getMessageDuplicates(messageId: String): List<String> = duplicates.filter { it.messageId == messageId }.map { it.uid }
+
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }
     }

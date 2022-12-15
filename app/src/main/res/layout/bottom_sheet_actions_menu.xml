@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_envelope"
-            app:text="@string/actionMarkAsRead" />
+            app:text="@string/actionMarkAsUnread" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/move"

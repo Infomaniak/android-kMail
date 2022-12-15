@@ -119,14 +119,25 @@ object ThreadController {
     }
 
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    private fun getThreadLastMessageUid(thread: Thread): List<String> {
-        return listOf(thread.messages.getLastMessageToExecuteAction().uid)
+    private fun getThreadLastMessageUids(thread: Thread): List<String> {
+        return mutableListOf<String>().apply {
+
+            val lastMessage = thread.messages.getLastMessageToExecuteAction()
+            add(lastMessage.uid)
+
+            addAll(thread.getMessageDuplicates(lastMessage.messageId))
+        }
     }
 
     // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
     private fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
-            thread.messages.forEach { if (!it.seen) add(it.uid) }
+            thread.messages.forEach { message ->
+                if (!message.seen) {
+                    add(message.uid)
+                    addAll(thread.getMessageDuplicates(message.messageId))
+                }
+            }
         }
     }
 
@@ -145,12 +156,14 @@ object ThreadController {
     }
 
     private fun markAsUnseen(thread: Thread, mailbox: Mailbox) {
-        val uid = getThreadLastMessageUid(thread)
-        ApiRepository.markMessagesAsUnseen(mailbox.uuid, uid)
+        val uids = getThreadLastMessageUids(thread)
+
+        ApiRepository.markMessagesAsUnseen(mailbox.uuid, uids)
     }
 
     fun markAsSeen(thread: Thread, mailbox: Mailbox) {
         val uids = getThreadUnseenMessagesUids(thread)
+
         ApiRepository.markMessagesAsSeen(mailbox.uuid, uids)
     }
     //endregion
