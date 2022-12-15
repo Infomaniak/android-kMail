@@ -27,10 +27,10 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController.incrementFolderUnreadCount
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.AppSettings
@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -49,9 +50,46 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    //region Current Mailbox
+    private val currentMailboxObjectId = MutableLiveData<String?>(null)
+
+    val currentMailbox = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
+    }
+
+    val currentFoldersLive = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        liveData(Dispatchers.IO) {
+            mailboxObjectId?.let { emitSource(FolderController.getFoldersAsync().map { getMenuFolders(it.list) }.asLiveData()) }
+        }
+    }
+
+    val currentQuotasLive = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
+    }
+    //endregion
+
+    //region Current Folder
+    private val currentFolderId = MutableLiveData<String?>(null)
+
+    val currentFolder = Transformations.switchMap(currentFolderId) { folderId ->
+        liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
+    }
+
+    val currentFolderLive = Transformations.switchMap(currentFolderId) { folderId ->
+        liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
+    }
+
+    val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
+
+    val currentThreadsLive = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
+        liveData(Dispatchers.IO) {
+            if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
+        }
+    }
+    //endregion
 
     private val localSettings by lazy { LocalSettings.getInstance(application) }
     val isInternetAvailable = SingleLiveEvent<Boolean>()
@@ -60,55 +98,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var forceRefreshJob: Job? = null
 
-    fun close() {
-        Log.i(TAG, "Close")
-        RealmDatabase.close()
-        resetAllCurrentLiveData()
+    private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
+        value = currentFolder.value to currentFilter.value!!
+        addSource(currentFolder) { value = it to value!!.second }
+        addSource(currentFilter) { value = value?.first to it }
     }
 
-    fun resetAllCurrentLiveData() {
-        currentThreadUid.value = null
-        currentFolderId.value = null
-        currentMailboxObjectId.value = null
+    fun observeMailboxesLive(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+        emitSource(MailboxController.getMailboxesAsync(userId).asLiveData())
     }
 
-    fun observeMailboxes(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
-        emitSource(
-            MailboxController.getMailboxesAsync(userId)
-                .map { it.list }
-                .asLiveData()
-        )
-    }
-
-    fun getMailbox(objectId: String): LiveData<Mailbox?> = liveData(Dispatchers.IO) {
-        emit(MailboxController.getMailbox(objectId))
-    }
-
-    fun getFolder(folderId: String): LiveData<Folder?> = liveData(Dispatchers.IO) {
-        emit(FolderController.getFolder(folderId))
-    }
-
-    private suspend fun selectMailbox(mailbox: Mailbox) {
+    private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             AccountUtils.currentMailboxId = mailbox.mailboxId
-            withContext(Dispatchers.Main) {
-                currentMailboxObjectId.value = mailbox.objectId
-
-                currentThreadUid.value = null
-                currentFolderId.value = null
-            }
+            currentMailboxObjectId.postValue(mailbox.objectId)
+            currentFolderId.postValue(null)
         }
     }
 
-    private suspend fun selectFolder(folderId: String) {
+    private fun selectFolder(folderId: String) {
         if (folderId != currentFolderId.value) {
             Log.d(TAG, "Select folder: $folderId")
-            withContext(Dispatchers.Main) {
-                currentFolderId.value = folderId
-
-                currentThreadUid.value = null
-            }
+            currentFolderId.postValue(folderId)
         }
     }
 
@@ -123,7 +135,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         loadCurrentMailboxFromRemote()
     }
 
-    private suspend fun loadCurrentMailboxFromLocal() {
+    private fun loadCurrentMailboxFromLocal() {
         Log.d(TAG, "Load current mailbox from local")
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
@@ -159,7 +171,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun updateCurrentMailboxQuotas() {
-        val mailbox = MailboxController.getCurrentMailbox() ?: return
+        val mailbox = currentMailbox.value ?: return
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
@@ -168,8 +180,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = MailboxController.getCurrentMailbox() ?: return@launch
-        if (folderId == currentFolderId.value) return@launch
+        val mailbox = currentMailbox.value ?: return@launch
+        if (folderId == currentFolder.value?.id) return@launch
 
         selectFolder(folderId)
         refreshThreads(mailbox, folderId)
@@ -179,8 +191,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         forceRefreshJob?.cancel()
         forceRefreshJob = viewModelScope.launch(Dispatchers.IO) {
             Log.d(TAG, "Force refresh threads")
-            val mailbox = MailboxController.getCurrentMailbox() ?: return@launch
-            val folderId = currentFolderId.value ?: return@launch
+            val mailbox = currentMailbox.value ?: return@launch
+            val folderId = currentFolder.value?.id ?: return@launch
             refreshThreads(mailbox, folderId)
         }
     }
@@ -228,34 +240,53 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
 
-        val mailboxUuid = MailboxController.getCurrentMailboxUuid() ?: return@launch
-        val folderId = currentFolderId.value ?: return@launch
+        val mailbox = currentMailbox.value ?: return@launch
+        val folderId = currentFolder.value?.id ?: return@launch
 
         RealmDatabase.mailboxContent().writeBlocking {
             val currentFolderRole = FolderController.getFolder(folderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
 
             val isSuccess = if (currentFolderRole == FolderRole.TRASH) {
-                ApiRepository.deleteMessages(mailboxUuid, messagesUids).isSuccess()
+                ApiRepository.deleteMessages(mailbox.uuid, messagesUids).isSuccess()
             } else {
                 val trashId = FolderController.getFolder(FolderRole.TRASH, realm = this)!!.id
-                ApiRepository.moveMessages(mailboxUuid, messagesUids, trashId).isSuccess()
+                ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId).isSuccess()
             }
 
             if (isSuccess) {
-                incrementFolderUnreadCount(folderId, -thread.unseenMessagesCount)
-                deleteMessages(thread.messages)
+                thread.messages.reversed().forEach {
+                    if (!it.seen) incrementFolderUnreadCount(it.folderId, -1, mailbox.objectId)
+                    MessageController.deleteMessage(it.uid, realm = this)
+                }
                 ThreadController.getThread(thread.uid, realm = this)?.let(::delete)
             }
+        }
+    }
+
+    private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
+        return folders.toMutableList().let { list ->
+
+            val inbox = list
+                .find { it.role == Folder.FolderRole.INBOX }
+                ?.also(list::remove)
+
+            val defaultFolders = list
+                .filter { it.role != null }
+                .sortedBy { it.role?.order }
+                .also(list::removeAll)
+
+            val customFolders = list
+                .filter { it.parentFolder.isEmpty() }
+                .sortedByDescending { it.isFavorite }
+                .formatFoldersListWithAllChildren()
+
+            Triple(inbox, defaultFolders, customFolders)
         }
     }
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
         private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
-
-        val currentMailboxObjectId = MutableLiveData<String?>()
-        val currentFolderId = MutableLiveData<String?>()
-        val currentThreadUid = MutableLiveData<String?>()
     }
 }

@@ -28,7 +28,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
@@ -37,32 +36,36 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.toggleChevron
 
 class MenuDrawerFragment : Fragment() {
 
     private lateinit var binding: FragmentMenuDrawerBinding
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val menuDrawerViewModel: MenuDrawerViewModel by viewModels()
 
     var exitDrawer: (() -> Unit)? = null
     var isDrawerOpen: (() -> Boolean)? = null
 
-    private var currentFolderRole: FolderRole? = null
     private var inboxFolderId: String? = null
     private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
-        mainViewModel.openMailbox(selectedMailbox)
-        closeDrawer()
+        // TODO: This works, but... The splashscreen blinks.
+        AccountUtils.currentMailboxId = selectedMailbox.mailboxId
+        RealmDatabase.close()
+        AccountUtils.reloadApp?.invoke()
     }
 
-    private val defaultFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
-    private val customFolderAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val defaultFoldersAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val customFoldersAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -76,10 +79,10 @@ class MenuDrawerFragment : Fragment() {
         setupAdapters()
         setupListeners()
 
-        observeMailboxes()
         observeCurrentMailbox()
-        observeFolders()
+        observeMailboxesLive()
         observeCurrentFolder()
+        observeFoldersLive()
         observeQuotas()
     }
 
@@ -90,8 +93,8 @@ class MenuDrawerFragment : Fragment() {
 
     private fun setupAdapters() = with(binding) {
         addressesList.adapter = addressAdapter
-        defaultFoldersList.adapter = defaultFolderAdapter
-        customFoldersList.adapter = customFolderAdapter
+        defaultFoldersList.adapter = defaultFoldersAdapter
+        customFoldersList.adapter = customFoldersAdapter
     }
 
     private fun setupListeners() = with(binding) {
@@ -170,8 +173,14 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun observeMailboxes() = with(binding) {
-        mainViewModel.observeMailboxes().observe(viewLifecycleOwner) { mailboxes ->
+    private fun observeCurrentMailbox() {
+        mainViewModel.currentMailbox.observe(viewLifecycleOwner) { mailbox ->
+            binding.mailboxSwitcherText.text = mailbox.email
+        }
+    }
+
+    private fun observeMailboxesLive() = with(binding) {
+        mainViewModel.observeMailboxesLive().observe(viewLifecycleOwner) { mailboxes ->
             val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
             addressAdapter.setMailboxes(sortedMailboxes)
             val isEmpty = sortedMailboxes.isEmpty()
@@ -180,43 +189,31 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun observeCurrentMailbox() {
-        MainViewModel.currentMailboxObjectId.observeNotNull(viewLifecycleOwner) { objectId ->
-            mainViewModel.getMailbox(objectId).observeNotNull(viewLifecycleOwner) { mailbox ->
-                binding.mailboxSwitcherText.text = mailbox.email
-            }
+    private fun observeCurrentFolder() {
+        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+            binding.inboxFolder.setSelectedState(folder.role == FolderRole.INBOX)
+
+            defaultFoldersAdapter.updateSelectedState(folder.id)
+            customFoldersAdapter.updateSelectedState(folder.id)
         }
     }
 
-    private fun observeFolders() {
-        menuDrawerViewModel.folders.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+    private fun observeFoldersLive() {
+        mainViewModel.currentFoldersLive.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
 
-            val currentFolderId = MainViewModel.currentFolderId.value
-            defaultFolderAdapter.setFolders(defaultFolders, currentFolderId)
-            customFolderAdapter.setFolders(customFolders, currentFolderId)
-
             binding.noFolderText.isVisible = customFolders.isEmpty()
-        }
-    }
 
-    private fun observeCurrentFolder() {
-        MainViewModel.currentFolderId.observeNotNull(viewLifecycleOwner) { folderId ->
-            mainViewModel.getFolder(folderId).observeNotNull(viewLifecycleOwner) { folder ->
-
-                currentFolderRole = folder.role
-                binding.inboxFolder.setSelectedState(currentFolderRole == FolderRole.INBOX)
-
-                defaultFolderAdapter.updateSelectedState(folderId)
-                customFolderAdapter.updateSelectedState(folderId)
-            }
+            val currentFolder = mainViewModel.currentFolder.value ?: return@observe
+            defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
+            customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }
     }
 
     private fun observeQuotas() = with(binding) {
-        menuDrawerViewModel.quotas.observe(viewLifecycleOwner) { quotas ->
+        mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
             storageLayout.isVisible = isLimited

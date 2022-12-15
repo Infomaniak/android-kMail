@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Quotas
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initMailNotificationChannel
 import io.realm.kotlin.MutableRealm
@@ -39,6 +38,7 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 object MailboxController {
 
@@ -82,8 +82,8 @@ object MailboxController {
         return getMailboxesQuery(realm).asFlow()
     }
 
-    fun getMailboxesAsync(userId: Int, realm: TypedRealm? = null): Flow<ResultsChange<Mailbox>> {
-        return getMailboxesQuery(userId, realm).asFlow()
+    fun getMailboxesAsync(userId: Int, realm: TypedRealm? = null): Flow<RealmResults<Mailbox>> {
+        return getMailboxesQuery(userId, realm).asFlow().map { it.list }
     }
 
     fun getMailbox(objectId: String, realm: TypedRealm? = null): Mailbox? {
@@ -96,14 +96,6 @@ object MailboxController {
 
     fun getMailboxAsync(objectId: String, realm: TypedRealm? = null): Flow<SingleQueryChange<Mailbox>> {
         return getMailboxQuery(objectId, realm).asFlow()
-    }
-
-    fun getCurrentMailbox(): Mailbox? {
-        return MainViewModel.currentMailboxObjectId.value?.let(::getMailbox)
-    }
-
-    fun getCurrentMailboxUuid(): String? {
-        return getCurrentMailbox()?.uuid
     }
     //endregion
 

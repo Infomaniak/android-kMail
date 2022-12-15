@@ -32,7 +32,6 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.NotificationUtils
@@ -55,17 +54,18 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     private lateinit var okHttpClient: OkHttpClient
-    private lateinit var mailboxObjectId: String
+    private var mailboxId: Int = AppSettings.DEFAULT_ID
     private lateinit var mailbox: Mailbox
     private var userId: Int by Delegates.notNull()
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
         if (DraftController.getDraftsWithActionsCount() == 0L) return@withContext Result.success()
         if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
-        userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
 
-        mailboxObjectId = inputData.getString(MAILBOX_OBJECT_ID_KEY) ?: return@withContext Result.failure()
-        mailbox = MailboxController.getMailbox(mailboxObjectId, mailboxInfoRealm) ?: return@withContext Result.failure()
+        userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
+        mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
+
+        mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
 
         moveServiceToForeground()
@@ -87,19 +87,15 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private fun handleDraftsActions(): Result {
         return mailboxContentRealm.writeBlocking {
 
-            fun getCurrentMailboxUuid(): String? {
-                return MailboxController.getMailbox(mailboxObjectId, mailboxInfoRealm)?.uuid
-            }
-
-            val mailboxUuid = getCurrentMailboxUuid() ?: return@writeBlocking Result.failure()
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { null }
                 ?: return@writeBlocking Result.failure()
+
             var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
                 try {
                     draft.uploadAttachments(this)
-                    DraftController.executeDraftAction(draft, mailboxUuid, realm = this, okHttpClient)
+                    DraftController.executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                     if (exception is ApiController.NetworkException) throw exception
@@ -160,15 +156,14 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     companion object {
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
-        private const val MAILBOX_OBJECT_ID_KEY = "mailboxObjectIdKey"
+        private const val MAILBOX_ID_KEY = "mailboxIdKey"
 
         fun scheduleWork(context: Context) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (DraftController.getDraftsWithActionsCount() == 0L) return
 
-            val currentMailboxObjectId = MainViewModel.currentMailboxObjectId.value ?: return
-            val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_OBJECT_ID_KEY to currentMailboxObjectId)
+            val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_ID_KEY to AccountUtils.currentMailboxId)
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
                 .setInputData(workData)
@@ -183,6 +178,5 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             val workQuery = WorkQuery.Builder.fromTags(listOf(TAG)).addStates(listOf(WorkInfo.State.SUCCEEDED)).build()
             return WorkManager.getInstance(context).getWorkInfosLiveData(workQuery)
         }
-
     }
 }

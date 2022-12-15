@@ -25,21 +25,20 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createMultiMessagesThreads
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createSingleMessageThreads
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.ui.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DisplayModeSettingViewModel : ViewModel() {
 
-    fun dropThreads(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
+    fun dropThreads(threadMode: ThreadMode, mailboxObjectId: String) = viewModelScope.launch(Dispatchers.IO) {
         RealmDatabase.mailboxContent().write {
 
             ThreadController.deleteAllThreads(realm = this)
 
             val messages = MessageController.getMessages(realm = this)
             when (threadMode) {
-                ThreadMode.THREADS -> createMultiMessagesThreads(messages, MainViewModel.currentMailboxObjectId.value!!)
-                ThreadMode.MESSAGES -> createSingleMessageThreads(messages, MainViewModel.currentMailboxObjectId.value!!)
+                ThreadMode.THREADS -> createMultiMessagesThreads(messages, mailboxObjectId)
+                ThreadMode.MESSAGES -> createSingleMessageThreads(messages, mailboxObjectId)
             }
         }
     }

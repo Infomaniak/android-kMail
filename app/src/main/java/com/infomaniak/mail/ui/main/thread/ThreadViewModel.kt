@@ -26,10 +26,9 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.update
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.markAsSeen
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.ui.MainViewModel
 import io.realm.kotlin.MutableRealm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
@@ -45,16 +44,11 @@ class ThreadViewModel : ViewModel() {
         ThreadController.getThread(threadUid)?.messages?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
-    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun openThread(threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         ThreadController.getThread(threadUid)?.let { thread ->
-            selectThread(thread)
-            markAsSeen(thread)
+            ThreadController.markAsSeen(thread, mailbox)
             updateMessages(thread)
         }
-    }
-
-    private fun selectThread(thread: Thread) {
-        if (thread.uid != MainViewModel.currentThreadUid.value) MainViewModel.currentThreadUid.postValue(thread.uid)
     }
 
     private fun updateMessages(thread: Thread) {
@@ -82,5 +76,7 @@ class ThreadViewModel : ViewModel() {
         }
     }
 
-    fun deleteDraft(message: Message) = viewModelScope.launch(Dispatchers.IO) { DraftController.deleteDraft(message) }
+    fun deleteDraft(message: Message, mailboxUuid: String) = viewModelScope.launch(Dispatchers.IO) {
+        DraftController.deleteDraft(message, mailboxUuid)
+    }
 }

@@ -50,7 +50,6 @@ import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
@@ -66,7 +65,6 @@ class NewMessageFragment : Fragment() {
 
     private lateinit var binding: FragmentNewMessageBinding
     private val newMessageActivityArgs by lazy { requireActivity().navArgs<NewMessageActivityArgs>().value }
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
@@ -236,13 +234,16 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeMailboxes() {
-        mainViewModel.observeMailboxes().observe(viewLifecycleOwner, ::setupFromField)
+        newMessageViewModel.observeMailboxes().observe(viewLifecycleOwner) {
+            setupFromField(it.first, it.second)
+        }
     }
 
-    private fun setupFromField(mailboxes: List<Mailbox>) = with(binding) {
+    // TODO: Since we don't want to allow changing email & signature, maybe this code could be simplified?
+    private fun setupFromField(mailboxes: List<Mailbox>, currentMailboxIndex: Int) = with(binding) {
 
         this@NewMessageFragment.mailboxes = mailboxes
-        selectedMailboxIndex = mailboxes.indexOfFirst { it.objectId == MainViewModel.currentMailboxObjectId.value }
+        selectedMailboxIndex = currentMailboxIndex
         val mails = mailboxes.map { it.email }
 
         fromMailAddress.text = mailboxes[selectedMailboxIndex].email

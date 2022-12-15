@@ -29,8 +29,10 @@ import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
@@ -38,6 +40,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.getFileNameAndSize
 import io.realm.kotlin.MutableRealm
@@ -131,6 +134,17 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
         emit(MergedContactController.getMergedContacts())
+    }
+
+    fun observeMailboxes(): LiveData<Pair<List<Mailbox>, Int>> = liveData(Dispatchers.IO) {
+
+        val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
+
+        val currentMailboxIndex = mailboxes.indexOfFirst {
+            it.userId == AccountUtils.currentUserId && it.mailboxId == AccountUtils.currentMailboxId
+        }
+
+        emit(mailboxes to currentMailboxIndex)
     }
 
     fun updateMailSubject(subject: String) {

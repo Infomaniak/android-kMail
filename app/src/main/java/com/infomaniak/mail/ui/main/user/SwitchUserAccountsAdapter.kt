@@ -28,7 +28,6 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.toggleChevron
@@ -99,9 +98,9 @@ class SwitchUserAccountsAdapter(
 
     override fun getItemCount(): Int = accounts.count()
 
-    fun notifyAdapter(newList: List<UiAccount>) {
+    fun notifyAdapter(newList: List<UiAccount>, mailboxObjectId: String) {
         collapseAllExceptFirst(newList)
-        currentMailboxObjectId = MainViewModel.currentMailboxObjectId.value
+        currentMailboxObjectId = mailboxObjectId
         DiffUtil.calculateDiff(UiAccountsListDiffCallback(accounts, newList)).dispatchUpdatesTo(this)
         accounts = newList
     }
