@@ -27,7 +27,6 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -251,24 +250,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val thread = ThreadController.getThread(threadUid, realm = this) ?: return@writeBlocking
             val currentFolderRole = FolderController.getFolder(folderId, realm = this)?.role
             val messagesUids = thread.messages.map { it.uid }
+            val duplicatesUids = thread.duplicates.map { it.uid }
 
             var undoResource: String? = null
 
-            val shouldPermanentlyDeleteMessage = currentFolderRole == FolderRole.TRASH
+            val shouldPermanentlyDeleteMessage = currentFolderRole == FolderRole.DRAFT
+                    || currentFolderRole == FolderRole.SPAM
+                    || currentFolderRole == FolderRole.TRASH
+
             val isSuccess = if (shouldPermanentlyDeleteMessage) {
-                ApiRepository.deleteMessages(mailbox.uuid, messagesUids).isSuccess()
+                ApiRepository.deleteMessages(mailbox.uuid, messagesUids + duplicatesUids).isSuccess()
             } else {
                 val trashId = FolderController.getFolder(FolderRole.TRASH, realm = this)!!.id
-                val response = ApiRepository.moveMessages(mailbox.uuid, messagesUids, trashId)
+                val filteredUids = (thread.messages + thread.duplicates).filter { !it.scheduled }.map { it.uid }
+                val response = ApiRepository.moveMessages(mailbox.uuid, filteredUids, trashId)
                 undoResource = response.data?.undoResource
                 response.isSuccess()
             }
 
             val context = getApplication<Application>()
             val snackbarTitle = if (isSuccess) {
-                deleteMessages(thread.messages)
-                delete(thread)
-
                 if (shouldPermanentlyDeleteMessage) {
                     context.resources.getQuantityString(R.plurals.snackbarThreadDeletedPermanently, 1)
                 } else {

@@ -122,8 +122,8 @@ class ThreadFragment : Fragment() {
                 )
             }
             onDeleteDraftClicked = { message ->
-                mainViewModel.currentMailbox.value?.uuid?.let { mailboxUuid ->
-                    threadViewModel.deleteDraft(message, mailboxUuid)
+                mainViewModel.currentMailbox.value?.let { mailbox ->
+                    threadViewModel.deleteDraft(message, navigationArgs.threadUid, mailbox)
                 }
             }
             onAttachmentClicked = { attachment ->
