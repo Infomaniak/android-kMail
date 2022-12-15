@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -151,11 +152,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun onDestinationChanged(destination: NavDestination) {
-        Sentry.addBreadcrumb(Breadcrumb().apply {
-            category = "Navigation"
-            message = "Accessed to destination : ${destination.displayName}"
-            level = SentryLevel.INFO
-        })
+        destination.addSentryBreadcrumb()
 
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
@@ -177,9 +174,21 @@ class MainActivity : ThemedActivity() {
             }
         )
 
-        with(destination) {
-            trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
-        }
+        destination.trackDestination()
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun NavDestination.addSentryBreadcrumb() {
+        Sentry.addBreadcrumb(Breadcrumb().apply {
+            category = "Navigation"
+            message = "Accessed to destination : $displayName"
+            level = SentryLevel.INFO
+        })
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun NavDestination.trackDestination() {
+        trackScreen(displayName.substringAfter("${BuildConfig.APPLICATION_ID}:id"), label.toString())
     }
 
     private fun setDrawerLockMode(isUnlocked: Boolean) {
