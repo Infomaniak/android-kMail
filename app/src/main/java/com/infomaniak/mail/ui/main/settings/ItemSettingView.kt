@@ -66,7 +66,7 @@ class ItemSettingView @JvmOverloads constructor(
                 chevron.isVisible = action == Action.CHEVRON
                 toggle.isVisible = action == Action.TOGGLE
 
-                if (getBoolean(R.styleable.ItemSettingView_noRipple, false)) root.background = null
+                if (!getBoolean(R.styleable.ItemSettingView_ripple, true)) root.background = null
             }
         }
     }

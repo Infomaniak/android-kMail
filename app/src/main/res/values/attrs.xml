@@ -60,7 +60,7 @@
             <enum name="chevron" value="1" />
             <enum name="toggle" value="2" />
         </attr>
-        <attr name="noRipple" format="boolean" />
+        <attr name="ripple" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="SettingRadioButtonView">
