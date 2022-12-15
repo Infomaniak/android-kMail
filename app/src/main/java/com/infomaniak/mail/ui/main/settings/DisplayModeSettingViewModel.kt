@@ -21,23 +21,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createMultiMessagesThreads
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createSingleMessageThreads
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DisplayModeSettingViewModel : ViewModel() {
 
     fun dropThreads(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
-        RealmDatabase.mailboxContent().write {
+        RealmDatabase.mailboxContent().writeBlocking {
 
             ThreadController.deleteThreads(realm = this)
 
+            val draftFolderId = FolderController.getFolder(FolderRole.DRAFT, realm = this)?.id
+            val trashFolderId = FolderController.getFolder(FolderRole.TRASH, realm = this)?.id
+
             val messages = MessageController.getMessages(realm = this)
             when (threadMode) {
-                ThreadMode.THREADS -> createMultiMessagesThreads(messages)
+                ThreadMode.THREADS -> createMultiMessagesThreads(messages, draftFolderId, trashFolderId)
                 ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
             }
         }
