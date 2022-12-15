@@ -241,24 +241,26 @@ object MessageController {
     }
 
     fun MutableRealm.createMultiMessagesThreads(messages: List<Message>): List<Thread> {
-        val allThreads = ThreadController.getThreads(realm = this).toMutableList()
 
-        // Here, we use a Set instead of a List, so we can't add multiple times the same Thread to it.
+        val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm = this)
         val threadsToUpsert = mutableMapOf<String, Thread>()
 
         messages.forEach { message ->
 
             message.initMessageIds()
 
-            val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
-            existingThreads.forEach { it.addMessageWithConditions(message, realm = this) }
+            val existingThreads = ThreadController.getThreads(message.messageIds, realm = this)
 
-            createNewThreadIfRequired(existingThreads, message)?.let { newThread ->
-                allThreads.add(newThread)
+            createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
+                ThreadController.upsertThread(newThread, realm = this)
                 threadsToUpsert[newThread.uid] = newThread
             }
 
-            existingThreads.forEach { threadsToUpsert[it.uid] = it }
+            existingThreads.forEach {
+                it.addMessageWithConditions(message, realm = this@createMultiMessagesThreads)
+                ThreadController.upsertThread(it, realm = this)
+                threadsToUpsert[it.uid] = it
+            }
         }
 
         return threadsToUpsert.map { (_, thread) ->
@@ -268,26 +270,37 @@ object MessageController {
         }
     }
 
-    private fun TypedRealm.createNewThreadIfRequired(existingThreads: List<Thread>, message: Message): Thread? {
+    private fun TypedRealm.createNewThreadIfRequired(
+        existingThreads: List<Thread>,
+        newMessage: Message,
+        idsOfFoldersWithSpecificBehavior: List<String>,
+    ): Thread? {
         var newThread: Thread? = null
 
-        if (existingThreads.none { it.folderId == message.folderId }) {
+        if (existingThreads.none { it.folderId == newMessage.folderId }) {
 
-            newThread = message.toThread()
-            newThread.addFirstMessage(message)
+            newThread = newMessage.toThread()
+            newThread.addFirstMessage(newMessage)
 
-            val encounteredMessages = mutableSetOf<String>()
-            existingThreads.forEach { thread ->
-                thread.messages.forEach { message ->
-                    if (!encounteredMessages.contains(message.uid)) {
-                        newThread.addMessageWithConditions(message, realm = this)
-                        encounteredMessages.add(message.uid)
-                    }
-                }
+            val referenceThread = existingThreads.firstOrNull { !idsOfFoldersWithSpecificBehavior.contains(it.folderId) }
+
+            if (referenceThread == null) {
+                existingThreads.forEach { thread -> addPreviousMessagesToThread(newThread, thread) }
+            } else {
+                addPreviousMessagesToThread(newThread, referenceThread)
             }
         }
 
         return newThread
+    }
+
+    private fun TypedRealm.addPreviousMessagesToThread(newThread: Thread, existingThread: Thread) {
+
+        newThread.messagesIds += existingThread.messagesIds
+
+        existingThread.messages.forEach { message ->
+            newThread.addMessageWithConditions(message, realm = this)
+        }
     }
 
     fun MutableRealm.createSingleMessageThreads(messages: List<Message>): List<Thread> {
