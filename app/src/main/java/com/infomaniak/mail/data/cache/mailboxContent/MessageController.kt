@@ -128,15 +128,14 @@ object MessageController {
     ): List<Thread> {
 
         val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
-        val draftFolderId = FolderController.getFolder(FolderRole.DRAFT, realm)?.id
-        val trashFolderId = FolderController.getFolder(FolderRole.TRASH, realm)?.id
+
+        val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm)
 
         val newMessagesThreads = fetchFolderMessages(
             mailbox,
             folder,
             threadMode,
-            draftFolderId,
-            trashFolderId,
+            idsOfFoldersWithSpecificBehavior,
             okHttpClient,
             realm,
         )
@@ -150,7 +149,7 @@ object MessageController {
 
         roles.forEach { role ->
             FolderController.getFolder(role)?.let { folder ->
-                fetchFolderMessages(mailbox, folder, threadMode, draftFolderId, trashFolderId, okHttpClient, realm)
+                fetchFolderMessages(mailbox, folder, threadMode, idsOfFoldersWithSpecificBehavior, okHttpClient, realm)
             }
         }
 
@@ -161,8 +160,7 @@ object MessageController {
         mailbox: Mailbox,
         folder: Folder,
         threadMode: ThreadMode,
-        draftFolderId: String?,
-        trashFolderId: String?,
+        idsOfFoldersWithSpecificBehavior: List<String>,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ): List<Thread> {
@@ -174,7 +172,15 @@ object MessageController {
             getMessagesUidsDelta(mailbox.uuid, folder.id, previousCursor, okHttpClient)
         } ?: return emptyList()
 
-        return handleMessagesUids(messagesUids, folder, mailbox, threadMode, draftFolderId, trashFolderId, okHttpClient, realm)
+        return handleMessagesUids(
+            messagesUids,
+            folder,
+            mailbox,
+            threadMode,
+            idsOfFoldersWithSpecificBehavior,
+            okHttpClient,
+            realm
+        )
     }
 
     private fun handleMessagesUids(
@@ -182,8 +188,7 @@ object MessageController {
         folder: Folder,
         mailbox: Mailbox,
         threadMode: ThreadMode,
-        draftFolderId: String?,
-        trashFolderId: String?,
+        idsOfFoldersWithSpecificBehavior: List<String>,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ) = with(messagesUids) {
@@ -198,8 +203,7 @@ object MessageController {
             folder.id,
             mailbox.uuid,
             threadMode,
-            draftFolderId,
-            trashFolderId,
+            idsOfFoldersWithSpecificBehavior,
             okHttpClient,
             realm,
         )
@@ -229,8 +233,7 @@ object MessageController {
         folderId: String,
         mailboxUuid: String,
         threadMode: ThreadMode,
-        draftFolderId: String?,
-        trashFolderId: String?,
+        idsOfFoldersWithSpecificBehavior: List<String>,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ): List<Thread> {
@@ -251,7 +254,7 @@ object MessageController {
                 apiResponse.data?.messages?.let { messages ->
                     (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
                         val threads = when (threadMode) {
-                            ThreadMode.THREADS -> createMultiMessagesThreads(messages, draftFolderId, trashFolderId)
+                            ThreadMode.THREADS -> createMultiMessagesThreads(messages, idsOfFoldersWithSpecificBehavior)
                             ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
                         }
                         newMessagesThreads.addAll(threads)
@@ -267,33 +270,27 @@ object MessageController {
 
     fun MutableRealm.createMultiMessagesThreads(
         messages: List<Message>,
-        draftFolderId: String?,
-        trashFolderId: String?,
+        idsOfFoldersWithSpecificBehavior: List<String>,
     ): List<Thread> {
-        val allThreads = ThreadController.getThreads(realm = this).toMutableList()
 
-        // Here, we use a Set instead of a List, so we can't add multiple times the same Thread to it.
         val threadsToUpsert = mutableMapOf<String, Thread>()
 
         messages.forEach { message ->
 
             message.initMessageIds()
 
-            val existingThreads = mutableListOf<Thread>().apply {
-                allThreads.forEach { thread ->
-                    if (thread.messagesIds.any { id -> message.messageIds.contains(id) }) {
-                        thread.addMessageWithConditions(message, realm = this@createMultiMessagesThreads)
-                        add(thread)
-                    }
-                }
-            }
+            val existingThreads = ThreadController.getThreads(message.messageIds, realm = this)
 
-            createNewThreadIfRequired(existingThreads, message, draftFolderId, trashFolderId)?.let { newThread ->
-                allThreads.add(newThread)
+            createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
+                ThreadController.upsertThread(newThread, realm = this)
                 threadsToUpsert[newThread.uid] = newThread
             }
 
-            existingThreads.forEach { threadsToUpsert[it.uid] = it }
+            existingThreads.forEach {
+                it.addMessageWithConditions(message, realm = this@createMultiMessagesThreads)
+                ThreadController.upsertThread(it, realm = this)
+                threadsToUpsert[it.uid] = it
+            }
         }
 
         return threadsToUpsert.map { (_, thread) ->
@@ -306,8 +303,7 @@ object MessageController {
     private fun TypedRealm.createNewThreadIfRequired(
         existingThreads: List<Thread>,
         newMessage: Message,
-        draftFolderId: String?,
-        trashFolderId: String?,
+        idsOfFoldersWithSpecificBehavior: List<String>,
     ): Thread? {
         var newThread: Thread? = null
 
@@ -316,29 +312,24 @@ object MessageController {
             newThread = newMessage.toThread()
             newThread.addFirstMessage(newMessage)
 
-            val encounteredMessages = mutableSetOf<String>()
-            val normalThread = existingThreads.firstOrNull { it.folderId != draftFolderId && it.folderId != trashFolderId }
+            val referenceThread = existingThreads.firstOrNull { !idsOfFoldersWithSpecificBehavior.contains(it.folderId) }
 
-            if (normalThread == null) {
-                existingThreads.forEach { thread -> addPreviousMessagesToThread(thread, newThread, encounteredMessages) }
+            if (referenceThread == null) {
+                existingThreads.forEach { thread -> addPreviousMessagesToThread(newThread, thread) }
             } else {
-                addPreviousMessagesToThread(normalThread, newThread, encounteredMessages)
+                addPreviousMessagesToThread(newThread, referenceThread)
             }
         }
 
         return newThread
     }
 
-    private fun TypedRealm.addPreviousMessagesToThread(
-        existingThread: Thread,
-        newThread: Thread,
-        encounteredMessages: MutableSet<String>,
-    ) {
+    private fun TypedRealm.addPreviousMessagesToThread(newThread: Thread, existingThread: Thread) {
+
+        newThread.messagesIds += existingThread.messagesIds
+
         existingThread.messages.forEach { message ->
-            if (!encounteredMessages.contains(message.uid)) {
-                newThread.addMessageWithConditions(message, realm = this)
-                encounteredMessages.add(message.uid)
-            }
+            newThread.addMessageWithConditions(message, realm = this)
         }
     }
 

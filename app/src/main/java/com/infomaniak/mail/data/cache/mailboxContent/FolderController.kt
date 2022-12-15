@@ -71,6 +71,13 @@ object FolderController {
     fun getFolderAsync(id: String, realm: TypedRealm? = null): Flow<Folder> {
         return getFolderQuery(Folder::id.name, id, realm).asFlow().mapNotNull { it.obj }
     }
+
+    fun getIdsOfFoldersWithSpecificBehavior(realm: TypedRealm? = null): List<String> {
+        return mutableListOf<String>().apply {
+            getFolder(FolderRole.DRAFT, realm)?.id?.let(::add)
+            getFolder(FolderRole.TRASH, realm)?.id?.let(::add)
+        }
+    }
     //endregion
 
     //region Edit data

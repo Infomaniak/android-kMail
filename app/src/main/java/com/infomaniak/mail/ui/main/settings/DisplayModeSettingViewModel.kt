@@ -26,7 +26,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createMultiMessagesThreads
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController.createSingleMessageThreads
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -36,13 +35,11 @@ class DisplayModeSettingViewModel : ViewModel() {
         RealmDatabase.mailboxContent().writeBlocking {
 
             ThreadController.deleteThreads(realm = this)
-
-            val draftFolderId = FolderController.getFolder(FolderRole.DRAFT, realm = this)?.id
-            val trashFolderId = FolderController.getFolder(FolderRole.TRASH, realm = this)?.id
-
+            val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm = this)
             val messages = MessageController.getMessages(realm = this)
+
             when (threadMode) {
-                ThreadMode.THREADS -> createMultiMessagesThreads(messages, draftFolderId, trashFolderId)
+                ThreadMode.THREADS -> createMultiMessagesThreads(messages, idsOfFoldersWithSpecificBehavior)
                 ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
             }
         }
