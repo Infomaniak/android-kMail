@@ -52,7 +52,7 @@ object MessageController {
     }
 
     private fun getMessagesQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Message> {
-        val byUids = "${Message::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
+        val byUids = "${Message::uid.name} IN {${uids.joinToString { "'$it'" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
     }
 

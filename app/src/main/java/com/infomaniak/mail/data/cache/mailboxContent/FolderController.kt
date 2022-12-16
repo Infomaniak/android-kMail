@@ -42,7 +42,7 @@ object FolderController {
     }
 
     private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm? = null): RealmQuery<Folder> {
-        val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "\"$it\"" }}}"
+        val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "'$it'" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(checkIsNotInExceptions)
     }
 

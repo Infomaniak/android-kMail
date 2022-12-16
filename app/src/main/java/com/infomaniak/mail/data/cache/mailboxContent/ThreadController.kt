@@ -45,7 +45,7 @@ object ThreadController {
     }
 
     private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
-        val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "\"$it\"" }}}"
+        val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "'$it'" }}}"
         return (realm ?: RealmDatabase.mailboxContent()).query(byMessagesIds)
     }
 
