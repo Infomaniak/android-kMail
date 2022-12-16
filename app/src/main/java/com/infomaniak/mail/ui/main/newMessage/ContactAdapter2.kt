@@ -17,17 +17,17 @@
  */
 package com.infomaniak.mail.ui.main.newMessage
 
-import android.util.Log
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter2.ContactViewHolder
 
+@SuppressLint("NotifyDataSetChanged")
 class ContactAdapter2(
     private val allContacts: List<MergedContact>,
     private val usedContacts: MutableSet<String>,
@@ -66,8 +66,6 @@ class ContactAdapter2(
         notifyDataSetChanged()
     }
 
-    private fun orderItemList() = contacts.sortBy { it.name }
-
     private fun selectContact(contact: MergedContact) {
         onContactClicked(contact)
         usedContacts.add(contact.email.standardize())
@@ -94,9 +92,6 @@ class ContactAdapter2(
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
                 @Suppress("UNCHECKED_CAST")
                 contacts = results.values as MutableList<MergedContact>
-
-                // DiffUtil.calculateDiff(MergedContactsCallback(contacts, newContacts)).dispatchUpdatesTo(this@ContactAdapter2)
-                // contacts = newContacts
                 notifyDataSetChanged()
             }
         }
@@ -110,18 +105,9 @@ class ContactAdapter2(
         usedContacts.remove(email)
     }
 
-    private fun CharSequence.standardize(): String = this.toString().trim().lowercase()
+    fun getUsedContacts() = usedContacts
 
-    // class MergedContactsCallback(private val oldList: List<MergedContact>, private val newList: List<MergedContact>) : DiffUtil.Callback() {
-    //     override fun getOldListSize(): Int = oldList.count()
-    //     override fun getNewListSize(): Int = newList.count()
-    //
-    //     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-    //         return oldList[oldItemPosition].id == newList[newItemPosition].id
-    //     }
-    //
-    //     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean = true
-    // }
+    fun CharSequence.standardize(): String = toString().trim().lowercase()
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 }

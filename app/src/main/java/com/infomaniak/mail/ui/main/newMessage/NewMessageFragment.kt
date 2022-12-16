@@ -93,7 +93,7 @@ class NewMessageFragment : Fragment() {
 
         subjectTextField.apply {
             // Enables having imeOptions="actionNext" and inputType="textMultiLine" at the same time
-            setRawInputType(InputType.TYPE_CLASS_TEXT)
+            setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
 
             filters = arrayOf<InputFilter>(object : InputFilter {
                 override fun filter(source: CharSequence?, s: Int, e: Int, d: Spanned?, dS: Int, dE: Int): CharSequence? {
@@ -304,98 +304,6 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
-
-    // private fun addUnrecognizedMail(field: FieldType): Boolean {
-    //     val input = getInputView(field).text.toString().trim()
-    //     val isEmail = input.isEmail()
-    //     if (isEmail) {
-    //         val usedEmails = contactAdapter.getUsedEmails(field)
-    //         if (usedEmails.none { it == input }) {
-    //             usedEmails.add(input)
-    //             val recipient = Recipient().initLocalValues(email = input, name = input)
-    //             addRecipientToField(field, recipient)
-    //             createChip(field, recipient)
-    //         }
-    //     }
-    //
-    //     return isEmail
-    // }
-
-    //region Chips behavior
-
-    // @SuppressLint("SetTextI18n")
-    // private fun updateChipVisibility() = with(newMessageViewModel) {
-    //     binding.singleChipGroup.isInvisible = !(!isAutocompletionOpened
-    //             && !areAdvancedFieldsOpened
-    //             && mailTo.isNotEmpty())
-    //
-    //     binding.toItemsChipGroup.isInvisible = !areAdvancedFieldsOpened
-    //
-    //     // TODO: Do we want this button?
-    //     // toTransparentButton.isVisible = !isAutocompletionOpened
-    //     //         && viewModel.recipients.isNotEmpty()
-    //     //         && !viewModel.areAdvancedFieldsOpened
-    //
-    //     val mailToCount = mailTo.count()
-    //
-    //     binding.plusOthers.isInvisible = !(!isAutocompletionOpened
-    //             && mailToCount > 1
-    //             && !areAdvancedFieldsOpened)
-    //
-    //     binding.plusOthersChip.root.text = "+${mailToCount - 1}"
-    //
-    //     binding.cc.isVisible = areAdvancedFieldsOpened
-    //     binding.bcc.isVisible = areAdvancedFieldsOpened
-    // }
-
-    // private fun openAutocompletionView(field: FieldType) = with(newMessageViewModel) {
-    //     areAdvancedFieldsOpened = true
-    //     openAdvancedFields()
-    //
-    //     isAutocompletionOpened = true
-    //     toggleAutocompletion(field)
-    // }
-    //
-    // private fun closeAutocompletionView() {
-    //     newMessageViewModel.isAutocompletionOpened = false
-    //     toggleAutocompletion()
-    // }
-
-    // private fun toggleAutocompletion(field: FieldType? = null) = with(newMessageViewModel) {
-    //     binding.preFields.isGone = isAutocompletionOpened
-    //
-    //     binding.to.isVisible = !isAutocompletionOpened || field == TO
-    //     binding.cc.isVisible = !isAutocompletionOpened || field == CC
-    //     binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
-    //     binding.autoComplete.isVisible = isAutocompletionOpened
-    //
-    //     binding.postFields.isGone = isAutocompletionOpened
-    // }
-
-    // private fun updateToAutocompleteInputLayout() = with(binding) {
-    //
-    //     fun updateToAutocompleteInputConstraints() {
-    //         ConstraintSet().apply {
-    //             clone(to)
-    //             val topView = when {
-    //                 newMessageViewModel.areAdvancedFieldsOpened -> R.id.toItemsChipGroup
-    //                 newMessageViewModel.mailTo.isEmpty() -> R.id.divider1
-    //                 else -> R.id.singleChipGroup
-    //             }
-    //             connect(R.id.toAutocompleteInput, ConstraintSet.TOP, topView, ConstraintSet.BOTTOM, 0)
-    //             applyTo(to)
-    //         }
-    //     }
-    //
-    //     fun updateToAutocompleteInputMargins() {
-    //         val margin = resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt()
-    //         toAutocompleteInput.setMarginsRelative(top = margin, start = margin, end = margin)
-    //     }
-    //
-    //     updateToAutocompleteInputConstraints()
-    //     updateToAutocompleteInputMargins()
-    // }
-    //endregion
 
     enum class FieldType {
         TO,

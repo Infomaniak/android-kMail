@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ChipContactBinding
 import com.infomaniak.mail.databinding.ViewRecipientFieldBinding
+import com.infomaniak.mail.utils.isEmail
 import com.infomaniak.mail.utils.toggleChevron
 
 class RecipientFieldView @JvmOverloads constructor(
@@ -65,7 +66,7 @@ class RecipientFieldView @JvmOverloads constructor(
         set(value) {
             autoCompletedContacts.isVisible = value
             binding.chevron.isGone = value || !isToggleable
-            binding.itemsChipGroup.isGone = value
+            // binding.itemsChipGroup.isGone = value
         }
 
     // TODO : Think about the textfield focus rather than the linearLayout focus
@@ -152,11 +153,20 @@ class RecipientFieldView @JvmOverloads constructor(
                 allContacts = allContacts,
                 usedContacts = usedContacts,
                 onContactClicked = {
-                    addContact(it)
-                    autocompleteInput.setText("")
+                    val recipient = Recipient().initLocalValues(it.email, it.name)
+                    addContact(recipient)
                 },
                 onAddUnrecognizedContact = {
-                    TODO()
+                    val input = autocompleteInput.text.toString().trim().lowercase()
+                    val isEmail = input.isEmail()
+                    if (isEmail) {
+                        val usedEmails = contactAdapter!!.getUsedContacts()
+                        if (!usedEmails.contains(input)) {
+                            usedEmails.add(input)
+                            val recipient = Recipient().initLocalValues(email = input, name = input)
+                            addContact(recipient)
+                        }
+                    }
                 }
             )
 
@@ -176,7 +186,9 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
 
                 setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE) contactAdapter!!.addFirstAvailableItem()
+                    if (actionId == EditorInfo.IME_ACTION_DONE && autocompleteInput.text.isNotBlank()) {
+                        contactAdapter!!.addFirstAvailableItem()
+                    }
                     // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
                     // if (actionId == EditorInfo.IME_ACTION_PREVIOUS) onFocusPrevious?.invoke()
                     true // Keep keyboard open
@@ -195,13 +207,13 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled?.invoke(isAutocompletionOpened)
     }
 
-    private fun addContact(contact: MergedContact) {
+    private fun addContact(recipient: Recipient) {
         if (recipients.isEmpty()) isCollapsed = false
-        val recipient = Recipient().initLocalValues(contact.email, contact.name)
         val recipientIsNew = recipients.add(recipient)
         if (recipientIsNew) {
             createChip(recipient)
             onContactAdded?.invoke(recipient)
+            clearField()
         }
     }
 
