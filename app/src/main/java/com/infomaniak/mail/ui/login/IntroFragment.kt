@@ -42,12 +42,12 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
 import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234PinkColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1Colors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234PinkColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2BlueColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2Colors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2PinkColors
@@ -107,7 +107,7 @@ class IntroFragment : Fragment() {
                 description.setText(R.string.onBoardingDescription3)
                 iconLayout.apply {
                     setAnimation(R.raw.illu_3)
-                    repeatFrame(118, 225)
+                    repeatFrame(113, 219)
                 }
             }
             3 -> {
