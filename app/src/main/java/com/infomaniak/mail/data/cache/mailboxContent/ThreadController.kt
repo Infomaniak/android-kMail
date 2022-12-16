@@ -88,7 +88,7 @@ object ThreadController {
     //endregion
 
     //region Get data
-    private fun getThreads(realm: TypedRealm? = null): RealmResults<Thread> {
+    fun getThreads(realm: TypedRealm? = null): RealmResults<Thread> {
         return getThreadsQuery(realm).find()
     }
 

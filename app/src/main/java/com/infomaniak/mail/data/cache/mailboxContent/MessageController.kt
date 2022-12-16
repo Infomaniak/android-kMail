@@ -242,6 +242,9 @@ object MessageController {
 
     fun MutableRealm.createMultiMessagesThreads(messages: List<Message>): List<Thread> {
 
+        // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
+        val allThreads = ThreadController.getThreads(realm = this).toMutableList()
+
         val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm = this)
         val threadsToUpsert = mutableMapOf<String, Thread>()
 
@@ -249,11 +252,16 @@ object MessageController {
 
             message.initMessageIds()
 
-            val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
+            // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), put this back when it's fixed.
+            // val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
+            // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
+            val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
 
             createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
                 ThreadController.upsertThread(newThread, realm = this)
                 threadsToUpsert[newThread.uid] = newThread
+                // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
+                allThreads.add(newThread)
             }
 
             existingThreads.forEach {
