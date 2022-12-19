@@ -191,6 +191,7 @@ class NewMessageFragment : Fragment() {
 
     /**
      * Handle `Mailto` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
+     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(binding) {
         val intent = requireActivity().intent
@@ -199,8 +200,8 @@ class NewMessageFragment : Fragment() {
 
             val mailTo = MailTo.parse(uri)
             val to = mailTo.to?.split(",")?.map { it.trim() } ?: emptyList()
-            val cc = mailTo.cc?.split(",") ?: emptyList()
-            val bcc = mailTo.bcc?.split(",") ?: emptyList()
+            val cc = mailTo.cc?.split(",") ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.toList() ?: emptyList()
+            val bcc = mailTo.bcc?.split(",") ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.toList() ?: emptyList()
 
             to.forEach {
                 toAutocompleteInput.setText(it)
@@ -217,11 +218,8 @@ class NewMessageFragment : Fragment() {
                 contactAdapter.addFirstAvailableItem()
             }
 
-            val subjectFromSendTo = intent.getStringExtra(Intent.EXTRA_SUBJECT)
-            val bodyFromSendTo = intent.getStringExtra(Intent.EXTRA_TEXT)
-
-            subjectTextField.setText(mailTo.subject ?: subjectFromSendTo)
-            bodyText.setText(mailTo.body ?: bodyFromSendTo)
+            subjectTextField.setText(mailTo.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT))
+            bodyText.setText(mailTo.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))
         }
     }
 
