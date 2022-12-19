@@ -121,6 +121,8 @@ class Thread : RealmObject {
         // TODO: Remove this `sortBy`, and get the Messages in the right order via Realm query (but before, fix the `Thread.date`)
         messages.sortBy { it.date }
         unseenMessagesCount = 0
+        from = realmListOf()
+        to = realmListOf()
         size = 0
         hasAttachments = false
         hasDrafts = false
