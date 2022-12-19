@@ -194,14 +194,16 @@ class NewMessageFragment : Fragment() {
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(binding) {
+        fun String.splitToList() = split(",").map { it.trim() }
+
         val intent = requireActivity().intent
         intent?.data?.let { uri ->
             if (!MailTo.isMailTo(uri)) return@with
 
             val mailTo = MailTo.parse(uri)
-            val to = mailTo.to?.split(",")?.map { it.trim() } ?: emptyList()
-            val cc = mailTo.cc?.split(",") ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.toList() ?: emptyList()
-            val bcc = mailTo.bcc?.split(",") ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.toList() ?: emptyList()
+            val to = mailTo.to?.splitToList() ?: emptyList()
+            val cc = mailTo.cc?.splitToList() ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.toList() ?: emptyList()
+            val bcc = mailTo.bcc?.splitToList() ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.toList() ?: emptyList()
 
             to.forEach {
                 toAutocompleteInput.setText(it)
