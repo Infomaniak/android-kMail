@@ -19,7 +19,10 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
 import android.content.ClipDescription
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
@@ -43,6 +46,8 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.parcelableArrayListExtra
+import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
@@ -163,15 +168,40 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndUi() {
-        newMessageViewModel.initDraftAndUi(newMessageActivityArgs)
-            .observe(viewLifecycleOwner) { isSuccess ->
-                if (isSuccess) {
-                    observeContacts()
-                    populateUiWithExistingDraftData()
-                } else {
-                    requireActivity().finish()
-                }
+        newMessageViewModel.initDraftAndUi(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess) {
+                observeContacts()
+                populateUiWithExistingDraftData()
+                handleActionSend()
+            } else {
+                requireActivity().finish()
             }
+        }
+    }
+
+    private fun handleActionSend() {
+        when (requireActivity().intent?.action) {
+            Intent.ACTION_SEND -> handleSingleSendIntent()
+            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
+        }
+    }
+
+
+    private fun handleSingleSendIntent() = with(requireActivity().intent) {
+        if (hasExtra(Intent.EXTRA_TEXT)) {
+            binding.subjectTextField.setText(getStringExtra(Intent.EXTRA_SUBJECT) ?: "")
+            binding.bodyText.setText(getStringExtra(Intent.EXTRA_TEXT) ?: "")
+        } else {
+            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
+                newMessageViewModel.importAttachments(listOf(uri))
+            }
+        }
+    }
+
+    private fun handleMultipleSendIntent() = with(requireActivity().intent) {
+        parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()?.let { uris ->
+            newMessageViewModel.importAttachments(uris)
+        }
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
