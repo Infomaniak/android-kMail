@@ -36,6 +36,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.net.MailTo
 import androidx.core.view.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
@@ -186,6 +187,41 @@ class NewMessageFragment : Fragment() {
         }
     }
 
+    /**
+     * Handle `Mailto` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
+     */
+    private fun handleMailTo() = with(binding) {
+        val intent = requireActivity().intent
+        intent?.data?.let { uri ->
+            if (!MailTo.isMailTo(uri)) return@with
+
+            val mailTo = MailTo.parse(uri)
+            val to = mailTo.to?.split(",")?.map { it.trim() } ?: emptyList()
+            val cc = mailTo.cc?.split(",") ?: emptyList()
+            val bcc = mailTo.bcc?.split(",") ?: emptyList()
+
+            to.forEach {
+                toAutocompleteInput.setText(it)
+                contactAdapter.addFirstAvailableItem()
+            }
+
+            cc.forEach {
+                ccAutocompleteInput.setText(it)
+                contactAdapter.addFirstAvailableItem()
+            }
+
+            bcc.forEach {
+                bccAutocompleteInput.setText(it)
+                contactAdapter.addFirstAvailableItem()
+            }
+
+            val subjectFromSendTo = intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            val bodyFromSendTo = intent.getStringExtra(Intent.EXTRA_TEXT)
+
+            subjectTextField.setText(mailTo.subject ?: subjectFromSendTo)
+            bodyText.setText(mailTo.body ?: bodyFromSendTo)
+        }
+    }
 
     private fun handleSingleSendIntent() = with(requireActivity().intent) {
         if (hasExtra(Intent.EXTRA_TEXT)) {
@@ -327,6 +363,7 @@ class NewMessageFragment : Fragment() {
         )
 
         binding.autoCompleteRecyclerView.adapter = contactAdapter
+        handleMailTo()
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
