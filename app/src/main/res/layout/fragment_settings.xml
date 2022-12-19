@@ -111,6 +111,7 @@
                 android:id="@+id/settingsMessageDisplay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:itemAction="chevron"
                 app:title="@string/settingsMessageDisplayTitle"
                 tools:subtitle="@string/settingsOptionDiscussions" />
