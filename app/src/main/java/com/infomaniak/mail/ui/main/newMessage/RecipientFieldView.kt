@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
+import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.MergedContact
@@ -43,14 +44,16 @@ class RecipientFieldView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    private var contactAdapter: ContactAdapter2? = null
+    private var contactAdapter: ContactAdapter? = null
     private val recipients = mutableSetOf<Recipient>()
+
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
     private var onFocusNext: (() -> Unit)? = null
     private var onFocusPrevious: (() -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
+
     private var isToggleable = false
     private var isCollapsed = true
         set(value) {
@@ -61,12 +64,11 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private lateinit var autoCompletedContacts: RecyclerView
 
-    private var isAutocompletionOpened
+    private var isAutoCompletionOpened
         get() = autoCompletedContacts.isVisible
         set(value) {
             autoCompletedContacts.isVisible = value
             binding.chevron.isGone = value || !isToggleable
-            // binding.itemsChipGroup.isGone = value
         }
 
     // TODO : Think about the textfield focus rather than the linearLayout focus
@@ -102,11 +104,18 @@ class RecipientFieldView @JvmOverloads constructor(
             chevron.isVisible = isToggleable
 
             if (isToggleable) {
-                chevron.setOnClickListener { isCollapsed = !isCollapsed }
-                plusChip.setOnClickListener { isCollapsed = !isCollapsed }
+                chevron.setOnClickListener {
+                    isCollapsed = !isCollapsed
+                    if (isCollapsed) autoCompleteInput.hideKeyboard()
+                }
+
+                plusChip.setOnClickListener {
+                    isCollapsed = !isCollapsed
+                }
+
                 transparentButton.setOnClickListener {
                     isCollapsed = !isCollapsed
-                    autocompleteInput.showKeyboard()
+                    autoCompleteInput.showKeyboard()
                 }
 
                 singleChip.root.setOnClickListener {
@@ -144,49 +153,44 @@ class RecipientFieldView @JvmOverloads constructor(
         }
 
         transparentButton.isGone = isTextInputAccessible
-        autocompleteInput.isVisible = isTextInputAccessible
+        autoCompleteInput.isVisible = isTextInputAccessible
     }
 
-    fun initContacts(autoComplete: RecyclerView?, allContacts: List<MergedContact>, usedContacts: MutableSet<String>) {
+    fun updateContacts(autoComplete: RecyclerView?, allContacts: List<MergedContact>, usedContacts: MutableSet<String>) {
         with(binding) {
-            contactAdapter = ContactAdapter2(
+            // TODO : Init once but update mutiple times
+            // TODO
+            // TODO
+            // TODO
+            contactAdapter = ContactAdapter(
                 allContacts = allContacts,
                 usedContacts = usedContacts,
-                onContactClicked = {
-                    val recipient = Recipient().initLocalValues(it.email, it.name)
-                    addContact(recipient)
-                },
+                onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
-                    val input = autocompleteInput.text.toString().trim().lowercase()
-                    val isEmail = input.isEmail()
-                    if (isEmail) {
-                        val usedEmails = contactAdapter!!.getUsedContacts()
-                        if (!usedEmails.contains(input)) {
-                            usedEmails.add(input)
-                            val recipient = Recipient().initLocalValues(email = input, name = input)
-                            addContact(recipient)
-                        }
-                    }
+                    val input = autoCompleteInput.text.toString().trim().lowercase()
+                    if (input.isEmail() && contactAdapter!!.addUsedContact(input)) addRecipient(email = input, name = input)
                 }
             )
 
+            // TODO : Do once
             autoComplete?.let {
                 autoCompletedContacts = it
                 autoCompletedContacts.adapter = contactAdapter!!
             }
 
-            autocompleteInput.apply {
+            // TODO : Do once
+            autoCompleteInput.apply {
                 doOnTextChanged { text, _, _, _ ->
                     if (text?.isNotEmpty() == true) {
                         if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
-                        if (!isAutocompletionOpened) openAutoCompletion()
-                    } else if (isAutocompletionOpened) {
+                        if (!isAutoCompletionOpened) openAutoCompletion()
+                    } else if (isAutoCompletionOpened) {
                         closeAutoCompletion()
                     }
                 }
 
                 setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE && autocompleteInput.text.isNotBlank()) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text.isNotBlank()) {
                         contactAdapter!!.addFirstAvailableItem()
                     }
                     // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
@@ -198,17 +202,18 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun openAutoCompletion() {
-        isAutocompletionOpened = true
-        onAutoCompletionToggled?.invoke(isAutocompletionOpened)
+        isAutoCompletionOpened = true
+        onAutoCompletionToggled?.invoke(isAutoCompletionOpened)
     }
 
     private fun closeAutoCompletion() {
-        isAutocompletionOpened = false
-        onAutoCompletionToggled?.invoke(isAutocompletionOpened)
+        isAutoCompletionOpened = false
+        onAutoCompletionToggled?.invoke(isAutoCompletionOpened)
     }
 
-    private fun addContact(recipient: Recipient) {
+    private fun addRecipient(email: String, name: String) {
         if (recipients.isEmpty()) isCollapsed = false
+        val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = recipients.add(recipient)
         if (recipientIsNew) {
             createChip(recipient)
@@ -252,7 +257,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun clearField() {
-        binding.autocompleteInput.setText("")
+        binding.autoCompleteInput.setText("")
     }
 
     fun onContactRemoved(callback: ((Recipient) -> Unit)) {
@@ -267,6 +272,4 @@ class RecipientFieldView @JvmOverloads constructor(
         recipients.addAll(initialRecipients)
         updateCollapsedChipValues(isCollapsed)
     }
-
-    // fun getRecipients(): Set<Recipient> = recipients
 }

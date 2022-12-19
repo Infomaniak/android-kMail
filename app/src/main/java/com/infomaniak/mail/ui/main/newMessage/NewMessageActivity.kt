@@ -58,8 +58,8 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutocompletionOpened) {
-                newMessageFragment.closeAutocompletion()
+            if (isAutoCompletionOpened) {
+                newMessageFragment.closeAutoCompletion()
             } else {
                 saveToLocalAndFinish(DraftAction.SAVE)
             }

@@ -63,7 +63,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     private var autoSaveJob: Job? = null
 
-    var isAutocompletionOpened = false
+    var isAutoCompletionOpened = false
     var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
 

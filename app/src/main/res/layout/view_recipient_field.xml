@@ -65,7 +65,7 @@
             tools:text="@string/bccTitle" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/autocompleteInput"
+            android:id="@+id/autoCompleteInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardVerySmall"
@@ -91,7 +91,7 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
             app:layout_constraintEnd_toStartOf="@id/plusChip"
-            app:layout_constraintStart_toEndOf="@id/autocompleteInput"
+            app:layout_constraintStart_toEndOf="@id/autoCompleteInput"
             app:layout_constraintTop_toTopOf="@id/singleLineGuide"
             tools:visibility="visible" />
 

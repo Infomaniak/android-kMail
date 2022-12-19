@@ -26,7 +26,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class MergedContact : RealmObject, Correspondent {
     @PrimaryKey
-    var id: Long = -1
+    var id: Long? = null
     override var email: String = ""
     override var name: String = ""
     var avatar: String? = null

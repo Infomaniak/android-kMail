@@ -50,6 +50,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
 
@@ -62,7 +63,6 @@ class NewMessageFragment : Fragment() {
     private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
     private lateinit var filePicker: FilePicker
 
-    // private lateinit var contactAdapter: ContactAdapter
     private val attachmentAdapter = AttachmentAdapter(shouldDisplayCloseButton = true, onDelete = ::onDeleteAttachment)
 
     private var mailboxes = emptyList<Mailbox>()
@@ -76,10 +76,11 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         filePicker = FilePicker(this@NewMessageFragment)
-
         initDraftAndUi()
-        observeSubject()
-        observeBody()
+
+        doAfterSubjectChange()
+        doAfterBodyChange()
+
         observeMailboxes()
 
         observeEditorActions()
@@ -163,19 +164,19 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
-        binding.toField.initContacts(binding.autoCompleteTo, allContacts, mutableSetOf())
-        binding.ccField.initContacts(binding.autoCompleteCc, allContacts, mutableSetOf())
-        binding.bccField.initContacts(binding.autoCompleteBcc, allContacts, mutableSetOf())
+        binding.toField.updateContacts(binding.autoCompleteTo, allContacts, mutableSetOf())
+        binding.ccField.updateContacts(binding.autoCompleteCc, allContacts, mutableSetOf())
+        binding.bccField.updateContacts(binding.autoCompleteBcc, allContacts, mutableSetOf())
     }
 
-    private fun toggleAutoCompletion(field: FieldType? = null, isAutocompletionOpened: Boolean) = with(newMessageViewModel) {
-        binding.preFields.isGone = isAutocompletionOpened
-        binding.to.isVisible = !isAutocompletionOpened || field == TO
-        binding.cc.isVisible = !isAutocompletionOpened || field == CC
-        binding.bcc.isVisible = !isAutocompletionOpened || field == BCC
-        binding.postFields.isGone = isAutocompletionOpened
+    private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(newMessageViewModel) {
+        binding.preFields.isGone = isAutoCompletionOpened
+        binding.to.isVisible = !isAutoCompletionOpened || field == TO
+        binding.cc.isVisible = !isAutoCompletionOpened || field == CC
+        binding.bcc.isVisible = !isAutoCompletionOpened || field == BCC
+        binding.postFields.isGone = isAutoCompletionOpened
 
-        newMessageViewModel.isAutocompletionOpened = isAutocompletionOpened
+        newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
     private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
@@ -196,13 +197,13 @@ class NewMessageFragment : Fragment() {
         binding.bccField.initRecipients(mailBcc)
     }
 
-    private fun observeSubject() {
+    private fun doAfterSubjectChange() {
         binding.subjectTextField.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailSubject)
         }
     }
 
-    private fun observeBody() {
+    private fun doAfterBodyChange() {
         binding.bodyText.doAfterTextChanged { editable ->
             editable?.toString()?.let(newMessageViewModel::updateMailBody)
         }
@@ -247,29 +248,19 @@ class NewMessageFragment : Fragment() {
         // }
     }
 
-    private fun observeEditorActions() = with(binding) {
+    private fun observeEditorActions() {
         newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, isToggled) ->
-
-            val selectedText = with(bodyText) { text?.substring(selectionStart, selectionEnd) }
-            // TODO: Do stuff here with this `selectedText`?
-
             when (editorAction) {
-                // TODO: Replace logs with actual code
                 EditorAction.ATTACHMENT -> {
-                    Log.d("SelectedText", "ATTACHMENT")
                     filePicker.open { uris ->
                         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                         newMessageViewModel.importAttachments(uris)
                     }
                 }
-                EditorAction.CAMERA -> Log.d("SelectedText", "CAMERA")
-                EditorAction.LINK -> Log.d("SelectedText", "LINK")
-                EditorAction.CLOCK -> Log.d("SelectedText", "CLOCK")
-                EditorAction.BOLD -> Log.d("SelectedText", "BOLD: $isToggled")
-                EditorAction.ITALIC -> Log.d("SelectedText", "ITALIC: $isToggled")
-                EditorAction.UNDERLINE -> Log.d("SelectedText", "UNDERLINE: $isToggled")
-                EditorAction.STRIKE_THROUGH -> Log.d("SelectedText", "STRIKE_THROUGH: $isToggled")
-                EditorAction.UNORDERED_LIST -> Log.d("SelectedText", "UNORDERED_LIST")
+                EditorAction.CAMERA -> notYetImplemented()
+                EditorAction.LINK -> notYetImplemented()
+                EditorAction.CLOCK -> notYetImplemented()
+                else -> Log.wtf("SelectedText", "Impossible action got triggered: $editorAction")
             }
         }
     }
@@ -288,7 +279,7 @@ class NewMessageFragment : Fragment() {
         super.onStop()
     }
 
-    fun closeAutocompletion() = with(binding) {
+    fun closeAutoCompletion() = with(binding) {
         toField.clearField()
         ccField.clearField()
         bccField.clearField()
