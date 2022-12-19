@@ -42,7 +42,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.navArgs
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.FilePicker
@@ -70,7 +69,10 @@ import com.infomaniak.lib.core.R as RCore
 class NewMessageFragment : Fragment() {
 
     private lateinit var binding: FragmentNewMessageBinding
-    private val newMessageActivityArgs by lazy { requireActivity().navArgs<NewMessageActivityArgs>().value }
+    private val newMessageActivityArgs by lazy {
+        // When deeplink it happens that the navigation extras are not yet initialized, so we don't use the `navArgs` here
+        requireActivity().intent?.extras?.let { NewMessageActivityArgs.fromBundle(it) } ?: NewMessageActivityArgs()
+    }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
