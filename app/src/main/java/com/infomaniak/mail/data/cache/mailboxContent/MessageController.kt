@@ -47,13 +47,13 @@ import kotlin.math.min
 object MessageController {
 
     //region Queries
-    private fun getMessagesQuery(realm: TypedRealm? = null): RealmQuery<Message> {
-        return (realm ?: RealmDatabase.mailboxContent()).query()
+    private fun getMessagesQuery(realm: TypedRealm): RealmQuery<Message> {
+        return realm.query()
     }
 
-    private fun getMessagesQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Message> {
+    private fun getMessagesQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Message> {
         val byUids = "${Message::uid.name} IN {${uids.joinToString { "'$it'" }}}"
-        return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
+        return realm.query(byUids)
     }
 
     private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
@@ -61,18 +61,18 @@ object MessageController {
         return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
     }
 
-    private fun getMessageQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Message> {
+    private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
         val byUid = "${Message::uid.name} == '$uid'"
-        return (realm ?: RealmDatabase.mailboxContent()).query<Message>(byUid).first()
+        return realm.query<Message>(byUid).first()
     }
     //endregion
 
     //region Get data
-    fun getMessages(realm: TypedRealm? = null): RealmResults<Message> {
+    fun getMessages(realm: TypedRealm): RealmResults<Message> {
         return getMessagesQuery(realm).find()
     }
 
-    private fun getMessages(uids: List<String>, realm: TypedRealm? = null): RealmResults<Message> {
+    private fun getMessages(uids: List<String>, realm: TypedRealm): RealmResults<Message> {
         return getMessagesQuery(uids, realm).find()
     }
 
@@ -80,7 +80,7 @@ object MessageController {
         return getMessagesQuery(folderId, realm).find()
     }
 
-    fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
+    fun getMessage(uid: String, realm: TypedRealm): Message? {
         return getMessageQuery(uid, realm).find()
     }
     //endregion

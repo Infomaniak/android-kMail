@@ -35,25 +35,25 @@ import kotlinx.coroutines.flow.Flow
 object ThreadController {
 
     //region Queries
-    private fun getThreadsQuery(realm: TypedRealm? = null): RealmQuery<Thread> {
-        return (realm ?: RealmDatabase.mailboxContent()).query()
+    private fun getThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
+        return realm.query()
     }
 
-    private fun getThreadsQuery(uids: List<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
+    private fun getThreadsQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Thread> {
         val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
-        return (realm ?: RealmDatabase.mailboxContent()).query(byUids)
+        return realm.query(byUids)
     }
 
-    private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm? = null): RealmQuery<Thread> {
+    private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
         val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "'$it'" }}}"
-        return (realm ?: RealmDatabase.mailboxContent()).query(byMessagesIds)
+        return realm.query(byMessagesIds)
     }
 
-    private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm? = null): RealmScalarQuery<Long> {
+    private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm): RealmScalarQuery<Long> {
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
         val unseen = "${Thread::unseenMessagesCount.name} > 0"
         val query = "$byFolderId AND $unseen"
-        return (realm ?: RealmDatabase.mailboxContent()).query<Thread>(query).count()
+        return realm.query<Thread>(query).count()
     }
 
     private fun getThreadsQuery(
@@ -88,36 +88,32 @@ object ThreadController {
     //endregion
 
     //region Get data
-    fun getThreads(realm: TypedRealm? = null): RealmResults<Thread> {
+    fun getThreads(realm: TypedRealm): RealmResults<Thread> {
         return getThreadsQuery(realm).find()
     }
 
-    fun getThreads(uids: List<String>, realm: TypedRealm? = null): RealmResults<Thread> {
+    fun getThreads(uids: List<String>, realm: TypedRealm): RealmResults<Thread> {
         return getThreadsQuery(uids, realm).find()
     }
 
-    fun getThreads(messageIds: Set<String>, realm: TypedRealm? = null): RealmResults<Thread> {
+    fun getThreads(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
         return getThreadsQuery(messageIds, realm).find()
     }
 
-    fun getUnreadThreadsCount(folderId: String, realm: TypedRealm? = null): Int {
+    fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {
         return getUnreadThreadsCountQuery(folderId, realm).find().toInt()
     }
 
-    fun getThreadsAsync(
-        folderId: String,
-        filter: ThreadFilter = ThreadFilter.ALL,
-        realm: TypedRealm? = null,
-    ): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folderId, filter, realm).asFlow()
+    fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
+        return getThreadsQuery(folderId, filter).asFlow()
     }
 
     fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
         return getThreadQuery(uid, realm).find()
     }
 
-    fun getThreadAsync(uid: String, realm: TypedRealm? = null): Flow<SingleQueryChange<Thread>> {
-        return getThreadQuery(uid, realm).asFlow()
+    fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
+        return getThreadQuery(uid).asFlow()
     }
     //endregion
 

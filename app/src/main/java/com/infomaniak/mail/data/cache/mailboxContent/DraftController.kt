@@ -77,9 +77,8 @@ object DraftController {
     //endregion
 
     //region Edit data
-    fun upsertDraft(draft: Draft, realm: MutableRealm? = null) {
-        val block: (MutableRealm) -> Unit = { it.copyToRealm(draft, UpdatePolicy.ALL) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    fun upsertDraft(draft: Draft, realm: MutableRealm) {
+        realm.copyToRealm(draft, UpdatePolicy.ALL)
     }
 
     fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {

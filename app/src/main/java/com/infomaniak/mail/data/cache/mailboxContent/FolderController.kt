@@ -37,13 +37,13 @@ import kotlinx.coroutines.flow.mapNotNull
 object FolderController {
 
     //region Queries
-    private fun getFoldersQuery(realm: TypedRealm? = null): RealmQuery<Folder> {
-        return (realm ?: RealmDatabase.mailboxContent()).query()
+    private fun getFoldersQuery(): RealmQuery<Folder> {
+        return RealmDatabase.mailboxContent().query()
     }
 
-    private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm? = null): RealmQuery<Folder> {
+    private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
         val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "'$it'" }}}"
-        return (realm ?: RealmDatabase.mailboxContent()).query(checkIsNotInExceptions)
+        return realm.query(checkIsNotInExceptions)
     }
 
     private fun getFolderQuery(key: String, value: String, realm: TypedRealm? = null): RealmSingleQuery<Folder> {
@@ -52,12 +52,12 @@ object FolderController {
     //endregion
 
     //region Get data
-    private fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm? = null): RealmResults<Folder> {
+    private fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm): RealmResults<Folder> {
         return getFoldersQuery(exceptionsFoldersIds, realm).find()
     }
 
-    fun getFoldersAsync(realm: TypedRealm? = null): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(realm).asFlow()
+    fun getFoldersAsync(): Flow<ResultsChange<Folder>> {
+        return getFoldersQuery().asFlow()
     }
 
     fun getFolder(id: String, realm: TypedRealm? = null): Folder? {
@@ -68,11 +68,11 @@ object FolderController {
         return getFolderQuery(Folder::_role.name, role.name, realm).find()
     }
 
-    fun getFolderAsync(id: String, realm: TypedRealm? = null): Flow<Folder> {
-        return getFolderQuery(Folder::id.name, id, realm).asFlow().mapNotNull { it.obj }
+    fun getFolderAsync(id: String): Flow<Folder> {
+        return getFolderQuery(Folder::id.name, id).asFlow().mapNotNull { it.obj }
     }
 
-    fun getIdsOfFoldersWithSpecificBehavior(realm: TypedRealm? = null): List<String> {
+    fun getIdsOfFoldersWithSpecificBehavior(realm: TypedRealm): List<String> {
         return mutableListOf<String>().apply {
             getFolder(FolderRole.DRAFT, realm)?.id?.let(::add)
             getFolder(FolderRole.TRASH, realm)?.id?.let(::add)

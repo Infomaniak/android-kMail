@@ -28,13 +28,13 @@ import io.realm.kotlin.query.RealmSingleQuery
 object SignatureController {
 
     //region Queries
-    private fun getDefaultSignatureQuery(realm: TypedRealm? = null): RealmSingleQuery<Signature> {
-        return (realm ?: RealmDatabase.mailboxContent()).query<Signature>("${Signature::isDefault.name} == true").first()
+    private fun getDefaultSignatureQuery(realm: TypedRealm): RealmSingleQuery<Signature> {
+        return realm.query<Signature>("${Signature::isDefault.name} == true").first()
     }
     //endregion
 
     //region Get data
-    fun getDefaultSignature(realm: TypedRealm? = null): Signature? {
+    fun getDefaultSignature(realm: TypedRealm): Signature? {
         return getDefaultSignatureQuery(realm).find()
     }
     //endregion
