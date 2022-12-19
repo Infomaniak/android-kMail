@@ -94,7 +94,8 @@ class ThreadListAdapter(
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() is Unit && holder.itemViewType == DisplayType.THREAD.layout) {
             with(holder.binding as CardviewThreadItemBinding) {
-                getDisplayedRecipient((dataSet[position] as Thread))?.let { expeditorAvatar.loadAvatar(it, contacts) }
+                val recipient = (dataSet[position] as Thread).getDisplayedRecipient()
+                expeditorAvatar.loadAvatar(recipient, contacts)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -123,7 +124,9 @@ class ThreadListAdapter(
         }
     }
 
-    private fun getDisplayedRecipient(thread: Thread): Recipient? = thread.messages.lastOrNull()?.from?.firstOrNull()
+    private fun Thread.getDisplayedMessage() = messages.last()
+
+    private fun Thread.getDisplayedRecipient(): Recipient = getDisplayedMessage().from.first()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
 
@@ -131,8 +134,9 @@ class ThreadListAdapter(
         expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
 
         mailSubject.text = getFormattedSubject(context)
-        mailBodyPreview.text = messages.lastOrNull()?.preview?.ifBlank { root.context.getString(R.string.noBodyTitle) }
-        getDisplayedRecipient(thread = this)?.let { expeditorAvatar.loadAvatar(it, contacts) }
+
+        mailBodyPreview.text = getDisplayedMessage().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
+        expeditorAvatar.loadAvatar(getDisplayedRecipient(), contacts)
 
         mailDate.text = formatDate(root.context)
 
