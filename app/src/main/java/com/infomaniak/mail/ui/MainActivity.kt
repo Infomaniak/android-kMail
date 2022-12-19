@@ -26,6 +26,7 @@ import androidx.activity.viewModels
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
+import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
@@ -118,7 +119,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun observeNetworkStatus() {
-        LiveDataNetworkStatus(this).observe(this) { isAvailable ->
+        LiveDataNetworkStatus(this).distinctUntilChanged().observe(this) { isAvailable ->
             Log.d("Internet availability", if (isAvailable) "Available" else "Unavailable")
             Sentry.addBreadcrumb(Breadcrumb().apply {
                 category = "Network"
@@ -126,9 +127,6 @@ class MainActivity : ThemedActivity() {
                 level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
             })
             mainViewModel.isInternetAvailable.value = isAvailable
-            if (isAvailable) {
-                // lifecycleScope.launch(Dispatchers.IO) { AccountUtils.updateCurrentUserAndDrives(this@MainActivity) } // TODO?
-            }
         }
     }
 

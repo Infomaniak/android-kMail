@@ -159,11 +159,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             addItemDecoration(DateSeparatorItemDecoration())
         }
 
-        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) {
-            // TODO: Manage no Internet screen
-            // threadAdapter.toggleOfflineMode(requireContext(), !isInternetAvailable)
+        mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
             TransitionManager.beginDelayedTransition(binding.root)
-            binding.noNetwork.isGone = it
+            binding.noNetwork.isGone = isAvailable
         }
 
         threadListAdapter.apply {
