@@ -30,7 +30,7 @@ import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
-    private val allContacts: List<MergedContact>,
+    private var allContacts: List<MergedContact>,
     private val usedContacts: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
@@ -60,7 +60,7 @@ class ContactAdapter(
 
     private fun selectContact(contact: MergedContact) {
         onContactClicked(contact)
-        usedContacts.add(contact.email.standardize())
+        addUsedContact(contact.email)
     }
 
     fun addFirstAvailableItem() {
@@ -106,9 +106,13 @@ class ContactAdapter(
         usedContacts.remove(email)
     }
 
-    fun addUsedContact(email: String) = usedContacts.add(email)
+    fun addUsedContact(email: String) = usedContacts.add(email.standardize())
 
     fun CharSequence.standardize(): String = toString().trim().lowercase()
+
+    fun updateContacts(allContacts: List<MergedContact>) {
+        this.allContacts = allContacts
+    }
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)
 }

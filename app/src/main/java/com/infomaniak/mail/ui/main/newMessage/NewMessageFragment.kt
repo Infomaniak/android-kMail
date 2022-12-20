@@ -127,6 +127,7 @@ class NewMessageFragment : Fragment() {
             //     openAdvancedFields(false)
             //     ccField.requestFocus()
             // }
+            linkRecyclerView(autoCompleteTo)
         }
 
         ccField.apply {
@@ -135,6 +136,7 @@ class NewMessageFragment : Fragment() {
             onContactRemoved(newMessageViewModel.mailCc::remove)
             //     onFocusNext { bccField.requestFocus() }
             //     onFocusPrevious { toField.requestFocus() }
+            linkRecyclerView(autoCompleteCc)
         }
 
         bccField.apply {
@@ -143,6 +145,7 @@ class NewMessageFragment : Fragment() {
             onContactRemoved(newMessageViewModel.mailBcc::remove)
             //     onFocusNext { subjectTextField.requestFocus() }
             //     onFocusPrevious { ccField.requestFocus() }
+            linkRecyclerView(autoCompleteBcc)
         }
     }
 
@@ -160,13 +163,13 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeContacts() {
-        newMessageViewModel.getMergedContacts().observe(viewLifecycleOwner, ::setupContactsAdapter)
+        newMessageViewModel.getMergedContacts().observe(viewLifecycleOwner, ::updateContactsAdapter)
     }
 
-    private fun setupContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
-        binding.toField.updateContacts(binding.autoCompleteTo, allContacts, mutableSetOf())
-        binding.ccField.updateContacts(binding.autoCompleteCc, allContacts, mutableSetOf())
-        binding.bccField.updateContacts(binding.autoCompleteBcc, allContacts, mutableSetOf())
+    private fun updateContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
+        binding.toField.updateContacts(allContacts)
+        binding.ccField.updateContacts(allContacts)
+        binding.bccField.updateContacts(allContacts)
     }
 
     private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(newMessageViewModel) {

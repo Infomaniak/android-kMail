@@ -124,6 +124,36 @@ class RecipientFieldView @JvmOverloads constructor(
                 }
             }
 
+            contactAdapter = ContactAdapter(
+                allContacts = emptyList(),
+                usedContacts = mutableSetOf(),
+                onContactClicked = { addRecipient(it.email, it.name) },
+                onAddUnrecognizedContact = {
+                    val input = autoCompleteInput.text.toString()
+                    if (input.isEmail() && contactAdapter!!.addUsedContact(input)) addRecipient(email = input, name = input)
+                }
+            )
+
+            autoCompleteInput.apply {
+                doOnTextChanged { text, _, _, _ ->
+                    if (text?.isNotEmpty() == true) {
+                        if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
+                        if (!isAutoCompletionOpened) openAutoCompletion()
+                    } else if (isAutoCompletionOpened) {
+                        closeAutoCompletion()
+                    }
+                }
+
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text.isNotBlank()) {
+                        contactAdapter!!.addFirstAvailableItem()
+                    }
+                    // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
+                    // if (actionId == EditorInfo.IME_ACTION_PREVIOUS) onFocusPrevious?.invoke()
+                    true // Keep keyboard open
+                }
+            }
+
             if (isInEditMode) {
                 singleChip.root.isVisible = isToggleable
                 plusChip.isVisible = isToggleable
@@ -156,49 +186,8 @@ class RecipientFieldView @JvmOverloads constructor(
         autoCompleteInput.isVisible = isTextInputAccessible
     }
 
-    fun updateContacts(autoComplete: RecyclerView?, allContacts: List<MergedContact>, usedContacts: MutableSet<String>) {
-        with(binding) {
-            // TODO : Init once but update mutiple times
-            // TODO
-            // TODO
-            // TODO
-            contactAdapter = ContactAdapter(
-                allContacts = allContacts,
-                usedContacts = usedContacts,
-                onContactClicked = { addRecipient(it.email, it.name) },
-                onAddUnrecognizedContact = {
-                    val input = autoCompleteInput.text.toString().trim().lowercase()
-                    if (input.isEmail() && contactAdapter!!.addUsedContact(input)) addRecipient(email = input, name = input)
-                }
-            )
-
-            // TODO : Do once
-            autoComplete?.let {
-                autoCompletedContacts = it
-                autoCompletedContacts.adapter = contactAdapter!!
-            }
-
-            // TODO : Do once
-            autoCompleteInput.apply {
-                doOnTextChanged { text, _, _, _ ->
-                    if (text?.isNotEmpty() == true) {
-                        if ((text.trim().count()) > 0) contactAdapter!!.filterField(text) else contactAdapter!!.clear()
-                        if (!isAutoCompletionOpened) openAutoCompletion()
-                    } else if (isAutoCompletionOpened) {
-                        closeAutoCompletion()
-                    }
-                }
-
-                setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text.isNotBlank()) {
-                        contactAdapter!!.addFirstAvailableItem()
-                    }
-                    // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
-                    // if (actionId == EditorInfo.IME_ACTION_PREVIOUS) onFocusPrevious?.invoke()
-                    true // Keep keyboard open
-                }
-            }
-        }
+    fun updateContacts(allContacts: List<MergedContact>) {
+        contactAdapter?.updateContacts(allContacts)
     }
 
     private fun openAutoCompletion() {
@@ -269,7 +258,17 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun initRecipients(initialRecipients: List<Recipient>) {
-        recipients.addAll(initialRecipients)
+        initialRecipients.forEach {
+            if (recipients.add(it)) {
+                createChip(it)
+                contactAdapter!!.addUsedContact(it.email)
+            }
+        }
         updateCollapsedChipValues(isCollapsed)
+    }
+
+    fun linkRecyclerView(autoComplete: RecyclerView) {
+        autoCompletedContacts = autoComplete
+        autoCompletedContacts.adapter = contactAdapter
     }
 }
