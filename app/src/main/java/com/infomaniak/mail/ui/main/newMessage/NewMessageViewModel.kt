@@ -58,6 +58,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val mailCc = mutableListOf<Recipient>()
     val mailBcc = mutableListOf<Recipient>()
     var mailSubject: String? = null
+        get() = field?.ifBlank { null }
     var mailBody = ""
     var mailSignature: String? = null
     val mailAttachments = mutableListOf<Attachment>()
@@ -74,6 +75,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     var currentDraftLocalUuid: String? = null
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
+
+    private lateinit var snapshot: DraftSnapshot
 
     fun initDraftAndViewModel(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
@@ -92,6 +95,9 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             if (isSuccess) initWithDraftData()
+
+            saveDraftSnapshot()
+
             emit(isSuccess)
         }
     }
@@ -130,6 +136,18 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             }
             DraftController.upsertDraft(draft = this, realm = this@createDraft)
         }.localUuid
+    }
+
+    private fun saveDraftSnapshot() {
+        snapshot = DraftSnapshot(
+            mailTo.toSet(),
+            mailCc.toSet(),
+            mailBcc.toSet(),
+            mailSubject,
+            mailBody,
+            // mailSignature,
+            mailAttachments.map { it.uuid }.toSet(),
+        )
     }
 
     fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
@@ -191,7 +209,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
         autoSaveJob?.cancel()
+
         saveDraftToLocal(action)
+        checkDraftSnapshot()
+
         shouldCloseActivity.postValue(true)
     }
 
@@ -205,6 +226,14 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 draft.body = mailBody.textToHtml() + (mailSignature ?: "")
                 draft.attachments = mailAttachments.toRealmList()
                 draft.action = action
+            }
+        }
+    }
+
+    private fun checkDraftSnapshot() {
+        if (snapshot.isTheSame()) {
+            RealmDatabase.mailboxContent().writeBlocking {
+                currentDraftLocalUuid?.let { DraftController.getDraft(it, realm = this)?.let(::delete) }
             }
         }
     }
@@ -258,6 +287,26 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     enum class ImportationResult {
         SUCCESS,
         FILE_SIZE_TOO_BIG,
+    }
+
+    private data class DraftSnapshot(
+        val to: Set<Recipient>,
+        val cc: Set<Recipient>,
+        val bcc: Set<Recipient>,
+        var subject: String?,
+        var body: String,
+        // var signature: String?,
+        val attachmentsUuids: Set<String>,
+    )
+
+    private fun DraftSnapshot.isTheSame(): Boolean {
+        return to == mailTo.toSet() &&
+                cc == mailCc.toSet() &&
+                bcc == mailBcc.toSet() &&
+                subject == mailSubject &&
+                body == mailBody &&
+                // signature == mailSignature &&
+                attachmentsUuids == mailAttachments.map { it.uuid }.toSet()
     }
 
     private companion object {
