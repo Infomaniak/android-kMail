@@ -49,8 +49,8 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
-    private var onFocusNext: (() -> Unit)? = null
-    private var onFocusPrevious: (() -> Unit)? = null
+    // private var onFocusNext: (() -> Unit)? = null
+    // private var onFocusPrevious: (() -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
 
@@ -229,10 +229,6 @@ class RecipientFieldView @JvmOverloads constructor(
         }
     }
 
-    fun onAutoCompletionToggled(callback: (hasOpened: Boolean) -> Unit) {
-        onAutoCompletionToggled = callback
-    }
-
     // fun onFocusNext(callback: () -> Unit) {
     //     onFocusNext = callback
     // }
@@ -241,20 +237,24 @@ class RecipientFieldView @JvmOverloads constructor(
     //     onFocusPrevious = callback
     // }
 
-    fun setOnToggleListener(listener: ((isCollapsed: Boolean) -> Unit)?) {
-        onToggle = listener
+    fun initRecipientField(
+        autoComplete: RecyclerView,
+        onAutoCompletionToggledCallback: (hasOpened: Boolean) -> Unit,
+        onContactAddedCallback: ((Recipient) -> Unit),
+        onContactRemovedCallback: ((Recipient) -> Unit),
+        onToggleCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+    ) {
+        autoCompletedContacts = autoComplete
+        autoCompletedContacts.adapter = contactAdapter
+
+        onToggle = onToggleCallback
+        onAutoCompletionToggled = onAutoCompletionToggledCallback
+        onContactAdded = onContactAddedCallback
+        onContactRemoved = onContactRemovedCallback
     }
 
     fun clearField() {
         binding.autoCompleteInput.setText("")
-    }
-
-    fun onContactRemoved(callback: ((Recipient) -> Unit)) {
-        onContactRemoved = callback
-    }
-
-    fun onContactAdded(callback: ((Recipient) -> Unit)) {
-        onContactAdded = callback
     }
 
     fun initRecipients(initialRecipients: List<Recipient>) {
@@ -265,10 +265,5 @@ class RecipientFieldView @JvmOverloads constructor(
             }
         }
         updateCollapsedChipValues(isCollapsed)
-    }
-
-    fun linkRecyclerView(autoComplete: RecyclerView) {
-        autoCompletedContacts = autoComplete
-        autoCompletedContacts.adapter = contactAdapter
     }
 }

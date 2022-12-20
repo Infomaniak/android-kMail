@@ -118,35 +118,35 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setupAutoCompletionFields() = with(binding) {
-        toField.apply {
-            setOnToggleListener(::openAdvancedFields)
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(TO, hasOpened) }
-            onContactAdded(newMessageViewModel.mailTo::add)
-            onContactRemoved(newMessageViewModel.mailTo::remove)
-            // onFocusNext {
+        toField.initRecipientField(
+            autoCompleteTo,
+            { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
+            newMessageViewModel.mailTo::add,
+            newMessageViewModel.mailTo::remove,
+            ::openAdvancedFields,
+            // onFocusNext = {
             //     openAdvancedFields(false)
             //     ccField.requestFocus()
             // }
-            linkRecyclerView(autoCompleteTo)
-        }
+        )
 
-        ccField.apply {
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(CC, hasOpened) }
-            onContactAdded(newMessageViewModel.mailCc::add)
-            onContactRemoved(newMessageViewModel.mailCc::remove)
-            //     onFocusNext { bccField.requestFocus() }
-            //     onFocusPrevious { toField.requestFocus() }
-            linkRecyclerView(autoCompleteCc)
-        }
+        ccField.initRecipientField(
+            autoCompleteCc,
+            { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
+            newMessageViewModel.mailCc::add,
+            newMessageViewModel.mailCc::remove
+            // onFocusNext = { bccField.requestFocus() }
+            // onFocusPrevious = { toField.requestFocus() }
+        )
 
-        bccField.apply {
-            onAutoCompletionToggled { hasOpened -> toggleAutoCompletion(BCC, hasOpened) }
-            onContactAdded(newMessageViewModel.mailBcc::add)
-            onContactRemoved(newMessageViewModel.mailBcc::remove)
-            //     onFocusNext { subjectTextField.requestFocus() }
-            //     onFocusPrevious { ccField.requestFocus() }
-            linkRecyclerView(autoCompleteBcc)
-        }
+        bccField.initRecipientField(
+            autoCompleteBcc,
+            { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
+            newMessageViewModel.mailBcc::add,
+            newMessageViewModel.mailBcc::remove
+            // onFocusNext = { subjectTextField.requestFocus() }
+            // onFocusPrevious = { ccField.requestFocus() }
+        )
     }
 
     private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
