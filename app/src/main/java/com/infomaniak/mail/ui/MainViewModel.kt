@@ -45,6 +45,7 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
@@ -208,11 +209,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun observeRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
-        MergedContactController.getMergedContactsAsync().collect {
+        MergedContactController.getMergedContactsAsync().collect { contacts ->
+            // TODO: We had this issue: https://sentry.infomaniak.com/share/issue/111cc162315d4873844c9b79be5b2491/
+            // TODO: We fixed it by doing an `associate` with `copyFromRealm`, instead of an `associateBy`.
+            // TODO: But we don't really know why it crashed in the first place. Maybe there's a memory leak somewhere?
+            // TODO: Previous version: `contacts.list.associateBy { Recipient().initLocalValues(it.email, it.name) }`
             mergedContacts.postValue(
-                it.list.associateBy { mergedContact ->
-                    Recipient().initLocalValues(mergedContact.email, mergedContact.name)
-                }
+                contacts.list.associate { Recipient().initLocalValues(it.email, it.name) to it.copyFromRealm(0u) }
             )
         }
     }

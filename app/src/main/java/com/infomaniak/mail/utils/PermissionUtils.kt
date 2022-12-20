@@ -61,5 +61,4 @@ class PermissionUtils {
             else -> arrayOf(Manifest.permission.READ_CONTACTS)
         }
     }
-
 }
