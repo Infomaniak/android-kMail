@@ -105,7 +105,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             mailAttachments.addAll(draft.attachments)
 
             val (body, signature) = splitSignatureFromBody(draft.body)
-            mailBody = body
+            mailBody = body.htmlToText()
             mailSignature = signature
         }
     }
@@ -180,7 +180,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             draft.cc = mailCc.toRealmList()
             draft.bcc = mailBcc.toRealmList()
             draft.subject = mailSubject
-            draft.body = mailBody + (mailSignature ?: "")
+            draft.body = mailBody.textToHtml() + (mailSignature ?: "")
             draft.attachments = mailAttachments.toRealmList()
             draft.action = action
         }
@@ -220,6 +220,9 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
         } ?: (null to false)
     }
+
+    private fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", "")).wholeText()
+    private fun String.textToHtml(): String = replace("\n", "<br>")
 
     override fun onCleared() {
         LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), currentDraftLocalUuid)
