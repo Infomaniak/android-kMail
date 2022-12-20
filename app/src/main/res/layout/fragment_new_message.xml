@@ -242,7 +242,6 @@
                         android:gravity="top"
                         android:hint="@string/newMessagePlaceholderTitle"
                         android:inputType="textMultiLine|textCapSentences"
-                        android:minHeight="200dp"
                         android:nextFocusUp="@id/subjectTextField"
                         android:textColor="@color/orca" />
 

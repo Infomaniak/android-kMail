@@ -64,7 +64,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private var autoSaveJob: Job? = null
 
     var isAutoCompletionOpened = false
-    var areAdvancedFieldsOpened = false
     var isEditorExpanded = false
 
     // Boolean: For toggleable actions, `false` if the formatting has been removed and `true` if the formatting has been applied.

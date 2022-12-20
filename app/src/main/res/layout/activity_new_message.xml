@@ -63,6 +63,7 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
+                android:visibility="gone"
                 android:id="@+id/editorTextOptions"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
@@ -124,6 +125,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:visibility="gone"
                 android:id="@+id/editorBold"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -135,6 +137,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:visibility="gone"
                 android:id="@+id/editorItalic"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -146,6 +149,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:visibility="gone"
                 android:id="@+id/editorUnderlined"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -157,6 +161,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
+                android:visibility="gone"
                 android:id="@+id/editorStrikeThrough"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -168,6 +173,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
+                android:visibility="gone"
                 android:id="@+id/editorList"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
