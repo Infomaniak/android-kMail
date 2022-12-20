@@ -22,6 +22,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +35,7 @@ import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
+import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
@@ -107,7 +109,7 @@ class IntroFragment : Fragment() {
                 description.setText(R.string.onBoardingDescription3)
                 iconLayout.apply {
                     setAnimation(R.raw.illu_3)
-                    repeatFrame(113, 219)
+                    repeatFrame(111, 187)
                 }
             }
             3 -> {
@@ -118,6 +120,12 @@ class IntroFragment : Fragment() {
                     setAnimation(R.raw.illu_4)
                     repeatFrame(127, 236)
                 }
+            }
+        }
+
+        iconLayout.addLottieOnCompositionLoadedListener {
+            iconLayout.resolveKeyPath(KeyPath("**")).forEach {
+                Log.d("keypath", it.keysToString())
             }
         }
 
