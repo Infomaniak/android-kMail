@@ -49,8 +49,6 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private var onAutoCompletionToggled: ((hasOpened: Boolean) -> Unit)? = null
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
-    // private var onFocusNext: (() -> Unit)? = null
-    // private var onFocusPrevious: (() -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
 
@@ -71,34 +69,11 @@ class RecipientFieldView @JvmOverloads constructor(
             binding.chevron.isGone = value || !isToggleable
         }
 
-    // TODO : Think about the textfield focus rather than the linearLayout focus
-    // override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-    //     Log.e("gibran", "onFocusChanged: ${binding.prefix.text}, gainFocus: $gainFocus", );
-    //     super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
-    //     // binding.autocompleteInput.requestFocus()
-    // }
-    //
-    // override fun onRequestFocusInDescendants(direction: Int, previouslyFocusedRect: Rect?): Boolean {
-    //     Log.e("gibran", "onRequestFocusInDescendants: ${binding.prefix.text}", );
-    //     return super.onRequestFocusInDescendants(direction, previouslyFocusedRect)
-    // }
-    //
-    // override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-    //     Log.e("gibran", "onWindowFocusChanged: ${binding.prefix.text}, hasWindowFocus: $hasWindowFocus", );
-    //     super.onWindowFocusChanged(hasWindowFocus)
-    // }
-
     init {
-        // isFocusable = true
-        // isClickable = true
-
         with(binding) {
             attrs?.getAttributes(context, R.styleable.RecipientFieldView) {
                 prefix.text = getText(R.styleable.RecipientFieldView_title)
                 isToggleable = getBoolean(R.styleable.RecipientFieldView_toggleable, isToggleable)
-
-                // autocompleteInput.nextFocusForwardId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
-                // autocompleteInput.nextFocusDownId = getResourceId(R.styleable.RecipientFieldView_nextFocusForward, NO_ID)
             }
 
             chevron.isVisible = isToggleable
@@ -148,8 +123,6 @@ class RecipientFieldView @JvmOverloads constructor(
                     if (actionId == EditorInfo.IME_ACTION_DONE && autoCompleteInput.text.isNotBlank()) {
                         contactAdapter!!.addFirstAvailableItem()
                     }
-                    // if (actionId == EditorInfo.IME_ACTION_NEXT) onFocusNext?.invoke()
-                    // if (actionId == EditorInfo.IME_ACTION_PREVIOUS) onFocusPrevious?.invoke()
                     true // Keep keyboard open
                 }
             }
@@ -228,14 +201,6 @@ class RecipientFieldView @JvmOverloads constructor(
             onContactRemoved?.invoke(recipient)
         }
     }
-
-    // fun onFocusNext(callback: () -> Unit) {
-    //     onFocusNext = callback
-    // }
-    //
-    // fun onFocusPrevious(callback: () -> Unit) {
-    //     onFocusPrevious = callback
-    // }
 
     fun initRecipientField(
         autoComplete: RecyclerView,

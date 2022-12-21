@@ -106,6 +106,5 @@
     <declare-styleable name="RecipientFieldView">
         <attr name="title" />
         <attr name="toggleable" format="boolean" />
-        <!--<attr name="nextFocusForward" format="reference" />-->
     </declare-styleable>
 </resources>

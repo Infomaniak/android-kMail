@@ -124,10 +124,6 @@ class NewMessageFragment : Fragment() {
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
             onToggleCallback = ::openAdvancedFields,
-            // onFocusNext = {
-            //     openAdvancedFields(false)
-            //     ccField.requestFocus()
-            // }
         )
 
         ccField.initRecipientField(
@@ -135,8 +131,6 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
-            // onFocusNext = { bccField.requestFocus() }
-            // onFocusPrevious = { toField.requestFocus() }
         )
 
         bccField.initRecipientField(
@@ -144,8 +138,6 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
-            // onFocusNext = { subjectTextField.requestFocus() }
-            // onFocusPrevious = { ccField.requestFocus() }
         )
     }
 
