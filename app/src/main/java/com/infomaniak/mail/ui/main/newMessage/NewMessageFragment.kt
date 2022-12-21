@@ -119,11 +119,11 @@ class NewMessageFragment : Fragment() {
 
     private fun setupAutoCompletionFields() = with(binding) {
         toField.initRecipientField(
-            autoCompleteTo,
-            { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
-            newMessageViewModel.mailTo::add,
-            newMessageViewModel.mailTo::remove,
-            ::openAdvancedFields,
+            autoComplete = autoCompleteTo,
+            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(TO, hasOpened) },
+            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
+            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
+            onToggleCallback = ::openAdvancedFields,
             // onFocusNext = {
             //     openAdvancedFields(false)
             //     ccField.requestFocus()
@@ -131,19 +131,19 @@ class NewMessageFragment : Fragment() {
         )
 
         ccField.initRecipientField(
-            autoCompleteCc,
-            { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
-            newMessageViewModel.mailCc::add,
-            newMessageViewModel.mailCc::remove
+            autoComplete = autoCompleteCc,
+            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
+            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
+            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
             // onFocusNext = { bccField.requestFocus() }
             // onFocusPrevious = { toField.requestFocus() }
         )
 
         bccField.initRecipientField(
-            autoCompleteBcc,
-            { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
-            newMessageViewModel.mailBcc::add,
-            newMessageViewModel.mailBcc::remove
+            autoComplete = autoCompleteBcc,
+            onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
+            onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
+            onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
             // onFocusNext = { subjectTextField.requestFocus() }
             // onFocusPrevious = { ccField.requestFocus() }
         )

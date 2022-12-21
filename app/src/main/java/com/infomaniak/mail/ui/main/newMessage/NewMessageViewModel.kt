@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.getFileNameAndSize
@@ -146,6 +147,26 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         emit(mailboxes to currentMailboxIndex)
     }
 
+    fun addRecipientToField(recipient: Recipient, type: FieldType) {
+        val field = when (type) {
+            FieldType.TO -> mailTo
+            FieldType.CC -> mailCc
+            FieldType.BCC -> mailBcc
+        }
+        field.add(recipient)
+        saveDraftDebouncing()
+    }
+
+    fun removeRecipientFromField(recipient: Recipient, type: FieldType) {
+        val field = when (type) {
+            FieldType.TO -> mailTo
+            FieldType.CC -> mailCc
+            FieldType.BCC -> mailBcc
+        }
+        field.remove(recipient)
+        saveDraftDebouncing()
+    }
+
     fun updateMailSubject(subject: String) {
         if (subject != mailSubject) {
             mailSubject = subject
@@ -169,6 +190,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
+        autoSaveJob?.cancel()
         saveDraftToLocal(action)
         shouldCloseActivity.postValue(true)
     }
@@ -205,7 +227,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             }
         }
 
-        saveDraftToLocal(DraftAction.SAVE)
+        saveDraftDebouncing()
 
         importedAttachments.postValue(newAttachments to ImportationResult.SUCCESS)
     }
