@@ -72,7 +72,7 @@ class NewMessageFragment : Fragment() {
     private val newMessageActivityArgs by lazy {
         // When opening this fragment via deeplinks, it can happen that the navigation
         // extras aren't yet initialized, so we don't use the `navArgs` here.
-        requireActivity().intent?.extras?.let { NewMessageActivityArgs.fromBundle(it) } ?: NewMessageActivityArgs()
+        requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
     }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
