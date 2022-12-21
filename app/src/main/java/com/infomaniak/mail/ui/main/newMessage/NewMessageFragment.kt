@@ -19,7 +19,10 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
 import android.content.ClipDescription
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.InputFilter
 import android.text.Spanned
 import android.transition.TransitionManager
@@ -33,16 +36,18 @@ import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.net.MailTo
 import androidx.core.view.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.navArgs
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.parcelableArrayListExtra
+import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
@@ -64,7 +69,11 @@ import com.infomaniak.lib.core.R as RCore
 class NewMessageFragment : Fragment() {
 
     private lateinit var binding: FragmentNewMessageBinding
-    private val newMessageActivityArgs by lazy { requireActivity().navArgs<NewMessageActivityArgs>().value }
+    private val newMessageActivityArgs by lazy {
+        // When opening this fragment via deeplink, it can happen that the navigation
+        // extras aren't yet initialized, so we don't use the `navArgs` here.
+        requireActivity().intent?.extras?.let(NewMessageActivityArgs::fromBundle) ?: NewMessageActivityArgs()
+    }
     private val newMessageViewModel: NewMessageViewModel by activityViewModels()
 
     private val addressListPopupWindow by lazy { ListPopupWindow(binding.root.context) }
@@ -163,15 +172,65 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initDraftAndUi() {
-        newMessageViewModel.initDraftAndUi(newMessageActivityArgs)
-            .observe(viewLifecycleOwner) { isSuccess ->
-                if (isSuccess) {
-                    observeContacts()
-                    populateUiWithExistingDraftData()
-                } else {
-                    requireActivity().finish()
-                }
+        newMessageViewModel.initDraftAndUi(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
+            if (isSuccess) {
+                observeContacts()
+                populateUiWithExistingDraftData()
+                handleActionSend()
+            } else {
+                requireActivity().finish()
             }
+        }
+    }
+
+    private fun handleActionSend() {
+        when (requireActivity().intent?.action) {
+            Intent.ACTION_SEND -> handleSingleSendIntent()
+            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
+        }
+    }
+
+    /**
+     * Handle `Mailto` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
+     * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
+     */
+    private fun handleMailTo() = with(binding) {
+        fun String.splitToList() = split(",").map { it.trim() }
+
+        val intent = requireActivity().intent
+        intent?.data?.let { uri ->
+            if (!MailTo.isMailTo(uri)) return@with
+
+            val mailTo = MailTo.parse(uri)
+            val to = mailTo.to?.splitToList() ?: emptyList()
+            val cc = mailTo.cc?.splitToList() ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.toList() ?: emptyList()
+            val bcc = mailTo.bcc?.splitToList() ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.toList() ?: emptyList()
+
+            to.forEach { addUnrecognizedMail(TO, it) }
+            cc.forEach { addUnrecognizedMail(CC, it) }
+            bcc.forEach { addUnrecognizedMail(BCC, it) }
+
+            toItemsChipGroup.isInvisible = to.isEmpty()
+            subjectTextField.setText(mailTo.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT))
+            bodyText.setText(mailTo.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))
+        }
+    }
+
+    private fun handleSingleSendIntent() = with(requireActivity().intent) {
+        if (hasExtra(Intent.EXTRA_TEXT)) {
+            binding.subjectTextField.setText(getStringExtra(Intent.EXTRA_SUBJECT) ?: "")
+            binding.bodyText.setText(getStringExtra(Intent.EXTRA_TEXT) ?: "")
+        } else {
+            (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
+                newMessageViewModel.importAttachments(listOf(uri))
+            }
+        }
+    }
+
+    private fun handleMultipleSendIntent() = with(requireActivity().intent) {
+        parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()?.let { uris ->
+            newMessageViewModel.importAttachments(uris)
+        }
     }
 
     private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
@@ -297,6 +356,7 @@ class NewMessageFragment : Fragment() {
         )
 
         binding.autoCompleteRecyclerView.adapter = contactAdapter
+        handleMailTo()
     }
 
     private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
@@ -309,8 +369,10 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun addUnrecognizedMail(field: FieldType): Boolean {
-        val input = getInputView(field).text.toString().trim()
+    private fun addUnrecognizedMail(
+        field: FieldType,
+        input: String = getInputView(field).text.toString().trim(),
+    ): Boolean {
         val isEmail = input.isEmail()
         if (isEmail) {
             val usedEmails = contactAdapter.getUsedEmails(field)
