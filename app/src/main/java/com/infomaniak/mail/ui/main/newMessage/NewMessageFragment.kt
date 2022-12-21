@@ -206,21 +206,11 @@ class NewMessageFragment : Fragment() {
             val cc = mailTo.cc?.splitToList() ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.toList() ?: emptyList()
             val bcc = mailTo.bcc?.splitToList() ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.toList() ?: emptyList()
 
-            to.forEach {
-                toAutocompleteInput.setText(it)
-                contactAdapter.addFirstAvailableItem()
-            }
+            to.forEach { addUnrecognizedMail(TO, it) }
+            cc.forEach { addUnrecognizedMail(CC, it) }
+            bcc.forEach { addUnrecognizedMail(BCC, it) }
 
-            cc.forEach {
-                ccAutocompleteInput.setText(it)
-                contactAdapter.addFirstAvailableItem()
-            }
-
-            bcc.forEach {
-                bccAutocompleteInput.setText(it)
-                contactAdapter.addFirstAvailableItem()
-            }
-
+            toItemsChipGroup.isInvisible = to.isEmpty()
             subjectTextField.setText(mailTo.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT))
             bodyText.setText(mailTo.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))
         }
@@ -379,8 +369,10 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun addUnrecognizedMail(field: FieldType): Boolean {
-        val input = getInputView(field).text.toString().trim()
+    private fun addUnrecognizedMail(
+        field: FieldType,
+        input: String = getInputView(field).text.toString().trim(),
+    ): Boolean {
         val isEmail = input.isEmail()
         if (isEmail) {
             val usedEmails = contactAdapter.getUsedEmails(field)
