@@ -350,7 +350,8 @@ class NewMessageFragment : Fragment() {
                 createChip(field, recipient)
             },
             addUnrecognizedContact = { field ->
-                val isEmail = addUnrecognizedMail(field)
+                val input = getInputView(field).text.toString().trim()
+                val isEmail = addUnrecognizedMail(field, input)
                 if (isEmail) getInputView(field).setText("")
             },
         )
@@ -369,10 +370,7 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun addUnrecognizedMail(
-        field: FieldType,
-        input: String = getInputView(field).text.toString().trim(),
-    ): Boolean {
+    private fun addUnrecognizedMail(field: FieldType, input: String): Boolean {
         val isEmail = input.isEmail()
         if (isEmail) {
             val usedEmails = contactAdapter.getUsedEmails(field)
