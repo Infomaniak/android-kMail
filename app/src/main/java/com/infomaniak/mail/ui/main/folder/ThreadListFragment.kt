@@ -31,6 +31,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
@@ -85,6 +86,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private var canRefreshThreads = false
 
+    private var currentFolderLive: LiveData<Folder>? = null
+
+    private val observer: (f: Folder) -> Unit = { folder ->
+        updateThreadsVisibilityIfNeeded(folder)
+        updateUpdatedAt(folder.lastUpdatedAt?.toDate())
+        updateUnreadCount(folder.unreadCount)
+        threadListViewModel.startUpdatedAtJob()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadListBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -101,10 +111,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeCurrentThreads()
         observeDownloadState()
         observeCurrentFolder()
-        observeCurrentFolderLive()
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        observeCurrentFolderLive()
+    }
+
+    override fun onStop() {
+        currentFolderLive?.removeObserver(observer)
+        super.onStop()
     }
 
     override fun onResume(): Unit = with(binding) {
@@ -357,12 +376,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderLive() {
-        mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
-            updateThreadsVisibilityIfNeeded(folder)
-            updateUpdatedAt(folder.lastUpdatedAt?.toDate())
-            updateUnreadCount(folder.unreadCount)
-            threadListViewModel.startUpdatedAtJob()
-        }
+        currentFolderLive = mainViewModel.currentFolderLive()
+        currentFolderLive?.observe(viewLifecycleOwner, observer)
     }
 
     private fun updateThreadsVisibilityIfNeeded(folder: Folder) {
@@ -434,7 +449,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun handleThreadsVisibility(threadsCount: Int) {
         Log.d("UI", "Received threads (${threadsCount})")
 
-        val cursor = mainViewModel.currentFolderLive.value?.cursor
+        val cursor = currentFolderLive?.value?.cursor
 
         if (cursor != null && threadsCount == 0) {
             displayNoEmailView()
