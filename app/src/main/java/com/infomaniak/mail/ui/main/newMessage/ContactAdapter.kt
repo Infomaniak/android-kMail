@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -51,20 +52,15 @@ class ContactAdapter(
         userName.text = contact.name
         userEmail.text = contact.email
         userAvatar.loadAvatar(contact)
-        root.setOnClickListener { selectContact(contact) }
+        root.setOnClickListener { onContactClicked(contact) }
     }
 
     override fun getItemCount(): Int = contacts.count()
 
     override fun getItemId(position: Int): Long = contacts[position].id!!
 
-    private fun selectContact(contact: MergedContact) {
-        onContactClicked(contact)
-        addUsedContact(contact.email)
-    }
-
     fun addFirstAvailableItem() {
-        contacts.firstOrNull()?.let(::selectContact) ?: onAddUnrecognizedContact()
+        contacts.firstOrNull()?.let(onContactClicked) ?: onAddUnrecognizedContact()
     }
 
     fun clear() {
@@ -102,8 +98,8 @@ class ContactAdapter(
         filter.filter(text)
     }
 
-    fun removeEmail(email: String) {
-        usedContacts.remove(email)
+    fun removeEmail(email: String): Boolean {
+        return usedContacts.remove(email.standardize())
     }
 
     fun addUsedContact(email: String) = usedContacts.add(email.standardize())

@@ -105,7 +105,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
                     val input = autoCompleteInput.text.toString()
-                    if (input.isEmail() && contactAdapter!!.addUsedContact(input)) addRecipient(email = input, name = input)
+                    if (input.isEmail()) addRecipient(email = input, name = input)
                 }
             )
 
@@ -176,8 +176,9 @@ class RecipientFieldView @JvmOverloads constructor(
     private fun addRecipient(email: String, name: String) {
         if (recipients.isEmpty()) isCollapsed = false
         val recipient = Recipient().initLocalValues(email, name)
-        val recipientIsNew = recipients.add(recipient)
+        val recipientIsNew = contactAdapter!!.addUsedContact(email)
         if (recipientIsNew) {
+            recipients.add(recipient)
             createChip(recipient)
             onContactAdded?.invoke(recipient)
             clearField()
@@ -194,9 +195,9 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun removeRecipient(recipient: Recipient) = with(binding) {
         val index = recipients.indexOf(recipient)
-        contactAdapter?.removeEmail(recipient.email)
-        val successfullyRemoved = recipients.remove(recipient)
+        val successfullyRemoved = contactAdapter!!.removeEmail(recipient.email)
         if (successfullyRemoved) {
+            recipients.remove(recipient)
             itemsChipGroup.removeViewAt(index)
             onContactRemoved?.invoke(recipient)
         }
