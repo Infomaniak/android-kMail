@@ -92,7 +92,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
             putExtras(LaunchActivityArgs(uid, userId, mailbox.mailboxId).toBundle())
         }
-        val contentIntent = PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags)
+        val contentIntent = PendingIntent.getActivity(applicationContext, uid.hashCode(), intent, pendingIntentFlags)
 
         applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
             setSubText(mailbox.email)
