@@ -319,7 +319,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeEditorActions() {
-        newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, isToggled) ->
+        newMessageViewModel.editorAction.observe(requireActivity()) { (editorAction, /*isToggled*/ _) ->
             when (editorAction) {
                 EditorAction.ATTACHMENT -> {
                     filePicker.open { uris ->
