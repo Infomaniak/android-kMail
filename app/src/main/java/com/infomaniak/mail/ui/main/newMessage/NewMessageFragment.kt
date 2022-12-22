@@ -172,18 +172,18 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.getMergedContacts().observe(viewLifecycleOwner, ::updateContactsAdapter)
     }
 
-    private fun updateContactsAdapter(allContacts: List<MergedContact>) = with(newMessageViewModel) {
-        binding.toField.updateContacts(allContacts)
-        binding.ccField.updateContacts(allContacts)
-        binding.bccField.updateContacts(allContacts)
+    private fun updateContactsAdapter(allContacts: List<MergedContact>) = with(binding) {
+        toField.updateContacts(allContacts)
+        ccField.updateContacts(allContacts)
+        bccField.updateContacts(allContacts)
     }
 
-    private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(newMessageViewModel) {
-        binding.preFields.isGone = isAutoCompletionOpened
-        binding.to.isVisible = !isAutoCompletionOpened || field == TO
-        binding.cc.isVisible = !isAutoCompletionOpened || field == CC
-        binding.bcc.isVisible = !isAutoCompletionOpened || field == BCC
-        binding.postFields.isGone = isAutoCompletionOpened
+    private fun toggleAutoCompletion(field: FieldType? = null, isAutoCompletionOpened: Boolean) = with(binding) {
+        preFields.isGone = isAutoCompletionOpened
+        to.isVisible = !isAutoCompletionOpened || field == TO
+        cc.isVisible = !isAutoCompletionOpened || field == CC
+        bcc.isVisible = !isAutoCompletionOpened || field == BCC
+        postFields.isGone = isAutoCompletionOpened
 
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
@@ -215,7 +215,7 @@ class NewMessageFragment : Fragment() {
      * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
-    private fun handleMailTo() = with(binding) {
+    private fun handleMailTo() = with(newMessageViewModel) {
         fun String.splitToList() = split(",").map {
             val email = it.trim()
             Recipient().initLocalValues(email, email)
@@ -225,24 +225,24 @@ class NewMessageFragment : Fragment() {
         intent?.data?.let { uri ->
             if (!MailTo.isMailTo(uri)) return@with
 
-            val mailTo = MailTo.parse(uri)
-            val to = mailTo.to?.splitToList()
+            val mailToIntent = MailTo.parse(uri)
+            val to = mailToIntent.to?.splitToList()
                 ?: emptyList()
-            val cc = mailTo.cc?.splitToList()
+            val cc = mailToIntent.cc?.splitToList()
                 ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
-            val bcc = mailTo.bcc?.splitToList()
+            val bcc = mailToIntent.bcc?.splitToList()
                 ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
-            newMessageViewModel.mailTo.addAll(to)
-            newMessageViewModel.mailCc.addAll(cc)
-            newMessageViewModel.mailBcc.addAll(bcc)
+            mailTo.addAll(to)
+            mailCc.addAll(cc)
+            mailBcc.addAll(bcc)
 
-            newMessageViewModel.mailSubject = mailTo.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
-            (mailTo.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))?.let { newMessageViewModel.mailBody = it }
+            mailSubject = mailToIntent.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            (mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))?.let { mailBody = it }
 
-            newMessageViewModel.saveDraftDebouncing()
+            saveDraftDebouncing()
         }
     }
 
@@ -264,8 +264,8 @@ class NewMessageFragment : Fragment() {
         }
     }
 
-    private fun handleMultipleSendIntent() = with(requireActivity().intent) {
-        parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()?.let { uris ->
+    private fun handleMultipleSendIntent() {
+        requireActivity().intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()?.let { uris ->
             newMessageViewModel.importAttachments(uris)
         }
     }
@@ -366,7 +366,9 @@ class NewMessageFragment : Fragment() {
         mailAttachments.removeAt(position)
     }
 
-    private fun toggleEditor(hasFocus: Boolean) = (activity as NewMessageActivity).toggleEditor(hasFocus)
+    private fun toggleEditor(hasFocus: Boolean) {
+        (activity as NewMessageActivity).toggleEditor(hasFocus)
+    }
 
     enum class FieldType {
         TO,
