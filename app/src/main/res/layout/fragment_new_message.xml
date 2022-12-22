@@ -58,6 +58,7 @@
                     android:clickable="false"
                     android:focusable="false"
                     android:gravity="center_vertical"
+                    android:textColor="@color/primaryTextColor"
                     app:layout_constraintBottom_toBottomOf="@id/fromPrefix"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0"

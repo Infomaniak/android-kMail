@@ -63,12 +63,12 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
-                android:visibility="gone"
                 android:id="@+id/editorTextOptions"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonTextOptionsOpen"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_text_options"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorAttachment"
@@ -106,6 +106,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonHyperlink"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_link"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorClock"
@@ -125,11 +126,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
-                android:visibility="gone"
                 android:id="@+id/editorBold"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonBold"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorItalic"
@@ -137,11 +138,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
-                android:visibility="gone"
                 android:id="@+id/editorItalic"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonItalic"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_italic"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorUnderlined"
@@ -149,11 +150,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
-                android:visibility="gone"
                 android:id="@+id/editorUnderlined"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonUnderlined"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_underline"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorStrikeThrough"
@@ -161,11 +162,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.infomaniak.mail.ui.main.newMessage.ToggleableTextFormatterItemView
-                android:visibility="gone"
                 android:id="@+id/editorStrikeThrough"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonStrikedThrough"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_strikethrough"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editorList"
@@ -173,13 +174,13 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
-                android:visibility="gone"
                 android:id="@+id/editorList"
                 style="@style/EditorIconButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/buttonBulletPoint"
                 android:minWidth="0dp"
+                android:visibility="gone"
                 app:icon="@drawable/ic_editor_list"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -191,15 +192,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:constraint_referenced_ids="editorBold,editorItalic,editorUnderlined,editorStrikeThrough,editorList"
-                tools:visibility="visible" />
+                app:constraint_referenced_ids="editorBold,editorItalic,editorUnderlined,editorStrikeThrough,editorList" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/editorActions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="editorAttachment,editorCamera,editorLink,editorClock"
-                tools:visibility="gone" />
+                app:constraint_referenced_ids="editorAttachment,editorCamera,editorClock" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
