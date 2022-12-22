@@ -18,8 +18,11 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.models.Folder
+import java.nio.charset.StandardCharsets
 
 object Utils {
+
+    val UTF_8: String = StandardCharsets.UTF_8.name()
 
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
 
