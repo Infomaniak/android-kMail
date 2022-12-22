@@ -53,7 +53,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         archive.setClosingOnClickListener { notYetImplemented() }
         markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(navigationArgs.threadUid) }
         move.setClosingOnClickListener { notYetImplemented() }
-        favorite.setClosingOnClickListener { notYetImplemented() }
+        favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid) }
         spam.setClosingOnClickListener { notYetImplemented() }
         print.setClosingOnClickListener { notYetImplemented() }
         saveAsPdf.setClosingOnClickListener { notYetImplemented() }

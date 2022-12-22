@@ -83,7 +83,7 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        iconFavorite.setOnClickListener { notYetImplemented() }
+        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid) }
 
         quickActionBar.setOnItemClickListener { menuId ->
             val lastMessageUid = threadAdapter.messages.getLastMessageToExecuteAction().uid

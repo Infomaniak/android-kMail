@@ -145,6 +145,18 @@ object ThreadController {
         }
     }
 
+    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
+    private fun getThreadFavoritesMessagesUids(thread: Thread): List<String> {
+        return mutableListOf<String>().apply {
+            thread.messages.forEach { message ->
+                if (message.isFavorite && !message.isDraft) {
+                    add(message.uid)
+                    addAll(thread.getMessageDuplicates(message.messageId))
+                }
+            }
+        }
+    }
+
     fun deleteThreads(realm: MutableRealm) {
         realm.delete(getThreads(realm))
     }
@@ -169,6 +181,18 @@ object ThreadController {
         val uids = getThreadUnseenMessagesUids(thread)
 
         ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
+    }
+    //endregion
+
+    //region Favorite status
+    fun toggleThreadFavoriteStatus(thread: Thread, mailboxUuid: String) {
+        if (thread.isFavorite) {
+            val uids = getThreadFavoritesMessagesUids(thread)
+            ApiRepository.removeFromFavorites(mailboxUuid, uids)
+        } else {
+            val uids = getThreadLastMessageUids(thread)
+            ApiRepository.addToFavorites(mailboxUuid, uids)
+        }
     }
     //endregion
 }
