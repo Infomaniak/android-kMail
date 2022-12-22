@@ -34,7 +34,9 @@ class MergedContact : RealmObject, Correspondent {
     override val initials by lazy { computeInitials() }
 
     fun initLocalValues(email: String, name: String, avatar: String? = null): MergedContact {
-        id = (email.hashCode().toLong() shl 32) + name.hashCode()
+        // We need an ID which is unique for each pair of email/name. Therefore we stick
+        // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
+        id = (email.hashCode().toLong() shl Int.SIZE_BITS) + name.hashCode()
         this.email = email
         this.name = name
         avatar?.let { this.avatar = it }
