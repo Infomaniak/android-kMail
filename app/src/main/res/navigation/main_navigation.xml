@@ -163,6 +163,9 @@
             android:name="messageUid"
             app:argType="string" />
         <argument
+            android:name="threadUid"
+            app:argType="string" />
+        <argument
             android:name="isFavorite"
             app:argType="boolean" />
         <argument

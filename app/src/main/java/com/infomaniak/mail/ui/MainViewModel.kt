@@ -305,6 +305,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads()
     }
 
+    fun toggleMessageFavoriteStatus(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val realm = RealmDatabase.mailboxContent()
+        val message = MessageController.getMessage(messageUid, realm) ?: return@launch
+        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
+        val mailbox = currentMailbox.value ?: return@launch
+
+        val uids = listOf(message.uid) + thread.getMessageDuplicates(message.messageId)
+
+        MessageController.toggleMessageFavoriteStatus(message.isFavorite, uids, mailbox.uuid)
+        refreshThreads()
+    }
+
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
         return folders.toMutableList().let { list ->
 

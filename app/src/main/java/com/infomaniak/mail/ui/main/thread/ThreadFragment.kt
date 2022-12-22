@@ -139,6 +139,7 @@ class ThreadFragment : Fragment() {
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToMessageActionBottomSheetDialog(
                         messageUid = message.uid,
+                        threadUid = navigationArgs.threadUid,
                         isFavorite = message.isFavorite,
                         isSeen = message.seen,
                     )

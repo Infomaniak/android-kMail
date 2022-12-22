@@ -118,6 +118,16 @@ object MessageController {
     }
     //endregion
 
+    //region Favorite status
+    fun toggleMessageFavoriteStatus(isFavorite: Boolean, uids: List<String>, mailboxUuid: String) {
+        if (isFavorite) {
+            ApiRepository.removeFromFavorites(mailboxUuid, uids)
+        } else {
+            ApiRepository.addToFavorites(mailboxUuid, uids)
+        }
+    }
+    //endregion
+
     //region New API routes
     fun fetchCurrentFolderMessages(
         mailbox: Mailbox,

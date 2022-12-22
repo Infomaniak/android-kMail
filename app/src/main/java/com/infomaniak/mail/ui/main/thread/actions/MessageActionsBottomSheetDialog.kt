@@ -19,15 +19,18 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -40,7 +43,9 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
         move.setClosingOnClickListener { notYetImplemented() }
         postpone.setClosingOnClickListener { notYetImplemented() }
-        favorite.setClosingOnClickListener { notYetImplemented() }
+        favorite.setClosingOnClickListener {
+            mainViewModel.toggleMessageFavoriteStatus(navigationArgs.messageUid, navigationArgs.threadUid)
+        }
         spam.setClosingOnClickListener { notYetImplemented() }
         blockSender.setClosingOnClickListener { notYetImplemented() }
         phishing.setClosingOnClickListener { notYetImplemented() }
