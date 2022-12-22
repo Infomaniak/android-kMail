@@ -71,7 +71,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
 
-    lateinit var currentDraftLocalUuid: String
+    var currentDraftLocalUuid: String? = null
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
@@ -97,7 +97,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun initUiData() {
-        DraftController.getDraft(currentDraftLocalUuid)?.let { draft ->
+        currentDraftLocalUuid?.let(DraftController::getDraft)?.let { draft ->
             mailTo.addAll(draft.to)
             mailCc.addAll(draft.cc)
             mailBcc.addAll(draft.bcc)
@@ -196,14 +196,16 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
-        DraftController.updateDraft(currentDraftLocalUuid) { draft ->
-            draft.to = mailTo.toRealmList()
-            draft.cc = mailCc.toRealmList()
-            draft.bcc = mailBcc.toRealmList()
-            draft.subject = mailSubject
-            draft.body = mailBody.textToHtml() + (mailSignature ?: "")
-            draft.attachments = mailAttachments.toRealmList()
-            draft.action = action
+        currentDraftLocalUuid?.let {
+            DraftController.updateDraft(it) { draft ->
+                draft.to = mailTo.toRealmList()
+                draft.cc = mailCc.toRealmList()
+                draft.bcc = mailBcc.toRealmList()
+                draft.subject = mailSubject
+                draft.body = mailBody.textToHtml() + (mailSignature ?: "")
+                draft.attachments = mailAttachments.toRealmList()
+                draft.action = action
+            }
         }
     }
 
@@ -236,17 +238,19 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
         if (fileSize > availableSpace) return null to true
 
-        return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, currentDraftLocalUuid)?.let { file ->
-            val mimeType = file.path.guessMimeType()
-            Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
-        } ?: (null to false)
+        return currentDraftLocalUuid
+            ?.let { LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, it) }
+            ?.let { file ->
+                val mimeType = file.path.guessMimeType()
+                Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
+            } ?: (null to false)
     }
 
     private fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", "")).wholeText()
     private fun String.textToHtml(): String = replace("\n", "<br>")
 
     override fun onCleared() {
-        LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), currentDraftLocalUuid)
+        currentDraftLocalUuid?.let { LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), it) }
         autoSaveJob?.cancel()
         super.onCleared()
     }
