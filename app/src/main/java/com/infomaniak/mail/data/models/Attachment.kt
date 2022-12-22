@@ -46,7 +46,6 @@ class Attachment : EmbeddedRealmObject {
     var driveUrl: String? = null
     var thumbnail: String = ""
 
-
     //region Local data (Transient)
     @Transient
     var uploadLocalUri: String? = null
