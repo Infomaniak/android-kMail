@@ -17,26 +17,27 @@
  */
 package com.infomaniak.mail.ui.main.user
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isGone
-import androidx.recyclerview.widget.DiffUtil
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.toggleChevron
 
+@SuppressLint("NotifyDataSetChanged")
 class SwitchUserAccountsAdapter(
-    private var accounts: List<UiAccount> = emptyList(),
-    private var currentMailboxObjectId: String? = null,
-    private val onMailboxSelected: (Mailbox) -> Unit,
+    val currentUserId: Int,
+    val onChangingUserAccount: ((User) -> Unit)
 ) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
+    private var accounts: List<User> = emptyList()
+
+    init {
+        setHasStableIds(true)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserAccountViewHolder {
         return SwitchUserAccountViewHolder(
@@ -46,7 +47,7 @@ class SwitchUserAccountsAdapter(
 
     override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() is Unit) {
-            holder.binding.updateAccountCardUiState(accounts[position].isCollapsed)
+            holder.binding.updateSelectedUi(position)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -55,100 +56,34 @@ class SwitchUserAccountsAdapter(
     override fun onBindViewHolder(holder: SwitchUserAccountViewHolder, position: Int): Unit = with(holder.binding) {
         val account = accounts[position]
 
-        if (!account.isCollapsed) chevron.rotation = ResourcesCompat.getFloat(context.resources, R.dimen.angleViewRotated)
-        updateAccountCardUiState(account.isCollapsed)
-
-        userAvatar.loadAvatar(account.user)
-        userName.text = account.user.displayName
-        userMailAddress.text = account.user.email
-        accountCardview.setOnClickListener { toggleMailboxes(position) }
-
-        addressesList.adapter = SwitchUserMailboxesAdapter(
-            mailboxes = account.mailboxes,
-            currentMailboxObjectId = currentMailboxObjectId,
-            onMailboxSelected = onMailboxSelected,
-        )
+        userAvatar.loadAvatar(account)
+        userName.text = account.displayName
+        userMailAddress.text = account.email
+        updateSelectedUi(position)
+        accountCardview.setOnClickListener { selectAccount(position) }
     }
 
-    private fun ItemSwitchUserAccountBinding.toggleMailboxes(position: Int) {
-        val account = accounts[position]
-        if (account.isCollapsed) closeAllBut(position)
-        account.isCollapsed = !account.isCollapsed
-
-        updateAccountCardUiState(account.isCollapsed)
+    override fun getItemId(position: Int): Long {
+        return accounts[position].id.toLong()
     }
 
-    private fun closeAllBut(position: Int) {
-        accounts.forEachIndexed { index, uiAccount ->
-            if (index != position) {
-                uiAccount.isCollapsed = true
-                notifyItemChanged(index, Unit)
-            }
-        }
-    }
+    private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
+        val isSelected = accounts[position].id == currentUserId
 
-    private fun ItemSwitchUserAccountBinding.updateAccountCardUiState(isCollapsed: Boolean) {
-        chevron.toggleChevron(isCollapsed)
-        addressesList.isGone = isCollapsed
-
-        val backgroundColorResource = if (isCollapsed) R.color.backgroundColor else R.color.backgroundSecondaryColor
+        checkmark.isVisible = isSelected
+        val backgroundColorResource = if (isSelected) R.color.backgroundSecondaryColor else R.color.backgroundColor
         val backgroundColor = ContextCompat.getColor(root.context, backgroundColorResource)
         accountCardview.setCardBackgroundColor(backgroundColor)
     }
 
+    private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])
+
     override fun getItemCount(): Int = accounts.count()
 
-    fun notifyAdapter(newList: List<UiAccount>, mailboxObjectId: String) {
-        collapseAllExceptFirst(newList)
-        currentMailboxObjectId = mailboxObjectId
-        DiffUtil.calculateDiff(UiAccountsListDiffCallback(accounts, newList)).dispatchUpdatesTo(this)
+    fun notifyAdapter(newList: List<User>) {
         accounts = newList
-    }
-
-    private fun collapseAllExceptFirst(newList: List<UiAccount>) {
-        newList.forEachIndexed { index, uiAccount ->
-            uiAccount.isCollapsed = index != 0
-        }
+        notifyDataSetChanged()
     }
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : RecyclerView.ViewHolder(binding.root)
-
-    private class UiAccountsListDiffCallback(
-        private val oldList: List<UiAccount>,
-        private val newList: List<UiAccount>,
-    ) : DiffUtil.Callback() {
-
-        override fun getOldListSize(): Int = oldList.size
-
-        override fun getNewListSize(): Int = newList.size
-
-        override fun areItemsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            return oldList[oldIndex].user.id == newList[newIndex].user.id
-        }
-
-        override fun areContentsTheSame(oldIndex: Int, newIndex: Int): Boolean {
-            val oldItem = oldList[oldIndex]
-            val newItem = newList[newIndex]
-
-            return if (oldItem.mailboxes.size == newItem.mailboxes.size) {
-                var areContentsTheSame = true
-                oldItem.mailboxes.forEachIndexed { index, oldMailbox ->
-                    if (oldMailbox.inboxUnreadCount != newItem.mailboxes[index].inboxUnreadCount) {
-                        areContentsTheSame = false
-                        return@forEachIndexed
-                    }
-                }
-                areContentsTheSame
-            } else {
-                false
-            }
-        }
-    }
-
-    data class UiAccount(
-        val user: User,
-        var mailboxes: List<Mailbox>,
-    ) {
-        var isCollapsed = true
-    }
 }
