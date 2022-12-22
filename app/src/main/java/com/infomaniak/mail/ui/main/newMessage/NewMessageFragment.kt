@@ -121,7 +121,7 @@ class NewMessageFragment : Fragment() {
             if (isSuccess) {
                 observeContacts()
                 populateViewModelWithExternalMailData()
-                populateUiWithExistingDraftData()
+                populateUiWithViewModel()
             } else {
                 requireActivity().finish()
             }
@@ -185,7 +185,7 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
-    private fun populateUiWithExistingDraftData() = with(newMessageViewModel) {
+    private fun populateUiWithViewModel() = with(newMessageViewModel) {
         attachmentAdapter.addAll(mailAttachments)
         binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
         binding.subjectTextField.setText(mailSubject)
@@ -232,12 +232,14 @@ class NewMessageFragment : Fragment() {
                 ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
-            toField.initRecipients(to)
-            ccField.initRecipients(cc)
-            bccField.initRecipients(bcc)
+            newMessageViewModel.mailTo.addAll(to)
+            newMessageViewModel.mailCc.addAll(cc)
+            newMessageViewModel.mailBcc.addAll(bcc)
 
-            subjectTextField.setText(mailTo.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT))
-            bodyText.setText(mailTo.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))
+            newMessageViewModel.mailSubject = mailTo.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            (mailTo.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))?.let { newMessageViewModel.mailBody = it }
+
+            newMessageViewModel.saveDraftDebouncing()
         }
     }
 
@@ -250,8 +252,8 @@ class NewMessageFragment : Fragment() {
 
     private fun handleSingleSendIntent() = with(requireActivity().intent) {
         if (hasExtra(Intent.EXTRA_TEXT)) {
-            binding.subjectTextField.setText(getStringExtra(Intent.EXTRA_SUBJECT) ?: "")
-            binding.bodyText.setText(getStringExtra(Intent.EXTRA_TEXT) ?: "")
+            getStringExtra(Intent.EXTRA_SUBJECT)?.let { newMessageViewModel.mailSubject = it }
+            getStringExtra(Intent.EXTRA_TEXT)?.let { newMessageViewModel.mailBody = it }
         } else {
             (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
                 newMessageViewModel.importAttachments(listOf(uri))
