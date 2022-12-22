@@ -88,7 +88,6 @@ class NewMessageActivity : ThemedActivity() {
 
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
-        linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
     }
 
