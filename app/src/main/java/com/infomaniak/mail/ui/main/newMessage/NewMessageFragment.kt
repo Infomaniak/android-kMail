@@ -120,9 +120,8 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.initDraftAndUi(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
                 observeContacts()
+                populateViewModelWithExternalMailData()
                 populateUiWithExistingDraftData()
-                handleMailTo()
-                handleActionSend()
             } else {
                 requireActivity().finish()
             }
@@ -204,8 +203,13 @@ class NewMessageFragment : Fragment() {
         binding.bccField.initRecipients(mailBcc)
     }
 
+    private fun populateViewModelWithExternalMailData() {
+        handleMailTo()
+        handleActionSend()
+    }
+
     /**
-     * Handle `Mailto` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
+     * Handle `MailTo` from [Intent.ACTION_VIEW] or [Intent.ACTION_SENDTO]
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(binding) {
@@ -222,12 +226,10 @@ class NewMessageFragment : Fragment() {
             val to = mailTo.to?.splitToList()
                 ?: emptyList()
             val cc = mailTo.cc?.splitToList()
-                ?: intent.getStringArrayExtra(Intent.EXTRA_CC)
-                ?.map { Recipient().initLocalValues(it, it) }
+                ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
             val bcc = mailTo.bcc?.splitToList()
-                ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)
-                ?.map { Recipient().initLocalValues(it, it) }
+                ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
             toField.initRecipients(to)
