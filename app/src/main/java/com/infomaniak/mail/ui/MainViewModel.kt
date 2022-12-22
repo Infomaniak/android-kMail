@@ -291,10 +291,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
-
         val mailbox = currentMailbox.value ?: return@launch
-        ThreadController.toggleSeenStatus(thread, mailbox)
 
+        ThreadController.toggleSeenStatus(thread, mailbox.uuid)
         refreshThreads()
     }
 

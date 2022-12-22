@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
@@ -155,21 +154,21 @@ object ThreadController {
     }
     //endregion
 
-    //region Mark as seen/unseen
-    fun toggleSeenStatus(thread: Thread, mailbox: Mailbox) {
-        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailbox) else markAsSeen(thread, mailbox)
+    //region Seen status
+    fun toggleSeenStatus(thread: Thread, mailboxUuid: String) {
+        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailboxUuid) else markAsSeen(thread, mailboxUuid)
     }
 
-    private fun markAsUnseen(thread: Thread, mailbox: Mailbox) {
+    private fun markAsUnseen(thread: Thread, mailboxUuid: String) {
         val uids = getThreadLastMessageUids(thread)
 
-        ApiRepository.markMessagesAsUnseen(mailbox.uuid, uids)
+        ApiRepository.markMessagesAsUnseen(mailboxUuid, uids)
     }
 
-    fun markAsSeen(thread: Thread, mailbox: Mailbox) {
+    fun markAsSeen(thread: Thread, mailboxUuid: String) {
         val uids = getThreadUnseenMessagesUids(thread)
 
-        ApiRepository.markMessagesAsSeen(mailbox.uuid, uids)
+        ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
     }
     //endregion
 }
