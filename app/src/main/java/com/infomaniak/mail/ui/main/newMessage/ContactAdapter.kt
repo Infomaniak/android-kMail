@@ -18,25 +18,23 @@
 package com.infomaniak.mail.ui.main.newMessage
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.data.models.MergedContact
-import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ItemContactBinding
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
-    private var allContacts: List<MergedContact>,
     private val usedContacts: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
 ) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
 
+    private var allContacts: List<MergedContact> = emptyList()
     private var contacts = mutableListOf<MergedContact>()
 
     init {
@@ -72,13 +70,13 @@ class ContactAdapter(
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val searchTerm = constraint?.standardize() ?: ""
-                val finalUserList = allContacts
-                    .filter {
-                        val standardizedEmail = it.email.standardize()
-                        (it.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm))
-                                && !usedContacts.contains(standardizedEmail)
-                    }
 
+                val finalUserList = allContacts.filter {
+                    val standardizedEmail = it.email.standardize()
+                    val isFound = it.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm)
+                    val isAlreadyUsed = usedContacts.contains(standardizedEmail)
+                    isFound && !isAlreadyUsed
+                }
 
                 return FilterResults().apply {
                     values = finalUserList
@@ -98,9 +96,7 @@ class ContactAdapter(
         filter.filter(text)
     }
 
-    fun removeEmail(email: String): Boolean {
-        return usedContacts.remove(email.standardize())
-    }
+    fun removeUsedEmail(email: String) = usedContacts.remove(email.standardize())
 
     fun addUsedContact(email: String) = usedContacts.add(email.standardize())
 

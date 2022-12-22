@@ -100,7 +100,6 @@ class RecipientFieldView @JvmOverloads constructor(
             }
 
             contactAdapter = ContactAdapter(
-                allContacts = emptyList(),
                 usedContacts = mutableSetOf(),
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
@@ -195,7 +194,7 @@ class RecipientFieldView @JvmOverloads constructor(
 
     private fun removeRecipient(recipient: Recipient) = with(binding) {
         val index = recipients.indexOf(recipient)
-        val successfullyRemoved = contactAdapter!!.removeEmail(recipient.email)
+        val successfullyRemoved = contactAdapter!!.removeUsedEmail(recipient.email)
         if (successfullyRemoved) {
             recipients.remove(recipient)
             itemsChipGroup.removeViewAt(index)
