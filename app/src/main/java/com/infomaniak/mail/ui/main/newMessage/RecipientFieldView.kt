@@ -40,8 +40,9 @@ import com.infomaniak.mail.utils.toggleChevron
 class RecipientFieldView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
+
     private val binding by lazy { ViewRecipientFieldBinding.inflate(LayoutInflater.from(context), this, true) }
 
     private var contactAdapter: ContactAdapter? = null
@@ -84,9 +85,7 @@ class RecipientFieldView @JvmOverloads constructor(
                     if (isCollapsed) autoCompleteInput.hideKeyboard()
                 }
 
-                plusChip.setOnClickListener {
-                    isCollapsed = !isCollapsed
-                }
+                plusChip.setOnClickListener { isCollapsed = !isCollapsed }
 
                 transparentButton.setOnClickListener {
                     isCollapsed = !isCollapsed
@@ -105,7 +104,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 onAddUnrecognizedContact = {
                     val input = autoCompleteInput.text.toString()
                     if (input.isEmail()) addRecipient(email = input, name = input)
-                }
+                },
             )
 
             autoCompleteInput.apply {
