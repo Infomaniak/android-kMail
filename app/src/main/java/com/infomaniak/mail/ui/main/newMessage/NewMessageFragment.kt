@@ -238,7 +238,7 @@ class NewMessageFragment : Fragment() {
             TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isGone = true
         }
-        mailAttachments[position].getUploadLocalFile(requireContext(), currentDraftLocalUuid).delete()
+        currentDraftLocalUuid?.let { mailAttachments[position].getUploadLocalFile(requireContext(), it).delete() }
         mailAttachments.removeAt(position)
     }
 
