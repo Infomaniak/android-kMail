@@ -49,7 +49,6 @@
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="colorOnPrimary">@color/bat</color>
     <color name="snackbarTextColor">@color/orca</color>
-    <color name="emailChipTextColor">@color/shark</color>
 
     <!-- Separators -->
     <color name="separatorDarker">@color/bat</color>

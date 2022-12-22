@@ -59,7 +59,6 @@
     <color name="snackbarTextColor">@color/mouse</color>
     <color name="hintTextColor">@color/shark</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
-    <color name="emailChipTextColor">@color/orca</color>
 
     <!-- Separators -->
     <color name="separatorDarker">#ECECEC</color>
