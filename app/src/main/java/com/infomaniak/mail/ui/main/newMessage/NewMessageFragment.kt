@@ -86,18 +86,20 @@ class NewMessageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         filePicker = FilePicker(this@NewMessageFragment)
-        initDraftAndUi()
+
+        initUi()
+        initDraftAndViewModel()
 
         doAfterSubjectChange()
         doAfterBodyChange()
 
+        observeContacts()
         observeMailboxes()
-
         observeEditorActions()
         observeNewAttachments()
     }
 
-    private fun initDraftAndUi() = with(binding) {
+    private fun initUi() = with(binding) {
         attachmentsRecyclerView.adapter = attachmentAdapter
 
         setupAutoCompletionFields()
@@ -116,10 +118,11 @@ class NewMessageFragment : Fragment() {
 
         bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
+    }
 
-        newMessageViewModel.initDraftAndUi(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
+    private fun initDraftAndViewModel() {
+        newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
-                observeContacts()
                 populateViewModelWithExternalMailData()
                 populateUiWithViewModel()
             } else {
