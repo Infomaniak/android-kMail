@@ -73,6 +73,8 @@ object AccountUtils : CredentialManager() {
             AppSettingsController.updateAppSettings { appSettings -> appSettings.currentMailboxId = mailboxId }
         }
 
+    var currentMailboxEmail: String? = null
+
     suspend fun requestCurrentUser(): User? {
         currentUser = getUserById(currentUserId)
         if (currentUser == null) {

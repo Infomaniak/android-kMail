@@ -28,7 +28,7 @@ interface Correspondent : Parcelable {
 
     val initials: String
 
-    fun isMe(): Boolean = AccountUtils.currentUser?.email == this.email
+    fun isMe(): Boolean = AccountUtils.currentMailboxEmail == this.email
 
     fun getNameOrEmail(): String = name.ifBlank { email }
 
