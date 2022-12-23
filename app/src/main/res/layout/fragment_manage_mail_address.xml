@@ -79,11 +79,26 @@
                     style="@style/SettingHeader"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
                     android:layout_marginTop="@dimen/marginStandardMedium"
                     android:text="@string/buttonAccountAssociatedEmailAddresses"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/changeAccountButton" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mailboxesRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                    android:layout_marginTop="@dimen/marginStandardMedium"
+                    android:overScrollMode="never"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/associatedEmailAddresses"
+                    tools:itemCount="10"
+                    tools:listitem="@layout/item_mailbox_my_account" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
