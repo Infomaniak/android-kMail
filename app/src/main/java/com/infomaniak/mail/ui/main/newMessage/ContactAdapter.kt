@@ -100,7 +100,7 @@ class ContactAdapter(
 
     fun addUsedContact(email: String) = usedContacts.add(email.standardize())
 
-    fun CharSequence.standardize(): String = toString().trim().lowercase()
+    private fun CharSequence.standardize(): String = toString().trim().lowercase()
 
     fun updateContacts(allContacts: List<MergedContact>) {
         this.allContacts = allContacts

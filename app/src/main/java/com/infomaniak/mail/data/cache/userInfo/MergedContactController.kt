@@ -31,8 +31,9 @@ object MergedContactController {
 
     //region Queries
     private fun getMergedContactsQuery(sorted: Boolean = false): RealmQuery<MergedContact> {
-        val query = RealmDatabase.userInfo().query<MergedContact>()
-        return if (sorted) query.sort(MergedContact::name.name) else query
+        return RealmDatabase.userInfo().query<MergedContact>().apply {
+            if (sorted) sort(MergedContact::name.name)
+        }
     }
     //endregion
 

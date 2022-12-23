@@ -91,12 +91,12 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 true
             }
 
-            if (isSuccess) populateViewModelWithDraftData()
+            if (isSuccess) initWithDraftData()
             emit(isSuccess)
         }
     }
 
-    private fun populateViewModelWithDraftData() {
+    private fun initWithDraftData() {
         currentDraftLocalUuid?.let(DraftController::getDraft)?.let { draft ->
             mailTo.addAll(draft.to)
             mailCc.addAll(draft.cc)

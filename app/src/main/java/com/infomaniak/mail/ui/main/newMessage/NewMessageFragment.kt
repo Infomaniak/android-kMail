@@ -163,9 +163,10 @@ class NewMessageFragment : Fragment() {
 
     private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
         ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->
-            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
-            callback(isKeyboardVisible)
-            insets
+            insets.also {
+                val isKeyboardVisible = it.isVisible(WindowInsetsCompat.Type.ime())
+                callback(isKeyboardVisible)
+            }
         }
     }
 
@@ -189,22 +190,22 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
-    private fun populateUiWithViewModel() = with(newMessageViewModel) {
-        attachmentAdapter.addAll(mailAttachments)
-        binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-        binding.subjectTextField.setText(mailSubject)
-        binding.bodyText.setText(mailBody)
-        mailSignature?.let {
-            binding.signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
-            binding.removeSignature.setOnClickListener {
-                mailSignature = null
-                binding.separatedSignature.isGone = true
+    private fun populateUiWithViewModel() = with(binding) {
+        attachmentAdapter.addAll(newMessageViewModel.mailAttachments)
+        attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+        subjectTextField.setText(newMessageViewModel.mailSubject)
+        bodyText.setText(newMessageViewModel.mailBody)
+        newMessageViewModel.mailSignature?.let {
+            signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+            removeSignature.setOnClickListener {
+                newMessageViewModel.mailSignature = null
+                separatedSignature.isGone = true
             }
-            binding.separatedSignature.isVisible = true
+            separatedSignature.isVisible = true
         }
-        binding.toField.initRecipients(mailTo)
-        binding.ccField.initRecipients(mailCc)
-        binding.bccField.initRecipients(mailBcc)
+        toField.initRecipients(newMessageViewModel.mailTo)
+        ccField.initRecipients(newMessageViewModel.mailCc)
+        bccField.initRecipients(newMessageViewModel.mailBcc)
     }
 
     private fun populateViewModelWithExternalMailData() {
@@ -220,7 +221,7 @@ class NewMessageFragment : Fragment() {
      * Get [Intent.ACTION_VIEW] data with [MailTo] and [Intent.ACTION_SENDTO] with [Intent]
      */
     private fun handleMailTo() = with(newMessageViewModel) {
-        fun String.splitToList() = split(",").map {
+        fun String.splitToRecipientList() = split(",").map {
             val email = it.trim()
             Recipient().initLocalValues(email, email)
         }
@@ -230,12 +231,12 @@ class NewMessageFragment : Fragment() {
             if (!MailTo.isMailTo(uri)) return@with
 
             val mailToIntent = MailTo.parse(uri)
-            val to = mailToIntent.to?.splitToList()
+            val to = mailToIntent.to?.splitToRecipientList()
                 ?: emptyList()
-            val cc = mailToIntent.cc?.splitToList()
+            val cc = mailToIntent.cc?.splitToRecipientList()
                 ?: intent.getStringArrayExtra(Intent.EXTRA_CC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
-            val bcc = mailToIntent.bcc?.splitToList()
+            val bcc = mailToIntent.bcc?.splitToRecipientList()
                 ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
