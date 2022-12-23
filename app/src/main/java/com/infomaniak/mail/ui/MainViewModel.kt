@@ -292,9 +292,40 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
-
         val mailbox = currentMailbox.value ?: return@launch
-        ThreadController.toggleSeenStatus(thread, mailbox)
+
+        ThreadController.toggleSeenStatus(thread, mailbox.uuid)
+        refreshThreads()
+    }
+
+    fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value ?: return@launch
+
+        if (thread.isFavorite) {
+            val uids = ThreadController.getThreadFavoritesMessagesUids(thread)
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+        } else {
+            val uids = ThreadController.getThreadLastMessageUids(thread)
+            ApiRepository.addToFavorites(mailbox.uuid, uids)
+        }
+
+        refreshThreads()
+    }
+
+    fun toggleMessageFavoriteStatus(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val realm = RealmDatabase.mailboxContent()
+        val message = MessageController.getMessage(messageUid, realm) ?: return@launch
+        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
+        val mailbox = currentMailbox.value ?: return@launch
+
+        val uids = listOf(message.uid) + thread.getMessageDuplicates(message.messageId)
+
+        if (message.isFavorite) {
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+        } else {
+            ApiRepository.addToFavorites(mailbox.uuid, uids)
+        }
 
         refreshThreads()
     }

@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
@@ -123,8 +122,8 @@ object ThreadController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    private fun getThreadLastMessageUids(thread: Thread): List<String> {
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getThreadLastMessageUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
 
             val lastMessage = thread.messages.getLastMessageToExecuteAction()
@@ -134,11 +133,23 @@ object ThreadController {
         }
     }
 
-    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    private fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
             thread.messages.forEach { message ->
                 if (!message.seen) {
+                    add(message.uid)
+                    addAll(thread.getMessageDuplicates(message.messageId))
+                }
+            }
+        }
+    }
+
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getThreadFavoritesMessagesUids(thread: Thread): List<String> {
+        return mutableListOf<String>().apply {
+            thread.messages.forEach { message ->
+                if (message.isFavorite && !message.isDraft) {
                     add(message.uid)
                     addAll(thread.getMessageDuplicates(message.messageId))
                 }
@@ -155,21 +166,22 @@ object ThreadController {
     }
     //endregion
 
-    //region Mark as seen/unseen
-    fun toggleSeenStatus(thread: Thread, mailbox: Mailbox) {
-        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailbox) else markAsSeen(thread, mailbox)
+    //region Seen status
+    fun toggleSeenStatus(thread: Thread, mailboxUuid: String) {
+        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailboxUuid) else markAsSeen(thread, mailboxUuid)
     }
 
-    private fun markAsUnseen(thread: Thread, mailbox: Mailbox) {
+    private fun markAsUnseen(thread: Thread, mailboxUuid: String) {
         val uids = getThreadLastMessageUids(thread)
 
-        ApiRepository.markMessagesAsUnseen(mailbox.uuid, uids)
+        ApiRepository.markMessagesAsUnseen(mailboxUuid, uids)
     }
 
-    fun markAsSeen(thread: Thread, mailbox: Mailbox) {
+    fun markAsSeen(thread: Thread, mailboxUuid: String) {
         val uids = getThreadUnseenMessagesUids(thread)
 
-        ApiRepository.markMessagesAsSeen(mailbox.uuid, uids)
+        ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
     }
     //endregion
+
 }

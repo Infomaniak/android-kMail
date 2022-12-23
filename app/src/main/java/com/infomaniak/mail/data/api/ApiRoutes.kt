@@ -51,19 +51,21 @@ object ApiRoutes {
         return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
     }
 
-    fun moveMessage(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/move"
+    private fun message(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
-    fun deleteMessage(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/delete"
+    fun moveMessage(mailboxUuid: String) = "${message(mailboxUuid)}/move"
+
+    fun deleteMessage(mailboxUuid: String) = "${message(mailboxUuid)}/delete"
 
     fun draft(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/draft"
 
     fun draft(mailboxUuid: String, draftRemoteUuid: String) = "${draft(mailboxUuid)}/$draftRemoteUuid"
 
-    fun messageSeen(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/seen"
+    fun messageSeen(mailboxUuid: String) = "${message(mailboxUuid)}/seen"
 
-    fun messageUnseen(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/unseen"
+    fun messageUnseen(mailboxUuid: String) = "${message(mailboxUuid)}/unseen"
 
-    // fun messageSafe(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message/safe"
+    // fun messageSafe(mailboxUuid: String) = "${message(mailboxUuid)}/safe"
 
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
@@ -75,9 +77,7 @@ object ApiRoutes {
         return "${folder(mailboxUuid, folderId)}/message/$messageId/attachmentsArchive"
     }
 
-    // fun starMessage(mailboxUuid: String, star: Boolean): String {
-    //     return "$MAIL_API/api/mail/$mailboxUuid/message/${if (star) "star" else "unstar"}"
-    // }
+    fun starMessage(mailboxUuid: String, star: Boolean): String = "${message(mailboxUuid)}/${if (star) "star" else "unstar"}"
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): String {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"

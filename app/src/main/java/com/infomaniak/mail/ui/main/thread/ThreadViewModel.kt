@@ -55,7 +55,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return@launch
         ThreadController.getThread(threadUid)?.let { thread ->
             if (thread.unseenMessagesCount > 0) {
-                ThreadController.markAsSeen(thread, mailbox)
+                ThreadController.markAsSeen(thread, mailbox.uuid)
                 MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
             }
             updateMessages(thread)
