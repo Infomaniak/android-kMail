@@ -78,6 +78,7 @@ class RecipientFieldView @JvmOverloads constructor(
             }
 
             chevron.isVisible = isToggleable
+            isCollapsed = isToggleable
 
             if (isToggleable) {
                 chevron.setOnClickListener {
