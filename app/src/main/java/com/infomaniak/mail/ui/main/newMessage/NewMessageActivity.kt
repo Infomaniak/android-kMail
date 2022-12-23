@@ -58,8 +58,8 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutocompletionOpened) {
-                newMessageFragment.closeAutocompletion()
+            if (isAutoCompletionOpened) {
+                newMessageFragment.closeAutoCompletion()
             } else {
                 saveToLocalAndFinish(DraftAction.SAVE)
             }
@@ -86,20 +86,9 @@ class NewMessageActivity : ThemedActivity() {
             view.setOnClickListener { newMessageViewModel.editorAction.value = action to null }
         }
 
-        fun linkEditor(view: ToggleableTextFormatterItemView, action: EditorAction) {
-            view.setOnClickListener { newMessageViewModel.editorAction.value = action to view.isToggled }
-        }
-
         linkEditor(editorAttachment, EditorAction.ATTACHMENT)
         linkEditor(editorCamera, EditorAction.CAMERA)
-        linkEditor(editorLink, EditorAction.LINK)
         linkEditor(editorClock, EditorAction.CLOCK)
-
-        linkEditor(editorBold, EditorAction.BOLD)
-        linkEditor(editorItalic, EditorAction.ITALIC)
-        linkEditor(editorUnderlined, EditorAction.UNDERLINE)
-        linkEditor(editorStrikeThrough, EditorAction.STRIKE_THROUGH)
-        linkEditor(editorList, EditorAction.UNORDERED_LIST)
     }
 
     private fun setupEditorFormatActionsToggle() = with(binding) {

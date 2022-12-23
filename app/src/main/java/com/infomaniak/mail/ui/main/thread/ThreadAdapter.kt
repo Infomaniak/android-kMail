@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.Utils
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
@@ -109,7 +110,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ItemMessageBinding.loadBodyInWebView(body: Body?) {
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
-        body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, "utf-8", "") }
+        body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, Utils.UTF_8, "") }
     }
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {

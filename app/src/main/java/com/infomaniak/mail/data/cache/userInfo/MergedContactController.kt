@@ -30,14 +30,16 @@ import kotlinx.coroutines.flow.Flow
 object MergedContactController {
 
     //region Queries
-    private fun getMergedContactsQuery(): RealmQuery<MergedContact> {
-        return RealmDatabase.userInfo().query()
+    private fun getMergedContactsQuery(sorted: Boolean = false): RealmQuery<MergedContact> {
+        return RealmDatabase.userInfo().query<MergedContact>().apply {
+            if (sorted) sort(MergedContact::name.name)
+        }
     }
     //endregion
 
     //region Get data
-    fun getMergedContacts(): RealmResults<MergedContact> {
-        return getMergedContactsQuery().find()
+    fun getMergedContacts(sorted: Boolean): RealmResults<MergedContact> {
+        return getMergedContactsQuery(sorted).find()
     }
 
     fun getMergedContactsAsync(): Flow<ResultsChange<MergedContact>> {

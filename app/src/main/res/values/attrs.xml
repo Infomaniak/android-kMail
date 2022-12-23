@@ -102,4 +102,9 @@
         <attr name="icon" />
         <attr name="title" />
     </declare-styleable>
+
+    <declare-styleable name="RecipientFieldView">
+        <attr name="title" />
+        <attr name="toggleable" format="boolean" />
+    </declare-styleable>
 </resources>
