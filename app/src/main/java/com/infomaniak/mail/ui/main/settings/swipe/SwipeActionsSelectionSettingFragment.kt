@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -72,6 +73,8 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 }
 
                 saveAction(swipeAction)
+
+                findNavController().popBackStack()
             }
         }
     }
