@@ -78,8 +78,8 @@
 
             <ImageView
                 android:id="@+id/checkmark"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="@dimen/mediumIconSize"
+                android:layout_height="@dimen/mediumIconSize"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 android:src="@drawable/ic_check"
                 app:layout_constraintBottom_toBottomOf="@id/userAvatar"

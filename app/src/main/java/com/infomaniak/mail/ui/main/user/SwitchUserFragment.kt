@@ -23,7 +23,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
+import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
@@ -36,8 +41,9 @@ import kotlinx.coroutines.withContext
 class SwitchUserFragment : Fragment() {
 
     private lateinit var binding: FragmentSwitchUserBinding
+    private val switchUserViewModel: SwitchUserViewModel by viewModels()
 
-    private val accountsAdapter = SwitchUserAccountsAdapter(AccountUtils.currentUserId) { user ->
+    private val accountsAdapter = SwitchUserAdapter(AccountUtils.currentUserId) { user ->
         lifecycleScope.launch(Dispatchers.IO) {
             if (user.id != AccountUtils.currentUserId) {
                 AccountUtils.currentUser = user
@@ -69,9 +75,12 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun observeAccounts() {
-        AccountUtils.getAllUsers().observe(viewLifecycleOwner) { users ->
-            val sortedUsers = users.sortedBy { it.displayName }
-            accountsAdapter.notifyAdapter(sortedUsers)
+        switchUserViewModel.getAllUsers().observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
+    }
+
+    class SwitchUserViewModel : ViewModel() {
+        fun getAllUsers(): LiveData<List<User>> {
+            return AccountUtils.getAllUsers().map { users -> users.sortedBy { it.displayName } }
         }
     }
 }

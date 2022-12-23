@@ -26,19 +26,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
-import com.infomaniak.mail.ui.main.user.SwitchUserAccountsAdapter.SwitchUserAccountViewHolder
+import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewHolder
 
 @SuppressLint("NotifyDataSetChanged")
-class SwitchUserAccountsAdapter(
+class SwitchUserAdapter(
     val currentUserId: Int,
     val onChangingUserAccount: ((User) -> Unit)
 ) : RecyclerView.Adapter<SwitchUserAccountViewHolder>() {
 
     private var accounts: List<User> = emptyList()
-
-    init {
-        setHasStableIds(true)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwitchUserAccountViewHolder {
         return SwitchUserAccountViewHolder(
@@ -64,26 +60,21 @@ class SwitchUserAccountsAdapter(
         accountCardview.setOnClickListener { selectAccount(position) }
     }
 
-    override fun getItemId(position: Int): Long {
-        return accounts[position].id.toLong()
-    }
-
     private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
         val isSelected = accounts[position].id == currentUserId
-
-        checkmark.isVisible = isSelected
         val backgroundColorResource = if (isSelected) R.color.backgroundSecondaryColor else R.color.backgroundColor
         val backgroundColor = ContextCompat.getColor(root.context, backgroundColorResource)
         accountCardview.setCardBackgroundColor(backgroundColor)
+        checkmark.isVisible = isSelected
     }
 
     private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])
 
     override fun getItemCount(): Int = accounts.count()
 
-    fun notifyAdapter(newList: List<User>) {
+    fun initializeAccounts(newList: List<User>) {
         accounts = newList
-        notifyDataSetChanged()
+        notifyItemRangeInserted(0, accounts.count())
     }
 
     class SwitchUserAccountViewHolder(val binding: ItemSwitchUserAccountBinding) : RecyclerView.ViewHolder(binding.root)

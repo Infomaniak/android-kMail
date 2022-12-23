@@ -198,7 +198,7 @@
         <item name="cornerRadius">@dimen/roundCornerRadius</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">0dp</item>
-        <item name="iconSize">16dp</item>
+        <item name="iconSize">@dimen/mediumIconSize</item>
         <item name="iconTint">@color/iconColor</item>
     </style>
 

@@ -28,6 +28,7 @@
     <dimen name="smallCornerRadius">6dp</dimen>
     <dimen name="userAvatarSizeLarge">42dp</dimen>
     <dimen name="messageDividerHeight">6dp</dimen>
+    <dimen name="mediumIconSize">16dp</dimen>
 
     <!-- Menu Drawer -->
 
