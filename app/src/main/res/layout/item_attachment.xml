@@ -91,7 +91,7 @@
             app:icon="@drawable/ic_close"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="16dp"
+            app:iconSize="@dimen/mediumIconSize"
             app:iconTint="@color/iconSecondaryColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1"

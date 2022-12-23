@@ -69,39 +69,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/marginStandardMedium"
                     android:text="@string/buttonAccountSwitch"
-                    app:layout_constraintBottom_toTopOf="@id/topDivider"
+                    app:layout_constraintBottom_toTopOf="@id/associatedEmailAddresses"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/mail" />
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:id="@+id/topDivider"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="@dimen/marginStandardSmall"
-                    app:dividerColor="@color/separatorDarker"
-                    app:layout_constraintBottom_toTopOf="@id/associatedEmailAddresses"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
-                <com.infomaniak.mail.ui.main.settings.ItemSettingView
+                <TextView
                     android:id="@+id/associatedEmailAddresses"
-                    android:layout_width="match_parent"
-                    android:layout_height="74dp"
-                    app:itemAction="chevron"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/topDivider"
-                    app:title="@string/buttonAccountAssociatedEmailAddresses" />
-
-                <com.google.android.material.divider.MaterialDivider
+                    style="@style/SettingHeader"
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="@dimen/marginStandardSmall"
-                    app:dividerColor="@color/separatorDarker"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/marginStandardMedium"
+                    android:text="@string/buttonAccountAssociatedEmailAddresses"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/associatedEmailAddresses" />
+                    app:layout_constraintTop_toBottomOf="@id/changeAccountButton" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>

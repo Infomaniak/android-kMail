@@ -69,7 +69,7 @@
             android:insetBottom="@dimen/marginStandardSmall"
             android:visibility="gone"
             app:icon="@drawable/ic_add_circle"
-            app:iconSize="16dp"
+            app:iconSize="@dimen/mediumIconSize"
             app:iconTint="?android:attr/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1"

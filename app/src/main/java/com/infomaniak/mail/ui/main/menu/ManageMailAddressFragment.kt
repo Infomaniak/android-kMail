@@ -22,20 +22,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.notYetImplemented
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ManageMailAddressFragment : Fragment() {
 
     private lateinit var binding: FragmentManageMailAddressBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -49,7 +45,6 @@ class ManageMailAddressFragment : Fragment() {
         }
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
-        associatedEmailAddresses.setOnClickListener { notYetImplemented() }
         disconnectAccountButton.setOnClickListener { removeCurrentUser() }
     }
 

@@ -23,12 +23,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
+import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.LoginActivity
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
@@ -38,26 +41,18 @@ import kotlinx.coroutines.withContext
 class SwitchUserFragment : Fragment() {
 
     private lateinit var binding: FragmentSwitchUserBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val switchUserViewModel: SwitchUserViewModel by viewModels()
 
-    private val accountsAdapter = SwitchUserAccountsAdapter { selectedMailbox ->
-        // TODO: This code is currently removed because if it triggers, the app crashes. This crash is because of the
-        // TODO: removal of the ThreadList DiffUtil. The DiffUtil was checking if the Threads are still `.valid()`.
-        // TODO: When we change Mailbox, the Threads are not valid anymore, so we don't want to display them.
-        // TODO: Now that we don't check that anymore, we display them, so the app crashes.
-        // if (selectedMailbox.userId == AccountUtils.currentUserId) {
-        //     mainViewModel.openMailbox(selectedMailbox)
-        //     findNavController().popBackStack()
-        // } else {
+    private val accountsAdapter = SwitchUserAdapter(AccountUtils.currentUserId) { user ->
         lifecycleScope.launch(Dispatchers.IO) {
-            AccountUtils.currentUser = AccountUtils.getUserById(selectedMailbox.userId)
-            // TODO: This works, but... The splashscreen blinks.
-            AccountUtils.currentMailboxId = selectedMailbox.mailboxId
-            RealmDatabase.close()
-            withContext(Dispatchers.Main) { AccountUtils.reloadApp?.invoke() }
+            if (user.id != AccountUtils.currentUserId) {
+                AccountUtils.currentUser = user
+                // TODO: This works, but... The splashscreen blinks.
+                AccountUtils.currentMailboxId = AppSettings.DEFAULT_ID
+                RealmDatabase.close()
+                withContext(Dispatchers.Main) { AccountUtils.reloadApp?.invoke() }
+            }
         }
-        // }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -80,9 +75,12 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun observeAccounts() {
-        switchUserViewModel.observeAccounts().observe(viewLifecycleOwner) { uiAccounts ->
-            val mailboxObjectId = mainViewModel.currentMailbox.value?.objectId ?: return@observe
-            accountsAdapter.notifyAdapter(uiAccounts, mailboxObjectId)
+        switchUserViewModel.getAllUsers().observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
+    }
+
+    class SwitchUserViewModel : ViewModel() {
+        fun getAllUsers(): LiveData<List<User>> {
+            return AccountUtils.getAllUsers().map { users -> users.sortedBy { it.displayName } }
         }
     }
 }
