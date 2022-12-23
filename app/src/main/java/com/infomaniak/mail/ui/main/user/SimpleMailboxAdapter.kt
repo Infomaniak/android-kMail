@@ -30,8 +30,7 @@ class SimpleMailboxAdapter : RecyclerView.Adapter<SimpleMailboxAdapter.SimpleMai
     }
 
     override fun onBindViewHolder(holder: SimpleMailboxViewHolder, position: Int): Unit = with(holder.binding) {
-        val mailbox = mailboxes[position]
-        email.text = mailbox
+        email.text = mailboxes[position]
     }
 
     override fun getItemCount(): Int = mailboxes.count()
