@@ -95,7 +95,7 @@ object MessageController {
         copyListToRealm(remoteMessages, alsoCopyManagedItems = false)
     }
 
-    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
     private fun getOutdatedMessages(localMessages: List<Message>, remoteMessages: List<Message>): List<Message> {
         return localMessages.filter { localMessage ->
             remoteMessages.none { remoteMessage -> remoteMessage.uid == localMessage.uid }
@@ -115,16 +115,6 @@ object MessageController {
                 }
         }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
-    //endregion
-
-    //region Favorite status
-    fun toggleMessageFavoriteStatus(isFavorite: Boolean, uids: List<String>, mailboxUuid: String) {
-        if (isFavorite) {
-            ApiRepository.removeFromFavorites(mailboxUuid, uids)
-        } else {
-            ApiRepository.addToFavorites(mailboxUuid, uids)
-        }
     }
     //endregion
 

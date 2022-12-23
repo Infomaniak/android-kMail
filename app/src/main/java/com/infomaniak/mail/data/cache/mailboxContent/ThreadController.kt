@@ -122,8 +122,8 @@ object ThreadController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    private fun getThreadLastMessageUids(thread: Thread): List<String> {
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getThreadLastMessageUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
 
             val lastMessage = thread.messages.getLastMessageToExecuteAction()
@@ -133,8 +133,8 @@ object ThreadController {
         }
     }
 
-    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    private fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
             thread.messages.forEach { message ->
                 if (!message.seen) {
@@ -145,8 +145,8 @@ object ThreadController {
         }
     }
 
-    // TODO: Replace this with a Realm query (blocked by https://github.com/realm/realm-kotlin/issues/591)
-    private fun getThreadFavoritesMessagesUids(thread: Thread): List<String> {
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getThreadFavoritesMessagesUids(thread: Thread): List<String> {
         return mutableListOf<String>().apply {
             thread.messages.forEach { message ->
                 if (message.isFavorite && !message.isDraft) {
@@ -184,15 +184,4 @@ object ThreadController {
     }
     //endregion
 
-    //region Favorite status
-    fun toggleThreadFavoriteStatus(thread: Thread, mailboxUuid: String) {
-        if (thread.isFavorite) {
-            val uids = getThreadFavoritesMessagesUids(thread)
-            ApiRepository.removeFromFavorites(mailboxUuid, uids)
-        } else {
-            val uids = getThreadLastMessageUids(thread)
-            ApiRepository.addToFavorites(mailboxUuid, uids)
-        }
-    }
-    //endregion
 }

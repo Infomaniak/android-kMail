@@ -301,7 +301,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         val mailbox = currentMailbox.value ?: return@launch
 
-        ThreadController.toggleThreadFavoriteStatus(thread, mailbox.uuid)
+        if (thread.isFavorite) {
+            val uids = ThreadController.getThreadFavoritesMessagesUids(thread)
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+        } else {
+            val uids = ThreadController.getThreadLastMessageUids(thread)
+            ApiRepository.addToFavorites(mailbox.uuid, uids)
+        }
+
         refreshThreads()
     }
 
@@ -313,7 +320,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val uids = listOf(message.uid) + thread.getMessageDuplicates(message.messageId)
 
-        MessageController.toggleMessageFavoriteStatus(message.isFavorite, uids, mailbox.uuid)
+        if (message.isFavorite) {
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+        } else {
+            ApiRepository.addToFavorites(mailbox.uuid, uids)
+        }
+
         refreshThreads()
     }
 
