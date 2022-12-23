@@ -208,8 +208,11 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun populateViewModelWithExternalMailData() {
-        handleMailTo()
-        handleActionSend()
+        when (requireActivity().intent?.action) {
+            Intent.ACTION_SEND -> handleSingleSendIntent()
+            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
+            Intent.ACTION_VIEW, Intent.ACTION_SENDTO -> handleMailTo()
+        }
     }
 
     /**
@@ -241,16 +244,9 @@ class NewMessageFragment : Fragment() {
             mailBcc.addAll(bcc)
 
             mailSubject = mailToIntent.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
-            (mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT))?.let { mailBody = it }
+            mailBody = mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
 
             saveDraftDebouncing()
-        }
-    }
-
-    private fun handleActionSend() {
-        when (requireActivity().intent?.action) {
-            Intent.ACTION_SEND -> handleSingleSendIntent()
-            Intent.ACTION_SEND_MULTIPLE -> handleMultipleSendIntent()
         }
     }
 
