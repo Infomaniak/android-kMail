@@ -129,7 +129,7 @@ object ThreadController {
             val lastMessage = thread.messages.getLastMessageToExecuteAction()
             add(lastMessage.uid)
 
-            addAll(thread.getMessageDuplicates(lastMessage.messageId))
+            addAll(thread.getMessageDuplicatesUids(lastMessage.messageId))
         }
     }
 
@@ -139,7 +139,7 @@ object ThreadController {
             thread.messages.forEach { message ->
                 if (!message.seen) {
                     add(message.uid)
-                    addAll(thread.getMessageDuplicates(message.messageId))
+                    addAll(thread.getMessageDuplicatesUids(message.messageId))
                 }
             }
         }
@@ -151,7 +151,7 @@ object ThreadController {
             thread.messages.forEach { message ->
                 if (message.isFavorite && !message.isDraft) {
                     add(message.uid)
-                    addAll(thread.getMessageDuplicates(message.messageId))
+                    addAll(thread.getMessageDuplicatesUids(message.messageId))
                 }
             }
         }

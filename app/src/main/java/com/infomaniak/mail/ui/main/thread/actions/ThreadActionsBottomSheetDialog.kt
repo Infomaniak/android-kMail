@@ -64,7 +64,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, navigationArgs.messageUid)
                 R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, navigationArgs.messageUid)
                 R.id.actionForward -> notYetImplemented()
-                R.id.actionDelete -> mainViewModel.deleteThread(navigationArgs.threadUid)
+                R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(navigationArgs.threadUid)
             }
         }
     }
