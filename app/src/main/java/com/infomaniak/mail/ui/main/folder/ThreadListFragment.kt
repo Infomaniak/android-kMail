@@ -245,6 +245,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 findNavController().navigate(R.id.swipeActionsSettingsFragment, null, getAnimatedNavOptions())
                 true
             }
+            SwipeAction.ARCHIVE -> {
+                mainViewModel.archiveThread(thread.uid)
+                false
+            }
             SwipeAction.DELETE -> {
                 mainViewModel.deleteThreadOrMessage(thread.uid)
                 false
