@@ -82,6 +82,7 @@ class ThreadFragment : Fragment() {
 
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
+        val threadUid = navigationArgs.threadUid
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
@@ -93,7 +94,7 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid) }
+        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
 
         quickActionBar.setOnItemClickListener { menuId ->
             val lastMessageUid = threadAdapter.messages.getLastMessageToExecuteAction().uid
@@ -102,12 +103,12 @@ class ThreadFragment : Fragment() {
                     ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUid)
                 )
                 R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> notYetImplemented()
-                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(navigationArgs.threadUid)
+                R.id.quickActionArchive -> mainViewModel.archiveThread(threadUid)
+                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                         messageUid = lastMessageUid,
-                        threadUid = navigationArgs.threadUid,
+                        threadUid = threadUid,
                     )
                 )
             }
