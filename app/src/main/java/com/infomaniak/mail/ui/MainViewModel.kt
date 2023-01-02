@@ -249,6 +249,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
+    fun archiveThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+
+        val mailbox = currentMailbox.value ?: return@launch
+        val realm = RealmDatabase.mailboxContent()
+        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
+
+        val uids = ThreadController.getSameFolderThreadMessagesUids(thread)
+        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
+
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
+
+        val context = getApplication<Application>()
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
+            context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+        } else {
+            context.getString(RCore.string.anErrorHasOccurred)
+        }
+
+        snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
+
+        refreshThreads()
+    }
+
     fun deleteThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val realm = RealmDatabase.mailboxContent()
         val mailbox = currentMailbox.value ?: return@launch
@@ -274,10 +298,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()
         } else {
             val trashId = FolderController.getFolder(FolderRole.TRASH, realm)!!.id
-            val uids = messages.filter { !it.scheduled }.map { it.uid }
-            val response = ApiRepository.moveMessages(mailbox.uuid, uids, trashId)
-            undoResource = response.data?.undoResource
-            response.isSuccess()
+            val filteredUids = messages.filter { !it.scheduled }.map { it.uid }
+
+            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, filteredUids, trashId)
+            undoResource = apiResponse.data?.undoResource
+            apiResponse.isSuccess()
         }
 
         val context = getApplication<Application>()
