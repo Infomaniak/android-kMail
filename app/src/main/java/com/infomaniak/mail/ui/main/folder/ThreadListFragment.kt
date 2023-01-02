@@ -249,6 +249,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 mainViewModel.deleteThread(thread.uid)
                 false
             }
+            SwipeAction.FAVORITE -> {
+                mainViewModel.toggleThreadFavoriteStatus(thread.uid)
+                true
+            }
             SwipeAction.READ_UNREAD -> {
                 mainViewModel.toggleSeenStatus(thread.uid)
                 true
