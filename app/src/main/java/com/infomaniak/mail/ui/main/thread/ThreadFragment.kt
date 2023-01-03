@@ -98,7 +98,7 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(thread) }
+        iconFavorite.setOnClickListener { mainViewModel.toggleFavoriteStatus(thread) }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {

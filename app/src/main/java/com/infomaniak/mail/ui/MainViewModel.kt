@@ -392,28 +392,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Favorite
-    fun toggleThreadFavoriteStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleFavoriteStatus(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
 
-        val messages = if (thread.isFavorite) thread.getFavoriteMessages() else thread.getLastMessageToExecuteAction()
+        val messages = message?.let(thread::getMessageAndDuplicates)
+            ?: if (thread.isFavorite) thread.getFavoriteMessages() else thread.getLastMessageToExecuteAction()
         val uids = messages.map { it.uid }
 
-        val isSuccess = if (thread.isFavorite) {
-            ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()
-        } else {
-            ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
-        }
-
-        if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
-    }
-
-    fun toggleMessageFavoriteStatus(thread: Thread, message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-
-        val messages = thread.getMessageAndDuplicates(message)
-        val uids = messages.map { it.uid }
-
-        val isSuccess = if (message.isFavorite) {
+        val isSuccess = if (message?.isFavorite ?: thread.isFavorite) {
             ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()
         } else {
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
