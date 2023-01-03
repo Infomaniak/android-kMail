@@ -34,6 +34,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
@@ -269,7 +270,7 @@ object MessageController {
         return threadsToUpsert.map { (_, thread) ->
             thread.recomputeThread(realm = this)
             ThreadController.upsertThread(thread, realm = this)
-            if (thread.isManaged()) copyFromRealm(thread, 0u) else thread
+            if (thread.isManaged()) thread.copyFromRealm(0u) else thread
         }
     }
 

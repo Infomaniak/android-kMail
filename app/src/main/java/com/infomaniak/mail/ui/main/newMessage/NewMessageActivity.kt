@@ -71,7 +71,7 @@ class NewMessageActivity : ThemedActivity() {
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding.toolbar.setOnMenuItemClickListener {
-            if (mailTo.isNotEmpty()) saveToLocalAndFinish(DraftAction.SEND)
+            if (draft.to.isNotEmpty()) saveToLocalAndFinish(DraftAction.SEND)
             true
         }
     }

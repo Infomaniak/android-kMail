@@ -67,7 +67,7 @@ object DraftController {
         return getDraftsWithActionsQuery().count().find()
     }
 
-    fun getDraft(localUuid: String, realm: TypedRealm? = null): Draft? {
+    fun getDraft(localUuid: String, realm: TypedRealm): Draft? {
         return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
     }
 
@@ -88,14 +88,6 @@ object DraftController {
     //endregion
 
     //region Open Draft
-    fun MutableRealm.fetchDraft(draftResource: String, messageUid: String): String? {
-        return ApiRepository.getDraft(draftResource).data?.also { draft ->
-            draft.initLocalValues(messageUid)
-            upsertDraft(draft, realm = this@fetchDraft)
-            MessageController.getMessage(messageUid, realm = this@fetchDraft)?.draftLocalUuid = draft.localUuid
-        }?.localUuid
-    }
-
     fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
         previousMessage.messageId.let {
             draft.inReplyTo = it

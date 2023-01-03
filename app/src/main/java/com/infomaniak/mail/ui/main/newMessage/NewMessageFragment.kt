@@ -190,22 +190,22 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
-    private fun populateUiWithViewModel() = with(binding) {
-        attachmentAdapter.addAll(newMessageViewModel.mailAttachments)
-        attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-        subjectTextField.setText(newMessageViewModel.mailSubject)
-        bodyText.setText(newMessageViewModel.mailBody)
-        newMessageViewModel.mailSignature?.let {
-            signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
-            removeSignature.setOnClickListener {
-                newMessageViewModel.mailSignature = null
-                separatedSignature.isGone = true
+    private fun populateUiWithViewModel() = with(newMessageViewModel.draft) {
+        attachmentAdapter.addAll(attachments)
+        binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+        binding.subjectTextField.setText(subject)
+        binding.bodyText.setText(uiBody)
+        uiSignature?.let {
+            binding.signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+            binding.removeSignature.setOnClickListener {
+                uiSignature = null
+                binding.separatedSignature.isGone = true
             }
-            separatedSignature.isVisible = true
+            binding.separatedSignature.isVisible = true
         }
-        toField.initRecipients(newMessageViewModel.mailTo)
-        ccField.initRecipients(newMessageViewModel.mailCc)
-        bccField.initRecipients(newMessageViewModel.mailBcc)
+        binding.toField.initRecipients(to)
+        binding.ccField.initRecipients(cc)
+        binding.bccField.initRecipients(bcc)
     }
 
     private fun populateViewModelWithExternalMailData() {
@@ -240,12 +240,12 @@ class NewMessageFragment : Fragment() {
                 ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
-            mailTo.addAll(to)
-            mailCc.addAll(cc)
-            mailBcc.addAll(bcc)
+            draft.to.addAll(to)
+            draft.cc.addAll(cc)
+            draft.bcc.addAll(bcc)
 
-            mailSubject = mailToIntent.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
-            mailBody = mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            draft.subject = mailToIntent.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            draft.uiBody = mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
 
             saveDraftDebouncing()
         }
@@ -253,8 +253,8 @@ class NewMessageFragment : Fragment() {
 
     private fun handleSingleSendIntent() = with(requireActivity().intent) {
         if (hasExtra(Intent.EXTRA_TEXT)) {
-            getStringExtra(Intent.EXTRA_SUBJECT)?.let { newMessageViewModel.mailSubject = it }
-            getStringExtra(Intent.EXTRA_TEXT)?.let { newMessageViewModel.mailBody = it }
+            getStringExtra(Intent.EXTRA_SUBJECT)?.let { newMessageViewModel.draft.subject = it }
+            getStringExtra(Intent.EXTRA_TEXT)?.let { newMessageViewModel.draft.uiBody = it }
         } else {
             (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
                 newMessageViewModel.importAttachments(listOf(uri))
@@ -270,7 +270,7 @@ class NewMessageFragment : Fragment() {
 
     private fun doAfterSubjectChange() {
         binding.subjectTextField.doAfterTextChanged { editable ->
-            editable?.toString()?.let(newMessageViewModel::updateMailSubject)
+            editable?.toString()?.let { newMessageViewModel.updateMailSubject(it.ifBlank { null }) }
         }
     }
 
@@ -355,13 +355,13 @@ class NewMessageFragment : Fragment() {
         bccField.clearField()
     }
 
-    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
+    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel.draft) {
         if (itemCountLeft == 0) {
             TransitionManager.beginDelayedTransition(binding.root)
             binding.attachmentsRecyclerView.isGone = true
         }
-        currentDraftLocalUuid?.let { mailAttachments[position].getUploadLocalFile(requireContext(), it).delete() }
-        mailAttachments.removeAt(position)
+        attachments[position].getUploadLocalFile(requireContext(), localUuid).delete()
+        attachments.removeAt(position)
     }
 
     private fun toggleEditor(hasFocus: Boolean) {
