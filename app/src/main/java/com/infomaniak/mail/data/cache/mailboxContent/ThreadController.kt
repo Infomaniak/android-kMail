@@ -134,16 +134,8 @@ object ThreadController {
         }
     }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
     fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
-        return mutableListOf<String>().apply {
-            thread.messages.forEach { message ->
-                if (!message.seen) {
-                    add(message.uid)
-                    addAll(thread.getMessageDuplicatesUids(message.messageId))
-                }
-            }
-        }
+        return getThreadMessagesAndDuplicatesUids(thread) { message -> !message.seen }
     }
 
     fun getSameFolderThreadMessagesUids(thread: Thread): List<String> {
