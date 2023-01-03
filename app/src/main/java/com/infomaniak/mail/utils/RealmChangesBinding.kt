@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
@@ -52,6 +53,8 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 ) {
 
     private var onRealmChanged: OnRealmChanged<T>
+
+    private var previousList = emptyList<T>()
 
     var recyclerView: RecyclerView? = null
     var waitingBeforeNotifyAdapter: LiveData<Boolean>? = null
@@ -90,6 +93,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
                 recyclerViewAdapter.notifyItemRangeRemoved(0, listChange.list.count())
             }
         }
+        previousList = listChange.list
         afterUpdateAdapter?.invoke(listChange.list)
     }
 
@@ -109,6 +113,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
         waitingBeforeNotifyAdapter?.removeObservers(lifecycleOwner)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun realmInitial(itemList: List<T>) {
         onRealmChanged.updateList(itemList)
         recyclerViewAdapter.notifyDataSetChanged()
@@ -116,18 +121,41 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
 
     private fun UpdatedResults<T>.notifyAdapter() {
         onRealmChanged.updateList(list)
-        notifyItemRanges()
+        notifyItemRanges(list)
     }
 
     private fun UpdatedList<T>.notifyAdapter() {
         onRealmChanged.updateList(list)
-        notifyItemRanges()
+        notifyItemRanges(list)
     }
 
-    private fun ListChangeSet.notifyItemRanges() {
+    private fun ListChangeSet.notifyItemRanges(newList: List<T>) {
         deletionRanges.forEach { recyclerViewAdapter.notifyItemRangeRemoved(it.startIndex, it.length) }
         insertionRanges.forEach { recyclerViewAdapter.notifyItemRangeInserted(it.startIndex, it.length) }
-        changeRanges.forEach { recyclerViewAdapter.notifyItemRangeChanged(it.startIndex, it.length) }
+        changeRanges.forEach { changeRange ->
+            if (previousList.isEmpty()) {
+                recyclerViewAdapter.notifyItemRangeChanged(changeRange.startIndex, changeRange.length)
+            } else {
+                runCatching {
+                    var start = changeRange.startIndex
+                    var count = 0
+                    for (index in changeRange.startIndex until changeRange.length) {
+                        if (onRealmChanged.areContentsTheSame(previousList[index], newList[index])) {
+                            if (count > 0) {
+                                recyclerViewAdapter.notifyItemRangeChanged(start, count)
+                                count = 0
+                            }
+                        } else {
+                            if (count == 0) start = index
+                            count++
+                        }
+                    }
+                    if (count > 0) recyclerViewAdapter.notifyItemRangeChanged(start, count)
+                }.onFailure {
+                    recyclerViewAdapter.notifyItemRangeChanged(changeRange.startIndex, changeRange.length)
+                }
+            }
+        }
     }
 
     private fun LiveData<Boolean>.observeWaiting(whenCanNotify: () -> Unit) {
@@ -146,6 +174,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     interface OnRealmChanged<T> {
         fun updateList(itemList: List<T>)
         fun deleteList() = Unit
+        fun areContentsTheSame(oldItem: T, newItem: T): Boolean = throw java.lang.UnsupportedOperationException()
     }
 
     companion object {
