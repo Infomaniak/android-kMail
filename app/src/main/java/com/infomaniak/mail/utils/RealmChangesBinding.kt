@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.utils.RealmChangesBinding.OnRealmChanged
 import io.realm.kotlin.notifications.*
 import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmObject
@@ -30,6 +31,8 @@ import io.realm.kotlin.types.RealmObject
  *
  * This adapter will automatically handle any updates to its data and call `notifyDataSetChanged()`,
  * `notifyItemInserted()`, `notifyItemRemoved()` or `notifyItemRangeChanged()` as appropriate.
+ * In case there are changes but we want to notify them only if needed,
+ * we can override the [OnRealmChanged.areContentsTheSame] method.
  *
  * The RealmAdapter will stop receiving updates if the Realm instance providing the [ResultsChange] or [ListChange] is
  * closed.
