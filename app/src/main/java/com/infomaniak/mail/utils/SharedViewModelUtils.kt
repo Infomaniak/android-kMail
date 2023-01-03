@@ -21,14 +21,15 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 
 object SharedViewModelUtils {
 
-    fun markAsSeen(thread: Thread, mailbox: Mailbox, withRefresh: Boolean = true): List<String>? {
-        val messages = thread.getUnseenMessages()
+    fun markAsSeen(mailbox: Mailbox, thread: Thread, message: Message? = null, withRefresh: Boolean = true): List<String>? {
+        val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getUnseenMessages()
 
-        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid }).isSuccess()
+        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()
 
         if (isSuccess) {
             val messagesFoldersIds = messages.getFoldersIds()
