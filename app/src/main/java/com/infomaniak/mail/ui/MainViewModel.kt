@@ -25,10 +25,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.*
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.update
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
@@ -39,12 +37,15 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -247,6 +248,42 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
+    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return@launch
+        ThreadController.getThread(threadUid)?.let { thread ->
+            if (thread.unseenMessagesCount > 0) {
+                markAsSeen(thread, mailbox.uuid)
+                MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
+            }
+            updateMessages(thread)
+        }
+    }
+
+    private fun updateMessages(thread: Thread) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            val remoteMessages = fetchMessages(thread)
+            update(thread.messages, remoteMessages)
+        }
+    }
+
+    private fun MutableRealm.fetchMessages(thread: Thread): List<Message> {
+        return thread.messages.mapNotNull { localMessage ->
+            if (localMessage.fullyDownloaded) {
+                localMessage
+            } else {
+                ApiRepository.getMessage(localMessage.resource).data?.also {
+                    it.messageIds = localMessage.messageIds
+
+                    // If we've already got this Message's Draft beforehand, we need to save
+                    // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                    if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid, realm = this)?.localUuid
+
+                    it.fullyDownloaded = true
+                }
+            }
+        }
+    }
+
     fun archiveThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val realm = RealmDatabase.mailboxContent()
@@ -337,13 +374,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads()
     }
 
+    //region Seen status
     fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-        ThreadController.toggleSeenStatus(thread, mailbox.uuid)
+        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailbox.uuid) else markAsSeen(thread, mailbox.uuid)
         refreshThreads()
     }
+
+    private fun markAsUnseen(thread: Thread, mailboxUuid: String) {
+        val uids = ThreadController.getThreadLastMessageUids(thread)
+
+        ApiRepository.markMessagesAsUnseen(mailboxUuid, uids)
+    }
+
+    private fun markAsSeen(thread: Thread, mailboxUuid: String) {
+        val uids = ThreadController.getThreadUnseenMessagesUids(thread)
+
+        ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
+    }
+    //endregion
 
     fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
