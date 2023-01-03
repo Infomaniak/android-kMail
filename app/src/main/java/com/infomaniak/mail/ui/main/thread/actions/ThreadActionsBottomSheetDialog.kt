@@ -65,7 +65,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread) }
                 markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(thread) }
                 move.setClosingOnClickListener { notYetImplemented() }
-                favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(thread) }
+                favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread) }
                 spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread) }
                 print.setClosingOnClickListener { notYetImplemented() }
                 saveAsPdf.setClosingOnClickListener { notYetImplemented() }

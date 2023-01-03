@@ -263,7 +263,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 false
             }
             SwipeAction.FAVORITE -> {
-                toggleThreadFavoriteStatus(thread)
+                toggleFavoriteStatus(thread)
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
