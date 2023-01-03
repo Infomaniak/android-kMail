@@ -140,29 +140,34 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
                     // We will avoid notifying each item in a row, instead we will notify by range while we can.
                     // To do this, we count the number of changes in a row, then as soon as we have a different element
                     // we notify the previous ones with a notification by range.
-                    var start = changeRange.startIndex
-                    var count = 0
-                    for (index in changeRange.startIndex until changeRange.length) {
-                        if (onRealmChanged.areContentsTheSame(previousList[index], newList[index])) {
-                            // The content has not changed so there is no need to notify the adapter.
-                            // However, if we had changes previously, we will notify them.
-                            if (count > 0) {
-                                recyclerViewAdapter.notifyItemRangeChanged(start, count)
-                                count = 0
-                            }
-                        } else {
-                            // For the first change we get its index in start and then we count the number of changes
-                            if (count == 0) start = index
-                            count++
-                        }
-                    }
-                    // if we finish the iteration and we still have some modifications to notify, we treat them here
-                    if (count > 0) recyclerViewAdapter.notifyItemRangeChanged(start, count)
+                    onlyNotifyChangesIfNeeded(changeRange, newList)
                 }.onFailure {
+                    // In case the `areContentsTheSame` method has not been overridden, then we notify all changes
                     recyclerViewAdapter.notifyItemRangeChanged(changeRange.startIndex, changeRange.length)
                 }
             }
         }
+    }
+
+    private fun onlyNotifyChangesIfNeeded(changeRange: ListChangeSet.Range, newList: List<T>) {
+        var start = changeRange.startIndex
+        var count = 0
+        for (index in changeRange.startIndex until changeRange.length) {
+            if (onRealmChanged.areContentsTheSame(previousList[index], newList[index])) {
+                // The content has not changed so there is no need to notify the adapter.
+                // However, if we had changes previously, we will notify them.
+                if (count > 0) {
+                    recyclerViewAdapter.notifyItemRangeChanged(start, count)
+                    count = 0
+                }
+            } else {
+                // For the first change we get its index in start and then we count the number of changes
+                if (count == 0) start = index
+                count++
+            }
+        }
+        // if we finish the iteration and we still have some modifications to notify, we treat them here
+        if (count > 0) recyclerViewAdapter.notifyItemRangeChanged(start, count)
     }
 
     private fun LiveData<Boolean>.observeWaiting(whenCanNotify: () -> Unit) {
@@ -181,7 +186,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     interface OnRealmChanged<T> {
         fun updateList(itemList: List<T>)
         fun deleteList() = Unit
-        fun areContentsTheSame(oldItem: T, newItem: T): Boolean = throw java.lang.UnsupportedOperationException()
+        fun areContentsTheSame(oldItem: T, newItem: T): Boolean = throw UnsupportedOperationException()
     }
 
     companion object {
