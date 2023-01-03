@@ -56,11 +56,11 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
                 ThreadController.markAsSeen(thread, mailbox.uuid)
                 MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
             }
-            updateMessages(thread)
+            fetchIncompleteMessages(thread)
         }
     }
 
-    private fun updateMessages(thread: Thread) {
+    private fun fetchIncompleteMessages(thread: Thread) {
         RealmDatabase.mailboxContent().writeBlocking {
             thread.messages.forEach { localMessage ->
                 if (!localMessage.fullyDownloaded) {
