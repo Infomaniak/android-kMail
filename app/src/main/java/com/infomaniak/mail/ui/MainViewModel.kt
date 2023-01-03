@@ -385,13 +385,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun markAsUnseen(thread: Thread, mailboxUuid: String) {
-        val uids = ThreadController.getThreadLastMessageUids(thread)
+        val uids = thread.getThreadLastMessageUids()
 
         ApiRepository.markMessagesAsUnseen(mailboxUuid, uids)
     }
 
     private fun markAsSeen(thread: Thread, mailboxUuid: String) {
-        val uids = ThreadController.getThreadUnseenMessagesUids(thread)
+        val uids = thread.getThreadUnseenMessagesUids()
 
         ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
     }
@@ -399,15 +399,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Favorite status
     fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
         if (thread.isFavorite) {
-            val uids = ThreadController.getThreadFavoritesMessagesUids(thread)
-            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+            val uids = thread.getThreadFavoritesMessagesUids()
+            ApiRepository.removeFromFavorites(mailboxUuid, uids)
         } else {
-            val uids = ThreadController.getThreadLastMessageUids(thread)
-            ApiRepository.addToFavorites(mailbox.uuid, uids)
+            val uids = thread.getThreadLastMessageUids()
+            ApiRepository.addToFavorites(mailboxUuid, uids)
         }
 
         refreshThreads()
@@ -415,16 +415,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleMessageFavoriteStatus(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val realm = RealmDatabase.mailboxContent()
-        val mailbox = currentMailbox.value ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = MessageController.getMessage(messageUid, realm) ?: return@launch
 
         val uids = listOf(message.uid) + thread.getMessageDuplicatesUids(message.messageId)
 
         if (message.isFavorite) {
-            ApiRepository.removeFromFavorites(mailbox.uuid, uids)
+            ApiRepository.removeFromFavorites(mailboxUuid, uids)
         } else {
-            ApiRepository.addToFavorites(mailbox.uuid, uids)
+            ApiRepository.addToFavorites(mailboxUuid, uids)
         }
 
         refreshThreads()

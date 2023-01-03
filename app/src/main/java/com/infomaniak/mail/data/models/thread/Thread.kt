@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
@@ -168,6 +169,45 @@ class Thread : RealmObject {
 
     // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
     fun getMessageDuplicatesUids(messageId: String): List<String> = getMessageDuplicates(messageId).map { it.uid }
+
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    private fun getThreadLastMessage(): List<Message> {
+        return mutableListOf<Message>().apply {
+            val lastMessage = messages.getLastMessageToExecuteAction()
+
+            add(lastMessage)
+            addAll(getMessageDuplicates(lastMessage.messageId))
+        }
+    }
+
+    fun getThreadLastMessageUids(): List<String> = getThreadLastMessage().map { it.uid }
+
+    fun getThreadUnseenMessagesUids(): List<String> = getThreadMessagesAndDuplicatesUids { message -> !message.seen }
+
+    fun getSameFolderThreadMessagesUids(): List<String> {
+        return getThreadMessagesAndDuplicatesUids { message -> message.folderId == folderId }
+    }
+
+    fun getThreadFavoritesMessagesUids(): List<String> {
+        return getThreadMessagesAndDuplicatesUids { message -> message.isFavorite && !message.isDraft }
+    }
+
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    private fun getThreadMessagesAndDuplicates(shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
+        return mutableListOf<Message>().apply {
+            messages.forEach { message ->
+                if (shouldKeepMessage(message)) {
+                    add(message)
+                    addAll(getMessageDuplicates(message.messageId))
+                }
+            }
+        }
+    }
+
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    private fun getThreadMessagesAndDuplicatesUids(shouldKeepMessage: (message: Message) -> Boolean): List<String> {
+        return getThreadMessagesAndDuplicates(shouldKeepMessage).map { it.uid }
+    }
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

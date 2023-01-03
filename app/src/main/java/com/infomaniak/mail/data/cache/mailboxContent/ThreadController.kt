@@ -18,10 +18,8 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
-import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -120,44 +118,6 @@ object ThreadController {
     fun upsertThread(thread: Thread, realm: MutableRealm? = null) {
         val block: (MutableRealm) -> Unit = { it.copyToRealm(thread, UpdatePolicy.ALL) }
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
-    }
-
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
-    fun getThreadLastMessageUids(thread: Thread): List<String> {
-        return mutableListOf<String>().apply {
-
-            val lastMessage = thread.messages.getLastMessageToExecuteAction()
-            add(lastMessage.uid)
-
-            addAll(thread.getMessageDuplicatesUids(lastMessage.messageId))
-        }
-    }
-
-    fun getThreadUnseenMessagesUids(thread: Thread): List<String> {
-        return getThreadMessagesAndDuplicatesUids(thread) { message -> !message.seen }
-    }
-
-    fun getSameFolderThreadMessagesUids(thread: Thread): List<String> {
-        return getThreadMessagesAndDuplicatesUids(thread) { message -> message.folderId == thread.folderId }
-    }
-
-    fun getThreadFavoritesMessagesUids(thread: Thread): List<String> {
-        return getThreadMessagesAndDuplicatesUids(thread) { message -> message.isFavorite && !message.isDraft }
-    }
-
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
-    private fun getThreadMessagesAndDuplicatesUids(
-        thread: Thread,
-        shouldKeepMessage: (message: Message) -> Boolean,
-    ): List<String> {
-        return mutableListOf<String>().apply {
-            thread.messages.forEach { message ->
-                if (shouldKeepMessage(message)) {
-                    add(message.uid)
-                    addAll(thread.getMessageDuplicatesUids(message.messageId))
-                }
-            }
-        }
     }
 
     fun deleteThreads(realm: MutableRealm) {
