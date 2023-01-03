@@ -284,6 +284,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+	//region Thread/Mail actions
     fun archiveThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val realm = RealmDatabase.mailboxContent()
@@ -396,6 +397,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
+    //region Favorite status
     fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
@@ -427,6 +429,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         refreshThreads()
     }
+    //endregion
+
+    //endregion
 
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
         return folders.toMutableList().let { list ->
