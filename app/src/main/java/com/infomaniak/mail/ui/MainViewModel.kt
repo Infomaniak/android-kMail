@@ -47,6 +47,7 @@ import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.utils.getFoldersIds
+import com.infomaniak.mail.utils.getUids
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -265,7 +266,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val messagesFoldersIds = mutableListOf<String>()
 
         if (thread.unseenMessagesCount > 0) {
-            markAsSeen(thread, mailbox, withRefresh = false)?.also(messagesFoldersIds::addAll)
+            markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
         }
         archiveThreadOrMessageSync(thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
 
@@ -282,7 +283,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getArchivableMessages(currentFolderId.value!!)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.map { it.uid }, archiveId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), archiveId)
 
         showArchiveSnackbar(message, apiResponse)
 
@@ -324,7 +325,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val messages = message?.let(thread::getMessageAndDuplicates)
             ?: if (shouldPermanentlyDelete) thread.getPermanentlyDeletableMessages() else thread.getDeletableMessages()
-        val uids = messages.map { it.uid }
+        val uids = messages.getUids()
 
         val isSuccess = if (shouldPermanentlyDelete) {
             ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()
@@ -372,20 +373,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Seen
-    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSeenStatus(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
 
-        if (thread.unseenMessagesCount == 0) {
-            markAsUnseen(thread, mailbox)
+        val isSeen = message?.seen ?: (thread.unseenMessagesCount == 0)
+
+        if (isSeen) {
+            markAsUnseen(mailbox, thread, message)
         } else {
-            markAsSeen(thread, mailbox)
+            markAsSeen(mailbox, thread, message)
         }
     }
 
-    private fun markAsUnseen(thread: Thread, mailbox: Mailbox) {
-        val messages = thread.getLastMessageToExecuteAction()
+    private fun markAsUnseen(mailbox: Mailbox, thread: Thread, message: Message? = null) {
+        val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getLastMessageToExecuteAction()
 
-        val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.map { it.uid }).isSuccess()
+        val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
 
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
     }
@@ -397,7 +400,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val messages = message?.let(thread::getMessageAndDuplicates)
             ?: if (thread.isFavorite) thread.getFavoriteMessages() else thread.getLastMessageToExecuteAction()
-        val uids = messages.map { it.uid }
+        val uids = messages.getUids()
 
         val isSuccess = if (message?.isFavorite ?: thread.isFavorite) {
             ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()
@@ -434,7 +437,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val messages = message?.let { if (message.from.first().isMe()) emptyList() else thread.getMessageAndDuplicates(message) }
             ?: thread.getSpamMessages()
-        val uids = messages.map { it.uid }
+        val uids = messages.getUids()
 
         val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailbox.uuid, uids, destinationFolderId)
 

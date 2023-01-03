@@ -174,3 +174,5 @@ fun OneTimeWorkRequest.Builder.setExpeditedWorkRequest(): OneTimeWorkRequest.Bui
 //endregion
 
 fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it.folderId == exception) null else it.folderId }
+
+fun List<Message>.getUids(): List<String> = map { it.uid }
