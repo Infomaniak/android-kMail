@@ -72,6 +72,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
+    // Add here everything in a Message that can be updated in the UI.
+    override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+        return newItem.body?.value == oldItem.body?.value &&
+                newItem.seen == oldItem.seen &&
+                newItem.isFavorite == oldItem.isFavorite
+    }
+
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
         val message = messages[position]
         if (payloads.firstOrNull() is Unit && !message.isDraft) {
