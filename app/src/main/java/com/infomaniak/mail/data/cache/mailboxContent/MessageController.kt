@@ -270,7 +270,7 @@ object MessageController {
         return threadsToUpsert.map { (_, thread) ->
             thread.recomputeThread(realm = this)
             ThreadController.upsertThread(thread, realm = this)
-            if (thread.isManaged()) thread.copyFromRealm(0u) else thread
+            if (thread.isManaged()) thread.copyFromRealm(UInt.MIN_VALUE) else thread
         }
     }
 
