@@ -182,7 +182,7 @@
         android:label="ThreadActionsBottomSheetDialog"
         tools:layout="@layout/bottom_sheet_actions_menu">
         <argument
-            android:name="messageUid"
+            android:name="messageUidToReplyTo"
             app:argType="string" />
         <argument
             android:name="threadUid"

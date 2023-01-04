@@ -131,6 +131,10 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 
 fun List<Message>.getLastMessageToExecuteAction(): Message = lastOrNull { !it.isDraft } ?: last()
 
+fun List<Message>.getLastMessageToReplyTo(): Message {
+    return lastOrNull { !it.from.first().isMe() && !it.isDraft } ?: getLastMessageToExecuteAction()
+}
+
 fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
     return runCatching {
         val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
