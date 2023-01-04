@@ -28,12 +28,12 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.utils.copyListToRealm
 import com.infomaniak.mail.utils.throwErrorAsException
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
+import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
@@ -86,13 +86,8 @@ object MessageController {
     //endregion
 
     //region Edit data
-    fun MutableRealm.update(localMessages: List<Message>, remoteMessages: List<Message>) {
-
-        Log.d(RealmDatabase.TAG, "Messages: Delete outdated data")
-        deleteMessages(getOutdatedMessages(localMessages, remoteMessages))
-
-        Log.d(RealmDatabase.TAG, "Messages: Save new data")
-        copyListToRealm(remoteMessages, alsoCopyManagedItems = false)
+    fun upsertMessage(message: Message, realm: MutableRealm) {
+        realm.copyToRealm(message, UpdatePolicy.ALL)
     }
 
     // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
