@@ -190,22 +190,26 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.isAutoCompletionOpened = isAutoCompletionOpened
     }
 
-    private fun populateUiWithViewModel() = with(newMessageViewModel.draft) {
-        attachmentAdapter.addAll(attachments)
-        binding.attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-        binding.subjectTextField.setText(subject)
-        binding.bodyText.setText(uiBody)
-        uiSignature?.let {
-            binding.signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
-            binding.removeSignature.setOnClickListener {
-                uiSignature = null
-                binding.separatedSignature.isGone = true
+    private fun populateUiWithViewModel() = with(binding) {
+        val draft = newMessageViewModel.draft
+
+        attachmentAdapter.addAll(draft.attachments)
+        attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
+        subjectTextField.setText(draft.subject)
+        bodyText.setText(draft.uiBody)
+
+        draft.uiSignature?.let {
+            signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+            removeSignature.setOnClickListener {
+                draft.uiSignature = null
+                separatedSignature.isGone = true
             }
-            binding.separatedSignature.isVisible = true
+            separatedSignature.isVisible = true
         }
-        binding.toField.initRecipients(to)
-        binding.ccField.initRecipients(cc)
-        binding.bccField.initRecipients(bcc)
+
+        toField.initRecipients(draft.to)
+        ccField.initRecipients(draft.cc)
+        bccField.initRecipients(draft.bcc)
     }
 
     private fun populateViewModelWithExternalMailData() {
@@ -355,13 +359,16 @@ class NewMessageFragment : Fragment() {
         bccField.clearField()
     }
 
-    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel.draft) {
+    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
+        val draft = newMessageViewModel.draft
+
         if (itemCountLeft == 0) {
             TransitionManager.beginDelayedTransition(binding.root)
-            binding.attachmentsRecyclerView.isGone = true
+            attachmentsRecyclerView.isGone = true
         }
-        attachments[position].getUploadLocalFile(requireContext(), localUuid).delete()
-        attachments.removeAt(position)
+
+        draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
+        draft.attachments.removeAt(position)
     }
 
     private fun toggleEditor(hasFocus: Boolean) {

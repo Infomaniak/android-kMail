@@ -66,12 +66,12 @@ class NewMessageActivity : ThemedActivity() {
         }
     }
 
-    private fun setupToolbar() = with(newMessageViewModel) {
+    private fun setupToolbar() = with(binding) {
 
-        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        binding.toolbar.setOnMenuItemClickListener {
-            if (draft.to.isNotEmpty()) saveToLocalAndFinish(DraftAction.SEND)
+        toolbar.setOnMenuItemClickListener {
+            if (newMessageViewModel.draft.to.isNotEmpty()) newMessageViewModel.saveToLocalAndFinish(DraftAction.SEND)
             true
         }
     }
