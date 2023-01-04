@@ -42,6 +42,7 @@ import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -53,6 +54,9 @@ class ThreadFragment : Fragment() {
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private var threadAdapter = ThreadAdapter()
+
+    // When opening the Thread, we want to scroll to the last Message, but only once.
+    private var shouldScrollToBottom = AtomicBoolean(true)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -155,7 +159,11 @@ class ThreadFragment : Fragment() {
     private fun observeMessagesLive() {
         threadViewModel.messagesLive(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
             beforeUpdateAdapter = ::onMessagesUpdate
-            afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+            afterUpdateAdapter = {
+                if (shouldScrollToBottom.compareAndSet(true, false)) {
+                    binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+                }
+            }
         }
     }
 
