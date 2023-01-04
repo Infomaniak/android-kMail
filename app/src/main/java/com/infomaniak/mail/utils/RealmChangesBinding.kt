@@ -169,7 +169,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
                 count++
             }
         }
-        // if we finish the iteration and we still have some modifications to notify, we treat them here
+        // If we finish the iteration and we still have some modifications to notify, we treat them here
         if (count > 0) recyclerViewAdapter.notifyItemRangeChanged(start, count)
     }
 
