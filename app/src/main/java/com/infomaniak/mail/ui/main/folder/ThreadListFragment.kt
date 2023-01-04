@@ -246,7 +246,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.DELETE -> {
-                mainViewModel.deleteThread(thread.uid)
+                mainViewModel.deleteThreadOrMessage(thread.uid)
                 false
             }
             SwipeAction.FAVORITE -> {
