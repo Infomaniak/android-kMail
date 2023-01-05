@@ -247,6 +247,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
+    fun archiveMessage(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value ?: return@launch
+        val realm = RealmDatabase.mailboxContent()
+        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
+        val message = MessageController.getMessage(messageUid, realm) ?: return@launch
+
+        val uids = listOf(message.uid) + thread.getMessageDuplicatesUids(message.messageId)
+        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
+
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
+
+        val context = getApplication<Application>()
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            context.getString(R.string.snackbarMessageMoved)
+        } else {
+            context.getString(RCore.string.anErrorHasOccurred)
+        }
+
+        snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
+
+        refreshThreads()
+    }
+
     fun archiveThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
 
         val mailbox = currentMailbox.value ?: return@launch
