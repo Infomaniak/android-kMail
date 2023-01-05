@@ -239,8 +239,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
-        return when (swipeAction) {
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
+        when (swipeAction) {
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
@@ -248,19 +248,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                mainViewModel.archiveThread(thread.uid)
-                false
+                archiveThread(thread.uid)
+                isCurrentFolder(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
-                mainViewModel.deleteThreadOrMessage(thread.uid)
+                deleteThreadOrMessage(thread.uid)
                 false
             }
             SwipeAction.FAVORITE -> {
-                mainViewModel.toggleThreadFavoriteStatus(thread.uid)
+                toggleThreadFavoriteStatus(thread.uid)
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                mainViewModel.toggleSeenStatus(thread.uid)
+                toggleSeenStatus(thread.uid)
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
@@ -359,9 +359,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         fun observeDraftsActions() {
             DraftsActionsWorker.getCompletedWorkInfosLiveData(requireContext()).observe(viewLifecycleOwner) {
                 mainViewModel.currentFolder.value?.let { folder ->
-                    if (folder.isValid() && folder.role == FolderRole.DRAFT) {
-                        mainViewModel.forceRefreshThreads()
-                    }
+                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
                 }
             }
         }

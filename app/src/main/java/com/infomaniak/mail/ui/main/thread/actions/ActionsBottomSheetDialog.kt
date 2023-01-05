@@ -74,8 +74,9 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     fun setSpamUi() = with(binding.spam) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val currentFolderIsSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-            withContext(Dispatchers.Main) { setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam) }
+            withContext(Dispatchers.Main) {
+                setText(if (mainViewModel.isCurrentFolder(FolderRole.SPAM)) R.string.actionNonSpam else R.string.actionSpam)
+            }
         }
     }
 
