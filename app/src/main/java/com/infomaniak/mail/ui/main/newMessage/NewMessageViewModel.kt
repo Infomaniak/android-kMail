@@ -282,12 +282,12 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     )
 
     private fun DraftSnapshot.hasChanges(): Boolean {
-        return !(to == draft.to.toSet() &&
-                cc == draft.cc.toSet() &&
-                bcc == draft.bcc.toSet() &&
-                subject == draft.subject &&
-                body == draft.uiBody &&
-                attachmentsUuids == draft.attachments.map { it.uuid }.toSet())
+        return to != draft.to.toSet() ||
+                cc != draft.cc.toSet() ||
+                bcc != draft.bcc.toSet() ||
+                subject != draft.subject ||
+                body != draft.uiBody ||
+                attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
     }
 
     private companion object {
