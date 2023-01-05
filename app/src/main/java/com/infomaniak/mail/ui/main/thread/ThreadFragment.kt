@@ -60,12 +60,14 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
-        setupAdapter()
-        threadViewModel.openThread(navigationArgs.threadUid)
-        observeThreadLive()
-        observeMessagesLive()
-        observeContacts()
+        threadViewModel.getThread(navigationArgs.threadUid)?.let {
+            setupUi()
+            setupAdapter()
+            threadViewModel.openThread(it)
+            observeThreadLive()
+            observeMessagesLive()
+            observeContacts()
+        } ?: findNavController().popBackStack()
     }
 
     private fun setupUi() = with(binding) {

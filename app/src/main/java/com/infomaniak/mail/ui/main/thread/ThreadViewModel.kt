@@ -41,6 +41,8 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     private val localSettings by lazy { LocalSettings.getInstance(application) }
 
+    fun getThread(threadUid: String) = ThreadController.getThread(threadUid)
+
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }
@@ -49,15 +51,13 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         ThreadController.getThread(threadUid)?.messages?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
-    fun openThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun openThread(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return@launch
-        ThreadController.getThread(threadUid)?.let { thread ->
-            if (thread.unseenMessagesCount > 0) {
-                ThreadController.markAsSeen(thread, mailbox.uuid)
-                MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
-            }
-            fetchIncompleteMessages(thread)
+        if (thread.unseenMessagesCount > 0) {
+            ThreadController.markAsSeen(thread, mailbox.uuid)
+            MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
         }
+        fetchIncompleteMessages(thread)
     }
 
     private fun fetchIncompleteMessages(thread: Thread) {
