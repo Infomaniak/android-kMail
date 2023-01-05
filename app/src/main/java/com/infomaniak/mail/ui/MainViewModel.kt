@@ -90,6 +90,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
         }
     }
+
+    fun isCurrentFolder(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
     private val localSettings by lazy { LocalSettings.getInstance(application) }

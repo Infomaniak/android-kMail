@@ -237,8 +237,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
-        return when (swipeAction) {
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
+        when (swipeAction) {
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
@@ -246,19 +246,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                mainViewModel.archiveThread(thread.uid)
-                false
+                archiveThread(thread.uid)
+                isCurrentFolder(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
-                mainViewModel.deleteThreadOrMessage(thread.uid)
+                deleteThreadOrMessage(thread.uid)
                 false
             }
             SwipeAction.FAVORITE -> {
-                mainViewModel.toggleThreadFavoriteStatus(thread.uid)
+                toggleThreadFavoriteStatus(thread.uid)
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                mainViewModel.toggleSeenStatus(thread.uid)
+                toggleSeenStatus(thread.uid)
                 true
             }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
@@ -345,9 +345,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
             DraftsActionsWorker.getCompletedWorkInfosLiveData(requireContext()).observe(viewLifecycleOwner) {
-                if (mainViewModel.currentFolder.value?.role == FolderRole.DRAFT) {
-                    mainViewModel.forceRefreshThreads()
-                }
+                if (mainViewModel.isCurrentFolder(FolderRole.DRAFT)) mainViewModel.forceRefreshThreads()
             }
         }
 
