@@ -66,10 +66,12 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUi()
         setupAdapter()
-        threadViewModel.openThread(navigationArgs.threadUid)
         observeThreadLive()
-        observeMessagesLive()
-        observeContacts()
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { isExpanded ->
+            threadAdapter.isExpanded = isExpanded.toMutableList()
+            observeMessagesLive()
+            observeContacts()
+        }
     }
 
     private fun setupUi() = with(binding) {
@@ -161,7 +163,7 @@ class ThreadFragment : Fragment() {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = {
                 if (shouldScrollToBottom.compareAndSet(true, false)) {
-                    binding.messagesList.scrollToPosition(threadAdapter.lastIndex())
+                    binding.messagesList.scrollToPosition(threadAdapter.isExpanded.indexOfFirst { it })
                 }
             }
         }

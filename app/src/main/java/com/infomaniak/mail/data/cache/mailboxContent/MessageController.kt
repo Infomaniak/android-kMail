@@ -90,13 +90,6 @@ object MessageController {
         realm.copyToRealm(message, UpdatePolicy.ALL)
     }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
-    private fun getOutdatedMessages(localMessages: List<Message>, remoteMessages: List<Message>): List<Message> {
-        return localMessages.filter { localMessage ->
-            remoteMessages.none { remoteMessage -> remoteMessage.uid == localMessage.uid }
-        }
-    }
-
     fun MutableRealm.deleteMessages(messages: List<Message>) {
         messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
     }
