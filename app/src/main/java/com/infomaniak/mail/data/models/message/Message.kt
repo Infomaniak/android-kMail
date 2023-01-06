@@ -113,12 +113,6 @@ class Message : RealmObject {
     //region UI data (Ignore & Transient)
     @Ignore
     @Transient
-    var isExpanded = false
-    @Ignore
-    @Transient
-    var isExpandedHeaderMode = false
-    @Ignore
-    @Transient
     var detailsAreExpanded = false
     //endregion
 

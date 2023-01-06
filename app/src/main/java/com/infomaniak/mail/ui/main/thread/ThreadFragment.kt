@@ -42,6 +42,7 @@ import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -54,18 +55,27 @@ class ThreadFragment : Fragment() {
 
     private var threadAdapter = ThreadAdapter()
 
+    // When opening the Thread, we want to scroll to the last Message, but only once.
+    private var shouldScrollToBottom = AtomicBoolean(true)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
-        setupAdapter()
-        threadViewModel.openThread(navigationArgs.threadUid)
         observeThreadLive()
-        observeMessagesLive()
-        observeContacts()
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedList ->
+            if (expandedList == null) {
+                findNavController().popBackStack()
+            } else {
+                setupUi()
+                setupAdapter()
+                threadAdapter.expandedList = expandedList.toMutableList()
+                observeMessagesLive()
+                observeContacts()
+            }
+        }
     }
 
     private fun setupUi() = with(binding) {
@@ -155,7 +165,11 @@ class ThreadFragment : Fragment() {
     private fun observeMessagesLive() {
         threadViewModel.messagesLive(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
             beforeUpdateAdapter = ::onMessagesUpdate
-            afterUpdateAdapter = { binding.messagesList.scrollToPosition(threadAdapter.lastIndex()) }
+            afterUpdateAdapter = {
+                if (shouldScrollToBottom.compareAndSet(true, false)) {
+                    binding.messagesList.scrollToPosition(threadAdapter.expandedList.indexOfFirst { it })
+                }
+            }
         }
     }
 

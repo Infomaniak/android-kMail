@@ -44,6 +44,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     var messages = listOf<Message>()
         private set
+    var expandedList = mutableListOf<Boolean>()
     var contacts: Map<Recipient, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
@@ -55,12 +56,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     var onMenuClicked: ((Message) -> Unit)? = null
 
     override fun updateList(itemList: List<Message>) {
-        messages = itemList.mapIndexed { index, message ->
-            message.also { if ((index == itemList.lastIndex || !it.seen) && !it.isDraft) it.isExpanded = true }
-        }
+        messages = itemList
     }
 
-    fun lastIndex() = messages.lastIndex
+    private fun lastIndex() = messages.lastIndex
 
     override fun getItemCount() = messages.size
 
@@ -92,11 +91,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         root.setStyleIfSingleMail(position)
 
-        holder.bindHeader(message)
+        holder.bindHeader(message, position)
         holder.bindAttachment(message)
         loadBodyInWebView(message.body)
 
-        displayExpandedCollapsedMessage(message)
+        displayExpandedCollapsedMessage(message, position)
     }
 
     private fun MaterialCardView.setStyleIfSingleMail(position: Int) {
@@ -120,7 +119,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, Utils.UTF_8, "") }
     }
 
-    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
+    private fun ThreadViewHolder.bindHeader(message: Message, position: Int) = with(binding) {
         val messageDate = message.date?.toDate()
 
         if (message.isDraft) {
@@ -142,7 +141,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
 
-        handleHeaderClick(message)
+        handleHeaderClick(message, position)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -172,17 +171,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
-    private fun ItemMessageBinding.handleHeaderClick(message: Message) = with(message) {
+    private fun ItemMessageBinding.handleHeaderClick(message: Message, position: Int) = with(message) {
         messageHeader.setOnClickListener {
-            if (isExpanded) {
-                isExpanded = false
-                displayExpandedCollapsedMessage(message = this@with)
+            if (expandedList[position]) {
+                expandedList[position] = false
+                displayExpandedCollapsedMessage(message = this@with, position)
             } else {
                 if (isDraft) {
                     onDraftClicked?.invoke(this@with)
                 } else {
-                    isExpanded = true
-                    displayExpandedCollapsedMessage(message = this@with)
+                    expandedList[position] = true
+                    displayExpandedCollapsedMessage(message = this@with, position)
                 }
             }
         }
@@ -239,11 +238,12 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
+    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message, position: Int) {
+        val isExpanded = expandedList[position]
         collapseMessageDetails(message)
-        setHeaderState(message)
-        if (message.isExpanded) displayAttachments(message.attachments) else hideAttachments()
-        webViewFrameLayout.isVisible = message.isExpanded
+        setHeaderState(message, isExpanded)
+        if (isExpanded) displayAttachments(message.attachments) else hideAttachments()
+        webViewFrameLayout.isVisible = isExpanded
     }
 
     @SuppressLint("SetTextI18n")
@@ -269,7 +269,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         recipientChevron.rotation = 0f
     }
 
-    private fun ItemMessageBinding.setHeaderState(message: Message) = with(message) {
+    private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) = with(message) {
         deleteDraftButton.apply {
             isVisible = isDraft
             setOnClickListener { onDeleteDraftClicked?.invoke(this@with) }

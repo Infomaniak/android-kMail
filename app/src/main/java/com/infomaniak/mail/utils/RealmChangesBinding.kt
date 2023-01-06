@@ -155,7 +155,7 @@ class RealmChangesBinding<T : BaseRealmObject, VH : RecyclerView.ViewHolder> pri
     private fun onlyNotifyChangesIfNeeded(changeRange: ListChangeSet.Range, newList: List<T>) {
         var start = changeRange.startIndex
         var count = 0
-        for (index in changeRange.startIndex until changeRange.length) {
+        for (index in changeRange.startIndex until changeRange.startIndex + changeRange.length) {
             if (onRealmChanged.areContentsTheSame(previousList[index], newList[index])) {
                 // The content has not changed so there is no need to notify the adapter.
                 // However, if we had changes previously, we will notify them.
