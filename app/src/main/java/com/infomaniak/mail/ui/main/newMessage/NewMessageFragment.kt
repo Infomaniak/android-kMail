@@ -191,21 +191,25 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun populateUiWithViewModel() = with(binding) {
-        attachmentAdapter.addAll(newMessageViewModel.mailAttachments)
+        val draft = newMessageViewModel.draft
+
+        attachmentAdapter.addAll(draft.attachments)
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-        subjectTextField.setText(newMessageViewModel.mailSubject)
-        bodyText.setText(newMessageViewModel.mailBody)
-        newMessageViewModel.mailSignature?.let {
+        subjectTextField.setText(draft.subject)
+        bodyText.setText(draft.uiBody)
+
+        draft.uiSignature?.let {
             signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
             removeSignature.setOnClickListener {
-                newMessageViewModel.mailSignature = null
+                draft.uiSignature = null
                 separatedSignature.isGone = true
             }
             separatedSignature.isVisible = true
         }
-        toField.initRecipients(newMessageViewModel.mailTo)
-        ccField.initRecipients(newMessageViewModel.mailCc)
-        bccField.initRecipients(newMessageViewModel.mailBcc)
+
+        toField.initRecipients(draft.to)
+        ccField.initRecipients(draft.cc)
+        bccField.initRecipients(draft.bcc)
     }
 
     private fun populateViewModelWithExternalMailData() {
@@ -240,12 +244,12 @@ class NewMessageFragment : Fragment() {
                 ?: intent.getStringArrayExtra(Intent.EXTRA_BCC)?.map { Recipient().initLocalValues(it, it) }
                 ?: emptyList()
 
-            mailTo.addAll(to)
-            mailCc.addAll(cc)
-            mailBcc.addAll(bcc)
+            draft.to.addAll(to)
+            draft.cc.addAll(cc)
+            draft.bcc.addAll(bcc)
 
-            mailSubject = mailToIntent.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
-            mailBody = mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+            draft.subject = mailToIntent.subject ?: intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            draft.uiBody = mailToIntent.body ?: intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
 
             saveDraftDebouncing()
         }
@@ -253,8 +257,8 @@ class NewMessageFragment : Fragment() {
 
     private fun handleSingleSendIntent() = with(requireActivity().intent) {
         if (hasExtra(Intent.EXTRA_TEXT)) {
-            getStringExtra(Intent.EXTRA_SUBJECT)?.let { newMessageViewModel.mailSubject = it }
-            getStringExtra(Intent.EXTRA_TEXT)?.let { newMessageViewModel.mailBody = it }
+            getStringExtra(Intent.EXTRA_SUBJECT)?.let { newMessageViewModel.draft.subject = it }
+            getStringExtra(Intent.EXTRA_TEXT)?.let { newMessageViewModel.draft.uiBody = it }
         } else {
             (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
                 newMessageViewModel.importAttachments(listOf(uri))
@@ -270,7 +274,7 @@ class NewMessageFragment : Fragment() {
 
     private fun doAfterSubjectChange() {
         binding.subjectTextField.doAfterTextChanged { editable ->
-            editable?.toString()?.let(newMessageViewModel::updateMailSubject)
+            editable?.toString()?.let { newMessageViewModel.updateMailSubject(it.ifBlank { null }) }
         }
     }
 
@@ -355,13 +359,16 @@ class NewMessageFragment : Fragment() {
         bccField.clearField()
     }
 
-    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(newMessageViewModel) {
+    private fun onDeleteAttachment(position: Int, itemCountLeft: Int) = with(binding) {
+        val draft = newMessageViewModel.draft
+
         if (itemCountLeft == 0) {
             TransitionManager.beginDelayedTransition(binding.root)
-            binding.attachmentsRecyclerView.isGone = true
+            attachmentsRecyclerView.isGone = true
         }
-        currentDraftLocalUuid?.let { mailAttachments[position].getUploadLocalFile(requireContext(), it).delete() }
-        mailAttachments.removeAt(position)
+
+        draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
+        draft.attachments.removeAt(position)
     }
 
     private fun toggleEditor(hasFocus: Boolean) {

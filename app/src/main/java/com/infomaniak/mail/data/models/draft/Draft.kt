@@ -29,6 +29,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -91,6 +92,15 @@ class Draft : RealmObject {
     var messageUid: String? = null
     //endregion
 
+    //region UI data (Transient & Ignore)
+    @Transient
+    @Ignore
+    var uiBody: String = ""
+    @Transient
+    @Ignore
+    var uiSignature: String? = null
+    //endregion
+
     var action
         get() = enumValueOfOrNull<DraftAction>(_action)
         set(value) {
@@ -123,7 +133,7 @@ class Draft : RealmObject {
             this.name = ""
         })
 
-        body += "<div class=\"editorUserSignature\">${defaultSignature.content}</div>"
+        body += "<div class=\"$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME\">${defaultSignature.content}</div>"
         // TODO: Handle SignaturePosition feature.
         // body = when (defaultSignature.position) {
         //     SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
@@ -150,6 +160,8 @@ class Draft : RealmObject {
     }
 
     companion object {
+        const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
+
         val actionPropertyName get() = Draft::_action.name
     }
 }

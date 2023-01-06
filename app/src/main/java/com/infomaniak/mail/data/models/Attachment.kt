@@ -32,6 +32,7 @@ import java.io.File
 
 @Serializable
 class Attachment : EmbeddedRealmObject {
+
     var uuid: String = ""
     @SerialName("mime_type")
     var mimeType: String = ""

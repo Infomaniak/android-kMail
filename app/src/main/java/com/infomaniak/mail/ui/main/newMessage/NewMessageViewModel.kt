@@ -24,9 +24,9 @@ import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.guessMimeType
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController.fetchDraft
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController.setPreviousMessage
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -36,6 +36,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
+import com.infomaniak.mail.data.models.draft.Draft.Companion.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
@@ -45,7 +46,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.getFileNameAndSize
 import io.realm.kotlin.MutableRealm
-import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -54,13 +55,7 @@ import org.jsoup.Jsoup
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
-    val mailTo = mutableListOf<Recipient>()
-    val mailCc = mutableListOf<Recipient>()
-    val mailBcc = mutableListOf<Recipient>()
-    var mailSubject: String? = null
-    var mailBody = ""
-    var mailSignature: String? = null
-    val mailAttachments = mutableListOf<Attachment>()
+    var draft: Draft = Draft()
 
     private var autoSaveJob: Job? = null
 
@@ -71,55 +66,45 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val editorAction = SingleLiveEvent<Pair<EditorAction, Boolean?>>()
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
 
-    var currentDraftLocalUuid: String? = null
-
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
+
+    private lateinit var snapshot: DraftSnapshot
+
+    private var isNewMessage = false
 
     fun initDraftAndViewModel(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
-                currentDraftLocalUuid = if (draftExists) {
-                    draftLocalUuid
+                draft = if (draftExists) {
+                    draftLocalUuid?.let { DraftController.getDraft(it, realm = this)?.copyFromRealm() }
                         ?: fetchDraft(draftResource!!, messageUid!!)
                         ?: run {
                             // TODO: Add Loader to block UI while waiting for `fetchDraft` API call to finish
                             return@writeBlocking false
                         }
                 } else {
+                    isNewMessage = true
                     createDraft(draftMode, previousMessageUid)
                 }
                 true
             }
 
-            if (isSuccess) initWithDraftData()
+            if (isSuccess) {
+                splitSignatureFromBody()
+                saveDraftSnapshot()
+            }
+
             emit(isSuccess)
         }
     }
 
-    private fun initWithDraftData() {
-        currentDraftLocalUuid?.let(DraftController::getDraft)?.let { draft ->
-            mailTo.addAll(draft.to)
-            mailCc.addAll(draft.cc)
-            mailBcc.addAll(draft.bcc)
-            mailSubject = draft.subject
-            mailAttachments.addAll(draft.attachments)
-
-            val (body, signature) = splitSignatureFromBody(draft.body)
-            mailBody = body.htmlToText()
-            mailSignature = signature
+    private fun fetchDraft(draftResource: String, messageUid: String): Draft? {
+        return ApiRepository.getDraft(draftResource).data?.also { draft ->
+            draft.initLocalValues(messageUid)
         }
     }
 
-    private fun splitSignatureFromBody(mailBody: String): Pair<String, String?> {
-        val doc = Jsoup.parse(mailBody)
-        return doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).lastOrNull()?.let {
-            it.remove()
-            val signature = if (it.html().isBlank()) null else it.outerHtml()
-            doc.body().html() to signature
-        } ?: (mailBody to null)
-    }
-
-    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): String {
+    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): Draft {
         return Draft().apply {
             initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
             initSignature(realm = this@createDraft)
@@ -128,8 +113,31 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                     ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
                     ?.let { message -> setPreviousMessage(draft = this, draftMode, message) }
             }
-            DraftController.upsertDraft(draft = this, realm = this@createDraft)
-        }.localUuid
+        }
+    }
+
+    private fun splitSignatureFromBody() {
+        val doc = Jsoup.parse(draft.body)
+
+        val (body, signature) = doc.getElementsByClass(INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).lastOrNull()?.let {
+            it.remove()
+            val signature = if (it.html().isBlank()) null else it.outerHtml()
+            doc.body().html() to signature
+        } ?: (draft.body to null)
+
+        draft.uiBody = body.htmlToText()
+        draft.uiSignature = signature
+    }
+
+    private fun saveDraftSnapshot() = with(draft) {
+        snapshot = DraftSnapshot(
+            to.toSet(),
+            cc.toSet(),
+            bcc.toSet(),
+            subject,
+            uiBody,
+            attachments.map { it.uuid }.toSet(),
+        )
     }
 
     fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
@@ -147,36 +155,36 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         emit(mailboxes to currentMailboxIndex)
     }
 
-    fun addRecipientToField(recipient: Recipient, type: FieldType) {
+    fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {
         val field = when (type) {
-            FieldType.TO -> mailTo
-            FieldType.CC -> mailCc
-            FieldType.BCC -> mailBcc
+            FieldType.TO -> to
+            FieldType.CC -> cc
+            FieldType.BCC -> bcc
         }
         field.add(recipient)
         saveDraftDebouncing()
     }
 
-    fun removeRecipientFromField(recipient: Recipient, type: FieldType) {
+    fun removeRecipientFromField(recipient: Recipient, type: FieldType) = with(draft) {
         val field = when (type) {
-            FieldType.TO -> mailTo
-            FieldType.CC -> mailCc
-            FieldType.BCC -> mailBcc
+            FieldType.TO -> to
+            FieldType.CC -> cc
+            FieldType.BCC -> bcc
         }
         field.remove(recipient)
         saveDraftDebouncing()
     }
 
-    fun updateMailSubject(subject: String) {
-        if (subject != mailSubject) {
-            mailSubject = subject
+    fun updateMailSubject(newSubject: String?) = with(draft) {
+        if (newSubject != subject) {
+            subject = newSubject
             saveDraftDebouncing()
         }
     }
 
-    fun updateMailBody(body: String) {
-        if (body != mailBody) {
-            mailBody = body
+    fun updateMailBody(newBody: String) = with(draft) {
+        if (newBody != uiBody) {
+            uiBody = newBody
             saveDraftDebouncing()
         }
     }
@@ -191,27 +199,32 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
         autoSaveJob?.cancel()
-        saveDraftToLocal(action)
+
+        if (snapshot.hasChanges()) {
+            saveDraftToLocal(action)
+        } else if (isNewMessage) {
+            RealmDatabase.mailboxContent().writeBlocking {
+                DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+            }
+        }
+
         shouldCloseActivity.postValue(true)
     }
 
     private fun saveDraftToLocal(action: DraftAction) {
-        currentDraftLocalUuid?.let {
-            DraftController.updateDraft(it) { draft ->
-                draft.to = mailTo.toRealmList()
-                draft.cc = mailCc.toRealmList()
-                draft.bcc = mailBcc.toRealmList()
-                draft.subject = mailSubject
-                draft.body = mailBody.textToHtml() + (mailSignature ?: "")
-                draft.attachments = mailAttachments.toRealmList()
-                draft.action = action
-            }
+
+        draft.body = draft.uiBody.textToHtml() + (draft.uiSignature ?: "")
+        draft.action = action
+
+        RealmDatabase.mailboxContent().writeBlocking {
+            DraftController.upsertDraft(draft, realm = this)
+            draft.messageUid?.let { MessageController.getMessage(it, realm = this)?.draftLocalUuid = draft.localUuid }
         }
     }
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
-        var attachmentsSize = mailAttachments.sumOf { it.size }
+        var attachmentsSize = draft.attachments.sumOf { it.size }
 
         uris.forEach { uri ->
             val availableSpace = FILE_SIZE_25_MB - attachmentsSize
@@ -224,7 +237,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
             attachment?.let {
                 newAttachments.add(it)
-                mailAttachments.add(it)
+                draft.attachments.add(it)
                 attachmentsSize += it.size
             }
         }
@@ -238,8 +251,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
         if (fileSize > availableSpace) return null to true
 
-        return currentDraftLocalUuid
-            ?.let { LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, it) }
+        return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, draft.localUuid)
             ?.let { file ->
                 val mimeType = file.path.guessMimeType()
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
@@ -250,7 +262,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     private fun String.textToHtml(): String = replace("\n", "<br>")
 
     override fun onCleared() {
-        currentDraftLocalUuid?.let { LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), it) }
+        LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), draft.localUuid)
         autoSaveJob?.cancel()
         super.onCleared()
     }
@@ -260,10 +272,26 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         FILE_SIZE_TOO_BIG,
     }
 
+    private data class DraftSnapshot(
+        val to: Set<Recipient>,
+        val cc: Set<Recipient>,
+        val bcc: Set<Recipient>,
+        var subject: String?,
+        var body: String,
+        val attachmentsUuids: Set<String>,
+    )
+
+    private fun DraftSnapshot.hasChanges(): Boolean {
+        return to != draft.to.toSet() ||
+                cc != draft.cc.toSet() ||
+                bcc != draft.bcc.toSet() ||
+                subject != draft.subject ||
+                body != draft.uiBody ||
+                attachmentsUuids != draft.attachments.map { it.uuid }.toSet()
+    }
+
     private companion object {
         const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
         const val FILE_SIZE_25_MB = 25 * 1024 * 1024
-
-        const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
     }
 }

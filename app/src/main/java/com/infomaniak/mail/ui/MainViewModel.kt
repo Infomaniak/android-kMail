@@ -216,7 +216,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // TODO: But we don't really know why it crashed in the first place. Maybe there's a memory leak somewhere?
             // TODO: Previous version: `contacts.list.associateBy { Recipient().initLocalValues(it.email, it.name) }`
             mergedContacts.postValue(
-                contacts.list.associate { Recipient().initLocalValues(it.email, it.name) to it.copyFromRealm(0u) }
+                contacts.list.associate { Recipient().initLocalValues(it.email, it.name) to it.copyFromRealm(UInt.MIN_VALUE) }
             )
         }
     }
