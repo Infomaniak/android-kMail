@@ -20,9 +20,9 @@ package com.infomaniak.mail.ui.login
 import android.graphics.Color
 import com.airbnb.lottie.model.KeyPath
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor1
+import com.infomaniak.mail.ui.login.Colors.Companion.blueColor9
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor10
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor11
-import com.infomaniak.mail.ui.login.Colors.Companion.blueColor12
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor2
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor3
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor4
@@ -30,7 +30,6 @@ import com.infomaniak.mail.ui.login.Colors.Companion.blueColor5
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor6
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor7
 import com.infomaniak.mail.ui.login.Colors.Companion.blueColor8
-import com.infomaniak.mail.ui.login.Colors.Companion.blueColor9
 import com.infomaniak.mail.ui.login.Colors.Companion.color1
 import com.infomaniak.mail.ui.login.Colors.Companion.color10
 import com.infomaniak.mail.ui.login.Colors.Companion.color2
@@ -159,7 +158,7 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(KeyPath("IPHONE SCREEN", "Groupe 72", "Fond 1"), pinkColor7),
         )
         val illu234BlueColors = arrayOf(
-            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 54", "Fond 1"), blueColor7),
+            IlluColors(KeyPath("IPHONE SCREEN", "Groupe 54", "Fond 1"), blueColor4),
             IlluColors(KeyPath("IPHONE SCREEN", "Groupe 61", "Fond 1"), blueColor5),
             IlluColors(KeyPath("IPHONE SCREEN", "Groupe 67", "Fond 1"), blueColor1),
             IlluColors(KeyPath("IPHONE SCREEN", "Groupe 72", "Fond 1"), blueColor6),
@@ -215,8 +214,8 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(KeyPath("NOTIFICATION 2", "Groupe 4", "Fond 1"), blueColor4),
             IlluColors(KeyPath("NOTIFICATION 2", "Groupe 11", "Fond 1"), blueColor1),
             IlluColors(KeyPath("HAND", "Groupe 1", "Fond 1"), blueColor6),
-            IlluColors(KeyPath("HAND", "Groupe 4", "Fond 1"), blueColor8),
-            IlluColors(KeyPath("HAND", "Groupe 5", "Fond 1"), blueColor8),
+            IlluColors(KeyPath("HAND", "Groupe 4", "Fond 1"), blueColor7),
+            IlluColors(KeyPath("HAND", "Groupe 5", "Fond 1"), blueColor7),
             IlluColors(KeyPath("MOVING NOTIF 1", "Groupe 15", "Fond 1"), blueColor1),
             IlluColors(KeyPath("MOVING NOTIF 2", "Groupe 4", "Fond 1"), blueColor4),
             IlluColors(KeyPath("MOVING NOTIF 2", "Groupe 11", "Fond 1"), blueColor1),
@@ -260,14 +259,14 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
         )
         val illu3BlueColors = arrayOf(
             IlluColors(KeyPath("NOTIFICATION 2", "Groupe 4", "Fond 1"), blueColor1),
-            IlluColors(KeyPath("NOTIFICATION 2", "Groupe 5", "Fond 1"), blueColor9),
+            IlluColors(KeyPath("NOTIFICATION 2", "Groupe 5", "Fond 1"), blueColor8),
             IlluColors(KeyPath("NOTIFICATION 3", "Groupe 4", "Fond 1"), blueColor1),
-            IlluColors(KeyPath("NOTIFICATION 3", "Groupe 5", "Fond 1"), blueColor9),
+            IlluColors(KeyPath("NOTIFICATION 3", "Groupe 5", "Fond 1"), blueColor8),
             IlluColors(KeyPath("NOTIFICATION 4", "Groupe 4", "Fond 1"), blueColor1),
-            IlluColors(KeyPath("NOTIFICATION 4", "Groupe 5", "Fond 1"), blueColor9),
+            IlluColors(KeyPath("NOTIFICATION 4", "Groupe 5", "Fond 1"), blueColor8),
             IlluColors(KeyPath("HAND", "Groupe 1", "Fond 1"), blueColor6),
-            IlluColors(KeyPath("HAND", "Groupe 4", "Fond 1"), blueColor8),
-            IlluColors(KeyPath("HAND", "Groupe 4", "Fond 1"), blueColor8),
+            IlluColors(KeyPath("HAND", "Groupe 4", "Fond 1"), blueColor7),
+            IlluColors(KeyPath("HAND", "Groupe 4", "Fond 1"), blueColor7),
             IlluColors(KeyPath("STAR", "Groupe 1", "Contour 1"), blueColor1),
             IlluColors(KeyPath("BEN", "Groupe 1", "Contour 1"), blueColor1),
             IlluColors(KeyPath("BEN", "Groupe 2", "Contour 1"), blueColor1),
@@ -310,10 +309,10 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             IlluColors(KeyPath("POINT 3", "Groupe 1", "Fond 1"), blueColor3),
             IlluColors(KeyPath("POINT 4", "Groupe 1", "Fond 1"), blueColor3),
             IlluColors(KeyPath("LETTER", "Groupe 1", "Fond 1"), blueColor2),
-            IlluColors(KeyPath("LETTER", "Groupe 2", "Fond 1"), blueColor10),
-            IlluColors(KeyPath("LETTER", "Groupe 5", "Fond 1"), blueColor11),
-            IlluColors(KeyPath("LETTER", "Groupe 6", "Fond 1"), blueColor12),
-            IlluColors(KeyPath("LETTER", "Groupe 7", "Fond 1"), blueColor12),
+            IlluColors(KeyPath("LETTER", "Groupe 2", "Fond 1"), blueColor9),
+            IlluColors(KeyPath("LETTER", "Groupe 5", "Fond 1"), blueColor10),
+            IlluColors(KeyPath("LETTER", "Groupe 6", "Fond 1"), blueColor11),
+            IlluColors(KeyPath("LETTER", "Groupe 7", "Fond 1"), blueColor11),
         )
     }
 }

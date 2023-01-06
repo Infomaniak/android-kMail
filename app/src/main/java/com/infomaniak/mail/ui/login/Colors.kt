@@ -51,11 +51,10 @@ class Colors(val light: String, val dark: String) {
         val blueColor4 = Colors("#289CDD", "#0D7DBC")
         val blueColor5 = Colors("#84BAD8", "#588EAC")
         val blueColor6 = Colors("#10405B", "#10405B")
-        val blueColor7 = Colors("#289CDD", "#3E3E3E")
-        val blueColor8 = Colors("#0B3547", "#266E8D")
-        val blueColor9 = Colors("#EAF8FE", "#282828")
-        val blueColor10 = Colors("#0A85C9", "#0A85C9")
-        val blueColor11 = Colors("#F7FCFF", "#E8F6FF")
-        val blueColor12 = Colors("#0875A5", "#0875A5")
+        val blueColor7 = Colors("#0B3547", "#266E8D")
+        val blueColor8 = Colors("#EAF8FE", "#282828")
+        val blueColor9 = Colors("#0A85C9", "#0A85C9")
+        val blueColor10 = Colors("#F7FCFF", "#E8F6FF")
+        val blueColor11 = Colors("#0875A5", "#0875A5")
     }
 }
