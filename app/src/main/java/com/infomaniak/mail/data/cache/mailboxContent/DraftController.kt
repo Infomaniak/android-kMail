@@ -28,6 +28,7 @@ import com.infomaniak.mail.utils.throwErrorAsException
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
@@ -100,7 +101,7 @@ object DraftController {
             DraftMode.NEW_MAIL -> Unit
         }
 
-        draft.to = previousMessage.from
+        draft.to = previousMessage.from.copyFromRealm(UInt.MIN_VALUE).toRealmList()
         if (draftMode == DraftMode.REPLY_ALL) draft.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
 
         draft.subject = formatSubject(draftMode, previousMessage.subject ?: "")
