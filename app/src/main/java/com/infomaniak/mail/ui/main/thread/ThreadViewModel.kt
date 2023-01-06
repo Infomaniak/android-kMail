@@ -18,10 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -33,6 +30,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -40,6 +38,8 @@ import kotlinx.coroutines.launch
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
 
     private val localSettings by lazy { LocalSettings.getInstance(application) }
+
+    val quickActionBarClicks = MutableLiveData<Pair<String, Int>>()
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
@@ -100,6 +100,22 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
         if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
             MessageController.fetchCurrentFolderMessages(mailbox, message.folderId, localSettings.threadMode)
+        }
+    }
+
+    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
+
+        ThreadController.getThread(threadUid)?.messages?.let {
+
+            val isNotFromMe =
+                "SUBQUERY(${Message::from.name}, \$recipient, \$recipient.email != '${AccountUtils.currentMailboxEmail}').@count > 0"
+            val isNotDraft = "${Message::isDraft.name} == false"
+
+            val message = it.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
+                ?: it.query(isNotDraft).find().lastOrNull()
+                ?: it.last()
+
+            quickActionBarClicks.postValue(message.uid to menuId)
         }
     }
 }

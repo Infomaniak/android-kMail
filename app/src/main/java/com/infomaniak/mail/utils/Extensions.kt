@@ -41,7 +41,6 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -127,12 +126,6 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
             previousMessageUid = messageUid,
         ).toBundle(),
     )
-}
-
-fun List<Message>.getLastMessageToExecuteAction(): Message = lastOrNull { !it.isDraft } ?: last()
-
-fun List<Message>.getLastMessageToReplyTo(): Message {
-    return lastOrNull { !it.from.first().isMe() && !it.isDraft } ?: getLastMessageToExecuteAction()
 }
 
 fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
