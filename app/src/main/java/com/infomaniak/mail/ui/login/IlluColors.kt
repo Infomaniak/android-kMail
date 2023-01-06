@@ -274,11 +274,11 @@ class IlluColors(val keyPath: KeyPath, val lightColor: String, val darkColor: St
             IlluColors(KeyPath("POINT 2", "Groupe 1", "Fond 1"), lightColor = "#289CDD", darkColor = "#0D7DBC"),
             IlluColors(KeyPath("POINT 3", "Groupe 1", "Fond 1"), lightColor = "#3981AA", darkColor = "#56AFE1"),
             IlluColors(KeyPath("POINT 4", "Groupe 1", "Fond 1"), lightColor = "#3981AA", darkColor = "#56AFE1"),
-            IlluColors(KeyPath("LETTER", "Groupe 1", "Fond 1"), lightColor = "#FF4388", darkColor = "#6DCBFF"),
-            IlluColors(KeyPath("LETTER", "Groupe 2", "Fond 1"), lightColor = "#D81B60", darkColor = "#0A85C9"),
-            IlluColors(KeyPath("LETTER", "Groupe 5", "Fond 1"), lightColor = "#FAF0F0", darkColor = "#E8F6FF"),
-            IlluColors(KeyPath("LETTER", "Groupe 6", "Fond 1"), lightColor = "#E10B59", darkColor = "#0875A5"),
-            IlluColors(KeyPath("LETTER", "Groupe 7", "Fond 1"), lightColor = "#E10B59", darkColor = "#0875A5"),
+            IlluColors(KeyPath("LETTER", "Groupe 1", "Fond 1"), lightColor = "#69C9FF", darkColor = "#6DCBFF"),
+            IlluColors(KeyPath("LETTER", "Groupe 2", "Fond 1"), lightColor = "#0A85C9", darkColor = "#0A85C9"),
+            IlluColors(KeyPath("LETTER", "Groupe 5", "Fond 1"), lightColor = "#F7FCFF", darkColor = "#E8F6FF"),
+            IlluColors(KeyPath("LETTER", "Groupe 6", "Fond 1"), lightColor = "#0875A5", darkColor = "#0875A5"),
+            IlluColors(KeyPath("LETTER", "Groupe 7", "Fond 1"), lightColor = "#0875A5", darkColor = "#0875A5"),
         )
     }
 }
