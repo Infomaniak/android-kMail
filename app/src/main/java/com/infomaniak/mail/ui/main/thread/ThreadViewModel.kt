@@ -61,10 +61,10 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
             return@liveData
         }
 
-        val isExpanded = thread.messages.mapIndexed { index, message ->
+        val expandedList = thread.messages.mapIndexed { index, message ->
             !message.isDraft && (!message.seen || index == thread.messages.lastIndex)
         }
-        emit(isExpanded)
+        emit(expandedList)
 
         fetchIncompleteMessages(thread)
 

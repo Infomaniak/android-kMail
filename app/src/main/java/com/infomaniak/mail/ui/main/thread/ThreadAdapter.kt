@@ -44,7 +44,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     var messages = listOf<Message>()
         private set
-    var isExpanded = mutableListOf<Boolean>()
+    var expandedList = mutableListOf<Boolean>()
     var contacts: Map<Recipient, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
@@ -173,14 +173,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ItemMessageBinding.handleHeaderClick(message: Message, position: Int) = with(message) {
         messageHeader.setOnClickListener {
-            if (isExpanded[position]) {
-                isExpanded[position] = false
+            if (expandedList[position]) {
+                expandedList[position] = false
                 displayExpandedCollapsedMessage(message = this@with, position)
             } else {
                 if (isDraft) {
                     onDraftClicked?.invoke(this@with)
                 } else {
-                    isExpanded[position] = true
+                    expandedList[position] = true
                     displayExpandedCollapsedMessage(message = this@with, position)
                 }
             }
@@ -239,7 +239,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message, position: Int) {
-        val isExpanded = isExpanded[position]
+        val isExpanded = expandedList[position]
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
         if (isExpanded) displayAttachments(message.attachments) else hideAttachments()

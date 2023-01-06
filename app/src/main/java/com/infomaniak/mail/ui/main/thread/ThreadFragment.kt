@@ -65,13 +65,13 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeThreadLive()
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { isExpanded ->
-            if (isExpanded == null) {
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedList ->
+            if (expandedList == null) {
                 findNavController().popBackStack()
             } else {
                 setupUi()
                 setupAdapter()
-                threadAdapter.isExpanded = isExpanded.toMutableList()
+                threadAdapter.expandedList = expandedList.toMutableList()
                 observeMessagesLive()
                 observeContacts()
             }
@@ -167,7 +167,7 @@ class ThreadFragment : Fragment() {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = {
                 if (shouldScrollToBottom.compareAndSet(true, false)) {
-                    binding.messagesList.scrollToPosition(threadAdapter.isExpanded.indexOfFirst { it })
+                    binding.messagesList.scrollToPosition(threadAdapter.expandedList.indexOfFirst { it })
                 }
             }
         }
