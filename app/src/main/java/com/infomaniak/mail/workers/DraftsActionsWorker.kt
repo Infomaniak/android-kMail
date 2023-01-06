@@ -87,14 +87,13 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private fun handleDraftsActions(): Result {
         return mailboxContentRealm.writeBlocking {
 
-            val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { null }
-                ?: return@writeBlocking Result.failure()
+            val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking Result.failure() }
 
             var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
                 try {
-                    draft.uploadAttachments(this)
+                    draft.uploadAttachments(realm = this)
                     DraftController.executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)
                 } catch (exception: Exception) {
                     exception.printStackTrace()
