@@ -64,10 +64,10 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUi()
-        setupAdapter()
         observeThreadLive()
         threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { isExpanded ->
+            setupUi()
+            setupAdapter()
             threadAdapter.isExpanded = isExpanded.toMutableList()
             observeMessagesLive()
             observeContacts()
