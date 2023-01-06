@@ -243,7 +243,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
         if (isExpanded) displayAttachments(message.attachments) else hideAttachments()
-        webViewFrameLayout.isVisible = isExpanded
+
+        if (message.body?.value == null) {
+            messageLoader.isVisible = isExpanded
+            webViewFrameLayout.isVisible = false
+        } else {
+            messageLoader.isVisible = false
+            webViewFrameLayout.isVisible = isExpanded
+        }
     }
 
     @SuppressLint("SetTextI18n")
