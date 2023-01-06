@@ -50,20 +50,27 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: return@liveData
-        ThreadController.getThread(threadUid)?.let { thread ->
 
-            val isExpanded = thread.messages.mapIndexed { index, message ->
-                !message.isDraft && (!message.seen || index == thread.messages.lastIndex)
-            }
-            emit(isExpanded)
+        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: run {
+            emit(null)
+            return@liveData
+        }
 
-            fetchIncompleteMessages(thread)
+        val thread = ThreadController.getThread(threadUid) ?: run {
+            emit(null)
+            return@liveData
+        }
 
-            if (thread.unseenMessagesCount > 0) {
-                ThreadController.markAsSeen(thread, mailbox.uuid)
-                MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
-            }
+        val isExpanded = thread.messages.mapIndexed { index, message ->
+            !message.isDraft && (!message.seen || index == thread.messages.lastIndex)
+        }
+        emit(isExpanded)
+
+        fetchIncompleteMessages(thread)
+
+        if (thread.unseenMessagesCount > 0) {
+            ThreadController.markAsSeen(thread, mailbox.uuid)
+            MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
         }
     }
 

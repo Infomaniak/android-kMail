@@ -66,11 +66,15 @@ class ThreadFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeThreadLive()
         threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { isExpanded ->
-            setupUi()
-            setupAdapter()
-            threadAdapter.isExpanded = isExpanded.toMutableList()
-            observeMessagesLive()
-            observeContacts()
+            if (isExpanded == null) {
+                findNavController().popBackStack()
+            } else {
+                setupUi()
+                setupAdapter()
+                threadAdapter.isExpanded = isExpanded.toMutableList()
+                observeMessagesLive()
+                observeContacts()
+            }
         }
     }
 
