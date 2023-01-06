@@ -96,21 +96,23 @@ class ThreadFragment : Fragment() {
         iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid) }
 
         quickActionBar.setOnItemClickListener { menuId ->
-            threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
+            when (menuId) {
+                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
+                R.id.quickActionForward -> notYetImplemented()
+                R.id.quickActionArchive -> notYetImplemented()
+                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(navigationArgs.threadUid)
+                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
+
+            }
         }
     }
 
     private fun observeQuickActionBarClicks() {
         threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (lastMessageUidToReplyTo, menuId) ->
             when (menuId) {
-                R.id.quickActionReply -> {
-                    safeNavigate(
-                        ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUidToReplyTo)
-                    )
-                }
-                R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> notYetImplemented()
-                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(navigationArgs.threadUid)
+                R.id.quickActionReply -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUidToReplyTo)
+                )
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                         messageUidToReplyTo = lastMessageUidToReplyTo,
