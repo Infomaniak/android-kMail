@@ -386,6 +386,53 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/attachmentsSizeText" />
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/messageLoader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/attachmentsDivider">
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:textSize="12sp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:textSize="12sp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:textSize="12sp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:textSize="12sp" />
+
+            <com.infomaniak.lib.core.views.LoaderTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/marginStandardMedium"
+                android:layout_marginBottom="@dimen/marginStandardVerySmall"
+                android:textSize="12sp" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
         <FrameLayout
             android:id="@+id/webViewFrameLayout"
             android:layout_width="match_parent"
@@ -394,15 +441,13 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attachmentsDivider"
-            tools:visibility="visible">
+            app:layout_constraintTop_toBottomOf="@id/attachmentsDivider">
 
             <WebView
                 android:id="@+id/messageBody"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scrollbars="horizontal" />
-
         </FrameLayout>
 
         <androidx.constraintlayout.widget.Group
