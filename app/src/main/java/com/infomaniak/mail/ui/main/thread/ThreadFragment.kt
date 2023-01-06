@@ -39,7 +39,6 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.getLastMessageToReplyTo
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
 import java.util.concurrent.atomic.AtomicBoolean
@@ -74,6 +73,7 @@ class ThreadFragment : Fragment() {
                 threadAdapter.expandedList = expandedList.toMutableList()
                 observeMessagesLive()
                 observeContacts()
+                observeQuickActionBarClicks()
             }
         }
     }
@@ -96,7 +96,12 @@ class ThreadFragment : Fragment() {
         iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid) }
 
         quickActionBar.setOnItemClickListener { menuId ->
-            val lastMessageUidToReplyTo = threadAdapter.messages.getLastMessageToReplyTo().uid
+            threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
+        }
+    }
+
+    private fun observeQuickActionBarClicks() {
+        threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (lastMessageUidToReplyTo, menuId) ->
             when (menuId) {
                 R.id.quickActionReply -> {
                     safeNavigate(
