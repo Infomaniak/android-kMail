@@ -19,8 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxInfo
 
 import android.content.Context
 import android.util.Log
-import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Mailbox
@@ -100,23 +98,19 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    suspend fun updateMailboxes(context: Context, user: User? = null) {
-        ApiRepository.getMailboxes(user?.id).data?.let { mailboxes ->
+    fun updateMailboxes(context: Context, mailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
 
-            context.initMailNotificationChannel(mailboxes)
+        context.initMailNotificationChannel(mailboxes)
 
-            val userId = user?.id ?: AccountUtils.currentUserId
-
-            val remoteMailboxes = RealmDatabase.mailboxInfo().writeBlocking {
-                mailboxes.map {
-                    val mailboxObjectId = it.createObjectId(userId)
-                    val inboxUnreadCount = getMailbox(mailboxObjectId, realm = this)?.inboxUnreadCount ?: 0
-                    it.initLocalValues(userId, inboxUnreadCount)
-                }
+        val remoteMailboxes = RealmDatabase.mailboxInfo().writeBlocking {
+            mailboxes.map {
+                val mailboxObjectId = it.createObjectId(userId)
+                val inboxUnreadCount = getMailbox(mailboxObjectId, realm = this)?.inboxUnreadCount ?: 0
+                it.initLocalValues(userId, inboxUnreadCount)
             }
-
-            update(remoteMailboxes, userId)
         }
+
+        update(remoteMailboxes, userId)
     }
 
     private fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
