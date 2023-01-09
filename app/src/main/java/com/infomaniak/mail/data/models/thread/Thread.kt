@@ -164,13 +164,13 @@ class Thread : RealmObject {
 
     fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    // TODO: Replace this with a RealmList sub query
     fun getMessageDuplicates(messageId: String): List<Message> = duplicates.filter { it.messageId == messageId }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    // TODO: Replace this with a RealmList sub query
     fun getMessageDuplicatesUids(messageId: String): List<String> = getMessageDuplicates(messageId).map { it.uid }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    // TODO: Replace this with a RealmList sub query
     private fun getThreadLastMessage(): List<Message> {
         return mutableListOf<Message>().apply {
             val lastMessage = messages.getLastMessageToExecuteAction()
@@ -192,7 +192,7 @@ class Thread : RealmObject {
         return getThreadMessagesAndDuplicatesUids { message -> message.isFavorite && !message.isDraft }
     }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    // TODO: Replace this with a RealmList sub query
     private fun getThreadMessagesAndDuplicates(shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
         return mutableListOf<Message>().apply {
             messages.forEach { message ->
@@ -204,7 +204,7 @@ class Thread : RealmObject {
         }
     }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    // TODO: Replace this with a RealmList sub query
     private fun getThreadMessagesAndDuplicatesUids(shouldKeepMessage: (message: Message) -> Boolean): List<String> {
         return getThreadMessagesAndDuplicates(shouldKeepMessage).map { it.uid }
     }

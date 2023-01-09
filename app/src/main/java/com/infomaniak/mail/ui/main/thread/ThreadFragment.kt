@@ -65,7 +65,7 @@ class ThreadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeThreadLive()
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedList ->
+        mainViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedList ->
             if (expandedList == null) {
                 findNavController().popBackStack()
             } else {
