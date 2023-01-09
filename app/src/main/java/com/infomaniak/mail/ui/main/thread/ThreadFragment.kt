@@ -103,7 +103,7 @@ class ThreadFragment : Fragment() {
                     ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUid)
                 )
                 R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> mainViewModel.archiveThread(threadUid)
+                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
                 R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(

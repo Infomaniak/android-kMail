@@ -247,46 +247,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
-    fun archiveMessage(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun archiveThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val realm = RealmDatabase.mailboxContent()
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
-        val message = MessageController.getMessage(messageUid, realm) ?: return@launch
+        val message = messageUid?.let { MessageController.getMessage(it, realm) }
 
-        val uids = listOf(message.uid) + thread.getMessageDuplicatesUids(message.messageId)
+        val uids = if (message == null) {
+            thread.messages + thread.duplicates
+        } else {
+            listOf(message) + thread.getMessageDuplicates(message.messageId)
+        }.map { it.uid }
+
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
 
         val context = getApplication<Application>()
-        val snackbarTitle = if (apiResponse.isSuccess()) {
-            context.getString(R.string.snackbarMessageMoved)
-        } else {
-            context.getString(RCore.string.anErrorHasOccurred)
-        }
 
-        snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
-
-        refreshThreads()
-    }
-
-    fun archiveThread(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-
-        val mailbox = currentMailbox.value ?: return@launch
-        val realm = RealmDatabase.mailboxContent()
-        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
-
-        val uids = ThreadController.getSameFolderThreadMessagesUids(thread)
-        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
-
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
-
-        val context = getApplication<Application>()
-        val snackbarTitle = if (apiResponse.isSuccess()) {
-            val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
-            context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
-        } else {
-            context.getString(RCore.string.anErrorHasOccurred)
+        val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
+        val snackbarTitle = when {
+            !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
+            message == null -> {
+                context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+            }
+            else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
         snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
