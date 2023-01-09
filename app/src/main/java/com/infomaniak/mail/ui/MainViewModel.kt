@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
@@ -257,18 +258,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
 
-        val uids = if (message == null) {
-            thread.messages + thread.duplicates
+        val messages = if (message == null) {
+            mutableListOf<Message>().apply {
+                thread.messages.forEach {
+                    if (it.folderId == currentFolderId.value) {
+                        add(it)
+                        addAll(thread.getMessageDuplicates(it.messageId))
+                    }
+                }
+            }
         } else {
             listOf(message) + thread.getMessageDuplicates(message.messageId)
-        }.map { it.uid }
+        }
 
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
-
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.map { it.uid }, archiveId)
 
         val context = getApplication<Application>()
-
         val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
         val snackbarTitle = when {
             !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
