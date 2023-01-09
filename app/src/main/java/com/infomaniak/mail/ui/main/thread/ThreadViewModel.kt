@@ -68,10 +68,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
         fetchIncompleteMessages(thread)
 
-        if (thread.unseenMessagesCount > 0) {
-            SharedViewModelUtils.markAsSeen(thread, mailbox.uuid)
-            MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
-        }
+        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox, localSettings.threadMode)
     }
 
     private fun fetchIncompleteMessages(thread: Thread) {

@@ -163,10 +163,10 @@ class Thread : RealmObject {
 
     fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    // TODO: Replace this with a RealmList sub query.
     fun getMessageDuplicates(messageId: String): List<Message> = duplicates.filter { it.messageId == messageId }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    // TODO: Replace this with a RealmList sub query.
     fun getMessageDuplicatesUids(messageId: String): List<String> = getMessageDuplicates(messageId).map { it.uid }
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
