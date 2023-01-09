@@ -26,6 +26,7 @@ import androidx.work.*
 import androidx.work.PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
 import com.infomaniak.lib.core.utils.clearStack
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -66,8 +67,9 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 val newMessagesThreads =
                     MessageController.fetchCurrentFolderMessages(mailbox, folder.id, threadMode, okHttpClient, realm)
 
+                val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder.id, realm)
                 newMessagesThreads.forEach { thread ->
-                    thread.showNotification(user.id, mailbox, realm)
+                    thread.showNotification(user.id, mailbox, unReadThreadsCount, realm)
                 }
 
                 realm.close()
@@ -79,7 +81,31 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         Result.success()
     }
 
-    private fun Thread.showNotification(userId: Int, mailbox: Mailbox, realm: Realm) {
+    private fun Thread.showNotification(userId: Int, mailbox: Mailbox, unReadThreadsCount: Int, realm: Realm) {
+
+        fun contentIntent(isSummary: Boolean): PendingIntent {
+            val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
+                putExtras(LaunchActivityArgs(if (isSummary) null else uid, userId, mailbox.mailboxId).toBundle())
+            }
+            val requestCode = if (isSummary) mailbox.uuid else uid
+            return PendingIntent.getActivity(applicationContext, requestCode.hashCode(), intent, pendingIntentFlags)
+        }
+
+        fun showNotification(contentText: String?, isSummary: Boolean, title: String = "", description: String? = null) {
+            applicationContext.showNewMessageNotification(mailbox.channelId, title, description).apply {
+                if (isSummary) setContentTitle(null)
+                setSubText(mailbox.email)
+                setContentText(contentText)
+                setColorized(true)
+                setContentIntent(contentIntent(isSummary = isSummary))
+                setGroup(mailbox.uuid)
+                setGroupSummary(isSummary)
+                color = localSettings.accentColor.getPrimary(applicationContext)
+
+                val notificationId = if (isSummary) mailbox.uuid else uid
+                notificationManagerCompat.notify(notificationId.hashCode(), build())
+            }
+        }
 
         val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
 
@@ -89,19 +115,15 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
         val description = "$subject$preview"
 
-        val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
-            putExtras(LaunchActivityArgs(uid, userId, mailbox.mailboxId).toBundle())
-        }
-        val contentIntent = PendingIntent.getActivity(applicationContext, uid.hashCode(), intent, pendingIntentFlags)
-
-        applicationContext.showNewMessageNotification(mailbox.channelId, message.sender.name, description).apply {
-            setSubText(mailbox.email)
-            setContentText(message.subject)
-            setColorized(true)
-            setContentIntent(contentIntent)
-            color = localSettings.accentColor.getPrimary(applicationContext)
-            notificationManagerCompat.notify(uid.hashCode(), build())
-        }
+        // Show message notification
+        showNotification(message.subject, false, message.sender.name, description)
+        // Show group summary notification
+        val summaryText = applicationContext.resources.getQuantityString(
+            R.plurals.newMessageNotificationSummary,
+            unReadThreadsCount,
+            unReadThreadsCount
+        )
+        showNotification(summaryText, true)
     }
 
     companion object {

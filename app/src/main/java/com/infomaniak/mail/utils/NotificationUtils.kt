@@ -114,7 +114,7 @@ object NotificationUtils : NotificationUtilsCore() {
         }
     }
 
-    fun Context.showNewMessageNotification(channelId: String, title: String, description: String): NotificationCompat.Builder {
+    fun Context.showNewMessageNotification(channelId: String, title: String, description: String?): NotificationCompat.Builder {
         return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description).apply {
             setCategory(Notification.CATEGORY_EMAIL)
             // setGroup(GROUP_KEY_WORK_EMAIL) TODO handle group
