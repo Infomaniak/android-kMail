@@ -18,13 +18,10 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.lib.core.utils.contains
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.throwErrorAsException
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -34,7 +31,6 @@ import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
-import okhttp3.OkHttpClient
 
 object DraftController {
 
@@ -121,25 +117,6 @@ object DraftController {
         }
 
         return prefix + subject
-    }
-
-    fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm, okHttpClient: OkHttpClient) {
-
-        when (draft.action) {
-            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
-                if (data != null) {
-                    updateDraft(draft.localUuid, realm) {
-                        it.remoteUuid = data?.draftRemoteUuid
-                        it.messageUid = data?.messageUid
-                        it.action = null
-                    }
-                } else throwErrorAsException()
-            }
-            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
-                if (isSuccess()) realm.delete(draft) else throwErrorAsException()
-            }
-            else -> Unit
-        }
     }
     //endregion
 }

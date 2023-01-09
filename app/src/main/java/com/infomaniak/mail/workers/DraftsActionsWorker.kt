@@ -24,6 +24,7 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.isNetworkException
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -32,11 +33,9 @@ import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.data.models.draft.Draft.DraftAction
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
-import com.infomaniak.mail.utils.setExpeditedWorkRequest
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +93,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             drafts.reversed().forEach { draft ->
                 try {
                     draft.uploadAttachments(realm = this)
-                    DraftController.executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)
+                    executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                     if (exception is ApiController.NetworkException) throw exception
@@ -147,6 +146,25 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         DraftController.updateDraft(localDraftUuid, realm) {
             realm.delete(it.attachments.first { attachment -> attachment.uuid == uuid })
             it.attachments.add(attachment)
+        }
+    }
+
+    private fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm, okHttpClient: OkHttpClient) {
+
+        when (draft.action) {
+            DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
+                if (data != null) {
+                    DraftController.updateDraft(draft.localUuid, realm) {
+                        it.remoteUuid = data?.draftRemoteUuid
+                        it.messageUid = data?.messageUid
+                        it.action = null
+                    }
+                } else throwErrorAsException()
+            }
+            DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
+                if (isSuccess()) realm.delete(draft) else throwErrorAsException()
+            }
+            else -> Unit
         }
     }
 
