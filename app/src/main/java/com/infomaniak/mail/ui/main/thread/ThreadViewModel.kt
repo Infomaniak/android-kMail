@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
-import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -104,18 +103,8 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
-
-        ThreadController.getThread(threadUid)?.messages?.let {
-
-            val isNotFromMe =
-                "SUBQUERY(${Message::from.name}, \$recipient, \$recipient.email != '${AccountUtils.currentMailboxEmail}').@count > 0"
-            val isNotDraft = "${Message::isDraft.name} == false"
-
-            val message = it.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
-                ?: it.query(isNotDraft).find().lastOrNull()
-                ?: it.last()
-
-            quickActionBarClicks.postValue(message.uid to menuId)
+        MessageController.getMessageUidToReplyTo(threadUid)?.let { messageUid ->
+            quickActionBarClicks.postValue(messageUid to menuId)
         }
     }
 }
