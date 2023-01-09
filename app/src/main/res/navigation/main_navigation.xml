@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_threadListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
+            app:destination="@id/threadActionsBottomSheetDialog" />
     </fragment>
 
     <dialog

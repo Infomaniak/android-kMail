@@ -58,6 +58,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.thread.ThreadFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -255,6 +256,15 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             SwipeAction.READ_UNREAD -> {
                 mainViewModel.toggleSeenStatus(thread.uid)
+                true
+            }
+            SwipeAction.QUICKACTIONS_MENU -> {
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                        messageUid = thread.messages.getLastMessageToExecuteAction().uid,
+                        threadUid = thread.uid,
+                    )
+                )
                 true
             }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
