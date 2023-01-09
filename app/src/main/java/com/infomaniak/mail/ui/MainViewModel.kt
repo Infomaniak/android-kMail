@@ -25,10 +25,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
@@ -39,6 +36,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
@@ -304,14 +302,76 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads()
     }
 
+    //region Open Thread
+    fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
+
+        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: run {
+            emit(null)
+            return@liveData
+        }
+
+        val thread = ThreadController.getThread(threadUid) ?: run {
+            emit(null)
+            return@liveData
+        }
+
+        val expandedList = thread.messages.mapIndexed { index, message ->
+            !message.isDraft && (!message.seen || index == thread.messages.lastIndex)
+        }
+        emit(expandedList)
+
+        fetchIncompleteMessages(thread)
+
+        if (thread.unseenMessagesCount > 0) {
+            markAsSeen(thread, mailbox.uuid)
+            MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
+        }
+    }
+
+    private fun fetchIncompleteMessages(thread: Thread) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            thread.messages.forEach { localMessage ->
+                if (!localMessage.fullyDownloaded) {
+                    ApiRepository.getMessage(localMessage.resource).data?.also {
+                        it.messageIds = localMessage.messageIds
+
+                        // If we've already got this Message's Draft beforehand, we need to save
+                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                        if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid, realm = this)?.localUuid
+
+                        it.fullyDownloaded = true
+
+                        MessageController.upsertMessage(it, realm = this)
+                    }
+                }
+            }
+        }
+    }
+    //endregion
+
+    //region Seen status
     fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-        ThreadController.toggleSeenStatus(thread, mailbox.uuid)
+        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailboxUuid) else markAsSeen(thread, mailboxUuid)
         refreshThreads()
     }
 
+    private fun markAsUnseen(thread: Thread, mailboxUuid: String) {
+        val uids = ThreadController.getThreadLastMessageUids(thread)
+
+        ApiRepository.markMessagesAsUnseen(mailboxUuid, uids)
+    }
+
+    private fun markAsSeen(thread: Thread, mailboxUuid: String) {
+        val uids = ThreadController.getThreadUnseenMessagesUids(thread)
+
+        ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
+    }
+    //endregion
+
+    //region Favorite status
     fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
@@ -343,6 +403,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         refreshThreads()
     }
+    //endregion
 
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
         return folders.toMutableList().let { list ->
