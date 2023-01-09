@@ -84,6 +84,7 @@
     <string name="buttonItalic">Italique</string>
     <string name="buttonLogInDifferentAccount">Me connecter avec un autre compte</string>
     <string name="buttonLogin">Se connecter</string>
+    <string name="buttonLogout">Me déconnecter</string>
     <string name="buttonManageAccount">Gérer mon compte</string>
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
@@ -104,6 +105,8 @@
     <string name="canceledEmailSendingConfirmationSnackbar">Envoi d’e-mail annulé</string>
     <string name="ccTitle">Cc :</string>
     <string name="commercialFolder">Promotions</string>
+    <string name="confirmLogoutDescription">Etes-vous sûr de vouloir vous déconnecter ?</string>
+    <string name="confirmLogoutTitle">Me déconnecter du compte %s</string>
     <string name="contactActionAddToContacts">Ajouter aux contacts</string>
     <string name="contactActionCopyEmailAddress">Copier l’adresse mail</string>
     <string name="contactActionWriteEmail">Écrire un e-mail</string>
@@ -165,12 +168,17 @@
         <item quantity="other">%d sélectionnés</item>
         <item quantity="many">%d de sélectionnés</item>
     </plurals>
+    <plurals name="newMessageNotificationSummary">
+        <item quantity="one">%d nouveau message</item>
+        <item quantity="other">%d nouveaux messages</item>
+        <item quantity="many">%d nouveaux messages</item>
+    </plurals>
     <string name="newMessagePlaceholderTitle">Rédigez votre message</string>
     <string name="noBodyTitle">Ce message est vide.</string>
     <string name="noConversationSelected">Aucune conversation sélectionnée dans %s</string>
     <string name="noEmailDescription">Composez un nouvel e-mail en cliquant sur \"Nouveau message\" en bas à droite</string>
     <string name="noEmailTitle">Vous n’avez pas d’e-mails</string>
-    <string name="noFolderTitle">Vous n’avez pas encore de dossier…</string>
+    <string name="noFolderTitle">Vous n’avez pas encore de dossier …</string>
     <string name="noMailboxDescription">Vous n’avez pas d’adresse mail associée à votre compte Infomaniak. Pour ajouter une adresse, appuyez sur le bouton ci-dessous.</string>
     <string name="noMailboxTitle">Pas d’adresse mail associée à ce compte</string>
     <string name="noNetworkDescription">Vos e-mails pourraient ne pas être à jour</string>
