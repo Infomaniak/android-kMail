@@ -39,7 +39,12 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         setFavoriteUi(navigationArgs.isFavorite)
         setSpamUi()
 
-        archive.setClosingOnClickListener { mainViewModel.archiveMessage(navigationArgs.messageUid, navigationArgs.threadUid) }
+        archive.setClosingOnClickListener {
+            mainViewModel.archiveThreadOrMessage(
+                navigationArgs.threadUid,
+                navigationArgs.messageUid
+            )
+        }
         markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
         move.setClosingOnClickListener { notYetImplemented() }
         postpone.setClosingOnClickListener { notYetImplemented() }

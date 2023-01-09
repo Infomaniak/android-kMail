@@ -51,7 +51,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         phishing.isGone = true
         rule.isGone = true
 
-        archive.setClosingOnClickListener { mainViewModel.archiveThread(threadUid) }
+        archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
         markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(navigationArgs.threadUid) }
         move.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
