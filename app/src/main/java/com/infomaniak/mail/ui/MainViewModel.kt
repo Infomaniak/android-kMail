@@ -39,10 +39,12 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
+import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
@@ -304,14 +306,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads()
     }
 
+    //region Seen status
     fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-        ThreadController.toggleSeenStatus(thread, mailbox.uuid)
+        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailboxUuid) else markAsSeen(thread, mailboxUuid)
         refreshThreads()
     }
 
+    private fun markAsUnseen(thread: Thread, mailboxUuid: String) {
+        val uids = ThreadController.getThreadLastMessageUids(thread)
+
+        ApiRepository.markMessagesAsUnseen(mailboxUuid, uids)
+    }
+    //endregion
+
+    //region Favorite status
     fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
@@ -343,6 +354,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         refreshThreads()
     }
+    //endregion
 
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
         return folders.toMutableList().let { list ->

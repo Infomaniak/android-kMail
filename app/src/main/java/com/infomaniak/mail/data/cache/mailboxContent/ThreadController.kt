@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -167,23 +166,4 @@ object ThreadController {
         realm.delete(getThreadsQuery(folderId, realm = realm))
     }
     //endregion
-
-    //region Seen status
-    fun toggleSeenStatus(thread: Thread, mailboxUuid: String) {
-        if (thread.unseenMessagesCount == 0) markAsUnseen(thread, mailboxUuid) else markAsSeen(thread, mailboxUuid)
-    }
-
-    private fun markAsUnseen(thread: Thread, mailboxUuid: String) {
-        val uids = getThreadLastMessageUids(thread)
-
-        ApiRepository.markMessagesAsUnseen(mailboxUuid, uids)
-    }
-
-    fun markAsSeen(thread: Thread, mailboxUuid: String) {
-        val uids = getThreadUnseenMessagesUids(thread)
-
-        ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
-    }
-    //endregion
-
 }

@@ -30,6 +30,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedViewModelUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -68,7 +69,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         fetchIncompleteMessages(thread)
 
         if (thread.unseenMessagesCount > 0) {
-            ThreadController.markAsSeen(thread, mailbox.uuid)
+            SharedViewModelUtils.markAsSeen(thread, mailbox.uuid)
             MessageController.fetchCurrentFolderMessages(mailbox, thread.folderId, localSettings.threadMode)
         }
     }
