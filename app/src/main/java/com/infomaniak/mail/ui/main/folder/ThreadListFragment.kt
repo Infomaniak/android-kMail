@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEF
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
@@ -328,7 +329,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
-            beforeUpdateAdapter = ::onThreadsUpdate
+            beforeUpdateAdapter = { threads -> handleThreadsVisibility(threads.count()) }
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
         }
     }
@@ -358,6 +359,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
+            handleThreadsVisibility(ThreadController.getThreadsCount(folder.id))
             threadListViewModel.startUpdatedAtJob()
         }
     }
@@ -417,9 +419,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun onThreadsUpdate(threads: List<Thread>) {
-        Log.d("UI", "Received threads (${threads.size})")
-        if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
+    private fun handleThreadsVisibility(numberOfThreads: Int) {
+        Log.d("UI", "Received threads (${numberOfThreads})")
+
+        val cursor = mainViewModel.currentFolderLive.value?.cursor
+
+        if (cursor != null && numberOfThreads == 0) {
+            displayNoEmailView()
+        } else {
+            displayThreadsView()
+        }
     }
 
     private fun displayNoEmailView() = with(binding) {
@@ -427,7 +436,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         emptyState.isVisible = true
     }
 
-    private fun displayThreadList() = with(binding) {
+    private fun displayThreadsView() = with(binding) {
         emptyState.isGone = true
         threadsList.isVisible = true
     }
