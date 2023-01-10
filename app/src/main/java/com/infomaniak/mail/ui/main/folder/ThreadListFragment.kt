@@ -282,7 +282,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             SwipeAction.READ_AND_ARCHIVE -> {
                 readAndArchive(thread.uid)
-                isCurrentFolder(FolderRole.ARCHIVE)
+                isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.NONE -> {
                 throw IllegalStateException("Cannot swipe on an action which is not set")

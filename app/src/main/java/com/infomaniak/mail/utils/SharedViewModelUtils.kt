@@ -28,11 +28,20 @@ import com.infomaniak.mail.data.models.thread.Thread
 
 object SharedViewModelUtils {
 
-    fun markAsSeen(thread: Thread, mailbox: Mailbox, threadMode: ThreadMode) {
+    fun markAsSeen(thread: Thread, mailbox: Mailbox, threadMode: ThreadMode, withRefresh: Boolean = true): List<Message>? {
         val messages = ThreadController.getThreadUnseenMessages(thread)
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid }).isSuccess()
-        if (isSuccess) refreshMessagesFolders(mailbox, threadMode, messages)
+
+        if (isSuccess) {
+            if (withRefresh) {
+                refreshMessagesFolders(mailbox, threadMode, messages)
+            } else {
+                return messages
+            }
+        }
+
+        return null
     }
 
     fun refreshMessagesFolders(
