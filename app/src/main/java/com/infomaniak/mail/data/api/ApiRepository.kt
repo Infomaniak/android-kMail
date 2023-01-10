@@ -163,14 +163,9 @@ object ApiRepository : ApiRepositoryCore() {
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
 
-    fun getMessagesUids(
-        mailboxUuid: String,
-        folderId: String,
-        dateSince: String,
-        okHttpClient: OkHttpClient?,
-    ): ApiResponse<GetMessagesUidsResult> {
+    fun getMessagesUids(mailboxUuid: String, folderId: String, okHttpClient: OkHttpClient?): ApiResponse<GetMessagesUidsResult> {
         return callApi(
-            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId, dateSince),
+            url = ApiRoutes.getMessagesUids(mailboxUuid, folderId),
             method = GET,
             okHttpClient = okHttpClient ?: HttpClient.okHttpClient,
         )

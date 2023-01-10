@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets
 object Utils {
 
     val UTF_8: String = StandardCharsets.UTF_8.name()
+    const val MAX_NUMBER_OF_MESSAGES_TO_FETCH: Int = 10_000
 
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
 
