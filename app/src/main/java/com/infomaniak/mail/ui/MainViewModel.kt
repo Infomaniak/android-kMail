@@ -261,7 +261,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val messages = if (message == null) {
             mutableListOf<Message>().apply {
                 thread.messages.forEach {
-                    if (it.folderId == currentFolderId.value) {
+                    if (it.folderId == currentFolderId.value && !it.scheduled) {
                         add(it)
                         addAll(thread.getMessageDuplicates(it.messageId))
                     }
@@ -296,18 +296,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val currentFolderRole = FolderController.getFolder(folderId, realm)?.role
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
-
-        val messages = if (message == null) {
-            thread.messages + thread.duplicates
-        } else {
-            listOf(message) + thread.getMessageDuplicates(message.messageId)
-        }
-
         var undoResource: String? = null
 
         val shouldPermanentlyDelete = currentFolderRole == FolderRole.DRAFT
                 || currentFolderRole == FolderRole.SPAM
                 || currentFolderRole == FolderRole.TRASH
+
+        val messages = if (message == null) {
+            (thread.messages + thread.duplicates).let { allMessages ->
+                if (shouldPermanentlyDelete) allMessages else allMessages.filter { !it.scheduled }
+            }
+        } else {
+            listOf(message) + thread.getMessageDuplicates(message.messageId)
+        }
 
         val isSuccess = if (shouldPermanentlyDelete) {
             val uids = messages.map { it.uid }
