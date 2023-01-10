@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.user
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
@@ -30,8 +31,8 @@ import kotlinx.coroutines.launch
 class ManageMailAddressViewModel(application: Application) : AndroidViewModel(application) {
 
     fun observeAccounts(): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
-        val currentUser = AccountUtils.currentUser
-        currentUser?.let { user ->
+        AccountUtils.currentUser?.let { user ->
+
             updateMailboxes(user)
 
             emitSource(MailboxController.getMailboxesAsync().map { mailboxes ->
@@ -42,6 +43,7 @@ class ManageMailAddressViewModel(application: Application) : AndroidViewModel(ap
     }
 
     private fun updateMailboxes(user: User) = viewModelScope.launch(Dispatchers.IO) {
-        MailboxController.updateMailboxes(getApplication(), user)
+        val mailboxes = ApiRepository.getMailboxes(user.id).data ?: return@launch
+        MailboxController.updateMailboxes(getApplication(), mailboxes, user.id)
     }
 }

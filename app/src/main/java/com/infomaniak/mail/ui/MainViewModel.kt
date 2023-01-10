@@ -152,7 +152,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private suspend fun loadCurrentMailboxFromRemote() {
         Log.d(TAG, "Load current mailbox from remote")
-        MailboxController.updateMailboxes(getApplication())
+        val mailboxes = ApiRepository.getMailboxes().data ?: return
+        MailboxController.updateMailboxes(getApplication(), mailboxes)
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
@@ -169,7 +170,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "Force refresh mailboxes")
-        MailboxController.updateMailboxes(getApplication())
+        val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
+        MailboxController.updateMailboxes(getApplication(), mailboxes)
         updateCurrentMailboxQuotas()
     }
 
