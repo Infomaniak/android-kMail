@@ -229,7 +229,7 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderId: String? = null): List<Thread> {
+    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderId: String): List<Thread> {
 
         // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
