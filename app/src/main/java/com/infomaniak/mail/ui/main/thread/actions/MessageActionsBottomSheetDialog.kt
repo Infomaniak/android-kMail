@@ -35,22 +35,18 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
+        val threadUid = navigationArgs.threadUid
+        val messageUid = navigationArgs.messageUid
+
         setMarkAsReadUi(navigationArgs.isSeen)
         setFavoriteUi(navigationArgs.isFavorite)
         setSpamUi()
 
-        archive.setClosingOnClickListener {
-            mainViewModel.archiveThreadOrMessage(
-                navigationArgs.threadUid,
-                navigationArgs.messageUid
-            )
-        }
+        archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, messageUid) }
         markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
         move.setClosingOnClickListener { notYetImplemented() }
         postpone.setClosingOnClickListener { notYetImplemented() }
-        favorite.setClosingOnClickListener {
-            mainViewModel.toggleMessageFavoriteStatus(navigationArgs.messageUid, navigationArgs.threadUid)
-        }
+        favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(messageUid, threadUid) }
         spam.setClosingOnClickListener { notYetImplemented() }
         blockSender.setClosingOnClickListener { notYetImplemented() }
         phishing.setClosingOnClickListener { notYetImplemented() }
@@ -61,10 +57,10 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         mainActions.setClosingOnClickListener { id: Int ->
             when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, navigationArgs.messageUid)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, navigationArgs.messageUid)
+                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
+                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
                 R.id.actionForward -> notYetImplemented()
-                R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(navigationArgs.threadUid, navigationArgs.messageUid)
+                R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid, messageUid)
             }
         }
     }
