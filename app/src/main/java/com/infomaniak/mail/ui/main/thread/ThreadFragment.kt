@@ -39,7 +39,6 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.getLastMessageToExecuteAction
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
 import java.util.concurrent.atomic.AtomicBoolean
@@ -74,6 +73,7 @@ class ThreadFragment : Fragment() {
                 threadAdapter.expandedList = expandedList.toMutableList()
                 observeMessagesLive()
                 observeContacts()
+                observeQuickActionBarClicks()
             }
         }
     }
@@ -96,17 +96,26 @@ class ThreadFragment : Fragment() {
         iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid) }
 
         quickActionBar.setOnItemClickListener { menuId ->
-            val lastMessageUid = threadAdapter.messages.getLastMessageToExecuteAction().uid
             when (menuId) {
-                R.id.quickActionReply -> safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUid)
-                )
+                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
                 R.id.quickActionForward -> notYetImplemented()
                 R.id.quickActionArchive -> notYetImplemented()
                 R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(navigationArgs.threadUid)
+                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
+
+            }
+        }
+    }
+
+    private fun observeQuickActionBarClicks() {
+        threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (lastMessageUidToReplyTo, menuId) ->
+            when (menuId) {
+                R.id.quickActionReply -> safeNavigate(
+                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUidToReplyTo)
+                )
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                        messageUid = lastMessageUid,
+                        messageUidToReplyTo = lastMessageUidToReplyTo,
                         threadUid = navigationArgs.threadUid,
                     )
                 )

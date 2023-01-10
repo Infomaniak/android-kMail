@@ -51,6 +51,7 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
@@ -58,7 +59,6 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.thread.ThreadFragmentDirections
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -259,12 +259,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                        messageUid = thread.messages.getLastMessageToExecuteAction().uid,
-                        threadUid = thread.uid,
+                MessageController.getMessageUidToReplyTo(thread.uid)?.let { messageUidToReplyTo ->
+                    safeNavigate(
+                        ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                            messageUidToReplyTo = messageUidToReplyTo,
+                            threadUid = thread.uid,
+                        )
                     )
-                )
+                }
                 true
             }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")

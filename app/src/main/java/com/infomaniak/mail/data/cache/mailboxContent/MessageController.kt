@@ -25,9 +25,11 @@ import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.throwErrorAsException
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
@@ -83,6 +85,20 @@ object MessageController {
 
     fun getMessage(uid: String, realm: TypedRealm): Message? {
         return getMessageQuery(uid, realm).find()
+    }
+
+    fun getMessageUidToReplyTo(threadUid: String): String? {
+        val messages = ThreadController.getThread(threadUid)?.messages ?: return null
+
+        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
+        val isNotDraft = "${Message::isDraft.name} == false"
+
+        val message = messages.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
+            ?: messages.query(isNotDraft).find().lastOrNull()
+            ?: messages.last()
+
+        return message.uid
     }
     //endregion
 

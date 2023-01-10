@@ -18,10 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -40,6 +37,8 @@ import kotlinx.coroutines.launch
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
 
     private val localSettings by lazy { LocalSettings.getInstance(application) }
+
+    val quickActionBarClicks = MutableLiveData<Pair<String, Int>>()
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
@@ -100,6 +99,12 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
         if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
             MessageController.fetchCurrentFolderMessages(mailbox, message.folderId, localSettings.threadMode)
+        }
+    }
+
+    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        MessageController.getMessageUidToReplyTo(threadUid)?.let { messageUid ->
+            quickActionBarClicks.postValue(messageUid to menuId)
         }
     }
 }
