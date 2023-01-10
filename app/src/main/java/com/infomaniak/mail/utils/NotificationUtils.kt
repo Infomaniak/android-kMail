@@ -34,8 +34,6 @@ object NotificationUtils : NotificationUtilsCore() {
 
     const val DRAFT_ACTIONS_ID = 1
 
-    private const val GROUP_KEY_WORK_EMAIL = "com.infomaniak.mail.WORK_EMAIL"
-
     fun Context.initNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelList = mutableListOf<NotificationChannel>()
@@ -114,10 +112,9 @@ object NotificationUtils : NotificationUtilsCore() {
         }
     }
 
-    fun Context.showNewMessageNotification(channelId: String, title: String, description: String): NotificationCompat.Builder {
+    fun Context.showNewMessageNotification(channelId: String, title: String, description: String?): NotificationCompat.Builder {
         return buildNotification(channelId, DEFAULT_SMALL_ICON, title, description).apply {
             setCategory(Notification.CATEGORY_EMAIL)
-            // setGroup(GROUP_KEY_WORK_EMAIL) TODO handle group
         }
     }
 }

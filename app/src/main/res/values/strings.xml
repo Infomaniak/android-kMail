@@ -90,6 +90,7 @@
     <string name="buttonItalic">Italic</string>
     <string name="buttonLogInDifferentAccount">Log in with another account</string>
     <string name="buttonLogin">Login</string>
+    <string name="buttonLogout">Log out</string>
     <string name="buttonManageAccount">Manage my account</string>
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
@@ -110,6 +111,8 @@
     <string name="canceledEmailSendingConfirmationSnackbar">Canceled email sending</string>
     <string name="ccTitle">Cc:</string>
     <string name="commercialFolder">Promotions</string>
+    <string name="confirmLogoutDescription">Are you sure you want to log out?</string>
+    <string name="confirmLogoutTitle">Log out from %s</string>
     <string name="contactActionAddToContacts">Add to contacts</string>
     <string name="contactActionCopyEmailAddress">Copy email address</string>
     <string name="contactActionWriteEmail">Write an email</string>
@@ -169,12 +172,16 @@
         <item quantity="one">%d selected</item>
         <item quantity="other">%d selected</item>
     </plurals>
+    <plurals name="newMessageNotificationSummary">
+        <item quantity="one">%d new message</item>
+        <item quantity="other">%d new messages</item>
+    </plurals>
     <string name="newMessagePlaceholderTitle">Type your message</string>
     <string name="noBodyTitle">This message is empty.</string>
     <string name="noConversationSelected">No conversation selected in %s</string>
     <string name="noEmailDescription">Write a new email by clicking on \'New message\' in the bottom-right corner</string>
     <string name="noEmailTitle">You don’t have any emails</string>
-    <string name="noFolderTitle">You don’t have any folder yet…</string>
+    <string name="noFolderTitle">You don’t have any folder yet …</string>
     <string name="noMailboxDescription">You do not have an email address associated with your Infomaniak account. To add an address, tap the button below.</string>
     <string name="noMailboxTitle">No email address associated with this account</string>
     <string name="noNetworkDescription">Your emails may not be up to date</string>
