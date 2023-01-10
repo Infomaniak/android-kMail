@@ -281,8 +281,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.READ_AND_ARCHIVE -> {
-                toggleSeenStatus(thread.uid)
-                archiveThreadOrMessage(thread.uid)
+                readAndArchive(thread.uid)
                 isCurrentFolder(FolderRole.ARCHIVE)
             }
             SwipeAction.NONE -> {
