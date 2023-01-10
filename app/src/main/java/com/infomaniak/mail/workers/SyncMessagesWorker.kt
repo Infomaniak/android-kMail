@@ -91,7 +91,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
             return PendingIntent.getActivity(applicationContext, requestCode.hashCode(), intent, pendingIntentFlags)
         }
 
-        fun showNotification(contentText: String?, isSummary: Boolean, title: String = "", description: String? = null) {
+        fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
             applicationContext.showNewMessageNotification(mailbox.channelId, title, description).apply {
                 if (isSummary) setContentTitle(null)
                 setSubText(mailbox.email)
@@ -116,7 +116,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         val description = "$subject$preview"
 
         // Show message notification
-        showNotification(message.subject, false, message.sender.name, description)
+        showNotification(subject, false, message.sender.name, description)
         // Show group summary notification
         val summaryText = applicationContext.resources.getQuantityString(
             R.plurals.newMessageNotificationSummary,
