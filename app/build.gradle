@@ -23,8 +23,8 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk 25
         targetSdk 33
-        versionCode 1_00_000_06
-        versionName '1.0-Alpha1'
+        versionCode 1_00_000_07
+        versionName '1.0-Alpha7'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "kmail-$versionName ($versionCode)"
