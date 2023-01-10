@@ -267,8 +267,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
 
         val messages = mutableListOf<Message>()
-        if (thread.unseenMessagesCount > 0) markAsSeen(thread, mailbox, withoutRefresh = true)?.also(messages::addAll)
-        archiveThreadOrMessageSync(thread.uid, withoutRefresh = true)?.also(messages::addAll)
+        if (thread.unseenMessagesCount > 0) markAsSeen(thread, mailbox, withRefresh = false)?.also(messages::addAll)
+        archiveThreadOrMessageSync(thread.uid, withRefresh = false)?.also(messages::addAll)
 
         refreshMessagesFolders(mailbox, messages, archiveId)
     }
@@ -280,7 +280,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun archiveThreadOrMessageSync(
         threadUid: String,
         messageUid: String? = null,
-        withoutRefresh: Boolean = false,
+        withRefresh: Boolean = true,
     ): List<Message>? {
         val mailbox = currentMailbox.value ?: return null
         val realm = RealmDatabase.mailboxContent()
@@ -310,15 +310,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         if (apiResponse.isSuccess()) refreshMessagesFolders(mailbox, localSettings.threadMode, messages, archiveId)
 
-        var messagesToRefresh: List<Message>? = null
         if (apiResponse.isSuccess()) {
-            if (withoutRefresh) {
-                messagesToRefresh = messages
-            } else {
+            if (withRefresh) {
                 refreshMessagesFolders(mailbox, messages, archiveId)
+            } else {
+                return messages
             }
         }
-        return messagesToRefresh
+
+        return null
     }
     //endregion
 
@@ -397,16 +397,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
     }
 
-    private fun markAsSeen(thread: Thread, mailbox: Mailbox, withoutRefresh: Boolean = false): List<Message>? {
+    private fun markAsSeen(thread: Thread, mailbox: Mailbox, withRefresh: Boolean = true): List<Message>? {
         val messages = ThreadController.getThreadUnseenMessages(thread)
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid }).isSuccess()
 
         if (isSuccess) {
-            if (withoutRefresh) {
-                return messages
-            } else {
+            if (withRefresh) {
                 refreshMessagesFolders(mailbox, messages)
+            } else {
+                return messages
             }
         }
 
