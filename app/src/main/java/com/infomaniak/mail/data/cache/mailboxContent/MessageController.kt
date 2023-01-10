@@ -231,7 +231,7 @@ object MessageController {
                 apiResponse.data?.messages?.let { messages ->
                     (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
                         val threads = when (threadMode) {
-                            ThreadMode.THREADS -> createMultiMessagesThreads(messages)
+                            ThreadMode.THREADS -> createMultiMessagesThreads(messages, folderId)
                             ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
                         }
                         newMessagesThreads.addAll(threads)
@@ -245,7 +245,7 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>): List<Thread> {
+    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderId: String): List<Thread> {
 
         // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
@@ -276,11 +276,16 @@ object MessageController {
             }
         }
 
-        return threadsToUpsert.map { (_, thread) ->
+        val folderThreads = mutableListOf<Thread>()
+        threadsToUpsert.forEach { (_, thread) ->
             thread.recomputeThread(realm = this)
             ThreadController.upsertThread(thread, realm = this)
-            if (thread.isManaged()) thread.copyFromRealm(UInt.MIN_VALUE) else thread
+            if (thread.folderId == folderId) {
+                folderThreads.add(if (thread.isManaged()) thread.copyFromRealm(UInt.MIN_VALUE) else thread)
+            }
         }
+
+        return folderThreads
     }
 
     private fun TypedRealm.createNewThreadIfRequired(

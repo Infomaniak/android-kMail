@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 class DisplayModeSettingViewModel : ViewModel() {
 
     fun dropThreads(threadMode: ThreadMode) = viewModelScope.launch(Dispatchers.IO) {
+        // TODO never used, but if not, you should change the folderId, or see if there are other changes needed
         RealmDatabase.mailboxContent().writeBlocking {
 
             ThreadController.deleteThreads(realm = this)
@@ -38,7 +39,7 @@ class DisplayModeSettingViewModel : ViewModel() {
             val messages = MessageController.getMessages(realm = this)
 
             when (threadMode) {
-                ThreadMode.THREADS -> createMultiMessagesThreads(messages)
+                ThreadMode.THREADS -> createMultiMessagesThreads(messages, "")
                 ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
             }
         }
