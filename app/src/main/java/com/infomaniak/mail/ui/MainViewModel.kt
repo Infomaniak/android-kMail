@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -262,8 +262,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Archive
     fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
         val realm = RealmDatabase.mailboxContent()
+        val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
 
@@ -285,19 +285,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         messageUid: String? = null,
         withRefresh: Boolean = true,
     ): List<Message>? {
-        val mailbox = currentMailbox.value ?: return null
         val realm = RealmDatabase.mailboxContent()
+        val mailbox = currentMailbox.value ?: return null
         val thread = ThreadController.getThread(threadUid, realm) ?: return null
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
-
-        val messages = if (message == null) {
-            ThreadController.getThreadMessagesAndDuplicates(thread) { it.folderId == currentFolderId.value && !it.scheduled }
-        } else {
-            listOf(message) + thread.getMessageDuplicates(message.messageId)
-        }
-
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.map { it.uid }, archiveId)
+
+        val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getArchivableMessages(currentFolderId.value!!)
+        val uids = messages.map { it.uid }
+
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
 
         val context = getApplication<Application>()
         val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
@@ -308,7 +305,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
-
         snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
 
         if (apiResponse.isSuccess()) {
@@ -328,27 +324,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
+        var trashId: String? = null
         var undoResource: String? = null
 
         val shouldPermanentlyDelete = isCurrentFolderRole(FolderRole.DRAFT)
                 || isCurrentFolderRole(FolderRole.SPAM)
                 || isCurrentFolderRole(FolderRole.TRASH)
 
-        val messages = if (message == null) {
-            val allMessages = thread.messages + thread.duplicates
-            if (shouldPermanentlyDelete) allMessages else allMessages.filter { !it.scheduled }
-        } else {
-            listOf(message) + thread.getMessageDuplicates(message.messageId)
-        }
-
-        var trashId: String? = null
+        val messages = message?.let(thread::getMessageAndDuplicates)
+            ?: if (shouldPermanentlyDelete) thread.getPermanentlyDeletableMessages() else thread.getDeletableMessages()
+        val uids = messages.map { it.uid }
 
         val isSuccess = if (shouldPermanentlyDelete) {
-            val uids = messages.map { it.uid }
             ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()
         } else {
             trashId = FolderController.getFolder(FolderRole.TRASH, realm)!!.id
-            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.map { it.uid }, trashId)
+            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, trashId)
             undoResource = apiResponse.data?.undoResource
             apiResponse.isSuccess()
         }
@@ -373,7 +364,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             context.getString(RCore.string.anErrorHasOccurred)
         }
-
         snackbarFeedback.postValue(snackbarTitle to undoResource)
 
         if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages, trashId)
@@ -392,9 +382,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun markAsUnseen(thread: Thread, mailbox: Mailbox) {
-        val messages = ThreadController.getThreadLastMessage(thread)
+        val messages = thread.getLastMessageToExecuteAction()
+        val uids = messages.map { it.uid }
 
-        val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.map { it.uid }).isSuccess()
+        val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, uids).isSuccess()
         if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
     }
     //endregion
@@ -404,15 +395,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-        if (thread.isFavorite) {
-            val messages = ThreadController.getThreadFavoritesMessages(thread)
-            val isSuccess = ApiRepository.removeFromFavorites(mailbox.uuid, messages.map { it.uid }).isSuccess()
-            if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
+        val messages = if (thread.isFavorite) thread.getFavoriteMessages() else thread.getLastMessageToExecuteAction()
+        val uids = messages.map { it.uid }
+
+        val isSuccess = if (thread.isFavorite) {
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()
         } else {
-            val messages = ThreadController.getThreadLastMessage(thread)
-            val isSuccess = ApiRepository.addToFavorites(mailbox.uuid, messages.map { it.uid }).isSuccess()
-            if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
+            ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
+
+        if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
     }
 
     fun toggleMessageFavoriteStatus(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -421,12 +413,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = MessageController.getMessage(messageUid, realm) ?: return@launch
 
-        val messages = listOf(message) + thread.getMessageDuplicates(message.messageId)
+        val messages = thread.getMessageAndDuplicates(message)
+        val uids = messages.map { it.uid }
 
         val isSuccess = if (message.isFavorite) {
-            ApiRepository.removeFromFavorites(mailbox.uuid, messages.map { it.uid }).isSuccess()
+            ApiRepository.removeFromFavorites(mailbox.uuid, uids).isSuccess()
         } else {
-            ApiRepository.addToFavorites(mailbox.uuid, messages.map { it.uid }).isSuccess()
+            ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
         if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
