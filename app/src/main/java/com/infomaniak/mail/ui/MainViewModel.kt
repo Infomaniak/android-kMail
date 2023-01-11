@@ -235,6 +235,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // test auto-author-assign
+
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
         folderId: String? = currentFolder.value?.id,
