@@ -155,7 +155,7 @@ object ThreadController {
     }
 
     // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
-    private fun getThreadMessagesAndDuplicatesUids(
+    fun getThreadMessagesAndDuplicatesUids(
         thread: Thread,
         shouldKeepMessage: (message: Message) -> Boolean,
     ): List<String> {

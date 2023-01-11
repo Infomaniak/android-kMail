@@ -39,7 +39,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
@@ -94,7 +93,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun isCurrentFolder(role: FolderRole) = currentFolder.value?.role == role
+    fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
     private val localSettings by lazy { LocalSettings.getInstance(application) }
@@ -258,21 +257,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
 
-        val messages = if (message == null) {
-            mutableListOf<Message>().apply {
-                thread.messages.forEach {
-                    if (it.folderId == currentFolderId.value && !it.scheduled) {
-                        add(it)
-                        addAll(thread.getMessageDuplicates(it.messageId))
-                    }
-                }
-            }
+        val uids = if (message == null) {
+            ThreadController.getThreadMessagesAndDuplicatesUids(thread) { it.folderId == currentFolderId.value && !it.scheduled }
         } else {
-            listOf(message) + thread.getMessageDuplicates(message.messageId)
+            listOf(message.uid) + thread.getMessageDuplicatesUids(message.messageId)
         }
 
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.map { it.uid }, archiveId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
 
         val context = getApplication<Application>()
         val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
@@ -292,20 +284,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val realm = RealmDatabase.mailboxContent()
         val mailbox = currentMailbox.value ?: return@launch
-        val folderId = currentFolder.value?.id ?: return@launch
-        val currentFolderRole = FolderController.getFolder(folderId, realm)?.role
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
         var undoResource: String? = null
 
-        val shouldPermanentlyDelete = currentFolderRole == FolderRole.DRAFT
-                || currentFolderRole == FolderRole.SPAM
-                || currentFolderRole == FolderRole.TRASH
+        val shouldPermanentlyDelete = isCurrentFolderRole(FolderRole.DRAFT)
+                || isCurrentFolderRole(FolderRole.SPAM)
+                || isCurrentFolderRole(FolderRole.TRASH)
 
         val messages = if (message == null) {
-            (thread.messages + thread.duplicates).let { allMessages ->
-                if (shouldPermanentlyDelete) allMessages else allMessages.filter { !it.scheduled }
-            }
+            val allMessages = thread.messages + thread.duplicates
+            if (shouldPermanentlyDelete) allMessages else allMessages.filter { !it.scheduled }
         } else {
             listOf(message) + thread.getMessageDuplicates(message.messageId)
         }
@@ -315,9 +304,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()
         } else {
             val trashId = FolderController.getFolder(FolderRole.TRASH, realm)!!.id
-            val filteredUids = messages.filter { !it.scheduled }.map { it.uid }
-
-            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, filteredUids, trashId)
+            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.map { it.uid }, trashId)
             undoResource = apiResponse.data?.undoResource
             apiResponse.isSuccess()
         }

@@ -239,8 +239,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    /**
+     * The boolean return value is used to know if we should keep the
+     * Thread in the RecyclerView, or remove it when the swipe is done.
+     */
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
-        when (swipeAction) {
+
+        val shouldKeepItem = when (swipeAction) {
+
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
@@ -249,7 +255,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             SwipeAction.ARCHIVE -> {
                 archiveThreadOrMessage(thread.uid)
-                isCurrentFolder(FolderRole.ARCHIVE)
+                isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
                 deleteThreadOrMessage(thread.uid)
@@ -274,12 +280,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }
                 true
             }
-            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
+            SwipeAction.NONE -> {
+                throw IllegalStateException("Cannot swipe on an action which is not set")
+            }
+
             else -> {
                 notYetImplemented()
                 true
             }
         }
+
+        return shouldKeepItem
     }
 
     private fun setDefaultSwipeActions() = with(localSettings) {
