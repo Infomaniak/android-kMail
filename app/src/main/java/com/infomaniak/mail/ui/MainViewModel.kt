@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -33,11 +34,8 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
-import com.infomaniak.mail.data.models.AppSettings
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -296,16 +294,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
 
-        val context = getApplication<Application>()
-        val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
-        val snackbarTitle = when {
-            !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
-            message == null -> {
-                context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
-            }
-            else -> context.getString(R.string.snackbarMessageMoved, destination)
-        }
-        snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
+        showArchiveSnackbar(message, apiResponse)
 
         if (apiResponse.isSuccess()) {
             if (withRefresh) {
@@ -317,8 +306,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         return null
     }
+
+    private fun showArchiveSnackbar(message: Message?, apiResponse: ApiResponse<MoveResult>) {
+
+        val context = getApplication<Application>()
+        val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
+
+        val snackbarTitle = when {
+            !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
+            message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+            else -> context.getString(R.string.snackbarMessageMoved, destination)
+        }
+
+        snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
+    }
     //endregion
 
+    //region Delete
     fun deleteThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val realm = RealmDatabase.mailboxContent()
         val mailbox = currentMailbox.value ?: return@launch
@@ -344,7 +348,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             apiResponse.isSuccess()
         }
 
+        showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource)
+
+        if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages, trashId)
+    }
+
+    private fun showDeleteSnackbar(
+        isSuccess: Boolean,
+        shouldPermanentlyDelete: Boolean,
+        message: Message?,
+        undoResource: String?,
+    ) {
         val context = getApplication<Application>()
+
         val snackbarTitle = if (isSuccess) {
             val destination = context.getString(FolderRole.TRASH.folderNameRes)
             when {
@@ -364,12 +380,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             context.getString(RCore.string.anErrorHasOccurred)
         }
+
         snackbarFeedback.postValue(snackbarTitle to undoResource)
-
-        if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages, trashId)
     }
+    //endregion
 
-    //region Seen status
+    //region Seen
     fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
@@ -390,7 +406,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
-    //region Favorite status
+    //region Favorite
     fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
