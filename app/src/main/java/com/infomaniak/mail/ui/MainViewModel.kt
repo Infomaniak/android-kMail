@@ -45,8 +45,9 @@ import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
-import com.infomaniak.mail.utils.SharedViewModelUtils.refreshMessagesFolders
+import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
+import com.infomaniak.mail.utils.getFoldersIds
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -264,14 +265,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
+        val messagesFoldersIds = mutableListOf<String>()
 
-        val messages = mutableListOf<Message>()
         if (thread.unseenMessagesCount > 0) {
-            markAsSeen(thread, mailbox, localSettings.threadMode, withRefresh = false)?.also(messages::addAll)
+            markAsSeen(thread, mailbox, localSettings.threadMode, withRefresh = false)?.also(messagesFoldersIds::addAll)
         }
-        archiveThreadOrMessageSync(thread.uid, withRefresh = false)?.also(messages::addAll)
+        archiveThreadOrMessageSync(thread.uid, withRefresh = false)?.also(messagesFoldersIds::addAll)
 
-        refreshMessagesFolders(mailbox, localSettings.threadMode, messages, archiveId)
+        refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds, archiveId)
     }
 
     fun archiveThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
@@ -282,7 +283,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         threadUid: String,
         messageUid: String? = null,
         withRefresh: Boolean = true,
-    ): List<Message>? {
+    ): List<String>? {
         val realm = RealmDatabase.mailboxContent()
         val mailbox = currentMailbox.value ?: return null
         val thread = ThreadController.getThread(threadUid, realm) ?: return null
@@ -297,10 +298,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         showArchiveSnackbar(message, apiResponse)
 
         if (apiResponse.isSuccess()) {
+            val messagesFoldersIds = messages.getFoldersIds(exception = archiveId)
             if (withRefresh) {
-                refreshMessagesFolders(mailbox, localSettings.threadMode, messages, archiveId)
+                refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds, archiveId)
             } else {
-                return messages
+                return messagesFoldersIds
             }
         }
 
@@ -350,7 +352,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource)
 
-        if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages, trashId)
+        if (isSuccess) {
+            val messagesFoldersIds = messages.getFoldersIds(exception = trashId)
+            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds, trashId)
+        }
     }
 
     private fun showDeleteSnackbar(
@@ -402,7 +407,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val uids = messages.map { it.uid }
 
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, uids).isSuccess()
-        if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
+
+        if (isSuccess) {
+            val messagesFoldersIds = messages.getFoldersIds()
+            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds)
+        }
     }
     //endregion
 
@@ -420,7 +429,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
-        if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
+        if (isSuccess) {
+            val messagesFoldersIds = messages.getFoldersIds()
+            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds)
+        }
     }
 
     fun toggleMessageFavoriteStatus(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -438,7 +450,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
-        if (isSuccess) refreshMessagesFolders(mailbox, localSettings.threadMode, messages)
+        if (isSuccess) {
+            val messagesFoldersIds = messages.getFoldersIds()
+            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds)
+        }
     }
     //endregion
 

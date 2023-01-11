@@ -94,8 +94,9 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         val messages = thread.getMessageAndDuplicates(message)
+        val uids = messages.map { it.uid }
 
-        if (ApiRepository.deleteMessages(mailbox.uuid, messages.map { it.uid }).isSuccess()) {
+        if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
             MessageController.fetchCurrentFolderMessages(mailbox, message.folderId, localSettings.threadMode)
         }
     }
