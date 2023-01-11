@@ -62,6 +62,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import io.realm.kotlin.ext.isValid
 import java.util.*
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
@@ -353,8 +354,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observerDraftsActionsCompletedWorks() {
         fun observeDraftsActions() {
             DraftsActionsWorker.getCompletedWorkInfosLiveData(requireContext()).observe(viewLifecycleOwner) {
-                if (mainViewModel.currentFolder.value?.role == FolderRole.DRAFT) {
-                    mainViewModel.forceRefreshThreads()
+                mainViewModel.currentFolder.value?.let { folder ->
+                    if (folder.isValid() && folder.role == FolderRole.DRAFT) {
+                        mainViewModel.forceRefreshThreads()
+                    }
                 }
             }
         }
