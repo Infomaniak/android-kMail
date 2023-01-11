@@ -22,7 +22,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +34,6 @@ import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
-import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
@@ -120,12 +118,6 @@ class IntroFragment : Fragment() {
                     setAnimation(R.raw.illu_4)
                     repeatFrame(127, 236)
                 }
-            }
-        }
-
-        iconLayout.addLottieOnCompositionLoadedListener {
-            iconLayout.resolveKeyPath(KeyPath("**")).forEach {
-                Log.d("keypath", it.keysToString())
             }
         }
 
@@ -231,10 +223,9 @@ class IntroFragment : Fragment() {
 
     private fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
         val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
-        addValueCallback(
-            illuColors.keyPath,
-            LottieProperty.COLOR_FILTER
-        ) { SimpleColorFilter(color) }
+        addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
+            SimpleColorFilter(color)
+        }
     }
 
     private fun updateEachPageUi(accentColor: AccentColor) {
