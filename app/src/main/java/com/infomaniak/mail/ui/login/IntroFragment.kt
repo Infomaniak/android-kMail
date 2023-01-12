@@ -32,13 +32,34 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
 import com.google.android.material.tabs.TabLayout
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
 import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu3BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu3Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu3PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuBlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuPinkColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
 import kotlinx.coroutines.Dispatchers
@@ -86,7 +107,7 @@ class IntroFragment : Fragment() {
                 description.setText(R.string.onBoardingDescription3)
                 iconLayout.apply {
                     setAnimation(R.raw.illu_3)
-                    repeatFrame(118, 225)
+                    repeatFrame(111, 187)
                 }
             }
             3 -> {
@@ -152,20 +173,70 @@ class IntroFragment : Fragment() {
     /**
      * `animate` is necessary because when the activity is started, we want to avoid animating the color change the first time.
      */
-    private fun setUi(accentColor: AccentColor, position: Int) = with(binding) {
+    private fun setUi(accentColor: AccentColor, position: Int) {
         updateEachPageUi(accentColor)
+
+        binding.iconLayout.changeIllustrationColors(position, accentColor)
+
         if (position == ACCENT_COLOR_PICKER_PAGE) updateAccentColorPickerPageUi(accentColor)
     }
 
-    private fun updateEachPageUi(accentColor: AccentColor) = with(binding) {
-        val newColor = accentColor.getSecondaryBackground(requireContext())
-        val oldColor = requireActivity().window.statusBarColor
-        animateColorChange(oldColor, newColor) { color ->
-            waveBackground.imageTintList = ColorStateList.valueOf(color)
+    private fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: AccentColor) {
+        val isDark = requireContext().isNightModeEnabled()
+
+        illuColors.forEach { changePathColor(it, isDark) }
+        when (position) {
+            1, 2, 3 -> illu234Colors.forEach { changePathColor(it, isDark) }
+        }
+
+        when (position) {
+            0 -> illu1Colors.forEach { changePathColor(it, isDark) }
+            1 -> illu2Colors.forEach { changePathColor(it, isDark) }
+            2 -> illu3Colors.forEach { changePathColor(it, isDark) }
+            3 -> illu4Colors.forEach { changePathColor(it, isDark) }
+        }
+
+        if (accentColor == PINK) {
+            illuPinkColors.forEach { changePathColor(it, isDark) }
+            when (position) {
+                1, 2, 3 -> illu234PinkColors.forEach { changePathColor(it, isDark) }
+            }
+            when (position) {
+                0 -> illu1PinkColors.forEach { changePathColor(it, isDark) }
+                1 -> illu2PinkColors.forEach { changePathColor(it, isDark) }
+                2 -> illu3PinkColors.forEach { changePathColor(it, isDark) }
+                3 -> illu4PinkColors.forEach { changePathColor(it, isDark) }
+            }
+        } else {
+            illuBlueColors.forEach { changePathColor(it, isDark) }
+            when (position) {
+                1, 2, 3 -> illu234BlueColors.forEach { changePathColor(it, isDark) }
+            }
+            when (position) {
+                0 -> illu1BlueColors.forEach { changePathColor(it, isDark) }
+                1 -> illu2BlueColors.forEach { changePathColor(it, isDark) }
+                2 -> illu3BlueColors.forEach { changePathColor(it, isDark) }
+                3 -> illu4BlueColors.forEach { changePathColor(it, isDark) }
+            }
         }
     }
 
-    private fun updateAccentColorPickerPageUi(accentColor: AccentColor) = with(binding) {
+    private fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
+        val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
+        addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
+            SimpleColorFilter(color)
+        }
+    }
+
+    private fun updateEachPageUi(accentColor: AccentColor) {
+        val newColor = accentColor.getSecondaryBackground(requireContext())
+        val oldColor = requireActivity().window.statusBarColor
+        animateColorChange(oldColor, newColor) { color ->
+            binding.waveBackground.imageTintList = ColorStateList.valueOf(color)
+        }
+    }
+
+    private fun updateAccentColorPickerPageUi(accentColor: AccentColor) {
         animateTabIndicatorAndTextColor(accentColor, requireContext())
         animateTabBackgroundColor(accentColor, requireContext())
     }
@@ -201,6 +272,5 @@ class IntroFragment : Fragment() {
 
     private companion object {
         const val ACCENT_COLOR_PICKER_PAGE = 0
-        const val LOGIN_BUTTON_PAGE = 3
     }
 }
