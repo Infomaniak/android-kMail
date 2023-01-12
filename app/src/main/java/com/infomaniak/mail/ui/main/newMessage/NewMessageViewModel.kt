@@ -111,7 +111,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             if (draftMode != DraftMode.NEW_MAIL) {
                 previousMessageUid
                     ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
-                    ?.let { message -> setPreviousMessage(draft = this, draftMode, message) }
+                    ?.let { message -> setPreviousMessage(draftMode, message) }
             }
         }
     }

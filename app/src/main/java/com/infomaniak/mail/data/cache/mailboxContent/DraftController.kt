@@ -85,21 +85,21 @@ object DraftController {
     //endregion
 
     //region Open Draft
-    fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
+    fun Draft.setPreviousMessage(draftMode: DraftMode, previousMessage: Message) {
 
-        draft.inReplyTo = previousMessage.messageId
-        draft.references = "${previousMessage.references} ${previousMessage.messageId}"
+        inReplyTo = previousMessage.messageId
+        references = "${previousMessage.references} ${previousMessage.messageId}"
 
         when (draftMode) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> draft.inReplyToUid = previousMessage.uid
-            DraftMode.FORWARD -> draft.forwardedUid = previousMessage.uid
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> inReplyToUid = previousMessage.uid
+            DraftMode.FORWARD -> forwardedUid = previousMessage.uid
             DraftMode.NEW_MAIL -> Unit
         }
 
-        draft.to = previousMessage.from.copyFromRealm(UInt.MIN_VALUE).toRealmList()
-        if (draftMode == DraftMode.REPLY_ALL) draft.cc = previousMessage.to.union(previousMessage.cc).toRealmList()
+        to = previousMessage.from.copyFromRealm(UInt.MIN_VALUE).toRealmList()
+        if (draftMode == DraftMode.REPLY_ALL) cc = previousMessage.to.union(previousMessage.cc).toRealmList()
 
-        draft.subject = formatSubject(draftMode, previousMessage.subject ?: "")
+        subject = formatSubject(draftMode, previousMessage.subject ?: "")
     }
 
     private fun formatSubject(draftMode: DraftMode, subject: String): String {
