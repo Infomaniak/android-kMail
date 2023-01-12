@@ -143,10 +143,13 @@ class Message : RealmObject {
         // `<x@x.x><x@x.x><x@x.x>`
         // `<x@x.x> <x@x.x> <x@x.x>`
         // `<x@x.x> <x@x.x> x@x.x`
+        // Not encountered (but handled) formats so far:
+        // `<x@x.x> x@x.x <x@x.x>`
+        // `x@x.x <x@x.x> <x@x.x>`
         fun String.parseMessagesIds(): List<String> = this
             .removePrefix("<")
             .removeSuffix(">")
-            .split("><", "> <", "> ")
+            .split("><", "> <", "> ", " <")
 
         messageIds = realmSetOf<String>().apply {
             addAll(messageId.parseMessagesIds())
