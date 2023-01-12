@@ -68,7 +68,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 swipeAction as SwipeAction
 
                 when (swipeAction) {
-                    ARCHIVE, DELETE, FAVORITE, NONE, QUICKACTIONS_MENU, READ_UNREAD, READ_AND_ARCHIVE -> Unit
+                    ARCHIVE, DELETE, FAVORITE, NONE, QUICKACTIONS_MENU, READ_UNREAD, READ_AND_ARCHIVE, SPAM -> Unit
                     else -> notYetImplemented()
                 }
 

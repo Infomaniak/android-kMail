@@ -143,6 +143,10 @@
     <string name="emailSentSnackbar">Email sent</string>
     <string name="emptyFolderDescription">There‘s nothing to see, look at another one :)</string>
     <string name="emptyFolderTitle">This folder is empty !</string>
+    <plurals name="errorActionsSpamOwnMessage">
+        <item quantity="one">You cannot report your own e-mail</item>
+        <item quantity="other">You cannot report your own emails</item>
+    </plurals>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="favoritesFolder">Favorites</string>

@@ -137,6 +137,11 @@
     <string name="emailSentSnackbar">E-mail envoyé</string>
     <string name="emptyFolderDescription">Il n‘y a rien à voir, regardez-en un autre :)</string>
     <string name="emptyFolderTitle">Ce dossier est vide !</string>
+    <plurals name="errorActionsSpamOwnMessage">
+        <item quantity="one">Vous ne pouvez pas signaler votre propre message</item>
+        <item quantity="other">Vous ne pouvez pas signaler vos propres messages</item>
+        <item quantity="many">Vous ne pouvez pas signaler vos propres messages</item>
+    </plurals>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
     <string name="favoritesFolder">Favoris</string>

@@ -57,7 +57,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
         move.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
-        spam.setClosingOnClickListener { notYetImplemented() }
+        spam.setClosingOnClickListener { mainViewModel.moveToOrFromSpam(threadUid) }
         print.setClosingOnClickListener { notYetImplemented() }
         saveAsPdf.setClosingOnClickListener { notYetImplemented() }
         reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
