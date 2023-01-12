@@ -143,7 +143,10 @@ class Message : RealmObject {
         // `<x@x.x><x@x.x><x@x.x>`
         // `<x@x.x> <x@x.x> <x@x.x>`
         // `<x@x.x> <x@x.x> x@x.x`
-        fun String.parseMessagesIds(): List<String> = this.split("<", ">", " ").filter { it.isNotEmpty() }
+        fun String.parseMessagesIds(): List<String> = this
+            .removePrefix("<")
+            .removeSuffix(">")
+            .split(">\\s*<|>?\\s+<?".toRegex())
 
         messageIds = realmSetOf<String>().apply {
             addAll(messageId.parseMessagesIds())
