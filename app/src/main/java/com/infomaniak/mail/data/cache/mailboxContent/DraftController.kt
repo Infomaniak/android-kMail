@@ -86,10 +86,9 @@ object DraftController {
 
     //region Open Draft
     fun setPreviousMessage(draft: Draft, draftMode: DraftMode, previousMessage: Message) {
-        previousMessage.messageId.let {
-            draft.inReplyTo = it
-            draft.references = it
-        }
+
+        draft.inReplyTo = previousMessage.messageId
+        draft.references = "${previousMessage.references} ${previousMessage.messageId}"
 
         when (draftMode) {
             DraftMode.REPLY, DraftMode.REPLY_ALL -> draft.inReplyToUid = previousMessage.uid
