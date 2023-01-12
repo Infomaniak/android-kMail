@@ -47,7 +47,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         move.setClosingOnClickListener { notYetImplemented() }
         postpone.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(messageUid, threadUid) }
-        spam.setClosingOnClickListener { notYetImplemented() }
+        spam.setClosingOnClickListener { mainViewModel.moveToOrFromSpam(threadUid, messageUid) }
         blockSender.setClosingOnClickListener { notYetImplemented() }
         phishing.setClosingOnClickListener { notYetImplemented() }
         print.setClosingOnClickListener { notYetImplemented() }
