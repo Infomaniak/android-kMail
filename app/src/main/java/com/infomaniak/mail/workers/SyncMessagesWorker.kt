@@ -49,6 +49,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
     private val localSettings by lazy { LocalSettings.getInstance(applicationContext) }
     private val threadMode by lazy { localSettings.threadMode }
+    private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     private val notificationManagerCompat by lazy { NotificationManagerCompat.from(applicationContext) }
 
@@ -56,10 +57,10 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         Log.d(TAG, "Work launched")
 
         AccountUtils.getAllUsersSync().forEach { user ->
-            MailboxController.getMailboxes(user.id).forEach loopMailboxes@{ mailbox ->
+            MailboxController.getMailboxes(user.id, mailboxInfoRealm).forEach loopMailboxes@{ mailbox ->
 
                 val realm = RealmDatabase.newMailboxContentInstance(user.id, mailbox.mailboxId)
-                val folder = FolderController.getFolder(FolderRole.INBOX) ?: return@loopMailboxes
+                val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: return@loopMailboxes
                 if (folder.cursor == null) return@loopMailboxes
 
                 val okHttpClient = AccountUtils.getHttpClient(user.id)
@@ -79,6 +80,10 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         Log.d(TAG, "Work finished")
 
         Result.success()
+    }
+
+    override fun onFinish() {
+        mailboxInfoRealm.close()
     }
 
     private fun Thread.showNotification(userId: Int, mailbox: Mailbox, unReadThreadsCount: Int, realm: Realm) {
