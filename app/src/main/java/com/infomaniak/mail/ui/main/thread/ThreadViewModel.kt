@@ -61,9 +61,34 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
         emit(expandedMap)
 
-        ThreadController.fetchIncompleteMessages(thread)
-
         if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
+    }
+
+    fun fetchIncompleteMessages(messages: List<Message>) = viewModelScope.launch(Dispatchers.IO) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            messages.forEach { localMessage ->
+                if (!localMessage.fullyDownloaded) {
+                    ApiRepository.getMessage(localMessage.resource).data?.also { remoteMessage ->
+
+                        // If we've already got this Message's Draft beforehand, we need to save
+                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                        val draftLocalUuid = if (remoteMessage.isDraft) {
+                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
+                        } else {
+                            null
+                        }
+
+                        remoteMessage.initLocalValues(
+                            fullyDownloaded = true,
+                            messageIds = localMessage.messageIds,
+                            draftLocalUuid,
+                        )
+
+                        MessageController.upsertMessage(remoteMessage, realm = this)
+                    }
+                }
+            }
+        }
     }
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {

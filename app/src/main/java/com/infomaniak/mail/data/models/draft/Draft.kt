@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class Draft : RealmObject {
     var resource: String? = null
     var quote: String = ""
     var references: String? = null
-    var delay: Int = 0
+    var delay: Int = -1
     @SerialName("ack_request")
     var ackRequest: Boolean = false
     @SerialName("st_uuid")

@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,18 @@ import androidx.work.*
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.lib.core.utils.FORMAT_DATE_WITH_TIMEZONE
 import com.infomaniak.lib.core.utils.isNetworkException
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
@@ -39,12 +43,15 @@ import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.properties.Delegates
 
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
@@ -83,17 +90,20 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         }
     }
 
-    private fun handleDraftsActions(): Result {
-        return mailboxContentRealm.writeBlocking {
+    private suspend fun handleDraftsActions(): Result {
 
-            val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking Result.failure() }
+        val scheduledDates = mutableListOf<String>()
+
+        val isFailure = mailboxContentRealm.writeBlocking {
+
+            val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
 
             var hasRemoteException = false
 
             drafts.reversed().forEach { draft ->
                 try {
                     draft.uploadAttachments(realm = this)
-                    executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)
+                    executeDraftAction(draft, mailbox.uuid, realm = this, okHttpClient)?.also(scheduledDates::add)
                 } catch (exception: Exception) {
                     exception.printStackTrace()
                     if (exception is ApiController.NetworkException) throw exception
@@ -102,7 +112,32 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                 }
             }
 
-            if (hasRemoteException) Result.failure() else Result.success()
+            return@writeBlocking hasRemoteException
+        }
+
+        return if (isFailure) {
+            Result.failure()
+        } else {
+            updateFolderAfterScheduledDate(scheduledDates)
+            Result.success()
+        }
+    }
+
+    private suspend fun updateFolderAfterScheduledDate(scheduledDates: MutableList<String>) {
+
+        val folder = FolderController.getFolder(FolderRole.DRAFT, realm = mailboxContentRealm)
+
+        if (folder?.cursor != null) {
+
+            val timeNow = Date().time
+            val simpleDateFormat = SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT)
+
+            val times = scheduledDates.mapNotNull { simpleDateFormat.parse(it)?.time }
+            var delay = REFRESH_DELAY
+            if (times.isNotEmpty()) delay += times.maxOf { it } - timeNow
+            delay(delay)
+
+            MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, mailboxContentRealm)
         }
     }
 
@@ -149,7 +184,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         }
     }
 
-    private fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm, okHttpClient: OkHttpClient) {
+    private fun executeDraftAction(draft: Draft, mailboxUuid: String, realm: MutableRealm, okHttpClient: OkHttpClient): String? {
+
+        var scheduledDate: String? = null
 
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
@@ -162,10 +199,17 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                 } else throwErrorAsException()
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
-                if (isSuccess()) realm.delete(draft) else throwErrorAsException()
+                if (isSuccess()) {
+                    scheduledDate = data?.scheduledDate
+                    realm.delete(draft)
+                } else {
+                    throwErrorAsException()
+                }
             }
             else -> Unit
         }
+
+        return scheduledDate
     }
 
     private fun Data.getIntOrNull(key: String) = getInt(key, 0).run { if (this == 0) null else this }
@@ -174,6 +218,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
+        private const val REFRESH_DELAY = 1_500L
 
         fun scheduleWork(context: Context) {
 

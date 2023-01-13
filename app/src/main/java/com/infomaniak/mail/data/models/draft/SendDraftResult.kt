@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022-2023 Infomaniak Network SA
+ * Copyright (C) 2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,13 @@
  */
 package com.infomaniak.mail.data.models.draft
 
-import com.infomaniak.mail.data.models.Attachment
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SaveDraftResult(
-    @SerialName("uuid")
-    val draftRemoteUuid: String,
-    @SerialName("uid")
-    val messageUid: String,
-    val attachments: List<Attachment>,
+data class SendDraftResult(
+    @SerialName("cancel_resource")
+    val cancelResource: String,
+    @SerialName("etop")
+    val scheduledDate: String,
 )
