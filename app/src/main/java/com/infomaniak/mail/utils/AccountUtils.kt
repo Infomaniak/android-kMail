@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import android.app.NotificationManager
 import android.content.Context
 import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
@@ -125,6 +126,8 @@ object AccountUtils : CredentialManager() {
             cancelAllWork()
             pruneWork()
         }
+        // Dismiss all current notifications
+        (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
     }
 
     fun getAllUsersSync(): List<User> = userDatabase.userDao().getAllSync()
