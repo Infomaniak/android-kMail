@@ -352,10 +352,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource)
 
-        if (isSuccess) {
-            val messagesFoldersIds = messages.getFoldersIds(exception = trashId)
-            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds, trashId)
-        }
+        if (isSuccess) refreshFolders(mailbox, localSettings.threadMode, messages.getFoldersIds(exception = trashId), trashId)
     }
 
     private fun showDeleteSnackbar(
@@ -408,10 +405,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, uids).isSuccess()
 
-        if (isSuccess) {
-            val messagesFoldersIds = messages.getFoldersIds()
-            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds)
-        }
+        if (isSuccess) refreshFolders(mailbox, localSettings.threadMode, messages.getFoldersIds())
     }
     //endregion
 
@@ -429,10 +423,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
-        if (isSuccess) {
-            val messagesFoldersIds = messages.getFoldersIds()
-            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds)
-        }
+        if (isSuccess) refreshFolders(mailbox, localSettings.threadMode, messages.getFoldersIds())
     }
 
     fun toggleMessageFavoriteStatus(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -450,10 +441,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ApiRepository.addToFavorites(mailbox.uuid, uids).isSuccess()
         }
 
-        if (isSuccess) {
-            val messagesFoldersIds = messages.getFoldersIds()
-            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds)
-        }
+        if (isSuccess) refreshFolders(mailbox, localSettings.threadMode, messages.getFoldersIds())
     }
     //endregion
 
