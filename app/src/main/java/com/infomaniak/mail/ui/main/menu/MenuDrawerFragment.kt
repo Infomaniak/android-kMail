@@ -28,6 +28,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
@@ -45,6 +48,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.toggleChevron
+import kotlinx.coroutines.launch
 
 class MenuDrawerFragment : Fragment() {
 
@@ -176,6 +180,14 @@ class MenuDrawerFragment : Fragment() {
     private fun observeCurrentMailbox() {
         mainViewModel.currentMailbox.observe(viewLifecycleOwner) { mailbox ->
             binding.mailboxSwitcherText.text = mailbox.email
+
+            // Make sure you always cancel all mailbox current notifications, whenever it is visible by the user.
+            // Also cancel notifications from the current mailbox if it no longer exists.
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    mainViewModel.dismissCurrentMailboxNotifications()
+                }
+            }
         }
     }
 
