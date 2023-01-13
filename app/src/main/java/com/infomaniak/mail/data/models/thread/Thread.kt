@@ -191,6 +191,10 @@ class Thread : RealmObject {
         return messages + duplicates
     }
 
+    fun getSpamMessages(): List<Message> {
+        return getMessagesAndDuplicates { message -> !message.scheduled && !message.from.first().isMe() }
+    }
+
     // TODO: Replace this with a RealmList sub query.
     private fun getMessagesAndDuplicates(shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
         return mutableListOf<Message>().apply {

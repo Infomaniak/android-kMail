@@ -461,25 +461,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun moveToOrFromSpam(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val realm = RealmDatabase.mailboxContent()
-        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+        val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
+        val destinationFolderRole = if (isCurrentFolderRole(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
+        val destinationFolderId = FolderController.getFolder(destinationFolderRole, realm)!!.id
 
-        val uids = if (message == null) {
-            val allMessages = thread.messages + thread.duplicates
-            allMessages.filterNot { it.scheduled || it.from.first().isMe() }
-        } else {
-            if (message.from.first().isMe()) emptyList() else listOf(message) + thread.getMessageDuplicates(message.messageId)
-        }.map { it.uid }
+        val messages = message?.let { if (message.from.first().isMe()) emptyList() else thread.getMessageAndDuplicates(message) }
+            ?: thread.getSpamMessages()
+        val uids = messages.map { it.uid }
 
-        val destinationRole = if (isCurrentFolderRole(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
-        val destinationId = FolderController.getFolder(destinationRole, realm)!!.id
+        val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailbox.uuid, uids, destinationFolderId)
+        val isSuccess = apiResponse?.isSuccess()
 
-        val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailboxUuid, uids, destinationId)
+        showSpamSnackbar(message, apiResponse, destinationFolderRole)
 
-        showSpamSnackbar(message, apiResponse, destinationRole)
-
-        refreshThreads()
+        if (isSuccess == true) {
+            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolderId)
+            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds, destinationFolderId)
+        }
     }
 
     private fun showSpamSnackbar(message: Message?, apiResponse: ApiResponse<MoveResult>?, destinationRole: FolderRole) {
@@ -489,9 +489,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val snackbarTitle = when {
             apiResponse == null -> context.resources.getQuantityString(R.plurals.errorActionsSpamOwnMessage, 1)
             !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
-            message == null -> {
-                context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
-            }
+            message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
