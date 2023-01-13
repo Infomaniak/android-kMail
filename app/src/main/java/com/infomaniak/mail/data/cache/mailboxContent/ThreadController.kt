@@ -49,11 +49,6 @@ object ThreadController {
         return realm.query<Thread>(query).count()
     }
 
-    private fun getThreadsCountQuery(folderId: String): RealmScalarQuery<Long> {
-        val byFolderId = "${Thread::folderId.name} == '$folderId'"
-        return RealmDatabase.mailboxContent().query<Thread>(byFolderId).count()
-    }
-
     private fun getThreadsQuery(
         folderId: String,
         filter: ThreadFilter = ThreadFilter.ALL,
@@ -96,10 +91,6 @@ object ThreadController {
 
     fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {
         return getUnreadThreadsCountQuery(folderId, realm).find().toInt()
-    }
-
-    fun getThreadsCount(folderId: String): Int {
-        return getThreadsCountQuery(folderId).find().toInt()
     }
 
     fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {

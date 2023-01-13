@@ -52,7 +52,6 @@ import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEF
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
@@ -356,12 +355,32 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderLive() {
+
+        var isFirstOpeningOfThisFolder = false
+
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
+            isFirstOpeningOfThisFolder = updateThreadsVisibilityIfNeeded(folder, isFirstOpeningOfThisFolder)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
-            handleThreadsVisibility(ThreadController.getThreadsCount(folder.id))
             threadListViewModel.startUpdatedAtJob()
         }
+    }
+
+    private fun updateThreadsVisibilityIfNeeded(folder: Folder, isFirstOpening: Boolean): Boolean {
+
+        var isFirstOpeningOfThisFolder = isFirstOpening
+
+        if (folder.cursor == null) isFirstOpeningOfThisFolder = true
+
+        if (isFirstOpeningOfThisFolder && folder.cursor != null) {
+            // We use the `totalCount` of Messages instead of the Threads' count, so yes the data is not the correct
+            // one, but here we don't care, because we really only want to know if there's at least 1 Thread in
+            // this Folder. And if there's at least 1 Message, it means there will be at least 1 Thread.
+            handleThreadsVisibility(folder.totalCount)
+            isFirstOpeningOfThisFolder = false
+        }
+
+        return isFirstOpeningOfThisFolder
     }
 
     private fun observeUpdatedAtTriggers() {
@@ -419,12 +438,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun handleThreadsVisibility(numberOfThreads: Int) {
-        Log.d("UI", "Received threads (${numberOfThreads})")
+    private fun handleThreadsVisibility(threadsCount: Int) {
+        Log.d("UI", "Received threads (${threadsCount})")
 
         val cursor = mainViewModel.currentFolderLive.value?.cursor
 
-        if (cursor != null && numberOfThreads == 0) {
+        if (cursor != null && threadsCount == 0) {
             displayNoEmailView()
         } else {
             displayThreadsView()
