@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,15 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     var onMenuClicked: ((Message) -> Unit)? = null
 
     override fun updateList(itemList: List<Message>) {
+
+        if (itemList.count() > expandedList.count()) {
+            for (index in expandedList.count() until itemList.count()) {
+                val message = itemList[index]
+                val expanded = !message.isDraft && (!message.seen || index == itemList.lastIndex)
+                expandedList.add(expanded)
+            }
+        }
+
         messages = itemList
     }
 
