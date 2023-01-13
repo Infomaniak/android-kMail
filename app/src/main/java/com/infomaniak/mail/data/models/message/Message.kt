@@ -137,12 +137,21 @@ class Message : RealmObject {
 
     fun initMessageIds() {
 
-        fun parseMessagesIds(id: String): List<String> = id.removePrefix("<").removeSuffix(">").split("><", "> <")
+        // Encountered formats so far:
+        // `x@x.x`
+        // `<x@x.x>`
+        // `<x@x.x><x@x.x><x@x.x>`
+        // `<x@x.x> <x@x.x> <x@x.x>`
+        // `<x@x.x> <x@x.x> x@x.x`
+        fun String.parseMessagesIds(): List<String> = this
+            .removePrefix("<")
+            .removeSuffix(">")
+            .split(">\\s*<|>?\\s+<?".toRegex())
 
         messageIds = realmSetOf<String>().apply {
-            addAll(parseMessagesIds(messageId))
-            references?.let { addAll(parseMessagesIds(it)) }
-            inReplyTo?.let { addAll(parseMessagesIds(it)) }
+            addAll(messageId.parseMessagesIds())
+            references?.let { addAll(it.parseMessagesIds()) }
+            inReplyTo?.let { addAll(it.parseMessagesIds()) }
         }
     }
 
