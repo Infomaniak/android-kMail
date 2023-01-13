@@ -239,24 +239,34 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean {
-        return when (swipeAction) {
+    /**
+     * The boolean return value is used to know if we should keep the
+     * Thread in the RecyclerView, or remove it when the swipe is done.
+     */
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
+
+        val shouldKeepItem = when (swipeAction) {
+
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
                 findNavController().navigate(R.id.swipeActionsSettingsFragment, null, getAnimatedNavOptions())
                 true
             }
+            SwipeAction.ARCHIVE -> {
+                archiveThreadOrMessage(thread.uid)
+                isCurrentFolderRole(FolderRole.ARCHIVE)
+            }
             SwipeAction.DELETE -> {
-                mainViewModel.deleteThreadOrMessage(thread.uid)
+                deleteThreadOrMessage(thread.uid)
                 false
             }
             SwipeAction.FAVORITE -> {
-                mainViewModel.toggleThreadFavoriteStatus(thread.uid)
+                toggleThreadFavoriteStatus(thread.uid)
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                mainViewModel.toggleSeenStatus(thread.uid)
+                toggleSeenStatus(thread.uid)
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
@@ -270,12 +280,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }
                 true
             }
-            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
+            SwipeAction.NONE -> {
+                throw IllegalStateException("Cannot swipe on an action which is not set")
+            }
+
             else -> {
                 notYetImplemented()
                 true
             }
         }
+
+        return shouldKeepItem
     }
 
     private fun setDefaultSwipeActions() = with(localSettings) {
@@ -355,9 +370,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         fun observeDraftsActions() {
             DraftsActionsWorker.getCompletedWorkInfosLiveData(requireContext()).observe(viewLifecycleOwner) {
                 mainViewModel.currentFolder.value?.let { folder ->
-                    if (folder.isValid() && folder.role == FolderRole.DRAFT) {
-                        mainViewModel.forceRefreshThreads()
-                    }
+                    if (folder.isValid() && folder.role == FolderRole.DRAFT) mainViewModel.forceRefreshThreads()
                 }
             }
         }

@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
@@ -31,9 +30,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.getAttributeColor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import com.google.android.material.R as RMaterial
 
 open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
@@ -72,11 +68,10 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         setText(favoriteText)
     }
 
-    fun setSpamUi() = with(binding.spam) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val currentFolderIsSpam = mainViewModel.currentFolder.value?.role == FolderRole.SPAM
-            withContext(Dispatchers.Main) { setText(if (currentFolderIsSpam) R.string.actionNonSpam else R.string.actionSpam) }
-        }
+    fun setSpamUi() {
+        binding.spam.setText(
+            if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) R.string.actionNonSpam else R.string.actionSpam
+        )
     }
 
     fun ActionItemView.setClosingOnClickListener(forceQuit: Boolean = false, callback: (() -> Unit)) {

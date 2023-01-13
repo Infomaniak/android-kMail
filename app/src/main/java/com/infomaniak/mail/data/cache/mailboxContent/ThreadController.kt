@@ -146,11 +146,22 @@ object ThreadController {
         }
     }
 
-    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getSameFolderThreadMessagesUids(thread: Thread): List<String> {
+        return getThreadMessagesAndDuplicatesUids(thread) { message -> message.folderId == thread.folderId }
+    }
+
     fun getThreadFavoritesMessagesUids(thread: Thread): List<String> {
+        return getThreadMessagesAndDuplicatesUids(thread) { message -> message.isFavorite && !message.isDraft }
+    }
+
+    // TODO: Replace this with a RealmList sub query (blocked by https://github.com/realm/realm-kotlin/issues/1037)
+    fun getThreadMessagesAndDuplicatesUids(
+        thread: Thread,
+        shouldKeepMessage: (message: Message) -> Boolean,
+    ): List<String> {
         return mutableListOf<String>().apply {
             thread.messages.forEach { message ->
-                if (message.isFavorite && !message.isDraft) {
+                if (shouldKeepMessage(message)) {
                     add(message.uid)
                     addAll(thread.getMessageDuplicatesUids(message.messageId))
                 }

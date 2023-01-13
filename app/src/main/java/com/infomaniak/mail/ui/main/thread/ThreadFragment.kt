@@ -93,15 +93,17 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(navigationArgs.threadUid) }
+        val threadUid = navigationArgs.threadUid
+
+        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
-                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
+                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
                 R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> notYetImplemented()
-                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(navigationArgs.threadUid)
-                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(navigationArgs.threadUid, menuId)
+                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
+                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
 
             }
         }
