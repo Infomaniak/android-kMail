@@ -148,7 +148,7 @@ fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
 }
 
 inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
-    throw error?.exception ?: Exception(data?.let { ApiController.json.encodeToString(it) })
+    throw error?.exception ?: Exception(ApiController.json.encodeToString(this))
 }
 
 //region Realm
