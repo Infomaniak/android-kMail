@@ -58,6 +58,15 @@ import com.infomaniak.lib.core.R as RCore
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    private inline val context: Context get() = getApplication<Application>()
+    private val localSettings by lazy { LocalSettings.getInstance(context) }
+    val isInternetAvailable = SingleLiveEvent<Boolean>()
+    var isDownloadingChanges = MutableLiveData(false)
+    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+    val snackbarFeedback = SingleLiveEvent<Pair<String, String?>>()
+
+    private var forceRefreshJob: Job? = null
+
     //region Current Mailbox
     private val currentMailboxObjectId = MutableLiveData<String?>(null)
 
@@ -97,14 +106,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
-
-    private inline val context: Context get() = getApplication<Application>()
-    val isInternetAvailable = SingleLiveEvent<Boolean>()
-    var isDownloadingChanges = MutableLiveData(false)
-    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
-    val snackbarFeedback = SingleLiveEvent<Pair<String, String?>>()
-
-    private var forceRefreshJob: Job? = null
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
@@ -444,26 +445,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Spam
-    fun reportAsSpam(thread: Thread, messageUid: String? = null): Boolean {
+    fun markAsSpamOrHam(thread: Thread, message: Message? = null): Boolean {
         var onlyContainsOwnMessages = true
         var containsOwnMessage = false
 
-        thread.from.forEach { if (it.isMe()) containsOwnMessage = true else onlyContainsOwnMessages = false }
+        (message?.from ?: thread.from).forEach { if (it.isMe()) containsOwnMessage = true else onlyContainsOwnMessages = false }
 
         if (onlyContainsOwnMessages) {
             snackbarFeedback.value = context.resources.getQuantityString(R.plurals.errorActionsSpamOwnMessage, 1) to null
         } else {
-            moveToOrFromSpam(thread.uid, messageUid)
+            toggleSpamOrHam(thread.uid, message)
         }
 
         return containsOwnMessage
     }
 
-    fun moveToOrFromSpam(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
+    private fun toggleSpamOrHam(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val realm = RealmDatabase.mailboxContent()
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
-        val message = messageUid?.let { MessageController.getMessage(it, realm) }
         val destinationFolderRole = if (isCurrentFolderRole(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolderId = FolderController.getFolder(destinationFolderRole, realm)!!.id
 
@@ -477,8 +477,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         showSpamSnackbar(message, apiResponse, destinationFolderRole)
 
         if (isSuccess == true) {
-            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolderId)
-            refreshFolders(mailbox, localSettings.threadMode, messagesFoldersIds, destinationFolderId)
+            refreshFolders(
+                mailbox,
+                localSettings.threadMode,
+                messages.getFoldersIds(exception = destinationFolderId),
+                destinationFolderId,
+            )
         }
     }
 

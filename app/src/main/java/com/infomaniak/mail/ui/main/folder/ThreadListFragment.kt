@@ -285,7 +285,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 readAndArchive(thread.uid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
-            SwipeAction.SPAM -> reportAsSpam(thread)
+            SwipeAction.SPAM -> markAsSpamOrHam(thread)
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
             else -> {
                 notYetImplemented()
