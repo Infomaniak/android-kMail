@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -239,7 +239,6 @@
     <string name="settingsMailboxGeneralFolders">Paramètres des dossiers</string>
     <string name="settingsMailboxGeneralNotifications">Notifications</string>
     <string name="settingsMailboxGeneralSignature">Paramètres de signature</string>
-    <string name="settingsMessageDisplayTitle">Mode d’affichage des messages</string>
     <string name="settingsOptionAlways">Toujours</string>
     <string name="settingsOptionAskMe">Me demander</string>
     <string name="settingsOptionDarkTheme">Sombre</string>

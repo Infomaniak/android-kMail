@@ -68,7 +68,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
         fetchIncompleteMessages(thread)
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox, localSettings.threadMode)
+        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
     }
 
     private fun fetchIncompleteMessages(thread: Thread) {
@@ -97,7 +97,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         val uids = messages.map { it.uid }
 
         if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
-            MessageController.fetchCurrentFolderMessages(mailbox, message.folderId, localSettings.threadMode)
+            MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
         }
     }
 

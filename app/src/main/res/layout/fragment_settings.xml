@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -106,15 +106,6 @@
                 android:layout_height="wrap_content"
                 app:itemAction="chevron"
                 app:title="@string/settingsSwipeActionsTitle" />
-
-            <com.infomaniak.mail.ui.main.settings.ItemSettingView
-                android:id="@+id/settingsMessageDisplay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:itemAction="chevron"
-                app:title="@string/settingsMessageDisplayTitle"
-                tools:subtitle="@string/settingsOptionDiscussions" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsExternalContent"
