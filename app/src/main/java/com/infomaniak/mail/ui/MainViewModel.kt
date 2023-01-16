@@ -469,6 +469,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
+    fun undoAction(undoResource: String) = viewModelScope.launch(Dispatchers.IO) {
+        if (ApiRepository.undoAction(undoResource).data == true) {
+            refreshFolders()
+            snackbarFeedback.postValue(context.getString(R.string.snackbarMoveCancelled) to null)
+        }
+    }
+
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
         return folders.toMutableList().let { list ->
 

@@ -203,6 +203,10 @@ object ApiRepository : ApiRepositoryCore() {
         )
     }
 
+    fun undoAction(undoResources: String): ApiResponse<Boolean> {
+        return callApi(url = ApiRoutes.resource(undoResources), method = POST)
+    }
+
     /**
      * RealmLists cannot be null, so they have to be empty when there is no data.
      * But the kMail API doesn't support empty lists, so we have to replace them with a `null` value.
