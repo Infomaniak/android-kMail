@@ -74,14 +74,8 @@ class Draft : RealmObject {
     @SerialName("forwarded_uid")
     var forwardedUid: String? = null
 
-    var resource: String? = null
-    var quote: String = ""
     var references: String? = null
-    var delay: Int = -1
-    @SerialName("ack_request")
-    var ackRequest: Boolean = false
-    @SerialName("st_uuid")
-    var stUuid: String? = null
+    var delay: Int = 0
     //endregion
 
     //region Local data (Transient)
@@ -141,10 +135,11 @@ class Draft : RealmObject {
         // }
     }
 
+    @Suppress("JSON_FORMAT_REDUNDANT")
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
-        return json.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
-            this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) })
-        }
+        return Json(json) { encodeDefaults = true }
+            .encodeToJsonElement(this).jsonObject.toMutableMap()
+            .apply { this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) }) }
     }
 
     enum class DraftAction(val apiCallValue: String) {
