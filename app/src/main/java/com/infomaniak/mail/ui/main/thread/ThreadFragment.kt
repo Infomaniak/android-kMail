@@ -51,6 +51,8 @@ class ThreadFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
+    private lateinit var thread: Thread
+
     private var threadAdapter = ThreadAdapter()
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
@@ -65,13 +67,14 @@ class ThreadFragment : Fragment() {
 
         observeThreadLive()
 
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedMap ->
-            if (expandedMap == null) {
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
+            if (result == null) {
                 findNavController().popBackStack()
             } else {
+                thread = result.first
                 setupUi()
                 setupAdapter()
-                threadAdapter.expandedMap = expandedMap
+                threadAdapter.expandedMap = result.second
                 observeMessagesLive()
                 observeContacts()
                 observeQuickActionBarClicks()
@@ -94,18 +97,15 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        val threadUid = navigationArgs.threadUid
-
-        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
+        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(thread) }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
-                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(thread, menuId)
                 R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
-                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
-                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
-
+                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(thread)
+                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(thread)
+                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(thread, menuId)
             }
         }
     }
@@ -143,7 +143,7 @@ class ThreadFragment : Fragment() {
             }
             onDeleteDraftClicked = { message ->
                 mainViewModel.currentMailbox.value?.let { mailbox ->
-                    threadViewModel.deleteDraft(message, navigationArgs.threadUid, mailbox)
+                    threadViewModel.deleteDraft(message, thread, mailbox)
                 }
             }
             onAttachmentClicked = { attachment ->
@@ -207,7 +207,8 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun onThreadUpdate(thread: Thread) = with(binding) {
+    private fun onThreadUpdate(updatedThread: Thread) = with(binding) {
+        thread = updatedThread
 
         val subject = thread.getFormattedSubject(context)
         threadSubject.text = subject

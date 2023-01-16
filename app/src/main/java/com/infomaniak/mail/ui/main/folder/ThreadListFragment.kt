@@ -255,34 +255,32 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                archiveThreadOrMessage(thread.uid)
+                archiveThreadOrMessage(thread)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
-                deleteThreadOrMessage(thread.uid)
+                deleteThreadOrMessage(thread)
                 false
             }
             SwipeAction.FAVORITE -> {
-                toggleThreadFavoriteStatus(thread.uid)
+                toggleThreadFavoriteStatus(thread)
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                MessageController.getMessageUidToReplyTo(thread.uid)?.let { messageUidToReplyTo ->
-                    safeNavigate(
-                        ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                            messageUidToReplyTo = messageUidToReplyTo,
-                            threadUid = thread.uid,
-                        )
+                safeNavigate(
+                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
+                        messageUidToReplyTo = MessageController.getMessageUidToReplyTo(thread.messages),
+                        threadUid = thread.uid,
                     )
-                }
+                )
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                toggleSeenStatus(thread.uid)
+                toggleSeenStatus(thread)
                 true
             }
             SwipeAction.READ_AND_ARCHIVE -> {
-                readAndArchive(thread.uid)
+                readAndArchive(thread)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.SPAM -> markAsSpamOrHam(thread)

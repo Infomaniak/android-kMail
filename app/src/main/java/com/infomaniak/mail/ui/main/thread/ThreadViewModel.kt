@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +63,8 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         thread.messages.forEachIndexed { index, message ->
             expandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
         }
-        emit(expandedMap)
+
+        emit(thread to expandedMap)
 
         if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
     }
@@ -74,18 +76,16 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+    fun deleteDraft(message: Message, thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         val messages = thread.getMessageAndDuplicates(message)
-        val uids = messages.map { it.uid }
 
-        if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
+        if (ApiRepository.deleteMessages(mailbox.uuid, messages.map { it.uid }).isSuccess()) {
             MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
         }
     }
 
-    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        MessageController.getMessageToReplyTo(threadUid)?.let { message ->
+    fun clickOnQuickActionBar(thread: Thread, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        MessageController.getMessageToReplyTo(thread.messages)?.let { message ->
             quickActionBarClicks.postValue(message to menuId)
         }
     }
