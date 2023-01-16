@@ -39,6 +39,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
@@ -259,10 +260,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isDownloadingChanges.postValue(false)
     }
 
-    fun archiveThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
+    //region Archive
+    fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val realm = RealmDatabase.mailboxContent()
         val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
+        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
+
+        val messages = mutableListOf<Message>()
+        if (thread.unseenMessagesCount > 0) {
+            markAsSeen(thread, mailbox, localSettings.threadMode, withRefresh = false)?.also(messages::addAll)
+        }
+        archiveThreadOrMessageSync(thread.uid, withRefresh = false)?.also(messages::addAll)
+
+        refreshMessagesFolders(mailbox, localSettings.threadMode, messages, archiveId)
+    }
+
+    fun archiveThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
+        archiveThreadOrMessageSync(threadUid, messageUid)
+    }
+
+    private fun archiveThreadOrMessageSync(
+        threadUid: String,
+        messageUid: String? = null,
+        withRefresh: Boolean = true,
+    ): List<Message>? {
+        val mailbox = currentMailbox.value ?: return null
+        val realm = RealmDatabase.mailboxContent()
+        val thread = ThreadController.getThread(threadUid, realm) ?: return null
         val message = messageUid?.let { MessageController.getMessage(it, realm) }
 
         val messages = if (message == null) {
@@ -286,8 +311,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         snackbarFeedback.postValue(snackbarTitle to apiResponse.data?.undoResource)
 
-        if (apiResponse.isSuccess()) refreshMessagesFolders(mailbox, localSettings.threadMode, messages, archiveId)
+        if (apiResponse.isSuccess()) {
+            if (withRefresh) {
+                refreshMessagesFolders(mailbox, localSettings.threadMode, messages, archiveId)
+            } else {
+                return messages
+            }
+        }
+
+        return null
     }
+    //endregion
 
     fun deleteThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         val realm = RealmDatabase.mailboxContent()

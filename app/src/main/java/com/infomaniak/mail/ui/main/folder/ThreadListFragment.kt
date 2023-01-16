@@ -265,10 +265,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 toggleThreadFavoriteStatus(thread.uid)
                 true
             }
-            SwipeAction.READ_UNREAD -> {
-                toggleSeenStatus(thread.uid)
-                true
-            }
             SwipeAction.QUICKACTIONS_MENU -> {
                 MessageController.getMessageUidToReplyTo(thread.uid)?.let { messageUidToReplyTo ->
                     safeNavigate(
@@ -279,6 +275,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     )
                 }
                 true
+            }
+            SwipeAction.READ_UNREAD -> {
+                toggleSeenStatus(thread.uid)
+                true
+            }
+            SwipeAction.READ_AND_ARCHIVE -> {
+                readAndArchive(thread.uid)
+                isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.NONE -> {
                 throw IllegalStateException("Cannot swipe on an action which is not set")
