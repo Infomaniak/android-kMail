@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,39 +21,41 @@ import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 
 object SharedViewModelUtils {
 
-    fun markAsSeen(thread: Thread, mailbox: Mailbox, threadMode: ThreadMode, withRefresh: Boolean = true): List<Message>? {
-        val messages = ThreadController.getThreadUnseenMessages(thread)
+    fun markAsSeen(thread: Thread, mailbox: Mailbox, threadMode: ThreadMode, withRefresh: Boolean = true): List<String>? {
+        val messages = thread.getUnseenMessages()
+        val uids = messages.map { it.uid }
 
-        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid }).isSuccess()
+        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, uids).isSuccess()
 
         if (isSuccess) {
+            val messagesFoldersIds = messages.getFoldersIds()
             if (withRefresh) {
-                refreshMessagesFolders(mailbox, threadMode, messages)
+                refreshFolders(mailbox, threadMode, messagesFoldersIds)
             } else {
-                return messages
+                return messagesFoldersIds
             }
         }
 
         return null
     }
 
-    fun refreshMessagesFolders(
+    fun refreshFolders(
         mailbox: Mailbox,
         threadMode: ThreadMode,
-        messages: List<Message>,
+        messagesFoldersIds: List<String>,
         destinationFolderId: String? = null,
     ) {
-        mutableSetOf<String>().apply {
-            addAll(messages.map { it.folderId })
-            destinationFolderId?.let(::add)
-        }.forEach { folderId ->
+
+        // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
+        val foldersIds = messagesFoldersIds.toMutableSet()
+        destinationFolderId?.let(foldersIds::add)
+
+        foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
                 MessageController.fetchFolderMessages(
                     mailbox = mailbox,

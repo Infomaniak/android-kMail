@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -164,10 +164,46 @@ class Thread : RealmObject {
     fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
 
     // TODO: Replace this with a RealmList sub query.
-    fun getMessageDuplicates(messageId: String): List<Message> = duplicates.filter { it.messageId == messageId }
+    fun getLastMessageToExecuteAction(): List<Message> {
+        return mutableListOf<Message>().apply {
+            val message = messages.lastOrNull { !it.isDraft } ?: messages.last()
+            addAll(getMessageAndDuplicates(message))
+        }
+    }
+
+    fun getUnseenMessages(): List<Message> {
+        return getMessagesAndDuplicates { message -> !message.seen }
+    }
+
+    fun getFavoriteMessages(): List<Message> {
+        return getMessagesAndDuplicates { message -> message.isFavorite && !message.isDraft }
+    }
+
+    fun getArchivableMessages(folderId: String): List<Message> {
+        return getMessagesAndDuplicates { message -> message.folderId == folderId && !message.scheduled }
+    }
+
+    fun getDeletableMessages(): List<Message> {
+        return getMessagesAndDuplicates { message -> !message.scheduled }
+    }
+
+    fun getPermanentlyDeletableMessages(): List<Message> {
+        return messages + duplicates
+    }
 
     // TODO: Replace this with a RealmList sub query.
-    fun getMessageDuplicatesUids(messageId: String): List<String> = getMessageDuplicates(messageId).map { it.uid }
+    private fun getMessagesAndDuplicates(shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
+        return mutableListOf<Message>().apply {
+            messages.forEach { message ->
+                if (shouldKeepMessage(message)) addAll(getMessageAndDuplicates(message))
+            }
+        }
+    }
+
+    // TODO: Replace this with a RealmList sub query.
+    fun getMessageAndDuplicates(message: Message): List<Message> {
+        return listOf(message) + duplicates.filter { it.messageId == message.messageId }
+    }
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

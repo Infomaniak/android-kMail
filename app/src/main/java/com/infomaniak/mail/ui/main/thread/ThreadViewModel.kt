@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,7 +93,8 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val uids = listOf(message.uid) + thread.getMessageDuplicatesUids(message.messageId)
+        val messages = thread.getMessageAndDuplicates(message)
+        val uids = messages.map { it.uid }
 
         if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
             MessageController.fetchCurrentFolderMessages(mailbox, message.folderId, localSettings.threadMode)
