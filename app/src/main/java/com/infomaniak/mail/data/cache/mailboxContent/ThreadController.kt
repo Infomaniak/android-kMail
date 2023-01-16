@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,11 +40,6 @@ object ThreadController {
     private fun getThreadsQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Thread> {
         val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
         return realm.query(byUids)
-    }
-
-    private fun getThreadsQuery(messageIds: Set<String>, realm: TypedRealm): RealmQuery<Thread> {
-        val byMessagesIds = "ANY ${Thread::messagesIds.name} IN {${messageIds.joinToString { "'$it'" }}}"
-        return realm.query(byMessagesIds)
     }
 
     private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm): RealmScalarQuery<Long> {
@@ -92,10 +87,6 @@ object ThreadController {
 
     fun getThreads(uids: List<String>, realm: TypedRealm): RealmResults<Thread> {
         return getThreadsQuery(uids, realm).find()
-    }
-
-    fun getThreads(messageIds: Set<String>, realm: TypedRealm): RealmResults<Thread> {
-        return getThreadsQuery(messageIds, realm).find()
     }
 
     fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {

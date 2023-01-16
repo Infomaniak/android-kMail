@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,6 +76,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
     private var previousFirstMessageUid: String? = null
+
+    private var isFirstOpeningOfThisFolder = false
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -328,7 +330,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
-            beforeUpdateAdapter = ::onThreadsUpdate
+            beforeUpdateAdapter = { threads -> handleThreadsVisibility(threads.count()) }
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
         }
     }
@@ -356,9 +358,23 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun observeCurrentFolderLive() {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
+            updateThreadsVisibilityIfNeeded(folder)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
+        }
+    }
+
+    private fun updateThreadsVisibilityIfNeeded(folder: Folder) {
+        when {
+            folder.cursor == null -> isFirstOpeningOfThisFolder = true
+            isFirstOpeningOfThisFolder -> {
+                // We use the `totalCount` of Messages instead of the Threads' count, so yes the data is not the correct
+                // one, but here we don't care, because we really only want to know if there's at least 1 Thread in
+                // this Folder. And if there's at least 1 Message, it means there will be at least 1 Thread.
+                handleThreadsVisibility(folder.totalCount)
+                isFirstOpeningOfThisFolder = false
+            }
         }
     }
 
@@ -417,9 +433,16 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun onThreadsUpdate(threads: List<Thread>) {
-        Log.d("UI", "Received threads (${threads.size})")
-        if (threads.isEmpty()) displayNoEmailView() else displayThreadList()
+    private fun handleThreadsVisibility(threadsCount: Int) {
+        Log.d("UI", "Received threads (${threadsCount})")
+
+        val cursor = mainViewModel.currentFolderLive.value?.cursor
+
+        if (cursor != null && threadsCount == 0) {
+            displayNoEmailView()
+        } else {
+            displayThreadsView()
+        }
     }
 
     private fun displayNoEmailView() = with(binding) {
@@ -427,7 +450,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         emptyState.isVisible = true
     }
 
-    private fun displayThreadList() = with(binding) {
+    private fun displayThreadsView() = with(binding) {
         emptyState.isGone = true
         threadsList.isVisible = true
     }
