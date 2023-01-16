@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,19 +114,7 @@ class MenuDrawerFragment : Fragment() {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
             }
-        }
-        manageAccount.setOnClickListener {
-            closeDrawer()
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToManageMailAddressFragment(),
-                currentClassName = MenuDrawerFragment::class.java.name,
-            )
-        }
-        swapAccount.setOnClickListener {
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToSwitchUserFragment(),
-                currentClassName = MenuDrawerFragment::class.java.name,
-            )
+            mailboxSwitcherText.setTextAppearance(if (mailboxExpandedSwitcher.isVisible) R.style.H5_Accent else R.style.H5)
         }
         inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
@@ -197,7 +185,14 @@ class MenuDrawerFragment : Fragment() {
             addressAdapter.setMailboxes(sortedMailboxes)
             val isEmpty = sortedMailboxes.isEmpty()
             addressesList.isGone = isEmpty
-            addressesListDivider.isGone = isEmpty
+
+            val hasMoreThanOneMailbox = mailboxes.count() > 1
+            mailboxSwitcher.apply {
+                isClickable = hasMoreThanOneMailbox
+                isFocusable = hasMoreThanOneMailbox
+            }
+
+            mailboxExpandButton.isVisible = hasMoreThanOneMailbox
         }
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -306,10 +306,6 @@
         <item name="cornerSizeTopLeft">10dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">10dp</item>
-    </style>
-
-    <style name="MenuDrawerItemSelected" parent="MenuDrawerItem">
-        <item name="cardBackgroundColor">?attr/colorPrimaryContainer</item>
     </style>
 
     <!-- Chips -->

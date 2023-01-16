@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mailboxSwitcher"
-                style="@style/MenuDrawerItemSelected">
+                style="@style/MenuDrawerItem">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -109,7 +109,7 @@
 
                     <TextView
                         android:id="@+id/mailboxSwitcherText"
-                        style="@style/H5.Accent"
+                        style="@style/H5"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -139,7 +139,6 @@
                 android:id="@+id/mailboxExpandedSwitcher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/marginStandardSmall"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
@@ -148,42 +147,18 @@
                     android:id="@+id/addressesList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/marginStandardSmall"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
                     tools:listitem="@layout/item_switch_user_mailbox_menu_drawer"
                     tools:visibility="visible" />
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:id="@+id/addressesListDivider"
-                    style="@style/MenuDrawerDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/marginStandardSmall" />
-
-                <com.infomaniak.mail.views.MenuDrawerItemView
-                    android:id="@+id/manageAccount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_user_setting"
-                    app:text="@string/buttonManageAccount" />
-
-                <com.infomaniak.mail.views.MenuDrawerItemView
-                    android:id="@+id/swapAccount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_user_swap"
-                    app:text="@string/buttonAccountSwitch" />
             </LinearLayout>
 
-            <View
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/MenuDrawerDivider"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/marginStandardSmall" />
+                android:layout_height="wrap_content" />
 
             <com.infomaniak.mail.views.MenuDrawerItemView
                 android:id="@+id/inboxFolder"
@@ -192,11 +167,6 @@
                 app:icon="@drawable/ic_drawer_mailbox"
                 app:text="@string/inboxFolder"
                 tools:badge="32" />
-
-            <com.google.android.material.divider.MaterialDivider
-                style="@style/MenuDrawerDivider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/defaultFoldersList"
