@@ -59,7 +59,6 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication<Application>()
-    private val localSettings by lazy { LocalSettings.getInstance(context) }
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
@@ -452,25 +451,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Spam
     fun markAsSpamOrHam(thread: Thread, message: Message? = null): Boolean {
-        var onlyContainsOwnMessages = true
         var containsOwnMessage = false
+        var onlyContainsOwnMessages = true
 
         (message?.from ?: thread.from).forEach { if (it.isMe()) containsOwnMessage = true else onlyContainsOwnMessages = false }
 
         if (onlyContainsOwnMessages) {
             snackbarFeedback.value = context.resources.getQuantityString(R.plurals.errorActionsSpamOwnMessage, 1) to null
         } else {
-            toggleSpamOrHam(thread.uid, message)
+            toggleSpamOrHam(thread, message)
         }
 
         return containsOwnMessage
     }
 
-    private fun toggleSpamOrHam(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val realm = RealmDatabase.mailboxContent()
+    private fun toggleSpamOrHam(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
-        val destinationFolderRole = if (isCurrentFolderRole(FolderRole.SPAM)) FolderRole.INBOX else FolderRole.SPAM
+        val realm = RealmDatabase.mailboxContent()
+        val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
+        val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolderId = FolderController.getFolder(destinationFolderRole, realm)!!.id
 
         val messages = message?.let { if (message.from.first().isMe()) emptyList() else thread.getMessageAndDuplicates(message) }
@@ -478,17 +477,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val uids = messages.map { it.uid }
 
         val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailbox.uuid, uids, destinationFolderId)
-        val isSuccess = apiResponse?.isSuccess()
 
         showSpamSnackbar(message, apiResponse, destinationFolderRole)
 
-        if (isSuccess == true) {
-            refreshFolders(
-                mailbox,
-                localSettings.threadMode,
-                messages.getFoldersIds(exception = destinationFolderId),
-                destinationFolderId,
-            )
+        if (apiResponse?.isSuccess() == true) {
+            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
     }
 
