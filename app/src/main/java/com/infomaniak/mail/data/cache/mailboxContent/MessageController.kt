@@ -150,7 +150,7 @@ object MessageController {
         return newMessagesThreads
     }
 
-    private fun fetchFolderMessages(
+    fun fetchFolderMessages(
         mailbox: Mailbox,
         folder: Folder,
         threadMode: ThreadMode,

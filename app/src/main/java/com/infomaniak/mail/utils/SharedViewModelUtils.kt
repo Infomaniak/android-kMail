@@ -17,14 +17,43 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 
 object SharedViewModelUtils {
-    fun markAsSeen(thread: Thread, mailboxUuid: String) {
-        val uids = ThreadController.getThreadUnseenMessagesUids(thread)
 
-        ApiRepository.markMessagesAsSeen(mailboxUuid, uids)
+    fun markAsSeen(thread: Thread, mailbox: Mailbox, threadMode: ThreadMode) {
+        val messages = ThreadController.getThreadUnseenMessages(thread)
+
+        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid }).isSuccess()
+        if (isSuccess) refreshMessagesFolders(mailbox, threadMode, messages)
+    }
+
+    fun refreshMessagesFolders(
+        mailbox: Mailbox,
+        threadMode: ThreadMode,
+        messages: List<Message>,
+        destinationFolderId: String? = null,
+    ) {
+        mutableSetOf<String>().apply {
+            addAll(messages.map { it.folderId })
+            destinationFolderId?.let(::add)
+        }.forEach { folderId ->
+            FolderController.getFolder(folderId)?.let { folder ->
+                MessageController.fetchFolderMessages(
+                    mailbox = mailbox,
+                    folder = folder,
+                    threadMode = threadMode,
+                    okHttpClient = null,
+                    realm = null,
+                )
+            }
+        }
     }
 }
