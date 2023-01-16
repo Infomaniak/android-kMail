@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,6 +106,8 @@ class Message : RealmObject {
     var fullyDownloaded: Boolean = false
     @Transient
     var hasUnsubscribeLink: Boolean = false
+    @Transient
+    var isSpam: Boolean = false
     @Transient
     var messageIds: RealmSet<String> = realmSetOf()
     //endregion

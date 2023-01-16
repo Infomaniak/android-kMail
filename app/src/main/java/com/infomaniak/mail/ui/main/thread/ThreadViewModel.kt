@@ -74,6 +74,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
                 if (!localMessage.fullyDownloaded) {
                     ApiRepository.getMessage(localMessage.resource).data?.also {
                         it.messageIds = localMessage.messageIds
+                        it.isSpam = localMessage.isSpam
 
                         // If we've already got this Message's Draft beforehand, we need to save
                         // its `draftLocalUuid`, otherwise we'll lose the link between them.
