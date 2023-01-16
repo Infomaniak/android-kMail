@@ -145,7 +145,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadListAdapter = ThreadListAdapter(
             context = requireContext(),
-            threadDensity = LocalSettings.getInstance(requireContext()).threadDensity,
+            threadDensity = localSettings.threadDensity,
             folderRole = FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },

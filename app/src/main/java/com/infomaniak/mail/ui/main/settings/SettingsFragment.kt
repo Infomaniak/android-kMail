@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,6 @@ class SettingsFragment : Fragment() {
             settingsThreadListDensity.setSubtitle(threadDensity.localisedNameRes)
             settingsTheme.setSubtitle(theme.localisedNameRes)
             settingsAccentColor.setSubtitle(accentColor.localisedNameRes)
-            settingsMessageDisplay.setSubtitle(threadMode.localisedNameRes)
             settingsExternalContent.setSubtitle(externalContent.localisedNameRes)
         }
     }
@@ -106,11 +105,6 @@ class SettingsFragment : Fragment() {
 
         settingsSwipeActions.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToSwipeActionsSetting())
-        }
-
-        settingsMessageDisplay.setOnClickListener {
-            notYetImplemented()
-            // animatedNavigation(SettingsFragmentDirections.actionSettingsToDisplayModeSetting())
         }
 
         settingsExternalContent.setOnClickListener {

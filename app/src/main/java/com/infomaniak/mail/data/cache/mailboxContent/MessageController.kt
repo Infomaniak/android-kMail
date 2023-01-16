@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
@@ -125,14 +124,13 @@ object MessageController {
     fun fetchCurrentFolderMessages(
         mailbox: Mailbox,
         folderId: String,
-        threadMode: ThreadMode,
         okHttpClient: OkHttpClient? = null,
         realm: Realm? = null,
     ): List<Thread> {
 
         val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
 
-        val newMessagesThreads = fetchFolderMessages(mailbox, folder, threadMode, okHttpClient, realm)
+        val newMessagesThreads = fetchFolderMessages(mailbox, folder, okHttpClient, realm)
 
         val roles = when (folder.role) {
             FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT)
@@ -143,20 +141,14 @@ object MessageController {
 
         roles.forEach { role ->
             FolderController.getFolder(role)?.let { folder ->
-                fetchFolderMessages(mailbox, folder, threadMode, okHttpClient, realm)
+                fetchFolderMessages(mailbox, folder, okHttpClient, realm)
             }
         }
 
         return newMessagesThreads
     }
 
-    fun fetchFolderMessages(
-        mailbox: Mailbox,
-        folder: Folder,
-        threadMode: ThreadMode,
-        okHttpClient: OkHttpClient?,
-        realm: Realm?,
-    ): List<Thread> {
+    fun fetchFolderMessages(mailbox: Mailbox, folder: Folder, okHttpClient: OkHttpClient?, realm: Realm?): List<Thread> {
         val previousCursor = folder.cursor
 
         val messagesUids = if (previousCursor == null) {
@@ -165,14 +157,13 @@ object MessageController {
             getMessagesUidsDelta(mailbox.uuid, folder.id, previousCursor, okHttpClient)
         } ?: return emptyList()
 
-        return handleMessagesUids(messagesUids, folder, mailbox, threadMode, okHttpClient, realm)
+        return handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
     }
 
     private fun handleMessagesUids(
         messagesUids: MessagesUids,
         folder: Folder,
         mailbox: Mailbox,
-        threadMode: ThreadMode,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ) = with(messagesUids) {
@@ -182,13 +173,13 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val newMessagesThreads = handleAddedUids(addedShortUids, folder.id, mailbox.uuid, threadMode, okHttpClient, realm)
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder.id, mailbox.uuid, okHttpClient, realm)
 
         (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
 
             val impactedFolders = newMessagesThreads.map { it.folderId }.toMutableSet()
 
-            impactedFolders += handleDeletedUids(deletedUids, threadMode)
+            impactedFolders += handleDeletedUids(deletedUids)
             impactedFolders += handleUpdatedUids(updatedMessages, folder.id)
 
             impactedFolders.forEach { folderId ->
@@ -208,7 +199,6 @@ object MessageController {
         shortUids: List<String>,
         folderId: String,
         mailboxUuid: String,
-        threadMode: ThreadMode,
         okHttpClient: OkHttpClient?,
         realm: Realm?,
     ): List<Thread> {
@@ -228,10 +218,7 @@ object MessageController {
                 if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
                 apiResponse.data?.messages?.let { messages ->
                     (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
-                        val threads = when (threadMode) {
-                            ThreadMode.THREADS -> createMultiMessagesThreads(messages, folderId)
-                            ThreadMode.MESSAGES -> createSingleMessageThreads(messages)
-                        }
+                        val threads = createMultiMessagesThreads(messages, folderId)
                         newMessagesThreads.addAll(threads)
                     }
                 }
@@ -243,7 +230,7 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderId: String): List<Thread> {
+    private fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderId: String): List<Thread> {
 
         // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
@@ -268,7 +255,7 @@ object MessageController {
             }
 
             existingThreads.forEach {
-                it.addMessageWithConditions(message, realm = this@createMultiMessagesThreads)
+                it.addMessageWithConditions(message, realm = this)
                 ThreadController.upsertThread(it, realm = this)
                 threadsToUpsert[it.uid] = it
             }
@@ -319,7 +306,8 @@ object MessageController {
         }
     }
 
-    fun MutableRealm.createSingleMessageThreads(messages: List<Message>): List<Thread> {
+    // Unused for now
+    private fun MutableRealm.createSingleMessageThreads(messages: List<Message>): List<Thread> {
         return messages.map { message ->
             message.toThread().also { thread ->
                 thread.addFirstMessage(message)
@@ -329,7 +317,7 @@ object MessageController {
         }
     }
 
-    private fun MutableRealm.handleDeletedUids(uids: List<String>, threadMode: ThreadMode): Set<String> {
+    private fun MutableRealm.handleDeletedUids(uids: List<String>): Set<String> {
 
         val impactedFolders = mutableSetOf<String>()
 
@@ -337,38 +325,29 @@ object MessageController {
 
             val deletedMessages = getMessages(uids, realm = this)
 
-            when (threadMode) {
-                ThreadMode.THREADS -> {
-                    val threads = mutableSetOf<Thread>()
-                    deletedMessages.forEach { message ->
-                        for (thread in message.parentThreads.reversed()) {
+            val threads = mutableSetOf<Thread>()
+            deletedMessages.forEach { message ->
+                for (thread in message.parentThreads.reversed()) {
 
-                            val isSuccess = thread.messages.removeIf { it.uid == message.uid }
-                            val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+                    val isSuccess = thread.messages.removeIf { it.uid == message.uid }
+                    val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
 
-                            // We need to save this value because the Thread could be deleted before we use this `folderId`.
-                            val threadFolderId = thread.folderId
+                    // We need to save this value because the Thread could be deleted before we use this `folderId`.
+                    val threadFolderId = thread.folderId
 
-                            if (numberOfMessagesInFolder == 0) {
-                                threads.removeIf { it.uid == thread.uid }
-                                delete(thread)
-                            } else if (isSuccess) {
-                                threads += thread
-                            } else {
-                                continue
-                            }
-
-                            impactedFolders.add(threadFolderId)
-                        }
+                    if (numberOfMessagesInFolder == 0) {
+                        threads.removeIf { it.uid == thread.uid }
+                        delete(thread)
+                    } else if (isSuccess) {
+                        threads += thread
+                    } else {
+                        continue
                     }
-                    threads.forEach { it.recomputeThread(realm = this) }
-                }
-                ThreadMode.MESSAGES -> {
-                    val threads = ThreadController.getThreads(uids, realm = this)
-                    impactedFolders.addAll(threads.map { it.folderId })
-                    delete(threads)
+
+                    impactedFolders.add(threadFolderId)
                 }
             }
+            threads.forEach { it.recomputeThread(realm = this) }
 
             deleteMessages(deletedMessages)
         }

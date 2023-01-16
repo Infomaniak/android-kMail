@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -162,17 +162,6 @@ class LocalSettings private constructor(context: Context) {
     }
     //endregion
 
-    //region Thread mode
-    var threadMode: ThreadMode
-        get() = getEnum(THREAD_MODE_KEY, DEFAULT_THREAD_MODE)
-        set(value) = putEnum(THREAD_MODE_KEY, value)
-
-    enum class ThreadMode(val apiCallValue: String, @StringRes val localisedNameRes: Int) {
-        THREADS("on", R.string.settingsOptionDiscussions),
-        MESSAGES("off", R.string.settingsOptionMessages),
-    }
-    //endregion
-
     //region External content
     var externalContent: ExternalContent
         get() = getEnum(EXTERNAL_CONTENT_KEY, DEFAULT_EXTERNAL_CONTENT)
@@ -210,7 +199,6 @@ class LocalSettings private constructor(context: Context) {
         private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
-        private val DEFAULT_THREAD_MODE = ThreadMode.THREADS
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
         //endregion
 
@@ -226,7 +214,6 @@ class LocalSettings private constructor(context: Context) {
         private const val ACCENT_COLOR_KEY = "accentColorKey"
         private const val SWIPE_RIGHT_KEY = "swipeRightKey"
         private const val SWIPE_LEFT_KEY = "swipeLeftKey"
-        private const val THREAD_MODE_KEY = "threadModeKey"
         private const val EXTERNAL_CONTENT_KEY = "externalContentKey"
         //endregion
 

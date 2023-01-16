@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@ import java.util.concurrent.TimeUnit
 class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
 
     private val localSettings by lazy { LocalSettings.getInstance(applicationContext) }
-    private val threadMode by lazy { localSettings.threadMode }
     private val mailboxInfoRealm by lazy { RealmDatabase.newMailboxInfoInstance }
 
     private val notificationManagerCompat by lazy { NotificationManagerCompat.from(applicationContext) }
@@ -64,9 +63,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 if (folder.cursor == null) return@loopMailboxes
 
                 val okHttpClient = AccountUtils.getHttpClient(user.id)
-
-                val newMessagesThreads =
-                    MessageController.fetchCurrentFolderMessages(mailbox, folder.id, threadMode, okHttpClient, realm)
+                val newMessagesThreads = MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, realm)
 
                 val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder.id, realm)
                 newMessagesThreads.forEach { thread ->

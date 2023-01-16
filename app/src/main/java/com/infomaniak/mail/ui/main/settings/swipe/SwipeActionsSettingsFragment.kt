@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ class SwipeActionsSettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSwipeActionsSettingsBinding
 
+    private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSwipeActionsSettingsBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -41,7 +43,7 @@ class SwipeActionsSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        with(LocalSettings.getInstance(requireContext())) {
+        with(localSettings) {
             swipeRightView.setSubtitle(swipeRight.nameRes)
             swipeLeftView.setSubtitle(swipeLeft.nameRes)
 

@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -36,8 +35,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val localSettings by lazy { LocalSettings.getInstance(application) }
 
     val quickActionBarClicks = MutableLiveData<Pair<String, Int>>()
 
@@ -68,7 +65,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
         fetchIncompleteMessages(thread)
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox, localSettings.threadMode)
+        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
     }
 
     private fun fetchIncompleteMessages(thread: Thread) {
@@ -97,7 +94,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         val uids = messages.map { it.uid }
 
         if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
-            MessageController.fetchCurrentFolderMessages(mailbox, message.folderId, localSettings.threadMode)
+            MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
         }
     }
 

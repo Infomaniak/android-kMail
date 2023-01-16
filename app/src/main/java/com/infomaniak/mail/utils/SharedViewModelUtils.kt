@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.utils
 
-import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -26,7 +25,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 
 object SharedViewModelUtils {
 
-    fun markAsSeen(thread: Thread, mailbox: Mailbox, threadMode: ThreadMode, withRefresh: Boolean = true): List<String>? {
+    fun markAsSeen(thread: Thread, mailbox: Mailbox, withRefresh: Boolean = true): List<String>? {
         val messages = thread.getUnseenMessages()
         val uids = messages.map { it.uid }
 
@@ -35,7 +34,7 @@ object SharedViewModelUtils {
         if (isSuccess) {
             val messagesFoldersIds = messages.getFoldersIds()
             if (withRefresh) {
-                refreshFolders(mailbox, threadMode, messagesFoldersIds)
+                refreshFolders(mailbox, messagesFoldersIds)
             } else {
                 return messagesFoldersIds
             }
@@ -44,12 +43,7 @@ object SharedViewModelUtils {
         return null
     }
 
-    fun refreshFolders(
-        mailbox: Mailbox,
-        threadMode: ThreadMode,
-        messagesFoldersIds: List<String>,
-        destinationFolderId: String? = null,
-    ) {
+    fun refreshFolders(mailbox: Mailbox, messagesFoldersIds: List<String>, destinationFolderId: String? = null) {
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
         val foldersIds = messagesFoldersIds.toMutableSet()
@@ -57,13 +51,7 @@ object SharedViewModelUtils {
 
         foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
-                MessageController.fetchFolderMessages(
-                    mailbox = mailbox,
-                    folder = folder,
-                    threadMode = threadMode,
-                    okHttpClient = null,
-                    realm = null,
-                )
+                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient = null, realm = null)
             }
         }
     }
