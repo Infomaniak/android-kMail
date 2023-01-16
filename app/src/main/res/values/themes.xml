@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -43,11 +43,13 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
         <item name="colorError">@color/redDestructiveAction</item>
+        <item name="textInputStyle">@style/TextInputLayout</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorOnSurfaceInverse">@color/snackbarTextColor</item>
         <item name="colorSurfaceInverse">@color/backgroundSnackbarColor</item>
         <item name="extendedFloatingActionButtonStyle">@style/ExtendedFloatingActionButtonStyle</item>
         <item name="floatingActionButtonStyle">@style/FloatingActionButtonStyle</item>
+        <item name="materialAlertDialogTheme">@style/DialogStyle</item>
         <item name="snackbarButtonStyle">@style/SnackbarButtonStyle</item>
         <item name="snackbarStyle">@style/SnackbarStyle</item>
         <item name="snackbarTextViewStyle">@style/SnackbarTextViewStyle</item>
