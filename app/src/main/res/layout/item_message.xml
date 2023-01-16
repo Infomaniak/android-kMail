@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -146,7 +146,7 @@
                     app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
                     app:layout_constraintStart_toEndOf="@id/expeditorName"
                     app:layout_constraintTop_toTopOf="@+id/expeditorName"
-                    tools:text="9 déc 2021 à 11:00" />
+                    tools:text="3 fév 1990 à 15:05" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/deleteDraftButton"
@@ -306,7 +306,7 @@
             app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
             app:layout_constraintStart_toEndOf="@id/prefixBarrier"
             app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
-            tools:text="10 juin 2022, 16:36" />
+            tools:text="3 février 1990, 15:05" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/prefixBarrier"
