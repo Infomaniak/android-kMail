@@ -33,8 +33,7 @@ android {
         buildConfigField 'String', 'FEEDBACK_USER_REPORT', '"https://feedback.userreport.com/9f60b46d-7299-4887-b79d-c756cf474c4d#ideas/popular"'
         buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
         // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail.preprod.dev.infomaniak.ch"'
-        // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail-mr-3440.preprod.dev.infomaniak.ch"'
-        // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail.devd338.dev.infomaniak.ch"'
+        // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail-mr-3651.preprod.dev.infomaniak.ch"'
         buildConfigField 'String', 'MAIL_BUCKET_ID', '"app_mail"'
         buildConfigField 'String', 'MAIL_PROJECT_NAME', '"mail"'
     }

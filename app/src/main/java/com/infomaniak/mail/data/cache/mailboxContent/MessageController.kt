@@ -18,7 +18,6 @@
 package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
-import com.infomaniak.lib.core.utils.monthsAgo
 import com.infomaniak.mail.data.LocalSettings.ThreadMode
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -43,7 +42,6 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import okhttp3.OkHttpClient
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.min
 
@@ -400,14 +398,12 @@ object MessageController {
         return impactedFolders
     }
 
-    private fun threeMonthsAgo(): String = SimpleDateFormat("yyyyMMdd", Locale.ROOT).format(Date().monthsAgo(3))
-
     private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
 
     private fun String.toShortUid(): String = substringBefore('@')
 
     private fun getMessagesUids(mailboxUuid: String, folderId: String, okHttpClient: OkHttpClient? = null): MessagesUids? {
-        val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, threeMonthsAgo(), okHttpClient)
+        val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, okHttpClient)
         if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
         return apiResponse.data?.let {
             MessagesUids(

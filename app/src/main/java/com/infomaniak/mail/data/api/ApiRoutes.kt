@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
+import com.infomaniak.mail.utils.Utils
 
 object ApiRoutes {
 
@@ -83,8 +84,8 @@ object ApiRoutes {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
     // }
 
-    fun getMessagesUids(mailboxUuid: String, folderId: String, dateSince: String): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages_uids?since=${dateSince}"
+    fun getMessagesUids(mailboxUuid: String, folderId: String): String {
+        return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${Utils.MAX_NUMBER_OF_MESSAGES_TO_FETCH}"
     }
 
     fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): String {
