@@ -61,10 +61,10 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 phishing.isGone = true
                 rule.isGone = true
 
-                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
-                markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
+                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread) }
+                markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(thread) }
                 move.setClosingOnClickListener { notYetImplemented() }
-                favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
+                favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(thread) }
                 spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread) }
                 print.setClosingOnClickListener { notYetImplemented() }
                 saveAsPdf.setClosingOnClickListener { notYetImplemented() }
@@ -75,7 +75,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                         R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
                         R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
                         R.id.actionForward -> notYetImplemented()
-                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread)
                     }
                 }
             }

@@ -51,11 +51,11 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 setFavoriteUi(navigationArgs.isFavorite)
                 setSpamUi(message)
 
-                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, messageUid) }
+                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread, message) }
                 markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
                 move.setClosingOnClickListener { notYetImplemented() }
                 postpone.setClosingOnClickListener { notYetImplemented() }
-                favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(messageUid, threadUid) }
+                favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(thread, message) }
                 spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread, message) }
                 blockSender.setClosingOnClickListener { notYetImplemented() }
                 phishing.setClosingOnClickListener { notYetImplemented() }
@@ -69,7 +69,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                         R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
                         R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
                         R.id.actionForward -> notYetImplemented()
-                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid, messageUid)
+                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread, message)
                     }
                 }
             }

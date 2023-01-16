@@ -25,7 +25,6 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
@@ -260,40 +259,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //region Archive
-    fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val realm = RealmDatabase.mailboxContent()
+    fun readAndArchive(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
-        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
+        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
         val messagesFoldersIds = mutableListOf<String>()
 
         if (thread.unseenMessagesCount > 0) {
             markAsSeen(thread, mailbox, withRefresh = false)?.also(messagesFoldersIds::addAll)
         }
-        archiveThreadOrMessageSync(thread.uid, withRefresh = false)?.also(messagesFoldersIds::addAll)
+        archiveThreadOrMessageSync(thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
 
         refreshFolders(mailbox, messagesFoldersIds, archiveId)
     }
 
-    fun archiveThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
-        archiveThreadOrMessageSync(threadUid, messageUid)
+    fun archiveThreadOrMessage(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+        archiveThreadOrMessageSync(thread, message)
     }
 
-    private fun archiveThreadOrMessageSync(
-        threadUid: String,
-        messageUid: String? = null,
-        withRefresh: Boolean = true,
-    ): List<String>? {
-        val realm = RealmDatabase.mailboxContent()
+    private fun archiveThreadOrMessageSync(thread: Thread, message: Message? = null, withRefresh: Boolean = true): List<String>? {
         val mailbox = currentMailbox.value ?: return null
-        val thread = ThreadController.getThread(threadUid, realm) ?: return null
-        val message = messageUid?.let { MessageController.getMessage(it, realm) }
-        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE, realm)!!.id
+        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
 
         val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getArchivableMessages(currentFolderId.value!!)
-        val uids = messages.map { it.uid }
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, archiveId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.map { it.uid }, archiveId)
 
         showArchiveSnackbar(message, apiResponse)
 
@@ -324,11 +313,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Delete
-    fun deleteThreadOrMessage(threadUid: String, messageUid: String? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val realm = RealmDatabase.mailboxContent()
+    fun deleteThreadOrMessage(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
-        val message = messageUid?.let { MessageController.getMessage(it, realm) }
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -343,7 +329,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val isSuccess = if (shouldPermanentlyDelete) {
             ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()
         } else {
-            trashId = FolderController.getFolder(FolderRole.TRASH, realm)!!.id
+            trashId = FolderController.getFolder(FolderRole.TRASH)!!.id
             val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, trashId)
             undoResource = apiResponse.data?.undoResource
             apiResponse.isSuccess()
@@ -386,9 +372,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Seen
-    fun toggleSeenStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSeenStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
 
         if (thread.unseenMessagesCount == 0) {
             markAsUnseen(thread, mailbox)
@@ -399,18 +384,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun markAsUnseen(thread: Thread, mailbox: Mailbox) {
         val messages = thread.getLastMessageToExecuteAction()
-        val uids = messages.map { it.uid }
 
-        val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, uids).isSuccess()
+        val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.map { it.uid }).isSuccess()
 
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
     }
     //endregion
 
     //region Favorite
-    fun toggleThreadFavoriteStatus(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleThreadFavoriteStatus(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
 
         val messages = if (thread.isFavorite) thread.getFavoriteMessages() else thread.getLastMessageToExecuteAction()
         val uids = messages.map { it.uid }
@@ -424,11 +407,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
     }
 
-    fun toggleMessageFavoriteStatus(messageUid: String, threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val realm = RealmDatabase.mailboxContent()
+    fun toggleMessageFavoriteStatus(thread: Thread, message: Message) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid, realm) ?: return@launch
-        val message = MessageController.getMessage(messageUid, realm) ?: return@launch
 
         val messages = thread.getMessageAndDuplicates(message)
         val uids = messages.map { it.uid }
@@ -461,10 +441,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun toggleSpamOrHam(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val realm = RealmDatabase.mailboxContent()
+
         val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
         val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
-        val destinationFolderId = FolderController.getFolder(destinationFolderRole, realm)!!.id
+        val destinationFolderId = FolderController.getFolder(destinationFolderRole)!!.id
 
         val messages = message?.let { if (message.from.first().isMe()) emptyList() else thread.getMessageAndDuplicates(message) }
             ?: thread.getSpamMessages()

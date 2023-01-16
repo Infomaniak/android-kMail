@@ -27,9 +27,8 @@ object SharedViewModelUtils {
 
     fun markAsSeen(thread: Thread, mailbox: Mailbox, withRefresh: Boolean = true): List<String>? {
         val messages = thread.getUnseenMessages()
-        val uids = messages.map { it.uid }
 
-        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, uids).isSuccess()
+        val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.map { it.uid }).isSuccess()
 
         if (isSuccess) {
             val messagesFoldersIds = messages.getFoldersIds()

@@ -40,6 +40,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.types.RealmList
 import okhttp3.OkHttpClient
 import java.util.*
 import kotlin.math.min
@@ -84,9 +85,7 @@ object MessageController {
         return getMessageQuery(uid, realm).find()
     }
 
-    fun getMessageUidToReplyTo(threadUid: String): String? {
-        val messages = ThreadController.getThread(threadUid)?.messages ?: return null
-
+    fun getMessageUidToReplyTo(messages: RealmList<Message>): String {
         val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
                 "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
         val isNotDraft = "${Message::isDraft.name} == false"

@@ -61,7 +61,8 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         val expandedList = thread.messages.mapIndexed { index, message ->
             !message.isDraft && (!message.seen || index == thread.messages.lastIndex)
         }
-        emit(expandedList)
+
+        emit(thread to expandedList)
 
         fetchIncompleteMessages(thread)
 
@@ -89,18 +90,16 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+    fun deleteDraft(message: Message, thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         val messages = thread.getMessageAndDuplicates(message)
-        val uids = messages.map { it.uid }
 
-        if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
+        if (ApiRepository.deleteMessages(mailbox.uuid, messages.map { it.uid }).isSuccess()) {
             MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
         }
     }
 
-    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        MessageController.getMessageUidToReplyTo(threadUid)?.let { messageUid ->
+    fun clickOnQuickActionBar(thread: Thread, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        MessageController.getMessageUidToReplyTo(thread.messages).let { messageUid ->
             quickActionBarClicks.postValue(messageUid to menuId)
         }
     }

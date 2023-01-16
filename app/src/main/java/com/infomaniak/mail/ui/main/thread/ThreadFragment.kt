@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,8 @@ class ThreadFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
+    private lateinit var thread: Thread
+
     private var threadAdapter = ThreadAdapter()
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
@@ -63,14 +65,17 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         observeThreadLive()
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedList ->
-            if (expandedList == null) {
+
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
+            if (result == null) {
                 findNavController().popBackStack()
             } else {
+                thread = result.first
                 setupUi()
                 setupAdapter()
-                threadAdapter.expandedList = expandedList.toMutableList()
+                threadAdapter.expandedList = result.second.toMutableList()
                 observeMessagesLive()
                 observeContacts()
                 observeQuickActionBarClicks()
@@ -93,18 +98,15 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        val threadUid = navigationArgs.threadUid
-
-        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
+        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(thread) }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
-                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(thread, menuId)
                 R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
-                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
-                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
-
+                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(thread)
+                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(thread)
+                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(thread, menuId)
             }
         }
     }
@@ -144,7 +146,7 @@ class ThreadFragment : Fragment() {
             }
             onDeleteDraftClicked = { message ->
                 mainViewModel.currentMailbox.value?.let { mailbox ->
-                    threadViewModel.deleteDraft(message, navigationArgs.threadUid, mailbox)
+                    threadViewModel.deleteDraft(message, thread, mailbox)
                 }
             }
             onAttachmentClicked = { attachment ->
@@ -199,7 +201,8 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun onThreadUpdate(thread: Thread) = with(binding) {
+    private fun onThreadUpdate(updatedThread: Thread) = with(binding) {
+        thread = updatedThread
 
         val subject = thread.getFormattedSubject(context)
         threadSubject.text = subject
