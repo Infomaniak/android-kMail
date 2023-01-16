@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,14 +63,15 @@ class ThreadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         observeThreadLive()
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedList ->
-            if (expandedList == null) {
+
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
+            if (result == null) {
                 findNavController().popBackStack()
             } else {
                 setupUi()
                 setupAdapter()
-                threadAdapter.expandedList = expandedList.toMutableList()
                 observeMessagesLive()
                 observeContacts()
                 observeQuickActionBarClicks()
@@ -142,6 +143,9 @@ class ThreadFragment : Fragment() {
                     )
                 )
             }
+            onMessageExpanded = { (message, isExpanded) ->
+                threadViewModel.expandMessage(message, isExpanded)
+            }
             onDeleteDraftClicked = { message ->
                 mainViewModel.currentMailbox.value?.let { mailbox ->
                     threadViewModel.deleteDraft(message, navigationArgs.threadUid, mailbox)
@@ -178,7 +182,7 @@ class ThreadFragment : Fragment() {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = {
                 if (shouldScrollToBottom.compareAndSet(true, false)) {
-                    binding.messagesList.scrollToPosition(threadAdapter.expandedList.indexOfFirst { it })
+                    binding.messagesList.scrollToPosition(threadAdapter.messages.indexOfFirst { it.isExpanded })
                 }
             }
         }

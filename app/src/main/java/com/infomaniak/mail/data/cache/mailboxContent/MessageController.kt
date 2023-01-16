@@ -104,6 +104,11 @@ object MessageController {
         realm.copyToRealm(message, UpdatePolicy.ALL)
     }
 
+    fun updateMessage(uid: String, realm: MutableRealm? = null, onUpdate: (message: Message) -> Unit) {
+        val block: (MutableRealm) -> Unit = { getMessage(uid, realm = it)?.let(onUpdate) }
+        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    }
+
     fun MutableRealm.deleteMessages(messages: List<Message>) {
         messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
     }
@@ -241,6 +246,8 @@ object MessageController {
         messages.forEach { message ->
 
             message.initMessageIds()
+
+            message.isExpanded = !message.seen
 
             // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), put this back when it's fixed.
             // val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()

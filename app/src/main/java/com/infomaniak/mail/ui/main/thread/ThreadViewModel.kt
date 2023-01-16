@@ -58,10 +58,15 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
             return@liveData
         }
 
-        val expandedList = thread.messages.mapIndexed { index, message ->
-            !message.isDraft && (!message.seen || index == thread.messages.lastIndex)
+        RealmDatabase.mailboxContent().writeBlocking {
+            thread.messages.forEachIndexed { index, message ->
+                MessageController.updateMessage(message.uid, realm = this) {
+                    it.isExpanded = it.shouldBeExpanded(index, thread.messages)
+                }
+            }
         }
-        emit(expandedList)
+
+        emit(Unit)
 
         fetchIncompleteMessages(thread)
 
@@ -72,16 +77,24 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         RealmDatabase.mailboxContent().writeBlocking {
             thread.messages.forEach { localMessage ->
                 if (!localMessage.fullyDownloaded) {
-                    ApiRepository.getMessage(localMessage.resource).data?.also {
-                        it.messageIds = localMessage.messageIds
+                    ApiRepository.getMessage(localMessage.resource).data?.also { remoteMessage ->
 
                         // If we've already got this Message's Draft beforehand, we need to save
                         // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                        if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid, realm = this)?.localUuid
+                        val draftLocalUuid = if (remoteMessage.isDraft) {
+                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
+                        } else {
+                            null
+                        }
 
-                        it.fullyDownloaded = true
+                        remoteMessage.initLocalValues(
+                            fullyDownloaded = true,
+                            messageIds = localMessage.messageIds,
+                            isExpanded = localMessage.isExpanded,
+                            draftLocalUuid,
+                        )
 
-                        MessageController.upsertMessage(it, realm = this)
+                        MessageController.upsertMessage(remoteMessage, realm = this)
                     }
                 }
             }
@@ -101,6 +114,12 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
         MessageController.getMessageUidToReplyTo(threadUid)?.let { messageUid ->
             quickActionBarClicks.postValue(messageUid to menuId)
+        }
+    }
+
+    fun expandMessage(message: Message, expanded: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        MessageController.updateMessage(message.uid) {
+            it.isExpanded = expanded
         }
     }
 }
