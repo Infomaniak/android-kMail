@@ -80,6 +80,8 @@ class Mailbox : RealmObject {
     //endregion
 
     inline val channelId get() = "${mailboxId}_channel_id"
+    inline val notificationGroupId get() = uuid.hashCode()
+    inline val notificationGroupKey get() = uuid
 
     fun createObjectId(userId: Int): String {
         return "${userId}_${this.mailboxId}"

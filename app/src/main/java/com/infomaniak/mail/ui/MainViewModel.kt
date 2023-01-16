@@ -44,6 +44,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
+import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -177,6 +178,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
         MailboxController.updateMailboxes(getApplication(), mailboxes)
         updateCurrentMailboxQuotas()
+    }
+
+    fun dismissCurrentMailboxNotifications() = viewModelScope.launch {
+        currentMailbox.value?.let {
+            getApplication<Application>().cancelNotification(it.notificationGroupId)
+        }
     }
 
     private fun updateCurrentMailboxQuotas() {

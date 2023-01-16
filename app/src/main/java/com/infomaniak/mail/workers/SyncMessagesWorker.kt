@@ -103,12 +103,12 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 setContentText(contentText)
                 setColorized(true)
                 setContentIntent(contentIntent(isSummary = isSummary))
-                setGroup(mailbox.uuid)
+                setGroup(mailbox.notificationGroupKey)
                 setGroupSummary(isSummary)
                 color = localSettings.accentColor.getPrimary(applicationContext)
 
-                val notificationId = if (isSummary) mailbox.uuid else uid
-                notificationManagerCompat.notify(notificationId.hashCode(), build())
+                val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
+                notificationManagerCompat.notify(notificationId, build())
             }
         }
 
