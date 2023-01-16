@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
+import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
@@ -60,7 +61,7 @@ class FolderAdapter(
             name = folder.name,
             iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
             badgeText = folder.unreadCount,
-            folderIndent = folder.path.split(folder.separator).size - 1,
+            folderIndent = min(folder.path.split(folder.separator).size - 1, MAX_SUB_FOLDERS_INDENT),
         )
     }
 
@@ -100,6 +101,10 @@ class FolderAdapter(
     private fun notifyCurrentItem(folderId: String) {
         val position = folders.indexOfFirst { it.id == folderId }
         notifyItemChanged(position)
+    }
+
+    private companion object {
+        const val MAX_SUB_FOLDERS_INDENT = 2
     }
 
     class FolderViewHolder(val binding: ItemFolderMenuDrawerBinding) : RecyclerView.ViewHolder(binding.root)
