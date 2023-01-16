@@ -77,6 +77,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var lastUpdatedDate: Date? = null
     private var previousFirstMessageUid: String? = null
 
+    private var isFirstOpeningOfThisFolder = false
+
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
@@ -355,32 +357,25 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderLive() {
-
-        var isFirstOpeningOfThisFolder = false
-
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
-            isFirstOpeningOfThisFolder = updateThreadsVisibilityIfNeeded(folder, isFirstOpeningOfThisFolder)
+            updateThreadsVisibilityIfNeeded(folder)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
         }
     }
 
-    private fun updateThreadsVisibilityIfNeeded(folder: Folder, isFirstOpening: Boolean): Boolean {
-
-        var isFirstOpeningOfThisFolder = isFirstOpening
-
-        if (folder.cursor == null) isFirstOpeningOfThisFolder = true
-
-        if (isFirstOpeningOfThisFolder && folder.cursor != null) {
-            // We use the `totalCount` of Messages instead of the Threads' count, so yes the data is not the correct
-            // one, but here we don't care, because we really only want to know if there's at least 1 Thread in
-            // this Folder. And if there's at least 1 Message, it means there will be at least 1 Thread.
-            handleThreadsVisibility(folder.totalCount)
-            isFirstOpeningOfThisFolder = false
+    private fun updateThreadsVisibilityIfNeeded(folder: Folder) {
+        when {
+            folder.cursor == null -> isFirstOpeningOfThisFolder = true
+            isFirstOpeningOfThisFolder -> {
+                // We use the `totalCount` of Messages instead of the Threads' count, so yes the data is not the correct
+                // one, but here we don't care, because we really only want to know if there's at least 1 Thread in
+                // this Folder. And if there's at least 1 Message, it means there will be at least 1 Thread.
+                handleThreadsVisibility(folder.totalCount)
+                isFirstOpeningOfThisFolder = false
+            }
         }
-
-        return isFirstOpeningOfThisFolder
     }
 
     private fun observeUpdatedAtTriggers() {
