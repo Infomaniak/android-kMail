@@ -219,19 +219,7 @@
         <action
             android:id="@+id/action_manageMailAddressFragment_to_switchUserFragment"
             app:destination="@id/switchUserFragment" />
-        <action
-            android:id="@+id/action_manageMailAddressFragment_to_confirmLogoutDialog"
-            app:destination="@id/confirmLogoutDialog" />
     </fragment>
-
-    <dialog
-        android:id="@+id/confirmLogoutDialog"
-        android:name="com.infomaniak.mail.ui.main.user.ConfirmLogoutDialog"
-        android:label="ConfirmLogoutDialog">
-        <argument
-            android:name="emailAddresse"
-            app:argType="string" />
-    </dialog>
 
     <fragment
         android:id="@+id/settingsFragment"
