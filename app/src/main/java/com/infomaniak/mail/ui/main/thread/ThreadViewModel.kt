@@ -86,7 +86,6 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
                             remoteMessage.initLocalValues(
                                 fullyDownloaded = true,
                                 messageIds = localMessage.messageIds,
-                                isExpanded = localMessage.isExpanded,
                                 draftLocalUuid,
                             )
 

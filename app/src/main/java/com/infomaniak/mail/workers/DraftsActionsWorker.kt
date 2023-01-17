@@ -115,15 +115,12 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             return@writeBlocking hasRemoteException
         }
 
-        return if (isFailure) {
-            Result.failure()
-        } else {
-            updateFolderAfterScheduledDate(scheduledDates)
-            Result.success()
-        }
+        if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
+
+        return if (isFailure) Result.failure() else Result.success()
     }
 
-    private suspend fun updateFolderAfterScheduledDate(scheduledDates: MutableList<String>) {
+    private suspend fun updateFolderAfterDelay(scheduledDates: MutableList<String>) {
 
         val folder = FolderController.getFolder(FolderRole.DRAFT, realm = mailboxContentRealm)
 
@@ -218,7 +215,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
-        private const val REFRESH_DELAY = 1_500L
+        // We add this delay because for now, it doesn't always work if we just use the `etop`.
+        private const val REFRESH_DELAY = 2_000L
 
         fun scheduleWork(context: Context) {
 
