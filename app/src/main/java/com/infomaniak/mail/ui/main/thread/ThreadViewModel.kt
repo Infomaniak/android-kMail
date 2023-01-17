@@ -28,12 +28,15 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
 
     val quickActionBarClicks = MutableLiveData<Pair<String, Int>>()
+
+    private var fetchMessagesJob: Job? = null
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
@@ -64,27 +67,31 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
     }
 
-    fun fetchIncompleteMessages(messages: List<Message>) = viewModelScope.launch(Dispatchers.IO) {
-        RealmDatabase.mailboxContent().writeBlocking {
-            messages.forEach { localMessage ->
-                if (!localMessage.fullyDownloaded) {
-                    ApiRepository.getMessage(localMessage.resource).data?.also { remoteMessage ->
+    fun fetchIncompleteMessages(messages: List<Message>) {
+        fetchMessagesJob?.cancel()
+        fetchMessagesJob = viewModelScope.launch(Dispatchers.IO) {
+            RealmDatabase.mailboxContent().writeBlocking {
+                messages.forEach { localMessage ->
+                    if (!localMessage.fullyDownloaded) {
+                        ApiRepository.getMessage(localMessage.resource).data?.also { remoteMessage ->
 
-                        // If we've already got this Message's Draft beforehand, we need to save
-                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                        val draftLocalUuid = if (remoteMessage.isDraft) {
-                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
-                        } else {
-                            null
+                            // If we've already got this Message's Draft beforehand, we need to save
+                            // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                            val draftLocalUuid = if (remoteMessage.isDraft) {
+                                DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
+                            } else {
+                                null
+                            }
+
+                            remoteMessage.initLocalValues(
+                                fullyDownloaded = true,
+                                messageIds = localMessage.messageIds,
+                                isExpanded = localMessage.isExpanded,
+                                draftLocalUuid,
+                            )
+
+                            MessageController.upsertMessage(remoteMessage, realm = this)
                         }
-
-                        remoteMessage.initLocalValues(
-                            fullyDownloaded = true,
-                            messageIds = localMessage.messageIds,
-                            draftLocalUuid,
-                        )
-
-                        MessageController.upsertMessage(remoteMessage, realm = this)
                     }
                 }
             }
