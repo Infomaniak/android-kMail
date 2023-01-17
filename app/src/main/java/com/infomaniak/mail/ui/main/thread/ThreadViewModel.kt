@@ -58,10 +58,11 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
             return@liveData
         }
 
-        val expandedList = thread.messages.mapIndexed { index, message ->
-            !message.isDraft && (!message.seen || index == thread.messages.lastIndex)
+        val expandedMap = mutableMapOf<String, Boolean>()
+        thread.messages.forEachIndexed { index, message ->
+            expandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
         }
-        emit(expandedList)
+        emit(expandedMap)
 
         fetchIncompleteMessages(thread)
 
@@ -72,16 +73,23 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         RealmDatabase.mailboxContent().writeBlocking {
             thread.messages.forEach { localMessage ->
                 if (!localMessage.fullyDownloaded) {
-                    ApiRepository.getMessage(localMessage.resource).data?.also {
-                        it.messageIds = localMessage.messageIds
+                    ApiRepository.getMessage(localMessage.resource).data?.also { remoteMessage ->
 
                         // If we've already got this Message's Draft beforehand, we need to save
                         // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                        if (it.isDraft) it.draftLocalUuid = DraftController.getDraftByMessageUid(it.uid, realm = this)?.localUuid
+                        val draftLocalUuid = if (remoteMessage.isDraft) {
+                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
+                        } else {
+                            null
+                        }
 
-                        it.fullyDownloaded = true
+                        remoteMessage.initLocalValues(
+                            fullyDownloaded = true,
+                            messageIds = localMessage.messageIds,
+                            draftLocalUuid,
+                        )
 
-                        MessageController.upsertMessage(it, realm = this)
+                        MessageController.upsertMessage(remoteMessage, realm = this)
                     }
                 }
             }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,13 +101,11 @@ class Message : RealmObject {
 
     //region Local data (Transient)
     @Transient
-    var draftLocalUuid: String? = null
-    @Transient
     var fullyDownloaded: Boolean = false
     @Transient
-    var hasUnsubscribeLink: Boolean = false
-    @Transient
     var messageIds: RealmSet<String> = realmSetOf()
+    @Transient
+    var draftLocalUuid: String? = null
     //endregion
 
     //region UI data (Ignore & Transient)
@@ -133,6 +131,12 @@ class Message : RealmObject {
         VALID,
         NOT_VALID,
         NOT_SIGNED,
+    }
+
+    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, draftLocalUuid: String?) {
+        this.fullyDownloaded = fullyDownloaded
+        this.messageIds = messageIds
+        draftLocalUuid?.let { this.draftLocalUuid = it }
     }
 
     fun initMessageIds() {
@@ -172,6 +176,8 @@ class Message : RealmObject {
     }
 
     fun isInTrash(realm: TypedRealm) = FolderController.getFolder(FolderRole.TRASH, realm)?.id == folderId
+
+    fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!seen || index == lastIndex)
 
     fun toThread() = Thread().apply {
         uid = this@Message.uid

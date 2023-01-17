@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     var messages = listOf<Message>()
         private set
-    var expandedList = mutableListOf<Boolean>()
+    var expandedMap = mutableMapOf<String, Boolean>()
     var contacts: Map<Recipient, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
@@ -80,9 +80,15 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
         val message = messages[position]
+
+        if (expandedMap[message.uid] == null) {
+            expandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
+        }
+
         if (payloads.firstOrNull() is Unit && !message.isDraft) {
             holder.binding.userAvatar.loadAvatar(message.from.first(), contacts)
         }
+
         super.onBindViewHolder(holder, position, payloads)
     }
 
@@ -91,11 +97,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         root.setStyleIfSingleMail(position)
 
-        holder.bindHeader(message, position)
+        holder.bindHeader(message)
         holder.bindAttachment(message)
         loadBodyInWebView(message.body)
 
-        displayExpandedCollapsedMessage(message, position)
+        displayExpandedCollapsedMessage(message)
     }
 
     private fun MaterialCardView.setStyleIfSingleMail(position: Int) {
@@ -119,7 +125,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, Utils.UTF_8, "") }
     }
 
-    private fun ThreadViewHolder.bindHeader(message: Message, position: Int) = with(binding) {
+    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date?.toDate()
 
         if (message.isDraft) {
@@ -141,7 +147,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
 
-        handleHeaderClick(message, position)
+        handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -171,17 +177,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
-    private fun ItemMessageBinding.handleHeaderClick(message: Message, position: Int) = with(message) {
+    private fun ItemMessageBinding.handleHeaderClick(message: Message) {
         messageHeader.setOnClickListener {
-            if (expandedList[position]) {
-                expandedList[position] = false
-                displayExpandedCollapsedMessage(message = this@with, position)
+            if (expandedMap[message.uid] == true) {
+                expandedMap[message.uid] = false
+                displayExpandedCollapsedMessage(message)
             } else {
-                if (isDraft) {
-                    onDraftClicked?.invoke(this@with)
+                if (message.isDraft) {
+                    onDraftClicked?.invoke(message)
                 } else {
-                    expandedList[position] = true
-                    displayExpandedCollapsedMessage(message = this@with, position)
+                    expandedMap[message.uid] = true
+                    displayExpandedCollapsedMessage(message)
                 }
             }
         }
@@ -216,6 +222,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun ThreadViewHolder.bindAttachment(message: Message) = with(binding) {
         val attachments = message.attachments
         val fileSize = formatAttachmentFileSize(attachments)
@@ -238,8 +245,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message, position: Int) {
-        val isExpanded = expandedList[position]
+    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
+        val isExpanded = expandedMap[message.uid]!!
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
         if (isExpanded) displayAttachments(message.attachments) else hideAttachments()
