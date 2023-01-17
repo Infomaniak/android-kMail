@@ -193,8 +193,8 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun observeSnackbar() {
-        mainViewModel.snackbarFeedback.observe(this) { (title, undoResource) ->
-            val onActionClicked = undoResource?.let { { mainViewModel.undoAction(undoResource) } }
+        mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
+            val onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
             showSnackbar(title, onActionClicked = onActionClicked)
         }
     }
