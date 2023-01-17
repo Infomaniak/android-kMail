@@ -27,6 +27,8 @@ import android.util.TypedValue
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavDirections
@@ -174,3 +176,28 @@ fun OneTimeWorkRequest.Builder.setExpeditedWorkRequest(): OneTimeWorkRequest.Bui
 //endregion
 
 fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it.folderId == exception) null else it.folderId }
+
+/**
+ * Send a value to the previous navigation
+ */
+fun <T> Fragment.setBackNavigationResult(key: String, value: T) {
+    findNavController().previousBackStackEntry?.savedStateHandle?.set(key, value)
+}
+
+/**
+ * Get the value sent by navigation popbackStack in the current navigation
+ */
+fun <T> Fragment.getBackNavigationResult(key: String, onResult: (result: T) -> Unit) {
+    val backStackEntry = findNavController().currentBackStackEntry
+    val observer = LifecycleEventObserver { _, event ->
+        if (event == Lifecycle.Event.ON_RESUME && backStackEntry?.savedStateHandle?.contains(key) == true) {
+            backStackEntry.savedStateHandle.get<T>(key)?.let(onResult)
+            backStackEntry.savedStateHandle.remove<T>(key)
+        }
+    }
+
+    backStackEntry?.lifecycle?.addObserver(observer)
+    viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
+        if (event == Lifecycle.Event.ON_DESTROY) backStackEntry?.lifecycle?.removeObserver(observer)
+    })
+}

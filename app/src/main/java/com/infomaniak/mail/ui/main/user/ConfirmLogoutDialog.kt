@@ -17,32 +17,25 @@
  */
 package com.infomaniak.mail.ui.main.user
 
-import android.app.Application
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogConfirmLogoutBinding
-import com.infomaniak.mail.utils.AccountUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.infomaniak.mail.utils.setBackNavigationResult
 
 class ConfirmLogoutDialog : DialogFragment() {
 
     private val binding by lazy { DialogConfirmLogoutBinding.inflate(layoutInflater) }
     private val navigationArgs: ConfirmLogoutDialogArgs by navArgs()
-    private val confirmLogoutViewModel: ConfirmLogoutViewModel by viewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setPositiveButton(R.string.buttonLogout) { _, _ ->
-                confirmLogoutViewModel.removeCurrentUser()
+                setBackNavigationResult(IS_LOGOUT_CONFIRMED, true)
             }
             .setNegativeButton(R.string.buttonCancel, null)
             .create().also {
@@ -50,9 +43,7 @@ class ConfirmLogoutDialog : DialogFragment() {
             }
     }
 
-    class ConfirmLogoutViewModel(application: Application) : AndroidViewModel(application) {
-        fun removeCurrentUser() = viewModelScope.launch(Dispatchers.IO) {
-            AccountUtils.removeUser(getApplication(), AccountUtils.currentUser!!)
-        }
+    companion object {
+        const val IS_LOGOUT_CONFIRMED = "is_logout_confirmed"
     }
 }

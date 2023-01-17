@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.app.NotificationManager
 import android.content.Context
+import android.util.Log
 import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
@@ -109,13 +110,21 @@ object AccountUtils : CredentialManager() {
     }
 
     suspend fun removeUser(context: Context, user: User) {
+        Log.e("gibran", "removeUser: about to remove data", );
 
         userDatabase.userDao().delete(user)
         RealmDatabase.removeUserData(context, user.id)
 
+        Log.e("gibran", "removeUser: removed data successfully checking if I was connected", );
+
         if (currentUserId == user.id) {
+            Log.e("gibran", "removeUser: we were the last user", );
             if (getAllUsersCount() == 0) resetSettings(context)
-            withContext(Dispatchers.Main) { reloadApp?.invoke() }
+            Log.e("gibran", "removeUser: about to change to Main thread to reload app", );
+            withContext(Dispatchers.Main) {
+                Log.e("gibran", "removeUser: About to reload the app to finish logging out", );
+                reloadApp?.invoke()
+            }
         }
     }
 

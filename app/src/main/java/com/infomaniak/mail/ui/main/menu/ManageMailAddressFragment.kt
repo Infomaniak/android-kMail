@@ -29,10 +29,12 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
+import com.infomaniak.mail.ui.main.user.ConfirmLogoutDialog.Companion.IS_LOGOUT_CONFIRMED
 import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
 import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.getBackNavigationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -68,6 +70,10 @@ class ManageMailAddressFragment : Fragment() {
 
         manageMailAddressViewModel.observeAccounts().observe(viewLifecycleOwner) { mailboxes ->
             simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
+        }
+
+        getBackNavigationResult<Boolean>(IS_LOGOUT_CONFIRMED) { isConfirmed ->
+            if (isConfirmed) removeCurrentUser()
         }
     }
 
