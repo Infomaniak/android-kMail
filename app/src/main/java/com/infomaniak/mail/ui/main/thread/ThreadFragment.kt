@@ -66,12 +66,13 @@ class ThreadFragment : Fragment() {
 
         observeThreadLive()
 
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
-            if (result == null) {
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedMap ->
+            if (expandedMap == null) {
                 findNavController().popBackStack()
             } else {
                 setupUi()
                 setupAdapter()
+                threadAdapter.expandedMap = expandedMap
                 observeMessagesLive()
                 observeContacts()
                 observeQuickActionBarClicks()
@@ -143,9 +144,6 @@ class ThreadFragment : Fragment() {
                     )
                 )
             }
-            onMessageExpanded = { (message, isExpanded) ->
-                threadViewModel.expandMessage(message, isExpanded)
-            }
             onDeleteDraftClicked = { message ->
                 mainViewModel.currentMailbox.value?.let { mailbox ->
                     threadViewModel.deleteDraft(message, navigationArgs.threadUid, mailbox)
@@ -182,7 +180,8 @@ class ThreadFragment : Fragment() {
             beforeUpdateAdapter = ::onMessagesUpdate
             afterUpdateAdapter = {
                 if (shouldScrollToBottom.compareAndSet(true, false)) {
-                    binding.messagesList.scrollToPosition(threadAdapter.messages.indexOfFirst { it.isExpanded })
+                    val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.expandedMap[it.uid] == true }
+                    binding.messagesList.scrollToPosition(indexToScroll)
                 }
             }
         }

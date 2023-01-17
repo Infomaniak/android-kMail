@@ -105,8 +105,6 @@ class Message : RealmObject {
     @Transient
     var messageIds: RealmSet<String> = realmSetOf()
     @Transient
-    var isExpanded: Boolean = false
-    @Transient
     var draftLocalUuid: String? = null
     //endregion
 
@@ -135,10 +133,9 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, isExpanded: Boolean, draftLocalUuid: String?) {
+    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, draftLocalUuid: String?) {
         this.fullyDownloaded = fullyDownloaded
         this.messageIds = messageIds
-        this.isExpanded = isExpanded
         draftLocalUuid?.let { this.draftLocalUuid = it }
     }
 
@@ -180,7 +177,7 @@ class Message : RealmObject {
 
     fun isInTrash(realm: TypedRealm) = FolderController.getFolder(FolderRole.TRASH, realm)?.id == folderId
 
-    fun shouldBeExpanded(index: Int, messages: List<Message>) = !isDraft && (!seen || index == messages.lastIndex)
+    fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!seen || index == lastIndex)
 
     fun toThread() = Thread().apply {
         uid = this@Message.uid

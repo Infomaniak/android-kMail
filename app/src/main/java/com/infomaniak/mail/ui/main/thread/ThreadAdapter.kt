@@ -44,12 +44,12 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     var messages = listOf<Message>()
         private set
+    var expandedMap = mutableMapOf<String, Boolean>()
     var contacts: Map<Recipient, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
     var onDeleteDraftClicked: ((message: Message) -> Unit)? = null
     var onDraftClicked: ((message: Message) -> Unit)? = null
-    var onMessageExpanded: ((pair: Pair<Message, Boolean>) -> Unit)? = null
     var onAttachmentClicked: ((attachment: Attachment) -> Unit)? = null
     var onDownloadAllClicked: ((message: Message) -> Unit)? = null
     var onReplyClicked: ((Message) -> Unit)? = null
@@ -75,15 +75,20 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
         return newItem.body?.value == oldItem.body?.value &&
                 newItem.seen == oldItem.seen &&
-                newItem.isFavorite == oldItem.isFavorite &&
-                newItem.isExpanded == oldItem.isExpanded
+                newItem.isFavorite == oldItem.isFavorite
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
         val message = messages[position]
+
+        if (expandedMap[message.uid] == null) {
+            expandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
+        }
+
         if (payloads.firstOrNull() is Unit && !message.isDraft) {
             holder.binding.userAvatar.loadAvatar(message.from.first(), contacts)
         }
+
         super.onBindViewHolder(holder, position, payloads)
     }
 
@@ -174,13 +179,15 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ItemMessageBinding.handleHeaderClick(message: Message) {
         messageHeader.setOnClickListener {
-            if (message.isExpanded) {
-                onMessageExpanded?.invoke(message to false)
+            if (expandedMap[message.uid] == true) {
+                expandedMap[message.uid] = false
+                displayExpandedCollapsedMessage(message)
             } else {
                 if (message.isDraft) {
                     onDraftClicked?.invoke(message)
                 } else {
-                    onMessageExpanded?.invoke(message to true)
+                    expandedMap[message.uid] = true
+                    displayExpandedCollapsedMessage(message)
                 }
             }
         }
@@ -215,6 +222,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun ThreadViewHolder.bindAttachment(message: Message) = with(binding) {
         val attachments = message.attachments
         val fileSize = formatAttachmentFileSize(attachments)
@@ -238,7 +246,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
-        val isExpanded = message.isExpanded
+        val isExpanded = expandedMap[message.uid]!!
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
         if (isExpanded) displayAttachments(message.attachments) else hideAttachments()

@@ -58,15 +58,11 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
             return@liveData
         }
 
-        RealmDatabase.mailboxContent().writeBlocking {
-            thread.messages.forEachIndexed { index, message ->
-                MessageController.updateMessage(message.uid, realm = this) {
-                    it.isExpanded = it.shouldBeExpanded(index, thread.messages)
-                }
-            }
+        val expandedMap = mutableMapOf<String, Boolean>()
+        thread.messages.forEachIndexed { index, message ->
+            expandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
         }
-
-        emit(Unit)
+        emit(expandedMap)
 
         fetchIncompleteMessages(thread)
 
@@ -90,7 +86,6 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
                         remoteMessage.initLocalValues(
                             fullyDownloaded = true,
                             messageIds = localMessage.messageIds,
-                            isExpanded = localMessage.isExpanded,
                             draftLocalUuid,
                         )
 
@@ -114,12 +109,6 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
         MessageController.getMessageUidToReplyTo(threadUid)?.let { messageUid ->
             quickActionBarClicks.postValue(messageUid to menuId)
-        }
-    }
-
-    fun expandMessage(message: Message, expanded: Boolean) = viewModelScope.launch(Dispatchers.IO) {
-        MessageController.updateMessage(message.uid) {
-            it.isExpanded = expanded
         }
     }
 }

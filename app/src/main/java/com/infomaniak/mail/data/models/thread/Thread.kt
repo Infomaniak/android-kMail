@@ -133,7 +133,7 @@ class Thread : RealmObject {
     }
 
     private fun updateThread() {
-        messages.forEachIndexed { index, message ->
+        messages.forEach { message ->
             messagesIds += message.messageIds
             if (!message.seen) unseenMessagesCount++
             from += message.from
@@ -145,7 +145,6 @@ class Thread : RealmObject {
             if (message.answered) answered = true
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true
-            if (index == messages.lastIndex) message.isExpanded = true
         }
         date = messages.findLast { it.folderId == folderId }?.date!!
     }
