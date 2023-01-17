@@ -127,9 +127,11 @@
                         android:layout_height="@dimen/chevronSize"
                         android:contentDescription="@string/contentDescriptionButtonExpandAccountSelection"
                         android:src="@drawable/ic_chevron_down"
+                        android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -150,8 +152,7 @@
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
-                    tools:listitem="@layout/item_switch_user_mailbox_menu_drawer"
-                    tools:visibility="visible" />
+                    tools:listitem="@layout/item_switch_user_mailbox_menu_drawer" />
 
             </LinearLayout>
 

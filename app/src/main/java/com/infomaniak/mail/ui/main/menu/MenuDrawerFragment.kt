@@ -181,12 +181,13 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeMailboxesLive() = with(binding) {
         mainViewModel.observeMailboxesLive().observe(viewLifecycleOwner) { mailboxes ->
-            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
-            addressAdapter.setMailboxes(sortedMailboxes)
-            val isEmpty = sortedMailboxes.isEmpty()
-            addressesList.isGone = isEmpty
 
-            val hasMoreThanOneMailbox = mailboxes.count() > 1
+            val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
+
+            addressAdapter.setMailboxes(sortedMailboxes)
+
+            val hasMoreThanOneMailbox = sortedMailboxes.isNotEmpty()
+
             mailboxSwitcher.apply {
                 isClickable = hasMoreThanOneMailbox
                 isFocusable = hasMoreThanOneMailbox
