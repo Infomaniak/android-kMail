@@ -469,7 +469,7 @@
 
     <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
-        <item name="android:textColorHint">@color/shark</item>
+        <item name="android:textColorHint">@color/hintTextColor</item>
     </style>
 
 </resources>

@@ -19,5 +19,5 @@
     <item android:color="?attr/colorPrimary" android:state_focused="true" />
     <item android:alpha="0.87" android:color="?attr/colorPrimary" android:state_hovered="true" />
     <item android:alpha="0.12" android:color="@color/mouse" android:state_enabled="false" />
-    <item android:color="@color/mouse" />
+    <item android:color="@color/cardViewStrokeColor" />
 </selector>
