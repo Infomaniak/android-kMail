@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
@@ -51,10 +52,12 @@ class ManageMailAddressFragment : Fragment() {
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
             mail.text = user.email
+            disconnectAccountButton.setOnClickListener {
+                safeNavigate(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToConfirmLogoutDialog(user.email))
+            }
         }
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
-        disconnectAccountButton.setOnClickListener { removeCurrentUser() }
 
         mailboxesRecyclerView.apply {
             adapter = simpleMailboxAdapter
