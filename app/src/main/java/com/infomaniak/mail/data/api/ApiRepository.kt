@@ -107,8 +107,7 @@ object ApiRepository : ApiRepositoryCore() {
 
         val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
-        fun postDraft(): ApiResponse<SaveDraftResult> =
-            callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+        fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
         fun putDraft(uuid: String): ApiResponse<SaveDraftResult> =
             callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
@@ -120,8 +119,7 @@ object ApiRepository : ApiRepositoryCore() {
 
         val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
-        fun postDraft(): ApiResponse<SendDraftResult> =
-            callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+        fun postDraft(): ApiResponse<SendDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
 
         fun putDraft(uuid: String): ApiResponse<SendDraftResult> =
             callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
