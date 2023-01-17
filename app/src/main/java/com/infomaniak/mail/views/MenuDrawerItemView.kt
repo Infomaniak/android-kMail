@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,14 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
@@ -78,6 +80,12 @@ class MenuDrawerItemView @JvmOverloads constructor(
             value?.let { binding.itemName.setTextSize(TypedValue.COMPLEX_UNIT_PX, it.toFloat()) }
         }
 
+    var textWeight: Int? = null
+        set(value) {
+            field = value
+            value?.let { binding.itemName.setTypeface(ResourcesCompat.getFont(context, value)) }
+        }
+
     init {
         attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
             val defaultTextSize = binding.itemName.textSize.toInt()
@@ -88,6 +96,9 @@ class MenuDrawerItemView @JvmOverloads constructor(
             isBadgeCapped = getBoolean(R.styleable.MenuDrawerItemView_isBadgeCapped, isBadgeCapped)
             text = getString(R.styleable.MenuDrawerItemView_text)
             textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
+            getResourceId(R.styleable.MenuDrawerItemView_textWeight, 0).also { fontFamily ->
+                if (fontFamily > 0) textWeight = fontFamily
+            }
         }
     }
 

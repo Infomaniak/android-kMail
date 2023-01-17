@@ -39,9 +39,6 @@
             android:id="@+id/action_threadListFragment_to_threadFragment"
             app:destination="@id/threadFragment" />
         <action
-            android:id="@+id/action_threadListFragment_to_switchUserFragment"
-            app:destination="@id/switchUserFragment" />
-        <action
             android:id="@+id/action_threadListFragment_to_manageMailAddressFragment"
             app:destination="@id/manageMailAddressFragment" />
         <action

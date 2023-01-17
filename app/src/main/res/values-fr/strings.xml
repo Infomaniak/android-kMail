@@ -85,7 +85,6 @@
     <string name="buttonLogInDifferentAccount">Me connecter avec un autre compte</string>
     <string name="buttonLogin">Se connecter</string>
     <string name="buttonLogout">Me déconnecter</string>
-    <string name="buttonManageAccount">Gérer mon compte</string>
     <string name="buttonMore">Plus</string>
     <string name="buttonMoreStorage">Obtenir plus de stockage</string>
     <string name="buttonNewMessage">Nouveau message</string>
