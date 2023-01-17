@@ -476,13 +476,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val (resource, threadUid) = undoData
             val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-            if (ApiRepository.undoAction(resource).data == true) {
+            val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
                 refreshFolders(mailbox, thread.messages.getFoldersIds())
-                // TODO replace by context when https://github.com/Infomaniak/android-mail/pull/481 is merged
-                snackbarFeedback.postValue(
-                    SnackbarFeedbackData(getApplication<Application>().getString(R.string.snackbarMoveCancelled))
-                )
+                R.string.snackbarMoveCancelled
+            } else {
+                RCore.string.anErrorHasOccurred
             }
+
+            // TODO replace by global context when https://github.com/Infomaniak/android-mail/pull/481 will be merged
+            snackbarFeedback.postValue(SnackbarFeedbackData(getApplication<Application>().getString(snackbarTitle)))
         }
     }
 
