@@ -356,6 +356,7 @@
 
     <style name="BottomSheetTitle" parent="H5" />
 
+
     <!-- Settings -->
 
     <style name="SettingSeparator">
@@ -403,6 +404,32 @@
     </style>
 
 
+    <!-- Dialog -->
+
+    <style name="DialogStyle" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:background">@color/backgroundColor</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DeletePositiveButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="colorControlNormal">?attr/colorControlNormal</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlayDialogRounded</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="TextButtonPrimary">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:padding">@dimen/marginStandardMedium</item>
+    </style>
+
+    <style name="DeletePositiveButtonStyle" parent="TextButtonError">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:padding">@dimen/marginStandardMedium</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlayDialogRounded">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
+
     <!-- Other -->
 
     <style name="ExtendedFloatingActionButtonStyle" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
@@ -438,6 +465,11 @@
     <style name="EditorIconRoundedBackground">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">5dp</item>
+    </style>
+
+    <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
+        <item name="android:textColorHint">@color/hintTextColor</item>
     </style>
 
 </resources>

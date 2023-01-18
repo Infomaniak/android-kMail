@@ -119,8 +119,10 @@ class MenuDrawerFragment : Fragment() {
         inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
         customFolders.setOnActionClickListener { // Create new folder
-            // TODO
-            notYetImplemented()
+            safeNavigate(
+                directions = ThreadListFragmentDirections.actionThreadListFragmentToNewFolderDialog(),
+                currentClassName = MenuDrawerFragment::class.java.name,
+            )
         }
         feedback.setOnClickListener {
             closeDrawer()

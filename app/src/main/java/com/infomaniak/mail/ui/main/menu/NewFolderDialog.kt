@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,28 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
+import com.infomaniak.mail.databinding.DialogNewFolderBinding
+import com.infomaniak.mail.utils.notYetImplemented
 
 class NewFolderDialog : DialogFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.dialog_new_folder, container, false)
+    private val binding by lazy { DialogNewFolderBinding.inflate(layoutInflater) }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return MaterialAlertDialogBuilder(requireContext())
+            .setView(binding.root)
+            .setPositiveButton(R.string.newFolderDialogPositiveButton) { _, _ ->
+                notYetImplemented()
+            }
+            .setNegativeButton(R.string.buttonCancel, null)
+            .create()
     }
 }
