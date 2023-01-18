@@ -200,16 +200,11 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
         autoSaveJob?.cancel()
 
-        when (action) {
-            DraftAction.SEND -> saveDraftToLocal(action)
-            DraftAction.SAVE -> {
-                if (snapshot.hasChanges()) {
-                    saveDraftToLocal(action)
-                } else if (isNewMessage) {
-                    RealmDatabase.mailboxContent().writeBlocking {
-                        DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
-                    }
-                }
+        if (shouldExecuteAction(action)) {
+            saveDraftToLocal(action)
+        } else if (isNewMessage) {
+            RealmDatabase.mailboxContent().writeBlocking {
+                DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
             }
         }
 
@@ -226,6 +221,8 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             draft.messageUid?.let { MessageController.getMessage(it, realm = this)?.draftLocalUuid = draft.localUuid }
         }
     }
+
+    fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot.hasChanges()
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
