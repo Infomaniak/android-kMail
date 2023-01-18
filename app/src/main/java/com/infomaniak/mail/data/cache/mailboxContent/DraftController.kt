@@ -98,8 +98,9 @@ object DraftController {
             DraftMode.NEW_MAIL -> Unit
         }
 
-        to = previousMessage.from.copyFromRealm(UInt.MIN_VALUE).toRealmList()
-        if (draftMode == DraftMode.REPLY_ALL) cc = previousMessage.to.union(previousMessage.cc).toRealmList()
+        val (to, cc) = previousMessage.getRecipientForReplyTo(draftMode == DraftMode.REPLY_ALL)
+        this.to = to.toRealmList()
+        this.cc = cc.toRealmList()
 
         subject = formatSubject(draftMode, previousMessage.subject ?: "")
     }

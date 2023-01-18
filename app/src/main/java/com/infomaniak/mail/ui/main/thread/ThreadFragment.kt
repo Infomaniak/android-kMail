@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
@@ -41,6 +42,7 @@ import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToA
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -112,14 +114,12 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeQuickActionBarClicks() {
-        threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (lastMessageUidToReplyTo, menuId) ->
+        threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (lastMessageToReplyTo, menuId) ->
             when (menuId) {
-                R.id.quickActionReply -> safeNavigate(
-                    ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = lastMessageUidToReplyTo)
-                )
+                R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                        messageUidToReplyTo = lastMessageUidToReplyTo,
+                        messageUidToReplyTo = lastMessageToReplyTo.uid,
                         threadUid = navigationArgs.threadUid,
                     )
                 )
@@ -155,8 +155,8 @@ class ThreadFragment : Fragment() {
             onDownloadAllClicked = { message ->
                 downloadAllAttachments(message)
             }
-            onReplyClicked = {
-                safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = it.uid))
+            onReplyClicked = { message ->
+                replyTo(message)
             }
             onMenuClicked = { message ->
                 safeNavigate(
@@ -168,6 +168,14 @@ class ThreadFragment : Fragment() {
                     )
                 )
             }
+        }
+    }
+
+    private fun replyTo(message: Message) {
+        if (message.getRecipientForReplyTo(true).second.isEmpty()) {
+            safeNavigateToNewMessageActivity(DraftMode.REPLY, message.uid)
+        } else {
+            safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = message.uid))
         }
     }
 

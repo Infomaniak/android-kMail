@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
 
-    val quickActionBarClicks = MutableLiveData<Pair<String, Int>>()
+    val quickActionBarClicks = MutableLiveData<Pair<Message, Int>>()
 
     private var fetchMessagesJob: Job? = null
 
@@ -85,8 +85,8 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        MessageController.getMessageUidToReplyTo(threadUid)?.let { messageUid ->
-            quickActionBarClicks.postValue(messageUid to menuId)
+        MessageController.getMessageToReplyTo(threadUid)?.let { message ->
+            quickActionBarClicks.postValue(message to menuId)
         }
     }
 }
