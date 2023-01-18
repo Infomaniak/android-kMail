@@ -26,11 +26,14 @@ import android.text.InputFilter
 import android.text.InputType
 import android.text.Spanned
 import android.transition.TransitionManager
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -46,6 +49,7 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
 import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.mail.R
@@ -61,6 +65,7 @@ import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import java.util.*
 import com.google.android.material.R as RMaterial
 
 class NewMessageFragment : Fragment() {
@@ -106,6 +111,30 @@ class NewMessageFragment : Fragment() {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)
         }
+
+        signatureWebView.apply {
+            settings.javaScriptEnabled = true
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    if (!context.isNightModeEnabled()) return
+
+                    val css = Scanner(resources.openRawResource(R.raw.custom_dark_mode)).useDelimiter("\\A").next()
+                    val base64EncodedCss = Base64.encodeToString(css.toByteArray(), Base64.DEFAULT)
+                    val injectCssCode = """
+                    (function() {
+                        var parent = document.getElementsByTagName('head').item(0);
+                        var style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.innerHTML = window.atob('$base64EncodedCss');
+                        parent.appendChild(style);
+                    })()
+                """.trimIndent()
+                    val javaScriptCode = "javascript:$injectCssCode"
+                    signatureWebView.loadUrl(javaScriptCode)
+                }
+            }
+        }
+
         attachmentsRecyclerView.adapter = attachmentAdapter
 
         setupAutoCompletionFields()
@@ -205,6 +234,7 @@ class NewMessageFragment : Fragment() {
 
         draft.uiSignature?.let {
             signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+
             removeSignature.setOnClickListener {
                 draft.uiSignature = null
                 separatedSignature.isGone = true
