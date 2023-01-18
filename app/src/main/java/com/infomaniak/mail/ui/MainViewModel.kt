@@ -62,7 +62,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
-    val snackbarFeedback = SingleLiveEvent<SnackbarFeedbackData>()
+    val snackbarFeedback = SingleLiveEvent<Pair<String, UndoData?>>()
 
     private var forceRefreshJob: Job? = null
 
@@ -291,21 +291,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), archiveId)
 
-        showArchiveSnackbar(message, thread.uid, apiResponse)
-
+        var impactedFoldersIds: List<String>? = null
         if (apiResponse.isSuccess()) {
             val messagesFoldersIds = messages.getFoldersIds(exception = archiveId)
             if (withRefresh) {
                 refreshFolders(mailbox, messagesFoldersIds, archiveId)
             } else {
-                return messagesFoldersIds
+                impactedFoldersIds = messagesFoldersIds
             }
         }
 
-        return null
+        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoIds = messages.getFoldersIds(exception = undoDestinationId) + archiveId
+        showArchiveSnackbar(message, apiResponse, undoIds, undoDestinationId)
+
+        return impactedFoldersIds
     }
 
-    private fun showArchiveSnackbar(message: Message?, threadUid: String, apiResponse: ApiResponse<MoveResult>) {
+    private fun showArchiveSnackbar(
+        message: Message?,
+        apiResponse: ApiResponse<MoveResult>,
+        undoIds: List<String>,
+        undoDestinationId: String?,
+    ) {
 
         val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
 
@@ -315,7 +323,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        snackbarFeedback.postValue(SnackbarFeedbackData(snackbarTitle, apiResponse.data?.undoResource?.let { it to threadUid }))
+        snackbarFeedback.postValue(
+            snackbarTitle to apiResponse.data?.undoResource?.let { UndoData(it, undoIds, undoDestinationId) }
+        )
     }
     //endregion
 
@@ -342,17 +352,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             apiResponse.isSuccess()
         }
 
-        showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, thread.uid, message, undoResource)
-
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId)
+
+        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
+        showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource, undoIds, undoDestinationId)
     }
 
     private fun showDeleteSnackbar(
         isSuccess: Boolean,
         shouldPermanentlyDelete: Boolean,
-        threadUid: String,
         message: Message?,
         undoResource: String?,
+        undoIds: List<String>,
+        undoDestinationId: String?,
     ) {
 
         val snackbarTitle = if (isSuccess) {
@@ -375,7 +388,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             context.getString(RCore.string.anErrorHasOccurred)
         }
 
-        snackbarFeedback.postValue(SnackbarFeedbackData(snackbarTitle, undoResource?.let { it to threadUid }))
+        snackbarFeedback.postValue(snackbarTitle to undoResource?.let { UndoData(it, undoIds, undoDestinationId) })
     }
     //endregion
 
@@ -470,21 +483,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
-    fun undoAction(undoData: Pair<String, String>) {
+    fun undoAction(undoData: UndoData) {
         viewModelScope.launch(Dispatchers.IO) {
             val mailbox = currentMailbox.value ?: return@launch
-            val (resource, threadUid) = undoData
-            val thread = ThreadController.getThread(threadUid) ?: return@launch
+            val (resource, foldersIds, destinationFolderId) = undoData
 
             val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
-                refreshFolders(mailbox, thread.messages.getFoldersIds())
+                refreshFolders(mailbox, foldersIds, destinationFolderId)
                 R.string.snackbarMoveCancelled
             } else {
                 RCore.string.anErrorHasOccurred
             }
 
             // TODO replace by global context when https://github.com/Infomaniak/android-mail/pull/481 will be merged
-            snackbarFeedback.postValue(SnackbarFeedbackData(getApplication<Application>().getString(snackbarTitle)))
+            snackbarFeedback.postValue(getApplication<Application>().getString(snackbarTitle) to null)
         }
     }
 
@@ -509,9 +521,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    data class SnackbarFeedbackData(
-        val title: String = "",
-        val undoData: Pair<String, String>? = null,
+    data class UndoData(
+        val resource: String,
+        val foldersIds: List<String>,
+        val destinationFolderId: String?,
     )
 
     companion object {
