@@ -23,8 +23,8 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk 25
         targetSdk 33
-        versionCode 1_00_000_07
-        versionName '1.0-Alpha7'
+        versionCode 1_00_000_08
+        versionName '1.0-Alpha8C'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "kmail-$versionName ($versionCode)"
@@ -71,7 +71,7 @@ dependencies {
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
     implementation 'androidx.webkit:webkit:1.6.0-rc01'
 
-    androidTestImplementation 'androidx.test:runner:1.5.1'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
 }
