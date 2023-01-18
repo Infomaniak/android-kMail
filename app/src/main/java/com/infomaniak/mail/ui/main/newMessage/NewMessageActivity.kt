@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -58,11 +59,7 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
-            if (isAutoCompletionOpened) {
-                newMessageFragment.closeAutoCompletion()
-            } else {
-                saveToLocalAndFinish(DraftAction.SAVE)
-            }
+            if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else saveDraftAndShowToast(DraftAction.SAVE)
         }
     }
 
@@ -71,9 +68,19 @@ class NewMessageActivity : ThemedActivity() {
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         toolbar.setOnMenuItemClickListener {
-            if (newMessageViewModel.draft.to.isNotEmpty()) newMessageViewModel.saveToLocalAndFinish(DraftAction.SEND)
+            if (newMessageViewModel.draft.to.isNotEmpty()) saveDraftAndShowToast(DraftAction.SEND)
             true
         }
+    }
+
+    private fun saveDraftAndShowToast(action: DraftAction) = with(newMessageViewModel) {
+        saveToLocalAndFinish(action)
+        if (shouldExecuteAction(action)) displayDraftActionToast(action)
+    }
+
+    private fun displayDraftActionToast(action: DraftAction) {
+        val text = if (action == DraftAction.SAVE) R.string.snackbarDraftSaved else R.string.snackbarEmailSending
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
 
     private fun observeCloseActivity() {

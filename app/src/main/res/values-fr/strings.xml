@@ -101,7 +101,6 @@
     <string name="buttonUnderlined">Souligner</string>
     <string name="buttonUnlock">Déverrouiller</string>
     <string name="buttonValid">Valider</string>
-    <string name="canceledEmailSendingConfirmationSnackbar">Envoi d’e-mail annulé</string>
     <string name="ccTitle">Cc :</string>
     <string name="commercialFolder">Promotions</string>
     <string name="confirmLogoutDescription">Etes-vous sûr de vouloir vous déconnecter ?</string>
@@ -133,7 +132,6 @@
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
-    <string name="emailSentSnackbar">E-mail envoyé</string>
     <string name="emptyFolderDescription">Il n‘y a rien à voir, regardez-en un autre :)</string>
     <string name="emptyFolderTitle">Ce dossier est vide !</string>
     <plurals name="errorActionsSpamOwnMessage">
@@ -287,11 +285,13 @@
     <string name="settingsTransferEmailsDescription">Lorsque vous transférez un mail, choisissez le mode d’affichage qui vous convient le mieux</string>
     <string name="settingsTransferEmailsTitle">Transférer les e-mails</string>
     <string name="settingsTransferInBody">Dans le corps du message</string>
-    <string name="snackBarDraftDeleted">Brouillon supprimé</string>
-    <string name="snackBarDraftSaved">Brouillon enregistré</string>
+    <string name="snackbarDraftDeleted">Brouillon supprimé</string>
+    <string name="snackbarDraftSaved">Brouillon enregistré</string>
     <string name="snackbarContactSaved">Nouveau contact enregistré avec succès</string>
     <string name="snackbarDisplayProblemReported">Problème d’affichage signalé</string>
     <string name="snackbarEmailCopiedToClipboard">Adresse mail copiée dans le presse papier</string>
+    <string name="snackbarEmailSending">E-mail en cours d’envoi</string>
+    <string name="snackbarEmailSent">E-mail envoyé</string>
     <string name="snackbarInvalidUrl">URL invalide</string>
     <string name="snackbarMessageDeletedPermanently">Message supprimé</string>
     <string name="snackbarMessageMoved">Message déplacé vers %s</string>
