@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import io.realm.kotlin.MutableRealm
@@ -113,17 +114,13 @@ object ThreadController {
         realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
 
-    fun deleteThreads(realm: MutableRealm) {
-        realm.delete(getThreads(realm))
-    }
-
     fun deleteThreads(folderId: String, realm: MutableRealm) {
         realm.delete(getThreadsQuery(folderId, realm = realm))
     }
 
-    fun fetchIncompleteMessages(thread: Thread, okHttpClient: OkHttpClient? = null) {
+    fun fetchIncompleteMessages(messages: List<Message>, okHttpClient: OkHttpClient? = null) {
         RealmDatabase.mailboxContent().writeBlocking {
-            thread.messages.forEach { localMessage ->
+            messages.forEach { localMessage ->
                 if (!localMessage.fullyDownloaded) {
                     ApiRepository.getMessage(localMessage.resource, okHttpClient).data?.also { remoteMessage ->
 

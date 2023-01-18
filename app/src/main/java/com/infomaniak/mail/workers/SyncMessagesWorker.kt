@@ -117,7 +117,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
             }
         }
 
-        ThreadController.fetchIncompleteMessages(this, okHttpClient)
+        ThreadController.fetchIncompleteMessages(messages, okHttpClient)
 
         val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
 

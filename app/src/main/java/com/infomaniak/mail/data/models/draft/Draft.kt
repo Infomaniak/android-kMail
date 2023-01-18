@@ -135,7 +135,6 @@ class Draft : RealmObject {
         // }
     }
 
-    @Suppress("JSON_FORMAT_REDUNDANT")
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
         return draftJson.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
             this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) })

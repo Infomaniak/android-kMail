@@ -70,30 +70,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     fun fetchIncompleteMessages(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(Dispatchers.IO) {
-            RealmDatabase.mailboxContent().writeBlocking {
-                messages.forEach { localMessage ->
-                    if (!localMessage.fullyDownloaded) {
-                        ApiRepository.getMessage(localMessage.resource).data?.also { remoteMessage ->
-
-                            // If we've already got this Message's Draft beforehand, we need to save
-                            // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                            val draftLocalUuid = if (remoteMessage.isDraft) {
-                                DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
-                            } else {
-                                null
-                            }
-
-                            remoteMessage.initLocalValues(
-                                fullyDownloaded = true,
-                                messageIds = localMessage.messageIds,
-                                draftLocalUuid,
-                            )
-
-                            MessageController.upsertMessage(remoteMessage, realm = this)
-                        }
-                    }
-                }
-            }
+            ThreadController.fetchIncompleteMessages(messages)
         }
     }
 
