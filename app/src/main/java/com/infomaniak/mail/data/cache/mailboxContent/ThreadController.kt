@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
@@ -28,6 +29,7 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.flow.Flow
+import okhttp3.OkHttpClient
 
 object ThreadController {
 
@@ -117,6 +119,33 @@ object ThreadController {
 
     fun deleteThreads(folderId: String, realm: MutableRealm) {
         realm.delete(getThreadsQuery(folderId, realm = realm))
+    }
+
+    fun fetchIncompleteMessages(thread: Thread, okHttpClient: OkHttpClient? = null) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            thread.messages.forEach { localMessage ->
+                if (!localMessage.fullyDownloaded) {
+                    ApiRepository.getMessage(localMessage.resource, okHttpClient).data?.also { remoteMessage ->
+
+                        // If we've already got this Message's Draft beforehand, we need to save
+                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                        val draftLocalUuid = if (remoteMessage.isDraft) {
+                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
+                        } else {
+                            null
+                        }
+
+                        remoteMessage.initLocalValues(
+                            fullyDownloaded = true,
+                            messageIds = localMessage.messageIds,
+                            draftLocalUuid,
+                        )
+
+                        MessageController.upsertMessage(remoteMessage, realm = this)
+                    }
+                }
+            }
+        }
     }
     //endregion
 }

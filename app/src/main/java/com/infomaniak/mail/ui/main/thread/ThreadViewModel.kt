@@ -20,14 +20,11 @@ package com.infomaniak.mail.ui.main.thread
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
 import kotlinx.coroutines.Dispatchers
@@ -64,36 +61,9 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
         emit(expandedMap)
 
-        fetchIncompleteMessages(thread)
+        ThreadController.fetchIncompleteMessages(thread)
 
         if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
-    }
-
-    private fun fetchIncompleteMessages(thread: Thread) {
-        RealmDatabase.mailboxContent().writeBlocking {
-            thread.messages.forEach { localMessage ->
-                if (!localMessage.fullyDownloaded) {
-                    ApiRepository.getMessage(localMessage.resource).data?.also { remoteMessage ->
-
-                        // If we've already got this Message's Draft beforehand, we need to save
-                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                        val draftLocalUuid = if (remoteMessage.isDraft) {
-                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
-                        } else {
-                            null
-                        }
-
-                        remoteMessage.initLocalValues(
-                            fullyDownloaded = true,
-                            messageIds = localMessage.messageIds,
-                            draftLocalUuid,
-                        )
-
-                        MessageController.upsertMessage(remoteMessage, realm = this)
-                    }
-                }
-            }
-        }
     }
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
