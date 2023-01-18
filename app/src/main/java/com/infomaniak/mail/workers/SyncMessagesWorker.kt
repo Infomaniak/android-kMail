@@ -20,6 +20,7 @@ package com.infomaniak.mail.workers
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.text.Html
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
@@ -43,6 +44,7 @@ import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
 class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
@@ -67,7 +69,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
                 val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder.id, realm)
                 newMessagesThreads.forEach { thread ->
-                    thread.showNotification(user.id, mailbox, unReadThreadsCount, realm)
+                    thread.showNotification(user.id, mailbox, unReadThreadsCount, realm, okHttpClient)
                 }
 
                 realm.close()
@@ -83,7 +85,13 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         mailboxInfoRealm.close()
     }
 
-    private fun Thread.showNotification(userId: Int, mailbox: Mailbox, unReadThreadsCount: Int, realm: Realm) {
+    private fun Thread.showNotification(
+        userId: Int,
+        mailbox: Mailbox,
+        unReadThreadsCount: Int,
+        realm: Realm,
+        okHttpClient: OkHttpClient
+    ) {
 
         fun contentIntent(isSummary: Boolean): PendingIntent {
             val intent = Intent(applicationContext, LaunchActivity::class.java).clearStack().apply {
@@ -109,12 +117,17 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
             }
         }
 
+        ThreadController.fetchIncompleteMessages(this, okHttpClient)
+
         val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
 
         if (message.seen) return // Ignore if it has already been seen
 
         val subject = message.getFormattedSubject(applicationContext)
-        val preview = if (message.preview.isEmpty()) "" else "\n${message.preview}"
+        val preview = message.body?.value?.ifBlank { null }?.let {
+            val bodyWithoutImage = it.replace("<img[^>]+(img)?/?>".toRegex(), "")
+            "\n" + Html.fromHtml(bodyWithoutImage, Html.FROM_HTML_MODE_LEGACY)
+        } ?: message.preview.ifBlank { null }?.let { "\n$it" } ?: ""
         val description = "$subject$preview"
 
         // Show message notification
