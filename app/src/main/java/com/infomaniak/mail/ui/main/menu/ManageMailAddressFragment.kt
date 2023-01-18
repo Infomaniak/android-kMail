@@ -44,13 +44,13 @@ class ManageMailAddressFragment : Fragment() {
     private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
 
     private var simpleMailboxAdapter = SimpleMailboxAdapter()
-    private var currentUserEmail = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        var currentUserEmail = ""
 
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
