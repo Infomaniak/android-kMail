@@ -39,7 +39,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
+import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -181,15 +181,18 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesLive() {
-        threadViewModel.messagesLive(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
-            beforeUpdateAdapter = ::onMessagesUpdate
-            afterUpdateAdapter = {
-                if (shouldScrollToBottom.compareAndSet(true, false)) {
-                    val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.expandedMap[it.uid] == true }
-                    binding.messagesList.scrollToPosition(indexToScroll)
+        threadViewModel
+            .messagesLive(navigationArgs.threadUid)
+            .bindResultsChangeToAdapter(viewLifecycleOwner, threadAdapter)
+            .apply {
+                beforeUpdateAdapter = ::onMessagesUpdate
+                afterUpdateAdapter = {
+                    if (shouldScrollToBottom.compareAndSet(true, false)) {
+                        val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.expandedMap[it.uid] == true }
+                        binding.messagesList.scrollToPosition(indexToScroll)
+                    }
                 }
             }
-        }
     }
 
     private fun observeContacts() {
