@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -200,11 +200,16 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
         autoSaveJob?.cancel()
 
-        if (snapshot.hasChanges()) {
-            saveDraftToLocal(action)
-        } else if (isNewMessage) {
-            RealmDatabase.mailboxContent().writeBlocking {
-                DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+        when (action) {
+            DraftAction.SEND -> saveDraftToLocal(action)
+            DraftAction.SAVE -> {
+                if (snapshot.hasChanges()) {
+                    saveDraftToLocal(action)
+                } else if (isNewMessage) {
+                    RealmDatabase.mailboxContent().writeBlocking {
+                        DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
+                    }
+                }
             }
         }
 
