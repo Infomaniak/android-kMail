@@ -84,19 +84,19 @@ object MessageController {
         return getMessageQuery(uid, realm).find()
     }
 
-    fun getMessageUidToReplyTo(threadUid: String): String? {
+    fun getMessageToReplyTo(threadUid: String): Message? {
         val messages = ThreadController.getThread(threadUid)?.messages ?: return null
 
         val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
                 "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
         val isNotDraft = "${Message::isDraft.name} == false"
 
-        val message = messages.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
+        return messages.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
             ?: messages.query(isNotDraft).find().lastOrNull()
             ?: messages.last()
-
-        return message.uid
     }
+
+    fun getMessageUidToReplyTo(threadUid: String): String? = getMessageToReplyTo(threadUid)?.uid
     //endregion
 
     //region Edit data

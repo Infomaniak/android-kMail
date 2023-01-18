@@ -32,13 +32,8 @@ import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.TypedRealm
-import io.realm.kotlin.ext.backlinks
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.realmSetOf
-import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
-import io.realm.kotlin.types.RealmObject
-import io.realm.kotlin.types.RealmSet
+import io.realm.kotlin.ext.*
+import io.realm.kotlin.types.*
 import io.realm.kotlin.types.annotations.Ignore
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -137,6 +132,35 @@ class Message : RealmObject {
         this.fullyDownloaded = fullyDownloaded
         this.messageIds = messageIds
         draftLocalUuid?.let { this.draftLocalUuid = it }
+    }
+
+    private inline fun <reified T : TypedRealmObject> RealmList<T>.detachedFromRealm(depth: UInt = UInt.MIN_VALUE): List<T> {
+        return if (isManaged()) copyFromRealm(depth) else this
+    }
+
+    fun getRecipientForReplyTo(replyAll: Boolean = false): Pair<List<Recipient>, List<Recipient>> {
+        val cleanedTo = to.detachedFromRealm().filter { !it.isMe() }
+        val cleanedCc = cc.detachedFromRealm().filter { !it.isMe() }
+
+        fun cleanedFrom() = from.detachedFromRealm().filter { !it.isMe() }
+        var to = replyTo.detachedFromRealm().filter { !it.isMe() }.ifEmpty { cleanedFrom() }
+        var cc = emptyList<Recipient>()
+
+        if (to.isEmpty()) {
+            to = cleanedTo
+        } else if (replyAll) {
+            cc = cleanedTo
+        }
+
+        if (to.isEmpty()) {
+            to = cleanedCc
+        } else if (replyAll) {
+            cc = cc + cleanedCc
+        }
+
+        if (to.isEmpty()) to = from
+
+        return to to cc
     }
 
     fun initMessageIds() {
