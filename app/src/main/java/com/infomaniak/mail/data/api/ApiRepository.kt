@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
+import com.infomaniak.mail.data.models.draft.SendDraftResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesByUidsResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
@@ -103,20 +104,25 @@ object ApiRepository : ApiRepositoryCore() {
     // fun trustSender(messageResource: String): ApiResponse<EmptyResponse> = callKotlinxApi(ApiRoutes.resource("$messageResource/trustForm"), POST)
 
     fun saveDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SaveDraftResult> {
+
         val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
         fun postDraft(): ApiResponse<SaveDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+
         fun putDraft(uuid: String): ApiResponse<SaveDraftResult> =
             callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }
 
-    fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
+    fun sendDraft(mailboxUuid: String, draft: Draft, okHttpClient: OkHttpClient): ApiResponse<SendDraftResult> {
+
         val body = Json.encodeToString(draft.getJsonRequestBody()).removeEmptyRealmLists()
 
-        fun postDraft(): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
-        fun putDraft(uuid: String): ApiResponse<Boolean> = callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
+        fun postDraft(): ApiResponse<SendDraftResult> = callApi(ApiRoutes.draft(mailboxUuid), POST, body, okHttpClient)
+
+        fun putDraft(uuid: String): ApiResponse<SendDraftResult> =
+            callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
     }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models.draft
 
-import com.infomaniak.lib.core.api.ApiController.json
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
@@ -74,14 +74,8 @@ class Draft : RealmObject {
     @SerialName("forwarded_uid")
     var forwardedUid: String? = null
 
-    var resource: String? = null
-    var quote: String = ""
     var references: String? = null
     var delay: Int = 0
-    @SerialName("ack_request")
-    var ackRequest: Boolean = false
-    @SerialName("st_uuid")
-    var stUuid: String? = null
     //endregion
 
     //region Local data (Transient)
@@ -142,7 +136,7 @@ class Draft : RealmObject {
     }
 
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
-        return json.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
+        return draftJson.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
             this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) })
         }
     }
@@ -163,5 +157,6 @@ class Draft : RealmObject {
         const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
 
         val actionPropertyName get() = Draft::_action.name
+        private val draftJson = Json(ApiController.json) { encodeDefaults = true }
     }
 }

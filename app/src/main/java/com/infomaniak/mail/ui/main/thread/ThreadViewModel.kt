@@ -28,12 +28,15 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
 
     val quickActionBarClicks = MutableLiveData<Pair<String, Int>>()
+
+    private var fetchMessagesJob: Job? = null
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
@@ -61,9 +64,14 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
         emit(expandedMap)
 
-        ThreadController.fetchIncompleteMessages(thread)
-
         if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
+    }
+
+    fun fetchIncompleteMessages(messages: List<Message>) {
+        fetchMessagesJob?.cancel()
+        fetchMessagesJob = viewModelScope.launch(Dispatchers.IO) {
+            ThreadController.fetchIncompleteMessages(messages)
+        }
     }
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
