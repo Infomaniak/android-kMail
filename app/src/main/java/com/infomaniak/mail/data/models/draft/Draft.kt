@@ -19,7 +19,7 @@
 
 package com.infomaniak.mail.data.models.draft
 
-import com.infomaniak.lib.core.api.ApiController.json
+import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
@@ -137,9 +137,9 @@ class Draft : RealmObject {
 
     @Suppress("JSON_FORMAT_REDUNDANT")
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
-        return Json(json) { encodeDefaults = true }
-            .encodeToJsonElement(this).jsonObject.toMutableMap()
-            .apply { this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) }) }
+        return draftJson.encodeToJsonElement(this).jsonObject.toMutableMap().apply {
+            this[Draft::attachments.name] = JsonArray(attachments.map { JsonPrimitive(it.uuid) })
+        }
     }
 
     enum class DraftAction(val apiCallValue: String) {
@@ -158,5 +158,6 @@ class Draft : RealmObject {
         const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
 
         val actionPropertyName get() = Draft::_action.name
+        private val draftJson = Json(ApiController.json) { encodeDefaults = true }
     }
 }
