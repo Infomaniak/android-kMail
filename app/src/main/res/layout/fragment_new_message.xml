@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -231,18 +231,18 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
                     app:placeholderText="@string/newMessagePlaceholderTitle"
-                    app:placeholderTextColor="@color/hintTextColor">
+                    app:placeholderTextColor="@color/tertiaryTextColor">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/bodyText"
+                        style="@style/Body"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/white"
                         android:gravity="top"
                         android:hint="@string/newMessagePlaceholderTitle"
                         android:inputType="textMultiLine|textCapSentences"
                         android:nextFocusUp="@id/subjectTextField"
-                        android:textColor="@color/orca" />
+                        android:textColorHighlight="?attr/colorControlHighlight" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
