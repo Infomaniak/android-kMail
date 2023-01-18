@@ -44,6 +44,7 @@ class ManageMailAddressFragment : Fragment() {
     private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
 
     private var simpleMailboxAdapter = SimpleMailboxAdapter()
+    private var currentUserEmail = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentManageMailAddressBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -54,13 +55,13 @@ class ManageMailAddressFragment : Fragment() {
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
             mail.text = user.email
-
-            dialogBinding.confirmLogoutDialogTitle.text = getString(R.string.confirmLogoutTitle, user.email)
+            currentUserEmail = getString(R.string.confirmLogoutTitle, user.email)
         }
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
 
         disconnectAccountButton.setOnClickListener {
+            dialogBinding.confirmLogoutDialogTitle.text = currentUserEmail
             MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogBinding.root)
                 .setPositiveButton(R.string.buttonLogout) { _, _ -> removeCurrentUser() }
