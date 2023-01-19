@@ -26,14 +26,11 @@ import android.text.InputFilter
 import android.text.InputType
 import android.text.Spanned
 import android.transition.TransitionManager
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -62,6 +59,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.injectCssInHtml
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
@@ -110,29 +108,6 @@ class NewMessageFragment : Fragment() {
     private fun initUi() = with(binding) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)
-        }
-
-        signatureWebView.apply {
-            settings.javaScriptEnabled = true
-            webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    if (!context.isNightModeEnabled()) return
-
-                    val css = Scanner(resources.openRawResource(R.raw.custom_dark_mode)).useDelimiter("\\A").next()
-                    val base64EncodedCss = Base64.encodeToString(css.toByteArray(), Base64.DEFAULT)
-                    val injectCssCode = """
-                    (function() {
-                        var parent = document.getElementsByTagName('head').item(0);
-                        var style = document.createElement('style');
-                        style.type = 'text/css';
-                        style.innerHTML = window.atob('$base64EncodedCss');
-                        parent.appendChild(style);
-                    })()
-                """.trimIndent()
-                    val javaScriptCode = "javascript:$injectCssCode"
-                    signatureWebView.loadUrl(javaScriptCode)
-                }
-            }
         }
 
         attachmentsRecyclerView.adapter = attachmentAdapter
@@ -232,8 +207,9 @@ class NewMessageFragment : Fragment() {
         subjectTextField.setText(draft.subject)
         bodyText.setText(draft.uiBody)
 
-        draft.uiSignature?.let {
-            signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+        draft.uiSignature?.let { html ->
+            val signature = if (context.isNightModeEnabled()) injectCssInHtml(R.raw.custom_dark_mode, html) else html
+            signatureWebView.loadDataWithBaseURL("", signature, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
 
             removeSignature.setOnClickListener {
                 draft.uiSignature = null
