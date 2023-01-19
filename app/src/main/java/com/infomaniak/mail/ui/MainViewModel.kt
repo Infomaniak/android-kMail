@@ -323,9 +323,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        snackbarFeedback.postValue(
-            snackbarTitle to apiResponse.data?.undoResource?.let { UndoData(it, undoIds, undoDestinationId) }
-        )
+        val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoIds, undoDestinationId) }
+        snackbarFeedback.postValue(snackbarTitle to undoData)
     }
     //endregion
 
@@ -461,14 +460,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailbox.uuid, uids, destinationFolderId)
 
-        showSpamSnackbar(message, apiResponse, destinationFolderRole)
-
         if (apiResponse?.isSuccess() == true) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
+
+        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+        showSpamSnackbar(message, apiResponse, destinationFolderRole, undoIds, undoDestinationId)
     }
 
-    private fun showSpamSnackbar(message: Message?, apiResponse: ApiResponse<MoveResult>?, destinationRole: FolderRole) {
+    private fun showSpamSnackbar(
+        message: Message?,
+        apiResponse: ApiResponse<MoveResult>?,
+        destinationRole: FolderRole,
+        undoIds: List<String>,
+        undoDestinationId: String?,
+    ) {
 
         val destination = context.getString(destinationRole.folderNameRes)
 
@@ -479,7 +486,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        snackbarFeedback.postValue(snackbarTitle to apiResponse?.data?.undoResource)
+        val undoData = apiResponse?.data?.undoResource?.let { UndoData(it, undoIds, undoDestinationId) }
+        snackbarFeedback.postValue(snackbarTitle to undoData)
     }
     //endregion
 
@@ -495,8 +503,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 RCore.string.anErrorHasOccurred
             }
 
-            // TODO replace by global context when https://github.com/Infomaniak/android-mail/pull/481 will be merged
-            snackbarFeedback.postValue(getApplication<Application>().getString(snackbarTitle) to null)
+            snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
         }
     }
 
