@@ -27,6 +27,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.realmListOf
@@ -37,6 +38,7 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
+import java.util.*
 
 class Thread : RealmObject {
 
@@ -146,7 +148,7 @@ class Thread : RealmObject {
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true
         }
-        date = messages.findLast { it.folderId == folderId }?.date!!
+        date = messages.findLast { it.folderId == folderId }?.date?: Date().toRealmInstant()
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {
