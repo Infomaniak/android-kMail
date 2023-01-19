@@ -208,7 +208,7 @@ class NewMessageFragment : Fragment() {
         bodyText.setText(draft.uiBody)
 
         draft.uiSignature?.let { html ->
-            val signature = if (context.isNightModeEnabled()) injectCssInHtml(R.raw.custom_dark_mode, html) else html
+            val signature = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
             signatureWebView.loadDataWithBaseURL("", signature, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
 
             removeSignature.setOnClickListener {
