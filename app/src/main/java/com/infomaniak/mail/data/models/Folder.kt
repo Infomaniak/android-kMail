@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ class Folder : RealmObject {
 
     enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
         INBOX(R.string.inboxFolder, R.drawable.ic_drawer_mailbox, 0),
-        DRAFT(R.string.draftFolder, R.drawable.ic_edit_draft, 4),
+        DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4),
         SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 5),
         TRASH(R.string.trashFolder, R.drawable.ic_bin, 6),
