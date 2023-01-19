@@ -142,7 +142,7 @@ object MessageController {
     }
 
     fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
-        return listOf(message) + thread.duplicates.filter { it.messageId == message.messageId }
+        return listOf(message) + thread.duplicates.query("${Message::messageId.name} == '${message.messageId}'").find()
     }
     //endregion
 
