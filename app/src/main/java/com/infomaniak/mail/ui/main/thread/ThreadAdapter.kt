@@ -129,7 +129,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let {
-            val html = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, it.value) else it.value
+            val html = if (context.isNightModeEnabled() && it.type == Utils.TEXT_HTML) {
+                context.injectCssInHtml(R.raw.custom_dark_mode, it.value)
+            } else {
+                it.value
+            }
             messageBody.loadDataWithBaseURL("", html, it.type, Utils.UTF_8, "")
         }
     }

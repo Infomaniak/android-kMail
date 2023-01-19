@@ -17,9 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
-import androidx.annotation.RawRes
 import android.content.Context
-import androidx.fragment.app.Fragment
+import androidx.annotation.RawRes
 import com.infomaniak.mail.data.models.Folder
 import org.jsoup.Jsoup
 import java.nio.charset.StandardCharsets
@@ -28,6 +27,7 @@ import java.util.*
 object Utils {
 
     val UTF_8: String = StandardCharsets.UTF_8.name()
+    const val TEXT_HTML: String = "text/html"
     const val MAX_NUMBER_OF_MESSAGES_TO_FETCH: Int = 500
 
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
