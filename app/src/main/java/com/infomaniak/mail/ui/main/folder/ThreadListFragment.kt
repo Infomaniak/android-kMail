@@ -107,11 +107,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observerDraftsActionsCompletedWorks()
     }
 
-    override fun onStart() {
-        super.onStart()
-        mainViewModel.forceRefreshCurrentFolderId()
-    }
-
     override fun onResume(): Unit = with(binding) {
         super.onResume()
 
