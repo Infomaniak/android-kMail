@@ -102,7 +102,48 @@ object MessageController {
             ?: messages.last()
     }
 
-    fun getMessageUidToReplyTo(messages: RealmList<Message>): String = getMessageToReplyTo(messages).uid
+    fun getUnseenMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread) { message -> !message.seen }
+    }
+
+    fun getFavoriteMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread) { message -> message.isFavorite && !message.isDraft }
+    }
+
+    fun getArchivableMessages(thread: Thread, folderId: String): List<Message> {
+        return getMessagesAndDuplicates(thread) { message -> message.folderId == folderId && !message.scheduled }
+    }
+
+    fun getSpamMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread) { message -> !message.scheduled && !message.from.first().isMe() }
+    }
+
+    fun getDeletableMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread) { message -> !message.scheduled }
+    }
+
+    fun getPermanentlyDeletableMessages(thread: Thread): List<Message> {
+        return thread.messages + thread.duplicates
+    }
+
+    fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
+        return mutableListOf<Message>().apply {
+            val message = thread.messages.lastOrNull { !it.isDraft } ?: thread.messages.last()
+            addAll(getMessageAndDuplicates(thread, message))
+        }
+    }
+
+    private fun getMessagesAndDuplicates(thread: Thread, shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
+        return mutableListOf<Message>().apply {
+            thread.messages.forEach { message ->
+                if (shouldKeepMessage(message)) addAll(getMessageAndDuplicates(thread, message))
+            }
+        }
+    }
+
+    fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
+        return listOf(message) + thread.duplicates.filter { it.messageId == message.messageId }
+    }
     //endregion
 
     //region Edit data

@@ -287,7 +287,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return null
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
 
-        val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getArchivableMessages(currentFolderId.value!!)
+        val messages = when {
+            message != null -> MessageController.getMessageAndDuplicates(thread, message)
+            else -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
+        }
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), archiveId)
 
@@ -338,8 +341,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 || isCurrentFolderRole(FolderRole.SPAM)
                 || isCurrentFolderRole(FolderRole.TRASH)
 
-        val messages = message?.let(thread::getMessageAndDuplicates)
-            ?: if (shouldPermanentlyDelete) thread.getPermanentlyDeletableMessages() else thread.getDeletableMessages()
+        val messages = when {
+            message != null -> MessageController.getMessageAndDuplicates(thread, message)
+            shouldPermanentlyDelete -> MessageController.getPermanentlyDeletableMessages(thread)
+            else -> MessageController.getDeletableMessages(thread)
+        }
         val uids = messages.getUids()
 
         val isSuccess = if (shouldPermanentlyDelete) {
@@ -405,7 +411,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun markAsUnseen(mailbox: Mailbox, thread: Thread, message: Message? = null) {
-        val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getLastMessageToExecuteAction()
+
+        val messages = when {
+            message != null -> MessageController.getMessageAndDuplicates(thread, message)
+            else -> MessageController.getLastMessageToExecuteAction(thread)
+        }
 
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
 
@@ -417,8 +427,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun toggleFavoriteStatus(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
 
-        val messages = message?.let(thread::getMessageAndDuplicates)
-            ?: if (thread.isFavorite) thread.getFavoriteMessages() else thread.getLastMessageToExecuteAction()
+        val messages = when {
+            message != null -> MessageController.getMessageAndDuplicates(thread, message)
+            thread.isFavorite -> MessageController.getFavoriteMessages(thread)
+            else -> MessageController.getLastMessageToExecuteAction(thread)
+        }
         val uids = messages.getUids()
 
         val isSuccess = if (message?.isFavorite ?: thread.isFavorite) {
@@ -454,8 +467,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolderId = FolderController.getFolder(destinationFolderRole)!!.id
 
-        val messages = message?.let { if (message.from.first().isMe()) emptyList() else thread.getMessageAndDuplicates(message) }
-            ?: thread.getSpamMessages()
+        val messages = when {
+            message != null && message.from.first().isMe() -> emptyList()
+            message != null -> MessageController.getMessageAndDuplicates(thread, message)
+            else -> MessageController.getSpamMessages(thread)
+        }
         val uids = messages.getUids()
 
         val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailbox.uuid, uids, destinationFolderId)

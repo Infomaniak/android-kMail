@@ -20,7 +20,6 @@ package com.infomaniak.mail.ui.main.thread
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -76,11 +75,9 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun deleteDraft(message: Message, thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
-        val messages = thread.getMessageAndDuplicates(message)
-
-        if (ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()) {
-            MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
-        }
+        val messages = MessageController.getMessageAndDuplicates(thread, message)
+        val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
+        if (isSuccess) MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
     }
 
     fun clickOnQuickActionBar(thread: Thread, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {

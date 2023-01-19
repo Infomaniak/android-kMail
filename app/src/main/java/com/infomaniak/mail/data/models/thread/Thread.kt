@@ -162,52 +162,6 @@ class Thread : RealmObject {
 
     fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
 
-    // TODO: Replace this with a RealmList sub query.
-    fun getLastMessageToExecuteAction(): List<Message> {
-        return mutableListOf<Message>().apply {
-            val message = messages.lastOrNull { !it.isDraft } ?: messages.last()
-            addAll(getMessageAndDuplicates(message))
-        }
-    }
-
-    fun getUnseenMessages(): List<Message> {
-        return getMessagesAndDuplicates { message -> !message.seen }
-    }
-
-    fun getFavoriteMessages(): List<Message> {
-        return getMessagesAndDuplicates { message -> message.isFavorite && !message.isDraft }
-    }
-
-    fun getArchivableMessages(folderId: String): List<Message> {
-        return getMessagesAndDuplicates { message -> message.folderId == folderId && !message.scheduled }
-    }
-
-    fun getDeletableMessages(): List<Message> {
-        return getMessagesAndDuplicates { message -> !message.scheduled }
-    }
-
-    fun getPermanentlyDeletableMessages(): List<Message> {
-        return messages + duplicates
-    }
-
-    fun getSpamMessages(): List<Message> {
-        return getMessagesAndDuplicates { message -> !message.scheduled && !message.from.first().isMe() }
-    }
-
-    // TODO: Replace this with a RealmList sub query.
-    private fun getMessagesAndDuplicates(shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
-        return mutableListOf<Message>().apply {
-            messages.forEach { message ->
-                if (shouldKeepMessage(message)) addAll(getMessageAndDuplicates(message))
-            }
-        }
-    }
-
-    // TODO: Replace this with a RealmList sub query.
-    fun getMessageAndDuplicates(message: Message): List<Message> {
-        return listOf(message) + duplicates.filter { it.messageId == message.messageId }
-    }
-
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }
     }

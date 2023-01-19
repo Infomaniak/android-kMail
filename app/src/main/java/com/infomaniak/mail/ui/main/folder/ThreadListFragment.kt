@@ -268,7 +268,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             SwipeAction.QUICKACTIONS_MENU -> {
                 safeNavigate(
                     ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                        messageUidToReplyTo = MessageController.getMessageUidToReplyTo(thread.messages),
+                        messageUidToReplyTo = MessageController.getMessageToReplyTo(thread.messages).uid,
                         threadUid = thread.uid,
                     )
                 )
