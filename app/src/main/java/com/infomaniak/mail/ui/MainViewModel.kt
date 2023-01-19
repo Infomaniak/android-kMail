@@ -60,12 +60,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Current Mailbox
     private val currentMailboxObjectId = MutableLiveData<String?>(null)
 
-    val currentMailbox = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+    val currentMailbox = currentMailboxObjectId.switchMap { mailboxObjectId ->
         liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
     }
 
     val currentFoldersLive
-        get() = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) {
                 mailboxObjectId?.let {
                     emitSource(FolderController.getFoldersAsync().map { getMenuFolders(it.list) }.asLiveData())
@@ -74,7 +74,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     val currentQuotasLive
-        get() = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+        get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
         }
     //endregion
@@ -82,19 +82,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Current Folder
     private val currentFolderId = MutableLiveData<String?>(null)
 
-    val currentFolder = Transformations.switchMap(currentFolderId) { folderId ->
+    val currentFolder = currentFolderId.switchMap { folderId ->
         liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
     }
 
     val currentFolderLive
-        get() = Transformations.switchMap(currentFolderId) { folderId ->
+        get() = currentFolderId.switchMap { folderId ->
             liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
         }
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
     val currentThreadsLive
-        get() = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
+        get() = observeFolderAndFilter().switchMap { (folder, filter) ->
             liveData(Dispatchers.IO) {
                 if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
             }
