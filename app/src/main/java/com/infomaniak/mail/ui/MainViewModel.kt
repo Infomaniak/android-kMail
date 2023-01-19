@@ -95,6 +95,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
+
+    fun forceRefreshCurrentFolderId() {
+        if (currentFolderId.value != null) currentFolderId.value = currentFolderId.value
+    }
     //endregion
 
     val isInternetAvailable = SingleLiveEvent<Boolean>()
