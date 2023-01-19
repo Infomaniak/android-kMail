@@ -357,7 +357,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderLive() {
-        mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
+        mainViewModel.currentFolderLive.continuouslyObserve(viewLifecycleOwner) { folder ->
             updateThreadsVisibilityIfNeeded(folder)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)

@@ -82,9 +82,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
     }
 
-    val currentFolderLive = Transformations.switchMap(currentFolderId) { folderId ->
-        liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
-    }
+    val currentFolderLive
+        get() = Transformations.switchMap(currentFolderId) { folderId ->
+            liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
+        }
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
