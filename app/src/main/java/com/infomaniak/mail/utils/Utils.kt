@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import androidx.annotation.RawRes
 import androidx.fragment.app.Fragment
 import com.infomaniak.mail.data.models.Folder
 import org.jsoup.Jsoup
@@ -47,7 +48,7 @@ object Utils {
         return formatFolderWithAllChildren(toMutableList())
     }
 
-    fun Fragment.injectCssInHtml(cssResId: Int, html: String): String {
+    fun Fragment.injectCssInHtml(@RawRes cssResId: Int, html: String): String {
         val css = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
         return with(Jsoup.parse(html)) {
             head().appendElement("style").attr("type", "text/css").appendText(css)
