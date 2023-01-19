@@ -114,7 +114,9 @@ object MessageController {
     }
 
     fun getArchivableMessages(thread: Thread, folderId: String): List<Message> {
-        return getMessagesAndDuplicates(thread) { message -> message.folderId == folderId && !message.scheduled }
+        val byFolderId = "${Message::folderId.name} == '$folderId'"
+        val isNotScheduled = "${Message::scheduled.name} == false"
+        return getMessagesAndDuplicates(thread, "$byFolderId AND $isNotScheduled")
     }
 
     fun getSpamMessages(thread: Thread): List<Message> {
