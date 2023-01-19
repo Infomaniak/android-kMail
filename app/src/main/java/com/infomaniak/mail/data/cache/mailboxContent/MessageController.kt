@@ -120,7 +120,10 @@ object MessageController {
     }
 
     fun getSpamMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread) { message -> !message.scheduled && !message.from.first().isMe() }
+        val isNotScheduled = "${Message::scheduled.name} == false"
+        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
+        return getMessagesAndDuplicates(thread, "$isNotScheduled AND $isNotFromMe")
     }
 
     fun getDeletableMessages(thread: Thread): List<Message> {
