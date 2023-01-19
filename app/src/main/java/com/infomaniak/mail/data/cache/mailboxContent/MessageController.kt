@@ -127,10 +127,8 @@ object MessageController {
     }
 
     fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
-        return mutableListOf<Message>().apply {
-            val message = thread.messages.lastOrNull { !it.isDraft } ?: thread.messages.last()
-            addAll(getMessageAndDuplicates(thread, message))
-        }
+        val message = thread.messages.query("${Message::isDraft.name} == false").find().lastOrNull() ?: thread.messages.last()
+        return getMessageAndDuplicates(thread, message)
     }
 
     private fun getMessagesAndDuplicates(thread: Thread, shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
