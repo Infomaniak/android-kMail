@@ -48,19 +48,20 @@ import kotlin.math.min
 
 object MessageController {
 
-    //region Queries
-    private fun getMessagesQuery(realm: TypedRealm): RealmQuery<Message> {
-        return realm.query()
-    }
+    private fun byFolderId(folderId: String) = "${Message::folderId.name} == '$folderId'"
+    private val isNotDraft = "${Message::isDraft.name} == false"
+    private val isNotScheduled = "${Message::scheduled.name} == false"
+    private val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+            "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
+    //region Queries
     private fun getMessagesQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Message> {
         val byUids = "${Message::uid.name} IN {${uids.joinToString { "'$it'" }}}"
         return realm.query(byUids)
     }
 
     private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
-        val byFolderId = "${Message::folderId.name} == '$folderId'"
-        return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
+        return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId(folderId))
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
@@ -70,10 +71,6 @@ object MessageController {
     //endregion
 
     //region Get data
-    fun getMessages(realm: TypedRealm): RealmResults<Message> {
-        return getMessagesQuery(realm).find()
-    }
-
     private fun getMessages(uids: List<String>, realm: TypedRealm): RealmResults<Message> {
         return getMessagesQuery(uids, realm).find()
     }
@@ -91,13 +88,7 @@ object MessageController {
     }
 
     fun getMessageToReplyTo(messages: RealmList<Message>): Message {
-
-        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
-                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
-
-        val isNotDraft = "${Message::isDraft.name} == false"
-
-        return messages.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
+        return messages.query("$isNotDraft AND $isNotFromMe").find().lastOrNull()
             ?: messages.query(isNotDraft).find().lastOrNull()
             ?: messages.last()
     }
@@ -109,25 +100,18 @@ object MessageController {
 
     fun getFavoriteMessages(thread: Thread): List<Message> {
         val isFavorite = "${Message::isFavorite.name} == true"
-        val isNotDraft = "${Message::isDraft.name} == false"
         return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
     }
 
     fun getArchivableMessages(thread: Thread, folderId: String): List<Message> {
-        val byFolderId = "${Message::folderId.name} == '$folderId'"
-        val isNotScheduled = "${Message::scheduled.name} == false"
-        return getMessagesAndDuplicates(thread, "$byFolderId AND $isNotScheduled")
+        return getMessagesAndDuplicates(thread, "${byFolderId(folderId)} AND $isNotScheduled")
     }
 
     fun getSpamMessages(thread: Thread): List<Message> {
-        val isNotScheduled = "${Message::scheduled.name} == false"
-        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
-                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
         return getMessagesAndDuplicates(thread, "$isNotScheduled AND $isNotFromMe")
     }
 
     fun getDeletableMessages(thread: Thread): List<Message> {
-        val isNotScheduled = "${Message::scheduled.name} == false"
         return getMessagesAndDuplicates(thread, isNotScheduled)
     }
 
@@ -136,7 +120,7 @@ object MessageController {
     }
 
     fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
-        val message = thread.messages.query("${Message::isDraft.name} == false").find().lastOrNull() ?: thread.messages.last()
+        val message = thread.messages.query(isNotDraft).find().lastOrNull() ?: thread.messages.last()
         return getMessageAndDuplicates(thread, message)
     }
 
@@ -148,14 +132,6 @@ object MessageController {
         val duplicates = thread.duplicates.query(byMessagesIds)
 
         return messages + duplicates.find()
-    }
-
-    private fun getMessagesAndDuplicates(thread: Thread, shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
-        return mutableListOf<Message>().apply {
-            thread.messages.forEach { message ->
-                if (shouldKeepMessage(message)) addAll(getMessageAndDuplicates(thread, message))
-            }
-        }
     }
 
     fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
