@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
         <TextView
             android:id="@+id/itemName"
-            style="@style/H5"
+            style="@style/BodyMedium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/marginStandardSmall"
@@ -47,7 +47,7 @@
 
         <TextView
             android:id="@+id/itemBadge"
-            style="@style/CalloutMedium.Accent"
+            style="@style/BodySmallMedium.Accent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"

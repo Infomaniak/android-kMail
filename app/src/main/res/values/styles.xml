@@ -33,32 +33,18 @@
         <item name="android:textColor">@color/redDestructiveAction</item>
     </style>
 
-    <style name="H3">
-        <item name="android:fontFamily">@font/suisseintl_regular</item>
-        <item name="android:textSize">18sp</item>
-    </style>
-
-    <style name="H3.Secondary">
-        <item name="android:textColor">@color/secondaryTextColor</item>
-    </style>
-
-    <style name="H4">
-        <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
-    <style name="H5">
+    <style name="BodyMedium">
         <item name="android:fontFamily">@font/suisseintl_medium</item>
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="H5.Accent">
+    <style name="BodyMedium.Accent">
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
-    <!-- H5.OnAccent is only used on FABs, see ExtendedFloatingActionButtonStyle -->
+    <!-- BodyMedium.OnAccent is only used on FABs, see ExtendedFloatingActionButtonStyle -->
 
-    <style name="H5.Error">
+    <style name="BodyMedium.Error">
         <item name="android:textColor">@color/redDestructiveAction</item>
     </style>
 
@@ -75,62 +61,53 @@
         <item name="android:textColor">@color/redDestructiveAction</item>
     </style>
 
-    <style name="CalloutStrong">
-        <item name="android:fontFamily">@font/suisseintl_semibold</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <!-- CalloutStrong.Accent is only used in read/unread chip, see R.id.unreadCountChip -->
-
-    <!-- CalloutStrong.OnAccent is only used in read/unread chip, see R.id.unreadCountChip -->
-
-    <style name="CalloutMedium">
+    <style name="BodySmallMedium">
         <item name="android:fontFamily">@font/suisseintl_medium</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="CalloutMedium.Accent">
+    <style name="BodySmallMedium.Accent">
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
-    <style name="Callout">
+    <style name="BodySmall">
         <item name="android:fontFamily">@font/suisseintl_regular</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Callout.Accent">
+    <style name="BodySmall.Accent">
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
-    <style name="Callout.Secondary">
+    <style name="BodySmall.Secondary">
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
-    <style name="Callout.Tertiary">
+    <style name="BodySmall.Tertiary">
         <item name="android:textColor">@color/tertiaryTextColor</item>
     </style>
 
-    <style name="Callout.Warning">
+    <style name="BodySmall.Warning">
         <item name="android:textColor">@color/orangeWarning</item>
     </style>
 
-    <style name="CaptionMedium">
+    <style name="LabelMedium">
         <item name="android:fontFamily">@font/suisseintl_medium</item>
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="CaptionMedium.Accent">
+    <style name="LabelMedium.Accent">
         <item name="android:textColor">?android:attr/colorPrimary</item>
     </style>
 
-    <!-- CaptionMedium.Secondary is only used in QuickBottomActionBar, see QuickBottomActionBarButton -->
+    <!-- LabelMedium.Secondary is only used in QuickBottomActionBar, see QuickBottomActionBarButton -->
 
-    <style name="Caption">
+    <style name="Label">
         <item name="android:fontFamily">@font/suisseintl_regular</item>
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="Caption.Secondary">
+    <style name="Label.Secondary">
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
@@ -354,7 +331,7 @@
         <item name="cornerSizeTopRight">10dp</item>
     </style>
 
-    <style name="BottomSheetTitle" parent="H5" />
+    <style name="BottomSheetTitle" parent="BodyMedium" />
 
 
     <!-- Settings -->
@@ -369,7 +346,7 @@
         <item name="dividerColor">@color/separatorDarker</item>
     </style>
 
-    <style name="SettingHeader" parent="Callout.Secondary">
+    <style name="SettingHeader" parent="BodySmall.Secondary">
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
@@ -379,7 +356,7 @@
         <item name="android:paddingTop">@dimen/marginStandardMedium</item>
     </style>
 
-    <style name="SettingButtonToggle" parent="H5">
+    <style name="SettingButtonToggle" parent="BodyMedium">
         <item name="android:backgroundTint">@color/button_toggle_background</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>

@@ -132,7 +132,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             userAvatar.loadAvatar(AccountUtils.currentUser!!)
             expeditorName.apply {
                 text = context.getString(R.string.messageIsDraftOption)
-                setTextAppearance(R.style.H5_Error)
+                setTextAppearance(R.style.BodyMedium_Error)
             }
             shortMessageDate.text = ""
         } else {
@@ -140,7 +140,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             userAvatar.loadAvatar(firstSender, contacts)
             expeditorName.apply {
                 UiUtils.fillInUserNameAndEmail(firstSender, this)
-                setTextAppearance(R.style.H5)
+                setTextAppearance(R.style.BodyMedium)
             }
             shortMessageDate.text = messageDate?.let { context.mailFormattedDate(it) } ?: ""
         }

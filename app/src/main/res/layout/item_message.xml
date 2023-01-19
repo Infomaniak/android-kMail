@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@
 
                 <TextView
                     android:id="@+id/expeditorName"
-                    style="@style/H5"
+                    style="@style/BodyMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardMedium"
@@ -73,7 +73,7 @@
 
                 <TextView
                     android:id="@+id/subjectTextView"
-                    style="@style/Callout.Secondary"
+                    style="@style/BodySmall.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
@@ -103,7 +103,7 @@
 
                     <TextView
                         android:id="@+id/recipient"
-                        style="@style/Callout.Secondary"
+                        style="@style/BodySmall.Secondary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/marginStandardSmall"
@@ -137,7 +137,7 @@
 
                 <TextView
                     android:id="@+id/shortMessageDate"
-                    style="@style/Caption.Secondary"
+                    style="@style/Label.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardSmall"
@@ -186,7 +186,7 @@
 
         <TextView
             android:id="@+id/fromPrefix"
-            style="@style/Callout.Secondary"
+            style="@style/BodySmall.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
@@ -210,7 +210,7 @@
 
         <TextView
             android:id="@+id/toPrefix"
-            style="@style/Callout.Secondary"
+            style="@style/BodySmall.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
@@ -235,7 +235,7 @@
 
         <TextView
             android:id="@+id/ccPrefix"
-            style="@style/Callout.Secondary"
+            style="@style/BodySmall.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
@@ -260,7 +260,7 @@
 
         <TextView
             android:id="@+id/bccPrefix"
-            style="@style/Callout.Secondary"
+            style="@style/BodySmall.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardMedium"
@@ -299,7 +299,7 @@
 
         <TextView
             android:id="@+id/detailedMessageDate"
-            style="@style/Callout.Secondary"
+            style="@style/BodySmall.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -353,7 +353,7 @@
 
         <TextView
             android:id="@+id/attachmentsSizeText"
-            style="@style/Callout.Secondary"
+            style="@style/BodySmall.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardVerySmall"

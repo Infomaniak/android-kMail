@@ -114,7 +114,7 @@ class MenuDrawerFragment : Fragment() {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
             }
-            mailboxSwitcherText.setTextAppearance(if (mailboxExpandedSwitcher.isVisible) R.style.H5_Accent else R.style.H5)
+            mailboxSwitcherText.setTextAppearance(if (mailboxExpandedSwitcher.isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
         }
         inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
