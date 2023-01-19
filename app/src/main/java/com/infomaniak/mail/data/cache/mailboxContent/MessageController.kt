@@ -124,7 +124,8 @@ object MessageController {
     }
 
     fun getDeletableMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread) { message -> !message.scheduled }
+        val isNotScheduled = "${Message::scheduled.name} == false"
+        return getMessagesAndDuplicates(thread, isNotScheduled)
     }
 
     fun getPermanentlyDeletableMessages(thread: Thread): List<Message> {
