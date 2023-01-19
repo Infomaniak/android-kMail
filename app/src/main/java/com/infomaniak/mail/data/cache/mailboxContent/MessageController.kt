@@ -108,7 +108,9 @@ object MessageController {
     }
 
     fun getFavoriteMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread) { message -> message.isFavorite && !message.isDraft }
+        val isFavorite = "${Message::isFavorite.name} == true"
+        val isNotDraft = "${Message::isDraft.name} == false"
+        return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
     }
 
     fun getArchivableMessages(thread: Thread, folderId: String): List<Message> {
