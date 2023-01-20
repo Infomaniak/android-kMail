@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,12 +48,6 @@ class Folder : RealmObject {
     @Suppress("PropertyName")
     @SerialName("role")
     var _role: String? = null
-    @SerialName("total_count")
-    var totalCount: Int = 0
-    @SerialName("is_fake")
-    var isFake: Boolean = false
-    @SerialName("is_collapsed")
-    var isCollapsed: Boolean = false
     @SerialName("is_favorite")
     var isFavorite: Boolean = false
     var separator: String = ""
