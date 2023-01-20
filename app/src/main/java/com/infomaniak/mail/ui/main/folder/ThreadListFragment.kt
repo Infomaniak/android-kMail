@@ -434,7 +434,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun handleThreadsVisibility(threadsCount: Int) {
         Log.d("UI", "Received threads (${threadsCount})")
 
-        val cursor = mainViewModel.currentFolderLive.value?.cursor
+        val cursor = mainViewModel.currentFolder.value?.cursor
 
         if (cursor != null && threadsCount == 0) {
             displayNoEmailView()
