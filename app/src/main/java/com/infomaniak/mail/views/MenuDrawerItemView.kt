@@ -18,7 +18,6 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
-import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -104,9 +103,9 @@ class MenuDrawerItemView @JvmOverloads constructor(
 
     fun setSelectedState(isSelected: Boolean) = with(binding) {
         val (color, textAppearance) = if (isSelected) {
-            Pair(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer), R.style.H5_Accent)
+            Pair(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer), R.style.BodyMedium_Accent)
         } else {
-            Pair(ContextCompat.getColor(context, R.color.backgroundColor), R.style.H5)
+            Pair(ContextCompat.getColor(context, R.color.backgroundColor), R.style.BodyMedium)
         }
 
         root.setCardBackgroundColor(color)

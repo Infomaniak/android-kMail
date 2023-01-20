@@ -109,7 +109,7 @@
 
                     <TextView
                         android:id="@+id/mailboxSwitcherText"
-                        style="@style/H5"
+                        style="@style/BodyMedium"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
@@ -207,7 +207,7 @@
 
                 <TextView
                     android:id="@+id/noFolderText"
-                    style="@style/Callout.Secondary"
+                    style="@style/BodySmall.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
@@ -310,7 +310,7 @@
 
                 <TextView
                     android:id="@+id/storageText"
-                    style="@style/H5"
+                    style="@style/BodyMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginStandardMedium"
@@ -328,7 +328,7 @@
 
             <TextView
                 android:id="@+id/appVersionName"
-                style="@style/Caption.Secondary"
+                style="@style/Label.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
