@@ -96,7 +96,7 @@ fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> U
     observe(owner) { it?.let(observer) }
 }
 
-inline fun <reified T> LiveData<T>.continuouslyObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
+inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
     removeObservers(viewLifecycleOwner)
     observe(viewLifecycleOwner, observer)
 }
