@@ -146,7 +146,7 @@ class Thread : RealmObject {
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true
         }
-        date = messages.findLast { it.folderId == folderId }?.date ?: Message.DEFAULT_DATE_IF_NULL
+        date = messages.findLast { it.folderId == folderId }?.date!!
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {

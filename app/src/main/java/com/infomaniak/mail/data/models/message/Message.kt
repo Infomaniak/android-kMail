@@ -51,7 +51,8 @@ class Message : RealmObject {
     var uid: String = ""
     @SerialName("msg_id")
     var messageId: String = ""
-    var date: RealmInstant = DEFAULT_DATE_IF_NULL
+    // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
+    var date: RealmInstant = Date().toRealmInstant()
     var subject: String? = null
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
@@ -208,10 +209,5 @@ class Message : RealmObject {
     fun toThread() = Thread().apply {
         uid = this@Message.uid
         folderId = this@Message.folderId
-    }
-
-    companion object {
-        // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
-        val DEFAULT_DATE_IF_NULL = Date().toRealmInstant()
     }
 }
