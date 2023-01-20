@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.types.*
@@ -40,6 +41,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import java.util.*
 
 @Serializable
 class Message : RealmObject {
@@ -49,7 +51,8 @@ class Message : RealmObject {
     var uid: String = ""
     @SerialName("msg_id")
     var messageId: String = ""
-    var date: RealmInstant? = null
+    // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
+    var date: RealmInstant = Date().toRealmInstant()
     var subject: String? = null
     var from: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
@@ -128,9 +131,10 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, draftLocalUuid: String?) {
+    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, date: RealmInstant, draftLocalUuid: String?) {
         this.fullyDownloaded = fullyDownloaded
         this.messageIds = messageIds
+        this.date = date
         draftLocalUuid?.let { this.draftLocalUuid = it }
     }
 

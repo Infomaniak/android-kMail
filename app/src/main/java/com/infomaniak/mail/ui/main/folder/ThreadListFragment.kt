@@ -369,10 +369,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         when {
             folder.cursor == null -> isFirstOpeningOfThisFolder = true
             isFirstOpeningOfThisFolder -> {
-                // We use the `totalCount` of Messages instead of the Threads' count, so yes the data is not the correct
-                // one, but here we don't care, because we really only want to know if there's at least 1 Thread in
-                // this Folder. And if there's at least 1 Message, it means there will be at least 1 Thread.
-                handleThreadsVisibility(folder.totalCount)
+                val threadsCount = mainViewModel.currentThreadsLive.value?.list?.count() ?: 0
+                handleThreadsVisibility(threadsCount)
                 isFirstOpeningOfThisFolder = false
             }
         }

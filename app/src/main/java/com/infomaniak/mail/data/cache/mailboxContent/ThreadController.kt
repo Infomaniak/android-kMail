@@ -135,6 +135,7 @@ object ThreadController {
                         remoteMessage.initLocalValues(
                             fullyDownloaded = true,
                             messageIds = localMessage.messageIds,
+                            date = localMessage.date,
                             draftLocalUuid,
                         )
 

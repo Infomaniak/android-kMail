@@ -126,7 +126,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
-        val messageDate = message.date?.toDate()
+        val messageDate = message.date.toDate()
 
         if (message.isDraft) {
             userAvatar.loadAvatar(AccountUtils.currentUser!!)
@@ -142,7 +142,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 UiUtils.fillInUserNameAndEmail(firstSender, this)
                 setTextAppearance(R.style.BodyMedium)
             }
-            shortMessageDate.text = messageDate?.let { context.mailFormattedDate(it) } ?: ""
+            shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
@@ -169,11 +169,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
     }
 
-    private fun Context.mostDetailedDate(date: Date): String {
+    private fun Context.mostDetailedDate(date: Date): String = with(date) {
         return getString(
             R.string.messageDetailsDateAt,
-            date.format(FORMAT_EMAIL_DATE_LONG_DATE),
-            date.format(FORMAT_EMAIL_DATE_HOUR),
+            format(FORMAT_EMAIL_DATE_LONG_DATE),
+            format(FORMAT_EMAIL_DATE_HOUR),
         )
     }
 
@@ -204,7 +204,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
     }
 
-    private fun ThreadViewHolder.bindRecipientDetails(message: Message, messageDate: Date?) = with(binding) {
+    private fun ThreadViewHolder.bindRecipientDetails(message: Message, messageDate: Date) = with(binding) {
+
         fromAdapter.updateList(message.from.toList())
         toAdapter.updateList(message.to.toList())
 
@@ -216,10 +217,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         bccGroup.isVisible = bccIsNotEmpty
         if (bccIsNotEmpty) bccAdapter.updateList(message.bcc.toList())
 
-        val isDateNotNull = messageDate != null
-        detailedMessageDate.isVisible = isDateNotNull
-        detailedMessagePrefix.isVisible = isDateNotNull
-        if (isDateNotNull) detailedMessageDate.text = context.mostDetailedDate(messageDate!!)
+        detailedMessageDate.text = context.mostDetailedDate(messageDate)
     }
 
     @SuppressLint("SetTextI18n")
