@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.refreshObserve
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -41,7 +42,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadUid = navigationArgs.threadUid
         val messageUidToReplyTo = navigationArgs.messageUidToReplyTo
 
-        threadActionsViewModel.threadLive(threadUid).observe(viewLifecycleOwner) { thread ->
+        threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }

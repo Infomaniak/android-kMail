@@ -64,15 +64,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
     }
 
-    val currentFoldersLive = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
-        liveData(Dispatchers.IO) {
-            mailboxObjectId?.let { emitSource(FolderController.getFoldersAsync().map { getMenuFolders(it.list) }.asLiveData()) }
+    val currentFoldersLive
+        get() = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+            liveData(Dispatchers.IO) {
+                mailboxObjectId?.let {
+                    emitSource(FolderController.getFoldersAsync().map { getMenuFolders(it.list) }.asLiveData())
+                }
+            }
         }
-    }
 
-    val currentQuotasLive = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
-        liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
-    }
+    val currentQuotasLive
+        get() = Transformations.switchMap(currentMailboxObjectId) { mailboxObjectId ->
+            liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
+        }
     //endregion
 
     //region Current Folder
@@ -89,11 +93,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    val currentThreadsLive = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
-        liveData(Dispatchers.IO) {
-            if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
+    val currentThreadsLive
+        get() = Transformations.switchMap(observeFolderAndFilter()) { (folder, filter) ->
+            liveData(Dispatchers.IO) {
+                if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
+            }
         }
-    }
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
