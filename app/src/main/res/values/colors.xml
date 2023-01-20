@@ -50,6 +50,7 @@
     <color name="backgroundSecondaryColor">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadBackground">@color/rabbit</color>
+    <color name="dialogBackground">@color/white</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
