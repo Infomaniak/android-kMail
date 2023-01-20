@@ -131,9 +131,10 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, draftLocalUuid: String?) {
+    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, date: RealmInstant, draftLocalUuid: String?) {
         this.fullyDownloaded = fullyDownloaded
         this.messageIds = messageIds
+        this.date = date
         draftLocalUuid?.let { this.draftLocalUuid = it }
     }
 

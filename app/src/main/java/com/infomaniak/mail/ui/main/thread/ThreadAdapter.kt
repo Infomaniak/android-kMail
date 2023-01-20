@@ -169,11 +169,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
     }
 
-    private fun Context.mostDetailedDate(date: Date): String {
+    private fun Context.mostDetailedDate(date: Date): String = with(date) {
         return getString(
             R.string.messageDetailsDateAt,
-            date.format(FORMAT_EMAIL_DATE_LONG_DATE),
-            date.format(FORMAT_EMAIL_DATE_HOUR),
+            format(FORMAT_EMAIL_DATE_LONG_DATE),
+            format(FORMAT_EMAIL_DATE_HOUR),
         )
     }
 
