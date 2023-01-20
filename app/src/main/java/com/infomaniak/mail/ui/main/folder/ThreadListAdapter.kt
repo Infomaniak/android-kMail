@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -124,6 +125,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
+        setupDensityDependentUi()
 
         displayAvatar(thread = this)
         expeditor.text = formatRecipientNames(computeDisplayedRecipients())
@@ -143,11 +145,15 @@ class ThreadListAdapter(
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
+        root.setOnClickListener { onThreadClicked?.invoke(this@with) }
+    }
+
+    private fun CardviewThreadItemBinding.setupDensityDependentUi() {
+        val margin = if (threadDensity == LARGE) THREAD_MARGIN_LARGE else THREAD_MARGIN_OTHER
+        threadCard.setMarginsRelative(top = margin, bottom = margin)
+
         expeditorAvatar.isVisible = threadDensity == LARGE
         mailBodyPreview.isGone = threadDensity == COMPACT
-        mailSubject.setMarginsRelative(top = if (threadDensity == COMPACT) 0 else 4.toPx())
-
-        root.setOnClickListener { onThreadClicked?.invoke(this@with) }
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
@@ -170,7 +176,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
-        newMailBullet.isGone = true
+        newMailBullet.isInvisible = true
     }
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
@@ -178,7 +184,17 @@ class ThreadListAdapter(
     }
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
+        setupDensityDependentUi()
         sectionTitle.text = title
+    }
+
+    private fun ItemThreadDateSeparatorBinding.setupDensityDependentUi() {
+        val (topMargin, bottomMargin) = if (threadDensity == LARGE) {
+            DATE_TOP_MARGIN_LARGE to DATE_BOTTOM_MARGIN_LARGE
+        } else {
+            DATE_TOP_MARGIN_OTHER to DATE_BOTTOM_MARGIN_OTHER
+        }
+        root.setMarginsRelative(top = topMargin, bottom = bottomMargin)
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {
@@ -298,6 +314,12 @@ class ThreadListAdapter(
         const val SWIPE_ANIMATION_THRESHOLD = 0.15f
         private val CARD_ELEVATION = 6.toPx().toFloat()
         private val CARD_CORNER_RADIUS = 12.toPx().toFloat()
+        private val THREAD_MARGIN_LARGE = 12.toPx()
+        private val THREAD_MARGIN_OTHER = 8.toPx()
+        private val DATE_TOP_MARGIN_LARGE = 4.toPx()
+        private val DATE_BOTTOM_MARGIN_LARGE = 4.toPx()
+        private val DATE_TOP_MARGIN_OTHER = 8.toPx()
+        private val DATE_BOTTOM_MARGIN_OTHER = 0.toPx()
 
         private const val FULL_MONTH = "MMMM"
         private const val MONTH_AND_YEAR = "MMMM yyyy"
