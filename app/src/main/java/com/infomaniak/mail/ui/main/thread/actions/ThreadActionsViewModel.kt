@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
@@ -30,7 +31,9 @@ class ThreadActionsViewModel : ViewModel() {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }
 
-    fun thread(threadUid: String) = liveData(Dispatchers.IO) {
-        emit(ThreadController.getThread(threadUid))
+    fun thread(threadUid: String, messageUidToReplyTo: String?) = liveData(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid)
+        val messageUid = messageUidToReplyTo ?: thread?.messages?.let(MessageController::getMessageToReplyTo)?.uid
+        emit(thread to messageUid)
     }
 }

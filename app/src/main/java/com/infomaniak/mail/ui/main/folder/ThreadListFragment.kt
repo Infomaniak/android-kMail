@@ -51,7 +51,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
@@ -266,12 +265,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                safeNavigate(
-                    ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                        messageUidToReplyTo = MessageController.getMessageToReplyTo(thread.messages).uid,
-                        threadUid = thread.uid,
-                    )
-                )
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(thread.uid))
                 true
             }
             SwipeAction.READ_UNREAD -> {

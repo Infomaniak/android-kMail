@@ -47,37 +47,37 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
         }
 
-        threadActionsViewModel.thread(threadUid).observe(viewLifecycleOwner) { thread ->
+        threadActionsViewModel.thread(threadUid, navigationArgs.messageUidToReplyTo).observe(viewLifecycleOwner) {
+
+            val (thread, messageUidToReplyTo) = it
 
             if (thread == null) {
                 findNavController().popBackStack()
-            } else {
+                return@observe
+            }
 
-                val messageUidToReplyTo = navigationArgs.messageUidToReplyTo
+            setSpamUi()
 
-                setSpamUi()
+            postpone.isGone = true
+            blockSender.isGone = true
+            phishing.isGone = true
+            rule.isGone = true
 
-                postpone.isGone = true
-                blockSender.isGone = true
-                phishing.isGone = true
-                rule.isGone = true
+            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread) }
+            markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(thread) }
+            move.setClosingOnClickListener { notYetImplemented() }
+            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread) }
+            spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread) }
+            print.setClosingOnClickListener { notYetImplemented() }
+            saveAsPdf.setClosingOnClickListener { notYetImplemented() }
+            reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
-                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread) }
-                markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(thread) }
-                move.setClosingOnClickListener { notYetImplemented() }
-                favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread) }
-                spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread) }
-                print.setClosingOnClickListener { notYetImplemented() }
-                saveAsPdf.setClosingOnClickListener { notYetImplemented() }
-                reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
-
-                mainActions.setClosingOnClickListener { id: Int ->
-                    when (id) {
-                        R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
-                        R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
-                        R.id.actionForward -> notYetImplemented()
-                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread)
-                    }
+            mainActions.setClosingOnClickListener { id: Int ->
+                when (id) {
+                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo!!)
+                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo!!)
+                    R.id.actionForward -> notYetImplemented()
+                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread)
                 }
             }
         }

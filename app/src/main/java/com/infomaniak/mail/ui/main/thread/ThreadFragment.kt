@@ -68,17 +68,19 @@ class ThreadFragment : Fragment() {
         observeThreadLive()
 
         threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
+
             if (result == null) {
                 findNavController().popBackStack()
-            } else {
-                thread = result.first
-                setupUi()
-                setupAdapter()
-                threadAdapter.expandedMap = result.second
-                observeMessagesLive()
-                observeContacts()
-                observeQuickActionBarClicks()
+                return@observe
             }
+
+            thread = result.first
+            setupUi()
+            setupAdapter()
+            threadAdapter.expandedMap = result.second
+            observeMessagesLive()
+            observeContacts()
+            observeQuickActionBarClicks()
         }
     }
 
@@ -116,8 +118,8 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                        messageUidToReplyTo = lastMessageToReplyTo.uid,
                         threadUid = navigationArgs.threadUid,
+                        messageUidToReplyTo = lastMessageToReplyTo.uid,
                     )
                 )
             }
