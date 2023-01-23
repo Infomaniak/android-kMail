@@ -24,6 +24,6 @@
     android:layout_marginTop="@dimen/marginStandardSmall"
     android:background="@color/backgroundColor"
     android:minWidth="120dp"
-    android:paddingHorizontal="@dimen/marginStandardSmall"
+    android:paddingHorizontal="@dimen/marginStandardMedium"
     android:paddingVertical="@dimen/marginStandardSmall"
     tools:text="@string/threadListSectionToday" />

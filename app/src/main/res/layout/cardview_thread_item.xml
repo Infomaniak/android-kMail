@@ -76,7 +76,7 @@
 
             <TextView
                 android:id="@+id/draftPrefix"
-                style="@style/BodyMedium.Error"
+                style="@style/H2.Error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandardVerySmall"
@@ -146,7 +146,7 @@
                 style="@style/Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/marginStandardSmall"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
                 android:ellipsize="end"
                 android:lines="1"
                 app:layout_constraintEnd_toStartOf="@id/iconAttachment"
@@ -203,7 +203,7 @@
                 style="@style/BodySmall.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/marginStandardSmall"
+                android:layout_marginTop="@dimen/marginStandardVerySmall"
                 android:ellipsize="end"
                 android:lines="1"
                 app:layout_constrainedWidth="true"
