@@ -38,11 +38,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -180,7 +177,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeThreadLive() {
-        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner, ::onThreadUpdate)
+        threadViewModel.threadLive(navigationArgs.threadUid).refreshObserve(viewLifecycleOwner, ::onThreadUpdate)
     }
 
     private fun observeMessagesLive() {

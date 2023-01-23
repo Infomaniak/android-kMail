@@ -96,6 +96,11 @@ fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> U
     observe(owner) { it?.let(observer) }
 }
 
+inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
+    removeObservers(viewLifecycleOwner)
+    observe(viewLifecycleOwner, observer)
+}
+
 fun Context.getAttributeColor(attribute: Int): Int {
     val typedValue = TypedValue()
     theme.resolveAttribute(attribute, typedValue, true)

@@ -44,10 +44,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.toggleChevron
+import com.infomaniak.mail.utils.*
 import kotlinx.coroutines.launch
 
 class MenuDrawerFragment : Fragment() {
@@ -182,7 +179,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeMailboxesLive() = with(binding) {
-        mainViewModel.observeMailboxesLive().observe(viewLifecycleOwner) { mailboxes ->
+        mainViewModel.observeMailboxesLive().refreshObserve(viewLifecycleOwner) { mailboxes ->
 
             val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
 
@@ -209,28 +206,28 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeFoldersLive() {
-        mainViewModel.currentFoldersLive.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+        mainViewModel.currentFoldersLive.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolder = mainViewModel.currentFolder.value ?: return@observe
+            val currentFolder = mainViewModel.currentFolder.value ?: return@refreshObserve
             defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
             customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }
     }
 
     private fun observeQuotas() = with(binding) {
-        mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
+        mainViewModel.currentQuotasLive.refreshObserve(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
             storageLayout.isVisible = isLimited
             storageDivider.isVisible = isLimited
 
             if (isLimited) {
-                storageText.text = quotas?.getText(context) ?: return@observe
+                storageText.text = quotas?.getText(context) ?: return@refreshObserve
                 storageIndicator.progress = quotas.getProgress()
             }
         }
