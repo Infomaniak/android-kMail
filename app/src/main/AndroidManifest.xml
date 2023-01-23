@@ -64,6 +64,12 @@
             android:theme="@style/WebViewTheme" />
 
         <activity
+            android:name=".ui.login.NoMailboxActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="false"
+            android:theme="@style/AppTheme.Login" />
+
+        <activity
             android:name="com.infomaniak.lib.bugtracker.BugTrackerActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false" />

@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -47,6 +48,7 @@ import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.databinding.ActivityLoginBinding
@@ -85,7 +87,7 @@ class LoginActivity : AppCompatActivity() {
         lockOrientationForSmallScreens()
         super.onCreate(savedInstanceState)
 
-        setContentView(binding.root)
+        setContentView(root)
 
         infomaniakLogin = InfomaniakLogin(
             context = this@LoginActivity,
@@ -159,7 +161,12 @@ class LoginActivity : AppCompatActivity() {
                         when (val user = authenticateUser(it)) {
                             is User -> {
                                 trackAccountEvent("loggedIn")
-                                AccountUtils.reloadApp?.invoke()
+                                if (ApiRepository.getMailboxes().data?.isEmpty() == true) {
+                                    launchNoMailboxActivity()
+                                    AccountUtils.removeUser(this@LoginActivity, user, false)
+                                } else {
+                                    AccountUtils.reloadApp?.invoke()
+                                }
                             }
                             is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
                             else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
@@ -213,6 +220,12 @@ class LoginActivity : AppCompatActivity() {
 
     private fun ViewPager2.removeOverScroll() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
+    }
+
+    private suspend fun launchNoMailboxActivity() = withContext(Dispatchers.Main) {
+        Intent(this@LoginActivity, NoMailboxActivity::class.java).apply { startActivity(this) }
+        binding.connectButton.hideProgress(R.string.buttonLogin)
+        binding.signInButton.isEnabled = true
     }
 
     companion object {

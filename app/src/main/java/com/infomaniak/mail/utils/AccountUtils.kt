@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -108,14 +108,14 @@ object AccountUtils : CredentialManager() {
         }
     }
 
-    suspend fun removeUser(context: Context, user: User) {
+    suspend fun removeUser(context: Context, user: User, withReload: Boolean = true) {
 
         userDatabase.userDao().delete(user)
         RealmDatabase.removeUserData(context, user.id)
 
         if (currentUserId == user.id) {
             if (getAllUsersCount() == 0) resetSettings(context)
-            withContext(Dispatchers.Main) { reloadApp?.invoke() }
+            if (withReload) withContext(Dispatchers.Main) { reloadApp?.invoke() }
         }
     }
 

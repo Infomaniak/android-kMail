@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
  */
 package com.infomaniak.mail.ui.login
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -62,6 +60,7 @@ import com.infomaniak.mail.ui.login.IlluColors.Companion.illuColors
 import com.infomaniak.mail.ui.login.IlluColors.Companion.illuPinkColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import com.infomaniak.mail.utils.getAttributeColor
+import com.infomaniak.mail.utils.repeatFrame
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -124,23 +123,6 @@ class IntroFragment : Fragment() {
         updateUiWhenThemeChanges(navigationArgs.position)
 
         setUi(localSettings.accentColor, navigationArgs.position)
-    }
-
-    private fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
-        addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator) = Unit
-
-            override fun onAnimationEnd(animation: Animator) {
-                removeAllAnimatorListeners()
-                repeatCount = ValueAnimator.INFINITE
-                setMinAndMaxFrame(firstFrame, lastFrame)
-                playAnimation()
-            }
-
-            override fun onAnimationCancel(animation: Animator) = Unit
-
-            override fun onAnimationRepeat(animation: Animator) = Unit
-        })
     }
 
     private fun setTabSelectedListener() = with(binding) {

@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
@@ -35,6 +37,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
+import com.airbnb.lottie.LottieAnimationView
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
@@ -127,6 +130,23 @@ fun Context.getAttributeColor(attribute: Int): Int {
     val typedValue = TypedValue()
     theme.resolveAttribute(attribute, typedValue, true)
     return typedValue.data
+}
+
+fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
+    addAnimatorListener(object : Animator.AnimatorListener {
+        override fun onAnimationStart(animation: Animator) = Unit
+
+        override fun onAnimationEnd(animation: Animator) {
+            removeAllAnimatorListeners()
+            repeatCount = ValueAnimator.INFINITE
+            setMinAndMaxFrame(firstFrame, lastFrame)
+            playAnimation()
+        }
+
+        override fun onAnimationCancel(animation: Animator) = Unit
+
+        override fun onAnimationRepeat(animation: Animator) = Unit
+    })
 }
 //endregion
 
