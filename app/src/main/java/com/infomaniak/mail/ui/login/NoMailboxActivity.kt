@@ -20,8 +20,8 @@ package com.infomaniak.mail.ui.login
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
-import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
 import com.infomaniak.mail.utils.repeatFrame
 
@@ -40,9 +40,10 @@ class NoMailboxActivity : AppCompatActivity() {
         }
 
         noMailboxActionButton.setOnClickListener {
-            openUrl(ApiRoutes.orderMailbox())
-            onBackPressed()
+            openUrl(SHOP_URL)
+            onBackPressedDispatcher.onBackPressed()
         }
-        connectAnotherAccountButton.setOnClickListener { onBackPressed() }
+        
+        connectAnotherAccountButton.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 }
