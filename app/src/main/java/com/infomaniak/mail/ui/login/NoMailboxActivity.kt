@@ -23,6 +23,7 @@ import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
+import com.infomaniak.mail.utils.repeatFrame
 
 class NoMailboxActivity : AppCompatActivity() {
 
@@ -35,7 +36,7 @@ class NoMailboxActivity : AppCompatActivity() {
 
         noMailboxIconLayout.apply {
             setAnimation(R.raw.illu_5)
-            // repeatFrame(54, 138)
+            repeatFrame(42, 112)
         }
 
         noMailboxActionButton.setOnClickListener {
