@@ -42,7 +42,6 @@
     <string name="actionSpam">Spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
     <string name="actionUnstar">Retirer des favoris</string>
-    <string name="actionsMenuTitle">Que souhaitez-vous faire ?</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
     <string name="attachmentActionCamera">Appareil photo</string>

@@ -42,7 +42,6 @@
     <string name="actionSpam">Spam</string>
     <string name="actionStar">Add to favorites</string>
     <string name="actionUnstar">Delete from favorites</string>
-    <string name="actionsMenuTitle">What would you like to do?</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
     <string name="attachmentActionCamera">Camera</string>
