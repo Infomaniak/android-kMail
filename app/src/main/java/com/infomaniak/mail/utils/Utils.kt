@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,12 @@
  */
 package com.infomaniak.mail.utils
 
+import androidx.annotation.RawRes
+import androidx.fragment.app.Fragment
 import com.infomaniak.mail.data.models.Folder
+import org.jsoup.Jsoup
 import java.nio.charset.StandardCharsets
+import java.util.*
 
 object Utils {
 
@@ -42,5 +46,13 @@ object Utils {
         }
 
         return formatFolderWithAllChildren(toMutableList())
+    }
+
+    fun Fragment.injectCssInHtml(@RawRes cssResId: Int, html: String): String {
+        val css = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
+        return with(Jsoup.parse(html)) {
+            head().appendElement("style").attr("type", "text/css").appendText(css)
+            html()
+        }
     }
 }

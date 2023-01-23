@@ -46,6 +46,7 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.FilePicker
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
 import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.mail.R
@@ -58,9 +59,11 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.injectCssInHtml
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
+import java.util.*
 import com.google.android.material.R as RMaterial
 
 class NewMessageFragment : Fragment() {
@@ -106,6 +109,7 @@ class NewMessageFragment : Fragment() {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)
         }
+
         attachmentsRecyclerView.adapter = attachmentAdapter
 
         setupAutoCompletionFields()
@@ -203,8 +207,10 @@ class NewMessageFragment : Fragment() {
         subjectTextField.setText(draft.subject)
         bodyText.setText(draft.uiBody)
 
-        draft.uiSignature?.let {
-            signatureWebView.loadDataWithBaseURL("", it, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+        draft.uiSignature?.let { html ->
+            val signature = if (context.isNightModeEnabled()) injectCssInHtml(R.raw.custom_dark_mode, html) else html
+            signatureWebView.loadDataWithBaseURL("", signature, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+
             removeSignature.setOnClickListener {
                 draft.uiSignature = null
                 separatedSignature.isGone = true
