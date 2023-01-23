@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,12 +16,17 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="#000000"
-        android:fillType="evenOdd"
-        android:pathData="M19.06,3.59L20.41,4.94C21.2,5.72 21.2,6.99 20.41,7.77L7.18,21H3V16.82L13.4,6.41L16.23,3.59C17.01,2.81 18.28,2.81 19.06,3.59ZM5,19L6.41,19.06L16.23,9.23L14.82,7.82L5,17.64V19Z" />
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M14.087,0.49L15.51,1.914C16.163,2.568 16.163,3.627 15.51,4.281L14.561,5.233C14.43,5.364 14.218,5.364 14.087,5.233L10.767,1.914C10.637,1.783 10.637,1.571 10.767,1.44L11.718,0.49C12.373,-0.163 13.432,-0.163 14.087,0.49Z"
+      android:fillColor="#ffffff"/>
+  <path
+      android:pathData="M10.057,2.626C9.994,2.563 9.908,2.527 9.819,2.527C9.73,2.527 9.645,2.563 9.582,2.626L2.258,9.952C2.127,10.083 2.127,10.295 2.258,10.426L5.576,13.744C5.707,13.875 5.919,13.875 6.05,13.744L13.371,6.423C13.501,6.292 13.501,6.081 13.371,5.95L10.057,2.626Z"
+      android:fillColor="#ffffff"/>
+  <path
+      android:pathData="M1.582,11.219C1.497,11.134 1.371,11.101 1.254,11.134C1.138,11.167 1.048,11.26 1.019,11.378L0.009,15.587C-0.018,15.701 0.016,15.82 0.098,15.903C0.181,15.984 0.3,16.017 0.414,15.991L4.619,14.985C4.738,14.957 4.831,14.867 4.864,14.75C4.897,14.633 4.864,14.508 4.778,14.422L1.582,11.219Z"
+      android:fillColor="#ffffff"/>
 </vector>

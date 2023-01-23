@@ -180,6 +180,8 @@
         android:layout_marginBottom="@dimen/marginStandard"
         android:text="@string/buttonNewMessage"
         app:icon="@drawable/ic_pencil"
+        app:iconSize="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+    
 </androidx.constraintlayout.widget.ConstraintLayout>
