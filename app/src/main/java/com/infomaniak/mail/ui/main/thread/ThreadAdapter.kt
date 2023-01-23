@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.google.android.material.card.MaterialCardView
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
@@ -37,6 +39,7 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
+import com.infomaniak.mail.utils.Utils.injectCssInHtml
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
@@ -121,8 +124,18 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ItemMessageBinding.loadBodyInWebView(body: Body?) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, true)
+        }
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
-        body?.let { messageBody.loadDataWithBaseURL("", it.value, it.type, Utils.UTF_8, "") }
+        body?.let {
+            val html = if (context.isNightModeEnabled() && it.type == Utils.TEXT_HTML) {
+                context.injectCssInHtml(R.raw.custom_dark_mode, it.value)
+            } else {
+                it.value
+            }
+            messageBody.loadDataWithBaseURL("", html, it.type, Utils.UTF_8, "")
+        }
     }
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
