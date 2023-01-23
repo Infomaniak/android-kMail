@@ -38,6 +38,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     val quickActionBarClicks = MutableLiveData<Pair<Message, Int>>()
 
     private var fetchMessagesJob: Job? = null
+    private var mailbox: Mailbox? = null
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
@@ -49,7 +50,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
 
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: run {
+        mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: run {
             emit(null)
             return@liveData
         }
@@ -66,13 +67,13 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
         emit(thread to expandedMap)
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
+        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox!!)
     }
 
     fun fetchIncompleteMessages(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(Dispatchers.IO) {
-            ThreadController.fetchIncompleteMessages(messages)
+            ThreadController.fetchIncompleteMessages(messages, mailbox!!)
         }
     }
 

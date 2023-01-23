@@ -19,10 +19,12 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -118,31 +120,51 @@ object ThreadController {
         realm.delete(getThreadsQuery(folderId, realm = realm))
     }
 
-    fun fetchIncompleteMessages(messages: List<Message>, okHttpClient: OkHttpClient? = null) {
-        RealmDatabase.mailboxContent().writeBlocking {
+    fun fetchIncompleteMessages(
+        messages: List<Message>,
+        mailbox: Mailbox,
+        okHttpClient: OkHttpClient? = null,
+        realm: Realm? = null,
+    ) {
+
+        val impactedFoldersIds = mutableSetOf<String>()
+
+        (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
             messages.forEach { localMessage ->
                 if (!localMessage.fullyDownloaded) {
-                    ApiRepository.getMessage(localMessage.resource, okHttpClient).data?.also { remoteMessage ->
+                    with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
+                        if (isSuccess()) {
+                            data?.also { remoteMessage ->
 
-                        // If we've already got this Message's Draft beforehand, we need to save
-                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                        val draftLocalUuid = if (remoteMessage.isDraft) {
-                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
+                                // If we've already got this Message's Draft beforehand, we need to save
+                                // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                                val draftLocalUuid = if (remoteMessage.isDraft) {
+                                    DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this@writeBlocking)?.localUuid
+                                } else {
+                                    null
+                                }
+
+                                remoteMessage.initLocalValues(
+                                    fullyDownloaded = true,
+                                    messageIds = localMessage.messageIds,
+                                    isSpam = localMessage.isSpam,
+                                    date = localMessage.date,
+                                    draftLocalUuid,
+                                )
+
+                                MessageController.upsertMessage(remoteMessage, realm = this@writeBlocking)
+                            }
                         } else {
-                            null
+                            impactedFoldersIds.add(localMessage.folderId)
                         }
-
-                        remoteMessage.initLocalValues(
-                            fullyDownloaded = true,
-                            messageIds = localMessage.messageIds,
-                            isSpam = localMessage.isSpam,
-                            date = localMessage.date,
-                            draftLocalUuid,
-                        )
-
-                        MessageController.upsertMessage(remoteMessage, realm = this)
                     }
                 }
+            }
+        }
+
+        impactedFoldersIds.forEach { folderId ->
+            FolderController.getFolder(folderId, realm)?.let { folder ->
+                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
             }
         }
     }
