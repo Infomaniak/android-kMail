@@ -16,13 +16,13 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <color name="pinkMail">@color/mail_pink_dark</color>
-    <color name="pinkMailInverse">@color/mail_pink_light</color>
+    <color name="pinkMail">@color/pink_mail_dark</color>
+    <color name="pinkMailInverse">@color/pink_mail_light</color>
     <color name="pinkMailSecondary">#2A0F1B</color>
     <color name="pinkBoardingSecondaryBackground">@color/black</color>
     <color name="pinkMailRipple">#1EE07FA3</color>
-    <color name="blueMail">@color/mail_blue_dark</color>
-    <color name="blueMailInverse">@color/mail_blue_light</color>
+    <color name="blueMail">@color/blue_mail_dark</color>
+    <color name="blueMailInverse">@color/blue_mail_light</color>
     <color name="blueMailSecondary">#292E3D</color>
     <color name="blueBoardingSecondaryBackground">@color/black</color>
     <color name="blueMailRipple">#1E4CB7FF</color>
@@ -50,6 +50,7 @@
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="colorOnPrimary">@color/bat</color>
     <color name="snackbarTextColor">@color/orca</color>
+    <color name="staffOnlyColor">@color/prince_dark</color>
 
     <!-- Separators -->
     <color name="separatorDarker">@color/bat</color>

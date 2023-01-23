@@ -46,6 +46,7 @@
         <attr name="icon" />
         <attr name="text" />
         <attr name="visibleDivider" format="boolean" />
+        <attr name="staffOnly" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="AvatarView">
