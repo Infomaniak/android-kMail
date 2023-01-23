@@ -78,6 +78,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var previousFirstMessageUid: String? = null
 
     private var isFirstOpeningOfThisFolder = false
+    private var currentFolderCursor: String? = null
+    private var currentThreadsCount: Int? = null
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -322,10 +324,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentThreads() {
-        mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
+        mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
             waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
-            beforeUpdateAdapter = { threads -> handleThreadsVisibility(threads.count()) }
+            beforeUpdateAdapter = { threads ->
+                currentThreadsCount = threads.count()
+                handleThreadsVisibility()
+            }
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
         }
     }
@@ -352,20 +357,20 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderLive() {
-        mainViewModel.currentFolderLive.refreshObserve(viewLifecycleOwner) { folder ->
-            updateThreadsVisibilityIfNeeded(folder)
+        mainViewModel.currentFolderLiveToObserve.refreshObserve(viewLifecycleOwner) { folder ->
+            currentFolderCursor = folder.cursor
+            updateThreadsVisibilityIfNeeded(folder.cursor)
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
             threadListViewModel.startUpdatedAtJob()
         }
     }
 
-    private fun updateThreadsVisibilityIfNeeded(folder: Folder) {
+    private fun updateThreadsVisibilityIfNeeded(cursor: String?) {
         when {
-            folder.cursor == null -> isFirstOpeningOfThisFolder = true
+            cursor == null -> isFirstOpeningOfThisFolder = true
             isFirstOpeningOfThisFolder -> {
-                val threadsCount = mainViewModel.currentThreadsLive.value?.list?.count() ?: 0
-                handleThreadsVisibility(threadsCount)
+                handleThreadsVisibility()
                 isFirstOpeningOfThisFolder = false
             }
         }
@@ -426,12 +431,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun handleThreadsVisibility(threadsCount: Int) {
-        Log.d("UI", "Received threads (${threadsCount})")
+    private fun handleThreadsVisibility() {
+        Log.d("UI", "Received threads (${currentThreadsCount})")
 
-        val cursor = mainViewModel.currentFolder.value?.cursor
-
-        if (cursor != null && threadsCount == 0) {
+        if (currentFolderCursor != null && currentThreadsCount == 0) {
             displayNoEmailView()
         } else {
             displayThreadsView()
