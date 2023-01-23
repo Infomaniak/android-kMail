@@ -69,9 +69,6 @@ class Message : RealmObject {
     private var _dkimStatus: String? = null
     @SerialName("folder_id")
     var folderId: String = ""
-    var folder: String = ""
-    @SerialName("st_uuid")
-    var stUuid: String? = null
     var resource: String = ""
     @SerialName("download_resource")
     var downloadResource: String = ""
@@ -93,8 +90,6 @@ class Message : RealmObject {
     var scheduled: Boolean = false
     var preview: String = ""
     var size: Int = 0
-    @SerialName("safe_display")
-    var safeDisplay: Boolean = false
     //endregion
 
     //region Local data (Transient)
