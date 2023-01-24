@@ -46,10 +46,10 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
         }
 
-        threadActionsViewModel.thread(
+        threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
             navigationArgs.messageUidToReplyTo,
-        ).observe(viewLifecycleOwner) { (thread, messageUidToReplyTo) ->
+        ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
 
             setSpamUi()
 
@@ -58,11 +58,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             phishing.isGone = true
             rule.isGone = true
 
-            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread) }
-            markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(thread) }
+            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
+            markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
             move.setClosingOnClickListener { notYetImplemented() }
-            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread) }
-            spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread) }
+            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
+            spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(threadUid) }
             print.setClosingOnClickListener { notYetImplemented() }
             saveAsPdf.setClosingOnClickListener { notYetImplemented() }
             reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
@@ -72,7 +72,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
                     R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
                     R.id.actionForward -> notYetImplemented()
-                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread)
+                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
                 }
             }
         }

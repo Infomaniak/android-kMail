@@ -42,7 +42,6 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
-import io.realm.kotlin.types.RealmList
 import okhttp3.OkHttpClient
 import java.util.*
 import kotlin.math.min
@@ -65,9 +64,9 @@ object MessageController {
         return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId(folderId))
     }
 
-    private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
+    private fun getMessageQuery(uid: String, realm: TypedRealm?): RealmSingleQuery<Message> {
         val byUid = "${Message::uid.name} == '$uid'"
-        return realm.query<Message>(byUid).first()
+        return (realm ?: RealmDatabase.mailboxContent()).query<Message>(byUid).first()
     }
     //endregion
 
@@ -84,11 +83,11 @@ object MessageController {
         return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
     }
 
-    fun getMessage(uid: String, realm: TypedRealm): Message? {
+    fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
         return getMessageQuery(uid, realm).find()
     }
 
-    fun getMessageToReplyTo(messages: RealmList<Message>): Message {
+    fun getMessageToReplyTo(thread: Thread): Message = with(thread) {
         return messages.query("$isNotDraft AND $isNotFromMe").find().lastOrNull()
             ?: messages.query(isNotDraft).find().lastOrNull()
             ?: messages.last()

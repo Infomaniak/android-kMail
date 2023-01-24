@@ -283,24 +283,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //region Archive
-    fun readAndArchive(thread: Thread) = viewModelScope.launch(Dispatchers.IO) {
+    fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
         val messagesFoldersIds = mutableListOf<String>()
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
 
         if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
-        archiveThreadOrMessageSync(thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
+        archiveThreadOrMessageSync(threadUid, withRefresh = false)?.also(messagesFoldersIds::addAll)
 
         refreshFolders(mailbox, messagesFoldersIds, archiveId)
     }
 
-    fun archiveThreadOrMessage(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        archiveThreadOrMessageSync(thread, message)
+    fun archiveThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+        archiveThreadOrMessageSync(threadUid, message)
     }
 
-    private fun archiveThreadOrMessageSync(thread: Thread, message: Message? = null, withRefresh: Boolean = true): List<String>? {
+    private fun archiveThreadOrMessageSync(
+        threadUid: String,
+        message: Message? = null,
+        withRefresh: Boolean = true,
+    ): List<String>? {
         val mailbox = currentMailbox.value ?: return null
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
+        val thread = ThreadController.getThread(threadUid) ?: return null
 
         val messages = when (message) {
             null -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
@@ -347,8 +353,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Delete
-    fun deleteThreadOrMessage(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -413,8 +420,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Seen
-    fun toggleSeenStatus(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSeenStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
 
         val isSeen = message?.seen ?: (thread.unseenMessagesCount == 0)
 
@@ -439,8 +447,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Favorite
-    fun toggleFavoriteStatus(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleFavoriteStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
 
         val messages = when {
             message != null -> MessageController.getMessageAndDuplicates(thread, message)
@@ -460,7 +469,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Spam
-    fun markAsSpamOrHam(thread: Thread, message: Message? = null): Boolean {
+    fun markAsSpamOrHam(threadUid: String, message: Message? = null): Boolean {
+        val thread = ThreadController.getThread(threadUid) ?: return true
+
         var containsOwnMessage = false
         var onlyContainsOwnMessages = true
 

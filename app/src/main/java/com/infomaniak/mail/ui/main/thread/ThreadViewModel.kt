@@ -25,7 +25,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
 import com.infomaniak.mail.utils.getUids
@@ -75,14 +74,16 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun deleteDraft(message: Message, thread: Thread, mailbox: Mailbox) = viewModelScope.launch(viewModelScope.handlerIO) {
+    fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(viewModelScope.handlerIO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
         val messages = MessageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
     }
 
-    fun clickOnQuickActionBar(thread: Thread, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        val message = MessageController.getMessageToReplyTo(thread.messages)
+    fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val message = MessageController.getMessageToReplyTo(thread)
         quickActionBarClicks.postValue(message to menuId)
     }
 }
