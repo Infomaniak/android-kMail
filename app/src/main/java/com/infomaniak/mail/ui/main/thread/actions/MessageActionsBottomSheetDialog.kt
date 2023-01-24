@@ -41,9 +41,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadUid = navigationArgs.threadUid
         val messageUid = navigationArgs.messageUid
 
-        messageActionsViewModel.threadAndMessage(threadUid, messageUid).observe(viewLifecycleOwner) {
-
-            val (thread, message) = it
+        messageActionsViewModel.threadAndMessage(threadUid, messageUid).observe(viewLifecycleOwner) { (thread, message) ->
 
             if (thread == null || message == null) {
                 findNavController().popBackStack()

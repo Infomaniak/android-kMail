@@ -47,9 +47,10 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
         }
 
-        threadActionsViewModel.thread(threadUid, navigationArgs.messageUidToReplyTo).observe(viewLifecycleOwner) {
-
-            val (thread, messageUidToReplyTo) = it
+        threadActionsViewModel.thread(
+            threadUid,
+            navigationArgs.messageUidToReplyTo,
+        ).observe(viewLifecycleOwner) { (thread, messageUidToReplyTo) ->
 
             if (thread == null) {
                 findNavController().popBackStack()
