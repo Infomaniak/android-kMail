@@ -72,7 +72,7 @@
         app:layout_constraintStart_toEndOf="@id/start"
         app:lottie_autoPlay="true"
         tools:ignore="ContentDescription"
-        tools:lottie_rawRes="@raw/illu_5" />
+        tools:lottie_rawRes="@raw/illu_no_mailbox" />
 
     <TextView
         android:id="@+id/noMailboxTitle"

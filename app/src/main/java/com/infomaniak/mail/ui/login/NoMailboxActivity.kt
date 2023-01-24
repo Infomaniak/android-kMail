@@ -18,24 +18,33 @@
 package com.infomaniak.mail.ui.login
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.BuildConfig.SHOP_URL
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.databinding.ActivityNoMailboxBinding
+import com.infomaniak.mail.ui.ThemedActivity
+import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.repeatFrame
 
-class NoMailboxActivity : AppCompatActivity() {
+class NoMailboxActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
 
-    override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
+    override fun onCreate(savedInstanceState: Bundle?): Unit = with(binding) {
         super.onCreate(savedInstanceState)
 
         setContentView(root)
 
         noMailboxIconLayout.apply {
-            setAnimation(R.raw.illu_5)
+            IlluColors.illuNoMailboxColors.forEach { changePathColor(it, isNightModeEnabled()) }
+
+            val isPink = LocalSettings.getInstance(this@NoMailboxActivity).accentColor == LocalSettings.AccentColor.PINK
+            val sleeveColors = if (isPink) IlluColors.illuNoMailboxPinkColor else IlluColors.illuNoMailboxBlueColor
+            sleeveColors.forEach { changePathColor(it, isNightModeEnabled()) }
+
+            setAnimation(R.raw.illu_no_mailbox)
             repeatFrame(42, 112)
         }
 
@@ -43,7 +52,7 @@ class NoMailboxActivity : AppCompatActivity() {
             openUrl(SHOP_URL)
             onBackPressedDispatcher.onBackPressed()
         }
-        
+
         connectAnotherAccountButton.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 }

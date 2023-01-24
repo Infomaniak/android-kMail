@@ -30,8 +30,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.airbnb.lottie.LottieAnimationView
-import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.SimpleColorFilter
 import com.google.android.material.tabs.TabLayout
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.R
@@ -40,25 +38,26 @@ import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.LocalSettings.AccentColor.BLUE
 import com.infomaniak.mail.data.LocalSettings.AccentColor.PINK
 import com.infomaniak.mail.databinding.FragmentIntroBinding
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu1PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu234PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu2PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu3BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu3Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu3PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4BlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4Colors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illu4PinkColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuBlueColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuColors
-import com.infomaniak.mail.ui.login.IlluColors.Companion.illuPinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding1PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding234PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding2PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding3PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4BlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4Colors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoarding4PinkColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingBlueColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingColors
+import com.infomaniak.mail.ui.login.IlluColors.Companion.illuOnBoardingPinkColors
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.changePathColor
 import com.infomaniak.mail.utils.getAttributeColor
 import com.infomaniak.mail.utils.repeatFrame
 import kotlinx.coroutines.Dispatchers
@@ -87,7 +86,7 @@ class IntroFragment : Fragment() {
                 pinkBlueTabLayout.selectTab(selectedTab)
                 setTabSelectedListener()
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_1)
+                    setAnimation(R.raw.illu_onboarding_1)
                     repeatFrame(54, 138)
                 }
             }
@@ -96,7 +95,7 @@ class IntroFragment : Fragment() {
                 title.setText(R.string.onBoardingTitle2)
                 description.setText(R.string.onBoardingDescription2)
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_2)
+                    setAnimation(R.raw.illu_onboarding_2)
                     repeatFrame(108, 253)
                 }
             }
@@ -105,7 +104,7 @@ class IntroFragment : Fragment() {
                 title.setText(R.string.onBoardingTitle3)
                 description.setText(R.string.onBoardingDescription3)
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_3)
+                    setAnimation(R.raw.illu_onboarding_3)
                     repeatFrame(111, 187)
                 }
             }
@@ -114,7 +113,7 @@ class IntroFragment : Fragment() {
                 title.setText(R.string.onBoardingTitle4)
                 description.setText(R.string.onBoardingDescription4)
                 iconLayout.apply {
-                    setAnimation(R.raw.illu_4)
+                    setAnimation(R.raw.illu_onboarding_4)
                     repeatFrame(127, 236)
                 }
             }
@@ -166,39 +165,39 @@ class IntroFragment : Fragment() {
     private fun LottieAnimationView.changeIllustrationColors(position: Int, accentColor: AccentColor) {
         val isDark = requireContext().isNightModeEnabled()
 
-        illuColors.forEach { changePathColor(it, isDark) }
+        illuOnBoardingColors.forEach { changePathColor(it, isDark) }
         when (position) {
-            1, 2, 3 -> illu234Colors.forEach { changePathColor(it, isDark) }
+            1, 2, 3 -> illuOnBoarding234Colors.forEach { changePathColor(it, isDark) }
         }
 
         when (position) {
-            0 -> illu1Colors.forEach { changePathColor(it, isDark) }
-            1 -> illu2Colors.forEach { changePathColor(it, isDark) }
-            2 -> illu3Colors.forEach { changePathColor(it, isDark) }
-            3 -> illu4Colors.forEach { changePathColor(it, isDark) }
+            0 -> illuOnBoarding1Colors.forEach { changePathColor(it, isDark) }
+            1 -> illuOnBoarding2Colors.forEach { changePathColor(it, isDark) }
+            2 -> illuOnBoarding3Colors.forEach { changePathColor(it, isDark) }
+            3 -> illuOnBoarding4Colors.forEach { changePathColor(it, isDark) }
         }
 
         if (accentColor == PINK) {
-            illuPinkColors.forEach { changePathColor(it, isDark) }
+            illuOnBoardingPinkColors.forEach { changePathColor(it, isDark) }
             when (position) {
-                1, 2, 3 -> illu234PinkColors.forEach { changePathColor(it, isDark) }
+                1, 2, 3 -> illuOnBoarding234PinkColors.forEach { changePathColor(it, isDark) }
             }
             when (position) {
-                0 -> illu1PinkColors.forEach { changePathColor(it, isDark) }
-                1 -> illu2PinkColors.forEach { changePathColor(it, isDark) }
-                2 -> illu3PinkColors.forEach { changePathColor(it, isDark) }
-                3 -> illu4PinkColors.forEach { changePathColor(it, isDark) }
+                0 -> illuOnBoarding1PinkColors.forEach { changePathColor(it, isDark) }
+                1 -> illuOnBoarding2PinkColors.forEach { changePathColor(it, isDark) }
+                2 -> illuOnBoarding3PinkColors.forEach { changePathColor(it, isDark) }
+                3 -> illuOnBoarding4PinkColors.forEach { changePathColor(it, isDark) }
             }
         } else {
-            illuBlueColors.forEach { changePathColor(it, isDark) }
+            illuOnBoardingBlueColors.forEach { changePathColor(it, isDark) }
             when (position) {
-                1, 2, 3 -> illu234BlueColors.forEach { changePathColor(it, isDark) }
+                1, 2, 3 -> illuOnBoarding234BlueColors.forEach { changePathColor(it, isDark) }
             }
             when (position) {
-                0 -> illu1BlueColors.forEach { changePathColor(it, isDark) }
-                1 -> illu2BlueColors.forEach { changePathColor(it, isDark) }
-                2 -> illu3BlueColors.forEach { changePathColor(it, isDark) }
-                3 -> illu4BlueColors.forEach { changePathColor(it, isDark) }
+                0 -> illuOnBoarding1BlueColors.forEach { changePathColor(it, isDark) }
+                1 -> illuOnBoarding2BlueColors.forEach { changePathColor(it, isDark) }
+                2 -> illuOnBoarding3BlueColors.forEach { changePathColor(it, isDark) }
+                3 -> illuOnBoarding4BlueColors.forEach { changePathColor(it, isDark) }
             }
         }
     }
