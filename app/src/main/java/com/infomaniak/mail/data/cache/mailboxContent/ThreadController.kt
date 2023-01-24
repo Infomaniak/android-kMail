@@ -17,8 +17,11 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
@@ -142,6 +145,10 @@ object ThreadController {
                                     draftLocalUuid,
                                 )
 
+                                remoteMessage.body?.value?.let {
+                                    remoteMessage.body?.value = insertInlineAttachment(it, remoteMessage.attachments)
+                                }
+
                                 MessageController.upsertMessage(remoteMessage, realm = this@writeBlocking)
                             }
                         } else {
@@ -157,6 +164,16 @@ object ThreadController {
                 MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
             }
         }
+    }
+
+    private fun insertInlineAttachment(body: String, attachments: List<Attachment>): String {
+        var html = body
+        attachments.forEach { attachment ->
+            if (attachment.getDisposition() == AttachmentDisposition.INLINE) {
+                html = html.replace("cid:${attachment.contentId}", "${BuildConfig.MAIL_API}${attachment.resource}")
+            }
+        }
+        return html
     }
     //endregion
 }
