@@ -53,7 +53,7 @@ class ThreadFragment : Fragment() {
 
     private lateinit var thread: Thread
 
-    private var threadAdapter = ThreadAdapter()
+    private val threadAdapter by lazy { ThreadAdapter() }
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
     private var shouldScrollToBottom = AtomicBoolean(true)

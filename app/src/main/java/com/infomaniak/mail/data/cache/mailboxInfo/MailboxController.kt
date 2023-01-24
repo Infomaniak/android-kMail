@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ object MailboxController {
         return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
 
-    private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm? = null): RealmSingleQuery<Mailbox> {
+    private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm?): RealmSingleQuery<Mailbox> {
         val checkMailboxId = "${Mailbox::mailboxId.name} == '$mailboxId'"
         return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
     }

@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.upsertThread
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -60,7 +61,7 @@ object MessageController {
         return realm.query(byUids)
     }
 
-    private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
+    private fun getMessagesQuery(folderId: String, realm: TypedRealm?): RealmQuery<Message> {
         return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId(folderId))
     }
 
@@ -143,15 +144,11 @@ object MessageController {
         messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
     }
 
-    private fun deleteMessage(uid: String, realm: MutableRealm? = null) {
-        val block: (MutableRealm) -> Unit = {
-            getMessage(uid, realm = it)
-                ?.let { message ->
-                    DraftController.getDraftByMessageUid(message.uid, realm = it)?.let(it::delete)
-                    it.delete(message)
-                }
+    private fun deleteMessage(uid: String, realm: MutableRealm) {
+        getMessage(uid, realm)?.let { message ->
+            DraftController.getDraftByMessageUid(message.uid, realm)?.let(realm::delete)
+            realm.delete(message)
         }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
     //endregion
 
@@ -285,7 +282,7 @@ object MessageController {
             val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
 
             createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
-                ThreadController.upsertThread(newThread, realm = this)
+                upsertThread(newThread)
                 threadsToUpsert[newThread.uid] = newThread
                 // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
                 allThreads.add(newThread)
@@ -293,7 +290,7 @@ object MessageController {
 
             existingThreads.forEach {
                 it.addMessageWithConditions(message, realm = this)
-                ThreadController.upsertThread(it, realm = this)
+                upsertThread(it)
                 threadsToUpsert[it.uid] = it
             }
         }
@@ -301,7 +298,7 @@ object MessageController {
         val folderThreads = mutableListOf<Thread>()
         threadsToUpsert.forEach { (_, thread) ->
             thread.recomputeThread(realm = this)
-            ThreadController.upsertThread(thread, realm = this)
+            upsertThread(thread)
             if (thread.folderId == folder.id) {
                 folderThreads.add(if (thread.isManaged()) thread.copyFromRealm(UInt.MIN_VALUE) else thread)
             }
@@ -349,7 +346,7 @@ object MessageController {
             message.toThread().also { thread ->
                 thread.addFirstMessage(message)
                 thread.recomputeThread(realm = this)
-                ThreadController.upsertThread(thread, realm = this)
+                upsertThread(thread)
             }
         }
     }

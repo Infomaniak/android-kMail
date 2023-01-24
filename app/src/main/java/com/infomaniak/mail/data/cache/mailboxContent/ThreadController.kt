@@ -51,7 +51,7 @@ object ThreadController {
     private fun getThreadsQuery(
         folderId: String,
         filter: ThreadFilter = ThreadFilter.ALL,
-        realm: TypedRealm? = null
+        realm: TypedRealm? = null,
     ): RealmQuery<Thread> {
 
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
@@ -102,9 +102,8 @@ object ThreadController {
     //endregion
 
     //region Edit data
-    fun upsertThread(thread: Thread, realm: MutableRealm? = null) {
-        val block: (MutableRealm) -> Unit = { it.copyToRealm(thread, UpdatePolicy.ALL) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    fun MutableRealm.upsertThread(thread: Thread) {
+        copyToRealm(thread, UpdatePolicy.ALL)
     }
 
     fun deleteThreads(folderId: String, realm: MutableRealm) {
