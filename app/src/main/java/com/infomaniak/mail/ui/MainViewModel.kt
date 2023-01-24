@@ -72,7 +72,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
     }
 
-    val currentFoldersLive
+    val currentFoldersLiveToObserve
         get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) {
                 mailboxObjectId?.let {
@@ -81,7 +81,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-    val currentQuotasLive
+    val currentQuotasLiveToObserve
         get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
         }
@@ -94,14 +94,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
     }
 
-    val currentFolderLive
+    val currentFolderLiveToObserve
         get() = currentFolderId.switchMap { folderId ->
             liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
         }
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    val currentThreadsLive
+    val currentThreadsLiveToObserve
         get() = observeFolderAndFilter().switchMap { (folder, filter) ->
             liveData(Dispatchers.IO) {
                 if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
