@@ -94,8 +94,7 @@ object MessageController {
     }
 
     fun getUnseenMessages(thread: Thread): List<Message> {
-        val isUnseen = "${Message::seen.name} == false"
-        return getMessagesAndDuplicates(thread, isUnseen)
+        return getMessagesAndDuplicates(thread, "${Message::seen.name} == false")
     }
 
     fun getFavoriteMessages(thread: Thread): List<Message> {
@@ -124,14 +123,14 @@ object MessageController {
         return getMessageAndDuplicates(thread, message)
     }
 
-    private fun getMessagesAndDuplicates(thread: Thread, condition: String): List<Message> {
+    private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
 
-        val messages = thread.messages.query(condition).find()
+        val messages = thread.messages.query(query).find()
 
-        val byMessagesIds = "${Message::messageId.name} IN {${messages.map { it.messageId }.joinToString { "'$it'" }}}"
-        val duplicates = thread.duplicates.query(byMessagesIds)
+        val byMessagesIds = "${Message::messageId.name} IN {${messages.joinToString { "'${it.messageId}'" }}}"
+        val duplicates = thread.duplicates.query(byMessagesIds).find()
 
-        return messages + duplicates.find()
+        return messages + duplicates
     }
 
     fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
