@@ -33,8 +33,6 @@ import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.blueColor9
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor1
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor10
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor11
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor12
-import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor13
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor2
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor3
 import com.infomaniak.mail.ui.login.IlluColors.Colors.Companion.commonColor4
@@ -75,8 +73,6 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             val commonColor9 = Colors("#FFFFFF", "#EAEAEA")
             val commonColor10 = Colors("#F8F8F8", "#E4E4E4")
             val commonColor11 = Colors("#D9D9D9", "#626262")
-            val commonColor12 = Colors("#FFFFFF", "#A1A1A1")
-            val commonColor13 = Colors("#E0E0E0", "#D4D4D4")
 
             val pinkColor1 = Colors("#BC0055", "#D0759F")
             val pinkColor2 = Colors("#FF5B97", "#EF0057")
@@ -399,8 +395,8 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
 
         val illuNoMailboxColors = arrayOf(
             IlluColors(keyPath(Category.LINK, 1), commonColor11),
-            IlluColors(keyPath(Category.IPHONESCREEN, 1), commonColor12),
-            IlluColors(keyPath(Category.IPHONESCREEN, 2), commonColor13),
+            IlluColors(keyPath(Category.IPHONESCREEN, 1), commonColor5),
+            IlluColors(keyPath(Category.IPHONESCREEN, 2), commonColor2),
         )
 
         val illuNoMailboxPinkColor = arrayOf(

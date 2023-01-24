@@ -43,8 +43,7 @@ class ManageMailAddressViewModel(application: Application) : AndroidViewModel(ap
     }
 
     private fun updateMailboxes(user: User) = viewModelScope.launch(Dispatchers.IO) {
-        val okHttpClient = user.id.let { AccountUtils.getHttpClient(it) }
-        val mailboxes = ApiRepository.getMailboxes(okHttpClient).data ?: return@launch
+        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(user.id)).data ?: return@launch
         MailboxController.updateMailboxes(getApplication(), mailboxes, user.id)
     }
 }
