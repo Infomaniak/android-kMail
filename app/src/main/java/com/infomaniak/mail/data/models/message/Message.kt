@@ -101,6 +101,8 @@ class Message : RealmObject {
     @Transient
     var fullyDownloaded: Boolean = false
     @Transient
+    var isSpam: Boolean = false
+    @Transient
     var messageIds: RealmSet<String> = realmSetOf()
     @Transient
     var draftLocalUuid: String? = null
@@ -131,9 +133,16 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, date: RealmInstant, draftLocalUuid: String?) {
+    fun initLocalValues(
+        fullyDownloaded: Boolean,
+        messageIds: RealmSet<String>,
+        isSpam: Boolean,
+        date: RealmInstant,
+        draftLocalUuid: String?,
+    ) {
         this.fullyDownloaded = fullyDownloaded
         this.messageIds = messageIds
+        this.isSpam = isSpam
         this.date = date
         draftLocalUuid?.let { this.draftLocalUuid = it }
     }

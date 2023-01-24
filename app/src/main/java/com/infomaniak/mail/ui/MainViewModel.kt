@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
@@ -56,6 +57,14 @@ import kotlinx.coroutines.launch
 import com.infomaniak.lib.core.R as RCore
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private inline val context: Context get() = getApplication<Application>()
+    val isInternetAvailable = SingleLiveEvent<Boolean>()
+    var isDownloadingChanges = MutableLiveData(false)
+    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+    val snackbarFeedback = SingleLiveEvent<Pair<String, String?>>()
+
+    private var forceRefreshJob: Job? = null
 
     //region Current Mailbox
     private val currentMailboxObjectId = MutableLiveData<String?>(null)
@@ -102,13 +111,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
-
-    val isInternetAvailable = SingleLiveEvent<Boolean>()
-    var isDownloadingChanges = MutableLiveData(false)
-    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
-    val snackbarFeedback = SingleLiveEvent<Pair<String, String?>>()
-
-    private var forceRefreshJob: Job? = null
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
@@ -163,7 +165,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun loadCurrentMailboxFromRemote() {
         Log.d(TAG, "Load current mailbox from remote")
         val mailboxes = ApiRepository.getMailboxes().data ?: return
-        MailboxController.updateMailboxes(getApplication(), mailboxes)
+        MailboxController.updateMailboxes(context, mailboxes)
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
@@ -175,13 +177,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             selectFolder(folder.id)
             refreshThreads(mailbox, folder.id)
         }
-        DraftsActionsWorker.scheduleWork(getApplication())
+        DraftsActionsWorker.scheduleWork(context)
     }
 
     fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "Force refresh mailboxes")
         val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
-        MailboxController.updateMailboxes(getApplication(), mailboxes)
+        MailboxController.updateMailboxes(context, mailboxes)
         updateCurrentMailboxQuotas()
     }
 
@@ -221,7 +223,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateContacts() {
         ApiRepository.getContacts().data?.let { apiContacts ->
-            val phoneMergedContacts = getPhoneContacts(getApplication())
+            val phoneMergedContacts = getPhoneContacts(context)
             mergeApiContactsIntoPhoneContacts(apiContacts, phoneMergedContacts)
             MergedContactController.update(phoneMergedContacts.values.toList())
         }
@@ -315,7 +317,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun showArchiveSnackbar(message: Message?, apiResponse: ApiResponse<MoveResult>) {
 
-        val context = getApplication<Application>()
         val destination = context.getString(FolderRole.ARCHIVE.folderNameRes)
 
         val snackbarTitle = when {
@@ -365,7 +366,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         message: Message?,
         undoResource: String?,
     ) {
-        val context = getApplication<Application>()
 
         val snackbarTitle = if (isSuccess) {
             val destination = context.getString(FolderRole.TRASH.folderNameRes)
@@ -446,6 +446,57 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds())
+    }
+    //endregion
+
+    //region Spam
+    fun markAsSpamOrHam(thread: Thread, message: Message? = null): Boolean {
+        var containsOwnMessage = false
+        var onlyContainsOwnMessages = true
+
+        (message?.from ?: thread.from).forEach { if (it.isMe()) containsOwnMessage = true else onlyContainsOwnMessages = false }
+
+        if (onlyContainsOwnMessages) {
+            snackbarFeedback.value = context.resources.getQuantityString(R.plurals.errorActionsSpamOwnMessage, 1) to null
+        } else {
+            toggleSpamOrHam(thread, message)
+        }
+
+        return containsOwnMessage
+    }
+
+    private fun toggleSpamOrHam(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value ?: return@launch
+        val realm = RealmDatabase.mailboxContent()
+        val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
+        val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
+        val destinationFolderId = FolderController.getFolder(destinationFolderRole, realm)!!.id
+
+        val messages = message?.let { if (message.from.first().isMe()) emptyList() else thread.getMessageAndDuplicates(message) }
+            ?: thread.getSpamMessages()
+        val uids = messages.map { it.uid }
+
+        val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailbox.uuid, uids, destinationFolderId)
+
+        showSpamSnackbar(message, apiResponse, destinationFolderRole)
+
+        if (apiResponse?.isSuccess() == true) {
+            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
+        }
+    }
+
+    private fun showSpamSnackbar(message: Message?, apiResponse: ApiResponse<MoveResult>?, destinationRole: FolderRole) {
+
+        val destination = context.getString(destinationRole.folderNameRes)
+
+        val snackbarTitle = when {
+            apiResponse == null -> context.resources.getQuantityString(R.plurals.errorActionsSpamOwnMessage, 1)
+            !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
+            message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+            else -> context.getString(R.string.snackbarMessageMoved, destination)
+        }
+
+        snackbarFeedback.postValue(snackbarTitle to apiResponse?.data?.undoResource)
     }
     //endregion
 

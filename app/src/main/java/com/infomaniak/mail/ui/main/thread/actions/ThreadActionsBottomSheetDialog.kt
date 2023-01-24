@@ -22,6 +22,7 @@ import android.view.View
 import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -40,35 +41,44 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         val threadUid = navigationArgs.threadUid
-        val messageUidToReplyTo = navigationArgs.messageUidToReplyTo
 
         threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
 
-        setSpamUi()
+        threadActionsViewModel.thread(threadUid).observe(viewLifecycleOwner) { thread ->
 
-        postpone.isGone = true
-        blockSender.isGone = true
-        phishing.isGone = true
-        rule.isGone = true
+            if (thread == null) {
+                findNavController().popBackStack()
+            } else {
 
-        archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
-        markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
-        move.setClosingOnClickListener { notYetImplemented() }
-        favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
-        spam.setClosingOnClickListener { notYetImplemented() }
-        print.setClosingOnClickListener { notYetImplemented() }
-        saveAsPdf.setClosingOnClickListener { notYetImplemented() }
-        reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+                val messageUidToReplyTo = navigationArgs.messageUidToReplyTo
 
-        mainActions.setClosingOnClickListener { id: Int ->
-            when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
-                R.id.actionForward -> notYetImplemented()
-                R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+                setSpamUi()
+
+                postpone.isGone = true
+                blockSender.isGone = true
+                phishing.isGone = true
+                rule.isGone = true
+
+                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
+                markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
+                move.setClosingOnClickListener { notYetImplemented() }
+                favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
+                spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread) }
+                print.setClosingOnClickListener { notYetImplemented() }
+                saveAsPdf.setClosingOnClickListener { notYetImplemented() }
+                reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+
+                mainActions.setClosingOnClickListener { id: Int ->
+                    when (id) {
+                        R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
+                        R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
+                        R.id.actionForward -> notYetImplemented()
+                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+                    }
+                }
             }
         }
     }

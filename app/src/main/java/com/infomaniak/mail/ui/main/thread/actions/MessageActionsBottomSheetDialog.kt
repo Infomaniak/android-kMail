@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -31,6 +33,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val messageActionsViewModel: MessageActionsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,29 +41,37 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadUid = navigationArgs.threadUid
         val messageUid = navigationArgs.messageUid
 
-        setMarkAsReadUi(navigationArgs.isSeen)
-        setFavoriteUi(navigationArgs.isFavorite)
-        setSpamUi()
+        messageActionsViewModel.threadAndMessage(threadUid, messageUid).observe(viewLifecycleOwner) { (thread, message) ->
 
-        archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, messageUid) }
-        markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
-        move.setClosingOnClickListener { notYetImplemented() }
-        postpone.setClosingOnClickListener { notYetImplemented() }
-        favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(messageUid, threadUid) }
-        spam.setClosingOnClickListener { notYetImplemented() }
-        blockSender.setClosingOnClickListener { notYetImplemented() }
-        phishing.setClosingOnClickListener { notYetImplemented() }
-        print.setClosingOnClickListener { notYetImplemented() }
-        saveAsPdf.setClosingOnClickListener { notYetImplemented() }
-        rule.setClosingOnClickListener { notYetImplemented() }
-        reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+            if (thread == null || message == null) {
+                findNavController().popBackStack()
+            } else {
 
-        mainActions.setClosingOnClickListener { id: Int ->
-            when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
-                R.id.actionForward -> notYetImplemented()
-                R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid, messageUid)
+                setMarkAsReadUi(navigationArgs.isSeen)
+                setFavoriteUi(navigationArgs.isFavorite)
+                setSpamUi(message)
+
+                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, messageUid) }
+                markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
+                move.setClosingOnClickListener { notYetImplemented() }
+                postpone.setClosingOnClickListener { notYetImplemented() }
+                favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(messageUid, threadUid) }
+                spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread, message) }
+                blockSender.setClosingOnClickListener { notYetImplemented() }
+                phishing.setClosingOnClickListener { notYetImplemented() }
+                print.setClosingOnClickListener { notYetImplemented() }
+                saveAsPdf.setClosingOnClickListener { notYetImplemented() }
+                rule.setClosingOnClickListener { notYetImplemented() }
+                reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+
+                mainActions.setClosingOnClickListener { id: Int ->
+                    when (id) {
+                        R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
+                        R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
+                        R.id.actionForward -> notYetImplemented()
+                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid, messageUid)
+                    }
+                }
             }
         }
     }

@@ -248,7 +248,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
 
         val shouldKeepItem = when (swipeAction) {
-
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
@@ -286,10 +285,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 readAndArchive(thread.uid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
-            SwipeAction.NONE -> {
-                throw IllegalStateException("Cannot swipe on an action which is not set")
-            }
-
+            SwipeAction.SPAM -> markAsSpamOrHam(thread)
+            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
             else -> {
                 notYetImplemented()
                 true
