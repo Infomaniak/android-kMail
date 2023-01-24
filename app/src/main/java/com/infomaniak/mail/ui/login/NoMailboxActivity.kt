@@ -36,15 +36,17 @@ class NoMailboxActivity : ThemedActivity() {
         super.onCreate(savedInstanceState)
 
         with(binding) {
-            
+
             setContentView(root)
 
+            val isNightModeEnabled = isNightModeEnabled()
+
             noMailboxIconLayout.apply {
-                IlluColors.illuNoMailboxColors.forEach { changePathColor(it, isNightModeEnabled()) }
+                IlluColors.illuNoMailboxColors.forEach { changePathColor(it, isNightModeEnabled) }
 
                 val isPink = LocalSettings.getInstance(this@NoMailboxActivity).accentColor == LocalSettings.AccentColor.PINK
                 val sleeveColors = if (isPink) IlluColors.illuNoMailboxPinkColor else IlluColors.illuNoMailboxBlueColor
-                sleeveColors.forEach { changePathColor(it, isNightModeEnabled()) }
+                sleeveColors.forEach { changePathColor(it, isNightModeEnabled) }
 
                 setAnimation(R.raw.illu_no_mailbox)
                 repeatFrame(42, 112)
