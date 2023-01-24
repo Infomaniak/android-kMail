@@ -271,9 +271,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
         val messagesFoldersIds = mutableListOf<String>()
 
-        if (thread.unseenMessagesCount > 0) {
-            markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
-        }
+        if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
         archiveThreadOrMessageSync(thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
 
         refreshFolders(mailbox, messagesFoldersIds, archiveId)
@@ -287,9 +285,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return null
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
 
-        val messages = when {
-            message != null -> MessageController.getMessageAndDuplicates(thread, message)
-            else -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
+        val messages = when (message) {
+            null -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
+            else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), archiveId)
@@ -412,9 +410,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun markAsUnseen(mailbox: Mailbox, thread: Thread, message: Message? = null) {
 
-        val messages = when {
-            message != null -> MessageController.getMessageAndDuplicates(thread, message)
-            else -> MessageController.getLastMessageToExecuteAction(thread)
+        val messages = when (message) {
+            null -> MessageController.getLastMessageToExecuteAction(thread)
+            else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
         val isSuccess = ApiRepository.markMessagesAsUnseen(mailbox.uuid, messages.getUids()).isSuccess()
