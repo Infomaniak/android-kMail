@@ -69,6 +69,8 @@ class Message : RealmObject {
     private var _dkimStatus: String? = null
     @SerialName("folder_id")
     var folderId: String = ""
+    @SerialName("st_uuid")
+    var swissTransferUuid: String? = null
     var resource: String = ""
     @SerialName("download_resource")
     var downloadResource: String = ""
