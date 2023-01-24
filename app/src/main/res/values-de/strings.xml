@@ -35,7 +35,6 @@
     <string name="actionReply">Reply</string>
     <string name="actionReplyAll">Reply all</string>
     <string name="actionReportDisplayProblem">Report a display problem</string>
-    <string name="actionSavePDF">Save as PDF</string>
     <string name="actionShortMarkAsRead">Read</string>
     <string name="actionShortMarkAsUnread">Unread</string>
     <string name="actionShortStar">Favorites</string>

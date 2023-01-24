@@ -60,7 +60,6 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
         spam.setClosingOnClickListener { notYetImplemented() }
         print.setClosingOnClickListener { notYetImplemented() }
-        saveAsPdf.setClosingOnClickListener { notYetImplemented() }
         reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
         mainActions.setClosingOnClickListener { id: Int ->

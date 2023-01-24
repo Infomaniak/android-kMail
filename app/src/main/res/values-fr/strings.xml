@@ -35,7 +35,6 @@
     <string name="actionReply">Répondre</string>
     <string name="actionReplyAll">Répondre à tous</string>
     <string name="actionReportDisplayProblem">Signaler un problème d’affichage</string>
-    <string name="actionSavePDF">Enregistrer en PDF</string>
     <string name="actionShortMarkAsRead">Lu</string>
     <string name="actionShortMarkAsUnread">Non lu</string>
     <string name="actionShortStar">Favoris</string>
