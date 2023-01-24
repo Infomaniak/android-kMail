@@ -40,16 +40,12 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setMarkAsReadUi(navigationArgs.isSeen)
         setFavoriteUi(navigationArgs.isFavorite)
-        setSpamUi()
 
         archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, messageUid) }
         markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
         move.setClosingOnClickListener { notYetImplemented() }
         postpone.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(messageUid, threadUid) }
-        spam.setClosingOnClickListener { notYetImplemented() }
-        blockSender.setClosingOnClickListener { notYetImplemented() }
-        phishing.setClosingOnClickListener { notYetImplemented() }
         print.setClosingOnClickListener { notYetImplemented() }
         rule.setClosingOnClickListener { notYetImplemented() }
         reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }

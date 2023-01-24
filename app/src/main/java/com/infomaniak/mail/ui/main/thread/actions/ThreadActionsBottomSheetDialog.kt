@@ -47,18 +47,13 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
         }
 
-        setSpamUi()
-
         postpone.isGone = true
-        blockSender.isGone = true
-        phishing.isGone = true
         rule.isGone = true
 
         archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
         markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
         move.setClosingOnClickListener { notYetImplemented() }
         favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
-        spam.setClosingOnClickListener { notYetImplemented() }
         print.setClosingOnClickListener { notYetImplemented() }
         reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 

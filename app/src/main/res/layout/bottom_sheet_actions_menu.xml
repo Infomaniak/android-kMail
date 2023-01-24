@@ -72,25 +72,11 @@
             app:text="@string/actionStar" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/spam"
+            android:id="@+id/reportJunk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_spam"
-            app:text="@string/actionSpam" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/blockSender"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_email_action_block_user"
-            app:text="@string/actionBlockSender" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/phishing"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_email_action_phishing"
-            app:text="@string/actionPhishing" />
+            app:icon="@drawable/ic_report_junk"
+            app:text="@string/actionReportJunk" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/print"

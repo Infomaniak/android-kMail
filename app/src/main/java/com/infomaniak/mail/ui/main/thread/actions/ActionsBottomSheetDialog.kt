@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
@@ -39,6 +41,12 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetActionsMenuBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+        archive.isGone = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
+        reportJunk.setOnClickListener { setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, true) }
     }
 
     private fun computeUnreadStyle(isSeen: Boolean) = if (isSeen) {
@@ -68,12 +76,6 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         setText(favoriteText)
     }
 
-    fun setSpamUi() {
-        binding.spam.setText(
-            if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) R.string.actionNonSpam else R.string.actionSpam
-        )
-    }
-
     fun ActionItemView.setClosingOnClickListener(forceQuit: Boolean = false, callback: (() -> Unit)) {
         setOnClickListener {
             callback()
@@ -86,5 +88,9 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
             callback(id)
             findNavController().popBackStack()
         }
+    }
+
+    companion object {
+        const val JUNK_BOTTOM_SHEET_NAV_KEY = "junk_bottom_sheet_nav_key"
     }
 }
