@@ -45,6 +45,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
@@ -94,7 +95,7 @@ class ThreadListAdapter(
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() is Unit && holder.itemViewType == DisplayType.THREAD.layout) {
             with(holder.binding as CardviewThreadItemBinding) {
-                val recipient = (dataSet[position] as Thread).getDisplayedRecipient()
+                val recipient = (dataSet[position] as Thread).getDisplayedMessage().getDisplayedRecipient()
                 expeditorAvatar.loadAvatar(recipient, contacts)
             }
         } else {
@@ -124,9 +125,13 @@ class ThreadListAdapter(
         }
     }
 
-    private fun Thread.getDisplayedMessage() = messages.last { it.folderId == folderId }
+    private fun Thread.getDisplayedMessage(): Message {
+        return messages
+            .lastOrNull { if (folderRole == FolderRole.SENT) it.folderId != folderId else it.folderId == folderId }
+            ?: messages.last()
+    }
 
-    private fun Thread.getDisplayedRecipient(): Recipient = getDisplayedMessage().from.first()
+    private fun Message.getDisplayedRecipient(): Recipient = from.first()
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
 
@@ -135,8 +140,9 @@ class ThreadListAdapter(
 
         mailSubject.text = getFormattedSubject(context)
 
-        mailBodyPreview.text = getDisplayedMessage().preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
-        expeditorAvatar.loadAvatar(getDisplayedRecipient(), contacts)
+        val displayedMessage = getDisplayedMessage()
+        mailBodyPreview.text = displayedMessage.preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
+        expeditorAvatar.loadAvatar(displayedMessage.getDisplayedRecipient(), contacts)
 
         mailDate.text = formatDate(root.context)
 
