@@ -131,7 +131,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         val description = "$subject$preview"
 
         // Show message notification
-        showNotification(subject, false, message.sender.name, description)
+        showNotification(subject, false, message.sender.displayedName(applicationContext), description)
         // Show group summary notification
         val summaryText = applicationContext.resources.getQuantityString(
             R.plurals.newMessageNotificationSummary,
