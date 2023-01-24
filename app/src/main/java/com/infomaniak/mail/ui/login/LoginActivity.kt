@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
@@ -33,6 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.models.ApiError
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
@@ -51,6 +53,8 @@ import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
@@ -158,17 +162,18 @@ class LoginActivity : AppCompatActivity() {
                 code = authCode,
                 onSuccess = {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        when (val user = authenticateUser(it)) {
+                        when (val user = authenticateUser(this@LoginActivity, it)) {
                             is User -> {
                                 trackAccountEvent("loggedIn")
-                                if (ApiRepository.getMailboxes().data?.isEmpty() == true) {
+                                AccountUtils.reloadApp?.invoke()
+                            }
+                            is ApiResponse<*> -> withContext(Dispatchers.Main) {
+                                if (user.error?.code == "no_mailbox") {
                                     launchNoMailboxActivity()
-                                    AccountUtils.removeUser(this@LoginActivity, user, false)
                                 } else {
-                                    AccountUtils.reloadApp?.invoke()
+                                    showError(getString(user.translatedError))
                                 }
                             }
-                            is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
                             else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
                         }
                     }
@@ -229,7 +234,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
-        suspend fun authenticateUser(apiToken: ApiToken): Any {
+        suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {
                 InfomaniakCore.bearerToken = apiToken.accessToken
@@ -243,12 +248,28 @@ class LoginActivity : AppCompatActivity() {
                         this.organizations = arrayListOf()
                     }
 
-                    if (user == null) {
-                        getErrorResponse(RCore.string.anErrorHasOccurred)
-                    } else {
-                        AccountUtils.addUser(user)
-                        user
-                    }
+                    user?.let {
+                        val apiResponse = ApiRepository.getMailboxes(HttpClient.okHttpClientNoInterceptor)
+                        when {
+                            !apiResponse.isSuccess() -> apiResponse
+                            apiResponse.data?.isEmpty() == true -> {
+                                ApiResponse<List<Mailbox>>(
+                                    result = ApiResponse.Status.ERROR,
+                                    error = ApiError(code = "no_mailbox")
+                                )
+                            }
+                            else -> {
+                                apiResponse.data?.let { mailboxes ->
+                                    MailboxController.updateMailboxes(context, mailboxes)
+
+                                    AccountUtils.addUser(it)
+                                    it
+                                } ?: run {
+                                    getErrorResponse(RCore.string.serverError)
+                                }
+                            }
+                        }
+                    } ?: getErrorResponse(RCore.string.anErrorHasOccurred)
                 }
             } else {
                 getErrorResponse(RCore.string.errorUserAlreadyPresent)

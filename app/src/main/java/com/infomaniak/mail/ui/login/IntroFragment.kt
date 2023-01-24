@@ -202,13 +202,6 @@ class IntroFragment : Fragment() {
         }
     }
 
-    private fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
-        val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
-        addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
-            SimpleColorFilter(color)
-        }
-    }
-
     private fun updateEachPageUi(accentColor: AccentColor) {
         val newColor = accentColor.getSecondaryBackground(requireContext())
         val oldColor = requireActivity().window.statusBarColor

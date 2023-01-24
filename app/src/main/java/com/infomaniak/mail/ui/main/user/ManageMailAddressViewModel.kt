@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ class ManageMailAddressViewModel(application: Application) : AndroidViewModel(ap
     }
 
     private fun updateMailboxes(user: User) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxes = ApiRepository.getMailboxes(user.id).data ?: return@launch
+        val okHttpClient = user.id.let { AccountUtils.getHttpClient(it) }
+        val mailboxes = ApiRepository.getMailboxes(okHttpClient).data ?: return@launch
         MailboxController.updateMailboxes(getApplication(), mailboxes, user.id)
     }
 }

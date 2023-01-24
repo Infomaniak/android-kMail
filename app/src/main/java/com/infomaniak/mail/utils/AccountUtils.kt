@@ -108,14 +108,14 @@ object AccountUtils : CredentialManager() {
         }
     }
 
-    suspend fun removeUser(context: Context, user: User, withReload: Boolean = true) {
+    suspend fun removeUser(context: Context, user: User) {
 
         userDatabase.userDao().delete(user)
         RealmDatabase.removeUserData(context, user.id)
 
         if (currentUserId == user.id) {
             if (getAllUsersCount() == 0) resetSettings(context)
-            if (withReload) withContext(Dispatchers.Main) { reloadApp?.invoke() }
+            withContext(Dispatchers.Main) { reloadApp?.invoke() }
         }
     }
 

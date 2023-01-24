@@ -38,6 +38,8 @@ import androidx.viewbinding.ViewBinding
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
@@ -45,6 +47,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -147,6 +150,13 @@ fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
 
         override fun onAnimationRepeat(animation: Animator) = Unit
     })
+}
+
+fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
+    val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
+    addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
+        SimpleColorFilter(color)
+    }
 }
 //endregion
 
