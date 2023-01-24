@@ -60,13 +60,19 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         AccountUtils.getAllUsersSync().forEach { user ->
             MailboxController.getMailboxes(user.id, mailboxInfoRealm).forEach loopMailboxes@{ mailbox ->
 
+                // Don't launch sync if the mailbox's notifications have been disabled by the user
+                if (mailbox.isNotificationsBlocked()) return@loopMailboxes
+
+                // Update local with remote
                 val realm = RealmDatabase.newMailboxContentInstance(user.id, mailbox.mailboxId)
                 val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: return@loopMailboxes
                 if (folder.cursor == null) return@loopMailboxes
 
                 val okHttpClient = AccountUtils.getHttpClient(user.id)
                 val newMessagesThreads = MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, realm)
+                Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
 
+                // Notify all new messages
                 val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder.id, realm)
                 newMessagesThreads.forEach { thread ->
                     thread.showNotification(user.id, mailbox, unReadThreadsCount, realm, okHttpClient)
@@ -83,6 +89,12 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
     override fun onFinish() {
         mailboxInfoRealm.close()
+    }
+
+    private fun Mailbox.isNotificationsBlocked(): Boolean = with(notificationManagerCompat) {
+        val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
+        val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
+        isChannelBlocked || isGroupBlocked
     }
 
     private fun Thread.showNotification(
