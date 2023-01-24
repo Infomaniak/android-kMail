@@ -32,27 +32,30 @@ class NoMailboxActivity : ThemedActivity() {
 
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
 
-    override fun onCreate(savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(root)
+        with(binding) {
+            
+            setContentView(root)
 
-        noMailboxIconLayout.apply {
-            IlluColors.illuNoMailboxColors.forEach { changePathColor(it, isNightModeEnabled()) }
+            noMailboxIconLayout.apply {
+                IlluColors.illuNoMailboxColors.forEach { changePathColor(it, isNightModeEnabled()) }
 
-            val isPink = LocalSettings.getInstance(this@NoMailboxActivity).accentColor == LocalSettings.AccentColor.PINK
-            val sleeveColors = if (isPink) IlluColors.illuNoMailboxPinkColor else IlluColors.illuNoMailboxBlueColor
-            sleeveColors.forEach { changePathColor(it, isNightModeEnabled()) }
+                val isPink = LocalSettings.getInstance(this@NoMailboxActivity).accentColor == LocalSettings.AccentColor.PINK
+                val sleeveColors = if (isPink) IlluColors.illuNoMailboxPinkColor else IlluColors.illuNoMailboxBlueColor
+                sleeveColors.forEach { changePathColor(it, isNightModeEnabled()) }
 
-            setAnimation(R.raw.illu_no_mailbox)
-            repeatFrame(42, 112)
+                setAnimation(R.raw.illu_no_mailbox)
+                repeatFrame(42, 112)
+            }
+
+            noMailboxActionButton.setOnClickListener {
+                openUrl(SHOP_URL)
+                onBackPressedDispatcher.onBackPressed()
+            }
+
+            connectAnotherAccountButton.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         }
-
-        noMailboxActionButton.setOnClickListener {
-            openUrl(SHOP_URL)
-            onBackPressedDispatcher.onBackPressed()
-        }
-
-        connectAnotherAccountButton.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 }

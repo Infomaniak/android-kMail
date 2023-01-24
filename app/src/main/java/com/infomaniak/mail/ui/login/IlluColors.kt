@@ -77,8 +77,6 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
             val commonColor11 = Colors("#D9D9D9", "#626262")
             val commonColor12 = Colors("#FFFFFF", "#A1A1A1")
             val commonColor13 = Colors("#E0E0E0", "#D4D4D4")
-            val commonColor14 = Colors("#824D65", "#10405B")
-            val commonColor15 = Colors("#693D51", "#266E8D")
 
             val pinkColor1 = Colors("#BC0055", "#D0759F")
             val pinkColor2 = Colors("#FF5B97", "#EF0057")
