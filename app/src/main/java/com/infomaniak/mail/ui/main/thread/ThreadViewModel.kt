@@ -39,6 +39,8 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     private var fetchMessagesJob: Job? = null
 
+    private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }
@@ -48,11 +50,6 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
-
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: run {
-            emit(null)
-            return@liveData
-        }
 
         val thread = ThreadController.getThread(threadUid) ?: run {
             emit(null)
@@ -72,7 +69,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     fun fetchIncompleteMessages(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(Dispatchers.IO) {
-            ThreadController.fetchIncompleteMessages(messages)
+            ThreadController.fetchIncompleteMessages(messages, mailbox)
         }
     }
 
