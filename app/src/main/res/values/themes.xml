@@ -63,7 +63,7 @@
         <item name="colorPrimaryInverse">@color/pinkMailInverse</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
-        <item name="colorPrimaryContainer">@color/pinkMailSecondary</item>
+        <item name="colorPrimaryContainer">@color/pinkMailContainer</item>
         <item name="colorOnPrimaryContainer">@color/pinkMail</item>
 
         <item name="colorAccent">@color/pinkMail</item>
@@ -80,7 +80,7 @@
         <item name="colorPrimaryInverse">@color/blueMailInverse</item>
         <item name="colorPrimaryDark">#00FF00</item>
 
-        <item name="colorPrimaryContainer">@color/blueMailSecondary</item>
+        <item name="colorPrimaryContainer">@color/blueMailContainer</item>
         <item name="colorOnPrimaryContainer">@color/blueMail</item>
 
         <item name="colorAccent">@color/blueMail</item>

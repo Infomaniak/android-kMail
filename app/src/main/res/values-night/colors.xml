@@ -16,16 +16,16 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <color name="pinkMail">@color/pink_mail_dark</color>
-    <color name="pinkMailInverse">@color/pink_mail_light</color>
-    <color name="pinkMailSecondary">#2A0F1B</color>
+    <color name="pinkMail">@color/pink_mail_primary_dark</color>
+    <color name="pinkMailInverse">@color/pink_mail_primary_light</color>
+    <color name="pinkMailContainer">@color/pink_mail_container_dark</color>
     <color name="pinkBoardingSecondaryBackground">@color/black</color>
-    <color name="pinkMailRipple">#1EE07FA3</color>
-    <color name="blueMail">@color/blue_mail_dark</color>
-    <color name="blueMailInverse">@color/blue_mail_light</color>
-    <color name="blueMailSecondary">#292E3D</color>
+    <color name="pinkMailRipple">@color/pink_mail_ripple_dark</color>
+    <color name="blueMail">@color/blue_mail_primary_dark</color>
+    <color name="blueMailInverse">@color/blue_mail_primary_light</color>
+    <color name="blueMailContainer">@color/blue_mail_container_dark</color>
     <color name="blueBoardingSecondaryBackground">@color/black</color>
-    <color name="blueMailRipple">#1E4CB7FF</color>
+    <color name="blueMailRipple">@color/blue_mail_ripple_dark</color>
 
     <!-- Context / errors -->
     <color name="orangeWarning">#FFAA4C</color>
