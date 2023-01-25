@@ -491,20 +491,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
-    fun undoAction(undoData: UndoData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val (resource, foldersIds, destinationFolderId) = undoData
+    fun undoAction(undoData: UndoData) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value ?: return@launch
+        val (resource, foldersIds, destinationFolderId) = undoData
 
-            val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
-                refreshFolders(mailbox, foldersIds, destinationFolderId)
-                R.string.snackbarMoveCancelled
-            } else {
-                RCore.string.anErrorHasOccurred
-            }
-
-            snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
+        val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
+            refreshFolders(mailbox, foldersIds, destinationFolderId)
+            R.string.snackbarMoveCancelled
+        } else {
+            RCore.string.anErrorHasOccurred
         }
+
+        snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
     }
 
     private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
