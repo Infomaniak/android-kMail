@@ -129,8 +129,8 @@ class MenuDrawerFragment : Fragment() {
                         BugTrackerActivityArgs(
                             user = AccountUtils.currentUser!!,
                             appBuildNumber = BuildConfig.VERSION_NAME,
-                            bucketIdentifier = BuildConfig.MAIL_BUCKET_ID,
-                            projectName = BuildConfig.MAIL_PROJECT_NAME,
+                            bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
+                            projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,
                         ).toBundle()
                     )
                     startActivity(this)
