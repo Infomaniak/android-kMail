@@ -158,7 +158,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateUserInfo() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(TAG, "Update user info")
-        updateAddressBooks()
+
+        // This is unused for now, put it back when we want to handle AddressBooks.
+        // updateAddressBooks()
+
         updateContacts()
     }
 
