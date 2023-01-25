@@ -125,7 +125,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
-        setupDensityDependentUi()
+        setupThreadDensityDependentUi()
 
         displayAvatar(thread = this)
         expeditor.text = formatRecipientNames(computeDisplayedRecipients())
@@ -148,7 +148,7 @@ class ThreadListAdapter(
         root.setOnClickListener { onThreadClicked?.invoke(this@with) }
     }
 
-    private fun CardviewThreadItemBinding.setupDensityDependentUi() {
+    private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
         val margin = if (threadDensity == LARGE) THREAD_MARGIN_LARGE else THREAD_MARGIN_OTHER
         threadCard.setMarginsRelative(top = margin, bottom = margin)
 
@@ -184,11 +184,11 @@ class ThreadListAdapter(
     }
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
-        setupDensityDependentUi()
+        setupDateSeparatorDensityDependentUi()
         sectionTitle.text = title
     }
 
-    private fun ItemThreadDateSeparatorBinding.setupDensityDependentUi() {
+    private fun ItemThreadDateSeparatorBinding.setupDateSeparatorDensityDependentUi() {
         val (topMargin, bottomMargin) = if (threadDensity == LARGE) {
             DATE_TOP_MARGIN_LARGE to DATE_BOTTOM_MARGIN_LARGE
         } else {
