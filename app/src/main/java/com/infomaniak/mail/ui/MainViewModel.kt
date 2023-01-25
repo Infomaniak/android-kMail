@@ -302,8 +302,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val undoDestinationId = message?.folderId ?: currentFolderId.value
-        val undoIds = messages.getFoldersIds(exception = undoDestinationId) + archiveId
-        showArchiveSnackbar(message, apiResponse, undoIds, undoDestinationId)
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + archiveId
+        showArchiveSnackbar(message, apiResponse, undoFoldersIds, undoDestinationId)
 
         return impactedFoldersIds
     }
@@ -311,7 +311,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun showArchiveSnackbar(
         message: Message?,
         apiResponse: ApiResponse<MoveResult>,
-        undoIds: List<String>,
+        undoFoldersIds: List<String>,
         undoDestinationId: String?,
     ) {
 
@@ -323,7 +323,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoIds, undoDestinationId) }
+        val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
         snackbarFeedback.postValue(snackbarTitle to undoData)
     }
     //endregion
@@ -354,8 +354,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId)
 
         val undoDestinationId = message?.folderId ?: currentFolderId.value
-        val undoIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
-        showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource, undoIds, undoDestinationId)
+        val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
+        showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource, undoFoldersIds, undoDestinationId)
     }
 
     private fun showDeleteSnackbar(
@@ -363,7 +363,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         shouldPermanentlyDelete: Boolean,
         message: Message?,
         undoResource: String?,
-        undoIds: List<String>,
+        undoFoldersIds: List<String>,
         undoDestinationId: String?,
     ) {
 
@@ -387,7 +387,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             context.getString(RCore.string.anErrorHasOccurred)
         }
 
-        snackbarFeedback.postValue(snackbarTitle to undoResource?.let { UndoData(it, undoIds, undoDestinationId) })
+        snackbarFeedback.postValue(snackbarTitle to undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
     }
     //endregion
 
@@ -465,15 +465,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val undoDestinationId = message?.folderId ?: currentFolderId.value
-        val undoIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-        showSpamSnackbar(message, apiResponse, destinationFolderRole, undoIds, undoDestinationId)
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+        showSpamSnackbar(message, apiResponse, destinationFolderRole, undoFoldersIds, undoDestinationId)
     }
 
     private fun showSpamSnackbar(
         message: Message?,
         apiResponse: ApiResponse<MoveResult>?,
         destinationRole: FolderRole,
-        undoIds: List<String>,
+        undoFoldersIds: List<String>,
         undoDestinationId: String?,
     ) {
 
@@ -486,7 +486,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = apiResponse?.data?.undoResource?.let { UndoData(it, undoIds, undoDestinationId) }
+        val undoData = apiResponse?.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
         snackbarFeedback.postValue(snackbarTitle to undoData)
     }
     //endregion
