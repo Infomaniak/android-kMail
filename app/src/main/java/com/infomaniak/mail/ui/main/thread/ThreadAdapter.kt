@@ -31,7 +31,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
@@ -77,7 +77,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     // Add here everything in a Message that can be updated in the UI.
     override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
         return newItem.body?.value == oldItem.body?.value &&
-                newItem.seen == oldItem.seen &&
+                newItem.isSeen == oldItem.isSeen &&
                 newItem.isFavorite == oldItem.isFavorite
     }
 

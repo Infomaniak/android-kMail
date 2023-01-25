@@ -33,7 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.Companion.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
@@ -256,7 +256,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         importedAttachments.postValue(newAttachments to ImportationResult.SUCCESS)
     }
 
-    private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean>? {
+    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
         val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
         if (fileSize > availableSpace) return null to true
 
@@ -298,6 +298,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     private companion object {
         const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
-        const val FILE_SIZE_25_MB = 25 * 1024 * 1024
+        const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
     }
 }

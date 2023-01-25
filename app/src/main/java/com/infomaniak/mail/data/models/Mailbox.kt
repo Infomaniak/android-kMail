@@ -89,6 +89,7 @@ class Mailbox : RealmObject {
     }
 
     fun initLocalValues(userId: Int, inboxUnreadCount: Int): Mailbox {
+
         this.objectId = createObjectId(userId)
         this.userId = userId
         this.inboxUnreadCount = inboxUnreadCount

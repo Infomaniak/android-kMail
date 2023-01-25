@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,19 +29,25 @@ import kotlinx.serialization.UseSerializers
 @Serializable
 data class Contact(
     val id: String = "",
+    val uuid: String? = null,
     val name: String = "",
     @SerialName("firstname")
-    val firstName: String = "",
+    val firstName: String? = null,
     @SerialName("lastname")
-    val lastName: String = "",
+    val lastName: String? = null,
     val color: String = "",
     val other: Boolean = false,
     // @SerialName("contacted_times")
     // private val contactedTimes: Map<String?, Int?> = emptyMap(),
     val emails: RealmList<String> = realmListOf(),
     @SerialName("addressbook_id")
-    val addressBookId: Int = 0,
+    val addressBookId: Int? = null,
     val avatar: String? = null,
+    val categories: List<Int>? = null,
+    @SerialName("favorite")
+    val isFavorite: Boolean? = null,
+    val nickname: String? = null,
+    val organization: String? = null,
 ) {
     // fun getContactedTimes(): ContactedTimes = with(contactedTimes) { ContactedTimes(keys.firstOrNull(), values.firstOrNull()) }
 

@@ -71,13 +71,13 @@ fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", ""
 
 fun String.textToHtml(): String = replace("\n", "<br>")
 
-fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
+fun Uri.getFileNameAndSize(context: Context): Pair<String, Long>? {
     return runCatching {
         val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
         context.contentResolver.query(this, projection, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val displayName = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
-                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
+                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getLong)
                 displayName to size
             } else {
                 Sentry.captureException(Exception("$this has empty cursor"))

@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ class Recipient : EmbeddedRealmObject, Correspondent {
     override val initials by lazy { computeInitials() }
 
     fun initLocalValues(email: String? = null, name: String? = null): Recipient {
+
         email?.let { this.email = it }
         name?.let { this.name = it }
 

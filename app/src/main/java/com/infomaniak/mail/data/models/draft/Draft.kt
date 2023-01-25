@@ -15,18 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(RealmListSerializer::class)
+@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
 
 package com.infomaniak.mail.data.models.draft
 
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
+import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Ignore
@@ -45,6 +48,8 @@ class Draft : RealmObject {
     @SerialName("uuid")
     var remoteUuid: String? = null
 
+    var date: RealmInstant = Date().toRealmInstant()
+
     @SerialName("reply_to")
     var replyTo: RealmList<Recipient> = realmListOf()
 
@@ -55,12 +60,13 @@ class Draft : RealmObject {
 
     var subject: String? = null
     var body: String = ""
+    var quote: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
 
     @SerialName("mime_type")
     var mimeType: String = ""
     @SerialName("identity_id")
-    var identityId: Int? = null
+    var identityId: String? = null
 
     @SerialName("priority")
     private var _priority: String? = null
@@ -76,6 +82,10 @@ class Draft : RealmObject {
 
     var references: String? = null
     var delay: Int = 0
+    @SerialName("ack_request")
+    var ackRequest: Boolean = false
+    @SerialName("st_uuid")
+    var swissTransferUuid: String? = null
     //endregion
 
     //region Local data (Transient)
@@ -115,7 +125,7 @@ class Draft : RealmObject {
 
     fun initSignature(realm: MutableRealm) = SignatureController.getDefaultSignature(realm)?.let { defaultSignature ->
 
-        identityId = defaultSignature.id
+        identityId = "${defaultSignature.id}"
 
         from = realmListOf(Recipient().apply {
             this.email = defaultSignature.sender

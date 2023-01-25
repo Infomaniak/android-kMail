@@ -35,7 +35,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
@@ -133,7 +133,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
         val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
 
-        if (message.seen) return // Ignore if it has already been seen
+        if (message.isSeen) return // Ignore if it has already been seen
 
         val subject = message.getFormattedSubject(applicationContext)
         val preview = message.body?.value?.ifBlank { null }
