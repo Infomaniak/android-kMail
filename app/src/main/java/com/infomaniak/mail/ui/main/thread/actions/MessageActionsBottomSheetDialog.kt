@@ -45,32 +45,32 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
             if (thread == null || message == null) {
                 findNavController().popBackStack()
-            } else {
+                return@observe
+            }
 
-                setMarkAsReadUi(navigationArgs.isSeen)
-                setFavoriteUi(navigationArgs.isFavorite)
-                setSpamUi(message)
+            setMarkAsReadUi(navigationArgs.isSeen)
+            setFavoriteUi(navigationArgs.isFavorite)
+            setSpamUi(message)
 
-                archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread, message) }
-                markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(thread, message) }
-                move.setClosingOnClickListener { notYetImplemented() }
-                postpone.setClosingOnClickListener { notYetImplemented() }
-                favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread, message) }
-                spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread, message) }
-                blockSender.setClosingOnClickListener { notYetImplemented() }
-                phishing.setClosingOnClickListener { notYetImplemented() }
-                print.setClosingOnClickListener { notYetImplemented() }
-                saveAsPdf.setClosingOnClickListener { notYetImplemented() }
-                rule.setClosingOnClickListener { notYetImplemented() }
-                reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread, message) }
+            markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(thread, message) }
+            move.setClosingOnClickListener { notYetImplemented() }
+            postpone.setClosingOnClickListener { notYetImplemented() }
+            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread, message) }
+            spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread, message) }
+            blockSender.setClosingOnClickListener { notYetImplemented() }
+            phishing.setClosingOnClickListener { notYetImplemented() }
+            print.setClosingOnClickListener { notYetImplemented() }
+            saveAsPdf.setClosingOnClickListener { notYetImplemented() }
+            rule.setClosingOnClickListener { notYetImplemented() }
+            reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
-                mainActions.setClosingOnClickListener { id: Int ->
-                    when (id) {
-                        R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
-                        R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
-                        R.id.actionForward -> notYetImplemented()
-                        R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread, message)
-                    }
+            mainActions.setClosingOnClickListener { id: Int ->
+                when (id) {
+                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
+                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
+                    R.id.actionForward -> notYetImplemented()
+                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread, message)
                 }
             }
         }

@@ -27,7 +27,11 @@ import com.infomaniak.mail.data.models.thread.Thread
 object SharedViewModelUtils {
 
     fun markAsSeen(mailbox: Mailbox, thread: Thread, message: Message? = null, withRefresh: Boolean = true): List<String>? {
-        val messages = message?.let(thread::getMessageAndDuplicates) ?: thread.getUnseenMessages()
+
+        val messages = when {
+            message != null -> MessageController.getMessageAndDuplicates(thread, message)
+            else -> MessageController.getUnseenMessages(thread)
+        }
 
         val isSuccess = ApiRepository.markMessagesAsSeen(mailbox.uuid, messages.getUids()).isSuccess()
 

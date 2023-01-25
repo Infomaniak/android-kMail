@@ -41,11 +41,6 @@ object ThreadController {
         return realm.query()
     }
 
-    private fun getThreadsQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Thread> {
-        val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
-        return realm.query(byUids)
-    }
-
     private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm): RealmScalarQuery<Long> {
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
         val unseen = "${Thread::unseenMessagesCount.name} > 0"
@@ -87,10 +82,6 @@ object ThreadController {
     //region Get data
     fun getThreads(realm: TypedRealm): RealmResults<Thread> {
         return getThreadsQuery(realm).find()
-    }
-
-    fun getThreads(uids: List<String>, realm: TypedRealm): RealmResults<Thread> {
-        return getThreadsQuery(uids, realm).find()
     }
 
     fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {

@@ -48,19 +48,20 @@ import kotlin.math.min
 
 object MessageController {
 
-    //region Queries
-    private fun getMessagesQuery(realm: TypedRealm): RealmQuery<Message> {
-        return realm.query()
-    }
+    private fun byFolderId(folderId: String) = "${Message::folderId.name} == '$folderId'"
+    private val isNotDraft = "${Message::isDraft.name} == false"
+    private val isNotScheduled = "${Message::scheduled.name} == false"
+    private val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+            "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
+    //region Queries
     private fun getMessagesQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Message> {
         val byUids = "${Message::uid.name} IN {${uids.joinToString { "'$it'" }}}"
         return realm.query(byUids)
     }
 
     private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
-        val byFolderId = "${Message::folderId.name} == '$folderId'"
-        return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
+        return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId(folderId))
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
@@ -70,10 +71,6 @@ object MessageController {
     //endregion
 
     //region Get data
-    fun getMessages(realm: TypedRealm): RealmResults<Message> {
-        return getMessagesQuery(realm).find()
-    }
-
     private fun getMessages(uids: List<String>, realm: TypedRealm): RealmResults<Message> {
         return getMessagesQuery(uids, realm).find()
     }
@@ -91,18 +88,50 @@ object MessageController {
     }
 
     fun getMessageToReplyTo(messages: RealmList<Message>): Message {
-
-        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
-                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
-
-        val isNotDraft = "${Message::isDraft.name} == false"
-
-        return messages.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
+        return messages.query("$isNotDraft AND $isNotFromMe").find().lastOrNull()
             ?: messages.query(isNotDraft).find().lastOrNull()
             ?: messages.last()
     }
 
-    fun getMessageUidToReplyTo(messages: RealmList<Message>): String = getMessageToReplyTo(messages).uid
+    fun getUnseenMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, "${Message::seen.name} == false")
+    }
+
+    fun getFavoriteMessages(thread: Thread): List<Message> {
+        val isFavorite = "${Message::isFavorite.name} == true"
+        return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
+    }
+
+    fun getArchivableMessages(thread: Thread, folderId: String): List<Message> {
+        return getMessagesAndDuplicates(thread, "${byFolderId(folderId)} AND $isNotScheduled")
+    }
+
+    fun getSpamMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, "$isNotScheduled AND $isNotFromMe")
+    }
+
+    fun getDeletableMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, isNotScheduled)
+    }
+
+    fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
+        val message = thread.messages.query(isNotDraft).find().lastOrNull() ?: thread.messages.last()
+        return getMessageAndDuplicates(thread, message)
+    }
+
+    private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
+
+        val messages = thread.messages.query(query).find()
+
+        val byMessagesIds = "${Message::messageId.name} IN {${messages.joinToString { "'${it.messageId}'" }}}"
+        val duplicates = thread.duplicates.query(byMessagesIds).find()
+
+        return messages + duplicates
+    }
+
+    fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
+        return listOf(message) + thread.duplicates.query("${Message::messageId.name} == '${message.messageId}'").find()
+    }
     //endregion
 
     //region Edit data
