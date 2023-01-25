@@ -88,7 +88,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
+
         lockOrientationForSmallScreens()
+
         super.onCreate(savedInstanceState)
 
         setContentView(root)
@@ -155,39 +157,37 @@ class LoginActivity : AppCompatActivity() {
         animateSecondaryColorElements(accentColor)
     }
 
-    private fun authenticateUser(authCode: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            infomaniakLogin.getToken(
-                okHttpClient = HttpClient.okHttpClientNoInterceptor,
-                code = authCode,
-                onSuccess = {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        when (val user = authenticateUser(this@LoginActivity, it)) {
-                            is User -> {
-                                trackAccountEvent("loggedIn")
-                                AccountUtils.reloadApp?.invoke()
-                            }
-                            is ApiResponse<*> -> withContext(Dispatchers.Main) {
-                                if (user.error?.code == "no_mailbox") {
-                                    launchNoMailboxActivity()
-                                } else {
-                                    showError(getString(user.translatedError))
-                                }
-                            }
-                            else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
+    private fun authenticateUser(authCode: String) = lifecycleScope.launch(Dispatchers.IO) {
+        infomaniakLogin.getToken(
+            okHttpClient = HttpClient.okHttpClientNoInterceptor,
+            code = authCode,
+            onSuccess = {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    when (val user = authenticateUser(this@LoginActivity, it)) {
+                        is User -> {
+                            trackAccountEvent("loggedIn")
+                            AccountUtils.reloadApp?.invoke()
                         }
+                        is ApiResponse<*> -> withContext(Dispatchers.Main) {
+                            if (user.error?.code == NO_MAILBOX_ERROR_CODE) {
+                                launchNoMailboxActivity()
+                            } else {
+                                showError(getString(user.translatedError))
+                            }
+                        }
+                        else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
                     }
-                },
-                onError = {
-                    val error = when (it) {
-                        ErrorStatus.SERVER -> RCore.string.serverError
-                        ErrorStatus.CONNECTION -> RCore.string.connectionError
-                        else -> RCore.string.anErrorHasOccurred
-                    }
-                    showError(getString(error))
-                },
-            )
-        }
+                }
+            },
+            onError = {
+                val error = when (it) {
+                    ErrorStatus.SERVER -> RCore.string.serverError
+                    ErrorStatus.CONNECTION -> RCore.string.connectionError
+                    else -> RCore.string.anErrorHasOccurred
+                }
+                showError(getString(error))
+            },
+        )
     }
 
     private fun showError(error: String) {
@@ -227,13 +227,16 @@ class LoginActivity : AppCompatActivity() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 
-    private suspend fun launchNoMailboxActivity() = withContext(Dispatchers.Main) {
+    private fun launchNoMailboxActivity() = with(binding) {
         Intent(this@LoginActivity, NoMailboxActivity::class.java).apply { startActivity(this) }
-        binding.connectButton.hideProgress(R.string.buttonLogin)
-        binding.signInButton.isEnabled = true
+        connectButton.hideProgress(R.string.buttonLogin)
+        signInButton.isEnabled = true
     }
 
     companion object {
+
+        private const val NO_MAILBOX_ERROR_CODE = "no_mailbox"
+
         suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {
@@ -255,7 +258,7 @@ class LoginActivity : AppCompatActivity() {
                             apiResponse.data?.isEmpty() == true -> {
                                 ApiResponse<List<Mailbox>>(
                                     result = ApiResponse.Status.ERROR,
-                                    error = ApiError(code = "no_mailbox")
+                                    error = ApiError(code = NO_MAILBOX_ERROR_CODE),
                                 )
                             }
                             else -> {
