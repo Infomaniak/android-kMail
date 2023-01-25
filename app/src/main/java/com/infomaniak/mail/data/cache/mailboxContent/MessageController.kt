@@ -40,6 +40,7 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmList
 import okhttp3.OkHttpClient
 import java.util.*
@@ -79,6 +80,10 @@ object MessageController {
 
     fun getMessages(folderId: String, realm: TypedRealm? = null): RealmResults<Message> {
         return getMessagesQuery(folderId, realm).find()
+    }
+
+    fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
+        return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
     }
 
     fun getMessage(uid: String, realm: TypedRealm): Message? {

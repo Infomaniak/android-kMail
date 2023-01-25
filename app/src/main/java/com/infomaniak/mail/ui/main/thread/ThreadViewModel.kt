@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread
 import android.app.Application
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -47,7 +48,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun messagesLive(threadUid: String) = liveData(Dispatchers.IO) {
-        ThreadController.getThread(threadUid)?.messages?.asFlow()?.asLiveData()?.let { emitSource(it) }
+        MessageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
     fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
