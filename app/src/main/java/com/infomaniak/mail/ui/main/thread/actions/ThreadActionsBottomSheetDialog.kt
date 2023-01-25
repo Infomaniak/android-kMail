@@ -22,7 +22,6 @@ import android.view.View
 import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -52,11 +51,6 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             navigationArgs.messageUidToReplyTo,
         ).observe(viewLifecycleOwner) { (thread, messageUidToReplyTo) ->
 
-            if (thread == null) {
-                findNavController().popBackStack()
-                return@observe
-            }
-
             setSpamUi()
 
             postpone.isGone = true
@@ -75,8 +69,8 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
             mainActions.setClosingOnClickListener { id: Int ->
                 when (id) {
-                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo!!)
-                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo!!)
+                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
+                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
                     R.id.actionForward -> notYetImplemented()
                     R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread)
                 }
