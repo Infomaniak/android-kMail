@@ -39,13 +39,13 @@ object DraftController {
     private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
 
     //region Queries
-    private fun getDraftsQuery(query: String? = null, realm: TypedRealm? = null): RealmQuery<Draft> {
+    private fun getDraftsQuery(query: String? = null, realm: TypedRealm?): RealmQuery<Draft> {
         return with(realm ?: RealmDatabase.mailboxContent()) {
             query?.let { query(it) } ?: query()
         }
     }
 
-    private fun getDraftQuery(key: String, value: String, realm: TypedRealm? = null): RealmSingleQuery<Draft> {
+    private fun getDraftQuery(key: String, value: String, realm: TypedRealm?): RealmSingleQuery<Draft> {
         return (realm ?: RealmDatabase.mailboxContent()).query<Draft>("$key == '$value'").first()
     }
 
