@@ -36,6 +36,7 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
+import org.jsoup.Jsoup
 
 object ThreadController {
 
@@ -167,13 +168,20 @@ object ThreadController {
     }
 
     private fun insertInlineAttachment(body: String, attachments: List<Attachment>): String {
-        var html = body
-        attachments.forEach { attachment ->
-            if (attachment.getDisposition() == AttachmentDisposition.INLINE) {
-                html = html.replace("cid:${attachment.contentId}", "${BuildConfig.MAIL_API}${attachment.resource}")
+        val cidPrefix = "cid:"
+        val srcAttribute = "src"
+
+        with(Jsoup.parse(body)) {
+            val inlineElements = allElements.filter { it -> it.attr(srcAttribute).startsWith(cidPrefix) }
+            attachments.forEach { attachment ->
+                if (attachment.getDisposition() == AttachmentDisposition.INLINE) {
+                    val target = "${cidPrefix}${attachment.contentId}"
+                    val correctUrl = "${BuildConfig.MAIL_API}${attachment.resource}"
+                    inlineElements.find { it.attr(srcAttribute) == target }?.attr(srcAttribute, correctUrl)
+                }
             }
+            return html()
         }
-        return html
     }
     //endregion
 }
