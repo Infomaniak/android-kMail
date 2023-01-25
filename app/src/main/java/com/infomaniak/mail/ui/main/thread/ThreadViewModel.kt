@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
+import com.infomaniak.mail.utils.getUids
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.mapNotNull
@@ -63,7 +64,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
         emit(thread to expandedMap)
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
+        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, thread)
     }
 
     fun fetchIncompleteMessages(messages: List<Message>) {
@@ -76,7 +77,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteDraft(message: Message, thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
         val messages = thread.getMessageAndDuplicates(message)
 
-        if (ApiRepository.deleteMessages(mailbox.uuid, messages.map { it.uid }).isSuccess()) {
+        if (ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()) {
             MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
         }
     }

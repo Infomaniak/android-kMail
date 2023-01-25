@@ -52,7 +52,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 setSpamUi(message)
 
                 archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread, message) }
-                markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
+                markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(thread, message) }
                 move.setClosingOnClickListener { notYetImplemented() }
                 postpone.setClosingOnClickListener { notYetImplemented() }
                 favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread, message) }
