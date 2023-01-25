@@ -114,10 +114,6 @@ object MessageController {
         return getMessagesAndDuplicates(thread, isNotScheduled)
     }
 
-    fun getPermanentlyDeletableMessages(thread: Thread): List<Message> {
-        return thread.messages + thread.duplicates
-    }
-
     fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
         val message = thread.messages.query(isNotDraft).find().lastOrNull() ?: thread.messages.last()
         return getMessageAndDuplicates(thread, message)

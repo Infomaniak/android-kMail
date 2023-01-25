@@ -341,7 +341,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val messages = when {
             message != null -> MessageController.getMessageAndDuplicates(thread, message)
-            shouldPermanentlyDelete -> MessageController.getPermanentlyDeletableMessages(thread)
+            shouldPermanentlyDelete -> thread.messages + thread.duplicates
             else -> MessageController.getDeletableMessages(thread)
         }
         val uids = messages.getUids()
