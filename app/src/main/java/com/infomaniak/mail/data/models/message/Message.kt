@@ -92,6 +92,8 @@ class Message : RealmObject {
     var scheduled: Boolean = false
     var preview: String = ""
     var size: Int = 0
+    @SerialName("safe_display")
+    var safeDisplay: Boolean = false
     //endregion
 
     //region Local data (Transient)
