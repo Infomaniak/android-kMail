@@ -36,6 +36,8 @@ import okhttp3.OkHttpClient
 
 object ThreadController {
 
+    private val defaultRealm = RealmDatabase.mailboxContent()
+
     //region Queries
     private fun getThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
         return realm.query()
@@ -51,11 +53,11 @@ object ThreadController {
     private fun getThreadsQuery(
         folderId: String,
         filter: ThreadFilter = ThreadFilter.ALL,
-        realm: TypedRealm? = null,
+        realm: TypedRealm,
     ): RealmQuery<Thread> {
 
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
-        val query = (realm ?: RealmDatabase.mailboxContent())
+        val query = realm
             .query<Thread>(byFolderId)
             .sort(Thread::date.name, Sort.DESCENDING)
 
@@ -74,8 +76,8 @@ object ThreadController {
         }
     }
 
-    private fun getThreadQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Thread> {
-        return (realm ?: RealmDatabase.mailboxContent()).query<Thread>("${Thread::uid.name} == '$uid'").first()
+    private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
+        return realm.query<Thread>("${Thread::uid.name} == '$uid'").first()
     }
     //endregion
 
@@ -88,16 +90,20 @@ object ThreadController {
         return getUnreadThreadsCountQuery(folderId, realm).find().toInt()
     }
 
-    fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folderId, filter).asFlow()
+    fun getThreadsAsync(
+        folderId: String,
+        filter: ThreadFilter = ThreadFilter.ALL,
+        realm: TypedRealm = defaultRealm,
+    ): Flow<ResultsChange<Thread>> {
+        return getThreadsQuery(folderId, filter, realm).asFlow()
     }
 
-    fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
+    fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
         return getThreadQuery(uid, realm).find()
     }
 
-    fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
-        return getThreadQuery(uid).asFlow()
+    fun getThreadAsync(uid: String, realm: TypedRealm = defaultRealm): Flow<SingleQueryChange<Thread>> {
+        return getThreadQuery(uid, realm).asFlow()
     }
     //endregion
 
@@ -114,12 +120,12 @@ object ThreadController {
         messages: List<Message>,
         mailbox: Mailbox,
         okHttpClient: OkHttpClient? = null,
-        realm: Realm? = null,
+        realm: Realm = defaultRealm,
     ) {
 
         val impactedFoldersIds = mutableSetOf<String>()
 
-        (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
+        realm.writeBlocking {
             messages.forEach { localMessage ->
                 if (!localMessage.fullyDownloaded) {
                     with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {

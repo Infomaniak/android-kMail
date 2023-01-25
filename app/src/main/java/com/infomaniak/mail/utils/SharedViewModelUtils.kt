@@ -55,7 +55,7 @@ object SharedViewModelUtils {
 
         foldersIds.forEach { folderId ->
             FolderController.getFolder(folderId)?.let { folder ->
-                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient = null, realm = null)
+                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient = null)
             }
         }
     }

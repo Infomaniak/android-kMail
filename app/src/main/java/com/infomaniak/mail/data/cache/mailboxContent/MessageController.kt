@@ -48,6 +48,8 @@ import kotlin.math.min
 
 object MessageController {
 
+    private val defaultRealm = RealmDatabase.mailboxContent()
+
     private fun byFolderId(folderId: String) = "${Message::folderId.name} == '$folderId'"
     private val isNotDraft = "${Message::isDraft.name} == false"
     private val isNotScheduled = "${Message::scheduled.name} == false"
@@ -60,13 +62,13 @@ object MessageController {
         return realm.query(byUids)
     }
 
-    private fun getMessagesQuery(folderId: String, realm: TypedRealm?): RealmQuery<Message> {
-        return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId(folderId))
+    private fun getMessagesQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
+        return realm.query(byFolderId(folderId))
     }
 
-    private fun getMessageQuery(uid: String, realm: TypedRealm?): RealmSingleQuery<Message> {
+    private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
         val byUid = "${Message::uid.name} == '$uid'"
-        return (realm ?: RealmDatabase.mailboxContent()).query<Message>(byUid).first()
+        return realm.query<Message>(byUid).first()
     }
     //endregion
 
@@ -75,7 +77,7 @@ object MessageController {
         return getMessagesQuery(uids, realm).find()
     }
 
-    fun getMessages(folderId: String, realm: TypedRealm? = null): RealmResults<Message> {
+    fun getMessages(folderId: String, realm: TypedRealm = defaultRealm): RealmResults<Message> {
         return getMessagesQuery(folderId, realm).find()
     }
 
@@ -83,7 +85,7 @@ object MessageController {
         return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
     }
 
-    fun getMessage(uid: String, realm: TypedRealm? = null): Message? {
+    fun getMessage(uid: String, realm: TypedRealm = RealmDatabase.mailboxContent()): Message? {
         return getMessageQuery(uid, realm).find()
     }
 
@@ -156,7 +158,7 @@ object MessageController {
         mailbox: Mailbox,
         folderId: String,
         okHttpClient: OkHttpClient? = null,
-        realm: Realm? = null,
+        realm: Realm = defaultRealm,
     ): List<Thread> {
 
         val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
@@ -179,7 +181,12 @@ object MessageController {
         return newMessagesThreads
     }
 
-    fun fetchFolderMessages(mailbox: Mailbox, folder: Folder, okHttpClient: OkHttpClient?, realm: Realm?): List<Thread> {
+    fun fetchFolderMessages(
+        mailbox: Mailbox,
+        folder: Folder,
+        okHttpClient: OkHttpClient?,
+        realm: Realm = defaultRealm,
+    ): List<Thread> {
         val previousCursor = folder.cursor
 
         val messagesUids = if (previousCursor == null) {
@@ -196,7 +203,7 @@ object MessageController {
         folder: Folder,
         mailbox: Mailbox,
         okHttpClient: OkHttpClient?,
-        realm: Realm?,
+        realm: Realm,
     ) = with(messagesUids) {
 
         Log.i(
@@ -206,7 +213,7 @@ object MessageController {
 
         val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, okHttpClient, realm)
 
-        (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
+        realm.writeBlocking {
 
             val impactedFolders = newMessagesThreads.map { it.folderId }.toMutableSet()
 
@@ -231,7 +238,7 @@ object MessageController {
         folder: Folder,
         mailboxUuid: String,
         okHttpClient: OkHttpClient?,
-        realm: Realm?,
+        realm: Realm,
     ): List<Thread> {
         val newMessagesThreads = mutableSetOf<Thread>()
         if (shortUids.isNotEmpty()) {
@@ -248,7 +255,7 @@ object MessageController {
                 val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page, okHttpClient)
                 if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
                 apiResponse.data?.messages?.let { messages ->
-                    (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
+                    realm.writeBlocking {
                         val threads = createMultiMessagesThreads(messages, folder)
                         newMessagesThreads.addAll(threads)
                     }

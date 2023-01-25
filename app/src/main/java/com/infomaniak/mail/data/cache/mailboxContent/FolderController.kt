@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@ import kotlinx.coroutines.flow.mapNotNull
 
 object FolderController {
 
+    private val defaultRealm = RealmDatabase.mailboxContent()
+
     //region Queries
     private fun getFoldersQuery(): RealmQuery<Folder> {
         return RealmDatabase.mailboxContent().query()
@@ -46,8 +48,8 @@ object FolderController {
         return realm.query(checkIsNotInExceptions)
     }
 
-    private fun getFolderQuery(key: String, value: String, realm: TypedRealm? = null): RealmSingleQuery<Folder> {
-        return (realm ?: RealmDatabase.mailboxContent()).query<Folder>("$key == '$value'").first()
+    private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {
+        return realm.query<Folder>("$key == '$value'").first()
     }
     //endregion
 
@@ -60,16 +62,16 @@ object FolderController {
         return getFoldersQuery().asFlow()
     }
 
-    fun getFolder(id: String, realm: TypedRealm? = null): Folder? {
+    fun getFolder(id: String, realm: TypedRealm = defaultRealm): Folder? {
         return getFolderQuery(Folder::id.name, id, realm).find()
     }
 
-    fun getFolder(role: FolderRole, realm: TypedRealm? = null): Folder? {
+    fun getFolder(role: FolderRole, realm: TypedRealm = defaultRealm): Folder? {
         return getFolderQuery(Folder::_role.name, role.name, realm).find()
     }
 
-    fun getFolderAsync(id: String): Flow<Folder> {
-        return getFolderQuery(Folder::id.name, id).asFlow().mapNotNull { it.obj }
+    fun getFolderAsync(id: String, realm: TypedRealm = defaultRealm): Flow<Folder> {
+        return getFolderQuery(Folder::id.name, id, realm).asFlow().mapNotNull { it.obj }
     }
 
     fun getIdsOfFoldersWithSpecificBehavior(realm: TypedRealm): List<String> {
