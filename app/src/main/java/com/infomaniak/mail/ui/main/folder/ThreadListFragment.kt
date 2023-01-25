@@ -78,10 +78,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private var lastUpdatedDate: Date? = null
     private var previousFirstMessageUid: String? = null
 
-    private var isFirstOpeningOfThisFolder = false
-    private var currentFolderCursor: String? = null
-    private var currentThreadsCount: Int? = null
-
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
@@ -144,14 +140,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    private fun setupAdapter() {
+    private fun setupAdapter() = with(threadListViewModel) {
 
         threadListAdapter = ThreadListAdapter(
             context = requireContext(),
             threadDensity = localSettings.threadDensity,
             folderRole = FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
-            onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
+            onSwipeFinished = { isRecoveringFinished.value = true },
         )
 
         binding.threadsList.apply {
@@ -178,7 +174,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             onThreadClicked = { thread ->
                 if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-                    threadListViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+                    navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
                         safeNavigate(
                             ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
                                 draftExists = true,
@@ -324,13 +320,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun observeCurrentThreads() {
+    private fun observeCurrentThreads() = with(threadListViewModel) {
         mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
-            waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
+            waitingBeforeNotifyAdapter = isRecoveringFinished
             beforeUpdateAdapter = { threads ->
                 currentThreadsCount = threads.count()
-                handleThreadsVisibility()
+                updateThreadsVisibility()
             }
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
         }
@@ -357,23 +353,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun observeCurrentFolderLive() {
+    private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLiveToObserve.refreshObserve(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
-            updateThreadsVisibilityIfNeeded(folder.cursor)
+            updateThreadsVisibility()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
-            threadListViewModel.startUpdatedAtJob()
-        }
-    }
-
-    private fun updateThreadsVisibilityIfNeeded(cursor: String?) {
-        when {
-            cursor == null -> isFirstOpeningOfThisFolder = true
-            isFirstOpeningOfThisFolder -> {
-                handleThreadsVisibility()
-                isFirstOpeningOfThisFolder = false
-            }
+            startUpdatedAtJob()
         }
     }
 
@@ -432,7 +418,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun handleThreadsVisibility() {
+    private fun updateThreadsVisibility() = with(threadListViewModel) {
         Log.d("UI", "Received threads (${currentThreadsCount})")
 
         if (currentFolderCursor != null && currentThreadsCount == 0) {
