@@ -319,9 +319,9 @@
     <string name="threadListHeaderLastUpdate">Mis à jour %s</string>
     <string name="threadListHeaderLastUpdateNow">à l’instant</string>
     <plurals name="threadListHeaderUnreadCount">
-        <item quantity="one">%d non lu</item>
-        <item quantity="other">%d non lus</item>
-        <item quantity="many">%d non lus</item>
+        <item quantity="one">%s non lu</item>
+        <item quantity="other">%s non lus</item>
+        <item quantity="many">%s non lus</item>
     </plurals>
     <string name="threadListSectionLastWeek">La semaine dernière</string>
     <string name="threadListSectionThisMonth">Ce mois-ci</string>

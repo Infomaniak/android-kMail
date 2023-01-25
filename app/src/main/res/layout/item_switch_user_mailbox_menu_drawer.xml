@@ -22,7 +22,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:icon="@drawable/ic_envelope"
-    app:isBadgeCapped="true"
     app:textWeight="@font/suisseintl_regular"
     tools:badge="420"
     tools:text="myriam.rais@infomaniak.com" />
