@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
 import com.infomaniak.mail.utils.getUids
+import com.infomaniak.mail.utils.handlerIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.mapNotNull
@@ -74,7 +75,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun deleteDraft(message: Message, thread: Thread, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteDraft(message: Message, thread: Thread, mailbox: Mailbox) = viewModelScope.launch(viewModelScope.handlerIO) {
         val messages = MessageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
