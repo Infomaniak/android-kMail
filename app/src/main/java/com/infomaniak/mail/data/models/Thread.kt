@@ -22,6 +22,7 @@ import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
@@ -30,6 +31,7 @@ import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
+import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.ext.toRealmList
@@ -47,10 +49,12 @@ class Thread : RealmObject {
     var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
     var duplicates: RealmList<Message> = realmListOf()
+    var messagesIds: RealmSet<String> = realmSetOf()
+    var folderRole: FolderRole? = null
+
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
-    var date: RealmInstant = Date().toRealmInstant()
     var size: Int = 0
     var hasAttachments: Boolean = false
     var hasDrafts: Boolean = false
@@ -58,7 +62,13 @@ class Thread : RealmObject {
     var isAnswered: Boolean = false
     var isForwarded: Boolean = false
     var isScheduled: Boolean = false
-    var messagesIds: RealmSet<String> = realmSetOf()
+    var avatarRecipient: Recipient? = null
+    var displayedRecipients: RealmList<Recipient> = realmListOf()
+    var subject: String? = null
+    var preview: String = ""
+    var date: RealmInstant = Date().toRealmInstant()
+
+    private val parentFolder by backlinks(Folder::threads)
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
@@ -102,7 +112,7 @@ class Thread : RealmObject {
         }
     }
 
-    fun recomputeThread(realm: MutableRealm) {
+    fun recomputeThread(sentFolderId: String, realm: MutableRealm) {
 
         // Delete Thread if empty
         if (messages.none { it.folderId == folderId }) {
@@ -117,10 +127,15 @@ class Thread : RealmObject {
         // Remove duplicates in Recipients lists
         from = from.toRecipientsList().distinct().toRealmList()
         to = to.toRecipientsList().distinct().toRealmList()
+
+        computeAvatarRecipient(sentFolderId)
+        computeDisplayedRecipients()
+        computeSubject()
+        computePreview()
+        computeDate()
     }
 
     private fun resetThread() {
-        messages.sortBy { it.date }
         unseenMessagesCount = 0
         from = realmListOf()
         to = realmListOf()
@@ -131,9 +146,13 @@ class Thread : RealmObject {
         isAnswered = false
         isForwarded = false
         isScheduled = false
+        displayedRecipients = realmListOf()
     }
 
     private fun updateThread() {
+
+        messages.sortBy { it.date }
+
         messages.forEach { message ->
             messagesIds += message.messageIds
             if (!message.isSeen) unseenMessagesCount++
@@ -147,6 +166,33 @@ class Thread : RealmObject {
             if (message.isForwarded) isForwarded = true
             if (message.isScheduled) isScheduled = true
         }
+
+        folderRole = parentFolder.first().role
+    }
+
+    private fun computeAvatarRecipient(sentFolderId: String) {
+        val message = messages.lastOrNull { it.folderId != sentFolderId } ?: messages.last()
+        avatarRecipient = message.from.first()
+    }
+
+    private fun computeDisplayedRecipients() {
+        displayedRecipients.addAll(if (folderRole == FolderRole.DRAFT) to else from)
+    }
+
+    private fun computeSubject() {
+        subject = messages.first().subject
+    }
+
+    private fun computePreview() {
+        val message = if (folderRole == FolderRole.SENT) {
+            messages.lastOrNull { it.folderId == folderId } ?: messages.last()
+        } else {
+            messages.last()
+        }
+        preview = message.preview
+    }
+
+    private fun computeDate() {
         date = messages.last { it.folderId == folderId }.date
     }
 
@@ -161,8 +207,6 @@ class Thread : RealmObject {
     }
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
-
-    fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

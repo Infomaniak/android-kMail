@@ -45,7 +45,6 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
@@ -94,10 +93,9 @@ class ThreadListAdapter(
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.firstOrNull() is Unit && holder.itemViewType == DisplayType.THREAD.layout) {
-            with(holder.binding as CardviewThreadItemBinding) {
-                val recipient = (dataSet[position] as Thread).getDisplayedMessage().getDisplayedRecipient()
-                expeditorAvatar.loadAvatar(recipient, contacts)
-            }
+            val binding = holder.binding as CardviewThreadItemBinding
+            val thread = dataSet[position] as Thread
+            binding.displayAvatar(thread)
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -125,26 +123,15 @@ class ThreadListAdapter(
         }
     }
 
-    private fun Thread.getDisplayedMessage(): Message {
-        return messages
-            .lastOrNull { if (folderRole == FolderRole.SENT) it.folderId != folderId else it.folderId == folderId }
-            ?: messages.last()
-    }
-
-    private fun Message.getDisplayedRecipient(): Recipient = from.first()
-
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
 
-        draftPrefix.isVisible = hasDrafts
-        expeditor.text = formatRecipientNames(context, if (folderRole == FolderRole.DRAFT) to else from)
-
-        mailSubject.text = getFormattedSubject(context)
-
-        val displayedMessage = getDisplayedMessage()
-        mailBodyPreview.text = displayedMessage.preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
-        expeditorAvatar.loadAvatar(displayedMessage.getDisplayedRecipient(), contacts)
-
+        displayAvatar(thread = this)
+        expeditor.text = context.formatRecipientNames(displayedRecipients)
+        mailSubject.text = context.formatSubject(subject)
+        mailBodyPreview.text = preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
         mailDate.text = formatDate(root.context)
+
+        draftPrefix.isVisible = hasDrafts
 
         iconAttachment.isVisible = hasAttachments
         iconCalendar.isGone = true // TODO: See with API when we should display this icon
@@ -156,14 +143,18 @@ class ThreadListAdapter(
 
         if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
-        root.setOnClickListener { onThreadClicked?.invoke(this@with) }
-
         expeditorAvatar.isVisible = threadDensity == LARGE
         mailBodyPreview.isGone = threadDensity == COMPACT
         mailSubject.setMarginsRelative(top = if (threadDensity == COMPACT) 0 else 4.toPx())
+
+        root.setOnClickListener { onThreadClicked?.invoke(this@with) }
     }
 
-    private fun formatRecipientNames(context: Context, recipients: List<Recipient>): String {
+    private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
+        expeditorAvatar.loadAvatar(thread.avatarRecipient!!, contacts)
+    }
+
+    private fun Context.formatRecipientNames(recipients: List<Recipient>): String {
         return when (recipients.count()) {
             0 -> context.getString(R.string.unknownRecipientTitle)
             1 -> recipients.single().displayedName(context)

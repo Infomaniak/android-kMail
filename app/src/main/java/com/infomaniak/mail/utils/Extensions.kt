@@ -136,6 +136,14 @@ fun Context.getAttributeColor(attribute: Int): Int {
     return typedValue.data
 }
 
+fun Context.formatSubject(subject: String?): String {
+    return if (subject.isNullOrBlank()) {
+        getString(R.string.noSubjectTitle)
+    } else {
+        subject.replace("\n+".toRegex(), " ")
+    }
+}
+
 fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     addAnimatorListener(object : Animator.AnimatorListener {
         override fun onAnimationStart(animation: Animator) = Unit

@@ -26,6 +26,7 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
+import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
@@ -61,6 +62,8 @@ class Folder : RealmObject {
     var cursor: String? = null
     @Transient
     var unreadCount: Int = 0
+    @Transient
+    var threads: RealmList<Thread> = realmListOf()
     //endregion
 
     val parentFolder by backlinks(Folder::children)
@@ -68,10 +71,11 @@ class Folder : RealmObject {
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
 
-    fun initLocalValues(lastUpdatedAt: RealmInstant?, cursor: String?, unreadCount: Int) {
+    fun initLocalValues(lastUpdatedAt: RealmInstant?, cursor: String?, unreadCount: Int, threads: RealmList<Thread>) {
         this.lastUpdatedAt = lastUpdatedAt
         this.cursor = cursor
         this.unreadCount = unreadCount
+        this.threads.addAll(threads)
     }
 
     fun getLocalizedName(context: Context): String {

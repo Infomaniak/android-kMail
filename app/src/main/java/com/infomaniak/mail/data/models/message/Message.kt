@@ -19,9 +19,7 @@
 
 package com.infomaniak.mail.data.models.message
 
-import android.content.Context
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
@@ -198,14 +196,6 @@ class Message : RealmObject {
             messageId?.let { addAll(it.parseMessagesIds()) }
             references?.let { addAll(it.parseMessagesIds()) }
             inReplyTo?.let { addAll(it.parseMessagesIds()) }
-        }
-    }
-
-    fun getFormattedSubject(context: Context): String {
-        return if (subject.isNullOrBlank()) {
-            context.getString(R.string.noSubjectTitle)
-        } else {
-            subject!!.replace("\n+".toRegex(), " ")
         }
     }
 

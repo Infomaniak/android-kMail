@@ -40,6 +40,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
+import com.infomaniak.mail.utils.formatSubject
 import com.infomaniak.mail.utils.htmlToText
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.Dispatchers
@@ -136,7 +137,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
         if (message.isSeen) return // Ignore if it has already been seen
 
-        val subject = message.getFormattedSubject(applicationContext)
+        val subject = applicationContext.formatSubject(message.subject)
         val preview = message.body?.value?.ifBlank { null }
             ?.let { "\n${it.htmlToText()}" } // TODO: remove body history
             ?: message.preview.ifBlank { null }?.let { "\n$it" } ?: ""
