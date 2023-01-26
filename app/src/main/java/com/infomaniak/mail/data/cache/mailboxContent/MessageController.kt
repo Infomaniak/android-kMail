@@ -85,7 +85,7 @@ object MessageController {
         return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
     }
 
-    fun getMessage(uid: String, realm: TypedRealm = RealmDatabase.mailboxContent()): Message? {
+    fun getMessage(uid: String, realm: TypedRealm = defaultRealm): Message? {
         return getMessageQuery(uid, realm).find()
     }
 

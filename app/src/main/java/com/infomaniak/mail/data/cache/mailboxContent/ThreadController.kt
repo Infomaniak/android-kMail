@@ -90,20 +90,16 @@ object ThreadController {
         return getUnreadThreadsCountQuery(folderId, realm).find().toInt()
     }
 
-    fun getThreadsAsync(
-        folderId: String,
-        filter: ThreadFilter = ThreadFilter.ALL,
-        realm: TypedRealm = defaultRealm,
-    ): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folderId, filter, realm).asFlow()
+    fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
+        return getThreadsQuery(folderId, filter, defaultRealm).asFlow()
     }
 
     fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
         return getThreadQuery(uid, realm).find()
     }
 
-    fun getThreadAsync(uid: String, realm: TypedRealm = defaultRealm): Flow<SingleQueryChange<Thread>> {
-        return getThreadQuery(uid, realm).asFlow()
+    fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
+        return getThreadQuery(uid, defaultRealm).asFlow()
     }
     //endregion
 

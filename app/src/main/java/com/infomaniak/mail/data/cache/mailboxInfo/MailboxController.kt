@@ -81,8 +81,8 @@ object MailboxController {
         return getMailboxesQuery().asFlow()
     }
 
-    fun getMailboxesAsync(userId: Int, realm: TypedRealm = defaultRealm): Flow<RealmResults<Mailbox>> {
-        return getMailboxesQuery(userId, realm).asFlow().map { it.list }
+    fun getMailboxesAsync(userId: Int): Flow<RealmResults<Mailbox>> {
+        return getMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
     }
 
     fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox? {
@@ -93,8 +93,8 @@ object MailboxController {
         return getMailboxQuery(userId, mailboxId, realm).find() ?: getMailboxesQuery(userId, realm).first().find()
     }
 
-    fun getMailboxAsync(objectId: String, realm: TypedRealm = defaultRealm): Flow<SingleQueryChange<Mailbox>> {
-        return getMailboxQuery(objectId, realm).asFlow()
+    fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
+        return getMailboxQuery(objectId, defaultRealm).asFlow()
     }
     //endregion
 

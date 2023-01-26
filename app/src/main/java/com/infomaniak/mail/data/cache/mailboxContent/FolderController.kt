@@ -40,7 +40,7 @@ object FolderController {
 
     //region Queries
     private fun getFoldersQuery(): RealmQuery<Folder> {
-        return RealmDatabase.mailboxContent().query()
+        return defaultRealm.query()
     }
 
     private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
@@ -70,8 +70,8 @@ object FolderController {
         return getFolderQuery(Folder::_role.name, role.name, realm).find()
     }
 
-    fun getFolderAsync(id: String, realm: TypedRealm = defaultRealm): Flow<Folder> {
-        return getFolderQuery(Folder::id.name, id, realm).asFlow().mapNotNull { it.obj }
+    fun getFolderAsync(id: String): Flow<Folder> {
+        return getFolderQuery(Folder::id.name, id, defaultRealm).asFlow().mapNotNull { it.obj }
     }
 
     fun getIdsOfFoldersWithSpecificBehavior(realm: TypedRealm): List<String> {

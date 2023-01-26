@@ -79,7 +79,7 @@ object DraftController {
 
     fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+        realm?.let(block) ?: defaultRealm.writeBlocking(block)
     }
     //endregion
 
