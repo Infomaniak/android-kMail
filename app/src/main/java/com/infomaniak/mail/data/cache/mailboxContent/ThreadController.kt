@@ -17,11 +17,8 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
@@ -37,7 +34,6 @@ import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
 import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
-import org.jsoup.Jsoup
 
 object ThreadController {
 
@@ -147,12 +143,6 @@ object ThreadController {
                                     draftLocalUuid,
                                 )
 
-                                remoteMessage.body?.let { body ->
-                                    if (body.type == Utils.TEXT_HTML) {
-                                        body.value = insertInlineAttachment(body.value, remoteMessage.attachments)
-                                    }
-                                }
-
                                 MessageController.upsertMessage(remoteMessage, realm = this@writeBlocking)
                             }
                         } else {
@@ -167,23 +157,6 @@ object ThreadController {
             FolderController.getFolder(folderId, realm)?.let { folder ->
                 MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
             }
-        }
-    }
-
-    private fun insertInlineAttachment(body: String, attachments: List<Attachment>): String {
-        val cidPrefix = "cid:"
-        val srcAttribute = "src"
-
-        with(Jsoup.parse(body)) {
-            val inlineElements = allElements.filter { it -> it.attr(srcAttribute).startsWith(cidPrefix) }
-            attachments.forEach { attachment ->
-                if (attachment.disposition == AttachmentDisposition.INLINE) {
-                    val target = "${cidPrefix}${attachment.contentId}"
-                    val correctUrl = "${BuildConfig.MAIL_API}${attachment.resource}"
-                    inlineElements.find { it.attr(srcAttribute) == target }?.attr(srcAttribute, correctUrl)
-                }
-            }
-            return html()
         }
     }
     //endregion

@@ -161,7 +161,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
 
-        messageBody.webViewClient = InlineAttachmentWebViewClient()
+        messageBody.webViewClient = MessageWebViewClient(context, message.attachments)
 
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
