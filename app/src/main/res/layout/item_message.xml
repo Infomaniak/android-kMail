@@ -349,6 +349,7 @@
             app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
+            app:tint="@color/iconSecondaryColor"
             tools:ignore="ContentDescription" />
 
         <TextView

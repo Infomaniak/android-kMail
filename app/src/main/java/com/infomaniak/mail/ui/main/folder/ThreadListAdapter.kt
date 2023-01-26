@@ -177,10 +177,20 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.setThreadUiRead() {
         newMailBullet.isInvisible = true
+        threadCount.setTextAppearance(R.style.Label_Secondary)
+        threadCountCardview.apply {
+            setStrokeColor(context.getColor(R.color.cardViewStrokeColor))
+            setCardBackgroundColor(context.getColor(R.color.dialogBackground))
+        }
     }
 
     private fun CardviewThreadItemBinding.setThreadUiUnread() {
         newMailBullet.isVisible = true
+        threadCount.setTextAppearance(R.style.LabelMedium)
+        threadCountCardview.apply {
+            setStrokeColor(context.getColor(R.color.primaryTextColor))
+            setCardBackgroundColor(context.getColor(R.color.backgroundColor))
+        }
     }
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
