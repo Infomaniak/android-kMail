@@ -48,6 +48,7 @@ import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.utils.getFoldersIds
 import com.infomaniak.mail.utils.getUids
+import com.infomaniak.mail.utils.handlerIO
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -180,7 +181,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         DraftsActionsWorker.scheduleWork(context)
     }
 
-    fun forceRefreshMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+    fun forceRefreshMailboxes() = viewModelScope.launch(viewModelScope.handlerIO) {
         Log.d(TAG, "Force refresh mailboxes")
         val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
         MailboxController.updateMailboxes(context, mailboxes)
