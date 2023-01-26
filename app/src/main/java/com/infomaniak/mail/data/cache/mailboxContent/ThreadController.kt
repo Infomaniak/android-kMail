@@ -36,7 +36,7 @@ import okhttp3.OkHttpClient
 
 object ThreadController {
 
-    private val defaultRealm = RealmDatabase.mailboxContent()
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
     private fun getThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
@@ -57,9 +57,7 @@ object ThreadController {
     ): RealmQuery<Thread> {
 
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
-        val query = realm
-            .query<Thread>(byFolderId)
-            .sort(Thread::date.name, Sort.DESCENDING)
+        val query = realm.query<Thread>(byFolderId).sort(Thread::date.name, Sort.DESCENDING)
 
         return if (filter == ThreadFilter.ALL) {
             query

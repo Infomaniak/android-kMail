@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.mapNotNull
 
 object FolderController {
 
-    private val defaultRealm = RealmDatabase.mailboxContent()
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
     private fun getFoldersQuery(): RealmQuery<Folder> {

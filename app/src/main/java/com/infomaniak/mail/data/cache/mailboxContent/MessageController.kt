@@ -48,7 +48,7 @@ import kotlin.math.min
 
 object MessageController {
 
-    private val defaultRealm = RealmDatabase.mailboxContent()
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     private fun byFolderId(folderId: String) = "${Message::folderId.name} == '$folderId'"
     private val isNotDraft = "${Message::isDraft.name} == false"

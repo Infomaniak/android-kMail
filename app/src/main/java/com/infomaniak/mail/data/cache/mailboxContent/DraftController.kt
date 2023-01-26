@@ -38,7 +38,7 @@ object DraftController {
     private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
     private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
 
-    private val defaultRealm = RealmDatabase.mailboxContent()
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
     private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {

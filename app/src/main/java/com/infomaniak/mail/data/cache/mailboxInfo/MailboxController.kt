@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.map
 
 object MailboxController {
 
-    private val defaultRealm = RealmDatabase.mailboxInfo()
+    private inline val defaultRealm get() = RealmDatabase.mailboxInfo()
 
     //region Queries
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
