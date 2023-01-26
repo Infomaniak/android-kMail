@@ -21,17 +21,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.google.android.material.card.MaterialCardView
-import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
@@ -46,7 +41,6 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
 import com.infomaniak.mail.utils.Utils.injectCssInHtml
-import okhttp3.Request
 import java.util.*
 import com.infomaniak.lib.core.R as RCore
 
@@ -167,20 +161,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
 
-        messageBody.webViewClient = object : WebViewClient() {
-            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-                val scheme = request?.url?.scheme
-                if (!(scheme == "http" || scheme == "https")) return null
-
-                val httpRequest = Request.Builder().url(request.url.toString()).build()
-                val response = HttpClient.okHttpClient.newCall(httpRequest).execute()
-                return WebResourceResponse(
-                    null,
-                    response.header("content-encoding", "utf-8"),
-                    response.body!!.byteStream()
-                )
-            }
-        }
+        messageBody.webViewClient = InlineAttachmentWebViewClient()
 
         handleHeaderClick(message)
         handleExpandDetailsClick(message)

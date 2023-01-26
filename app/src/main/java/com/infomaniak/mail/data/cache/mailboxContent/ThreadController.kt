@@ -26,6 +26,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -146,8 +147,10 @@ object ThreadController {
                                     draftLocalUuid,
                                 )
 
-                                remoteMessage.body?.value?.let {
-                                    remoteMessage.body?.value = insertInlineAttachment(it, remoteMessage.attachments)
+                                remoteMessage.body?.let { body ->
+                                    if (body.type == Utils.TEXT_HTML) {
+                                        body.value = insertInlineAttachment(body.value, remoteMessage.attachments)
+                                    }
                                 }
 
                                 MessageController.upsertMessage(remoteMessage, realm = this@writeBlocking)
@@ -174,7 +177,7 @@ object ThreadController {
         with(Jsoup.parse(body)) {
             val inlineElements = allElements.filter { it -> it.attr(srcAttribute).startsWith(cidPrefix) }
             attachments.forEach { attachment ->
-                if (attachment.getDisposition() == AttachmentDisposition.INLINE) {
+                if (attachment.disposition == AttachmentDisposition.INLINE) {
                     val target = "${cidPrefix}${attachment.contentId}"
                     val correctUrl = "${BuildConfig.MAIL_API}${attachment.resource}"
                     inlineElements.find { it.attr(srcAttribute) == target }?.attr(srcAttribute, correctUrl)
