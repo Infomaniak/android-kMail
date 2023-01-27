@@ -74,6 +74,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
     }
 
+    /**
+     * This LiveData value should never be accessed directly.
+     * The overridden `get()` will make it null.
+     */
     val currentFoldersLiveToObserve
         get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) {
@@ -83,6 +87,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
+    /**
+     * This LiveData value should never be accessed directly.
+     * The overridden `get()` will make it null.
+     */
     val currentQuotasLiveToObserve
         get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
@@ -96,6 +104,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
     }
 
+    /**
+     * This LiveData value should never be accessed directly.
+     * The overridden `get()` will make it null.
+     */
     val currentFolderLiveToObserve
         get() = currentFolderId.switchMap { folderId ->
             liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
@@ -103,6 +115,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
+    /**
+     * This LiveData value should never be accessed directly.
+     * The overridden `get()` will make it null.
+     */
     val currentThreadsLiveToObserve
         get() = observeFolderAndFilter().switchMap { (folder, filter) ->
             liveData(Dispatchers.IO) {
