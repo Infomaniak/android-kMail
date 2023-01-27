@@ -161,7 +161,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
 
-        messageBody.webViewClient = MessageWebViewClient(context, message.attachments)
+        messageWebViewClient.setAttachments(message.attachments)
 
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
@@ -342,6 +342,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
+        val messageWebViewClient = MessageWebViewClient(binding.context)
 
         init {
             with(binding) {
@@ -350,6 +351,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 ccRecyclerView.adapter = ccAdapter
                 bccRecyclerView.adapter = bccAdapter
                 attachmentsRecyclerView.adapter = attachmentAdapter
+                messageBody.webViewClient = messageWebViewClient
             }
         }
     }
