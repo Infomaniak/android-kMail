@@ -269,7 +269,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:paddingEnd">@dimen/marginStandard</item>
         <item name="android:paddingStart">@dimen/marginStandard</item>
-        <item name="cardBackgroundColor">@color/backgroundColor</item>
+        <item name="cardBackgroundColor">@android:color/transparent</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
         <item name="shapeAppearanceOverlay">@style/MenuDrawerItemShapeAppearance</item>
     </style>

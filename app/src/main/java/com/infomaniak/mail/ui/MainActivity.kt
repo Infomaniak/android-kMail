@@ -53,14 +53,15 @@ class MainActivity : ThemedActivity() {
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
+    private val menuDrawerBackground: Int by lazy { getColor(R.color.menuDrawerBackground) }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset)
+            colorSystemBarsWithMenuDrawer(slideOffset)
         }
 
         override fun onDrawerOpened(drawerView: View) {
-            window.statusBarColor = getColor(R.color.backgroundColor)
+            colorSystemBarsWithMenuDrawer()
             (binding.menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
         }
 
@@ -94,6 +95,11 @@ class MainActivity : ThemedActivity() {
     override fun onStart() {
         super.onStart()
         SyncMessagesWorker.cancelWork(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
     override fun onStop() {
@@ -136,10 +142,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun setupMenuDrawerCallbacks() = with(binding) {
-        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.apply {
-            exitDrawer = { drawerLayout.close() }
-            isDrawerOpen = { drawerLayout.isOpen }
-        }
+        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.exitDrawer = { drawerLayout.close() }
     }
 
     private fun registerMainPermissions(permissionUtils: PermissionUtils) {
@@ -196,6 +199,16 @@ class MainActivity : ThemedActivity() {
         mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
             val onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
             showSnackbar(title, onActionClicked = onActionClicked)
+        }
+    }
+
+    private fun colorSystemBarsWithMenuDrawer(slideOffset: Float = 1.0f) {
+        if (slideOffset == 1.0f) {
+            window.statusBarColor = menuDrawerBackground
+            window.navigationBarColor = menuDrawerBackground
+        } else {
+            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackground, slideOffset)
+            window.navigationBarColor = UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackground, slideOffset)
         }
     }
 }

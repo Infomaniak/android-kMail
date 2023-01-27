@@ -53,6 +53,8 @@
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadBackground">@color/rabbit</color>
 
+    <color name="menuDrawerBackground">@color/backgroundColorSecondary</color>
+
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
     <color name="secondaryTextColor">@color/elephant</color>
