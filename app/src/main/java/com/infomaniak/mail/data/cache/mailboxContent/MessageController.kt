@@ -306,7 +306,7 @@ object MessageController {
             thread.recomputeThread(realm = this)
             upsertThread(thread)
             if (thread.folderId == folder.id) {
-                folderThreads.add(if (thread.isManaged()) thread.copyFromRealm(UInt.MIN_VALUE) else thread)
+                folderThreads.add(if (thread.isManaged()) thread.copyFromRealm(1u) else thread)
             }
         }
 
