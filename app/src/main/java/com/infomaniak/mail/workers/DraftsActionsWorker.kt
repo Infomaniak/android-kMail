@@ -187,13 +187,15 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         when (draft.action) {
             DraftAction.SAVE -> with(ApiRepository.saveDraft(mailboxUuid, draft, okHttpClient)) {
-                if (data != null) {
+                if (data == null) {
+                    throwErrorAsException()
+                } else {
                     DraftController.updateDraft(draft.localUuid, realm) {
                         it.remoteUuid = data?.draftRemoteUuid
                         it.messageUid = data?.messageUid
                         it.action = null
                     }
-                } else throwErrorAsException()
+                }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
                 if (isSuccess()) {
