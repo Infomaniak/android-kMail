@@ -29,24 +29,27 @@ import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.utils.Utils
 import okhttp3.Request
 
 open class MessageWebViewClient(val context: Context, val attachments: List<Attachment>) : WebViewClient() {
-    private val cidDictionary = attachments.associateBy { it.contentId }
-    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-        val scheme = request?.url?.scheme
-        if (scheme != CID_SCHEME) return super.shouldInterceptRequest(view, request)
 
-        val cid = request.url.schemeSpecificPart
-        cidDictionary[cid]?.resource?.let { attachmentResource ->
-            val resourceUrl = "${BuildConfig.MAIL_API}${attachmentResource}"
-            val httpRequest = Request.Builder().url(resourceUrl).build()
-            val response = HttpClient.okHttpClient.newCall(httpRequest).execute()
-            return WebResourceResponse(
-                null,
-                response.header("content-encoding", "utf-8"),
-                response.body!!.byteStream()
-            )
+    private val cidDictionary = attachments.associateBy { it.contentId }
+
+    override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+
+        if (request?.url?.scheme == CID_SCHEME) {
+            val cid = request.url.schemeSpecificPart
+            cidDictionary[cid]?.resource?.let { attachmentResource ->
+                val resourceUrl = "${BuildConfig.MAIL_API}${attachmentResource}"
+                val httpRequest = Request.Builder().url(resourceUrl).build()
+                val response = HttpClient.okHttpClient.newCall(httpRequest).execute()
+                return WebResourceResponse(
+                    null,
+                    response.header("content-encoding", Utils.UTF_8),
+                    response.body!!.byteStream(),
+                )
+            }
         }
 
         return super.shouldInterceptRequest(view, request)
@@ -54,8 +57,9 @@ open class MessageWebViewClient(val context: Context, val attachments: List<Atta
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         request?.url?.let {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(it.toString())
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(it.toString())
+            }
             runCatching {
                 context.startActivity(intent)
             }.onFailure {
@@ -65,7 +69,7 @@ open class MessageWebViewClient(val context: Context, val attachments: List<Atta
         return true
     }
 
-    companion object {
+    private companion object {
         const val CID_SCHEME = "cid"
     }
 }
