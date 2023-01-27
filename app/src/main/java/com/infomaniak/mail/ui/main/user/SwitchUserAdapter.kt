@@ -20,11 +20,9 @@ package com.infomaniak.mail.ui.main.user
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.models.user.User
-import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemSwitchUserAccountBinding
 import com.infomaniak.mail.ui.main.user.SwitchUserAdapter.SwitchUserAccountViewHolder
 
@@ -61,11 +59,7 @@ class SwitchUserAdapter(
     }
 
     private fun ItemSwitchUserAccountBinding.updateSelectedUi(position: Int) {
-        val isSelected = accounts[position].id == currentUserId
-        val backgroundColorResource = if (isSelected) R.color.backgroundSecondaryColor else R.color.backgroundColor
-        val backgroundColor = ContextCompat.getColor(root.context, backgroundColorResource)
-        accountCardview.setCardBackgroundColor(backgroundColor)
-        checkmark.isVisible = isSelected
+        checkmark.isVisible = accounts[position].id == currentUserId
     }
 
     private fun selectAccount(position: Int) = onChangingUserAccount(accounts[position])
