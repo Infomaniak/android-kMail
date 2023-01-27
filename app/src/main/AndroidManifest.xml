@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -39,12 +39,6 @@
         <meta-data
             android:name="io.sentry.dsn"
             android:value="https://8ddfc8b292d14e69b12ea723aa3287b7@sentry.infomaniak.com/45" />
-
-        <!-- Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring. -->
-        <!-- TODO: We recommend adjusting this value in production. -->
-        <meta-data
-            android:name="io.sentry.traces.sample-rate"
-            android:value="1.0" />
 
         <activity
             android:name=".ui.LaunchActivity"
