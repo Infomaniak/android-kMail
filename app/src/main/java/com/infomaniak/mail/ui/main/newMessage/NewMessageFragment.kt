@@ -63,7 +63,6 @@ import com.infomaniak.mail.utils.Utils.injectCssInHtml
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
-import java.util.*
 import com.google.android.material.R as RMaterial
 
 class NewMessageFragment : Fragment() {

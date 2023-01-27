@@ -80,7 +80,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     var textWeight: Int? = null
         set(value) {
             field = value
-            value?.let { binding.itemName.setTypeface(ResourcesCompat.getFont(context, value)) }
+            value?.let { binding.itemName.typeface = ResourcesCompat.getFont(context, value) }
         }
 
     init {

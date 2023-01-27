@@ -271,7 +271,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
         folderId: String? = currentFolder.value?.id,
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    ) = viewModelScope.launch(viewModelScope.handlerIO) {
 
         if (mailbox == null || folderId == null) return@launch
 
