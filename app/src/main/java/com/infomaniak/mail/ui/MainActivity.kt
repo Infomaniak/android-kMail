@@ -169,7 +169,11 @@ class MainActivity : ThemedActivity() {
 
         window.navigationBarColor = getColor(
             when (destination.id) {
-                R.id.threadFragment -> R.color.backgroundSecondaryColor
+                R.id.threadFragment -> R.color.backgroundAccentuated
+                R.id.messageActionBottomSheetDialog,
+                R.id.replyBottomSheetDialog,
+                R.id.detailedContactBottomSheetDialog,
+                R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
                 else -> R.color.backgroundColor
             }
         )

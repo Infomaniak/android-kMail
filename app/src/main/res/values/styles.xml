@@ -317,7 +317,7 @@
     <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base" />
 
     <style name="BottomSheetDialogThemeModalStyle" parent="Widget.Material3.BottomSheet">
-        <item name="backgroundTint">@color/backgroundColor</item>
+        <item name="backgroundTint">@color/backgroundColorSecondary</item>
         <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
     </style>
 

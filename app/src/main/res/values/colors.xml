@@ -49,7 +49,7 @@
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/orca</color>
-    <color name="backgroundSecondaryColor">@color/swan</color>
+    <color name="backgroundAccentuated">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadBackground">@color/rabbit</color>
 
