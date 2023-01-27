@@ -63,7 +63,7 @@ object DraftController {
         return getDraftsWithActionsQuery(realm).count().find()
     }
 
-    fun getDraft(localUuid: String, realm: TypedRealm): Draft? {
+    fun getDraft(localUuid: String, realm: TypedRealm = defaultRealm): Draft? {
         return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
     }
 

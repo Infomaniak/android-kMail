@@ -104,6 +104,11 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
     }
 
+    override fun onResume() {
+        super.onResume()
+        newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
+    }
+
     private fun initUi() = with(binding) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)
