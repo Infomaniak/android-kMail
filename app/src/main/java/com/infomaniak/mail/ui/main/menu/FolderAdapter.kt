@@ -25,6 +25,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
@@ -54,13 +55,18 @@ class FolderAdapter(
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
         val folder = folders[position]
 
+        val badge = when (folder.role) {
+            FolderRole.DRAFT -> folder.threads.count()
+            else -> folder.unreadCount
+        }
+
         folder.role?.let {
-            setFolderUi(folder.id, context.getString(it.folderNameRes), it.folderIconRes, folder.unreadCount)
+            setFolderUi(folder.id, context.getString(it.folderNameRes), it.folderIconRes, badge)
         } ?: setFolderUi(
             id = folder.id,
             name = folder.name,
             iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-            badgeText = folder.unreadCount,
+            badgeText = badge,
             folderIndent = min(folder.path.split(folder.separator).size - 1, MAX_SUB_FOLDERS_INDENT),
         )
     }
