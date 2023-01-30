@@ -228,7 +228,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun launchNoMailboxActivity() = with(binding) {
-        Intent(this@LoginActivity, NoMailboxActivity::class.java).apply { startActivity(this) }
+        startActivity(Intent(this@LoginActivity, NoMailboxActivity::class.java))
         connectButton.hideProgress(R.string.buttonLogin)
         signInButton.isEnabled = true
     }
@@ -263,9 +263,9 @@ class LoginActivity : AppCompatActivity() {
                             }
                             else -> {
                                 apiResponse.data?.let { mailboxes ->
+                                    AccountUtils.addUser(it)
                                     MailboxController.updateMailboxes(context, mailboxes)
 
-                                    AccountUtils.addUser(it)
                                     it
                                 } ?: run {
                                     getErrorResponse(RCore.string.serverError)

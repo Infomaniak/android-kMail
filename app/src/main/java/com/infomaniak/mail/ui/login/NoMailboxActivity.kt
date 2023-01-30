@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.login
 
 import android.os.Bundle
+import com.infomaniak.lib.core.utils.Utils.lockOrientationForSmallScreens
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.mail.BuildConfig.SHOP_URL
@@ -33,6 +34,8 @@ class NoMailboxActivity : ThemedActivity() {
     private val binding by lazy { ActivityNoMailboxBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        lockOrientationForSmallScreens()
+        
         super.onCreate(savedInstanceState)
 
         with(binding) {

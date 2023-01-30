@@ -102,40 +102,36 @@
         app:layout_constraintStart_toEndOf="@id/start"
         app:layout_constraintTop_toBottomOf="@id/noMailboxTitle" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/noMailboxActionButton"
+        style="@style/TextButtonPrimary"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:animateLayoutChanges="true"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        android:text="@string/buttonAddEmailAddress"
+        app:icon="@drawable/ic_add"
+        app:iconGravity="textStart"
+        app:iconPadding="@dimen/marginStandardSmall"
+        app:layout_constraintBottom_toTopOf="@id/connectAnotherAccountButton"
+        app:layout_constraintEnd_toEndOf="@id/end"
+        app:layout_constraintStart_toStartOf="@id/start"
+        app:layout_constraintTop_toTopOf="@id/footer" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/connectAnotherAccountButton"
+        style="@style/TextButtonSecondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonLogInDifferentAccount"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/end"
-        app:layout_constraintHeight_percent="0.20"
-        app:layout_constraintStart_toStartOf="@id/start">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/noMailboxActionButton"
-            style="@style/TextButtonPrimary"
-            android:layout_width="0dp"
-            android:layout_marginTop="@dimen/marginStandardMedium"
-            android:text="@string/buttonAddEmailAddress"
-            app:icon="@drawable/ic_add"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/marginStandardSmall"
-            app:layout_constraintBottom_toTopOf="@id/connectAnotherAccountButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/connectAnotherAccountButton"
-            style="@style/TextButtonSecondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/buttonLogInDifferentAccount"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/noMailboxActionButton" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="@id/start"
+        app:layout_constraintTop_toBottomOf="@id/noMailboxActionButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
