@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2023 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,11 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import kotlinx.coroutines.Dispatchers
 
 class MessageActionsViewModel : ViewModel() {
-    fun threadAndMessage(threadUid: String, messageUid: String) = liveData(Dispatchers.IO) {
-        val realm = RealmDatabase.mailboxContent()
-        val thread = ThreadController.getThread(threadUid, realm)
-        val message = MessageController.getMessage(messageUid, realm)
-        emit(thread to message)
+    fun getMessage(messageUid: String) = liveData(Dispatchers.IO) {
+        emit(MessageController.getMessage(messageUid))
     }
 }

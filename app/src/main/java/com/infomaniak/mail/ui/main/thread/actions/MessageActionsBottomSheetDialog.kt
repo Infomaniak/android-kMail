@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -41,23 +40,18 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadUid = navigationArgs.threadUid
         val messageUid = navigationArgs.messageUid
 
-        messageActionsViewModel.threadAndMessage(threadUid, messageUid).observe(viewLifecycleOwner) { (thread, message) ->
-
-            if (thread == null || message == null) {
-                findNavController().popBackStack()
-                return@observe
-            }
+        messageActionsViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
             setMarkAsReadUi(navigationArgs.isSeen)
             setFavoriteUi(navigationArgs.isFavorite)
             setSpamUi(message)
 
-            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(thread, message) }
-            markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(thread, message) }
+            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, message) }
+            markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(threadUid, message) }
             move.setClosingOnClickListener { notYetImplemented() }
             postpone.setClosingOnClickListener { notYetImplemented() }
-            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(thread, message) }
-            spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(thread, message) }
+            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid, message) }
+            spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(threadUid, message) }
             blockSender.setClosingOnClickListener { notYetImplemented() }
             phishing.setClosingOnClickListener { notYetImplemented() }
             print.setClosingOnClickListener { notYetImplemented() }
@@ -70,7 +64,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
                     R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
                     R.id.actionForward -> notYetImplemented()
-                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(thread, message)
+                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid, message)
                 }
             }
         }

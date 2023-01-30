@@ -223,7 +223,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item)
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.uid)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
@@ -243,7 +243,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
      * The boolean return value is used to know if we should keep the
      * Thread in the RecyclerView, or remove it when the swipe is done.
      */
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, threadUid: String): Boolean = with(mainViewModel) {
 
         val shouldKeepItem = when (swipeAction) {
             SwipeAction.TUTORIAL -> {
@@ -253,30 +253,30 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                archiveThreadOrMessage(thread)
+                archiveThreadOrMessage(threadUid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
-                deleteThreadOrMessage(thread)
+                deleteThreadOrMessage(threadUid)
                 false
             }
             SwipeAction.FAVORITE -> {
-                toggleFavoriteStatus(thread)
+                toggleFavoriteStatus(threadUid)
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(thread.uid))
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(threadUid))
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                toggleSeenStatus(thread)
+                toggleSeenStatus(threadUid)
                 true
             }
             SwipeAction.READ_AND_ARCHIVE -> {
-                readAndArchive(thread)
+                readAndArchive(threadUid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
-            SwipeAction.SPAM -> markAsSpamOrHam(thread)
+            SwipeAction.SPAM -> markAsSpamOrHam(threadUid)
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
             else -> {
                 notYetImplemented()

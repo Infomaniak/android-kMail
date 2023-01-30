@@ -40,16 +40,17 @@ import kotlinx.coroutines.flow.map
 
 object MailboxController {
 
+    private inline val defaultRealm get() = RealmDatabase.mailboxInfo()
+
     //region Queries
     private fun checkHasUserId(userId: Int) = "${Mailbox::userId.name} == '$userId'"
 
     private fun getMailboxesQuery(): RealmQuery<Mailbox> {
-        return RealmDatabase.mailboxInfo().query<Mailbox>().sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
+        return defaultRealm.query<Mailbox>().sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
     }
 
-    private fun getMailboxesQuery(userId: Int, realm: TypedRealm? = null): RealmQuery<Mailbox> {
-        return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>(checkHasUserId(userId))
-            .sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
+    private fun getMailboxesQuery(userId: Int, realm: TypedRealm): RealmQuery<Mailbox> {
+        return realm.query<Mailbox>(checkHasUserId(userId)).sort(Mailbox::inboxUnreadCount.name, Sort.DESCENDING)
     }
 
     private fun getMailboxesQuery(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmQuery<Mailbox> {
@@ -57,22 +58,22 @@ object MailboxController {
         return realm.query<Mailbox>(checkHasUserId(userId)).query(checkIsNotInExceptions)
     }
 
-    private fun getMailboxQuery(objectId: String, realm: TypedRealm? = null): RealmSingleQuery<Mailbox> {
-        return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
+    private fun getMailboxQuery(objectId: String, realm: TypedRealm): RealmSingleQuery<Mailbox> {
+        return realm.query<Mailbox>("${Mailbox::objectId.name} == '$objectId'").first()
     }
 
-    private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm?): RealmSingleQuery<Mailbox> {
+    private fun getMailboxQuery(userId: Int, mailboxId: Int, realm: TypedRealm): RealmSingleQuery<Mailbox> {
         val checkMailboxId = "${Mailbox::mailboxId.name} == '$mailboxId'"
-        return (realm ?: RealmDatabase.mailboxInfo()).query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
+        return realm.query<Mailbox>("${checkHasUserId(userId)} AND $checkMailboxId").first()
     }
     //endregion
 
     //region Get data
-    fun getMailboxes(userId: Int, realm: TypedRealm? = null): RealmResults<Mailbox> {
+    fun getMailboxes(userId: Int, realm: TypedRealm = defaultRealm): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, realm).find()
     }
 
-    private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmResults<Mailbox> {
+    fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
 
@@ -81,19 +82,19 @@ object MailboxController {
     }
 
     fun getMailboxesAsync(userId: Int): Flow<RealmResults<Mailbox>> {
-        return getMailboxesQuery(userId).asFlow().map { it.list }
+        return getMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
     }
 
-    fun getMailbox(objectId: String, realm: TypedRealm? = null): Mailbox? {
+    fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox? {
         return getMailboxQuery(objectId, realm).find()
     }
 
-    fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm? = null): Mailbox? {
+    fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
         return getMailboxQuery(userId, mailboxId, realm).find() ?: getMailboxesQuery(userId, realm).first().find()
     }
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
-        return getMailboxQuery(objectId).asFlow()
+        return getMailboxQuery(objectId, defaultRealm).asFlow()
     }
     //endregion
 
@@ -102,7 +103,7 @@ object MailboxController {
 
         context.initMailNotificationChannel(mailboxes)
 
-        val remoteMailboxes = RealmDatabase.mailboxInfo().writeBlocking {
+        val remoteMailboxes = defaultRealm.writeBlocking {
             mailboxes.map {
                 val mailboxObjectId = it.createObjectId(userId)
                 val inboxUnreadCount = getMailbox(mailboxObjectId, realm = this)?.inboxUnreadCount ?: 0
@@ -119,7 +120,7 @@ object MailboxController {
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
         val localQuotas = getMailboxes(userId).associate { it.objectId to it.quotas }
 
-        val isCurrentMailboxDeleted = RealmDatabase.mailboxInfo().writeBlocking {
+        val isCurrentMailboxDeleted = defaultRealm.writeBlocking {
 
             Log.d(RealmDatabase.TAG, "Mailboxes: Save new data")
             upsertMailboxes(localQuotas, remoteMailboxes)
@@ -151,7 +152,7 @@ object MailboxController {
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-        RealmDatabase.mailboxInfo().writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
+        defaultRealm.writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
     }
     //endregion
 }

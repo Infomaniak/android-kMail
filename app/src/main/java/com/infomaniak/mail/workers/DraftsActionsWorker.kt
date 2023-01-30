@@ -65,7 +65,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private var userId: Int by Delegates.notNull()
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
-        if (DraftController.getDraftsWithActionsCount() == 0L) return@withContext Result.success()
+        if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
         if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
 
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()

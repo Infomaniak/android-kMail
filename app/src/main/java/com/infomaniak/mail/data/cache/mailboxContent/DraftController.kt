@@ -38,18 +38,18 @@ object DraftController {
     private const val REGEX_REPLY = "(re|ref|aw|rif|r):"
     private const val REGEX_FORWARD = "(fw|fwd|rv|wg|tr|i):"
 
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
+
     //region Queries
-    private fun getDraftsQuery(query: String? = null, realm: TypedRealm?): RealmQuery<Draft> {
-        return with(realm ?: RealmDatabase.mailboxContent()) {
-            query?.let { query(it) } ?: query()
-        }
+    private fun getDraftsQuery(query: String? = null, realm: TypedRealm): RealmQuery<Draft> = with(realm) {
+        return@with query?.let { query(it) } ?: query()
     }
 
-    private fun getDraftQuery(key: String, value: String, realm: TypedRealm?): RealmSingleQuery<Draft> {
-        return (realm ?: RealmDatabase.mailboxContent()).query<Draft>("$key == '$value'").first()
+    private fun getDraftQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Draft> {
+        return realm.query<Draft>("$key == '$value'").first()
     }
 
-    private fun getDraftsWithActionsQuery(realm: TypedRealm? = null): RealmQuery<Draft> {
+    private fun getDraftsWithActionsQuery(realm: TypedRealm): RealmQuery<Draft> {
         return getDraftsQuery("${Draft.actionPropertyName} != nil", realm)
     }
     //endregion
@@ -59,15 +59,15 @@ object DraftController {
         return getDraftsWithActionsQuery(realm).find()
     }
 
-    fun getDraftsWithActionsCount(): Long {
-        return getDraftsWithActionsQuery().count().find()
+    fun getDraftsWithActionsCount(realm: TypedRealm = defaultRealm): Long {
+        return getDraftsWithActionsQuery(realm).count().find()
     }
 
     fun getDraft(localUuid: String, realm: TypedRealm): Draft? {
         return getDraftQuery(Draft::localUuid.name, localUuid, realm).find()
     }
 
-    fun getDraftByMessageUid(messageUid: String, realm: TypedRealm? = null): Draft? {
+    fun getDraftByMessageUid(messageUid: String, realm: TypedRealm = defaultRealm): Draft? {
         return getDraftQuery(Draft::messageUid.name, messageUid, realm).find()
     }
     //endregion
@@ -79,7 +79,7 @@ object DraftController {
 
     fun updateDraft(localUuid: String, realm: MutableRealm? = null, onUpdate: (draft: Draft) -> Unit) {
         val block: (MutableRealm) -> Unit = { getDraft(localUuid, realm = it)?.let(onUpdate) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+        realm?.let(block) ?: defaultRealm.writeBlocking(block)
     }
     //endregion
 
