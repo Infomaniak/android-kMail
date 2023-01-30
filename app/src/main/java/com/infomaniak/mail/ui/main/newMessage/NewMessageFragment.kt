@@ -55,7 +55,9 @@ import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.BCC
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.CC
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.TO
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.Utils
@@ -104,8 +106,8 @@ class NewMessageFragment : Fragment() {
         observeNewAttachments()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
     }
 
