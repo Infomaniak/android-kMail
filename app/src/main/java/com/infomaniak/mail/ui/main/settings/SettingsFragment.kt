@@ -38,12 +38,13 @@ class SettingsFragment : Fragment() {
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val mailboxesAdapter = SettingsMailboxesAdapter { selectedMailbox ->
-        animatedNavigation(
-            SettingsFragmentDirections.actionSettingsToMailboxSettings(
-                selectedMailbox.objectId,
-                selectedMailbox.email
-            )
-        )
+        notYetImplemented()
+        // animatedNavigation(
+        //     SettingsFragmentDirections.actionSettingsToMailboxSettings(
+        //         selectedMailbox.objectId,
+        //         selectedMailbox.email,
+        //     )
+        // )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
