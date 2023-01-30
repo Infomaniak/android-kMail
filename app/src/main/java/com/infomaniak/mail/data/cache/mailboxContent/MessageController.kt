@@ -350,18 +350,6 @@ object MessageController {
         }
     }
 
-    // Unused for now
-    // private fun MutableRealm.createSingleMessageThreads(messages: List<Message>, folder: Folder): List<Thread> {
-    //     return messages.map { message ->
-    //         message.toThread().also { newThread ->
-    //             newThread.addFirstMessage(message)
-    //             newThread.recomputeThread(sentFolderId, realm = this)
-    //             upsertThread(newThread)
-    //             folder.threads.add(newThread)
-    //         }
-    //     }
-    // }
-
     private fun MutableRealm.handleDeletedUids(uids: List<String>, sentFolderId: String): Set<String> {
 
         val impactedFolders = mutableSetOf<String>()
