@@ -366,7 +366,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val messages = when {
             message != null -> MessageController.getMessageAndDuplicates(thread, message)
             shouldPermanentlyDelete -> thread.messages + thread.duplicates
-            else -> MessageController.getDeletableMessages(thread)
+            else -> MessageController.getUnscheduledMessages(thread)
         }
         val uids = messages.getUids()
 
@@ -469,40 +469,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Spam
-    fun markAsSpamOrHam(threadUid: String, message: Message? = null): Boolean {
-        val thread = ThreadController.getThread(threadUid) ?: return true
-
-        var containsOwnMessage = false
-        var onlyContainsOwnMessages = true
-
-        (message?.from ?: thread.from).forEach { if (it.isMe()) containsOwnMessage = true else onlyContainsOwnMessages = false }
-
-        if (onlyContainsOwnMessages) {
-            snackbarFeedback.value = context.resources.getQuantityString(R.plurals.errorActionsSpamOwnMessage, 1) to null
-        } else {
-            toggleSpamOrHam(thread, message)
-        }
-
-        return containsOwnMessage
-    }
-
-    private fun toggleSpamOrHam(thread: Thread, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSpamOrHam(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
 
         val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
         val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolderId = FolderController.getFolder(destinationFolderRole)!!.id
 
-        val messages = when {
-            message != null && message.from.first().isMe() -> emptyList()
-            message != null -> MessageController.getMessageAndDuplicates(thread, message)
-            else -> MessageController.getSpamMessages(thread)
+        val messages = when (message) {
+            null -> MessageController.getUnscheduledMessages(thread)
+            else -> MessageController.getMessageAndDuplicates(thread, message)
         }
-        val uids = messages.getUids()
 
-        val apiResponse = if (uids.isEmpty()) null else ApiRepository.moveMessages(mailbox.uuid, uids, destinationFolderId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
 
-        if (apiResponse?.isSuccess() == true) {
+        if (apiResponse.isSuccess()) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
@@ -513,7 +495,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun showSpamSnackbar(
         message: Message?,
-        apiResponse: ApiResponse<MoveResult>?,
+        apiResponse: ApiResponse<MoveResult>,
         destinationRole: FolderRole,
         undoFoldersIds: List<String>,
         undoDestinationId: String?,
@@ -522,13 +504,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val destination = context.getString(destinationRole.folderNameRes)
 
         val snackbarTitle = when {
-            apiResponse == null -> context.resources.getQuantityString(R.plurals.errorActionsSpamOwnMessage, 1)
             !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
             message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
             else -> context.getString(R.string.snackbarMessageMoved, destination)
         }
 
-        val undoData = apiResponse?.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
+        val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
         snackbarFeedback.postValue(snackbarTitle to undoData)
     }
     //endregion
