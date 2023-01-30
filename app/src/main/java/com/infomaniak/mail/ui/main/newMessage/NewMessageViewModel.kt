@@ -68,7 +68,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
-    private lateinit var snapshot: DraftSnapshot
+    private var snapshot: DraftSnapshot? = null
 
     private var isNewMessage = false
 
@@ -231,7 +231,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot.hasChanges()
+    fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
