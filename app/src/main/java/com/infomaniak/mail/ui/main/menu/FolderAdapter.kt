@@ -57,6 +57,7 @@ class FolderAdapter(
 
         val badge = when (folder.role) {
             FolderRole.DRAFT -> folder.threads.count()
+            FolderRole.SENT -> 0
             else -> folder.unreadCount
         }
 
