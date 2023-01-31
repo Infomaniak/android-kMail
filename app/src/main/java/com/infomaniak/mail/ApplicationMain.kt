@@ -17,9 +17,11 @@
  */
 package com.infomaniak.mail
 
+import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
@@ -106,7 +108,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     private fun configureAccountUtils() {
-        AccountUtils.init(this@ApplicationMain)
+        AccountUtils.init(this)
     }
 
     private fun configureAppReloading() {
@@ -129,18 +131,35 @@ class ApplicationMain : Application(), ImageLoaderFactory {
 
     private val refreshTokenError: (User) -> Unit = { user ->
         val openAppIntent = Intent(this, LaunchActivity::class.java).clearStack()
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            this, 0, openAppIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        val pendingIntent = PendingIntent.getActivity(
+            /* context = */ this,
+            /* requestCode = */ 0,
+            /* intent = */ openAppIntent,
+            /* flags = */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
-        val notificationManagerCompat = NotificationManagerCompat.from(this)
-        showGeneralNotification(getString(R.string.refreshTokenError)).apply {
-            setContentIntent(pendingIntent)
-            notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
+        if (isAllowedToPostNotifications()) {
+            val notificationManagerCompat = NotificationManagerCompat.from(this)
+            showGeneralNotification(getString(R.string.refreshTokenError)).apply {
+                setContentIntent(pendingIntent)
+                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
+            }
+        } else {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
+    }
+
+    private fun isAllowedToPostNotifications(): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {
@@ -156,7 +175,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(applicationContext)
+        return ImageLoader.Builder(this)
             .crossfade(true)
             .okHttpClient {
                 OkHttpClient.Builder().apply {
@@ -173,10 +192,10 @@ class ApplicationMain : Application(), ImageLoaderFactory {
                 }.build()
             }
             .memoryCache {
-                MemoryCache.Builder(applicationContext).build()
+                MemoryCache.Builder(this).build()
             }
             .diskCache {
-                DiskCache.Builder().directory(applicationContext.cacheDir.resolve(COIL_CACHE_DIR)).build()
+                DiskCache.Builder().directory(cacheDir.resolve(COIL_CACHE_DIR)).build()
             }
             .build()
     }
