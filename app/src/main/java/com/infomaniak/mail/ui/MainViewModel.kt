@@ -179,7 +179,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private suspend fun loadCurrentMailboxFromRemote() {
+    private fun loadCurrentMailboxFromRemote() {
         Log.d(TAG, "Load current mailbox from remote")
         val mailboxes = ApiRepository.getMailboxes().data ?: return
         MailboxController.updateMailboxes(context, mailboxes)

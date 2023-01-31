@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.ui.login
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -32,6 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.models.ApiError
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
@@ -47,8 +50,11 @@ import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.AccentColor
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
@@ -82,10 +88,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) = with(binding) {
+
         lockOrientationForSmallScreens()
+
         super.onCreate(savedInstanceState)
 
-        setContentView(binding.root)
+        setContentView(root)
 
         infomaniakLogin = InfomaniakLogin(
             context = this@LoginActivity,
@@ -149,33 +157,37 @@ class LoginActivity : AppCompatActivity() {
         animateSecondaryColorElements(accentColor)
     }
 
-    private fun authenticateUser(authCode: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            infomaniakLogin.getToken(
-                okHttpClient = HttpClient.okHttpClientNoInterceptor,
-                code = authCode,
-                onSuccess = {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        when (val user = authenticateUser(it)) {
-                            is User -> {
-                                trackAccountEvent("loggedIn")
-                                AccountUtils.reloadApp?.invoke()
-                            }
-                            is ApiResponse<*> -> withContext(Dispatchers.Main) { showError(getString(user.translatedError)) }
-                            else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
+    private fun authenticateUser(authCode: String) = lifecycleScope.launch(Dispatchers.IO) {
+        infomaniakLogin.getToken(
+            okHttpClient = HttpClient.okHttpClientNoInterceptor,
+            code = authCode,
+            onSuccess = {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    when (val user = authenticateUser(this@LoginActivity, it)) {
+                        is User -> {
+                            trackAccountEvent("loggedIn")
+                            AccountUtils.reloadApp?.invoke()
                         }
+                        is ApiResponse<*> -> withContext(Dispatchers.Main) {
+                            if (user.error?.code == NO_MAILBOX_ERROR_CODE) {
+                                launchNoMailboxActivity()
+                            } else {
+                                showError(getString(user.translatedError))
+                            }
+                        }
+                        else -> withContext(Dispatchers.Main) { showError(getString(RCore.string.anErrorHasOccurred)) }
                     }
-                },
-                onError = {
-                    val error = when (it) {
-                        ErrorStatus.SERVER -> RCore.string.serverError
-                        ErrorStatus.CONNECTION -> RCore.string.connectionError
-                        else -> RCore.string.anErrorHasOccurred
-                    }
-                    showError(getString(error))
-                },
-            )
-        }
+                }
+            },
+            onError = {
+                val error = when (it) {
+                    ErrorStatus.SERVER -> RCore.string.serverError
+                    ErrorStatus.CONNECTION -> RCore.string.connectionError
+                    else -> RCore.string.anErrorHasOccurred
+                }
+                showError(getString(error))
+            },
+        )
     }
 
     private fun showError(error: String) {
@@ -215,8 +227,17 @@ class LoginActivity : AppCompatActivity() {
         (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
     }
 
+    private fun launchNoMailboxActivity() = with(binding) {
+        startActivity(Intent(this@LoginActivity, NoMailboxActivity::class.java))
+        connectButton.hideProgress(R.string.buttonLogin)
+        signInButton.isEnabled = true
+    }
+
     companion object {
-        suspend fun authenticateUser(apiToken: ApiToken): Any {
+
+        private const val NO_MAILBOX_ERROR_CODE = "no_mailbox"
+
+        suspend fun authenticateUser(context: Context, apiToken: ApiToken): Any {
 
             return if (AccountUtils.getUserById(apiToken.userId) == null) {
                 InfomaniakCore.bearerToken = apiToken.accessToken
@@ -230,12 +251,28 @@ class LoginActivity : AppCompatActivity() {
                         this.organizations = arrayListOf()
                     }
 
-                    if (user == null) {
-                        getErrorResponse(RCore.string.anErrorHasOccurred)
-                    } else {
-                        AccountUtils.addUser(user)
-                        user
-                    }
+                    user?.let {
+                        val apiResponse = ApiRepository.getMailboxes(HttpClient.okHttpClientNoInterceptor)
+                        when {
+                            !apiResponse.isSuccess() -> apiResponse
+                            apiResponse.data?.isEmpty() == true -> {
+                                ApiResponse<List<Mailbox>>(
+                                    result = ApiResponse.Status.ERROR,
+                                    error = ApiError(code = NO_MAILBOX_ERROR_CODE),
+                                )
+                            }
+                            else -> {
+                                apiResponse.data?.let { mailboxes ->
+                                    AccountUtils.addUser(it)
+                                    MailboxController.updateMailboxes(context, mailboxes)
+
+                                    it
+                                } ?: run {
+                                    getErrorResponse(RCore.string.serverError)
+                                }
+                            }
+                        }
+                    } ?: getErrorResponse(RCore.string.anErrorHasOccurred)
                 }
             } else {
                 getErrorResponse(RCore.string.errorUserAlreadyPresent)

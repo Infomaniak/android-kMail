@@ -17,6 +17,8 @@
  */
 package com.infomaniak.mail.utils
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
@@ -35,6 +37,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
@@ -42,6 +47,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -127,6 +133,30 @@ fun Context.getAttributeColor(attribute: Int): Int {
     val typedValue = TypedValue()
     theme.resolveAttribute(attribute, typedValue, true)
     return typedValue.data
+}
+
+fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
+    addAnimatorListener(object : Animator.AnimatorListener {
+        override fun onAnimationStart(animation: Animator) = Unit
+
+        override fun onAnimationEnd(animation: Animator) {
+            removeAllAnimatorListeners()
+            repeatCount = ValueAnimator.INFINITE
+            setMinAndMaxFrame(firstFrame, lastFrame)
+            playAnimation()
+        }
+
+        override fun onAnimationCancel(animation: Animator) = Unit
+
+        override fun onAnimationRepeat(animation: Animator) = Unit
+    })
+}
+
+fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
+    val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
+    addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
+        SimpleColorFilter(color)
+    }
 }
 //endregion
 
