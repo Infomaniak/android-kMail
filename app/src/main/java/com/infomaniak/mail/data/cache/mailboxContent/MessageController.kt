@@ -299,9 +299,7 @@ object MessageController {
 
             existingThreads.forEach { thread ->
                 thread.addMessageWithConditions(message, realm = this)
-                upsertThread(thread).also {
-                    threadsToUpsert[it.uid]
-                }
+                threadsToUpsert[thread.uid] = upsertThread(thread)
             }
         }
 
