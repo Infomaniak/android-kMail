@@ -63,7 +63,7 @@ import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChange
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.isValid
-import java.util.*
+import java.util.Date
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -276,7 +276,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 readAndArchive(threadUid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
-            SwipeAction.SPAM -> markAsSpamOrHam(threadUid)
+            SwipeAction.SPAM -> {
+                toggleSpamOrHam(threadUid)
+                false
+            }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
             else -> {
                 notYetImplemented()

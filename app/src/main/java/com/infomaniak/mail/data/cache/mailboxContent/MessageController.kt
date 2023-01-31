@@ -108,13 +108,7 @@ object MessageController {
         return getMessagesAndDuplicates(thread, "${byFolderId(folderId)} AND $isNotScheduled")
     }
 
-    fun getSpamMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, "$isNotScheduled AND $isNotFromMe")
-    }
-
-    fun getDeletableMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, isNotScheduled)
-    }
+    fun getUnscheduledMessages(thread: Thread) = getMessagesAndDuplicates(thread, isNotScheduled)
 
     fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
         val message = thread.messages.query(isNotDraft).find().lastOrNull() ?: thread.messages.last()
