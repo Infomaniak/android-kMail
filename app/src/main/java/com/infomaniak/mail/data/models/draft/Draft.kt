@@ -123,26 +123,20 @@ class Draft : RealmObject {
         mimeType?.let { this.mimeType = it }
     }
 
-    fun initSignature(realm: MutableRealm) = SignatureController.getDefaultSignature(realm)?.let { defaultSignature ->
+    fun initSignature(realm: MutableRealm) {
+
+        val defaultSignature = SignatureController.getDefaultSignature(realm)
 
         identityId = defaultSignature.id.toString()
 
-        from = realmListOf(Recipient().apply {
-            this.email = defaultSignature.sender
-            this.name = defaultSignature.fullName
-        })
-
-        replyTo = realmListOf(Recipient().apply {
-            this.email = defaultSignature.replyTo
-            this.name = ""
-        })
-
-        body += "<div class=\"$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME\">${defaultSignature.content}</div>"
-        // TODO: Handle SignaturePosition feature.
-        // body = when (defaultSignature.position) {
-        //     SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
-        //     else -> html + body
-        // }
+        if (defaultSignature.content.isNotEmpty()) {
+            body += "<div class=\"$INFOMANIAK_SIGNATURE_HTML_CLASS_NAME\">${defaultSignature.content}</div>"
+            // TODO: Handle SignaturePosition feature.
+            // body = when (defaultSignature.position) {
+            //     SignaturePosition.AFTER_REPLY_MESSAGE -> body + html
+            //     else -> html + body
+            // }
+        }
     }
 
     fun getJsonRequestBody(): MutableMap<String, JsonElement> {
