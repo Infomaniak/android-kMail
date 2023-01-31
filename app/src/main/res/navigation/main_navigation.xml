@@ -50,6 +50,9 @@
         <action
             android:id="@+id/action_threadListFragment_to_threadActionsBottomSheetDialog"
             app:destination="@id/threadActionsBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadListFragment_to_moveFragment"
+            app:destination="@id/moveFragment" />
     </fragment>
 
     <dialog
@@ -206,6 +209,12 @@
             android:id="@+id/action_replyBottomSheetDialog_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
     </dialog>
+
+    <fragment
+        android:id="@+id/moveFragment"
+        android:name="com.infomaniak.mail.ui.main.menu.MoveFragment"
+        android:label="MoveFragment"
+        tools:layout="@layout/fragment_move" />
 
     <fragment
         android:id="@+id/helpFragment"

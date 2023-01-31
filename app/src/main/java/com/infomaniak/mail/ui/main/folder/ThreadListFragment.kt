@@ -63,6 +63,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
+import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.isValid
 import java.util.Date
@@ -272,6 +273,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             SwipeAction.FAVORITE -> {
                 toggleFavoriteStatus(threadUid)
+                true
+            }
+            SwipeAction.MOVE -> {
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment())
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
