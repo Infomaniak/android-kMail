@@ -59,7 +59,8 @@ import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
 

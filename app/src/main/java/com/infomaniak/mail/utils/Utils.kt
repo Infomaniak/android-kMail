@@ -22,7 +22,7 @@ import androidx.annotation.RawRes
 import com.infomaniak.mail.data.models.Folder
 import org.jsoup.Jsoup
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Scanner
 
 object Utils {
 

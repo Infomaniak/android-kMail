@@ -38,7 +38,7 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
-import java.util.*
+import java.util.Date
 
 class Thread : RealmObject {
 

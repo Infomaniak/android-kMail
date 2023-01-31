@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.matomo.sdk.Tracker
-import java.util.*
+import java.util.UUID
 
 class ApplicationMain : Application(), ImageLoaderFactory {
 
