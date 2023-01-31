@@ -159,9 +159,8 @@ object ThreadController {
         }
 
         impactedFoldersIds.forEach { folderId ->
-            FolderController.getFolder(folderId, realm)?.let { folder ->
-                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
-            }
+            val folder = FolderController.getFolder(folderId, realm)
+            MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
         }
     }
     //endregion

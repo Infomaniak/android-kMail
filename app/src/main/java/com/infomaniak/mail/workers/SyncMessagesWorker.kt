@@ -66,7 +66,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
                 // Update local with remote
                 val realm = RealmDatabase.newMailboxContentInstance(user.id, mailbox.mailboxId)
-                val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: return@loopMailboxes
+                val folder = FolderController.getFolder(FolderRole.INBOX, realm)
                 if (folder.cursor == null) return@loopMailboxes
 
                 val okHttpClient = AccountUtils.getHttpClient(user.id)

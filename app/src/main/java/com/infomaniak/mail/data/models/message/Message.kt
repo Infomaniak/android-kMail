@@ -212,7 +212,7 @@ class Message : RealmObject {
         isScheduled = flags.isScheduled
     }
 
-    fun isInTrash(realm: TypedRealm) = FolderController.getFolder(FolderRole.TRASH, realm)?.id == folderId
+    fun isInTrash(realm: TypedRealm) = FolderController.getFolder(FolderRole.TRASH, realm).id == folderId
 
     fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
 

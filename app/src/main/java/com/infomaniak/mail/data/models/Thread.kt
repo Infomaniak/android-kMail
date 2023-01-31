@@ -74,7 +74,7 @@ class Thread : RealmObject {
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
         messagesIds += newMessage.messageIds
 
-        val folderRole = FolderController.getFolder(folderId, realm)?.role
+        val folderRole = FolderController.getFolder(folderId, realm).role
 
         val isInTrash = newMessage.isInTrash(realm)
 

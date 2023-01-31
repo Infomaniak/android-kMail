@@ -62,11 +62,19 @@ object FolderController {
         return getFoldersQuery().asFlow()
     }
 
-    fun getFolder(id: String, realm: TypedRealm = defaultRealm): Folder? {
+    fun getFolder(id: String, realm: TypedRealm = defaultRealm): Folder {
+        return getFolderIfExists(id, realm)!!
+    }
+
+    private fun getFolderIfExists(id: String, realm: TypedRealm = defaultRealm): Folder? {
         return getFolderQuery(Folder::id.name, id, realm).find()
     }
 
-    fun getFolder(role: FolderRole, realm: TypedRealm = defaultRealm): Folder? {
+    fun getFolder(role: FolderRole, realm: TypedRealm = defaultRealm): Folder {
+        return getFolderIfExists(role, realm)!!
+    }
+
+    fun getFolderIfExists(role: FolderRole, realm: TypedRealm = defaultRealm): Folder? {
         return getFolderQuery(Folder::_role.name, role.name, realm).find()
     }
 
@@ -76,8 +84,8 @@ object FolderController {
 
     fun getIdsOfFoldersWithSpecificBehavior(realm: TypedRealm): List<String> {
         return mutableListOf<String>().apply {
-            getFolder(FolderRole.DRAFT, realm)?.id?.let(::add)
-            getFolder(FolderRole.TRASH, realm)?.id?.let(::add)
+            add(getFolder(FolderRole.DRAFT, realm).id)
+            add(getFolder(FolderRole.TRASH, realm).id)
         }
     }
     //endregion
@@ -110,7 +118,7 @@ object FolderController {
 
         remoteFolders.forEach { remoteFolder ->
 
-            getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
+            getFolderIfExists(remoteFolder.id, realm = this)?.let { localFolder ->
                 remoteFolder.initLocalValues(
                     localFolder.lastUpdatedAt,
                     localFolder.cursor,
@@ -126,7 +134,7 @@ object FolderController {
 
     fun refreshUnreadCount(id: String, mailboxObjectId: String, realm: MutableRealm) {
 
-        val folder = getFolder(id, realm) ?: return
+        val folder = getFolder(id, realm)
 
         val unreadCount = ThreadController.getUnreadThreadsCount(id, realm)
         folder.unreadCount = unreadCount

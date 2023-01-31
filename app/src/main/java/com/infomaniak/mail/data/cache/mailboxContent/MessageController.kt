@@ -144,7 +144,7 @@ object MessageController {
         realm: Realm = defaultRealm,
     ): List<Thread> {
 
-        val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
+        val folder = FolderController.getFolder(folderId, realm)
 
         val newMessagesThreads = fetchFolderMessages(mailbox, folder, okHttpClient, realm)
 
@@ -155,11 +155,7 @@ object MessageController {
             else -> return emptyList()
         }
 
-        roles.forEach { role ->
-            FolderController.getFolder(role)?.let { folder ->
-                fetchFolderMessages(mailbox, folder, okHttpClient, realm)
-            }
-        }
+        roles.forEach { role -> fetchFolderMessages(mailbox, FolderController.getFolder(role), okHttpClient, realm) }
 
         return newMessagesThreads
     }
@@ -212,10 +208,9 @@ object MessageController {
                 FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
             }
 
-            FolderController.getFolder(folder.id, realm = this)?.let {
-                it.lastUpdatedAt = Date().toRealmInstant()
-                it.cursor = cursor
-            }
+            val latestFolder = findLatest(folder)!!
+            latestFolder.lastUpdatedAt = Date().toRealmInstant()
+            latestFolder.cursor = cursor
         }
 
         return@with newMessagesThreads

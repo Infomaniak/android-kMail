@@ -50,13 +50,14 @@ object SharedViewModelUtils {
     fun refreshFolders(mailbox: Mailbox, messagesFoldersIds: List<String>, destinationFolderId: String? = null) {
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.
-        val foldersIds = messagesFoldersIds.toMutableSet()
-        destinationFolderId?.let(foldersIds::add)
+        val foldersIds = mutableSetOf<String>().apply {
+            addAll(messagesFoldersIds)
+            destinationFolderId?.let(::add)
+        }
 
         foldersIds.forEach { folderId ->
-            FolderController.getFolder(folderId)?.let { folder ->
-                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient = null)
-            }
+            val folder = FolderController.getFolder(folderId)
+            MessageController.fetchFolderMessages(mailbox, folder, okHttpClient = null)
         }
     }
 }

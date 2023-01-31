@@ -132,7 +132,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         val folder = FolderController.getFolder(FolderRole.DRAFT, realm = mailboxContentRealm)
 
-        if (folder?.cursor != null) {
+        if (folder.cursor != null) {
 
             val timeNow = Date().time
             val simpleDateFormat = SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT)

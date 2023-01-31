@@ -101,7 +101,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val currentFolderId = MutableLiveData<String?>(null)
 
     val currentFolder = currentFolderId.switchMap { folderId ->
-        liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
+        liveData(Dispatchers.IO) { folderId?.let { emit(FolderController.getFolder(it)) } }
     }
 
     /**
@@ -169,13 +169,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadCurrentMailboxFromLocal() {
         Log.d(TAG, "Load current mailbox from local")
+
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
+
         if (userId != AppSettings.DEFAULT_ID && mailboxId != AppSettings.DEFAULT_ID) {
+
             val mailbox = MailboxController.getMailbox(userId, mailboxId)
             selectMailbox(mailbox)
-            val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
-            selectFolder(folder.id)
+
+            val folderId = FolderController.getFolderIfExists(DEFAULT_SELECTED_FOLDER)?.id ?: return
+            selectFolder(folderId)
         }
     }
 
@@ -188,13 +192,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+
         selectMailbox(mailbox)
         updateSignatures(mailbox)
         updateFolders(mailbox)
-        FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
-            selectFolder(folder.id)
-            refreshThreads(mailbox, folder.id)
-        }
+
+        val folderId = FolderController.getFolder(DEFAULT_SELECTED_FOLDER).id
+        selectFolder(folderId)
+        refreshThreads(mailbox, folderId)
+
         DraftsActionsWorker.scheduleWork(context)
     }
 
@@ -286,7 +292,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Archive
     fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
+        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE).id
         val messagesFoldersIds = mutableListOf<String>()
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
@@ -306,7 +312,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         withRefresh: Boolean = true,
     ): List<String>? {
         val mailbox = currentMailbox.value ?: return null
-        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
+        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE).id
         val thread = ThreadController.getThread(threadUid) ?: return null
 
         val messages = when (message) {
@@ -374,7 +380,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val isSuccess = if (shouldPermanentlyDelete) {
             ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()
         } else {
-            trashId = FolderController.getFolder(FolderRole.TRASH)!!.id
+            trashId = FolderController.getFolder(FolderRole.TRASH).id
             val apiResponse = ApiRepository.moveMessages(mailbox.uuid, uids, trashId)
             undoResource = apiResponse.data?.undoResource
             apiResponse.isSuccess()
@@ -476,7 +482,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
         val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
-        val destinationFolderId = FolderController.getFolder(destinationFolderRole)!!.id
+        val destinationFolderId = FolderController.getFolder(destinationFolderRole).id
 
         val messages = when (message) {
             null -> MessageController.getUnscheduledMessages(thread)
