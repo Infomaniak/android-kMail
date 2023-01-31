@@ -26,7 +26,6 @@ import androidx.work.*
 import androidx.work.PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
 import com.infomaniak.lib.core.utils.clearStack
-import com.infomaniak.mail.ApplicationMain
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -115,31 +114,19 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         }
 
         fun showNotification(contentText: String, isSummary: Boolean, title: String = "", description: String? = null) {
+            applicationContext.showNewMessageNotification(mailbox.channelId, title, description).apply {
+                if (isSummary) setContentTitle(null)
+                setSubText(mailbox.email)
+                setContentText(contentText)
+                setColorized(true)
+                setContentIntent(contentIntent(isSummary = isSummary))
+                setGroup(mailbox.notificationGroupKey)
+                setGroupSummary(isSummary)
+                color = localSettings.accentColor.getPrimary(applicationContext)
 
-            if (ApplicationMain.isAllowedToPostNotifications(applicationContext)) {
-                applicationContext.showNewMessageNotification(mailbox.channelId, title, description).apply {
-                    if (isSummary) setContentTitle(null)
-                    setSubText(mailbox.email)
-                    setContentText(contentText)
-                    setColorized(true)
-                    setContentIntent(contentIntent(isSummary = isSummary))
-                    setGroup(mailbox.notificationGroupKey)
-                    setGroupSummary(isSummary)
-                    color = localSettings.accentColor.getPrimary(applicationContext)
-
-                    val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
-                    notificationManagerCompat.notify(notificationId, build())
-                }
-            } else {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
+                val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
+                notificationManagerCompat.notify(notificationId, build())
             }
-
         }
 
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)

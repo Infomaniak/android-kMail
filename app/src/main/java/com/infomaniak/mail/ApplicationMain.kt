@@ -17,12 +17,9 @@
  */
 package com.infomaniak.mail
 
-import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
@@ -139,20 +136,10 @@ class ApplicationMain : Application(), ImageLoaderFactory {
             /* flags = */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
-        if (isAllowedToPostNotifications(this)) {
-            val notificationManagerCompat = NotificationManagerCompat.from(this)
-            showGeneralNotification(getString(R.string.refreshTokenError)).apply {
-                setContentIntent(pendingIntent)
-                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
-            }
-        } else {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        val notificationManagerCompat = NotificationManagerCompat.from(this)
+        showGeneralNotification(getString(R.string.refreshTokenError)).apply {
+            setContentIntent(pendingIntent)
+            notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
@@ -196,12 +183,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
             .build()
     }
 
-    companion object {
-        private const val COIL_CACHE_DIR = "coil_cache"
-
-        fun isAllowedToPostNotifications(context: Context): Boolean {
-            return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                    || context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-        }
+    private companion object {
+        const val COIL_CACHE_DIR = "coil_cache"
     }
 }
