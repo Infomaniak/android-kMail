@@ -249,7 +249,8 @@ class MenuDrawerFragment : Fragment() {
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersLayout.isVisible = true
         customFolders.setIsCollapsed(false)
-        advancedActionsLayout.isVisible = true
+        advancedActionsLayout.isGone = true
+        advancedActions.setIsCollapsed(true)
     }
 
     private fun openFolder(folderId: String) {
