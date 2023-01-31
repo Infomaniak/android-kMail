@@ -71,7 +71,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val currentMailboxObjectId = MutableLiveData<String?>(null)
 
     val currentMailbox = currentMailboxObjectId.switchMap { mailboxObjectId ->
-        liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
+        liveData(Dispatchers.IO) { mailboxObjectId?.let { emit(MailboxController.getMailbox(it)) } }
     }
 
     /**
@@ -172,7 +172,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
         if (userId != AppSettings.DEFAULT_ID && mailboxId != AppSettings.DEFAULT_ID) {
-            val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
+            val mailbox = MailboxController.getMailbox(userId, mailboxId)
             selectMailbox(mailbox)
             val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
             selectFolder(folder.id)
@@ -183,7 +183,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         Log.d(TAG, "Load current mailbox from remote")
         val mailboxes = ApiRepository.getMailboxes().data ?: return
         MailboxController.updateMailboxes(context, mailboxes)
-        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
+        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)
+        openMailbox(mailbox)
     }
 
     private fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {

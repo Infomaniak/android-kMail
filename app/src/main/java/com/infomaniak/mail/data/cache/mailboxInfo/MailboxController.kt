@@ -85,16 +85,20 @@ object MailboxController {
         return getMailboxesQuery(userId, defaultRealm).asFlow().map { it.list }
     }
 
-    fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailboxQuery(objectId, realm).find()
+    fun getMailbox(objectId: String, realm: TypedRealm = defaultRealm): Mailbox {
+        return getMailboxQuery(objectId, realm).find()!!
     }
 
-    fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox? {
-        return getMailboxQuery(userId, mailboxId, realm).find() ?: getMailboxesQuery(userId, realm).first().find()
+    fun getMailbox(userId: Int, mailboxId: Int, realm: TypedRealm = defaultRealm): Mailbox {
+        return getMailboxQuery(userId, mailboxId, realm).find() ?: getMailboxesQuery(userId, realm).first().find()!!
     }
 
     fun getMailboxAsync(objectId: String): Flow<SingleQueryChange<Mailbox>> {
         return getMailboxQuery(objectId, defaultRealm).asFlow()
+    }
+
+    private fun getMailboxInboxUnreadCount(objectId: String, realm: TypedRealm): Int {
+        return getMailboxQuery(objectId, realm).find()?.inboxUnreadCount ?: 0
     }
     //endregion
 
@@ -106,7 +110,7 @@ object MailboxController {
         val remoteMailboxes = defaultRealm.writeBlocking {
             mailboxes.map {
                 val mailboxObjectId = it.createObjectId(userId)
-                val inboxUnreadCount = getMailbox(mailboxObjectId, realm = this)?.inboxUnreadCount ?: 0
+                val inboxUnreadCount = getMailboxInboxUnreadCount(mailboxObjectId, realm = this)
                 it.initLocalValues(userId, inboxUnreadCount)
             }
         }
@@ -152,7 +156,7 @@ object MailboxController {
     }
 
     fun updateMailbox(objectId: String, onUpdate: (mailbox: Mailbox) -> Unit) {
-        defaultRealm.writeBlocking { getMailbox(objectId, realm = this)?.let(onUpdate) }
+        defaultRealm.writeBlocking { onUpdate(getMailbox(objectId, realm = this)) }
     }
     //endregion
 }

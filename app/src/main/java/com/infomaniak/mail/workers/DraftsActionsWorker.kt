@@ -76,7 +76,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@withContext Result.failure()
         mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@withContext Result.failure()
 
-        mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
+        mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm)
         okHttpClient = AccountUtils.getHttpClient(userId)
 
         handleDraftsActions()

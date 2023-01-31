@@ -40,7 +40,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     private var fetchMessagesJob: Job? = null
 
-    private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+    private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) }
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
