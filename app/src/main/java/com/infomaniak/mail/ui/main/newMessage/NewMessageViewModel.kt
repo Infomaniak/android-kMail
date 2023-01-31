@@ -140,6 +140,15 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
+    fun updateDraftInLocalIfRemoteHasChanged() = viewModelScope.launch(Dispatchers.IO) {
+        if (draft.remoteUuid == null) {
+            DraftController.getDraft(draft.localUuid)?.let { localDraft ->
+                draft.remoteUuid = localDraft.remoteUuid
+                draft.messageUid = localDraft.messageUid
+            }
+        }
+    }
+
     fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
         emit(MergedContactController.getMergedContacts(sorted = true))
     }
