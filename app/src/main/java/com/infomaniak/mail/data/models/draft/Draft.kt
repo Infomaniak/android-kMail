@@ -125,7 +125,7 @@ class Draft : RealmObject {
 
     fun initSignature(realm: MutableRealm) = SignatureController.getDefaultSignature(realm)?.let { defaultSignature ->
 
-        identityId = "${defaultSignature.id}"
+        identityId = defaultSignature.id.toString()
 
         from = realmListOf(Recipient().apply {
             this.email = defaultSignature.sender
