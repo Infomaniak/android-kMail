@@ -74,9 +74,9 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
 
                 // Notify all new messages
-                val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder.id, realm)
+                val unreadThreadsCount = ThreadController.getUnreadThreadsCount(folder.id, realm)
                 newMessagesThreads.forEach { thread ->
-                    thread.showNotification(user.id, mailbox, unReadThreadsCount, realm, okHttpClient)
+                    thread.showNotification(user.id, mailbox, unreadThreadsCount, realm, okHttpClient)
                 }
 
                 realm.close()
@@ -133,7 +133,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
         ThreadController.fetchIncompleteMessages(messages, mailbox, okHttpClient, realm)
 
-        val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
+        val message = ThreadController.getThread(uid, realm).messages.last()
 
         if (message.isSeen) return // Ignore if it has already been seen
 

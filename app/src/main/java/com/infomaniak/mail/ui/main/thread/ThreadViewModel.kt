@@ -47,22 +47,18 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun messagesLive(threadUid: String) = liveData(Dispatchers.IO) {
-        MessageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
+        emitSource(MessageController.getSortedMessages(threadUid).asFlow().asLiveData())
     }
 
     fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
 
-        val thread = ThreadController.getThread(threadUid) ?: run {
-            emit(null)
-            return@liveData
-        }
+        val thread = ThreadController.getThread(threadUid)
 
         val expandedMap = mutableMapOf<String, Boolean>()
         thread.messages.forEachIndexed { index, message ->
             expandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
         }
-
-        emit(thread to expandedMap)
+        emit(expandedMap)
 
         if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, thread)
     }
@@ -75,14 +71,14 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(viewModelScope.handlerIO) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)
         val messages = MessageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
         if (isSuccess) MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)
         val message = MessageController.getMessageToReplyTo(thread)
         quickActionBarClicks.postValue(message to menuId)
     }

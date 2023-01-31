@@ -65,17 +65,11 @@ class ThreadFragment : Fragment() {
 
         observeThreadLive()
 
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
-
-            if (result == null) {
-                findNavController().popBackStack()
-                return@observe
-            }
-
-            val threadUid = result.first.uid
+        val threadUid = navigationArgs.threadUid
+        threadViewModel.openThread(threadUid).observe(viewLifecycleOwner) { expandedMap ->
             setupUi(threadUid)
             setupAdapter(threadUid)
-            threadAdapter.expandedMap = result.second
+            threadAdapter.expandedMap = expandedMap
             observeMessagesLive()
             observeContacts()
             observeQuickActionBarClicks()

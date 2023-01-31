@@ -294,7 +294,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return@launch
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE).id
         val messagesFoldersIds = mutableListOf<String>()
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)
 
         if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
         archiveThreadOrMessageSync(threadUid, withRefresh = false)?.also(messagesFoldersIds::addAll)
@@ -313,7 +313,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     ): List<String>? {
         val mailbox = currentMailbox.value ?: return null
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE).id
-        val thread = ThreadController.getThread(threadUid) ?: return null
+        val thread = ThreadController.getThread(threadUid)
 
         val messages = when (message) {
             null -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
@@ -362,7 +362,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Delete
     fun deleteThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -429,7 +429,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Seen
     fun toggleSeenStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)
 
         val isSeen = message?.isSeen ?: (thread.unseenMessagesCount == 0)
 
@@ -456,7 +456,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Favorite
     fun toggleFavoriteStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)
 
         val messages = when {
             message != null -> MessageController.getMessageAndDuplicates(thread, message)
@@ -478,7 +478,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Spam
     fun toggleSpamOrHam(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)
 
         val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
         val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM

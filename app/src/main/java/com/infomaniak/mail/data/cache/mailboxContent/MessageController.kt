@@ -70,8 +70,8 @@ object MessageController {
         return getMessagesQuery(folderId, realm).find()
     }
 
-    fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
-        return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
+    fun getSortedMessages(threadUid: String): RealmQuery<Message> {
+        return ThreadController.getThread(threadUid).messages.query().sort(Message::date.name, Sort.ASCENDING)
     }
 
     fun getMessage(uid: String, realm: TypedRealm = defaultRealm): Message? {

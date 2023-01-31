@@ -34,7 +34,11 @@ class ThreadActionsViewModel : ViewModel() {
     fun getMessageUidToReplyTo(threadUid: String, messageUidToReplyTo: String?) = liveData(Dispatchers.IO) {
 
         val uidToReplyTo = messageUidToReplyTo
-            ?: ThreadController.getThread(threadUid)?.let(MessageController::getMessageToReplyTo)?.uid!!
+            ?: run {
+                val thread = ThreadController.getThread(threadUid)
+                val messageToReplyTo = MessageController.getMessageToReplyTo(thread)
+                return@run messageToReplyTo.uid
+            }
 
         emit(uidToReplyTo)
     }

@@ -100,8 +100,8 @@ object ThreadController {
         return getThreadsQuery(folderId, defaultRealm, filter).asFlow()
     }
 
-    fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
-        return getThreadQuery(uid, realm).find()
+    fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread {
+        return getThreadQuery(uid, realm).find()!!
     }
 
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
