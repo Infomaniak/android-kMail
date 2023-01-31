@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.correspondent
 
-import com.infomaniak.mail.data.models.correspondent.Correspondent
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
@@ -34,9 +33,11 @@ class MergedContact : RealmObject, Correspondent {
     override val initials by lazy { computeInitials() }
 
     fun initLocalValues(email: String, name: String, avatar: String? = null): MergedContact {
+
         // We need an ID which is unique for each pair of email/name. Therefore we stick
         // together the two 32 bits hashcodes to make one unique 64 bits hashcode.
-        id = (email.hashCode().toLong() shl Int.SIZE_BITS) + name.hashCode()
+        this.id = (email.hashCode().toLong() shl Int.SIZE_BITS) + name.hashCode()
+
         this.email = email
         this.name = name
         avatar?.let { this.avatar = it }

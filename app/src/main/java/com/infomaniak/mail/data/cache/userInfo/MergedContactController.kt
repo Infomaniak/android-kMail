@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package com.infomaniak.mail.data.cache.userInfo
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.utils.update
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange

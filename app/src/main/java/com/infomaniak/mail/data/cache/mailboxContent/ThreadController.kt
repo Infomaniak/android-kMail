@@ -20,9 +20,9 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -121,7 +121,7 @@ object ThreadController {
 
         realm.writeBlocking {
             messages.forEach { localMessage ->
-                if (!localMessage.fullyDownloaded) {
+                if (!localMessage.isFullyDownloaded) {
                     with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
                         if (isSuccess()) {
                             data?.also { remoteMessage ->
@@ -135,7 +135,7 @@ object ThreadController {
                                 }
 
                                 remoteMessage.initLocalValues(
-                                    fullyDownloaded = true,
+                                    isFullyDownloaded = true,
                                     messageIds = localMessage.messageIds,
                                     isSpam = localMessage.isSpam,
                                     date = localMessage.date,

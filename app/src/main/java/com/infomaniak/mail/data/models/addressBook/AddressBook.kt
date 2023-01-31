@@ -29,14 +29,17 @@ import kotlinx.serialization.UseSerializers
 @Serializable
 class AddressBook : RealmObject {
     @PrimaryKey
+    var uuid: String = ""
     var id: Int = 0
     @SerialName("user_id")
     var userId: Int = 0
     var name: String = ""
     @SerialName("principal_uri")
     var principalUri: String = ""
-    var description: String = ""
+    var description: String? = null
     var color: String = ""
+    @SerialName("default")
+    var isDefault: Boolean = false
     @SerialName("is_activated")
     var isActivated: Boolean = false
     @SerialName("is_hidden")

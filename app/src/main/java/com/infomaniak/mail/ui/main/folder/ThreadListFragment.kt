@@ -53,8 +53,8 @@ import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIG
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel

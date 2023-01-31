@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,32 +34,35 @@ import java.io.File
 class Attachment : EmbeddedRealmObject {
 
     var uuid: String = ""
+    @SerialName("part_id")
+    var partId: String = ""
     @SerialName("mime_type")
     var mimeType: String = ""
-    var encoding: String = ""
-    var size: Int = 0
+    var encoding: String? = null
+    var size: Long = 0L
     var name: String = ""
-    private var disposition: String? = null
+    @SerialName("disposition")
+    private var _disposition: String? = null
     @SerialName("content_id")
     var contentId: String? = null
-    var resource: String = ""
+    var resource: String? = null
     @SerialName("drive_url")
     var driveUrl: String? = null
-    var thumbnail: String = ""
 
     //region Local data (Transient)
     @Transient
     var uploadLocalUri: String? = null
     //endregion
 
-    fun initLocalValues(newName: String, newSize: Long, newMimeType: String, uri: String) {
-        name = newName
-        size = newSize.toInt()
-        mimeType = newMimeType
-        uploadLocalUri = uri
-    }
+    val disposition: AttachmentDisposition?
+        get() = enumValueOfOrNull<AttachmentDisposition>(_disposition)
 
-    fun getDisposition(): AttachmentDisposition? = enumValueOfOrNull<AttachmentDisposition>(disposition)
+    fun initLocalValues(name: String, size: Long, mimeType: String, uri: String) {
+        this.name = name
+        this.size = size
+        this.mimeType = mimeType
+        this.uploadLocalUri = uri
+    }
 
     fun getFileTypeFromExtension(): AttachmentType = when (mimeType) {
         in Regex("application/(zip|rar|x-tar|.*compressed|.*archive)") -> AttachmentType.ARCHIVE

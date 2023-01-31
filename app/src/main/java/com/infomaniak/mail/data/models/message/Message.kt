@@ -27,10 +27,10 @@ import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
@@ -50,14 +50,14 @@ class Message : RealmObject {
     @PrimaryKey
     var uid: String = ""
     @SerialName("msg_id")
-    var messageId: String = ""
+    var messageId: String? = null
     // This is hardcoded by default to `now`, because the mail protocol allows a date to be null 🤷
     var date: RealmInstant = Date().toRealmInstant()
     var subject: String? = null
     var from: RealmList<Recipient> = realmListOf()
+    var to: RealmList<Recipient> = realmListOf()
     var cc: RealmList<Recipient> = realmListOf()
     var bcc: RealmList<Recipient> = realmListOf()
-    var to: RealmList<Recipient> = realmListOf()
     @SerialName("reply_to")
     var replyTo: RealmList<Recipient> = realmListOf()
     @SerialName("in_reply_to")
@@ -77,28 +77,34 @@ class Message : RealmObject {
     @SerialName("is_draft")
     var isDraft: Boolean = false
     @SerialName("draft_resource")
-    var draftResource: String = ""
+    var draftResource: String? = null
     var body: Body? = null
     @SerialName("has_attachments")
     var hasAttachments: Boolean = false
     @SerialName("attachments_resources")
     var attachmentsResource: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
-    var seen: Boolean = false
-    var forwarded: Boolean = false
-    var answered: Boolean = false
+    @SerialName("seen")
+    var isSeen: Boolean = false
+    @SerialName("forwarded")
+    var isForwarded: Boolean = false
+    @SerialName("answered")
+    var isAnswered: Boolean = false
     @SerialName("flagged")
     var isFavorite: Boolean = false
-    var scheduled: Boolean = false
+    @SerialName("scheduled")
+    var isScheduled: Boolean = false
     var preview: String = ""
     var size: Int = 0
     @SerialName("safe_display")
-    var safeDisplay: Boolean = false
+    var safeDisplay: Boolean? = null
+    @SerialName("has_unsubscribe_link")
+    var hasUnsubscribeLink: Boolean? = null
     //endregion
 
     //region Local data (Transient)
     @Transient
-    var fullyDownloaded: Boolean = false
+    var isFullyDownloaded: Boolean = false
     @Transient
     var isSpam: Boolean = false
     @Transient
@@ -133,13 +139,13 @@ class Message : RealmObject {
     }
 
     fun initLocalValues(
-        fullyDownloaded: Boolean,
+        isFullyDownloaded: Boolean,
         messageIds: RealmSet<String>,
         isSpam: Boolean,
         date: RealmInstant,
         draftLocalUuid: String?,
     ) {
-        this.fullyDownloaded = fullyDownloaded
+        this.isFullyDownloaded = isFullyDownloaded
         this.messageIds = messageIds
         this.isSpam = isSpam
         this.date = date
@@ -189,7 +195,7 @@ class Message : RealmObject {
             .split(">\\s*<|>?\\s+<?".toRegex())
 
         messageIds = realmSetOf<String>().apply {
-            addAll(messageId.parseMessagesIds())
+            messageId?.let { addAll(it.parseMessagesIds()) }
             references?.let { addAll(it.parseMessagesIds()) }
             inReplyTo?.let { addAll(it.parseMessagesIds()) }
         }
@@ -204,16 +210,16 @@ class Message : RealmObject {
     }
 
     fun updateFlags(flags: MessageFlags) {
-        seen = flags.seen
+        isSeen = flags.isSeen
         isFavorite = flags.isFavorite
-        answered = flags.answered
-        forwarded = flags.forwarded
-        scheduled = flags.scheduled
+        isAnswered = flags.isAnswered
+        isForwarded = flags.isForwarded
+        isScheduled = flags.isScheduled
     }
 
     fun isInTrash(realm: TypedRealm) = FolderController.getFolder(FolderRole.TRASH, realm)?.id == folderId
 
-    fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!seen || index == lastIndex)
+    fun shouldBeExpanded(index: Int, lastIndex: Int) = !isDraft && (!isSeen || index == lastIndex)
 
     fun toThread() = Thread().apply {
         uid = this@Message.uid

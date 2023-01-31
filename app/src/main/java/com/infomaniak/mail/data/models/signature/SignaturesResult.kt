@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,5 @@ data class SignaturesResult(
     val signatures: List<Signature>,
     @SerialName("default_signature_id")
     val defaultSignatureId: Int,
-    @SerialName("valid_emails")
-    val validEmails: List<SignatureEmail>,
     val position: String,
 )

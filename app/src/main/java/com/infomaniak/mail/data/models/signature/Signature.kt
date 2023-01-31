@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,13 @@ package com.infomaniak.mail.data.models.signature
 
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 class Signature : RealmObject {
+    @PrimaryKey
     var id: Int = 0
     var name: String = ""
     @SerialName("reply_to")
@@ -46,8 +48,6 @@ class Signature : RealmObject {
     var serviceMailModelId: Int? = null
     @SerialName("position")
     private var _position: String = ""
-    @SerialName("is_editable")
-    var isEditable: Boolean = false
     var content: String = ""
 
     val position: SignaturePosition?

@@ -35,10 +35,10 @@ import com.infomaniak.mail.data.cache.userInfo.AddressBookController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -424,7 +424,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-        val isSeen = message?.seen ?: (thread.unseenMessagesCount == 0)
+        val isSeen = message?.isSeen ?: (thread.unseenMessagesCount == 0)
 
         if (isSeen) {
             markAsUnseen(mailbox, thread, message)

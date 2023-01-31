@@ -24,10 +24,10 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.upsertThre
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.throwErrorAsException
 import com.infomaniak.mail.utils.toRealmInstant
@@ -43,7 +43,7 @@ import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
 import okhttp3.OkHttpClient
-import java.util.*
+import java.util.Date
 import kotlin.math.min
 
 object MessageController {
@@ -52,7 +52,7 @@ object MessageController {
 
     private fun byFolderId(folderId: String) = "${Message::folderId.name} == '$folderId'"
     private val isNotDraft = "${Message::isDraft.name} == false"
-    private val isNotScheduled = "${Message::scheduled.name} == false"
+    private val isNotScheduled = "${Message::isScheduled.name} == false"
     private val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
             "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
@@ -96,7 +96,7 @@ object MessageController {
     }
 
     fun getUnseenMessages(thread: Thread): List<Message> {
-        return getMessagesAndDuplicates(thread, "${Message::seen.name} == false")
+        return getMessagesAndDuplicates(thread, "${Message::isSeen.name} == false")
     }
 
     fun getFavoriteMessages(thread: Thread): List<Message> {
@@ -224,7 +224,7 @@ object MessageController {
             }
         }
 
-        newMessagesThreads
+        return@with newMessagesThreads
     }
 
     private fun handleAddedUids(

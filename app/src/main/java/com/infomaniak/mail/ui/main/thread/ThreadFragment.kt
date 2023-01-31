@@ -33,9 +33,9 @@ import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
@@ -161,7 +161,7 @@ class ThreadFragment : Fragment() {
                         messageUid = message.uid,
                         threadUid = navigationArgs.threadUid,
                         isFavorite = message.isFavorite,
-                        isSeen = message.seen,
+                        isSeen = message.isSeen,
                     )
                 )
             }
