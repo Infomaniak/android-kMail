@@ -20,6 +20,7 @@ package com.infomaniak.mail
 import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -138,7 +139,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
             /* flags = */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
-        if (isAllowedToPostNotifications()) {
+        if (isAllowedToPostNotifications(this)) {
             val notificationManagerCompat = NotificationManagerCompat.from(this)
             showGeneralNotification(getString(R.string.refreshTokenError)).apply {
                 setContentIntent(pendingIntent)
@@ -155,11 +156,6 @@ class ApplicationMain : Application(), ImageLoaderFactory {
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
-    }
-
-    private fun isAllowedToPostNotifications(): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-                || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun tokenInterceptorListener() = object : TokenInterceptorListener {
@@ -200,7 +196,12 @@ class ApplicationMain : Application(), ImageLoaderFactory {
             .build()
     }
 
-    private companion object {
-        const val COIL_CACHE_DIR = "coil_cache"
+    companion object {
+        private const val COIL_CACHE_DIR = "coil_cache"
+
+        fun isAllowedToPostNotifications(context: Context): Boolean {
+            return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                    || context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        }
     }
 }
