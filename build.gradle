@@ -14,7 +14,7 @@ buildscript {
     dependencies {
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigation_version"
         // Realm Kotlin SNAPSHOT
-        classpath "io.realm.kotlin:gradle-plugin:$realm_kotlin_version"
+        // classpath "io.realm.kotlin:gradle-plugin:$realm_kotlin_version"
     }
 }
 
