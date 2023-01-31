@@ -52,6 +52,7 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import kotlinx.serialization.encodeToString
+import org.jsoup.Jsoup
 import java.util.*
 
 fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
@@ -59,6 +60,10 @@ fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under
 fun Activity.notYetImplemented() = showSnackbar("This feature is currently under development.")
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
+fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", "")).wholeText()
+
+fun String.textToHtml(): String = replace("\n", "<br>")
 
 fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
     return runCatching {

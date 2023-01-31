@@ -42,9 +42,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.getFileNameAndSize
+import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -268,9 +266,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
             } ?: (null to false)
     }
-
-    private fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", "")).wholeText()
-    private fun String.textToHtml(): String = replace("\n", "<br>")
 
     override fun onCleared() {
         LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), draft.localUuid)
