@@ -22,7 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -34,7 +36,9 @@ import com.infomaniak.mail.utils.notYetImplemented
 class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
     lateinit var binding: BottomSheetJunkBinding
+    private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val actionsViewModel: ActionsViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -43,14 +47,27 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        setSpamUi()
+        val threadUid = navigationArgs.threadUid
+        val messageUid = navigationArgs.messageUid
 
-        spam.setClosingOnClickListener { notYetImplemented() }
+        if (messageUid == null) {
+            handleButtons(threadUid)
+        } else {
+            actionsViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
+                handleButtons(threadUid, message)
+            }
+        }
+    }
+
+    private fun handleButtons(threadUid: String, message: Message? = null) = with(binding) {
+        setSpamUi(message)
+
+        spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(threadUid, message) }
         phishing.setClosingOnClickListener { notYetImplemented() }
         blockSender.setClosingOnClickListener { notYetImplemented() }
     }
 
-    fun setSpamUi(message: Message? = null) { // TODO : Pass message from navigation etc.
+    private fun setSpamUi(message: Message?) {
         val isSpam = message?.isSpam ?: mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
         binding.spam.setText(if (isSpam) R.string.actionNonSpam else R.string.actionSpam)
     }

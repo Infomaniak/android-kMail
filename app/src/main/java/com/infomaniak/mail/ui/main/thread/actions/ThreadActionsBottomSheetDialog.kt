@@ -23,6 +23,7 @@ import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.MainViewModel
@@ -34,19 +35,19 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
+    private val actionsViewModel: ActionsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         val threadUid = navigationArgs.threadUid
 
-        threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
+        actionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
 
-        threadActionsViewModel.getMessageUidToReplyTo(
+        actionsViewModel.getMessageUidToReplyTo(
             threadUid,
             navigationArgs.messageUidToReplyTo,
         ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
@@ -58,6 +59,9 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
             move.setClosingOnClickListener { notYetImplemented() }
             favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
+            reportJunk.setOnClickListener {
+                setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply { putBoolean(SHOULD_OPEN_JUNK, true) })
+            }
             print.setClosingOnClickListener { notYetImplemented() }
             reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 

@@ -145,7 +145,15 @@
         android:id="@+id/junkBottomSheetDialog"
         android:name="com.infomaniak.mail.ui.main.thread.actions.JunkBottomSheetDialog"
         android:label="JunkBottomSheetDialog"
-        tools:layout="@layout/bottom_sheet_junk" />
+        tools:layout="@layout/bottom_sheet_junk">
+        <argument
+            android:name="threadUid"
+            app:argType="string" />
+        <argument
+            android:name="messageUid"
+            app:argType="string"
+            app:nullable="true" />
+    </dialog>
 
     <fragment
         android:id="@+id/switchUserFragment"

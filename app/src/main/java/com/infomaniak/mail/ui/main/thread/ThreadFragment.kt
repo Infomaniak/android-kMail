@@ -40,8 +40,14 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.JUNK_BOTTOM_SHEET_NAV_KEY
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.MESSAGE_UID
+import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.SHOULD_OPEN_JUNK
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.observeNotNull
+import com.infomaniak.mail.utils.refreshObserve
+import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -83,8 +89,12 @@ class ThreadFragment : Fragment() {
             observeQuickActionBarClicks()
         }
 
-        getBackNavigationResult<Boolean>(JUNK_BOTTOM_SHEET_NAV_KEY) { shouldOpenJunk ->
-            if (shouldOpenJunk) safeNavigate(ThreadFragmentDirections.actionThreadFragmentToJunkBottomSheetDialog())
+        getBackNavigationResult<Bundle>(JUNK_BOTTOM_SHEET_NAV_KEY) {
+            val shouldOpenJunk = it.getBoolean(SHOULD_OPEN_JUNK)
+            val messageUid = it.getString(MESSAGE_UID)
+            if (shouldOpenJunk) safeNavigate(
+                ThreadFragmentDirections.actionThreadFragmentToJunkBottomSheetDialog(navigationArgs.threadUid, messageUid)
+            )
         }
     }
 

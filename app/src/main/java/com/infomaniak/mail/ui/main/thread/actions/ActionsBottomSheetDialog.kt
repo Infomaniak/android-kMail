@@ -47,7 +47,6 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
         archive.isGone = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
-        reportJunk.setOnClickListener { setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, true) }
     }
 
     private fun computeUnreadStyle(isSeen: Boolean) = if (isSeen) {
@@ -93,5 +92,7 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     companion object {
         const val JUNK_BOTTOM_SHEET_NAV_KEY = "junk_bottom_sheet_nav_key"
+        const val SHOULD_OPEN_JUNK = "should_open_junk"
+        const val MESSAGE_UID = "message_uid"
     }
 }
