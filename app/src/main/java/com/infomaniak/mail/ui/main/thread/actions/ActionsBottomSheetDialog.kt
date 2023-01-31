@@ -29,6 +29,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.getAttributeColor

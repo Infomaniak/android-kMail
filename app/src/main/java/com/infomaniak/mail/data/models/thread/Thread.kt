@@ -81,10 +81,10 @@ class Thread : RealmObject {
 
         if (shouldAddMessage) {
             val twinMessage = messages.firstOrNull { it.messageId == newMessage.messageId }
-            if (twinMessage != null) {
-                addDuplicatedMessage(twinMessage, newMessage)
-            } else {
+            if (twinMessage == null) {
                 messages.add(newMessage)
+            } else {
+                addDuplicatedMessage(twinMessage, newMessage)
             }
         }
     }
@@ -118,7 +118,6 @@ class Thread : RealmObject {
     }
 
     private fun resetThread() {
-        // TODO: Remove this `sortBy`, and get the Messages in the right order via Realm query (but before, fix the `Thread.date`)
         messages.sortBy { it.date }
         unseenMessagesCount = 0
         from = realmListOf()
@@ -146,7 +145,7 @@ class Thread : RealmObject {
             if (message.forwarded) forwarded = true
             if (message.scheduled) scheduled = true
         }
-        date = messages.findLast { it.folderId == folderId }?.date!!
+        date = messages.last { it.folderId == folderId }.date
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {
@@ -162,48 +161,6 @@ class Thread : RealmObject {
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
     fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
-
-    // TODO: Replace this with a RealmList sub query.
-    fun getLastMessageToExecuteAction(): List<Message> {
-        return mutableListOf<Message>().apply {
-            val message = messages.lastOrNull { !it.isDraft } ?: messages.last()
-            addAll(getMessageAndDuplicates(message))
-        }
-    }
-
-    fun getUnseenMessages(): List<Message> {
-        return getMessagesAndDuplicates { message -> !message.seen }
-    }
-
-    fun getFavoriteMessages(): List<Message> {
-        return getMessagesAndDuplicates { message -> message.isFavorite && !message.isDraft }
-    }
-
-    fun getArchivableMessages(folderId: String): List<Message> {
-        return getMessagesAndDuplicates { message -> message.folderId == folderId && !message.scheduled }
-    }
-
-    fun getDeletableMessages(): List<Message> {
-        return getMessagesAndDuplicates { message -> !message.scheduled }
-    }
-
-    fun getPermanentlyDeletableMessages(): List<Message> {
-        return messages + duplicates
-    }
-
-    // TODO: Replace this with a RealmList sub query.
-    private fun getMessagesAndDuplicates(shouldKeepMessage: (message: Message) -> Boolean): List<Message> {
-        return mutableListOf<Message>().apply {
-            messages.forEach { message ->
-                if (shouldKeepMessage(message)) addAll(getMessageAndDuplicates(message))
-            }
-        }
-    }
-
-    // TODO: Replace this with a RealmList sub query.
-    fun getMessageAndDuplicates(message: Message): List<Message> {
-        return listOf(message) + duplicates.filter { it.messageId == message.messageId }
-    }
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

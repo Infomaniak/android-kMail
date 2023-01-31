@@ -51,7 +51,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.thread.Thread
@@ -61,6 +60,7 @@ import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.isValid
 import java.util.*
@@ -76,8 +76,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var threadListAdapter: ThreadListAdapter
     private var lastUpdatedDate: Date? = null
     private var previousFirstMessageUid: String? = null
-
-    private var isFirstOpeningOfThisFolder = false
 
     private val showLoadingTimer: CountDownTimer by lazy {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
@@ -141,14 +139,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    private fun setupAdapter() {
+    private fun setupAdapter() = with(threadListViewModel) {
 
         threadListAdapter = ThreadListAdapter(
             context = requireContext(),
             threadDensity = localSettings.threadDensity,
             folderRole = FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
-            onSwipeFinished = { threadListViewModel.isRecoveringFinished.value = true },
+            onSwipeFinished = { isRecoveringFinished.value = true },
         )
 
         binding.threadsList.apply {
@@ -175,7 +173,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             onThreadClicked = { thread ->
                 if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-                    threadListViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+                    navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
                         safeNavigate(
                             ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
                                 draftExists = true,
@@ -225,7 +223,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                     else -> throw IllegalStateException("Only SwipeDirection.LEFT_TO_RIGHT and SwipeDirection.RIGHT_TO_LEFT can be triggered")
                 }
 
-                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item)
+                val shouldKeepItem = performSwipeActionOnThread(swipeAction, item.uid)
 
                 threadListAdapter.apply {
                     blockOtherSwipes()
@@ -245,10 +243,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
      * The boolean return value is used to know if we should keep the
      * Thread in the RecyclerView, or remove it when the swipe is done.
      */
-    private fun performSwipeActionOnThread(swipeAction: SwipeAction, thread: Thread): Boolean = with(mainViewModel) {
+    private fun performSwipeActionOnThread(swipeAction: SwipeAction, threadUid: String): Boolean = with(mainViewModel) {
 
         val shouldKeepItem = when (swipeAction) {
-
             SwipeAction.TUTORIAL -> {
                 setDefaultSwipeActions()
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSettingsFragment())
@@ -256,40 +253,31 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.ARCHIVE -> {
-                archiveThreadOrMessage(thread.uid)
+                archiveThreadOrMessage(threadUid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
             SwipeAction.DELETE -> {
-                deleteThreadOrMessage(thread.uid)
+                deleteThreadOrMessage(threadUid)
                 false
             }
             SwipeAction.FAVORITE -> {
-                toggleThreadFavoriteStatus(thread.uid)
+                toggleFavoriteStatus(threadUid)
                 true
             }
             SwipeAction.QUICKACTIONS_MENU -> {
-                MessageController.getMessageUidToReplyTo(thread.uid)?.let { messageUidToReplyTo ->
-                    safeNavigate(
-                        ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(
-                            messageUidToReplyTo = messageUidToReplyTo,
-                            threadUid = thread.uid,
-                        )
-                    )
-                }
+                safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(threadUid))
                 true
             }
             SwipeAction.READ_UNREAD -> {
-                toggleSeenStatus(thread.uid)
+                toggleSeenStatus(threadUid)
                 true
             }
             SwipeAction.READ_AND_ARCHIVE -> {
-                readAndArchive(thread.uid)
+                readAndArchive(threadUid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
-            SwipeAction.NONE -> {
-                throw IllegalStateException("Cannot swipe on an action which is not set")
-            }
-
+            SwipeAction.SPAM -> markAsSpamOrHam(threadUid)
+            SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
             else -> {
                 notYetImplemented()
                 true
@@ -326,11 +314,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun observeCurrentThreads() {
-        mainViewModel.currentThreadsLive.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
+    private fun observeCurrentThreads() = with(threadListViewModel) {
+        mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
-            waitingBeforeNotifyAdapter = threadListViewModel.isRecoveringFinished
-            beforeUpdateAdapter = { threads -> handleThreadsVisibility(threads.count()) }
+            waitingBeforeNotifyAdapter = isRecoveringFinished
+            beforeUpdateAdapter = { threads ->
+                currentThreadsCount = threads.count()
+                updateThreadsVisibility()
+            }
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
         }
     }
@@ -356,23 +347,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun observeCurrentFolderLive() {
-        mainViewModel.currentFolderLive.refreshObserve(viewLifecycleOwner) { folder ->
-            updateThreadsVisibilityIfNeeded(folder)
+    private fun observeCurrentFolderLive() = with(threadListViewModel) {
+        mainViewModel.currentFolderLiveToObserve.refreshObserve(viewLifecycleOwner) { folder ->
+            currentFolderCursor = folder.cursor
+            updateThreadsVisibility()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
-            threadListViewModel.startUpdatedAtJob()
-        }
-    }
-
-    private fun updateThreadsVisibilityIfNeeded(folder: Folder) {
-        when {
-            folder.cursor == null -> isFirstOpeningOfThisFolder = true
-            isFirstOpeningOfThisFolder -> {
-                val threadsCount = mainViewModel.currentThreadsLive.value?.list?.count() ?: 0
-                handleThreadsVisibility(threadsCount)
-                isFirstOpeningOfThisFolder = false
-            }
+            startUpdatedAtJob()
         }
     }
 
@@ -420,7 +401,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         if (mainViewModel.currentFilter.value == ThreadFilter.UNSEEN && unreadCount == 0) clearFilter()
 
         binding.unreadCountChip.apply {
-            text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, unreadCount)
+            text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
             isVisible = unreadCount > 0
         }
     }
@@ -431,12 +412,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.toolbar.title = folderName
     }
 
-    private fun handleThreadsVisibility(threadsCount: Int) {
-        Log.d("UI", "Received threads (${threadsCount})")
+    private fun updateThreadsVisibility() = with(threadListViewModel) {
+        Log.d("UI", "Received threads (${currentThreadsCount})")
 
-        val cursor = mainViewModel.currentFolder.value?.cursor
-
-        if (cursor != null && threadsCount == 0) {
+        if (currentFolderCursor != null && currentThreadsCount == 0) {
             displayNoEmailView()
         } else {
             displayThreadsView()

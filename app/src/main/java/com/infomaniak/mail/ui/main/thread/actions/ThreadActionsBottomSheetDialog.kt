@@ -40,29 +40,34 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         super.onViewCreated(view, savedInstanceState)
 
         val threadUid = navigationArgs.threadUid
-        val messageUidToReplyTo = navigationArgs.messageUidToReplyTo
 
         threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
 
-        postpone.isGone = true
-        rule.isGone = true
+        threadActionsViewModel.getMessageUidToReplyTo(
+            threadUid,
+            navigationArgs.messageUidToReplyTo,
+        ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
 
-        archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
-        markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
-        move.setClosingOnClickListener { notYetImplemented() }
-        favorite.setClosingOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
-        print.setClosingOnClickListener { notYetImplemented() }
-        reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+            postpone.isGone = true
+            rule.isGone = true
 
-        mainActions.setClosingOnClickListener { id: Int ->
-            when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
-                R.id.actionForward -> notYetImplemented()
-                R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
+            markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
+            move.setClosingOnClickListener { notYetImplemented() }
+            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
+            print.setClosingOnClickListener { notYetImplemented() }
+            reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+
+            mainActions.setClosingOnClickListener { id: Int ->
+                when (id) {
+                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
+                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
+                    R.id.actionForward -> notYetImplemented()
+                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+                }
             }
         }
     }

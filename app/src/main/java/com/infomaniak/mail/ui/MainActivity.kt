@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.SyncMessagesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
@@ -194,8 +193,8 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun observeSnackbar() {
-        mainViewModel.snackbarFeedback.observe(this) { (title, undoResource) ->
-            val onActionClicked = undoResource?.let { { notYetImplemented() } }
+        mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
+            val onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
             showSnackbar(title, onActionClicked = onActionClicked)
         }
     }

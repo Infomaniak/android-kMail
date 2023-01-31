@@ -206,7 +206,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeFoldersLive() {
-        mainViewModel.currentFoldersLive.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+        mainViewModel.currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
@@ -220,7 +220,7 @@ class MenuDrawerFragment : Fragment() {
     }
 
     private fun observeQuotas() = with(binding) {
-        mainViewModel.currentQuotasLive.refreshObserve(viewLifecycleOwner) { quotas ->
+        mainViewModel.currentQuotasLiveToObserve.refreshObserve(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
             storageLayout.isVisible = isLimited
@@ -249,7 +249,8 @@ class MenuDrawerFragment : Fragment() {
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersLayout.isVisible = true
         customFolders.setIsCollapsed(false)
-        advancedActionsLayout.isVisible = true
+        advancedActionsLayout.isGone = true
+        advancedActions.setIsCollapsed(true)
     }
 
     private fun openFolder(folderId: String) {

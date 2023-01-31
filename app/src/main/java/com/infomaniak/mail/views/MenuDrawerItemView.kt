@@ -44,14 +44,12 @@ class MenuDrawerItemView @JvmOverloads constructor(
 
     val binding by lazy { ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true) }
 
-    var isBadgeCapped: Boolean = false
-
     var badge: Int = 0
         set(value) {
             field = value
             binding.itemBadge.apply {
                 isVisible = value > 0
-                text = if (isBadgeCapped) formatUnreadCount(value) else value.toString()
+                text = formatUnreadCount(value)
             }
         }
 
@@ -86,7 +84,6 @@ class MenuDrawerItemView @JvmOverloads constructor(
             badge = getInteger(R.styleable.MenuDrawerItemView_badge, badge)
             icon = getDrawable(R.styleable.MenuDrawerItemView_icon)
             indent = getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, indent)
-            isBadgeCapped = getBoolean(R.styleable.MenuDrawerItemView_isBadgeCapped, isBadgeCapped)
             text = getString(R.styleable.MenuDrawerItemView_text)
             textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
             getResourceId(R.styleable.MenuDrawerItemView_textWeight, 0).also { fontFamily ->

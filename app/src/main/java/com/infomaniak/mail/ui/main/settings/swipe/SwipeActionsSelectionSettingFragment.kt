@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 swipeAction as SwipeAction
 
                 when (swipeAction) {
-                    ARCHIVE, DELETE, FAVORITE, NONE, QUICKACTIONS_MENU, READ_UNREAD, READ_AND_ARCHIVE -> Unit
+                    ARCHIVE, DELETE, FAVORITE, NONE, QUICKACTIONS_MENU, READ_UNREAD, READ_AND_ARCHIVE, SPAM -> Unit
                     else -> notYetImplemented()
                 }
 

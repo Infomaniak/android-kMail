@@ -41,7 +41,7 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.JUNK_BOTTOM_SHEET_NAV_KEY
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindListChangeToAdapter
+import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -53,7 +53,7 @@ class ThreadFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val threadViewModel: ThreadViewModel by viewModels()
 
-    private var threadAdapter = ThreadAdapter()
+    private val threadAdapter by lazy { ThreadAdapter() }
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
     private var shouldScrollToBottom = AtomicBoolean(true)
@@ -67,17 +67,20 @@ class ThreadFragment : Fragment() {
 
         observeThreadLive()
 
-        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { expandedMap ->
-            if (expandedMap == null) {
+        threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
+
+            if (result == null) {
                 findNavController().popBackStack()
-            } else {
-                setupUi()
-                setupAdapter()
-                threadAdapter.expandedMap = expandedMap
-                observeMessagesLive()
-                observeContacts()
-                observeQuickActionBarClicks()
+                return@observe
             }
+
+            val threadUid = result.first.uid
+            setupUi(threadUid)
+            setupAdapter(threadUid)
+            threadAdapter.expandedMap = result.second
+            observeMessagesLive()
+            observeContacts()
+            observeQuickActionBarClicks()
         }
 
         getBackNavigationResult<Boolean>(JUNK_BOTTOM_SHEET_NAV_KEY) { shouldOpenJunk ->
@@ -85,7 +88,7 @@ class ThreadFragment : Fragment() {
         }
     }
 
-    private fun setupUi() = with(binding) {
+    private fun setupUi(threadUid: String) = with(binding) {
 
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
@@ -100,9 +103,7 @@ class ThreadFragment : Fragment() {
             toolbarSubject.setTextColor(textColor)
         }
 
-        val threadUid = navigationArgs.threadUid
-
-        iconFavorite.setOnClickListener { mainViewModel.toggleThreadFavoriteStatus(threadUid) }
+        iconFavorite.setOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
@@ -111,7 +112,6 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
                 R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
                 R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
-
             }
         }
     }
@@ -122,15 +122,15 @@ class ThreadFragment : Fragment() {
                 R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
-                        messageUidToReplyTo = lastMessageToReplyTo.uid,
                         threadUid = navigationArgs.threadUid,
+                        messageUidToReplyTo = lastMessageToReplyTo.uid,
                     )
                 )
             }
         }
     }
 
-    private fun setupAdapter() = with(binding) {
+    private fun setupAdapter(threadUid: String) = with(binding) {
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             contacts = mainViewModel.mergedContacts.value ?: emptyMap()
@@ -149,7 +149,7 @@ class ThreadFragment : Fragment() {
             }
             onDeleteDraftClicked = { message ->
                 mainViewModel.currentMailbox.value?.let { mailbox ->
-                    threadViewModel.deleteDraft(message, navigationArgs.threadUid, mailbox)
+                    threadViewModel.deleteDraft(message, threadUid, mailbox)
                 }
             }
             onAttachmentClicked = { attachment ->
@@ -187,15 +187,18 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeMessagesLive() {
-        threadViewModel.messagesLive(navigationArgs.threadUid).bindListChangeToAdapter(viewLifecycleOwner, threadAdapter).apply {
-            beforeUpdateAdapter = ::onMessagesUpdate
-            afterUpdateAdapter = {
-                if (shouldScrollToBottom.compareAndSet(true, false)) {
-                    val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.expandedMap[it.uid] == true }
-                    binding.messagesList.scrollToPosition(indexToScroll)
+        threadViewModel
+            .messagesLive(navigationArgs.threadUid)
+            .bindResultsChangeToAdapter(viewLifecycleOwner, threadAdapter)
+            .apply {
+                beforeUpdateAdapter = ::onMessagesUpdate
+                afterUpdateAdapter = {
+                    if (shouldScrollToBottom.compareAndSet(true, false)) {
+                        val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.expandedMap[it.uid] == true }
+                        binding.messagesList.scrollToPosition(indexToScroll)
+                    }
                 }
             }
-        }
     }
 
     private fun observeContacts() {

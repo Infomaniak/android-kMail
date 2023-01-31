@@ -54,6 +54,32 @@ import io.sentry.Sentry
 import kotlinx.serialization.encodeToString
 import java.util.*
 
+fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
+
+fun Activity.notYetImplemented() = showSnackbar("This feature is currently under development.")
+
+fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
+fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
+    return runCatching {
+        val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
+        context.contentResolver.query(this, projection, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val displayName = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
+                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
+                displayName to size
+            } else {
+                Sentry.captureException(Exception("$this has empty cursor"))
+                null
+            }
+        }
+    }.getOrElse { exception ->
+        Sentry.captureException(exception)
+        null
+    }
+}
+
+//region Date
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
 
 fun Date.toRealmInstant(): RealmInstant {
@@ -73,6 +99,10 @@ fun Date.isLastWeek(): Boolean {
     val lastWeek = Calendar.getInstance().apply { add(Calendar.WEEK_OF_YEAR, -1) }.time
     return this in lastWeek.startOfTheWeek()..lastWeek.endOfTheWeek()
 }
+//endregion
+
+//region UI
+inline val ViewBinding.context: Context get() = root.context
 
 fun View.toggleChevron(
     isCollapsed: Boolean,
@@ -88,29 +118,14 @@ fun View.toggleChevron(
     animate().rotation(angle).setDuration(duration).start()
 }
 
-fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
-
-inline val ViewBinding.context: Context get() = root.context
-
-fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
-    observe(owner) { it?.let(observer) }
-}
-
-inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
-    removeObservers(viewLifecycleOwner)
-    observe(viewLifecycleOwner, observer)
-}
-
 fun Context.getAttributeColor(attribute: Int): Int {
     val typedValue = TypedValue()
     theme.resolveAttribute(attribute, typedValue, true)
     return typedValue.data
 }
+//endregion
 
-fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
-
-fun Activity.notYetImplemented() = showSnackbar("This feature is currently under development.")
-
+//region Navigation
 fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: String? = null) {
     if (canNavigate(currentClassName)) findNavController().navigate(directions, getAnimatedNavOptions())
 }
@@ -133,29 +148,20 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
         ).toBundle(),
     )
 }
+//endregion
 
-fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
-    return runCatching {
-        val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
-        context.contentResolver.query(this, projection, null, null, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val displayName = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
-                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
-                displayName to size
-            } else {
-                Sentry.captureException(Exception("$this has empty cursor"))
-                null
-            }
-        }
-    }.getOrElse { exception ->
-        Sentry.captureException(exception)
-        null
-    }
+//region WorkManager
+fun OneTimeWorkRequest.Builder.setExpeditedWorkRequest(): OneTimeWorkRequest.Builder {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+    return this
 }
+//endregion
 
+//region API
 inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
     throw error?.exception ?: Exception(ApiController.json.encodeToString(this))
 }
+//endregion
 
 //region Realm
 inline fun <reified T : RealmObject> Realm.update(items: List<RealmObject>) {
@@ -171,11 +177,19 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
 }
 //endregion
 
-//region WorkManager
-fun OneTimeWorkRequest.Builder.setExpeditedWorkRequest(): OneTimeWorkRequest.Builder {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-    return this
+//region LiveData
+fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
+    observe(owner) { it?.let(observer) }
+}
+
+inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
+    removeObservers(viewLifecycleOwner)
+    observe(viewLifecycleOwner, observer)
 }
 //endregion
 
+//region Messages
 fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it.folderId == exception) null else it.folderId }
+
+fun List<Message>.getUids(): List<String> = map { it.uid }
+//endregion

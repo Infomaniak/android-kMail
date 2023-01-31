@@ -69,9 +69,8 @@ class Message : RealmObject {
     private var _dkimStatus: String? = null
     @SerialName("folder_id")
     var folderId: String = ""
-    var folder: String = ""
     @SerialName("st_uuid")
-    var stUuid: String? = null
+    var swissTransferUuid: String? = null
     var resource: String = ""
     @SerialName("download_resource")
     var downloadResource: String = ""
@@ -100,6 +99,8 @@ class Message : RealmObject {
     //region Local data (Transient)
     @Transient
     var fullyDownloaded: Boolean = false
+    @Transient
+    var isSpam: Boolean = false
     @Transient
     var messageIds: RealmSet<String> = realmSetOf()
     @Transient
@@ -131,9 +132,16 @@ class Message : RealmObject {
         NOT_SIGNED,
     }
 
-    fun initLocalValues(fullyDownloaded: Boolean, messageIds: RealmSet<String>, date: RealmInstant, draftLocalUuid: String?) {
+    fun initLocalValues(
+        fullyDownloaded: Boolean,
+        messageIds: RealmSet<String>,
+        isSpam: Boolean,
+        date: RealmInstant,
+        draftLocalUuid: String?,
+    ) {
         this.fullyDownloaded = fullyDownloaded
         this.messageIds = messageIds
+        this.isSpam = isSpam
         this.date = date
         draftLocalUuid?.let { this.draftLocalUuid = it }
     }

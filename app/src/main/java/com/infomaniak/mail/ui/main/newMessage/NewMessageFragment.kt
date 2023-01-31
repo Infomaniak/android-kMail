@@ -55,7 +55,9 @@ import com.infomaniak.mail.data.models.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
-import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.BCC
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.CC
+import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.TO
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.Utils
@@ -63,7 +65,6 @@ import com.infomaniak.mail.utils.Utils.injectCssInHtml
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
-import java.util.*
 import com.google.android.material.R as RMaterial
 
 class NewMessageFragment : Fragment() {
@@ -103,6 +104,11 @@ class NewMessageFragment : Fragment() {
         observeMailboxes()
         observeEditorActions()
         observeNewAttachments()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        newMessageViewModel.updateDraftInLocalIfRemoteHasChanged()
     }
 
     private fun initUi() = with(binding) {
@@ -208,7 +214,8 @@ class NewMessageFragment : Fragment() {
         bodyText.setText(draft.uiBody)
 
         draft.uiSignature?.let { html ->
-            val signature = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
+            var signature = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
+            signature = context.injectCssInHtml(R.raw.remove_margin, signature)
             signatureWebView.loadDataWithBaseURL("", signature, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
 
             removeSignature.setOnClickListener {

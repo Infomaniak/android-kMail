@@ -225,6 +225,7 @@
                 android:layout_height="wrap_content" />
 
             <com.infomaniak.mail.ui.main.menu.MenuDrawerDropdownView
+                app:collapsedByDefault="true"
                 android:id="@+id/advancedActions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -232,6 +233,7 @@
 
             <LinearLayout
                 android:id="@+id/advancedActionsLayout"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">

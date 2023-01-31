@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -31,6 +32,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val messageActionsViewModel: MessageActionsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,24 +40,27 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadUid = navigationArgs.threadUid
         val messageUid = navigationArgs.messageUid
 
-        setMarkAsReadUi(navigationArgs.isSeen)
-        setFavoriteUi(navigationArgs.isFavorite)
+        messageActionsViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
-        archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, messageUid) }
-        markAsReadUnread.setClosingOnClickListener { notYetImplemented() }
-        move.setClosingOnClickListener { notYetImplemented() }
-        postpone.setClosingOnClickListener { notYetImplemented() }
-        favorite.setClosingOnClickListener { mainViewModel.toggleMessageFavoriteStatus(messageUid, threadUid) }
-        print.setClosingOnClickListener { notYetImplemented() }
-        rule.setClosingOnClickListener { notYetImplemented() }
-        reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+            setMarkAsReadUi(navigationArgs.isSeen)
+            setFavoriteUi(navigationArgs.isFavorite)
 
-        mainActions.setClosingOnClickListener { id: Int ->
-            when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
-                R.id.actionForward -> notYetImplemented()
-                R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid, messageUid)
+            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, message) }
+            markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(threadUid, message) }
+            move.setClosingOnClickListener { notYetImplemented() }
+            postpone.setClosingOnClickListener { notYetImplemented() }
+            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid, message) }
+            print.setClosingOnClickListener { notYetImplemented() }
+            rule.setClosingOnClickListener { notYetImplemented() }
+            reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
+
+            mainActions.setClosingOnClickListener { id: Int ->
+                when (id) {
+                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
+                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
+                    R.id.actionForward -> notYetImplemented()
+                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid, message)
+                }
             }
         }
     }

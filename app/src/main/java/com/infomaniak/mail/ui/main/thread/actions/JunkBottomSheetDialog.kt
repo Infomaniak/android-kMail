@@ -26,6 +26,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.notYetImplemented
@@ -49,10 +50,9 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
         blockSender.setClosingOnClickListener { notYetImplemented() }
     }
 
-    private fun setSpamUi() {
-        binding.spam.setText(
-            if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) R.string.actionNonSpam else R.string.actionSpam
-        )
+    fun setSpamUi(message: Message? = null) { // TODO : Pass message from navigation etc.
+        val isSpam = message?.isSpam ?: mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
+        binding.spam.setText(if (isSpam) R.string.actionNonSpam else R.string.actionSpam)
     }
 
     private fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {

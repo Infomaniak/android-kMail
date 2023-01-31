@@ -27,6 +27,8 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SharedViewModelUtils
+import com.infomaniak.mail.utils.getUids
+import com.infomaniak.mail.utils.handlerIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.mapNotNull
@@ -38,20 +40,17 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     private var fetchMessagesJob: Job? = null
 
+    private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
+
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }
 
     fun messagesLive(threadUid: String) = liveData(Dispatchers.IO) {
-        ThreadController.getThread(threadUid)?.messages?.asFlow()?.asLiveData()?.let { emitSource(it) }
+        MessageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 
     fun openThread(threadUid: String) = liveData(Dispatchers.IO) {
-
-        val mailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId) ?: run {
-            emit(null)
-            return@liveData
-        }
 
         val thread = ThreadController.getThread(threadUid) ?: run {
             emit(null)
@@ -62,31 +61,29 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         thread.messages.forEachIndexed { index, message ->
             expandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
         }
-        emit(expandedMap)
 
-        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(thread, mailbox)
+        emit(thread to expandedMap)
+
+        if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, thread)
     }
 
     fun fetchIncompleteMessages(messages: List<Message>) {
         fetchMessagesJob?.cancel()
         fetchMessagesJob = viewModelScope.launch(Dispatchers.IO) {
-            ThreadController.fetchIncompleteMessages(messages)
+            ThreadController.fetchIncompleteMessages(messages, mailbox)
         }
     }
 
-    fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteDraft(message: Message, threadUid: String, mailbox: Mailbox) = viewModelScope.launch(viewModelScope.handlerIO) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val messages = thread.getMessageAndDuplicates(message)
-        val uids = messages.map { it.uid }
-
-        if (ApiRepository.deleteMessages(mailbox.uuid, uids).isSuccess()) {
-            MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
-        }
+        val messages = MessageController.getMessageAndDuplicates(thread, message)
+        val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
+        if (isSuccess) MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        MessageController.getMessageToReplyTo(threadUid)?.let { message ->
-            quickActionBarClicks.postValue(message to menuId)
-        }
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val message = MessageController.getMessageToReplyTo(thread)
+        quickActionBarClicks.postValue(message to menuId)
     }
 }

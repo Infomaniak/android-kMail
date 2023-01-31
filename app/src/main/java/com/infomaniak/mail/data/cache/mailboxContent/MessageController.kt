@@ -20,6 +20,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.upsertThread
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -40,25 +41,29 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 import okhttp3.OkHttpClient
 import java.util.*
 import kotlin.math.min
 
 object MessageController {
 
-    //region Queries
-    private fun getMessagesQuery(realm: TypedRealm): RealmQuery<Message> {
-        return realm.query()
-    }
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
+    private fun byFolderId(folderId: String) = "${Message::folderId.name} == '$folderId'"
+    private val isNotDraft = "${Message::isDraft.name} == false"
+    private val isNotScheduled = "${Message::scheduled.name} == false"
+    private val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+            "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
+
+    //region Queries
     private fun getMessagesQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Message> {
         val byUids = "${Message::uid.name} IN {${uids.joinToString { "'$it'" }}}"
         return realm.query(byUids)
     }
 
-    private fun getMessagesQuery(folderId: String, realm: TypedRealm? = null): RealmQuery<Message> {
-        val byFolderId = "${Message::folderId.name} == '$folderId'"
-        return (realm ?: RealmDatabase.mailboxContent()).query(byFolderId)
+    private fun getMessagesQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
+        return realm.query(byFolderId(folderId))
     }
 
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
@@ -68,35 +73,67 @@ object MessageController {
     //endregion
 
     //region Get data
-    fun getMessages(realm: TypedRealm): RealmResults<Message> {
-        return getMessagesQuery(realm).find()
-    }
-
     private fun getMessages(uids: List<String>, realm: TypedRealm): RealmResults<Message> {
         return getMessagesQuery(uids, realm).find()
     }
 
-    fun getMessages(folderId: String, realm: TypedRealm? = null): RealmResults<Message> {
+    fun getMessages(folderId: String, realm: TypedRealm = defaultRealm): RealmResults<Message> {
         return getMessagesQuery(folderId, realm).find()
     }
 
-    fun getMessage(uid: String, realm: TypedRealm): Message? {
+    fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
+        return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
+    }
+
+    fun getMessage(uid: String, realm: TypedRealm = defaultRealm): Message? {
         return getMessageQuery(uid, realm).find()
     }
 
-    fun getMessageToReplyTo(threadUid: String): Message? {
-        val messages = ThreadController.getThread(threadUid)?.messages ?: return null
-
-        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
-                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
-        val isNotDraft = "${Message::isDraft.name} == false"
-
-        return messages.query("$isNotFromMe AND $isNotDraft").find().lastOrNull()
+    fun getMessageToReplyTo(thread: Thread): Message = with(thread) {
+        return messages.query("$isNotDraft AND $isNotFromMe").find().lastOrNull()
             ?: messages.query(isNotDraft).find().lastOrNull()
             ?: messages.last()
     }
 
-    fun getMessageUidToReplyTo(threadUid: String): String? = getMessageToReplyTo(threadUid)?.uid
+    fun getUnseenMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, "${Message::seen.name} == false")
+    }
+
+    fun getFavoriteMessages(thread: Thread): List<Message> {
+        val isFavorite = "${Message::isFavorite.name} == true"
+        return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
+    }
+
+    fun getArchivableMessages(thread: Thread, folderId: String): List<Message> {
+        return getMessagesAndDuplicates(thread, "${byFolderId(folderId)} AND $isNotScheduled")
+    }
+
+    fun getSpamMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, "$isNotScheduled AND $isNotFromMe")
+    }
+
+    fun getDeletableMessages(thread: Thread): List<Message> {
+        return getMessagesAndDuplicates(thread, isNotScheduled)
+    }
+
+    fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
+        val message = thread.messages.query(isNotDraft).find().lastOrNull() ?: thread.messages.last()
+        return getMessageAndDuplicates(thread, message)
+    }
+
+    private fun getMessagesAndDuplicates(thread: Thread, query: String): List<Message> {
+
+        val messages = thread.messages.query(query).find()
+
+        val byMessagesIds = "${Message::messageId.name} IN {${messages.joinToString { "'${it.messageId}'" }}}"
+        val duplicates = thread.duplicates.query(byMessagesIds).find()
+
+        return messages + duplicates
+    }
+
+    fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
+        return listOf(message) + thread.duplicates.query("${Message::messageId.name} == '${message.messageId}'").find()
+    }
     //endregion
 
     //region Edit data
@@ -108,15 +145,11 @@ object MessageController {
         messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
     }
 
-    private fun deleteMessage(uid: String, realm: MutableRealm? = null) {
-        val block: (MutableRealm) -> Unit = {
-            getMessage(uid, realm = it)
-                ?.let { message ->
-                    DraftController.getDraftByMessageUid(message.uid, realm = it)?.let(it::delete)
-                    it.delete(message)
-                }
+    private fun deleteMessage(uid: String, realm: MutableRealm) {
+        getMessage(uid, realm)?.let { message ->
+            DraftController.getDraftByMessageUid(message.uid, realm)?.let(realm::delete)
+            realm.delete(message)
         }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
     }
     //endregion
 
@@ -125,7 +158,7 @@ object MessageController {
         mailbox: Mailbox,
         folderId: String,
         okHttpClient: OkHttpClient? = null,
-        realm: Realm? = null,
+        realm: Realm = defaultRealm,
     ): List<Thread> {
 
         val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
@@ -148,7 +181,12 @@ object MessageController {
         return newMessagesThreads
     }
 
-    fun fetchFolderMessages(mailbox: Mailbox, folder: Folder, okHttpClient: OkHttpClient?, realm: Realm?): List<Thread> {
+    fun fetchFolderMessages(
+        mailbox: Mailbox,
+        folder: Folder,
+        okHttpClient: OkHttpClient?,
+        realm: Realm = defaultRealm,
+    ): List<Thread> {
         val previousCursor = folder.cursor
 
         val messagesUids = if (previousCursor == null) {
@@ -165,7 +203,7 @@ object MessageController {
         folder: Folder,
         mailbox: Mailbox,
         okHttpClient: OkHttpClient?,
-        realm: Realm?,
+        realm: Realm,
     ) = with(messagesUids) {
 
         Log.i(
@@ -173,9 +211,9 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val newMessagesThreads = handleAddedUids(addedShortUids, folder.id, mailbox.uuid, okHttpClient, realm)
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, okHttpClient, realm)
 
-        (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
+        realm.writeBlocking {
 
             val impactedFolders = newMessagesThreads.map { it.folderId }.toMutableSet()
 
@@ -197,28 +235,28 @@ object MessageController {
 
     private fun handleAddedUids(
         shortUids: List<String>,
-        folderId: String,
+        folder: Folder,
         mailboxUuid: String,
         okHttpClient: OkHttpClient?,
-        realm: Realm?,
+        realm: Realm,
     ): List<Thread> {
         val newMessagesThreads = mutableSetOf<Thread>()
         if (shortUids.isNotEmpty()) {
 
             var pageStart = 0
             val pageSize = ApiRepository.PER_PAGE
-            val uids = getUniquesUidsWithNewestFirst(folderId, shortUids)
+            val uids = getUniquesUidsWithNewestFirst(folder.id, shortUids)
 
             while (pageStart < uids.count()) {
 
                 val pageEnd = min(pageStart + pageSize, uids.count())
                 val page = uids.subList(pageStart, pageEnd)
 
-                val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folderId, page, okHttpClient)
+                val apiResponse = ApiRepository.getMessagesByUids(mailboxUuid, folder.id, page, okHttpClient)
                 if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
                 apiResponse.data?.messages?.let { messages ->
-                    (realm ?: RealmDatabase.mailboxContent()).writeBlocking {
-                        val threads = createMultiMessagesThreads(messages, folderId)
+                    realm.writeBlocking {
+                        val threads = createMultiMessagesThreads(messages, folder)
                         newMessagesThreads.addAll(threads)
                     }
                 }
@@ -230,7 +268,7 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    private fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folderId: String): List<Thread> {
+    private fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folder: Folder): List<Thread> {
 
         // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
@@ -242,13 +280,15 @@ object MessageController {
 
             message.initMessageIds()
 
+            message.isSpam = folder.role == FolderRole.SPAM
+
             // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), put this back when it's fixed.
             // val existingThreads = ThreadController.getThreads(message.messageIds, realm = this).toList()
             // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
             val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
 
             createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
-                ThreadController.upsertThread(newThread, realm = this)
+                upsertThread(newThread)
                 threadsToUpsert[newThread.uid] = newThread
                 // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
                 allThreads.add(newThread)
@@ -256,7 +296,7 @@ object MessageController {
 
             existingThreads.forEach {
                 it.addMessageWithConditions(message, realm = this)
-                ThreadController.upsertThread(it, realm = this)
+                upsertThread(it)
                 threadsToUpsert[it.uid] = it
             }
         }
@@ -264,8 +304,8 @@ object MessageController {
         val folderThreads = mutableListOf<Thread>()
         threadsToUpsert.forEach { (_, thread) ->
             thread.recomputeThread(realm = this)
-            ThreadController.upsertThread(thread, realm = this)
-            if (thread.folderId == folderId) {
+            upsertThread(thread)
+            if (thread.folderId == folder.id) {
                 folderThreads.add(if (thread.isManaged()) thread.copyFromRealm(UInt.MIN_VALUE) else thread)
             }
         }
@@ -312,7 +352,7 @@ object MessageController {
             message.toThread().also { thread ->
                 thread.addFirstMessage(message)
                 thread.recomputeThread(realm = this)
-                ThreadController.upsertThread(thread, realm = this)
+                upsertThread(thread)
             }
         }
     }

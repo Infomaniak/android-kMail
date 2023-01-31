@@ -19,10 +19,12 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
@@ -34,14 +36,11 @@ import okhttp3.OkHttpClient
 
 object ThreadController {
 
+    private inline val defaultRealm get() = RealmDatabase.mailboxContent()
+
     //region Queries
     private fun getThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
         return realm.query()
-    }
-
-    private fun getThreadsQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Thread> {
-        val byUids = "${Thread::uid.name} IN {${uids.joinToString { "\"$it\"" }}}"
-        return realm.query(byUids)
     }
 
     private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm): RealmScalarQuery<Long> {
@@ -54,13 +53,11 @@ object ThreadController {
     private fun getThreadsQuery(
         folderId: String,
         filter: ThreadFilter = ThreadFilter.ALL,
-        realm: TypedRealm? = null
+        realm: TypedRealm,
     ): RealmQuery<Thread> {
 
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
-        val query = (realm ?: RealmDatabase.mailboxContent())
-            .query<Thread>(byFolderId)
-            .sort(Thread::date.name, Sort.DESCENDING)
+        val query = realm.query<Thread>(byFolderId).sort(Thread::date.name, Sort.DESCENDING)
 
         return if (filter == ThreadFilter.ALL) {
             query
@@ -77,8 +74,8 @@ object ThreadController {
         }
     }
 
-    private fun getThreadQuery(uid: String, realm: TypedRealm? = null): RealmSingleQuery<Thread> {
-        return (realm ?: RealmDatabase.mailboxContent()).query<Thread>("${Thread::uid.name} == '$uid'").first()
+    private fun getThreadQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Thread> {
+        return realm.query<Thread>("${Thread::uid.name} == '$uid'").first()
     }
     //endregion
 
@@ -87,61 +84,77 @@ object ThreadController {
         return getThreadsQuery(realm).find()
     }
 
-    fun getThreads(uids: List<String>, realm: TypedRealm): RealmResults<Thread> {
-        return getThreadsQuery(uids, realm).find()
-    }
-
     fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {
         return getUnreadThreadsCountQuery(folderId, realm).find().toInt()
     }
 
     fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folderId, filter).asFlow()
+        return getThreadsQuery(folderId, filter, defaultRealm).asFlow()
     }
 
-    fun getThread(uid: String, realm: TypedRealm? = null): Thread? {
+    fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
         return getThreadQuery(uid, realm).find()
     }
 
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
-        return getThreadQuery(uid).asFlow()
+        return getThreadQuery(uid, defaultRealm).asFlow()
     }
     //endregion
 
     //region Edit data
-    fun upsertThread(thread: Thread, realm: MutableRealm? = null) {
-        val block: (MutableRealm) -> Unit = { it.copyToRealm(thread, UpdatePolicy.ALL) }
-        realm?.let(block) ?: RealmDatabase.mailboxContent().writeBlocking(block)
+    fun MutableRealm.upsertThread(thread: Thread) {
+        copyToRealm(thread, UpdatePolicy.ALL)
     }
 
     fun deleteThreads(folderId: String, realm: MutableRealm) {
         realm.delete(getThreadsQuery(folderId, realm = realm))
     }
 
-    fun fetchIncompleteMessages(messages: List<Message>, okHttpClient: OkHttpClient? = null) {
-        RealmDatabase.mailboxContent().writeBlocking {
+    fun fetchIncompleteMessages(
+        messages: List<Message>,
+        mailbox: Mailbox,
+        okHttpClient: OkHttpClient? = null,
+        realm: Realm = defaultRealm,
+    ) {
+
+        val impactedFoldersIds = mutableSetOf<String>()
+
+        realm.writeBlocking {
             messages.forEach { localMessage ->
                 if (!localMessage.fullyDownloaded) {
-                    ApiRepository.getMessage(localMessage.resource, okHttpClient).data?.also { remoteMessage ->
+                    with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
+                        if (isSuccess()) {
+                            data?.also { remoteMessage ->
 
-                        // If we've already got this Message's Draft beforehand, we need to save
-                        // its `draftLocalUuid`, otherwise we'll lose the link between them.
-                        val draftLocalUuid = if (remoteMessage.isDraft) {
-                            DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this)?.localUuid
+                                // If we've already got this Message's Draft beforehand, we need to save
+                                // its `draftLocalUuid`, otherwise we'll lose the link between them.
+                                val draftLocalUuid = if (remoteMessage.isDraft) {
+                                    DraftController.getDraftByMessageUid(remoteMessage.uid, realm = this@writeBlocking)?.localUuid
+                                } else {
+                                    null
+                                }
+
+                                remoteMessage.initLocalValues(
+                                    fullyDownloaded = true,
+                                    messageIds = localMessage.messageIds,
+                                    isSpam = localMessage.isSpam,
+                                    date = localMessage.date,
+                                    draftLocalUuid,
+                                )
+
+                                MessageController.upsertMessage(remoteMessage, realm = this@writeBlocking)
+                            }
                         } else {
-                            null
+                            impactedFoldersIds.add(localMessage.folderId)
                         }
-
-                        remoteMessage.initLocalValues(
-                            fullyDownloaded = true,
-                            messageIds = localMessage.messageIds,
-                            date = localMessage.date,
-                            draftLocalUuid,
-                        )
-
-                        MessageController.upsertMessage(remoteMessage, realm = this)
                     }
                 }
+            }
+        }
+
+        impactedFoldersIds.forEach { folderId ->
+            FolderController.getFolder(folderId, realm)?.let { folder ->
+                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
             }
         }
     }

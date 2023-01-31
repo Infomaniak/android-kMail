@@ -310,8 +310,8 @@
     <string name="threadListHeaderLastUpdate">Updated %s</string>
     <string name="threadListHeaderLastUpdateNow">now</string>
     <plurals name="threadListHeaderUnreadCount">
-        <item quantity="one">%d unread</item>
-        <item quantity="other">%d unread</item>
+        <item quantity="one">%s unread</item>
+        <item quantity="other">%s unread</item>
     </plurals>
     <string name="threadListSectionLastWeek">Last week</string>
     <string name="threadListSectionThisMonth">This month</string>
