@@ -17,12 +17,15 @@
  */
 package com.infomaniak.mail
 
+import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -136,11 +139,19 @@ class ApplicationMain : Application(), ImageLoaderFactory {
             /* flags = */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
-        val notificationManagerCompat = NotificationManagerCompat.from(this)
-        showGeneralNotification(getString(R.string.refreshTokenError)).apply {
-            setContentIntent(pendingIntent)
-            @Suppress("MissingPermission")
-            notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
+        if (ActivityCompat.checkSelfPermission(
+                /* context = */ this,
+                /* permission = */ Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val notificationManagerCompat = NotificationManagerCompat.from(this)
+            showGeneralNotification(getString(R.string.refreshTokenError)).apply {
+                setContentIntent(pendingIntent)
+                @Suppress("MissingPermission")
+                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
+            }
+        } else {
+            // TODO: Display Toast?
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
