@@ -110,7 +110,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
     }
 
     fun setBadgeVisibility(isVisible: Boolean) {
-        binding.itemBadge.isGone = isVisible
+        binding.itemBadge.isVisible = isVisible
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {

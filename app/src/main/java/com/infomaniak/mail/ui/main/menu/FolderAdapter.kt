@@ -36,6 +36,7 @@ class FolderAdapter(
     private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
     private val openFolder: (folderId: String) -> Unit,
+    private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
@@ -84,7 +85,7 @@ class FolderAdapter(
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
-        badge = badgeText
+        badge = if (isInMenuDrawer) badgeText else 0
 
         setSelectedState(currentFolderId == id)
 

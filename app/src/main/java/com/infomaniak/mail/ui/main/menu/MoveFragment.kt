@@ -35,8 +35,14 @@ class MoveFragment : Fragment() {
 
     private var inboxFolderId: String? = null
 
-    private val defaultFoldersAdapter = FolderAdapter(openFolder = { folderId -> mainViewModel.openFolder(folderId) })
-    private val customFoldersAdapter = FolderAdapter(openFolder = { folderId -> mainViewModel.openFolder(folderId) })
+    private val defaultFoldersAdapter = FolderAdapter(
+        openFolder = { folderId -> mainViewModel.openFolder(folderId) },
+        isInMenuDrawer = false,
+    )
+    private val customFoldersAdapter = FolderAdapter(
+        openFolder = { folderId -> mainViewModel.openFolder(folderId) },
+        isInMenuDrawer = false,
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMoveBinding.inflate(inflater, container, false).also { binding = it }.root
