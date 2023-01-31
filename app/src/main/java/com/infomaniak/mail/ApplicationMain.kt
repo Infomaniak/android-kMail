@@ -139,6 +139,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
         val notificationManagerCompat = NotificationManagerCompat.from(this)
         showGeneralNotification(getString(R.string.refreshTokenError)).apply {
             setContentIntent(pendingIntent)
+            @Suppress("MissingPermission")
             notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
         }
 
