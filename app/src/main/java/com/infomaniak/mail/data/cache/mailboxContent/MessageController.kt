@@ -74,8 +74,8 @@ object MessageController {
         return ThreadController.getThread(threadUid).messages.query().sort(Message::date.name, Sort.ASCENDING)
     }
 
-    fun getMessage(uid: String, realm: TypedRealm = defaultRealm): Message? {
-        return getMessageQuery(uid, realm).find()
+    fun getMessage(uid: String, realm: TypedRealm = defaultRealm): Message {
+        return getMessageQuery(uid, realm).find()!!
     }
 
     fun getMessageToReplyTo(thread: Thread): Message = with(thread) {
@@ -129,10 +129,9 @@ object MessageController {
     }
 
     private fun deleteMessage(uid: String, realm: MutableRealm) {
-        getMessage(uid, realm)?.let { message ->
-            DraftController.getDraftByMessageUid(message.uid, realm)?.let(realm::delete)
-            realm.delete(message)
-        }
+        val message = getMessage(uid, realm)
+        DraftController.getDraftByMessageUid(message.uid, realm)?.let(realm::delete)
+        realm.delete(message)
     }
     //endregion
 
@@ -374,12 +373,10 @@ object MessageController {
         val threads = mutableSetOf<Thread>()
 
         messageFlags.forEach { flags ->
-
             val uid = flags.shortUid.toLongUid(folderId)
-            getMessage(uid, realm = this)?.let { message ->
-                message.updateFlags(flags)
-                threads += message.parentsFromMessage
-            }
+            val message = getMessage(uid, realm = this)
+            message.updateFlags(flags)
+            threads += message.parentsFromMessage
         }
 
         threads.forEach { thread ->

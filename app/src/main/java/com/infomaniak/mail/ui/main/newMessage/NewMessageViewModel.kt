@@ -225,7 +225,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
         RealmDatabase.mailboxContent().writeBlocking {
             DraftController.upsertDraft(draft, realm = this)
-            draft.messageUid?.let { MessageController.getMessage(it, realm = this)?.draftLocalUuid = draft.localUuid }
+            draft.messageUid?.let { MessageController.getMessage(it, realm = this).draftLocalUuid = draft.localUuid }
         }
     }
 
