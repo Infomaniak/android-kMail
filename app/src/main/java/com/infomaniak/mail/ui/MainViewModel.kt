@@ -309,7 +309,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid) ?: return null
 
         val messages = when (message) {
-            null -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
+            null -> MessageController.getMoveableMessages(thread, currentFolderId.value!!)
             else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
@@ -426,7 +426,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val thread = ThreadController.getThread(threadUid) ?: return@launch
             val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
             val messages = when (message) {
-                null -> MessageController.getUnscheduledMessages(thread)
+                null -> MessageController.getMoveableMessages(thread, destinationFolderId)
                 else -> MessageController.getMessageAndDuplicates(thread, message)
             }
 

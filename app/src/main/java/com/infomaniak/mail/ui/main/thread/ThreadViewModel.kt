@@ -18,7 +18,11 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -33,10 +37,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.collections.set
 
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
 
-    val quickActionBarClicks = MutableLiveData<Pair<Message, Int>>()
+    val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
     private var fetchMessagesJob: Job? = null
 

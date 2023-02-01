@@ -76,8 +76,8 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     fun ActionItemView.setClosingOnClickListener(forceQuit: Boolean = false, callback: (() -> Unit)) {
         setOnClickListener {
-            callback()
             with(findNavController()) { if (forceQuit) popBackStack(R.id.threadListFragment, false) else popBackStack() }
+            callback()
         }
     }
 

@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.refreshObserve
@@ -74,7 +75,7 @@ class MoveFragment : Fragment() {
             inboxFolderId = inbox?.id
 
             val currentFolder = mainViewModel.currentFolder.value ?: return@refreshObserve
-            defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
+            defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == Folder.FolderRole.DRAFT }, currentFolder.id)
             customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }
     }
