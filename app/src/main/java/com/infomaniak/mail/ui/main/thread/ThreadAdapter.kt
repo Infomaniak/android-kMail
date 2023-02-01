@@ -31,6 +31,7 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Attachment.*
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
@@ -160,6 +161,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
 
+        initWebViewClientIfNeeded(message.attachments)
+
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
@@ -250,7 +253,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (attachments.isEmpty()) return ""
 
         val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
-            attachment.size.toLong()
+            attachment.size
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
@@ -340,6 +343,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
 
+        private var doesWebViewNeedInit = true
+
         init {
             with(binding) {
                 fromRecyclerView.adapter = fromAdapter
@@ -347,6 +352,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 ccRecyclerView.adapter = ccAdapter
                 bccRecyclerView.adapter = bccAdapter
                 attachmentsRecyclerView.adapter = attachmentAdapter
+            }
+        }
+
+        fun initWebViewClientIfNeeded(attachments: List<Attachment>) {
+            if (doesWebViewNeedInit) {
+                val cidDictionary = mutableMapOf<String, Attachment>()
+                attachments.forEach {
+                    if (!it.contentId.isNullOrBlank()) cidDictionary[it.contentId as String] = it
+                }
+                binding.messageBody.webViewClient = MessageWebViewClient(binding.context, cidDictionary)
+                doesWebViewNeedInit = false
             }
         }
     }
