@@ -125,6 +125,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 color = localSettings.accentColor.getPrimary(applicationContext)
 
                 val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
+                @Suppress("MissingPermission")
                 notificationManagerCompat.notify(notificationId, build())
             }
         }

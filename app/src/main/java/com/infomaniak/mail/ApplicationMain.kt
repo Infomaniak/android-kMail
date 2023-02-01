@@ -17,12 +17,16 @@
  */
 package com.infomaniak.mail
 
+import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -106,7 +110,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     private fun configureAccountUtils() {
-        AccountUtils.init(this@ApplicationMain)
+        AccountUtils.init(this)
     }
 
     private fun configureAppReloading() {
@@ -133,11 +137,20 @@ class ApplicationMain : Application(), ImageLoaderFactory {
             this, 0, openAppIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+        val notificationText = getString(R.string.refreshTokenError)
 
-        val notificationManagerCompat = NotificationManagerCompat.from(this)
-        showGeneralNotification(getString(R.string.refreshTokenError)).apply {
-            setContentIntent(pendingIntent)
-            notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val notificationManagerCompat = NotificationManagerCompat.from(this)
+            showGeneralNotification(notificationText).apply {
+                setContentIntent(pendingIntent)
+                @Suppress("MissingPermission")
+                notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
+            }
+        } else {
+            Toast.makeText(this, notificationText, Toast.LENGTH_LONG).show()
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
@@ -156,7 +169,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(applicationContext)
+        return ImageLoader.Builder(this)
             .crossfade(true)
             .okHttpClient {
                 OkHttpClient.Builder().apply {
@@ -173,10 +186,10 @@ class ApplicationMain : Application(), ImageLoaderFactory {
                 }.build()
             }
             .memoryCache {
-                MemoryCache.Builder(applicationContext).build()
+                MemoryCache.Builder(this).build()
             }
             .diskCache {
-                DiskCache.Builder().directory(applicationContext.cacheDir.resolve(COIL_CACHE_DIR)).build()
+                DiskCache.Builder().directory(cacheDir.resolve(COIL_CACHE_DIR)).build()
             }
             .build()
     }
