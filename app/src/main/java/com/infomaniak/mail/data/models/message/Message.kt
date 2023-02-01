@@ -178,7 +178,7 @@ class Message : RealmObject {
             cc = cc + cleanedCc
         }
 
-        if (to.isEmpty()) to = from
+        if (to.isEmpty()) to = from.detachedFromRealm()
 
         return to to cc
     }
