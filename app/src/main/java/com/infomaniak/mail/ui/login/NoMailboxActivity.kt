@@ -35,7 +35,7 @@ class NoMailboxActivity : ThemedActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         lockOrientationForSmallScreens()
-        
+
         super.onCreate(savedInstanceState)
 
         with(binding) {
