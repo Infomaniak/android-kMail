@@ -24,6 +24,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
@@ -132,26 +133,24 @@ class ApplicationMain : Application(), ImageLoaderFactory {
 
     private val refreshTokenError: (User) -> Unit = { user ->
         val openAppIntent = Intent(this, LaunchActivity::class.java).clearStack()
-        val pendingIntent = PendingIntent.getActivity(
-            /* context = */ this,
-            /* requestCode = */ 0,
-            /* intent = */ openAppIntent,
-            /* flags = */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(
+            this, 0, openAppIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
+        val notificationText = getString(R.string.refreshTokenError)
 
         if (ActivityCompat.checkSelfPermission(
-                /* context = */ this,
-                /* permission = */ Manifest.permission.POST_NOTIFICATIONS,
+                this, Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             val notificationManagerCompat = NotificationManagerCompat.from(this)
-            showGeneralNotification(getString(R.string.refreshTokenError)).apply {
+            showGeneralNotification(notificationText).apply {
                 setContentIntent(pendingIntent)
                 @Suppress("MissingPermission")
                 notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         } else {
-            // TODO: Display Toast?
+            Toast.makeText(this, notificationText, Toast.LENGTH_LONG).show()
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
