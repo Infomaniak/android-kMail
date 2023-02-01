@@ -91,18 +91,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         setupOnRefresh()
-        setupAdapter()
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
 
-        observeCurrentThreads()
         observeDownloadState()
-        observeCurrentFolder()
         observeCurrentFolderLive()
         observeUpdatedAtTriggers()
-        observeContacts()
         observerDraftsActionsCompletedWorks()
+
+        threadListViewModel.sentFolderId().observe(viewLifecycleOwner) { sentFolderId ->
+            setupAdapter(sentFolderId)
+            observeCurrentThreads()
+            observeCurrentFolder()
+            observeContacts()
+        }
     }
 
     override fun onResume(): Unit = with(binding) {
@@ -139,13 +142,14 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    private fun setupAdapter() = with(threadListViewModel) {
+    private fun setupAdapter(sentFolderId: String?) = with(threadListViewModel) {
 
         threadListAdapter = ThreadListAdapter(
             context = requireContext(),
             threadDensity = localSettings.threadDensity,
             folderRole = FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
+            sentFolderId = sentFolderId,
             onSwipeFinished = { isRecoveringFinished.value = true },
         )
 

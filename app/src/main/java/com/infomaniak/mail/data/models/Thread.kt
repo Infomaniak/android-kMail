@@ -22,7 +22,6 @@ import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
@@ -50,11 +49,12 @@ class Thread : RealmObject {
     var messages: RealmList<Message> = realmListOf()
     var duplicates: RealmList<Message> = realmListOf()
     var messagesIds: RealmSet<String> = realmSetOf()
-    var folderRole: FolderRole? = null
 
+    var date: RealmInstant = Date().toRealmInstant()
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
+    var subject: String? = null
     var size: Int = 0
     var hasAttachments: Boolean = false
     var hasDrafts: Boolean = false
@@ -62,13 +62,9 @@ class Thread : RealmObject {
     var isAnswered: Boolean = false
     var isForwarded: Boolean = false
     var isScheduled: Boolean = false
-    var avatarRecipient: Recipient? = null
-    var displayedRecipients: RealmList<Recipient> = realmListOf()
-    var subject: String? = null
-    var preview: String = ""
-    var date: RealmInstant = Date().toRealmInstant()
 
     private val parentFolder by backlinks(Folder::threads)
+    private val folderRole get() = parentFolder.first().role
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
@@ -112,7 +108,7 @@ class Thread : RealmObject {
         }
     }
 
-    fun recomputeThread(sentFolderId: String, realm: MutableRealm) {
+    fun recomputeThread(realm: MutableRealm) {
 
         // Delete Thread if empty
         if (messages.none { it.folderId == folderId }) {
@@ -127,12 +123,6 @@ class Thread : RealmObject {
         // Remove duplicates in Recipients lists
         from = from.toRecipientsList().distinct().toRealmList()
         to = to.toRecipientsList().distinct().toRealmList()
-
-        computeAvatarRecipient(sentFolderId)
-        computeDisplayedRecipients()
-        computeSubject()
-        computePreview()
-        computeDate()
     }
 
     private fun resetThread() {
@@ -146,7 +136,6 @@ class Thread : RealmObject {
         isAnswered = false
         isForwarded = false
         isScheduled = false
-        displayedRecipients = realmListOf()
     }
 
     private fun updateThread() {
@@ -167,33 +156,8 @@ class Thread : RealmObject {
             if (message.isScheduled) isScheduled = true
         }
 
-        folderRole = parentFolder.first().role
-    }
-
-    private fun computeAvatarRecipient(sentFolderId: String) {
-        val message = messages.lastOrNull { it.folderId != sentFolderId } ?: messages.last()
-        avatarRecipient = message.from.first()
-    }
-
-    private fun computeDisplayedRecipients() {
-        displayedRecipients.addAll(if (folderRole == FolderRole.DRAFT) to else from)
-    }
-
-    private fun computeSubject() {
-        subject = messages.first().subject
-    }
-
-    private fun computePreview() {
-        val message = if (folderRole == FolderRole.SENT) {
-            messages.lastOrNull { it.folderId == folderId } ?: messages.last()
-        } else {
-            messages.last()
-        }
-        preview = message.preview
-    }
-
-    private fun computeDate() {
         date = messages.last { it.folderId == folderId }.date
+        subject = messages.first().subject
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {
@@ -204,6 +168,25 @@ class Thread : RealmObject {
             isThisYear() -> format(FORMAT_DATE_SHORT_DAY_ONE_CHAR)
             else -> format(FORMAT_DATE_CLEAR_MONTH_DAY_ONE_CHAR)
         }
+    }
+
+    fun computeAvatarRecipient(sentFolderId: String?): Recipient {
+        val message = messages.lastOrNull { it.folderId != sentFolderId } ?: messages.last()
+        return message.from.first()
+    }
+
+    fun computeDisplayedRecipients(): RealmList<Recipient> {
+        return if (folderRole == FolderRole.DRAFT) to else from
+    }
+
+    fun computePreview(): String {
+        val message = if (folderRole == FolderRole.SENT) {
+            messages.lastOrNull { it.folderId == folderId } ?: messages.last()
+        } else {
+            messages.last()
+        }
+
+        return message.preview
     }
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1

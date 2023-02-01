@@ -205,16 +205,14 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val sentFolderId = FolderController.getFolder(FolderRole.SENT, realm)!!.id
-
-        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, sentFolderId, okHttpClient, realm)
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, okHttpClient, realm)
 
         realm.writeBlocking {
 
             val impactedFolders = newMessagesThreads.map { it.folderId }.toMutableSet()
 
-            impactedFolders += handleDeletedUids(deletedUids, sentFolderId)
-            impactedFolders += handleUpdatedUids(updatedMessages, folder.id, sentFolderId)
+            impactedFolders += handleDeletedUids(deletedUids)
+            impactedFolders += handleUpdatedUids(updatedMessages, folder.id)
 
             impactedFolders.forEach { folderId ->
                 FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
@@ -233,7 +231,6 @@ object MessageController {
         shortUids: List<String>,
         folder: Folder,
         mailboxUuid: String,
-        sentFolderId: String,
         okHttpClient: OkHttpClient?,
         realm: Realm,
     ): List<Thread> {
@@ -253,7 +250,7 @@ object MessageController {
                 if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
                 apiResponse.data?.messages?.let { messages ->
                     realm.writeBlocking {
-                        val threads = createMultiMessagesThreads(messages, findLatest(folder)!!, sentFolderId)
+                        val threads = createMultiMessagesThreads(messages, findLatest(folder)!!)
                         newMessagesThreads.addAll(threads)
                     }
                 }
@@ -265,11 +262,7 @@ object MessageController {
         return newMessagesThreads.toList()
     }
 
-    private fun MutableRealm.createMultiMessagesThreads(
-        messages: List<Message>,
-        folder: Folder,
-        sentFolderId: String,
-    ): List<Thread> {
+    private fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folder: Folder): List<Thread> {
 
         // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
@@ -305,7 +298,7 @@ object MessageController {
 
         val folderThreads = mutableListOf<Thread>()
         threadsToUpsert.forEach { (_, thread) ->
-            thread.recomputeThread(sentFolderId, realm = this)
+            thread.recomputeThread(realm = this)
             upsertThread(thread)
             if (thread.folderId == folder.id) {
                 folderThreads.add(if (thread.isManaged()) thread.copyFromRealm(1u) else thread)
@@ -348,7 +341,7 @@ object MessageController {
         }
     }
 
-    private fun MutableRealm.handleDeletedUids(uids: List<String>, sentFolderId: String): Set<String> {
+    private fun MutableRealm.handleDeletedUids(uids: List<String>): Set<String> {
 
         val impactedFolders = mutableSetOf<String>()
 
@@ -378,7 +371,7 @@ object MessageController {
                     impactedFolders.add(threadFolderId)
                 }
             }
-            threads.forEach { it.recomputeThread(sentFolderId, realm = this) }
+            threads.forEach { it.recomputeThread(realm = this) }
 
             deleteMessages(deletedMessages)
         }
@@ -386,11 +379,7 @@ object MessageController {
         return impactedFolders
     }
 
-    private fun MutableRealm.handleUpdatedUids(
-        messageFlags: List<MessageFlags>,
-        folderId: String,
-        sentFolderId: String,
-    ): Set<String> {
+    private fun MutableRealm.handleUpdatedUids(messageFlags: List<MessageFlags>, folderId: String): Set<String> {
 
         val impactedFolders = mutableSetOf<String>()
         val threads = mutableSetOf<Thread>()
@@ -406,7 +395,7 @@ object MessageController {
 
         threads.forEach { thread ->
             impactedFolders.add(thread.folderId)
-            thread.recomputeThread(sentFolderId, realm = this)
+            thread.recomputeThread(realm = this)
         }
 
         return impactedFolders

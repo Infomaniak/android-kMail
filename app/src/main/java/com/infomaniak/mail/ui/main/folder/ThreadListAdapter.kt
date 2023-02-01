@@ -59,6 +59,7 @@ class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
+    private val sentFolderId: String?,
     private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
@@ -126,10 +127,10 @@ class ThreadListAdapter(
     private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
 
         displayAvatar(thread = this)
-        expeditor.text = context.formatRecipientNames(displayedRecipients)
+        expeditor.text = formatRecipientNames(computeDisplayedRecipients())
         mailSubject.text = context.formatSubject(subject)
-        mailBodyPreview.text = preview.ifBlank { root.context.getString(R.string.noBodyTitle) }
-        mailDate.text = formatDate(root.context)
+        mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
+        mailDate.text = formatDate(context)
 
         draftPrefix.isVisible = hasDrafts
 
@@ -151,10 +152,10 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
-        expeditorAvatar.loadAvatar(thread.avatarRecipient!!, contacts)
+        expeditorAvatar.loadAvatar(thread.computeAvatarRecipient(sentFolderId), contacts)
     }
 
-    private fun Context.formatRecipientNames(recipients: List<Recipient>): String {
+    private fun formatRecipientNames(recipients: List<Recipient>): String {
         return when (recipients.count()) {
             0 -> context.getString(R.string.unknownRecipientTitle)
             1 -> recipients.single().displayedName(context)

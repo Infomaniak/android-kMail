@@ -23,6 +23,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.message.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,6 +54,10 @@ class ThreadListViewModel : ViewModel() {
     fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(SelectedDraft(localUuid, message.draftResource, message.uid))
+    }
+
+    fun sentFolderId() = liveData(Dispatchers.IO) {
+        emit(FolderController.getFolder(FolderRole.SENT)?.id)
     }
 
     data class SelectedDraft(
