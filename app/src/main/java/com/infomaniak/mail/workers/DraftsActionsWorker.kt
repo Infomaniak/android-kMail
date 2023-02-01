@@ -53,6 +53,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.max
 import kotlin.properties.Delegates
 
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
@@ -133,7 +134,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             val times = scheduledDates.mapNotNull { simpleDateFormat.parse(it)?.time }
             var delay = REFRESH_DELAY
             if (times.isNotEmpty()) delay += times.maxOf { it } - timeNow
-            delay(delay)
+            delay(max(delay, MAX_REFRESH_DELAY))
 
             MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, mailboxContentRealm)
         }
@@ -220,6 +221,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         private const val REFRESH_DELAY = 2_000L
+        private const val MAX_REFRESH_DELAY = 6_000L
 
         fun scheduleWork(context: Context) {
 
