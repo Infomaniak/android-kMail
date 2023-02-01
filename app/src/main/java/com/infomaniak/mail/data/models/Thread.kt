@@ -64,7 +64,7 @@ class Thread : RealmObject {
     var isScheduled: Boolean = false
 
     private val parentFolders by backlinks(Folder::threads)
-    private val folderRole get() = parentFolders.first().role
+    private val parentFolder get() = parentFolders.first()
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
@@ -173,16 +173,16 @@ class Thread : RealmObject {
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
     fun computeAvatarRecipient(): Recipient {
-        val message = messages.lastOrNull { it.folderRole != FolderRole.SENT } ?: messages.last()
+        val message = messages.lastOrNull { it.parentFolder.role != FolderRole.SENT } ?: messages.last()
         return message.from.first()
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> {
-        return if (folderRole == FolderRole.DRAFT) to else from
+        return if (parentFolder.role == FolderRole.DRAFT) to else from
     }
 
     fun computePreview(): String {
-        val message = if (folderRole == FolderRole.SENT) {
+        val message = if (parentFolder.role == FolderRole.SENT) {
             messages.lastOrNull { it.folderId == folderId } ?: messages.last()
         } else {
             messages.last()

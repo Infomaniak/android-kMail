@@ -121,7 +121,7 @@ class Message : RealmObject {
     val parentThreads by backlinks(Thread::messages)
 
     private val parentFolders by backlinks(Folder::messages)
-    val folderRole get() = parentFolders.first().role
+    val parentFolder get() = parentFolders.first()
 
     inline val shortUid get() = uid.split("@").first().toLong()
     inline val sender get() = from.first()
