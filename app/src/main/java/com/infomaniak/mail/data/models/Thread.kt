@@ -63,8 +63,8 @@ class Thread : RealmObject {
     var isForwarded: Boolean = false
     var isScheduled: Boolean = false
 
-    private val parentFolder by backlinks(Folder::threads)
-    private val folderRole get() = parentFolder.first().role
+    private val parentFolders by backlinks(Folder::threads)
+    private val folderRole get() = parentFolders.first().role
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
@@ -170,8 +170,10 @@ class Thread : RealmObject {
         }
     }
 
-    fun computeAvatarRecipient(sentFolderId: String?): Recipient {
-        val message = messages.lastOrNull { it.folderId != sentFolderId } ?: messages.last()
+    fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
+
+    fun computeAvatarRecipient(): Recipient {
+        val message = messages.lastOrNull { it.folderRole != FolderRole.SENT } ?: messages.last()
         return message.from.first()
     }
 
@@ -188,8 +190,6 @@ class Thread : RealmObject {
 
         return message.preview
     }
-
-    fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

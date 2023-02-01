@@ -64,7 +64,6 @@ import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.isValid
 import java.util.Date
-import java.util.concurrent.atomic.AtomicBoolean
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -92,16 +91,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         super.onViewCreated(view, savedInstanceState)
 
         setupOnRefresh()
+        setupAdapter()
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
 
+        observeCurrentThreads()
         observeDownloadState()
+        observeCurrentFolder()
         observeCurrentFolderLive()
         observeUpdatedAtTriggers()
+        observeContacts()
         observerDraftsActionsCompletedWorks()
-
-        waitForRealm()
     }
 
     override fun onResume(): Unit = with(binding) {
@@ -138,26 +139,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    private fun waitForRealm() {
-        val isFirstTime = AtomicBoolean(true)
-        threadListViewModel.sentFolderId().observe(viewLifecycleOwner) { sentFolderId ->
-            if (isFirstTime.compareAndSet(true, false)) {
-                setupAdapter(sentFolderId)
-                observeCurrentThreads()
-                observeCurrentFolder()
-                observeContacts()
-            }
-        }
-    }
-
-    private fun setupAdapter(sentFolderId: String?) = with(threadListViewModel) {
+    private fun setupAdapter() = with(threadListViewModel) {
 
         threadListAdapter = ThreadListAdapter(
             context = requireContext(),
             threadDensity = localSettings.threadDensity,
             folderRole = FolderRole.INBOX,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
-            sentFolderId = sentFolderId,
             onSwipeFinished = { isRecoveringFinished.value = true },
         )
 

@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -118,6 +119,9 @@ class Message : RealmObject {
     //endregion
 
     val parentThreads by backlinks(Thread::messages)
+
+    private val parentFolders by backlinks(Folder::messages)
+    val folderRole get() = parentFolders.first().role
 
     inline val shortUid get() = uid.split("@").first().toLong()
     inline val sender get() = from.first()

@@ -272,8 +272,8 @@ object MessageController {
 
         messages.forEach { message ->
 
+            folder.messages.add(message)
             message.initMessageIds()
-
             message.isSpam = folder.role == FolderRole.SPAM
 
             // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), put this back when it's fixed.

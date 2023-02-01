@@ -18,15 +18,15 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.text.format.DateUtils
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.message.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
@@ -52,10 +52,6 @@ class ThreadListViewModel : ViewModel() {
     fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(SelectedDraft(localUuid, message.draftResource, message.uid))
-    }
-
-    fun sentFolderId() = liveData(Dispatchers.IO) {
-        emitSource(FolderController.getFolderAsync(FolderRole.SENT).mapNotNull { it.id }.asLiveData())
     }
 
     data class SelectedDraft(

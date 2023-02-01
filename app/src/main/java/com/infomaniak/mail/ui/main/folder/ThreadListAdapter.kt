@@ -59,7 +59,6 @@ class ThreadListAdapter(
     private val threadDensity: ThreadDensity,
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
-    private val sentFolderId: String?,
     private val onSwipeFinished: () -> Unit,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
@@ -152,7 +151,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {
-        expeditorAvatar.loadAvatar(thread.computeAvatarRecipient(sentFolderId), contacts)
+        expeditorAvatar.loadAvatar(thread.computeAvatarRecipient(), contacts)
     }
 
     private fun formatRecipientNames(recipients: List<Recipient>): String {
