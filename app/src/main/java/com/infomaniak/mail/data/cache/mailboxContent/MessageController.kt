@@ -357,10 +357,10 @@ object MessageController {
 
         if (uids.isNotEmpty()) {
 
-            val deletedMessages = getMessages(uids, realm = this)
-
             val threads = mutableSetOf<Thread>()
-            deletedMessages.forEach { message ->
+            uids.forEach { messageUid ->
+                val message = getMessage(messageUid, this) ?: return@forEach
+
                 for (thread in message.parentThreads.reversed()) {
 
                     val isSuccess = thread.messages.removeIf { it.uid == message.uid }
@@ -380,10 +380,11 @@ object MessageController {
 
                     impactedFolders.add(threadFolderId)
                 }
-            }
-            threads.forEach { it.recomputeThread(realm = this) }
 
-            deleteMessages(deletedMessages)
+                deleteMessage(message.uid, this)
+            }
+
+            threads.forEach { it.recomputeThread(realm = this) }
         }
 
         return impactedFolders
