@@ -214,7 +214,16 @@
         android:id="@+id/moveFragment"
         android:name="com.infomaniak.mail.ui.main.menu.MoveFragment"
         android:label="MoveFragment"
-        tools:layout="@layout/fragment_move" />
+        tools:layout="@layout/fragment_move">
+        <argument
+            android:name="threadUid"
+            app:argType="string" />
+        <argument
+            android:name="messageUid"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/helpFragment"

@@ -35,7 +35,7 @@ import com.infomaniak.lib.core.R as RCore
 class FolderAdapter(
     private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
-    private val openFolder: (folderId: String) -> Unit,
+    private val onClick: (folderId: String) -> Unit,
     private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
@@ -89,7 +89,7 @@ class FolderAdapter(
 
         setSelectedState(currentFolderId == id)
 
-        setOnClickListener { openFolder.invoke(id) }
+        setOnClickListener { onClick.invoke(id) }
     }
 
     @SuppressLint("NotifyDataSetChanged")

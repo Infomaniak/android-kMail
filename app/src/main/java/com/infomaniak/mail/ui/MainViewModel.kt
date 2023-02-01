@@ -419,6 +419,52 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
+    //region Move
+    fun moveTo(destinationFolderId: String, threadUid: String, messageUid: String? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val mailbox = currentMailbox.value ?: return@launch
+            val thread = ThreadController.getThread(threadUid) ?: return@launch
+            val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
+            val messages = when (message) {
+                null -> MessageController.getUnscheduledMessages(thread)
+                else -> MessageController.getMessageAndDuplicates(thread, message)
+            }
+
+            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
+
+            if (apiResponse.isSuccess()) {
+                refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
+            }
+
+            val undoDestinationId = message?.folderId ?: currentFolderId.value
+            val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+
+            showMoveSnackbar(message, apiResponse, destinationFolderId, undoFoldersIds, undoDestinationId)
+        }
+    }
+
+    private fun showMoveSnackbar(
+        message: Message?,
+        apiResponse: ApiResponse<MoveResult>,
+        destinationFolderId: String,
+        undoFoldersIds: List<String>,
+        undoDestinationId: String?,
+    ) {
+
+        val destinationFolder = FolderController.getFolder(destinationFolderId)
+        val destination = destinationFolder?.role?.folderNameRes?.let { context.getString(it) } ?: destinationFolder?.name
+
+        val snackbarTitle = when {
+            !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
+            message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+            else -> context.getString(R.string.snackbarMessageMoved, destination)
+        }
+
+        val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
+        snackbarFeedback.postValue(snackbarTitle to undoData)
+    }
+    //endregion
+
     //region Seen
     fun toggleSeenStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch

@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.refreshObserve
@@ -32,15 +33,16 @@ class MoveFragment : Fragment() {
 
     private lateinit var binding: FragmentMoveBinding
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val navigationArgs: MoveFragmentArgs by navArgs()
 
     private var inboxFolderId: String? = null
 
     private val defaultFoldersAdapter = FolderAdapter(
-        openFolder = { folderId -> mainViewModel.openFolder(folderId) },
+        onClick = { folderId -> moveToFolder(folderId) },
         isInMenuDrawer = false,
     )
     private val customFoldersAdapter = FolderAdapter(
-        openFolder = { folderId -> mainViewModel.openFolder(folderId) },
+        onClick = { folderId -> moveToFolder(folderId) },
         isInMenuDrawer = false,
     )
 
@@ -53,12 +55,17 @@ class MoveFragment : Fragment() {
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         setupAdapters()
+        setupListeners()
         observeFoldersLive()
     }
 
     private fun setupAdapters() = with(binding) {
         defaultFoldersList.adapter = defaultFoldersAdapter
         customFoldersList.adapter = customFoldersAdapter
+    }
+
+    private fun setupListeners() {
+        binding.inboxFolder.setOnClickListener { inboxFolderId?.let(::moveToFolder) }
     }
 
     private fun observeFoldersLive() {
@@ -70,5 +77,10 @@ class MoveFragment : Fragment() {
             defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
             customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }
+    }
+
+    private fun moveToFolder(folderId: String) = with(navigationArgs) {
+        mainViewModel.moveTo(folderId, threadUid, messageUid)
+        findNavController().popBackStack()
     }
 }
