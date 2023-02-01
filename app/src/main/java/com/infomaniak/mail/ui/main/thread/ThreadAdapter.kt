@@ -161,7 +161,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
 
-        messageWebViewClient.setAttachments(message.attachments)
+        initWebViewClientIfNeeded(message.attachments)
 
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
@@ -253,7 +253,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (attachments.isEmpty()) return ""
 
         val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
-            attachment.size.toLong()
+            attachment.size
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
@@ -342,7 +342,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
-        val messageWebViewClient = MessageWebViewClient(binding.context)
+
+        private var doesWebViewNeedInit = true
 
         init {
             with(binding) {
@@ -351,7 +352,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 ccRecyclerView.adapter = ccAdapter
                 bccRecyclerView.adapter = bccAdapter
                 attachmentsRecyclerView.adapter = attachmentAdapter
-                messageBody.webViewClient = messageWebViewClient
+            }
+        }
+
+        fun initWebViewClientIfNeeded(attachments: List<Attachment>) {
+            if (doesWebViewNeedInit) {
+                val cidDictionary = mutableMapOf<String, Attachment>()
+                attachments.forEach {
+                    if (!it.contentId.isNullOrBlank()) cidDictionary[it.contentId as String] = it
+                }
+                binding.messageBody.webViewClient = MessageWebViewClient(binding.context, cidDictionary)
+                doesWebViewNeedInit = false
             }
         }
     }

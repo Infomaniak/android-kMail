@@ -32,9 +32,10 @@ import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.Utils
 import okhttp3.Request
 
-class MessageWebViewClient(val context: Context) : WebViewClient() {
-
-    private var cidDictionary = mutableMapOf<String, Attachment>()
+class MessageWebViewClient(
+    private val context: Context,
+    private val cidDictionary: MutableMap<String, Attachment>
+) : WebViewClient() {
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
 
@@ -67,14 +68,6 @@ class MessageWebViewClient(val context: Context) : WebViewClient() {
             }
         }
         return true
-    }
-
-
-    fun setAttachments(attachments: List<Attachment>) {
-        cidDictionary.clear()
-        attachments.forEach {
-            if (!it.contentId.isNullOrBlank()) cidDictionary[it.contentId as String] = it
-        }
     }
 
     private companion object {
