@@ -543,7 +543,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 .also(list::removeAll)
 
             val customFolders = list
-                .filter { it.parentFolder.isEmpty() }
+                .filter { it.parentFolder == null }
                 .sortedByDescending { it.isFavorite }
                 .formatFoldersListWithAllChildren()
 

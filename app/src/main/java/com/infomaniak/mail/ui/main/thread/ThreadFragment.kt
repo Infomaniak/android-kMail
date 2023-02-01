@@ -212,7 +212,7 @@ class ThreadFragment : Fragment() {
 
     private fun onThreadUpdate(thread: Thread) = with(binding) {
 
-        val subject = thread.getFormattedSubject(context)
+        val subject = context.formatSubject(thread.subject)
         threadSubject.text = subject
         toolbarSubject.text = subject
 

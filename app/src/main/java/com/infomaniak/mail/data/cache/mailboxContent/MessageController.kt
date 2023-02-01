@@ -250,7 +250,7 @@ object MessageController {
                 if (!apiResponse.isSuccess() && okHttpClient != null) apiResponse.throwErrorAsException()
                 apiResponse.data?.messages?.let { messages ->
                     realm.writeBlocking {
-                        val threads = createMultiMessagesThreads(messages, folder)
+                        val threads = createMultiMessagesThreads(messages, findLatest(folder)!!)
                         newMessagesThreads.addAll(threads)
                     }
                 }
@@ -272,8 +272,8 @@ object MessageController {
 
         messages.forEach { message ->
 
+            folder.messages.add(message)
             message.initMessageIds()
-
             message.isSpam = folder.role == FolderRole.SPAM
 
             // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), put this back when it's fixed.
@@ -282,16 +282,17 @@ object MessageController {
             val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
 
             createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
-                upsertThread(newThread)
-                threadsToUpsert[newThread.uid] = newThread
-                // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
-                allThreads.add(newThread)
+                upsertThread(newThread).also {
+                    folder.threads.add(it)
+                    threadsToUpsert[it.uid] = it
+                    // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
+                    allThreads.add(it)
+                }
             }
 
-            existingThreads.forEach {
-                it.addMessageWithConditions(message, realm = this)
-                upsertThread(it)
-                threadsToUpsert[it.uid] = it
+            existingThreads.forEach { thread ->
+                thread.addMessageWithConditions(message, realm = this)
+                threadsToUpsert[thread.uid] = upsertThread(thread)
             }
         }
 
@@ -337,17 +338,6 @@ object MessageController {
 
         existingThread.messages.forEach { message ->
             newThread.addMessageWithConditions(message, realm = this)
-        }
-    }
-
-    // Unused for now
-    private fun MutableRealm.createSingleMessageThreads(messages: List<Message>): List<Thread> {
-        return messages.map { message ->
-            message.toThread().also { thread ->
-                thread.addFirstMessage(message)
-                thread.recomputeThread(realm = this)
-                upsertThread(thread)
-            }
         }
     }
 

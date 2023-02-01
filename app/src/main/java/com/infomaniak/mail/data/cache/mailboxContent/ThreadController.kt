@@ -102,9 +102,7 @@ object ThreadController {
     //endregion
 
     //region Edit data
-    fun MutableRealm.upsertThread(thread: Thread) {
-        copyToRealm(thread, UpdatePolicy.ALL)
-    }
+    fun MutableRealm.upsertThread(thread: Thread): Thread = copyToRealm(thread, UpdatePolicy.ALL)
 
     fun deleteThreads(folderId: String, realm: MutableRealm) {
         realm.delete(getThreadsQuery(folderId, realm = realm))

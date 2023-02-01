@@ -205,15 +205,15 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun observeFoldersLive() {
-        mainViewModel.currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+    private fun observeFoldersLive() = with(mainViewModel) {
+        currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolder = mainViewModel.currentFolder.value ?: return@refreshObserve
+            val currentFolder = currentFolder.value ?: return@refreshObserve
             defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
             customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }

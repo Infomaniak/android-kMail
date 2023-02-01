@@ -19,13 +19,12 @@
 
 package com.infomaniak.mail.data.models.message
 
-import android.content.Context
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
-import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -121,6 +120,9 @@ class Message : RealmObject {
 
     val parentThreads by backlinks(Thread::messages)
 
+    private val parentFolders by backlinks(Folder::messages)
+    val parentFolder get() = parentFolders.first()
+
     inline val shortUid get() = uid.split("@").first().toLong()
     inline val sender get() = from.first()
 
@@ -198,14 +200,6 @@ class Message : RealmObject {
             messageId?.let { addAll(it.parseMessagesIds()) }
             references?.let { addAll(it.parseMessagesIds()) }
             inReplyTo?.let { addAll(it.parseMessagesIds()) }
-        }
-    }
-
-    fun getFormattedSubject(context: Context): String {
-        return if (subject.isNullOrBlank()) {
-            context.getString(R.string.noSubjectTitle)
-        } else {
-            subject!!.replace("\n+".toRegex(), " ")
         }
     }
 

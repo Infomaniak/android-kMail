@@ -111,7 +111,13 @@ object FolderController {
         remoteFolders.forEach { remoteFolder ->
 
             getFolder(remoteFolder.id, realm = this)?.let { localFolder ->
-                remoteFolder.initLocalValues(localFolder.lastUpdatedAt, localFolder.cursor, localFolder.unreadCount)
+                remoteFolder.initLocalValues(
+                    localFolder.lastUpdatedAt,
+                    localFolder.cursor,
+                    localFolder.unreadCount,
+                    localFolder.threads,
+                    localFolder.messages,
+                )
             }
 
             copyToRealm(remoteFolder, UpdatePolicy.ALL)
