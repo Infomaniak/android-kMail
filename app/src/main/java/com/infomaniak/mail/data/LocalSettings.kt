@@ -193,7 +193,7 @@ class LocalSettings private constructor(context: Context) {
 
         private const val DEFAULT_IS_APP_LOCKED = false
 
-        private val DEFAULT_THREAD_DENSITY = ThreadDensity.NORMAL
+        private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
         private val DEFAULT_THEME = Theme.SYSTEM
         val DEFAULT_ACCENT_COLOR = AccentColor.PINK
         private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
