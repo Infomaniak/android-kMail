@@ -57,11 +57,6 @@ object MessageController {
             "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
     //region Queries
-    private fun getMessagesQuery(uids: List<String>, realm: TypedRealm): RealmQuery<Message> {
-        val byUids = "${Message::uid.name} IN {${uids.joinToString { "'$it'" }}}"
-        return realm.query(byUids)
-    }
-
     private fun getMessagesQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
         return realm.query(byFolderId(folderId))
     }
@@ -73,10 +68,6 @@ object MessageController {
     //endregion
 
     //region Get data
-    private fun getMessages(uids: List<String>, realm: TypedRealm): RealmResults<Message> {
-        return getMessagesQuery(uids, realm).find()
-    }
-
     fun getMessages(folderId: String, realm: TypedRealm = defaultRealm): RealmResults<Message> {
         return getMessagesQuery(folderId, realm).find()
     }

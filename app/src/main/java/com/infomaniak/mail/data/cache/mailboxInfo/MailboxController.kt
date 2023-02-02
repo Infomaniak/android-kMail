@@ -73,7 +73,7 @@ object MailboxController {
         return getMailboxesQuery(userId, realm).find()
     }
 
-    fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmResults<Mailbox> {
+    private fun getMailboxes(userId: Int, exceptionMailboxIds: List<Int>, realm: TypedRealm): RealmResults<Mailbox> {
         return getMailboxesQuery(userId, exceptionMailboxIds, realm).find()
     }
 

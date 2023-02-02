@@ -52,8 +52,8 @@ object ThreadController {
 
     private fun getThreadsQuery(
         folderId: String,
-        filter: ThreadFilter = ThreadFilter.ALL,
         realm: TypedRealm,
+        filter: ThreadFilter = ThreadFilter.ALL,
     ): RealmQuery<Thread> {
 
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
@@ -89,7 +89,7 @@ object ThreadController {
     }
 
     fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folderId, filter, defaultRealm).asFlow()
+        return getThreadsQuery(folderId, defaultRealm, filter).asFlow()
     }
 
     fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
