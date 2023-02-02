@@ -42,6 +42,8 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
 import java.util.Date
 import kotlin.math.min
@@ -196,7 +198,7 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, okHttpClient, realm)
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, cursor, okHttpClient, realm)
 
         realm.writeBlocking {
 
@@ -222,6 +224,7 @@ object MessageController {
         shortUids: List<String>,
         folder: Folder,
         mailboxUuid: String,
+        newCursor: String,
         okHttpClient: OkHttpClient?,
         realm: Realm,
     ): List<Thread> {
@@ -244,6 +247,7 @@ object MessageController {
                         val threads = createMultiMessagesThreads(messages, findLatest(folder)!!)
                         newMessagesThreads.addAll(threads)
                     }
+                    sendMissingMessagesSentry(page, messages, folder, newCursor)
                 }
 
                 pageStart += pageSize
@@ -251,6 +255,29 @@ object MessageController {
         }
 
         return newMessagesThreads.toList()
+    }
+
+    private fun sendMissingMessagesSentry(
+        sentUids: List<String>,
+        receivedMessages: List<Message>,
+        folder: Folder,
+        newCursor: String,
+    ) {
+        if (receivedMessages.count() != sentUids.count()) {
+            val receivedUids = mutableSetOf<String>().apply {
+                receivedMessages.forEach { add(it.uid.toShortUid()) }
+            }
+            val missingUids = sentUids.filter { !receivedUids.contains(it) }
+            if (missingUids.isNotEmpty()) {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("missingMessages", "${missingUids.map { it.toLongUid(folder.id) }}")
+                    scope.setExtra("previousCursor", "${folder.cursor}")
+                    scope.setExtra("newCursor", newCursor)
+                    Sentry.captureMessage("We tried to download some Messages, but they were nowhere to be found.")
+                }
+            }
+        }
     }
 
     private fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folder: Folder): List<Thread> {
