@@ -185,6 +185,7 @@ object MessageController {
         val updatedThreads = handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
 
         searchForOrphanMessages(previousCursor, folder, realm)
+        searchForOrphanThreads(previousCursor, folder.cursor, realm)
 
         return updatedThreads
     }
@@ -198,6 +199,19 @@ object MessageController {
                 scope.setExtra("previousCursor", "$previousCursor")
                 scope.setExtra("newCursor", "${folder.cursor}")
                 Sentry.captureMessage("We found some orphan Messages.")
+            }
+        }
+    }
+
+    private fun searchForOrphanThreads(previousCursor: String?, newCursor: String?, realm: TypedRealm) {
+        val orphanThreads = ThreadController.getOrphanThreads(realm)
+        if (orphanThreads.isNotEmpty()) {
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
+                scope.setExtra("previousCursor", "$previousCursor")
+                scope.setExtra("newCursor", "$newCursor")
+                Sentry.captureMessage("We found some orphan Threads.")
             }
         }
     }
