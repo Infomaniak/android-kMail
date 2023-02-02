@@ -182,7 +182,24 @@ object MessageController {
             getMessagesUidsDelta(mailbox.uuid, folder.id, previousCursor, okHttpClient)
         } ?: return emptyList()
 
-        return handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
+        val updatedThreads = handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
+
+        searchForOrphanMessages(previousCursor, folder, realm)
+
+        return updatedThreads
+    }
+
+    private fun searchForOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm) {
+        val orphanMessages = getMessages(folder.id, realm).filter { it.parentThreads.isEmpty() }
+        if (orphanMessages.isNotEmpty()) {
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
+                scope.setExtra("previousCursor", "$previousCursor")
+                scope.setExtra("newCursor", "${folder.cursor}")
+                Sentry.captureMessage("We found some orphan Messages.")
+            }
+        }
     }
 
     private fun handleMessagesUids(
