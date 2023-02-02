@@ -344,38 +344,35 @@ object MessageController {
     private fun MutableRealm.handleDeletedUids(uids: List<String>): Set<String> {
 
         val impactedFolders = mutableSetOf<String>()
+        val threads = mutableSetOf<Thread>()
 
-        if (uids.isNotEmpty()) {
+        uids.forEach { messageUid ->
+            val message = getMessage(messageUid, this) ?: return@forEach
 
-            val threads = mutableSetOf<Thread>()
-            uids.forEach { messageUid ->
-                val message = getMessage(messageUid, this) ?: return@forEach
+            for (thread in message.parentThreads.reversed()) {
 
-                for (thread in message.parentThreads.reversed()) {
+                val isSuccess = thread.messages.removeIf { it.uid == messageUid }
+                val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
 
-                    val isSuccess = thread.messages.removeIf { it.uid == message.uid }
-                    val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
+                // We need to save this value because the Thread could be deleted before we use this `folderId`.
+                val threadFolderId = thread.folderId
 
-                    // We need to save this value because the Thread could be deleted before we use this `folderId`.
-                    val threadFolderId = thread.folderId
-
-                    if (numberOfMessagesInFolder == 0) {
-                        threads.removeIf { it.uid == thread.uid }
-                        delete(thread)
-                    } else if (isSuccess) {
-                        threads += thread
-                    } else {
-                        continue
-                    }
-
-                    impactedFolders.add(threadFolderId)
+                if (numberOfMessagesInFolder == 0) {
+                    threads.removeIf { it.uid == thread.uid }
+                    delete(thread)
+                } else if (isSuccess) {
+                    threads += thread
+                } else {
+                    continue
                 }
 
-                deleteMessage(message.uid, this)
+                impactedFolders.add(threadFolderId)
             }
 
-            threads.forEach { it.recomputeThread(realm = this) }
+            deleteMessage(messageUid, this)
         }
+
+        threads.forEach { it.recomputeThread(realm = this) }
 
         return impactedFolders
     }
