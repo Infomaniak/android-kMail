@@ -25,7 +25,6 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
@@ -65,6 +64,8 @@ class MenuDrawerItemView @JvmOverloads constructor(
             binding.itemName.setMarginsRelative(start = value)
         }
 
+    var selectionStyle = SelectionStyle.MENU_DRAWER
+
     var text: CharSequence? = null
         set(value) {
             field = value
@@ -90,6 +91,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
             badge = getInteger(R.styleable.MenuDrawerItemView_badge, badge)
             icon = getDrawable(R.styleable.MenuDrawerItemView_icon)
             indent = getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, indent)
+            selectionStyle = SelectionStyle.values()[getInteger(R.styleable.MenuDrawerItemView_selectionStyle, 0)]
             text = getString(R.styleable.MenuDrawerItemView_text)
             textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
             getResourceId(R.styleable.MenuDrawerItemView_textWeight, 0).also { fontFamily ->
@@ -99,12 +101,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
     }
 
     fun setSelectedState(isSelected: Boolean) = with(binding) {
-        val (color, textAppearance) = if (isSelected) {
-            Pair(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer), R.style.BodyMedium_Accent)
+        val (color, textAppearance) = if (isSelected && selectionStyle == SelectionStyle.MENU_DRAWER) {
+            context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
         } else {
-            Pair(ContextCompat.getColor(context, R.color.backgroundColor), R.style.BodyMedium)
+            ContextCompat.getColor(context, R.color.backgroundColor) to R.style.BodyMedium
         }
 
+        binding.itemTick.isVisible = isSelected && selectionStyle == SelectionStyle.MOVE_FRAGMENT
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
     }
@@ -115,5 +118,9 @@ class MenuDrawerItemView @JvmOverloads constructor(
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {
         binding.root.setOnClickListener(onClickListener)
+    }
+
+    enum class SelectionStyle {
+        MENU_DRAWER, MOVE_FRAGMENT
     }
 }

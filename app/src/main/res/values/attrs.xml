@@ -31,6 +31,10 @@
         <attr name="text" />
         <attr name="textSize" format="dimension" />
         <attr name="textWeight" format="reference" />
+        <attr name="selectionStyle" format="enum">
+            <enum name="menuDrawer" value="0" />
+            <enum name="moveFragment" value="1" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="BottomQuickActionBarView">

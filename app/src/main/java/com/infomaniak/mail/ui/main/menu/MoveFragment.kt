@@ -57,7 +57,17 @@ class MoveFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         setupAdapters()
         setupListeners()
+        observeCurrentFolder()
         observeFoldersLive()
+    }
+
+    private fun observeCurrentFolder() {
+        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+            binding.inboxFolder.setSelectedState(folder.role == Folder.FolderRole.INBOX)
+
+            defaultFoldersAdapter.updateSelectedState(folder.id)
+            customFoldersAdapter.updateSelectedState(folder.id)
+        }
     }
 
     private fun setupAdapters() = with(binding) {
