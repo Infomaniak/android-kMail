@@ -26,12 +26,11 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.bugtracker.BugTrackerActivity
 import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
@@ -40,22 +39,24 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.views.MenuDrawerItemView
 import kotlinx.coroutines.launch
 
-class MenuDrawerFragment : Fragment() {
+class MenuDrawerFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMenuDrawerBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
+
+    override val inboxFolder: MenuDrawerItemView by lazy { binding.inboxFolder }
+    override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
+    override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
 
     var exitDrawer: (() -> Unit)? = null
     var isDrawerOpen: (() -> Boolean)? = null
 
-    private var inboxFolderId: String? = null
     private var canNavigate = true
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
@@ -65,8 +66,6 @@ class MenuDrawerFragment : Fragment() {
         AccountUtils.reloadApp?.invoke()
     }
 
-    private val defaultFoldersAdapter = FolderAdapter(onClick = { folderId -> openFolder(folderId) })
-    private val customFoldersAdapter = FolderAdapter(onClick = { folderId -> openFolder(folderId) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -87,15 +86,18 @@ class MenuDrawerFragment : Fragment() {
         observeQuotas()
     }
 
+    override fun onFolderClicked(folderId: String) {
+        mainViewModel.openFolder(folderId)
+        closeDrawer()
+    }
+
     @SuppressLint("SetTextI18n")
     private fun displayVersion() {
         binding.appVersionName.text = "kMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     }
 
-    private fun setupAdapters() = with(binding) {
-        addressesList.adapter = addressAdapter
-        defaultFoldersList.adapter = defaultFoldersAdapter
-        customFoldersList.adapter = customFoldersAdapter
+    private fun setupAdapters() {
+        binding.addressesList.adapter = addressAdapter
     }
 
     private fun setupListeners() = with(binding) {
@@ -113,7 +115,6 @@ class MenuDrawerFragment : Fragment() {
             }
             mailboxSwitcherText.setTextAppearance(if (mailboxExpandedSwitcher.isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
         }
-        inboxFolder.setOnClickListener { inboxFolderId?.let(::openFolder) }
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
         customFolders.setOnActionClickListener { // Create new folder
             safeNavigate(
@@ -198,7 +199,7 @@ class MenuDrawerFragment : Fragment() {
 
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
-            binding.inboxFolder.setSelectedState(folder.role == FolderRole.INBOX)
+            binding.inboxFolder.setSelectedState(folder.role == Folder.FolderRole.INBOX)
 
             defaultFoldersAdapter.updateSelectedState(folder.id)
             customFoldersAdapter.updateSelectedState(folder.id)
@@ -209,11 +210,12 @@ class MenuDrawerFragment : Fragment() {
         currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
-            inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
+            inbox?.unreadCount?.let { inboxFolder.badge = it }
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
             val currentFolder = currentFolder.value ?: return@refreshObserve
+
             defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
             customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }
@@ -251,10 +253,5 @@ class MenuDrawerFragment : Fragment() {
         customFolders.setIsCollapsed(false)
         advancedActionsLayout.isGone = true
         advancedActions.setIsCollapsed(true)
-    }
-
-    private fun openFolder(folderId: String) {
-        mainViewModel.openFolder(folderId)
-        closeDrawer()
     }
 }
