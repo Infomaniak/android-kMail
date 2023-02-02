@@ -210,7 +210,12 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun onThreadUpdate(thread: Thread) = with(binding) {
+    private fun onThreadUpdate(thread: Thread?) = with(binding) {
+
+        if (thread == null) {
+            leaveThread()
+            return@with
+        }
 
         val subject = context.formatSubject(thread.subject)
         threadSubject.text = subject
@@ -224,7 +229,6 @@ class ThreadFragment : Fragment() {
 
     private fun onMessagesUpdate(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
-        if (messages.isEmpty()) leaveThread()
         threadViewModel.fetchIncompleteMessages(messages)
         binding.messagesList.setBackgroundResource(if (messages.count() == 1) R.color.backgroundColor else R.color.threadBackground)
     }
