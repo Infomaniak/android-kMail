@@ -28,9 +28,7 @@ import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.throwErrorAsException
-import com.infomaniak.mail.utils.toRealmInstant
+import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -42,8 +40,6 @@ import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
 import java.util.Date
 import kotlin.math.min
@@ -184,36 +180,10 @@ object MessageController {
 
         val updatedThreads = handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
 
-        searchForOrphanMessages(previousCursor, folder, realm)
-        searchForOrphanThreads(previousCursor, folder.cursor, realm)
+        SentryDebug.sendOrphanMessagesSentry(previousCursor, folder, realm)
+        SentryDebug.sendOrphanThreadsSentry(previousCursor, folder.cursor, realm)
 
         return updatedThreads
-    }
-
-    private fun searchForOrphanMessages(previousCursor: String?, folder: Folder, realm: TypedRealm) {
-        val orphanMessages = getMessages(folder.id, realm).filter { it.parentThreads.isEmpty() }
-        if (orphanMessages.isNotEmpty()) {
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
-                scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "${folder.cursor}")
-                Sentry.captureMessage("We found some orphan Messages.")
-            }
-        }
-    }
-
-    private fun searchForOrphanThreads(previousCursor: String?, newCursor: String?, realm: TypedRealm) {
-        val orphanThreads = ThreadController.getOrphanThreads(realm)
-        if (orphanThreads.isNotEmpty()) {
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
-                scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "$newCursor")
-                Sentry.captureMessage("We found some orphan Threads.")
-            }
-        }
     }
 
     private fun handleMessagesUids(
@@ -278,7 +248,7 @@ object MessageController {
                         val threads = createMultiMessagesThreads(messages, findLatest(folder)!!)
                         newMessagesThreads.addAll(threads)
                     }
-                    sendMissingMessagesSentry(page, messages, folder, newCursor)
+                    SentryDebug.sendMissingMessagesSentry(page, messages, folder, newCursor)
                 }
 
                 pageStart += pageSize
@@ -286,29 +256,6 @@ object MessageController {
         }
 
         return newMessagesThreads.toList()
-    }
-
-    private fun sendMissingMessagesSentry(
-        sentUids: List<String>,
-        receivedMessages: List<Message>,
-        folder: Folder,
-        newCursor: String,
-    ) {
-        if (receivedMessages.count() != sentUids.count()) {
-            val receivedUids = mutableSetOf<String>().apply {
-                receivedMessages.forEach { add(it.uid.toShortUid()) }
-            }
-            val missingUids = sentUids.filter { !receivedUids.contains(it) }
-            if (missingUids.isNotEmpty()) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    scope.setExtra("missingMessages", "${missingUids.map { it.toLongUid(folder.id) }}")
-                    scope.setExtra("previousCursor", "${folder.cursor}")
-                    scope.setExtra("newCursor", newCursor)
-                    Sentry.captureMessage("We tried to download some Messages, but they were nowhere to be found.")
-                }
-            }
-        }
     }
 
     private fun MutableRealm.createMultiMessagesThreads(messages: List<Message>, folder: Folder): List<Thread> {
@@ -447,10 +394,6 @@ object MessageController {
 
         return impactedFolders
     }
-
-    private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
-
-    private fun String.toShortUid(): String = substringBefore('@')
 
     private fun getMessagesUids(mailboxUuid: String, folderId: String, okHttpClient: OkHttpClient? = null): MessagesUids? {
         val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, okHttpClient)
