@@ -46,6 +46,7 @@ import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
 import com.infomaniak.mail.utils.throwErrorAsException
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -126,6 +127,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
 
+        searchForOrphanDrafts()
+
         return if (isFailure) Result.failure() else Result.success()
     }
 
@@ -144,6 +147,27 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             delay(min(delay, MAX_REFRESH_DELAY))
 
             MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, mailboxContentRealm)
+        }
+    }
+
+    private fun searchForOrphanDrafts() {
+        val orphanDrafts = DraftController.getOrphanDrafts(mailboxContentRealm)
+        if (orphanDrafts.isNotEmpty()) {
+            Sentry.withScope { scope ->
+                scope.level = SentryLevel.ERROR
+                scope.setExtra(
+                    "orphanDrafts", "${
+                        orphanDrafts.map {
+                            if (it.messageUid == null) {
+                                "${Draft::date.name}: [${it.date}] | ${Draft::subject.name}: [${it.subject}]"
+                            } else {
+                                "${Draft::messageUid.name}: ${it.messageUid}"
+                            }
+                        }
+                    }"
+                )
+                Sentry.captureMessage("We found some orphan Drafts.")
+            }
         }
     }
 
