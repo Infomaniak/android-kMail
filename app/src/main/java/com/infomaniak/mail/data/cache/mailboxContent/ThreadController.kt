@@ -43,6 +43,10 @@ object ThreadController {
         return realm.query()
     }
 
+    private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
+        return realm.query("${Thread::folderId.name} == ''")
+    }
+
     private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm): RealmScalarQuery<Long> {
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
         val unseen = "${Thread::unseenMessagesCount.name} > 0"
@@ -82,6 +86,10 @@ object ThreadController {
     //region Get data
     fun getThreads(realm: TypedRealm): RealmResults<Thread> {
         return getThreadsQuery(realm).find()
+    }
+
+    fun getOrphanThreads(realm: TypedRealm): RealmResults<Thread> {
+        return getOrphanThreadsQuery(realm).find()
     }
 
     fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {

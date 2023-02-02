@@ -45,6 +45,10 @@ object DraftController {
         return@with query?.let { query(it) } ?: query()
     }
 
+    private fun getOrphanDraftsQuery(realm: TypedRealm): RealmQuery<Draft> {
+        return realm.query("${Draft::remoteUuid.name} == nil AND _action == nil")
+    }
+
     private fun getDraftQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Draft> {
         return realm.query<Draft>("$key == '$value'").first()
     }
@@ -55,6 +59,10 @@ object DraftController {
     //endregion
 
     //region Get data
+    fun getOrphanDrafts(realm: TypedRealm): RealmResults<Draft> {
+        return getOrphanDraftsQuery(realm).find()
+    }
+
     fun getDraftsWithActions(realm: TypedRealm): RealmResults<Draft> {
         return getDraftsWithActionsQuery(realm).find()
     }

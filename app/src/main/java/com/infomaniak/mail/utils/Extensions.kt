@@ -22,7 +22,6 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
@@ -35,8 +34,6 @@ import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OutOfQuotaPolicy
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -198,6 +195,10 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
     throw error?.exception ?: Exception(ApiController.json.encodeToString(this))
 }
+
+fun String.toLongUid(folderId: String) = "${this}@${folderId}"
+
+fun String.toShortUid(): String = substringBefore('@')
 //endregion
 
 //region Realm

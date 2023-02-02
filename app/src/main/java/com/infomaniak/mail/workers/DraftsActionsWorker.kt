@@ -39,11 +39,8 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.NotificationUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.NotificationUtils.showDraftActionsNotification
-import com.infomaniak.mail.utils.throwErrorAsException
 import io.realm.kotlin.MutableRealm
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
@@ -125,6 +122,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         }
 
         if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
+
+        SentryDebug.sendOrphanDraftsSentry(mailboxContentRealm)
 
         return if (isFailure) Result.failure() else Result.success()
     }

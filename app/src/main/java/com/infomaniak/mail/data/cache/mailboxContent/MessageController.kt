@@ -28,9 +28,7 @@ import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.throwErrorAsException
-import com.infomaniak.mail.utils.toRealmInstant
+import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -180,7 +178,12 @@ object MessageController {
             getMessagesUidsDelta(mailbox.uuid, folder.id, previousCursor, okHttpClient)
         } ?: return emptyList()
 
-        return handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
+        val updatedThreads = handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
+
+        SentryDebug.sendOrphanMessagesSentry(previousCursor, folder, realm)
+        SentryDebug.sendOrphanThreadsSentry(previousCursor, folder.cursor, realm)
+
+        return updatedThreads
     }
 
     private fun handleMessagesUids(
@@ -196,7 +199,7 @@ object MessageController {
             "Added: ${addedShortUids.count()} | Deleted: ${deletedUids.count()} | Updated: ${updatedMessages.count()} | ${folder.name}",
         )
 
-        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, okHttpClient, realm)
+        val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, cursor, okHttpClient, realm)
 
         realm.writeBlocking {
 
@@ -222,6 +225,7 @@ object MessageController {
         shortUids: List<String>,
         folder: Folder,
         mailboxUuid: String,
+        newCursor: String,
         okHttpClient: OkHttpClient?,
         realm: Realm,
     ): List<Thread> {
@@ -244,6 +248,7 @@ object MessageController {
                         val threads = createMultiMessagesThreads(messages, findLatest(folder)!!)
                         newMessagesThreads.addAll(threads)
                     }
+                    SentryDebug.sendMissingMessagesSentry(page, messages, folder, newCursor)
                 }
 
                 pageStart += pageSize
@@ -389,10 +394,6 @@ object MessageController {
 
         return impactedFolders
     }
-
-    private fun String.toLongUid(folderId: String) = "${this}@${folderId}"
-
-    private fun String.toShortUid(): String = substringBefore('@')
 
     private fun getMessagesUids(mailboxUuid: String, folderId: String, okHttpClient: OkHttpClient? = null): MessagesUids? {
         val apiResponse = ApiRepository.getMessagesUids(mailboxUuid, folderId, okHttpClient)
