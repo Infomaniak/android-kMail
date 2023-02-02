@@ -53,7 +53,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.max
+import kotlin.math.min
 import kotlin.properties.Delegates
 
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
@@ -134,7 +134,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             val times = scheduledDates.mapNotNull { simpleDateFormat.parse(it)?.time }
             var delay = REFRESH_DELAY
             if (times.isNotEmpty()) delay += times.maxOf { it } - timeNow
-            delay(max(delay, MAX_REFRESH_DELAY))
+            delay(min(delay, MAX_REFRESH_DELAY))
 
             MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, mailboxContentRealm)
         }
