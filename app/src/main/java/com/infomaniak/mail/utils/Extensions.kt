@@ -194,13 +194,6 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 }
 //endregion
 
-//region WorkManager
-fun OneTimeWorkRequest.Builder.setExpeditedWorkRequest(): OneTimeWorkRequest.Builder {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-    return this
-}
-//endregion
-
 //region API
 inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
     throw error?.exception ?: Exception(ApiController.json.encodeToString(this))
