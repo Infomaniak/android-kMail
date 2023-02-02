@@ -105,7 +105,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
 
-            Log.d(TAG, "handleDraftsActions: ${drafts.count()} draft to handle")
+            Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
 
             var hasRemoteException = false
 
