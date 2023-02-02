@@ -107,7 +107,8 @@ class MenuDrawerItemView @JvmOverloads constructor(
             ContextCompat.getColor(context, R.color.backgroundColor) to R.style.BodyMedium
         }
 
-        binding.itemTick.isVisible = isSelected && selectionStyle == SelectionStyle.MOVE_FRAGMENT
+        itemTick.isVisible = isSelected && selectionStyle == SelectionStyle.MOVE_FRAGMENT
+
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
     }

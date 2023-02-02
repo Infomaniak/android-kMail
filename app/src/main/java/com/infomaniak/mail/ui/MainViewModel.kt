@@ -426,7 +426,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val thread = ThreadController.getThread(threadUid) ?: return@launch
             val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
             val messages = when (message) {
-                null -> MessageController.getMoveableMessages(thread, destinationFolderId)
+                null -> MessageController.getMoveableMessages(thread, currentFolderId.value!!)
                 else -> MessageController.getMessageAndDuplicates(thread, message)
             }
 
