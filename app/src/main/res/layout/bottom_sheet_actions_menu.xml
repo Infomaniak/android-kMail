@@ -86,14 +86,6 @@
             app:text="@string/actionPrint" />
 
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
-            android:id="@+id/rule"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:icon="@drawable/ic_email_action_rule_filter"
-            app:text="@string/actionCreateRule" />
-
-        <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/reportDisplayProblem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

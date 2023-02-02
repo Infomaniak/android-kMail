@@ -59,7 +59,6 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     })
                 }
                 print.setClosingOnClickListener { notYetImplemented() }
-                rule.setClosingOnClickListener { notYetImplemented() }
                 reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
 
                 mainActions.setClosingOnClickListener { id: Int ->

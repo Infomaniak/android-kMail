@@ -27,7 +27,6 @@
     <string name="accentColorPinkTitle">Pink</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
-    <string name="actionCreateRule">Create a rule</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
     <string name="actionForward">Forward</string>

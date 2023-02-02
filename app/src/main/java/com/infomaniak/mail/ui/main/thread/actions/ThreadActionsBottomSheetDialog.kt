@@ -53,7 +53,6 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
 
             postpone.isGone = true
-            rule.isGone = true
 
             archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
             markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
