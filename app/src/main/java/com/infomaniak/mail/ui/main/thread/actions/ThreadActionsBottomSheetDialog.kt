@@ -20,13 +20,11 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.setBackNavigationResult
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.refreshObserve
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
@@ -34,8 +32,6 @@ import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
-    private val actionsViewModel: ActionsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,31 +43,64 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
         }
 
+        postpone.isGone = true
+
         actionsViewModel.getMessageUidToReplyTo(
             threadUid,
             navigationArgs.messageUidToReplyTo,
         ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
 
-            postpone.isGone = true
-
-            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
-            markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
-            move.setClosingOnClickListener { notYetImplemented() }
-            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
-            reportJunk.setOnClickListener {
-                setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply { putBoolean(SHOULD_OPEN_JUNK, true) })
-            }
-            print.setClosingOnClickListener { notYetImplemented() }
-            reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
-
-            mainActions.setClosingOnClickListener { id: Int ->
-                when (id) {
-                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
-                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
-                    R.id.actionForward -> notYetImplemented()
-                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+            initOnClickListener(object : OnActionClick {
+                override fun onArchive() {
+                    mainViewModel.archiveThreadOrMessage(navigationArgs.threadUid)
                 }
-            }
+
+                override fun onReadUnread() {
+                    mainViewModel.toggleSeenStatus(navigationArgs.threadUid)
+                    findNavController().popBackStack(R.id.threadListFragment, false)
+                }
+
+                override fun onMove() {
+                    notYetImplemented()
+                }
+
+                override fun onPostpone() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onFavorite() {
+                    mainViewModel.toggleFavoriteStatus(navigationArgs.threadUid)
+                }
+
+                override fun onReportJunk() {
+                    setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply { putBoolean(SHOULD_OPEN_JUNK, true) })
+                }
+
+                override fun onPrint() {
+                    notYetImplemented()
+                }
+
+                override fun onReportDisplayProblem() {
+                    notYetImplemented()
+                }
+
+
+                override fun onReply() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
+                }
+
+                override fun onReplyAll() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
+                }
+
+                override fun onForward() {
+                    notYetImplemented()
+                }
+
+                override fun onDelete() {
+                    mainViewModel.deleteThreadOrMessage(threadUid)
+                }
+            })
         }
     }
 }
