@@ -181,7 +181,7 @@ object MessageController {
         val updatedThreads = handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
 
         SentryDebug.sendOrphanMessagesSentry(previousCursor, folder, realm)
-        SentryDebug.sendOrphanThreadsSentry(previousCursor, folder.cursor, realm)
+        SentryDebug.sendOrphanThreadsSentry(previousCursor, folder, realm)
 
         return updatedThreads
     }

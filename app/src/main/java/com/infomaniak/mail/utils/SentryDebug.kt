@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.message.Message
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -52,27 +53,27 @@ object SentryDebug {
         }
     }
 
-    fun sendOrphanMessagesSentry(previousCursor: String?, folder: Folder, realm: TypedRealm) {
+    fun sendOrphanMessagesSentry(previousCursor: String?, folder: Folder, realm: Realm) {
         val orphanMessages = MessageController.getMessages(folder.id, realm).filter { it.parentThreads.isEmpty() }
         if (orphanMessages.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
                 scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "${folder.cursor}")
+                scope.setExtra("newCursor", "${realm.writeBlocking { findLatest(folder) }?.cursor}")
                 Sentry.captureMessage("We found some orphan Messages.")
             }
         }
     }
 
-    fun sendOrphanThreadsSentry(previousCursor: String?, newCursor: String?, realm: TypedRealm) {
+    fun sendOrphanThreadsSentry(previousCursor: String?, folder: Folder, realm: Realm) {
         val orphanThreads = ThreadController.getOrphanThreads(realm)
         if (orphanThreads.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR
                 scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
                 scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "$newCursor")
+                scope.setExtra("newCursor", "${realm.writeBlocking { findLatest(folder) }?.cursor}")
                 Sentry.captureMessage("We found some orphan Threads.")
             }
         }
