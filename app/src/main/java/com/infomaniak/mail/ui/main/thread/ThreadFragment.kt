@@ -30,7 +30,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
-import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
@@ -39,10 +38,8 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.JUNK_BOTTOM_SHEET_NAV_KEY
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.MESSAGE_UID
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.SHOULD_OPEN_JUNK
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.UiUtils.handleJunkBottomSheet
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
@@ -89,13 +86,7 @@ class ThreadFragment : Fragment() {
             observeQuickActionBarClicks()
         }
 
-        getBackNavigationResult<Bundle>(JUNK_BOTTOM_SHEET_NAV_KEY) {
-            val shouldOpenJunk = it.getBoolean(SHOULD_OPEN_JUNK)
-            val messageUid = it.getString(MESSAGE_UID)
-            if (shouldOpenJunk) safeNavigate(
-                ThreadFragmentDirections.actionThreadFragmentToJunkBottomSheetDialog(navigationArgs.threadUid, messageUid)
-            )
-        }
+        handleJunkBottomSheet()
     }
 
     private fun setupUi(threadUid: String) = with(binding) {

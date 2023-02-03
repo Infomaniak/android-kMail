@@ -75,7 +75,10 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
 
                 override fun onReportJunk() {
-                    setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply { putBoolean(SHOULD_OPEN_JUNK, true) })
+                    setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply {
+                        putBoolean(SHOULD_OPEN_JUNK, true)
+                        putString(THREAD_UID, threadUid)
+                    })
                 }
 
                 override fun onPrint() {

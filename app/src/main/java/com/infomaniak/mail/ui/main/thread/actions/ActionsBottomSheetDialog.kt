@@ -129,6 +129,7 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         const val JUNK_BOTTOM_SHEET_NAV_KEY = "junk_bottom_sheet_nav_key"
         const val SHOULD_OPEN_JUNK = "should_open_junk"
         const val MESSAGE_UID = "message_uid"
+        const val THREAD_UID = "thread_uid"
     }
 }
 

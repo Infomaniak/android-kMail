@@ -65,6 +65,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply {
                         putBoolean(SHOULD_OPEN_JUNK, true)
                         putString(MESSAGE_UID, messageUid)
+                        putString(THREAD_UID, threadUid)
                     })
                 }
 

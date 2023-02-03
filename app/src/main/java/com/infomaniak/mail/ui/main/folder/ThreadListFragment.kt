@@ -61,9 +61,10 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
+import com.infomaniak.mail.utils.UiUtils.handleJunkBottomSheet
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.isValid
-import java.util.*
+import java.util.Date
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -95,6 +96,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
+
+        handleJunkBottomSheet()
 
         observeCurrentThreads()
         observeDownloadState()

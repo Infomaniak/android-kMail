@@ -154,6 +154,7 @@ class MainActivity : ThemedActivity() {
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
         when (destination.id) {
+            R.id.junkBottomSheetDialog,
             R.id.messageActionBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
