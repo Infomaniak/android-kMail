@@ -54,7 +54,9 @@ object SentryDebug {
     }
 
     fun sendOrphanMessagesSentry(previousCursor: String?, folder: Folder, realm: Realm) {
-        val orphanMessages = MessageController.getMessages(folder.id, realm).filter { it.parentThreads.isEmpty() }
+        val orphanMessages = MessageController.getMessages(folder.id, realm).filter {
+            it.parentsAsMessage.isEmpty() && it.parentsAsDuplicate.isEmpty()
+        }
         if (orphanMessages.isNotEmpty()) {
             Sentry.withScope { scope ->
                 scope.level = SentryLevel.ERROR

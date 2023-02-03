@@ -118,7 +118,8 @@ class Message : RealmObject {
     var detailsAreExpanded = false
     //endregion
 
-    val parentThreads by backlinks(Thread::messages)
+    val parentsAsMessage by backlinks(Thread::messages)
+    val parentsAsDuplicate by backlinks(Thread::duplicates)
 
     private val parentFolders by backlinks(Folder::messages)
     val parentFolder get() = parentFolders.first()
