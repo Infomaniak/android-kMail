@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -38,7 +37,6 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
     lateinit var binding: BottomSheetJunkBinding
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val actionsViewModel: ActionsViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -53,7 +51,7 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
         if (messageUid == null) {
             handleButtons(threadUid)
         } else {
-            actionsViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
+            mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
                 handleButtons(threadUid, message)
             }
         }

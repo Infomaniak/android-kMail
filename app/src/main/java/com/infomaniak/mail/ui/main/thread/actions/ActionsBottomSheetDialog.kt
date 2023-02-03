@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
@@ -38,7 +37,6 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     lateinit var binding: BottomSheetActionsMenuBinding
     val mainViewModel: MainViewModel by activityViewModels()
-    val actionsViewModel: ActionsViewModel by viewModels()
 
     private var onClickListener: OnActionClick = object : OnActionClick {
         override fun onArchive() = Unit

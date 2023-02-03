@@ -26,10 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
 
 class ActionsViewModel : ViewModel() {
-    fun getMessage(messageUid: String) = liveData(Dispatchers.IO) {
-        emit(MessageController.getMessage(messageUid))
-    }
-
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }

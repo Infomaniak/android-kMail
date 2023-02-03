@@ -570,6 +570,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun getMessage(messageUid: String) = liveData(Dispatchers.IO) {
+        emit(MessageController.getMessage(messageUid))
+    }
+
     data class UndoData(
         val resource: String,
         val foldersIds: List<String>,

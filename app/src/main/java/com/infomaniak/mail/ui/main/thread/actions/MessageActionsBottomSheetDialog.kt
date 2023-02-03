@@ -35,7 +35,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         val threadUid = navigationArgs.threadUid
         val messageUid = navigationArgs.messageUid
 
-        actionsViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
+        mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
             setMarkAsReadUi(navigationArgs.isSeen)
             setFavoriteUi(navigationArgs.isFavorite)
