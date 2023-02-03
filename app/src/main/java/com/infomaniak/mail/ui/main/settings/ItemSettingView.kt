@@ -65,6 +65,7 @@ class ItemSettingView @JvmOverloads constructor(
 
                 chevron.isVisible = action == Action.CHEVRON
                 toggle.isVisible = action == Action.TOGGLE
+                openExternal.isVisible = action == Action.OPEN_EXTERNAL
 
                 if (!getBoolean(R.styleable.ItemSettingView_ripple, true)) root.background = null
             }
@@ -102,5 +103,6 @@ class ItemSettingView @JvmOverloads constructor(
         NONE,
         CHEVRON,
         TOGGLE,
+        OPEN_EXTERNAL,
     }
 }

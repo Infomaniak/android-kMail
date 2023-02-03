@@ -64,8 +64,8 @@
 
         <ImageView
             android:id="@+id/chevron"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:src="@drawable/ic_chevron_right"
             android:visibility="gone"
             tools:ignore="ContentDescription"
@@ -78,6 +78,14 @@
             android:layout_marginStart="@dimen/marginStandardVerySmall"
             android:minHeight="0dp"
             android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/openExternal"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_open_external"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
     </FrameLayout>
 
 </LinearLayout>
