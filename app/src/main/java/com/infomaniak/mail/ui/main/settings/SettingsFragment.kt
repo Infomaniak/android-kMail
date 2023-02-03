@@ -82,6 +82,11 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupListeners() = with(binding) {
+
+        settingsNotifications.setOnClickListener {
+            notYetImplemented()
+        }
+
         settingsSend.setOnClickListener {
             animatedNavigation(SettingsFragmentDirections.actionSettingsToSendSettings())
         }
