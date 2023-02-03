@@ -58,7 +58,8 @@
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsSectionGeneral" />
+                android:text="@string/settingsSectionGeneral"
+                android:visibility="gone" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsSend"
@@ -76,11 +77,14 @@
                 app:itemAction="toggle"
                 app:title="@string/settingsAppLock" />
 
-            <com.google.android.material.divider.MaterialDivider style="@style/SettingSeparator" />
+            <com.google.android.material.divider.MaterialDivider
+                style="@style/SettingSeparator"
+                android:visibility="gone" />
 
             <TextView
                 style="@style/SettingHeader"
-                android:text="@string/settingsSectionAppearance" />
+                android:text="@string/settingsSectionAppearance"
+                android:visibility="gone" />
 
             <com.infomaniak.mail.ui.main.settings.ItemSettingView
                 android:id="@+id/settingsThreadListDensity"
