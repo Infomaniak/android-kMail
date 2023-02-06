@@ -115,8 +115,8 @@
 
                     <ImageView
                         android:id="@+id/recipientChevron"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
+                        android:layout_width="@dimen/chevronSize"
+                        android:layout_height="@dimen/chevronSize"
                         android:layout_marginHorizontal="@dimen/marginStandardSmall"
                         android:src="@drawable/ic_chevron_down"
                         app:layout_constraintHorizontal_bias="0"
@@ -332,7 +332,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
+            android:paddingHorizontal="@dimen/alternativeMargin"
             android:paddingVertical="@dimen/marginStandardMedium"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
@@ -342,8 +342,8 @@
 
         <ImageView
             android:id="@+id/attachmentsIcon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="@dimen/mediumIconSize"
+            android:layout_height="@dimen/mediumIconSize"
             android:layout_marginStart="@dimen/marginStandardMedium"
             android:src="@drawable/ic_attachment"
             app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"

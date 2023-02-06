@@ -35,8 +35,8 @@
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/marginStandardVerySmall"
         android:paddingEnd="@dimen/marginStandardMedium"
-        tools:layout_marginBottom="12dp"
-        tools:layout_marginTop="12dp">
+        tools:layout_marginBottom="@dimen/alternativeMargin"
+        tools:layout_marginTop="@dimen/alternativeMargin">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/newMailBullet"
@@ -68,7 +68,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="@dimen/alternativeMargin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/expeditorAvatar"
             app:layout_constraintTop_toTopOf="parent"
@@ -156,8 +156,8 @@
 
             <ImageView
                 android:id="@+id/iconCalendar"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="@dimen/mediumIconSize"
+                android:layout_height="@dimen/mediumIconSize"
                 android:layout_marginStart="@dimen/marginStandardSmall"
                 android:contentDescription="@string/contentDescriptionIconCalendar"
                 android:src="@drawable/ic_calendar"
@@ -171,8 +171,8 @@
 
             <ImageView
                 android:id="@+id/iconAttachment"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="@dimen/mediumIconSize"
+                android:layout_height="@dimen/mediumIconSize"
                 android:layout_marginStart="@dimen/marginStandardSmall"
                 android:contentDescription="@string/contentDescriptionIconAttachments"
                 android:src="@drawable/ic_attachment"
@@ -186,8 +186,8 @@
 
             <ImageView
                 android:id="@+id/iconFavorite"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="@dimen/mediumIconSize"
+                android:layout_height="@dimen/mediumIconSize"
                 android:layout_marginStart="@dimen/marginStandardSmall"
                 android:contentDescription="@string/contentDescriptionIconFavorite"
                 android:src="@drawable/ic_star_filled"

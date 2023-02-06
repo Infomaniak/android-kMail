@@ -52,11 +52,12 @@ import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import kotlin.math.abs
+import com.infomaniak.lib.core.R as RCore
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
 // TODO: Same for all adapters in the app?
 class ThreadListAdapter(
-    private val context: Context,
+    context: Context,
     private val threadDensity: ThreadDensity,
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
@@ -66,6 +67,13 @@ class ThreadListAdapter(
     private lateinit var recyclerView: RecyclerView
 
     private val localSettings by lazy { LocalSettings.getInstance(context) }
+
+    private val CARD_CORNER_RADIUS by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
+    private val THREAD_MARGIN_LARGE by lazy { context.resources.getDimension(R.dimen.alternativeMargin).toInt() }
+    private val THREAD_MARGIN_OTHER by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
+    private val DATE_TOP_MARGIN_LARGE by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
+    private val DATE_BOTTOM_MARGIN_LARGE by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
+    private val DATE_TOP_MARGIN_OTHER by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -160,7 +168,7 @@ class ThreadListAdapter(
         expeditorAvatar.loadAvatar(thread.computeAvatarRecipient(), contacts)
     }
 
-    private fun formatRecipientNames(recipients: List<Recipient>): String {
+    private fun CardviewThreadItemBinding.formatRecipientNames(recipients: List<Recipient>): String {
         return when (recipients.count()) {
             0 -> context.getString(R.string.unknownRecipientTitle)
             1 -> recipients.single().displayedName(context)
@@ -320,19 +328,13 @@ class ThreadListAdapter(
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
-    companion object {
+    private companion object {
         const val SWIPE_ANIMATION_THRESHOLD = 0.15f
-        private val CARD_ELEVATION = 6.toPx().toFloat()
-        private val CARD_CORNER_RADIUS = 12.toPx().toFloat()
-        private val THREAD_MARGIN_LARGE = 12.toPx()
-        private val THREAD_MARGIN_OTHER = 8.toPx()
-        private val DATE_TOP_MARGIN_LARGE = 4.toPx()
-        private val DATE_BOTTOM_MARGIN_LARGE = 4.toPx()
-        private val DATE_TOP_MARGIN_OTHER = 8.toPx()
-        private val DATE_BOTTOM_MARGIN_OTHER = 0.toPx()
+        val CARD_ELEVATION = 6.toPx().toFloat()
+        const val DATE_BOTTOM_MARGIN_OTHER = 0
 
-        private const val FULL_MONTH = "MMMM"
-        private const val MONTH_AND_YEAR = "MMMM yyyy"
+        const val FULL_MONTH = "MMMM"
+        const val MONTH_AND_YEAR = "MMMM yyyy"
 
         fun formatList(threads: List<Thread>, context: Context, threadDensity: ThreadDensity): MutableList<Any> {
             if (threadDensity == COMPACT) return threads.toMutableList()
@@ -355,7 +357,7 @@ class ThreadListAdapter(
             return formattedList
         }
 
-        private fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
+        fun Thread.getSectionTitle(context: Context): String = with(date.toDate()) {
             return when {
                 isToday() -> context.getString(R.string.threadListSectionToday)
                 isYesterday() -> context.getString(R.string.messageDetailsYesterday)

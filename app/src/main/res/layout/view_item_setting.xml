@@ -23,7 +23,7 @@
     android:baselineAligned="false"
     android:gravity="center"
     android:paddingHorizontal="@dimen/marginStandardMedium"
-    android:paddingVertical="12dp"
+    android:paddingVertical="@dimen/alternativeMargin"
     tools:layout_height="wrap_content">
 
     <ImageView
@@ -64,8 +64,8 @@
 
         <ImageView
             android:id="@+id/chevron"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:layout_width="@dimen/chevronSize"
+            android:layout_height="@dimen/chevronSize"
             android:src="@drawable/ic_chevron_right"
             android:visibility="gone"
             tools:ignore="ContentDescription"
