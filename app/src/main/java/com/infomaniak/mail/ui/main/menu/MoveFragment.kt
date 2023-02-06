@@ -54,20 +54,11 @@ class MoveFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         setupAdapters()
         setupListeners()
-        observeCurrentFolder()
         observeFoldersLive()
-    }
 
-    private fun observeCurrentFolder() {
-        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
-            binding.inboxFolder.setSelectedState(folder.role == Folder.FolderRole.INBOX)
-
-            defaultFoldersAdapter.updateSelectedState(folder.id)
-            customFoldersAdapter.updateSelectedState(folder.id)
-        }
+        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
     private fun setupAdapters() = with(binding) {
@@ -85,6 +76,7 @@ class MoveFragment : Fragment() {
             inboxFolderId = inbox?.id
 
             val currentFolder = mainViewModel.currentFolder.value ?: return@refreshObserve
+            binding.inboxFolder.setSelectedState(currentFolder.role == Folder.FolderRole.INBOX)
             defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == Folder.FolderRole.DRAFT }, currentFolder.id)
             customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }
