@@ -292,7 +292,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
         archiveThreadOrMessageSync(threadUid, withRefresh = false)?.also(messagesFoldersIds::addAll)
 
-        refreshFolders(mailbox, messagesFoldersIds, archiveId)
+        if (messagesFoldersIds.isNotEmpty()) refreshFolders(mailbox, messagesFoldersIds, archiveId)
     }
 
     fun archiveThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
@@ -307,6 +307,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return null
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
         val thread = ThreadController.getThread(threadUid) ?: return null
+
+        val isAlreadyArchived = (message?.folderId ?: currentFolderId.value) == archiveId
+        if (isAlreadyArchived) {
+            snackbarFeedback.postValue("Already archived." to null)
+            return null
+        }
 
         val messages = when (message) {
             null -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
