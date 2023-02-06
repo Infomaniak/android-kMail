@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -33,6 +34,24 @@ class EmptyStateView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewEmptyStateBinding by lazy { ViewEmptyStateBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    var illustration: Drawable?
+        get() = binding.illustration.drawable
+        set(value) {
+            binding.illustration.setImageDrawable(value)
+        }
+
+    var title: CharSequence?
+        get() = binding.title.text
+        set(value) {
+            binding.title.text = value
+        }
+
+    var description: CharSequence?
+        get() = binding.description.text
+        set(value) {
+            binding.description.text = value
+        }
 
     init {
         attrs?.getAttributes(context, R.styleable.EmptyStateView) {

@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -468,8 +469,30 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun displayNoEmailView() = with(binding) {
+
         threadsList.isGone = true
-        emptyState.isVisible = true
+
+        emptyState.apply {
+            val noSignal = false
+            when {
+                noSignal -> {
+                    illustration = getDrawable(context, R.drawable.ic_no_network_big)
+                    title = "No signal"
+                    description = "No signal description"
+                }
+                mainViewModel.isCurrentFolderRole(FolderRole.TRASH) -> {
+                    illustration = getDrawable(context, R.drawable.ic_empty_trash)
+                    title = "Empty trash"
+                    description = "Empty trash description"
+                }
+                else -> {
+                    illustration = getDrawable(context, R.drawable.ic_empty_folder)
+                    title = "Empty folder"
+                    description = "Empty folder description"
+                }
+            }
+            isVisible = true
+        }
     }
 
     private fun displayThreadsView() = with(binding) {

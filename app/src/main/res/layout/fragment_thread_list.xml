@@ -141,7 +141,7 @@
                     android:drawablePadding="@dimen/marginStandardSmall"
                     android:text="@string/noNetworkTitle"
                     android:visibility="gone"
-                    app:drawableStartCompat="@drawable/ic_no_network" />
+                    app:drawableStartCompat="@drawable/ic_no_network_small" />
 
                 <TextView
                     android:id="@+id/updatedAt"
@@ -209,7 +209,7 @@
                         android:layout_height="match_parent"
                         android:visibility="gone"
                         app:description="@string/noEmailDescription"
-                        app:icon="@drawable/ic_empty_state_no_mail"
+                        app:icon="@drawable/ic_empty_folder"
                         app:title="@string/noEmailTitle" />
 
                 </FrameLayout>
