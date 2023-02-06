@@ -31,7 +31,7 @@ import com.infomaniak.mail.utils.getUids
 import com.infomaniak.mail.utils.handlerIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
@@ -43,7 +43,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
-        emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
+        emitSource(ThreadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
     fun messagesLive(threadUid: String) = liveData(Dispatchers.IO) {

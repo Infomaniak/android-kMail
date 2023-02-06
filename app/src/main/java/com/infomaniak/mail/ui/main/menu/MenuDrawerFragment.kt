@@ -129,8 +129,8 @@ class MenuDrawerFragment : Fragment() {
                         BugTrackerActivityArgs(
                             user = AccountUtils.currentUser!!,
                             appBuildNumber = BuildConfig.VERSION_NAME,
-                            bucketIdentifier = BuildConfig.MAIL_BUCKET_ID,
-                            projectName = BuildConfig.MAIL_PROJECT_NAME,
+                            bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
+                            projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,
                         ).toBundle()
                     )
                     startActivity(this)
@@ -205,15 +205,15 @@ class MenuDrawerFragment : Fragment() {
         }
     }
 
-    private fun observeFoldersLive() {
-        mainViewModel.currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+    private fun observeFoldersLive() = with(mainViewModel) {
+        currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { binding.inboxFolder.badge = it }
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolder = mainViewModel.currentFolder.value ?: return@refreshObserve
+            val currentFolder = currentFolder.value ?: return@refreshObserve
             defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
             customFoldersAdapter.setFolders(customFolders, currentFolder.id)
         }

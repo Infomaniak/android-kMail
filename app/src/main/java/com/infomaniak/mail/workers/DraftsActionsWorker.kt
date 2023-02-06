@@ -18,6 +18,7 @@
 package com.infomaniak.mail.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.infomaniak.lib.core.api.ApiController
@@ -51,7 +52,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import kotlin.math.min
 import kotlin.properties.Delegates
 
 class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
@@ -65,6 +68,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private var userId: Int by Delegates.notNull()
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
+        Log.d(TAG, "Work started")
+
         if (DraftController.getDraftsWithActionsCount(mailboxContentRealm) == 0L) return@withContext Result.success()
         if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return@withContext Result.failure()
 
@@ -74,19 +79,18 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@withContext Result.failure()
         okHttpClient = AccountUtils.getHttpClient(userId)
 
-        moveServiceToForeground()
-
         handleDraftsActions()
     }
 
     override fun onFinish() {
         mailboxContentRealm.close()
         mailboxInfoRealm.close()
+        Log.d(TAG, "Work finished")
     }
 
-    private suspend fun moveServiceToForeground() {
-        applicationContext.showDraftActionsNotification().apply {
-            setForeground(ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, build()))
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return applicationContext.showDraftActionsNotification().run {
+            ForegroundInfo(NotificationUtils.DRAFT_ACTIONS_ID, build())
         }
     }
 
@@ -97,6 +101,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         val isFailure = mailboxContentRealm.writeBlocking {
 
             val drafts = DraftController.getDraftsWithActions(realm = this).ifEmpty { return@writeBlocking false }
+
+            Log.d(TAG, "handleDraftsActions: ${drafts.count()} drafts to handle")
 
             var hasRemoteException = false
 
@@ -117,6 +123,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
 
+        SentryDebug.sendOrphanDraftsSentry(mailboxContentRealm)
+
         return if (isFailure) Result.failure() else Result.success()
     }
 
@@ -132,7 +140,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             val times = scheduledDates.mapNotNull { simpleDateFormat.parse(it)?.time }
             var delay = REFRESH_DELAY
             if (times.isNotEmpty()) delay += times.maxOf { it } - timeNow
-            delay(delay)
+            delay(min(delay, MAX_REFRESH_DELAY))
 
             MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, mailboxContentRealm)
         }
@@ -219,18 +227,21 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         private const val MAILBOX_ID_KEY = "mailboxIdKey"
         // We add this delay because for now, it doesn't always work if we just use the `etop`.
         private const val REFRESH_DELAY = 2_000L
+        private const val MAX_REFRESH_DELAY = 6_000L
 
         fun scheduleWork(context: Context) {
 
             if (AccountUtils.currentMailboxId == AppSettings.DEFAULT_ID) return
             if (DraftController.getDraftsWithActionsCount() == 0L) return
 
+            Log.d(TAG, "Work scheduled")
+
             val workData = workDataOf(USER_ID_KEY to AccountUtils.currentUserId, MAILBOX_ID_KEY to AccountUtils.currentMailboxId)
             val workRequest = OneTimeWorkRequestBuilder<DraftsActionsWorker>()
                 .addTag(TAG)
                 .setInputData(workData)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .setExpeditedWorkRequest()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
 
             WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)

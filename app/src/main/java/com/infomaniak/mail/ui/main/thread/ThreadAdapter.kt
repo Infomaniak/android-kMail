@@ -31,7 +31,8 @@ import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.Attachment.*
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
@@ -77,7 +78,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     // Add here everything in a Message that can be updated in the UI.
     override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
         return newItem.body?.value == oldItem.body?.value &&
-                newItem.seen == oldItem.seen &&
+                newItem.isSeen == oldItem.isSeen &&
                 newItem.isFavorite == oldItem.isFavorite
     }
 
@@ -159,6 +160,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
 
         userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
+
+        initWebViewClientIfNeeded(message.attachments)
 
         handleHeaderClick(message)
         handleExpandDetailsClick(message)
@@ -250,7 +253,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (attachments.isEmpty()) return ""
 
         val totalAttachmentsFileSizeInBytes: Long = attachments.map { attachment ->
-            attachment.size.toLong()
+            attachment.size
         }.reduce { accumulator: Long, size: Long -> accumulator + size }
 
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
@@ -308,7 +311,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             setOnClickListener { onMenuClicked?.invoke(message) }
         }
 
-        recipient.text = if (isExpanded) getAllRecipientsFormatted(message = this@with) else getFormattedSubject(context)
+        recipient.text = if (isExpanded) getAllRecipientsFormatted(message = this@with) else context.formatSubject(subject)
         recipientChevron.isVisible = isExpanded
         recipientOverlayedButton.isVisible = isExpanded
     }
@@ -340,6 +343,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
 
+        private var doesWebViewNeedInit = true
+
         init {
             with(binding) {
                 fromRecyclerView.adapter = fromAdapter
@@ -347,6 +352,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 ccRecyclerView.adapter = ccAdapter
                 bccRecyclerView.adapter = bccAdapter
                 attachmentsRecyclerView.adapter = attachmentAdapter
+            }
+        }
+
+        fun initWebViewClientIfNeeded(attachments: List<Attachment>) {
+            if (doesWebViewNeedInit) {
+                val cidDictionary = mutableMapOf<String, Attachment>()
+                attachments.forEach {
+                    if (!it.contentId.isNullOrBlank()) cidDictionary[it.contentId as String] = it
+                }
+                binding.messageBody.webViewClient = MessageWebViewClient(binding.context, cidDictionary)
+                doesWebViewNeedInit = false
             }
         }
     }

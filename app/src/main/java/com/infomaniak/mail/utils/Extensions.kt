@@ -17,10 +17,11 @@
  */
 package com.infomaniak.mail.utils
 
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
@@ -33,8 +34,9 @@ import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OutOfQuotaPolicy
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
@@ -42,6 +44,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -52,7 +55,9 @@ import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
 import kotlinx.serialization.encodeToString
-import java.util.*
+import org.jsoup.Jsoup
+import java.util.Calendar
+import java.util.Date
 
 fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
 
@@ -60,13 +65,17 @@ fun Activity.notYetImplemented() = showSnackbar("This feature is currently under
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
-fun Uri.getFileNameAndSize(context: Context): Pair<String, Int>? {
+fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", "")).wholeText()
+
+fun String.textToHtml(): String = replace("\n", "<br>")
+
+fun Uri.getFileNameAndSize(context: Context): Pair<String, Long>? {
     return runCatching {
         val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
         context.contentResolver.query(this, projection, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val displayName = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
-                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getInt)
+                val size = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE).let(cursor::getLong)
                 displayName to size
             } else {
                 Sentry.captureException(Exception("$this has empty cursor"))
@@ -123,6 +132,38 @@ fun Context.getAttributeColor(attribute: Int): Int {
     theme.resolveAttribute(attribute, typedValue, true)
     return typedValue.data
 }
+
+fun Context.formatSubject(subject: String?): String {
+    return if (subject.isNullOrBlank()) {
+        getString(R.string.noSubjectTitle)
+    } else {
+        subject.replace("\n+".toRegex(), " ")
+    }
+}
+
+fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
+    addAnimatorListener(object : Animator.AnimatorListener {
+        override fun onAnimationStart(animation: Animator) = Unit
+
+        override fun onAnimationEnd(animation: Animator) {
+            removeAllAnimatorListeners()
+            repeatCount = ValueAnimator.INFINITE
+            setMinAndMaxFrame(firstFrame, lastFrame)
+            playAnimation()
+        }
+
+        override fun onAnimationCancel(animation: Animator) = Unit
+
+        override fun onAnimationRepeat(animation: Animator) = Unit
+    })
+}
+
+fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean) {
+    val color = if (isDark) illuColors.getDarkColor() else illuColors.getLightColor()
+    addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
+        SimpleColorFilter(color)
+    }
+}
 //endregion
 
 //region Navigation
@@ -150,17 +191,14 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 }
 //endregion
 
-//region WorkManager
-fun OneTimeWorkRequest.Builder.setExpeditedWorkRequest(): OneTimeWorkRequest.Builder {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-    return this
-}
-//endregion
-
 //region API
 inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
     throw error?.exception ?: Exception(ApiController.json.encodeToString(this))
 }
+
+fun String.toLongUid(folderId: String) = "${this}@${folderId}"
+
+fun String.toShortUid(): String = substringBefore('@')
 //endregion
 
 //region Realm

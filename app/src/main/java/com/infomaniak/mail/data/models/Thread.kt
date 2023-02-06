@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models.thread
+package com.infomaniak.mail.data.models
 
 import android.content.Context
 import androidx.annotation.IdRes
@@ -27,8 +27,10 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
+import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
+import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.realmSetOf
 import io.realm.kotlin.ext.toRealmList
@@ -37,6 +39,7 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
+import java.util.Date
 
 class Thread : RealmObject {
 
@@ -45,18 +48,23 @@ class Thread : RealmObject {
     var folderId: String = ""
     var messages: RealmList<Message> = realmListOf()
     var duplicates: RealmList<Message> = realmListOf()
+    var messagesIds: RealmSet<String> = realmSetOf()
+
+    var date: RealmInstant = Date().toRealmInstant()
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
-    var date: RealmInstant = RealmInstant.MAX
+    var subject: String? = null
     var size: Int = 0
     var hasAttachments: Boolean = false
     var hasDrafts: Boolean = false
     var isFavorite: Boolean = false
-    var answered: Boolean = false
-    var forwarded: Boolean = false
-    var scheduled: Boolean = false
-    var messagesIds: RealmSet<String> = realmSetOf()
+    var isAnswered: Boolean = false
+    var isForwarded: Boolean = false
+    var isScheduled: Boolean = false
+
+    private val parentFolders by backlinks(Folder::threads)
+    private val parentFolder get() = parentFolders.first()
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
@@ -118,7 +126,6 @@ class Thread : RealmObject {
     }
 
     private fun resetThread() {
-        messages.sortBy { it.date }
         unseenMessagesCount = 0
         from = realmListOf()
         to = realmListOf()
@@ -126,26 +133,31 @@ class Thread : RealmObject {
         hasAttachments = false
         hasDrafts = false
         isFavorite = false
-        answered = false
-        forwarded = false
-        scheduled = false
+        isAnswered = false
+        isForwarded = false
+        isScheduled = false
     }
 
     private fun updateThread() {
+
+        messages.sortBy { it.date }
+
         messages.forEach { message ->
             messagesIds += message.messageIds
-            if (!message.seen) unseenMessagesCount++
+            if (!message.isSeen) unseenMessagesCount++
             from += message.from
             to += message.to
             size += message.size
             if (message.hasAttachments) hasAttachments = true
             if (message.isDraft) hasDrafts = true
             if (message.isFavorite) isFavorite = true
-            if (message.answered) answered = true
-            if (message.forwarded) forwarded = true
-            if (message.scheduled) scheduled = true
+            if (message.isAnswered) isAnswered = true
+            if (message.isForwarded) isForwarded = true
+            if (message.isScheduled) isScheduled = true
         }
+
         date = messages.last { it.folderId == folderId }.date
+        subject = messages.first().subject
     }
 
     fun formatDate(context: Context): String = with(date.toDate()) {
@@ -160,7 +172,24 @@ class Thread : RealmObject {
 
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
-    fun getFormattedSubject(context: Context) = messages.first().getFormattedSubject(context)
+    fun computeAvatarRecipient(): Recipient {
+        val message = messages.lastOrNull { it.parentFolder.role != FolderRole.SENT } ?: messages.last()
+        return message.from.first()
+    }
+
+    fun computeDisplayedRecipients(): RealmList<Recipient> {
+        return if (parentFolder.role == FolderRole.DRAFT) to else from
+    }
+
+    fun computePreview(): String {
+        val message = if (parentFolder.role == FolderRole.SENT) {
+            messages.lastOrNull { it.folderId == folderId } ?: messages.last()
+        } else {
+            messages.last()
+        }
+
+        return message.preview
+    }
 
     private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
         return map { Recipient().initLocalValues(it.email, it.name) }

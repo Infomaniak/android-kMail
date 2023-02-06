@@ -138,10 +138,6 @@
     <string name="draftPrefix">(Draft)</string>
     <string name="emptyFolderDescription">There‘s nothing to see, look at another one :)</string>
     <string name="emptyFolderTitle">This folder is empty !</string>
-    <plurals name="errorActionsSpamOwnMessage">
-        <item quantity="one">You cannot report your own e-mail</item>
-        <item quantity="other">You cannot report your own emails</item>
-    </plurals>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
     <string name="favoritesFolder">Favorites</string>
@@ -331,5 +327,6 @@
     <string name="unknownRecipientTitle">(unknown)</string>
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
+    <string name="webViewCantHandleAction">No application has been found to handle this action</string>
     <string name="workInProgressTitle">This feature is currently under development.</string>
 </resources>

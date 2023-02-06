@@ -60,7 +60,7 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
     private fun handleButtons(threadUid: String, message: Message? = null) = with(binding) {
         setSpamUi(message)
 
-        spam.setClosingOnClickListener { mainViewModel.markAsSpamOrHam(threadUid, message) }
+        spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid, message) }
         phishing.setClosingOnClickListener { notYetImplemented() }
         blockSender.setClosingOnClickListener { notYetImplemented() }
     }

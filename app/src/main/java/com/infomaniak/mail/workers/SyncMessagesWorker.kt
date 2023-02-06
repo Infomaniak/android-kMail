@@ -20,7 +20,6 @@ package com.infomaniak.mail.workers
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.text.Html
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
@@ -36,11 +35,13 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
+import com.infomaniak.mail.utils.formatSubject
+import com.infomaniak.mail.utils.htmlToText
 import io.realm.kotlin.Realm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -125,6 +126,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 color = localSettings.accentColor.getPrimary(applicationContext)
 
                 val notificationId = if (isSummary) mailbox.notificationGroupId else uid.hashCode()
+                @Suppress("MissingPermission")
                 notificationManagerCompat.notify(notificationId, build())
             }
         }
@@ -133,13 +135,12 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
         val message = ThreadController.getThread(uid, realm)?.messages?.last() ?: return
 
-        if (message.seen) return // Ignore if it has already been seen
+        if (message.isSeen) return // Ignore if it has already been seen
 
-        val subject = message.getFormattedSubject(applicationContext)
-        val preview = message.body?.value?.ifBlank { null }?.let {
-            val bodyWithoutImage = it.replace("<img[^>]+(img)?/?>".toRegex(), "")
-            "\n" + Html.fromHtml(bodyWithoutImage, Html.FROM_HTML_MODE_LEGACY)
-        } ?: message.preview.ifBlank { null }?.let { "\n$it" } ?: ""
+        val subject = applicationContext.formatSubject(message.subject)
+        val preview = message.body?.value?.ifBlank { null }
+            ?.let { "\n${it.htmlToText()}" } // TODO: remove body history
+            ?: message.preview.ifBlank { null }?.let { "\n$it" } ?: ""
         val description = "$subject$preview"
 
         // Show message notification

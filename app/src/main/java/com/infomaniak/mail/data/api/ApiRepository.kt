@@ -34,7 +34,6 @@ import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
 import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
-import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -60,9 +59,8 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)
     }
 
-    suspend fun getMailboxes(userId: Int? = null): ApiResponse<List<Mailbox>> {
-        val okHttpClient = userId?.let { AccountUtils.getHttpClient(userId) } ?: HttpClient.okHttpClient
-        return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient)
+    fun getMailboxes(okHttpClient: OkHttpClient? = null): ApiResponse<List<Mailbox>> {
+        return callApi(ApiRoutes.mailbox(), GET, okHttpClient = okHttpClient ?: HttpClient.okHttpClient)
     }
 
     fun getFolders(mailboxUuid: String): ApiResponse<List<Folder>> = callApi(ApiRoutes.folders(mailboxUuid), GET)

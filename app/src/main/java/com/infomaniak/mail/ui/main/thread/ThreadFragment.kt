@@ -33,18 +33,14 @@ import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.handleJunkBottomSheet
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.observeNotNull
-import com.infomaniak.mail.utils.refreshObserve
-import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -168,7 +164,7 @@ class ThreadFragment : Fragment() {
                         messageUid = message.uid,
                         threadUid = navigationArgs.threadUid,
                         isFavorite = message.isFavorite,
-                        isSeen = message.seen,
+                        isSeen = message.isSeen,
                     )
                 )
             }
@@ -217,9 +213,14 @@ class ThreadFragment : Fragment() {
         DownloadManagerUtils.scheduleDownload(requireContext(), url, name)
     }
 
-    private fun onThreadUpdate(thread: Thread) = with(binding) {
+    private fun onThreadUpdate(thread: Thread?) = with(binding) {
 
-        val subject = thread.getFormattedSubject(context)
+        if (thread == null) {
+            leaveThread()
+            return@with
+        }
+
+        val subject = context.formatSubject(thread.subject)
         threadSubject.text = subject
         toolbarSubject.text = subject
 
@@ -231,7 +232,6 @@ class ThreadFragment : Fragment() {
 
     private fun onMessagesUpdate(messages: List<Message>) {
         Log.i("UI", "Received messages (${messages.size})")
-        if (messages.isEmpty()) leaveThread()
         threadViewModel.fetchIncompleteMessages(messages)
         binding.messagesList.setBackgroundResource(if (messages.count() == 1) R.color.backgroundColor else R.color.threadBackground)
     }

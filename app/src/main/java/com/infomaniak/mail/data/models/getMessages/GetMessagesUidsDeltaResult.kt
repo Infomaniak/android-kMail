@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,15 @@ data class GetMessagesUidsDeltaResult(
     data class MessageFlags(
         @SerialName("uid")
         val shortUid: String,
-        val answered: Boolean,
+        @SerialName("answered")
+        val isAnswered: Boolean,
         @SerialName("flagged")
         val isFavorite: Boolean,
-        val forwarded: Boolean,
-        val scheduled: Boolean,
-        val seen: Boolean,
+        @SerialName("forwarded")
+        val isForwarded: Boolean,
+        @SerialName("scheduled")
+        val isScheduled: Boolean,
+        @SerialName("seen")
+        val isSeen: Boolean,
     )
 }

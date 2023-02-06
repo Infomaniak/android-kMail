@@ -53,8 +53,8 @@ import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIG
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
 import com.infomaniak.mail.ui.MainActivity
 import com.infomaniak.mail.ui.MainViewModel
@@ -198,7 +198,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         toolbar.setNavigationOnClickListener { (activity as? MainActivity)?.binding?.drawerLayout?.open() }
 
         searchButton.setOnClickListener {
-            safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
+            notYetImplemented()
+            // safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
         }
 
         userAvatar.setOnClickListener {
@@ -279,7 +280,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 readAndArchive(threadUid)
                 isCurrentFolderRole(FolderRole.ARCHIVE)
             }
-            SwipeAction.SPAM -> markAsSpamOrHam(threadUid)
+            SwipeAction.SPAM -> {
+                toggleSpamOrHam(threadUid)
+                false
+            }
             SwipeAction.NONE -> throw IllegalStateException("Cannot swipe on an action which is not set")
             else -> {
                 notYetImplemented()

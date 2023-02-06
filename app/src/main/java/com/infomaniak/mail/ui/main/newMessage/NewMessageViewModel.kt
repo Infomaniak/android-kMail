@@ -33,7 +33,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.MergedContact
+import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.Companion.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
@@ -42,9 +42,7 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.LocalStorageUtils
-import com.infomaniak.mail.utils.getFileNameAndSize
+import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +66,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
 
-    private lateinit var snapshot: DraftSnapshot
+    private var snapshot: DraftSnapshot? = null
 
     private var isNewMessage = false
 
@@ -231,7 +229,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot.hasChanges()
+    fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
@@ -258,7 +256,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         importedAttachments.postValue(newAttachments to ImportationResult.SUCCESS)
     }
 
-    private fun importAttachment(uri: Uri, availableSpace: Int): Pair<Attachment?, Boolean>? {
+    private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
         val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
         if (fileSize > availableSpace) return null to true
 
@@ -268,9 +266,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
             } ?: (null to false)
     }
-
-    private fun String.htmlToText(): String = Jsoup.parse(replace("\r", "").replace("\n", "")).wholeText()
-    private fun String.textToHtml(): String = replace("\n", "<br>")
 
     override fun onCleared() {
         LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), draft.localUuid)
@@ -303,6 +298,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     private companion object {
         const val DELAY_BEFORE_AUTO_SAVING_DRAFT = 3_000L
-        const val FILE_SIZE_25_MB = 25 * 1024 * 1024
+        const val FILE_SIZE_25_MB = 25L * 1_024L * 1_024L
     }
 }

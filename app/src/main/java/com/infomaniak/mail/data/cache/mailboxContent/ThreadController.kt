@@ -20,9 +20,9 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Mailbox
+import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.data.models.thread.Thread
-import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -43,6 +43,10 @@ object ThreadController {
         return realm.query()
     }
 
+    private fun getOrphanThreadsQuery(realm: TypedRealm): RealmQuery<Thread> {
+        return realm.query("${Thread::folderId.name} == ''")
+    }
+
     private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm): RealmScalarQuery<Long> {
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
         val unseen = "${Thread::unseenMessagesCount.name} > 0"
@@ -52,8 +56,8 @@ object ThreadController {
 
     private fun getThreadsQuery(
         folderId: String,
-        filter: ThreadFilter = ThreadFilter.ALL,
         realm: TypedRealm,
+        filter: ThreadFilter = ThreadFilter.ALL,
     ): RealmQuery<Thread> {
 
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
@@ -84,12 +88,16 @@ object ThreadController {
         return getThreadsQuery(realm).find()
     }
 
+    fun getOrphanThreads(realm: TypedRealm): RealmResults<Thread> {
+        return getOrphanThreadsQuery(realm).find()
+    }
+
     fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {
         return getUnreadThreadsCountQuery(folderId, realm).find().toInt()
     }
 
     fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folderId, filter, defaultRealm).asFlow()
+        return getThreadsQuery(folderId, defaultRealm, filter).asFlow()
     }
 
     fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
@@ -102,9 +110,7 @@ object ThreadController {
     //endregion
 
     //region Edit data
-    fun MutableRealm.upsertThread(thread: Thread) {
-        copyToRealm(thread, UpdatePolicy.ALL)
-    }
+    fun MutableRealm.upsertThread(thread: Thread): Thread = copyToRealm(thread, UpdatePolicy.ALL)
 
     fun deleteThreads(folderId: String, realm: MutableRealm) {
         realm.delete(getThreadsQuery(folderId, realm = realm))
@@ -121,7 +127,7 @@ object ThreadController {
 
         realm.writeBlocking {
             messages.forEach { localMessage ->
-                if (!localMessage.fullyDownloaded) {
+                if (!localMessage.isFullyDownloaded) {
                     with(ApiRepository.getMessage(localMessage.resource, okHttpClient)) {
                         if (isSuccess()) {
                             data?.also { remoteMessage ->
@@ -135,7 +141,7 @@ object ThreadController {
                                 }
 
                                 remoteMessage.initLocalValues(
-                                    fullyDownloaded = true,
+                                    isFullyDownloaded = true,
                                     messageIds = localMessage.messageIds,
                                     isSpam = localMessage.isSpam,
                                     date = localMessage.date,
