@@ -40,12 +40,12 @@
             android:lineSpacingMultiplier="1"
             android:lines="1"
             android:maxLines="2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/itemBadge"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:drawableStartCompat="@drawable/ic_folder"
             app:drawableTint="?android:attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/itemBadge"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Folder (Default/Custom)" />
 
         <TextView
@@ -63,13 +63,13 @@
             android:id="@+id/itemTick"
             android:layout_width="wrap_content"
             android:layout_height="16dp"
+            android:contentDescription="@string/contentDescriptionIconFolderSelected"
             android:src="@drawable/ic_check"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="?android:attr/colorPrimary"
-            android:contentDescription="selected" />
+            app:tint="?android:attr/colorPrimary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
