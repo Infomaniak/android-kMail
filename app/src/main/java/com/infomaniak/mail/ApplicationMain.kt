@@ -150,7 +150,9 @@ class ApplicationMain : Application(), ImageLoaderFactory {
                 notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         } else {
-            Toast.makeText(this, notificationText, Toast.LENGTH_LONG).show()
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(this@ApplicationMain, notificationText, Toast.LENGTH_LONG).show()
+            }
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
