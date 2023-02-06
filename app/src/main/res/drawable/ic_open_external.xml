@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:tint="@color/iconColor"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group>
+        <clip-path android:pathData="M0,0h24v24h-24z" />
+        <path
+            android:pathData="M23.251,7.498V0.748H16.501"
+            android:strokeWidth="1"
+            android:strokeColor="#000"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M23.251,0.748L8.251,15.748"
+            android:strokeWidth="1"
+            android:strokeColor="#000"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M11.251,5.248H2.251C1.853,5.248 1.472,5.406 1.19,5.687C0.909,5.969 0.751,6.35 0.751,6.748V21.748C0.751,22.146 0.909,22.527 1.19,22.809C1.472,23.09 1.853,23.248 2.251,23.248H17.251C17.649,23.248 18.03,23.09 18.312,22.809C18.593,22.527 18.751,22.146 18.751,21.748V12.748"
+            android:strokeWidth="1"
+            android:strokeColor="#000"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>
