@@ -65,10 +65,12 @@
             app:icon="@drawable/ic_email_action_move"
             app:text="@string/actionMove" />
 
+        <!-- TODO: Display this when Postpone/Snooze action will be done (v2) -->
         <com.infomaniak.mail.ui.main.thread.actions.ActionItemView
             android:id="@+id/postpone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:icon="@drawable/ic_alarm_clock"
             app:text="@string/actionPostpone" />
 
