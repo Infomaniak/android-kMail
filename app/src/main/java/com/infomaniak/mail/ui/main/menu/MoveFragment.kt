@@ -26,6 +26,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -58,8 +59,6 @@ class MoveFragment : Fragment() {
         setupAdapters()
         setupListeners()
         observeFolders()
-
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
     private fun setupAdapters() = with(binding) {
@@ -67,8 +66,10 @@ class MoveFragment : Fragment() {
         customFoldersList.adapter = customFoldersAdapter
     }
 
-    private fun setupListeners() {
-        binding.inboxFolder.setOnClickListener { inboxFolderId?.let(::moveToFolder) }
+    private fun setupListeners() = with(binding) {
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        iconAddFolder.setOnClickListener { safeNavigate(MoveFragmentDirections.actionMoveFragmentToNewFolderDialog()) }
+        inboxFolder.setOnClickListener { inboxFolderId?.let(::moveToFolder) }
     }
 
     private fun observeFolders() = with(navigationArgs) {

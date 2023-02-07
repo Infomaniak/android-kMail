@@ -177,9 +177,6 @@
         <action
             android:id="@+id/action_messageActionsBottomSheet_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
-        <action
-            android:id="@+id/action_messageActionsBottomSheet_to_moveFragment"
-            app:destination="@id/moveFragment" />
     </dialog>
 
     <dialog
@@ -198,9 +195,6 @@
         <action
             android:id="@+id/action_threadActionsBottomSheet_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
-        <action
-            android:id="@+id/action_threadActionsBottomSheet_to_moveFragment"
-            app:destination="@id/moveFragment" />
     </dialog>
 
     <dialog
@@ -232,6 +226,9 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_moveFragment_to_newFolderDialog"
+            app:destination="@id/newFolderDialog" />
     </fragment>
 
     <fragment
