@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -43,6 +44,7 @@ import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChange
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
+import com.google.android.material.R as RMaterial
 
 class ThreadFragment : Fragment() {
 
@@ -223,7 +225,12 @@ class ThreadFragment : Fragment() {
 
         iconFavorite.apply {
             setIconResource(if (thread.isFavorite) R.drawable.ic_star_filled else R.drawable.ic_star)
-            setIconTintResource(if (thread.isFavorite) R.color.favoriteYellow else R.color.iconColor)
+            val color = if (thread.isFavorite) {
+                context.getColor(R.color.favoriteYellow)
+            } else {
+                context.getAttributeColor(RMaterial.attr.colorPrimary)
+            }
+            iconTint = ColorStateList.valueOf(color)
         }
     }
 
