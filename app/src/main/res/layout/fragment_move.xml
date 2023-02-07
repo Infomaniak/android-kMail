@@ -71,11 +71,10 @@
             android:background="@color/backgroundColor"
             android:scrollbars="none">
 
-            <!-- TODO replace 12dp by alternativeMargin when https://github.com/Infomaniak/android-mail/pull/515 will be merged -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="@dimen/alternativeMargin"
                 android:layout_marginBottom="@dimen/marginStandardMedium"
                 android:animateLayoutChanges="true"
                 android:orientation="vertical">
