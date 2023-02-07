@@ -68,12 +68,12 @@ class ThreadListAdapter(
 
     private val localSettings by lazy { LocalSettings.getInstance(context) }
 
-    private val CARD_CORNER_RADIUS by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
-    private val THREAD_MARGIN_LARGE by lazy { context.resources.getDimension(R.dimen.alternativeMargin).toInt() }
-    private val THREAD_MARGIN_OTHER by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
-    private val DATE_TOP_MARGIN_LARGE by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
-    private val DATE_BOTTOM_MARGIN_LARGE by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
-    private val DATE_TOP_MARGIN_OTHER by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
+    private val cardCornerRadius by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
+    private val threadMarginLarge by lazy { context.resources.getDimension(R.dimen.alternativeMargin).toInt() }
+    private val threadMarginOther by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
+    private val dateTopMarginLarge by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
+    private val dateBottomMarginLarge by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
+    private val dateTopMarginOther by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -157,7 +157,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
-        val margin = if (threadDensity == LARGE) THREAD_MARGIN_LARGE else THREAD_MARGIN_OTHER
+        val margin = if (threadDensity == LARGE) threadMarginLarge else threadMarginOther
         threadCard.setMarginsRelative(top = margin, bottom = margin)
 
         expeditorAvatar.isVisible = threadDensity == LARGE
@@ -208,9 +208,9 @@ class ThreadListAdapter(
 
     private fun ItemThreadDateSeparatorBinding.setupDateSeparatorDensityDependentUi() {
         val (topMargin, bottomMargin) = if (threadDensity == LARGE) {
-            DATE_TOP_MARGIN_LARGE to DATE_BOTTOM_MARGIN_LARGE
+            dateTopMarginLarge to dateBottomMarginLarge
         } else {
-            DATE_TOP_MARGIN_OTHER to DATE_BOTTOM_MARGIN_OTHER
+            dateTopMarginOther to DATE_BOTTOM_MARGIN_OTHER
         }
         root.setMarginsRelative(top = topMargin, bottom = bottomMargin)
     }
@@ -273,7 +273,7 @@ class ThreadListAdapter(
 
         val cardView = root as MaterialCardView
         cardView.cardElevation = cappedLinearInterpolator(CARD_ELEVATION, progress)
-        cardView.radius = cappedLinearInterpolator(CARD_CORNER_RADIUS, progress)
+        cardView.radius = cappedLinearInterpolator(cardCornerRadius, progress)
     }
 
     private fun cappedLinearInterpolator(max: Float, progress: Float): Float {
