@@ -202,7 +202,7 @@ class ThreadFragment : Fragment() {
     private fun downloadAllAttachments(message: Message) {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return,
-            folderId = mainViewModel.currentFolder.value?.id ?: return,
+            folderId = mainViewModel.currentFolderId.value ?: return,
             messageId = message.shortUid,
         )
         val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }

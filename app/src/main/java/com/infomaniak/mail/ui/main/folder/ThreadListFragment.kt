@@ -276,7 +276,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             SwipeAction.MOVE -> {
                 animatedNavigation(
-                    ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(currentFolder.value!!.id, threadUid)
+                    ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(currentFolderId.value!!, threadUid)
                 )
                 false
             }

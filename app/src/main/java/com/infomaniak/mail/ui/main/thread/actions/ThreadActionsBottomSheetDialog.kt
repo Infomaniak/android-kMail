@@ -65,7 +65,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             move.setClosingOnClickListener {
                 animatedNavigation(
                     resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(mainViewModel.currentFolder.value!!.id, threadUid).toBundle(),
+                    args = MoveFragmentArgs(mainViewModel.currentFolderId.value!!, threadUid).toBundle(),
                     currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
                 )
             }

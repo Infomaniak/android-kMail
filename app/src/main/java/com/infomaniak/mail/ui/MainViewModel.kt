@@ -95,7 +95,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Current Folder
-    private val currentFolderId = MutableLiveData<String?>(null)
+    val currentFolderId = MutableLiveData<String?>(null)
 
     val currentFolder = currentFolderId.switchMap { folderId ->
         liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
@@ -217,7 +217,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        if (folderId == currentFolder.value?.id) return@launch
+        if (folderId == currentFolderId.value) return@launch
 
         selectFolder(folderId)
         refreshThreads(folderId = folderId)
@@ -267,7 +267,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
-        folderId: String? = currentFolder.value?.id,
+        folderId: String? = currentFolderId.value,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
 
         if (mailbox == null || folderId == null) return@launch
