@@ -92,7 +92,7 @@
 
             <TextView
                 android:id="@+id/expeditor"
-                style="@style/H2"
+                style="@style/BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/marginStandardSmall"
