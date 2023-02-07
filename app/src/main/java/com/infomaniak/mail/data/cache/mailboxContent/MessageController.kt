@@ -181,7 +181,7 @@ object MessageController {
         val updatedThreads = handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
 
         SentryDebug.sendOrphanMessagesSentry(previousCursor, folder, realm)
-        SentryDebug.sendOrphanThreadsSentry(previousCursor, folder.cursor, realm)
+        SentryDebug.sendOrphanThreadsSentry(previousCursor, folder, realm)
 
         return updatedThreads
     }
@@ -345,7 +345,7 @@ object MessageController {
         uids.forEach { messageUid ->
             val message = getMessage(messageUid, this) ?: return@forEach
 
-            for (thread in message.parentThreads.reversed()) {
+            for (thread in message.parentsFromMessage.reversed()) {
 
                 val isSuccess = thread.messages.removeIf { it.uid == messageUid }
                 val numberOfMessagesInFolder = thread.messages.count { it.folderId == thread.folderId }
@@ -383,7 +383,7 @@ object MessageController {
             val uid = flags.shortUid.toLongUid(folderId)
             getMessage(uid, realm = this)?.let { message ->
                 message.updateFlags(flags)
-                threads += message.parentThreads
+                threads += message.parentsFromMessage
             }
         }
 
