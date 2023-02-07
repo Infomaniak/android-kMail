@@ -35,17 +35,15 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
-
-        val threadUid = navigationArgs.threadUid
 
         threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
 
-        postpone.isGone = true
+        binding.postpone.isGone = true
 
         threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
@@ -54,11 +52,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
             initOnClickListener(object : OnActionClick {
                 override fun onArchive() {
-                    mainViewModel.archiveThreadOrMessage(navigationArgs.threadUid)
+                    mainViewModel.archiveThreadOrMessage(threadUid)
                 }
 
                 override fun onReadUnread() {
-                    mainViewModel.toggleSeenStatus(navigationArgs.threadUid)
+                    mainViewModel.toggleSeenStatus(threadUid)
                     findNavController().popBackStack(R.id.threadListFragment, false)
                 }
 
@@ -71,7 +69,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
 
                 override fun onFavorite() {
-                    mainViewModel.toggleFavoriteStatus(navigationArgs.threadUid)
+                    mainViewModel.toggleFavoriteStatus(threadUid)
                 }
 
                 override fun onReportJunk() {

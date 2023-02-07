@@ -29,16 +29,13 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
-
-        val threadUid = navigationArgs.threadUid
-        val messageUid = navigationArgs.messageUid
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
-            setMarkAsReadUi(navigationArgs.isSeen)
-            setFavoriteUi(navigationArgs.isFavorite)
+            setMarkAsReadUi(isSeen)
+            setFavoriteUi(isFavorite)
 
             initOnClickListener(object : OnActionClick {
                 override fun onArchive() {
