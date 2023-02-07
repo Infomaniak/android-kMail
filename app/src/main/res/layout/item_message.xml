@@ -150,7 +150,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/deleteDraftButton"
-                    style="@style/ToolbarIcon"
+                    style="@style/IconButton"
                     android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
                     android:visibility="gone"
                     app:icon="@drawable/ic_bin"
@@ -161,7 +161,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/replyButton"
-                    style="@style/ToolbarIcon"
+                    style="@style/IconButton"
                     android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
                     app:icon="@drawable/ic_email_action_reply"
                     app:layout_constraintEnd_toStartOf="@id/menuButton"
@@ -169,7 +169,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/menuButton"
-                    style="@style/ToolbarIcon"
+                    style="@style/IconButton"
                     android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
                     app:icon="@drawable/ic_param_dots"
                     app:layout_constraintEnd_toEndOf="parent"

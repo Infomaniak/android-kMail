@@ -60,7 +60,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/actionButton"
-            style="@style/ToolbarIcon"
+            style="@style/IconButton"
             android:visibility="gone"
             app:icon="@drawable/ic_add_circle"
             app:iconSize="16dp"

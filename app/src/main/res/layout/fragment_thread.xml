@@ -52,7 +52,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/iconFavorite"
-                style="@style/ToolbarIcon"
+                style="@style/IconButton"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 app:icon="@drawable/ic_star"
                 app:layout_constraintBottom_toBottomOf="parent"

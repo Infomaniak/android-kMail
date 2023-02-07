@@ -23,7 +23,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button1"
-        style="@style/IconButton"
+        style="@style/IconButtonSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="?attr/colorPrimaryContainer"
@@ -53,7 +53,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button2"
-        style="@style/IconButton"
+        style="@style/IconButtonSmall"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:backgroundTint="?attr/colorPrimaryContainer"
@@ -84,7 +84,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button3"
-        style="@style/IconButton"
+        style="@style/IconButtonSmall"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:backgroundTint="?attr/colorPrimaryContainer"
@@ -115,7 +115,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button4"
-        style="@style/IconButton"
+        style="@style/IconButtonSmall"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:backgroundTint="?attr/colorPrimaryContainer"

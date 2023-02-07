@@ -52,7 +52,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settingsButton"
-                style="@style/ToolbarIcon"
+                style="@style/IconButton"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
                 app:icon="@drawable/ic_cog"
                 app:layout_constraintEnd_toEndOf="parent" />

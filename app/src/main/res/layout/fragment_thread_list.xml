@@ -55,7 +55,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/searchButton"
-                        style="@style/ToolbarIcon"
+                        style="@style/IconButton"
                         app:icon="@drawable/ic_search"
                         app:iconSize="24dp"
                         app:iconTint="?android:attr/colorPrimary" />
