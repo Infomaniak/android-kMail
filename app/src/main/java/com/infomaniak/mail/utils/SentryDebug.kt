@@ -20,6 +20,7 @@ package com.infomaniak.mail.utils
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft
@@ -62,12 +63,15 @@ object SentryDebug {
             it.parentsFromMessage.isEmpty() && it.parentsFromDuplicate.isEmpty()
         }
         if (orphanMessages.isNotEmpty()) {
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
-                scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "${realm.writeBlocking { findLatest(folder) }?.cursor}")
-                Sentry.captureMessage("We found some orphan Messages.")
+            RealmDatabase.mailboxContent().writeBlocking {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("orphanMessages", "${orphanMessages.map { it.uid }}")
+                    scope.setExtra("previousCursor", "$previousCursor")
+                    scope.setExtra("newCursor", "${findLatest(folder)?.cursor}")
+                    Sentry.captureMessage("We found some orphan Messages.")
+                }
+                deleteMessages(orphanMessages)
             }
         }
     }
