@@ -39,7 +39,7 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
@@ -51,8 +51,8 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     private lateinit var binding: FragmentMenuDrawerBinding
 
     override val inboxFolder: MenuDrawerItemView by lazy { binding.inboxFolder }
-    override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
+    override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
     var exitDrawer: (() -> Unit)? = null
     var isDrawerOpen: (() -> Boolean)? = null
@@ -76,9 +76,6 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         displayVersion()
 
-        setupAdapters()
-        setupListeners()
-
         observeCurrentMailbox()
         observeMailboxesLive()
         observeCurrentFolder()
@@ -86,21 +83,9 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeQuotas()
     }
 
-    override fun onFolderClicked(folderId: String) {
-        mainViewModel.openFolder(folderId)
-        closeDrawer()
-    }
+    override fun setupListeners() = with(binding) {
+        super.setupListeners()
 
-    @SuppressLint("SetTextI18n")
-    private fun displayVersion() {
-        binding.appVersionName.text = "kMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-    }
-
-    private fun setupAdapters() {
-        binding.addressesList.adapter = addressAdapter
-    }
-
-    private fun setupListeners() = with(binding) {
         settingsButton.setOnClickListener {
             closeDrawer()
             safeNavigate(
@@ -158,6 +143,21 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         }
     }
 
+    override fun setupAdapters() {
+        super.setupAdapters()
+        binding.addressesList.adapter = addressAdapter
+    }
+
+    override fun onFolderSelected(folderId: String) {
+        mainViewModel.openFolder(folderId)
+        closeDrawer()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun displayVersion() {
+        binding.appVersionName.text = "kMail Android version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    }
+
     private fun menuDrawerSafeNavigate(destinationResId: Int) {
         if (canNavigate) {
             canNavigate = false
@@ -199,7 +199,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
-            binding.inboxFolder.setSelectedState(folder.role == Folder.FolderRole.INBOX)
+            binding.inboxFolder.setSelectedState(folder.role == FolderRole.INBOX)
 
             defaultFoldersAdapter.updateSelectedState(folder.id)
             customFoldersAdapter.updateSelectedState(folder.id)
@@ -214,10 +214,9 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolder = currentFolder.value ?: return@refreshObserve
-
-            defaultFoldersAdapter.setFolders(defaultFolders, currentFolder.id)
-            customFoldersAdapter.setFolders(customFolders, currentFolder.id)
+            val currentFolderId = currentFolderId.value ?: return@refreshObserve
+            defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
+            customFoldersAdapter.setFolders(customFolders, currentFolderId)
         }
     }
 

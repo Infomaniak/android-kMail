@@ -36,9 +36,9 @@ class MoveFragment : MenuFoldersFragment() {
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
 
-    override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
-    override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val inboxFolder: MenuDrawerItemView by lazy { binding.inboxFolder }
+    override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
+    override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
     override val isInMenuDrawer = false
 
@@ -48,23 +48,20 @@ class MoveFragment : MenuFoldersFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-
         observeFolders()
     }
 
-    override fun onFolderClicked(folderId: String): Unit = with(navigationArgs) {
+    override fun setupListeners() = with(binding) {
+        super.setupListeners()
+
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        iconAddFolder.setOnClickListener { safeNavigate(MoveFragmentDirections.actionMoveFragmentToNewFolderDialog()) }
+    }
+
+    override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
         mainViewModel.moveTo(folderId, threadUid, messageUid)
         findNavController().popBackStack()
     }
-
-private fun setupListeners() = with(binding) {
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        iconAddFolder.setOnClickListener { safeNavigate(MoveFragmentDirections.actionMoveFragmentToNewFolderDialog()) }
-        inboxFolder.setOnClickListener { inboxFolderId?.let(::moveToFolder) }
-    }
-
 
     private fun observeFolders() = with(navigationArgs) {
         moveViewModel.currentFolders.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->

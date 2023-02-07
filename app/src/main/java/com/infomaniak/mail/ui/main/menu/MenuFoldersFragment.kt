@@ -29,37 +29,37 @@ abstract class MenuFoldersFragment : Fragment() {
 
     protected val mainViewModel: MainViewModel by activityViewModels()
 
-    protected abstract val customFoldersList: RecyclerView
-    protected abstract val defaultFoldersList: RecyclerView
     protected abstract val inboxFolder: MenuDrawerItemView
+    protected abstract val defaultFoldersList: RecyclerView
+    protected abstract val customFoldersList: RecyclerView
 
     protected open val isInMenuDrawer: Boolean = true
 
     protected var inboxFolderId: String? = null
 
-    protected val customFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(onClick = ::onFolderClicked, isInMenuDrawer = isInMenuDrawer)
-    }
-
     protected val defaultFoldersAdapter: FolderAdapter by lazy {
-        FolderAdapter(onClick = ::onFolderClicked, isInMenuDrawer = isInMenuDrawer)
+        FolderAdapter(onClick = ::onFolderSelected, isInMenuDrawer = isInMenuDrawer)
     }
 
-    protected abstract fun onFolderClicked(folderId: String)
+    protected val customFoldersAdapter: FolderAdapter by lazy {
+        FolderAdapter(onClick = ::onFolderSelected, isInMenuDrawer = isInMenuDrawer)
+    }
+
+    protected abstract fun onFolderSelected(folderId: String)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupAdapters()
         setupListeners()
+        setupAdapters()
     }
 
-    private fun setupAdapters() {
+    open fun setupListeners() {
+        inboxFolder.setOnClickListener { inboxFolderId?.let(::onFolderSelected) }
+    }
+
+    open fun setupAdapters() {
         defaultFoldersList.adapter = defaultFoldersAdapter
         customFoldersList.adapter = customFoldersAdapter
-    }
-
-    private fun setupListeners() {
-        inboxFolder.setOnClickListener { inboxFolderId?.let(::onFolderClicked) }
     }
 }
