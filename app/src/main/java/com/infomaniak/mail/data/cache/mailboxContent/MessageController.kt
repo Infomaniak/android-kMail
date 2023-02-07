@@ -128,7 +128,7 @@ object MessageController {
         messages.reversed().forEach { deleteMessage(it.uid, realm = this) }
     }
 
-    private fun deleteMessage(uid: String, realm: MutableRealm) {
+    fun deleteMessage(uid: String, realm: MutableRealm) {
         getMessage(uid, realm)?.let { message ->
             DraftController.getDraftByMessageUid(message.uid, realm)?.let(realm::delete)
             realm.delete(message)

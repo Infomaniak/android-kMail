@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.utils
 
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
@@ -48,6 +49,9 @@ object SentryDebug {
                     scope.setExtra("previousCursor", "${folder.cursor}")
                     scope.setExtra("newCursor", newCursor)
                     Sentry.captureMessage("We tried to download some Messages, but they were nowhere to be found.")
+                }
+                RealmDatabase.mailboxContent().writeBlocking {
+                    missingUids.forEach { MessageController.deleteMessage(it, realm = this) }
                 }
             }
         }
