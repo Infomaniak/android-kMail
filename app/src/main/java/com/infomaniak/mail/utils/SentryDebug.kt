@@ -113,6 +113,7 @@ object SentryDebug {
                 )
                 Sentry.captureMessage("We found some orphan Drafts.")
             }
+            RealmDatabase.mailboxContent().writeBlocking { delete(orphanDrafts) }
         }
     }
 }
