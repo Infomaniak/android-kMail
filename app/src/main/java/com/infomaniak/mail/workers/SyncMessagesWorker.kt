@@ -24,6 +24,8 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
 import androidx.work.PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
+import com.infomaniak.lib.core.api.ApiController
+import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.NotificationUtilsCore.Companion.pendingIntentFlags
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.mail.R
@@ -39,12 +41,15 @@ import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.ApiErrorException
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import com.infomaniak.mail.utils.formatSubject
 import com.infomaniak.mail.utils.htmlToText
 import io.realm.kotlin.Realm
+import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
@@ -70,7 +75,12 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 if (folder.cursor == null) return@loopMailboxes
 
                 val okHttpClient = AccountUtils.getHttpClient(user.id)
-                val newMessagesThreads = MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, realm)
+                val newMessagesThreads = runCatching {
+                    MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, realm)
+                }.getOrElse {
+                    if (it is ApiErrorException) handleApiError(it) else throw it
+                    return@loopMailboxes
+                }
                 Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
 
                 // Notify all new messages
@@ -154,6 +164,13 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
             unReadThreadsCount
         )
         showNotification(summaryText, true)
+    }
+
+    private fun handleApiError(exception: ApiErrorException) {
+        when (ApiController.json.decodeFromString<ApiResponse<Any>>(exception.message!!).error?.code) {
+            "folder__not_exists" -> Unit
+            else -> Sentry.captureException(exception)
+        }
     }
 
     companion object {
