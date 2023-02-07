@@ -39,8 +39,8 @@ object FolderController {
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
-    private fun getFoldersQuery(): RealmQuery<Folder> {
-        return defaultRealm.query()
+    private fun getFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+        return realm.query()
     }
 
     private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
@@ -55,11 +55,16 @@ object FolderController {
 
     //region Get data
     fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm = defaultRealm): RealmResults<Folder> {
-        return getFoldersQuery(exceptionsFoldersIds, realm).find()
+        val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
+            getFoldersQuery(realm)
+        } else {
+            getFoldersQuery(exceptionsFoldersIds, realm)
+        }
+        return realmQuery.find()
     }
 
     fun getFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery().asFlow()
+        return getFoldersQuery(defaultRealm).asFlow()
     }
 
     fun getFolder(id: String, realm: TypedRealm = defaultRealm): Folder? {
