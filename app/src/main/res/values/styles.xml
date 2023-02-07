@@ -177,16 +177,16 @@
     </style>
 
     <style name="IconButton" parent="Widget.Material3.Button.TextButton">
-        <item name="android:insetBottom">4dp</item>
-        <item name="android:insetLeft">4dp</item>
-        <item name="android:insetRight">4dp</item>
-        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetLeft">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetRight">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetTop">@dimen/marginStandardVerySmall</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:layout_width">40dp</item>
         <item name="cornerRadius">@dimen/roundCornerRadius</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">0dp</item>
-        <item name="iconSize">24dp</item>
+        <item name="iconSize">@dimen/marginStandard</item>
         <item name="iconTint">?attr/colorPrimary</item>
     </style>
 
