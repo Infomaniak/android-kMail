@@ -44,6 +44,8 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         messageActionsViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
+            if (message == null) return@observe
+
             setMarkAsReadUi(navigationArgs.isSeen)
             setFavoriteUi(navigationArgs.isFavorite)
             setSpamUi(message)
@@ -53,8 +55,8 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             move.setClosingOnClickListener {
                 safeNavigate(
                     resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(threadUid, messageUid).toBundle(),
-                    currentClassName = MessageActionsBottomSheetDialog::class.java.name
+                    args = MoveFragmentArgs(message.folderId, threadUid, messageUid).toBundle(),
+                    currentClassName = MessageActionsBottomSheetDialog::class.java.name,
                 )
             }
             postpone.setClosingOnClickListener { notYetImplemented() }

@@ -23,18 +23,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.refreshObserve
 
 class MoveFragment : Fragment() {
 
     private lateinit var binding: FragmentMoveBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val navigationArgs: MoveFragmentArgs by navArgs()
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private val moveViewModel: MoveViewModel by viewModels()
 
     private var inboxFolderId: String? = null
 
@@ -56,7 +57,7 @@ class MoveFragment : Fragment() {
 
         setupAdapters()
         setupListeners()
-        observeFoldersLive()
+        observeFolders()
 
         binding.toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
     }
@@ -70,15 +71,14 @@ class MoveFragment : Fragment() {
         binding.inboxFolder.setOnClickListener { inboxFolderId?.let(::moveToFolder) }
     }
 
-    private fun observeFoldersLive() {
-        mainViewModel.currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+    private fun observeFolders() = with(navigationArgs) {
+        moveViewModel.currentFolders.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
 
-            val currentFolder = mainViewModel.currentFolder.value ?: return@refreshObserve
-            binding.inboxFolder.setSelectedState(currentFolder.role == Folder.FolderRole.INBOX)
-            defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == Folder.FolderRole.DRAFT }, currentFolder.id)
-            customFoldersAdapter.setFolders(customFolders, currentFolder.id)
+            binding.inboxFolder.setSelectedState(folderId == inboxFolderId)
+            defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
+            customFoldersAdapter.setFolders(customFolders, folderId)
         }
     }
 

@@ -65,8 +65,8 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             move.setClosingOnClickListener {
                 safeNavigate(
                     resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(threadUid).toBundle(),
-                    currentClassName = ThreadActionsBottomSheetDialog::class.java.name
+                    args = MoveFragmentArgs(mainViewModel.currentFolder.value!!.id, threadUid).toBundle(),
+                    currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
                 )
             }
             favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }

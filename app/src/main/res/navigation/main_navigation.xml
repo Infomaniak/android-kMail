@@ -222,6 +222,9 @@
         android:label="MoveFragment"
         tools:layout="@layout/fragment_move">
         <argument
+            android:name="folderId"
+            app:argType="string" />
+        <argument
             android:name="threadUid"
             app:argType="string" />
         <argument

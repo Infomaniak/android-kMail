@@ -39,16 +39,13 @@ import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
-import com.infomaniak.mail.utils.getFoldersIds
-import com.infomaniak.mail.utils.getUids
-import com.infomaniak.mail.utils.handlerIO
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +79,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) {
                 mailboxObjectId?.let {
-                    emitSource(FolderController.getFoldersAsync().map { getMenuFolders(it.list) }.asLiveData())
+                    emitSource(FolderController.getFoldersAsync().map { it.list.getMenuFolders() }.asLiveData())
                 }
             }
         }
@@ -573,27 +570,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
-        }
-    }
-
-    private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
-        return folders.toMutableList().let { list ->
-
-            val inbox = list
-                .find { it.role == FolderRole.INBOX }
-                ?.also(list::remove)
-
-            val defaultFolders = list
-                .filter { it.role != null }
-                .sortedBy { it.role?.order }
-                .also(list::removeAll)
-
-            val customFolders = list
-                .filter { it.parentFolder == null }
-                .sortedByDescending { it.isFavorite }
-                .formatFoldersListWithAllChildren()
-
-            Triple(inbox, defaultFolders, customFolders)
         }
     }
 

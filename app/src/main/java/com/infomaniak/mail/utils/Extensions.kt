@@ -42,10 +42,12 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -223,6 +225,29 @@ fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> U
 inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
     removeObservers(viewLifecycleOwner)
     observe(viewLifecycleOwner, observer)
+}
+//endregion
+
+//region Folders
+fun List<Folder>.getMenuFolders(): Triple<Folder?, List<Folder>, List<Folder>> {
+    return toMutableList().let { list ->
+
+        val inbox = list
+            .find { it.role == Folder.FolderRole.INBOX }
+            ?.also(list::remove)
+
+        val defaultFolders = list
+            .filter { it.role != null }
+            .sortedBy { it.role?.order }
+            .also(list::removeAll)
+
+        val customFolders = list
+            .filter { it.parentFolder == null }
+            .sortedByDescending { it.isFavorite }
+            .formatFoldersListWithAllChildren()
+
+        Triple(inbox, defaultFolders, customFolders)
+    }
 }
 //endregion
 

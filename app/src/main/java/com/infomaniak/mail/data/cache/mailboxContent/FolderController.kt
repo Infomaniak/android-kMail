@@ -54,7 +54,7 @@ object FolderController {
     //endregion
 
     //region Get data
-    private fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm): RealmResults<Folder> {
+    fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm = defaultRealm): RealmResults<Folder> {
         return getFoldersQuery(exceptionsFoldersIds, realm).find()
     }
 
