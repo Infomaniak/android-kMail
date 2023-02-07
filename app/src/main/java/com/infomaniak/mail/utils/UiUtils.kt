@@ -131,14 +131,13 @@ object UiUtils {
         }
     }
 
-
     fun Fragment.handleJunkBottomSheet() {
         getBackNavigationResult<Bundle>(JUNK_BOTTOM_SHEET_NAV_KEY) {
             val shouldOpenJunk = it.getBoolean(SHOULD_OPEN_JUNK)
             val messageUid = it.getString(MESSAGE_UID)
-            val threadUid = it.getString(THREAD_UID)
+            val threadUid = it.getString(THREAD_UID)!!
 
-            val args = JunkBottomSheetDialogArgs(threadUid!!, messageUid).toBundle()
+            val args = JunkBottomSheetDialogArgs(threadUid, messageUid).toBundle()
             if (shouldOpenJunk) safeNavigate(R.id.junkBottomSheetDialog, args)
         }
     }
