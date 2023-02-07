@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
     <!-- View sizes -->
 
     <dimen name="attachmentChipMaxSize">160dp</dimen>
+    <dimen name="alternativeMargin">12dp</dimen>
     <dimen name="chevronSize">12dp</dimen>
     <dimen name="iconButtonSize">32dp</dimen>
     <dimen name="iconImageSize">20dp</dimen>
