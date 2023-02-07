@@ -140,7 +140,8 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         val subject = applicationContext.formatSubject(message.subject)
         val preview = message.body?.value?.ifBlank { null }
             ?.let { "\n${it.htmlToText().trim()}" } // TODO: remove body history
-            ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" } ?: ""
+            ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
+            ?: ""
         val formattedPreview = preview.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
         val description = "$subject$formattedPreview"
 
