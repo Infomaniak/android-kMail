@@ -22,10 +22,12 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
+import androidx.annotation.IdRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -171,6 +173,10 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean)
 //region Navigation
 fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: String? = null) {
     if (canNavigate(currentClassName)) findNavController().navigate(directions, getAnimatedNavOptions())
+}
+
+fun Fragment.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String? = null) {
+    if (canNavigate(currentClassName)) findNavController().navigate(resId, args, getAnimatedNavOptions())
 }
 
 fun getAnimatedNavOptions() = NavOptions

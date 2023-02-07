@@ -31,7 +31,7 @@
         app:navigationIconTint="?android:attr/colorPrimary"
         app:titleTextAppearance="@style/H2">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical">
@@ -41,14 +41,11 @@
                 style="@style/H1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:lines="1"
-                android:text="@string/actionMove"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/iconAddFolder"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:text="@string/actionMove" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/iconAddFolder"
@@ -57,11 +54,8 @@
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 app:icon="@drawable/ic_folder_add"
                 app:iconSize="24dp"
-                app:iconTint="?android:attr/colorPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                app:iconTint="?android:attr/colorPrimary" />
+        </LinearLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
     <com.google.android.material.card.MaterialCardView
@@ -77,10 +71,12 @@
             android:background="@color/backgroundColor"
             android:scrollbars="none">
 
+            <!-- TODO replace 12dp by alternativeMargin when https://github.com/Infomaniak/android-mail/pull/515 will be merged -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginVertical="@dimen/marginStandardMedium"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="@dimen/marginStandardMedium"
                 android:animateLayoutChanges="true"
                 android:orientation="vertical">
 

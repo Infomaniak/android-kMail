@@ -22,11 +22,11 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
@@ -53,7 +53,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid, message) }
             markAsReadUnread.setClosingOnClickListener { mainViewModel.toggleSeenStatus(threadUid, message) }
             move.setClosingOnClickListener {
-                safeNavigate(
+                animatedNavigation(
                     resId = R.id.moveFragment,
                     args = MoveFragmentArgs(message.folderId, threadUid, messageUid).toBundle(),
                     currentClassName = MessageActionsBottomSheetDialog::class.java.name,

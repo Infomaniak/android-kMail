@@ -37,7 +37,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.collections.set
 
 class ThreadViewModel(application: Application) : AndroidViewModel(application) {
 

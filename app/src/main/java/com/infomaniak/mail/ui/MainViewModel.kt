@@ -306,7 +306,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid) ?: return null
 
         val messages = when (message) {
-            null -> MessageController.getMoveableMessages(thread, currentFolderId.value!!)
+            null -> MessageController.getMovableMessages(thread, currentFolderId.value!!)
             else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
@@ -417,27 +417,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Move
-    fun moveTo(destinationFolderId: String, threadUid: String, messageUid: String? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val thread = ThreadController.getThread(threadUid) ?: return@launch
-            val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
-            val messages = when (message) {
-                null -> MessageController.getMoveableMessages(thread, currentFolderId.value!!)
-                else -> MessageController.getMessageAndDuplicates(thread, message)
-            }
-
-            val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
-
-            if (apiResponse.isSuccess()) {
-                refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
-            }
-
-            val undoDestinationId = message?.folderId ?: currentFolderId.value
-            val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-
-            showMoveSnackbar(message, apiResponse, destinationFolderId, undoFoldersIds, undoDestinationId)
+    fun moveTo(
+        destinationFolderId: String,
+        threadUid: String,
+        messageUid: String? = null,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value ?: return@launch
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
+        val messages = when (message) {
+            null -> MessageController.getMovableMessages(thread, currentFolderId.value!!)
+            else -> MessageController.getMessageAndDuplicates(thread, message)
         }
+
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
+
+        if (apiResponse.isSuccess()) {
+            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
+        }
+
+        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+
+        showMoveSnackbar(message, apiResponse, destinationFolderId, undoFoldersIds, undoDestinationId)
     }
 
     private fun showMoveSnackbar(

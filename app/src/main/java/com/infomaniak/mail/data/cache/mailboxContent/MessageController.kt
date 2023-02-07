@@ -93,7 +93,7 @@ object MessageController {
         return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
     }
 
-    fun getMoveableMessages(thread: Thread, folderId: String) = getMessagesAndDuplicates(thread, byFolderId(folderId))
+    fun getMovableMessages(thread: Thread, folderId: String) = getMessagesAndDuplicates(thread, byFolderId(folderId))
 
     fun getUnscheduledMessages(thread: Thread) = getMessagesAndDuplicates(thread, isNotScheduled)
 
