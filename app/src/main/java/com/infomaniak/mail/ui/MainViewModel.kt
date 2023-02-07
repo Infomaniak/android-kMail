@@ -306,7 +306,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid) ?: return null
 
         val messages = when (message) {
-            null -> MessageController.getMovableMessages(thread, currentFolderId.value!!)
+            null -> MessageController.getMovableMessages(thread, thread.folderId)
             else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
@@ -322,7 +322,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoDestinationId = message?.folderId ?: thread.folderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + archiveId
         showArchiveSnackbar(message, apiResponse, undoFoldersIds, undoDestinationId)
 
@@ -378,7 +378,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId)
 
-        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoDestinationId = message?.folderId ?: thread.folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
         showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource, undoFoldersIds, undoDestinationId)
     }
@@ -426,7 +426,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
         val messages = when (message) {
-            null -> MessageController.getMovableMessages(thread, currentFolderId.value!!)
+            null -> MessageController.getMovableMessages(thread, thread.folderId)
             else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
@@ -436,7 +436,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
-        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoDestinationId = message?.folderId ?: thread.folderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
 
         showMoveSnackbar(message, apiResponse, destinationFolderId, undoFoldersIds, undoDestinationId)
@@ -533,7 +533,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
-        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoDestinationId = message?.folderId ?: thread.folderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
         showSpamSnackbar(message, apiResponse, destinationFolderRole, undoFoldersIds, undoDestinationId)
     }
