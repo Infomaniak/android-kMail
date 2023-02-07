@@ -292,7 +292,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
         archiveThreadOrMessageSync(threadUid, withRefresh = false)?.also(messagesFoldersIds::addAll)
 
-        refreshFolders(mailbox, messagesFoldersIds, archiveId)
+        if (messagesFoldersIds.isNotEmpty()) refreshFolders(mailbox, messagesFoldersIds, archiveId)
     }
 
     fun archiveThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
