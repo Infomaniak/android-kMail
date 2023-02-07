@@ -33,21 +33,21 @@ import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
-    private val actionsViewModel: ActionsViewModel by viewModels()
+    private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         val threadUid = navigationArgs.threadUid
 
-        actionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
+        threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
 
         postpone.isGone = true
 
-        actionsViewModel.getMessageUidToReplyTo(
+        threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
             navigationArgs.messageUidToReplyTo,
         ).observe(viewLifecycleOwner) { messageUidToReplyTo ->

@@ -25,7 +25,8 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
 
-class ActionsViewModel : ViewModel() {
+class ThreadActionsViewModel : ViewModel() {
+
     fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
         emitSource(ThreadController.getThreadAsync(threadUid).mapNotNull { it.obj }.asLiveData())
     }
