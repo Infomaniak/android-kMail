@@ -79,12 +79,18 @@ object SentryDebug {
     fun sendOrphanThreadsSentry(previousCursor: String?, folder: Folder, realm: Realm) {
         val orphanThreads = ThreadController.getOrphanThreads(realm)
         if (orphanThreads.isNotEmpty()) {
-            Sentry.withScope { scope ->
-                scope.level = SentryLevel.ERROR
-                scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
-                scope.setExtra("previousCursor", "$previousCursor")
-                scope.setExtra("newCursor", "${realm.writeBlocking { findLatest(folder) }?.cursor}")
-                Sentry.captureMessage("We found some orphan Threads.")
+            RealmDatabase.mailboxContent().writeBlocking {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("orphanThreads", "${orphanThreads.map { it.uid }}")
+                    scope.setExtra("previousCursor", "$previousCursor")
+                    scope.setExtra("newCursor", "${findLatest(folder)?.cursor}")
+                    Sentry.captureMessage("We found some orphan Threads.")
+                }
+                orphanThreads.reversed().forEach { thread ->
+                    deleteMessages(thread.messages)
+                    delete(thread)
+                }
             }
         }
     }
