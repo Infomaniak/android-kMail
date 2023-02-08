@@ -197,11 +197,12 @@ class MainActivity : ThemedActivity() {
 
     private fun observeSnackbar() {
         mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
-            showSnackbar(
-                title = title,
-                anchor = if (currentDestinationId == R.id.threadFragment) findViewById<View>(R.id.quickActionBar) else null,
-                onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
-            )
+            val anchor: View? = when (currentDestinationId) {
+                R.id.threadListFragment -> findViewById(R.id.newMessageFab)
+                R.id.threadFragment -> findViewById(R.id.quickActionBar)
+                else -> null
+            }
+            showSnackbar(title, anchor, onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } })
         }
     }
 }
