@@ -54,6 +54,8 @@ class MainActivity : ThemedActivity() {
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
 
+    private var currentDestinationId: Int? = null
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset)
@@ -171,6 +173,7 @@ class MainActivity : ThemedActivity() {
             }
         )
 
+        currentDestinationId = destination.id
         destination.trackDestination()
     }
 
@@ -194,8 +197,11 @@ class MainActivity : ThemedActivity() {
 
     private fun observeSnackbar() {
         mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
-            val onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
-            showSnackbar(title, onActionClicked = onActionClicked)
+            showSnackbar(
+                title = title,
+                anchor = if (currentDestinationId == R.id.threadFragment) findViewById<View>(R.id.quickActionBar) else null,
+                onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
+            )
         }
     }
 }
