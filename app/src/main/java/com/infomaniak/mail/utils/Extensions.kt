@@ -193,7 +193,7 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
 
 //region API
 inline fun <reified T> ApiResponse<T>.throwErrorAsException() {
-    throw error?.exception ?: Exception(ApiController.json.encodeToString(this))
+    throw error?.exception ?: ApiErrorException(ApiController.json.encodeToString(this))
 }
 
 fun String.toLongUid(folderId: String) = "${this}@${folderId}"
