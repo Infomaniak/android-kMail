@@ -83,6 +83,7 @@
 
     <!-- Icons -->
     <color name="iconColor">@color/elephant</color>
+    <color name="iconColorPrimaryText">@color/primaryTextColor</color>
     <color name="iconSecondaryColor">@color/elephant</color>
     <color name="favoriteYellow">#F1BE41</color>
     <color name="swipeActionIconColor">@color/white</color>
