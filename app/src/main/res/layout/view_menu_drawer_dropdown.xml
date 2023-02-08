@@ -40,11 +40,11 @@
             app:layout_constraintEnd_toStartOf="@id/title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/iconSecondaryColor" />
+            app:tint="@color/iconColorPrimaryText" />
 
         <TextView
             android:id="@+id/title"
-            style="@style/SettingHeader"
+            style="@style/BodySmall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardSmall"

@@ -166,7 +166,7 @@
                 app:layout_constraintEnd_toStartOf="@id/iconFavorite"
                 app:layout_constraintStart_toEndOf="@id/iconAttachment"
                 app:layout_constraintTop_toTopOf="@id/iconFavorite"
-                app:tint="@color/primaryTextColor"
+                app:tint="@color/iconColorPrimaryText"
                 tools:visibility="visible" />
 
             <ImageView
@@ -181,7 +181,7 @@
                 app:layout_constraintEnd_toStartOf="@id/iconCalendar"
                 app:layout_constraintStart_toEndOf="@id/mailSubject"
                 app:layout_constraintTop_toTopOf="@id/iconFavorite"
-                app:tint="@color/primaryTextColor"
+                app:tint="@color/iconColorPrimaryText"
                 tools:visibility="visible" />
 
             <ImageView
