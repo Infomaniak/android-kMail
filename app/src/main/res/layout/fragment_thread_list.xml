@@ -63,7 +63,7 @@
                     <com.infomaniak.mail.views.AvatarView
                         android:id="@+id/userAvatar"
                         android:layout_width="wrap_content"
-                        android:layout_height="@dimen/iconButtonSize"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_marginHorizontal="@dimen/marginStandardMedium"
                         tools:src="@tools:sample/avatars[12]" />

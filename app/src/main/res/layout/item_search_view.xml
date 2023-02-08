@@ -73,7 +73,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/filterButton"
-            style="@style/IconButton"
+            style="@style/IconButtonSmall"
             android:layout_width="@dimen/iconImageSize"
             android:layout_height="@dimen/iconImageSize"
             android:layout_marginEnd="@dimen/marginStandardMedium"

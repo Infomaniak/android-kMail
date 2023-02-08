@@ -257,7 +257,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/removeSignature"
-                    style="@style/IconButton"
+                    style="@style/IconButtonSmall"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:insetLeft="@dimen/marginStandardVerySmall"

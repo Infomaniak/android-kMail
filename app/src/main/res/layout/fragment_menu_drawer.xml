@@ -53,19 +53,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settingsButton"
                 style="@style/IconButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
-                android:insetLeft="@dimen/marginStandardVerySmall"
-                android:insetTop="@dimen/marginStandardVerySmall"
-                android:insetRight="@dimen/marginStandardVerySmall"
-                android:insetBottom="@dimen/marginStandardVerySmall"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:padding="@dimen/marginStandardVerySmall"
                 app:icon="@drawable/ic_cog"
-                app:iconSize="24dp"
-                app:iconTint="?android:attr/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent" />
 
         </LinearLayout>

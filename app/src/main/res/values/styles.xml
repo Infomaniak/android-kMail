@@ -162,7 +162,7 @@
         <item name="android:fontFamily">@font/suisseintl_medium</item>
     </style>
 
-    <style name="IconButton" parent="Widget.Material3.Button.TextButton">
+    <style name="IconButtonSmall" parent="Widget.Material3.Button.TextButton">
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
@@ -176,7 +176,21 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
-    <style name="EditorIconButton" parent="IconButton">
+    <style name="IconButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:insetBottom">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetLeft">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetRight">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetTop">@dimen/marginStandardVerySmall</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="cornerRadius">@dimen/roundCornerRadius</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">@dimen/marginStandard</item>
+        <item name="iconTint">?attr/colorPrimary</item>
+    </style>
+
+    <style name="EditorIconButton" parent="IconButtonSmall">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textColor">@color/iconColor</item>

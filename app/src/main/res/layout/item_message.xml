@@ -154,7 +154,6 @@
                     android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
                     android:visibility="gone"
                     app:icon="@drawable/ic_bin"
-                    app:iconSize="18dp"
                     app:iconTint="@color/redDestructiveAction"
                     app:layout_constraintEnd_toStartOf="@id/replyButton"
                     app:layout_constraintTop_toTopOf="parent"
@@ -165,8 +164,6 @@
                     style="@style/IconButton"
                     android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
                     app:icon="@drawable/ic_email_action_reply"
-                    app:iconSize="18dp"
-                    app:iconTint="?android:attr/colorPrimary"
                     app:layout_constraintEnd_toStartOf="@id/menuButton"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -175,8 +172,6 @@
                     style="@style/IconButton"
                     android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
                     app:icon="@drawable/ic_param_dots"
-                    app:iconSize="18dp"
-                    app:iconTint="?android:attr/colorPrimary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
