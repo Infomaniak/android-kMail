@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.SwipeAction.*
 import com.infomaniak.mail.databinding.FragmentSwipeActionsSelectionSettingBinding
-import com.infomaniak.mail.utils.notYetImplemented
 
 class SwipeActionsSelectionSettingFragment : Fragment() {
 
@@ -65,15 +64,7 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
             check(localSettings.getSwipeAction(actionResId))
 
             onItemCheckedListener { _, _, swipeAction ->
-                swipeAction as SwipeAction
-
-                when (swipeAction) {
-                    ARCHIVE, DELETE, FAVORITE, MOVE, NONE, QUICKACTIONS_MENU, READ_UNREAD, READ_AND_ARCHIVE, SPAM -> Unit
-                    else -> notYetImplemented()
-                }
-
-                saveAction(swipeAction)
-
+                saveAction(swipeAction as SwipeAction)
                 findNavController().popBackStack()
             }
         }

@@ -68,10 +68,12 @@
                     android:layout_height="wrap_content"
                     app:text="@string/favoritesFolder" />
 
+                <!-- TODO: Display this when Postpone/Snooze action will be done (v2) -->
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/postpone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     app:text="@string/actionPostpone" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
