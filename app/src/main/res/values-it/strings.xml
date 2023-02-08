@@ -26,6 +26,7 @@
     <string name="actionMarkAsRead">Mark as read</string>
     <string name="actionMarkAsUnread">Mark as unread</string>
     <string name="actionMove">Move</string>
+    <string name="actionMoveToInbox">Move to inbox</string>
     <string name="actionNonSpam">Not spam</string>
     <string name="actionOpenIn">Open in</string>
     <string name="actionPhishing">Report phishing</string>
@@ -67,6 +68,7 @@
     <string name="buttonCamera">Take a picture</string>
     <string name="buttonCancel">Cancel</string>
     <string name="buttonClose">Close</string>
+    <string name="buttonConfirm">Confirm</string>
     <string name="buttonConfirmRestoreEmails">Restore</string>
     <string name="buttonCreate">Create</string>
     <string name="buttonCreateAccount">Create an account</string>
@@ -81,7 +83,6 @@
     <string name="buttonItalic">Italic</string>
     <string name="buttonLogInDifferentAccount">Log in with another account</string>
     <string name="buttonLogin">Login</string>
-    <string name="buttonLogout">Log out</string>
     <string name="buttonMore">More</string>
     <string name="buttonMoreStorage">Get more storage</string>
     <string name="buttonNewMessage">New message</string>
@@ -100,8 +101,8 @@
     <string name="buttonValid">Validate</string>
     <string name="ccTitle">Cc:</string>
     <string name="commercialFolder">Promotions</string>
-    <string name="confirmLogoutDescription">Are you sure you want to log out?</string>
-    <string name="confirmLogoutTitle">Log out from %s</string>
+    <string name="confirmLogoutDescription">Are you sure you want to log out from %s?</string>
+    <string name="confirmLogoutTitle">Log out</string>
     <string name="contactActionAddToContacts">Add to contacts</string>
     <string name="contactActionCopyEmailAddress">Copy email address</string>
     <string name="contactActionWriteEmail">Write an email</string>
@@ -119,6 +120,7 @@
     <string name="contentDescriptionIconAttachments">Has attachments</string>
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
     <string name="contentDescriptionIconFavorite">Is favorite</string>
+    <string name="contentDescriptionIconFolderSelected">Folder selected</string>
     <string name="contentDescriptionIconNewMail">New</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionUserAvatar">User avatar</string>
@@ -129,7 +131,7 @@
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
-    <string name="emptyFolderDescription">There‘s nothing to see, look at another one :)</string>
+    <string name="emptyFolderDescription">There’s nothing to see, look at another one :)</string>
     <string name="emptyFolderTitle">This folder is empty !</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>

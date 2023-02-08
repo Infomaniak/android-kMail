@@ -51,21 +51,21 @@ class ManageMailAddressFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        var currentUserEmail = ""
+        var logoutDescriptionWithUserEmail = ""
 
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
             mail.text = user.email
-            currentUserEmail = getString(R.string.confirmLogoutTitle, user.email)
+            logoutDescriptionWithUserEmail = getString(R.string.confirmLogoutDescription, user.email)
         }
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
 
         disconnectAccountButton.setOnClickListener {
-            dialogBinding.confirmLogoutDialogTitle.text = currentUserEmail
+            dialogBinding.confirmLogoutDialogDescription.text = logoutDescriptionWithUserEmail
             MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogBinding.root)
-                .setPositiveButton(R.string.buttonLogout) { _, _ -> removeCurrentUser() }
+                .setPositiveButton(R.string.buttonConfirm) { _, _ -> removeCurrentUser() }
                 .setNegativeButton(R.string.buttonCancel, null)
                 .create()
                 .show()
