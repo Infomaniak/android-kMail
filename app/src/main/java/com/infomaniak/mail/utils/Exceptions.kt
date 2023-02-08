@@ -19,7 +19,7 @@ package com.infomaniak.mail.utils
 
 class ApiErrorException(override val message: String?) : Exception() {
 
-    enum class ErrorCodes(val code: String) {
-        FOLDER_DOESNT_EXIST("folder__not_exists"),
+    object ErrorCodes {
+        const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
     }
 }

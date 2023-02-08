@@ -79,7 +79,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 val newMessagesThreads = runCatching {
                     MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, realm)
                 }.getOrElse {
-                    if (it is ApiErrorException) handleApiError(it) else throw it
+                    if (it is ApiErrorException) handleApiErrors(it) else throw it
                     return@loopMailboxes
                 }
                 Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
@@ -167,9 +167,9 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         showNotification(summaryText, true)
     }
 
-    private fun handleApiError(exception: ApiErrorException) {
+    private fun handleApiErrors(exception: ApiErrorException) {
         when (ApiController.json.decodeFromString<ApiResponse<Any>>(exception.message!!).error?.code) {
-            ErrorCodes.FOLDER_DOESNT_EXIST.code -> Unit
+            ErrorCodes.FOLDER_DOES_NOT_EXIST -> Unit
             else -> Sentry.captureException(exception)
         }
     }
