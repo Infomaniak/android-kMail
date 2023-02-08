@@ -37,7 +37,7 @@
     <color name="backgroundColor">#101010</color>
     <color name="backgroundColorSecondary">@color/bat</color>
     <color name="backgroundColorTertiary">@color/orca</color>
-    <color name="backgroundHeaderColor">@color/bat</color>
+    <color name="backgroundHeaderColor">#212121</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/rabbit</color>
