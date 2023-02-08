@@ -39,6 +39,14 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
     protected val mainViewModel: MainViewModel by activityViewModels()
 
     private var onClickListener: OnActionClick = object : OnActionClick {
+        //region Main actions
+        override fun onReply() = Unit
+        override fun onReplyAll() = Unit
+        override fun onForward() = Unit
+        override fun onDelete() = Unit
+        //endregion
+
+        //region Actions
         override fun onArchive() = Unit
         override fun onReadUnread() = Unit
         override fun onMove() = Unit
@@ -47,10 +55,7 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         override fun onReportJunk() = Unit
         override fun onPrint() = Unit
         override fun onReportDisplayProblem() = Unit
-        override fun onReply() = Unit
-        override fun onReplyAll() = Unit
-        override fun onForward() = Unit
-        override fun onDelete() = Unit
+        //endregion
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

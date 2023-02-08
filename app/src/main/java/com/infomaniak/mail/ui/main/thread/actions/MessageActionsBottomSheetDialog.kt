@@ -39,6 +39,25 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             setFavoriteUi(isFavorite)
 
             initOnClickListener(object : OnActionClick {
+                //region Main actions
+                override fun onReply() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
+                }
+
+                override fun onReplyAll() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
+                }
+
+                override fun onForward() {
+                    notYetImplemented()
+                }
+
+                override fun onDelete() {
+                    mainViewModel.deleteThreadOrMessage(threadUid, message)
+                }
+                //endregion
+
+                //region Actions
                 override fun onArchive() {
                     mainViewModel.archiveThreadOrMessage(threadUid, message)
                 }
@@ -74,23 +93,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 override fun onReportDisplayProblem() {
                     notYetImplemented()
                 }
-
-
-                override fun onReply() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
-                }
-
-                override fun onReplyAll() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
-                }
-
-                override fun onForward() {
-                    notYetImplemented()
-                }
-
-                override fun onDelete() {
-                    mainViewModel.deleteThreadOrMessage(threadUid, message)
-                }
+                //endregion
             })
         }
     }

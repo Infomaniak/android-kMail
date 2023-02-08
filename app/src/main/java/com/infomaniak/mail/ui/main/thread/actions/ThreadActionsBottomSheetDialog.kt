@@ -51,6 +51,25 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
 
             initOnClickListener(object : OnActionClick {
+                //region Main actions
+                override fun onReply() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
+                }
+
+                override fun onReplyAll() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
+                }
+
+                override fun onForward() {
+                    notYetImplemented()
+                }
+
+                override fun onDelete() {
+                    mainViewModel.deleteThreadOrMessage(threadUid)
+                }
+                //endregion
+
+                //region Actions
                 override fun onArchive() {
                     mainViewModel.archiveThreadOrMessage(threadUid)
                 }
@@ -87,23 +106,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 override fun onReportDisplayProblem() {
                     notYetImplemented()
                 }
-
-
-                override fun onReply() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
-                }
-
-                override fun onReplyAll() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
-                }
-
-                override fun onForward() {
-                    notYetImplemented()
-                }
-
-                override fun onDelete() {
-                    mainViewModel.deleteThreadOrMessage(threadUid)
-                }
+                //endregion
             })
         }
     }
