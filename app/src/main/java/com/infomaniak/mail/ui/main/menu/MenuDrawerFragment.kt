@@ -116,6 +116,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                             appBuildNumber = BuildConfig.VERSION_NAME,
                             bucketIdentifier = BuildConfig.BUGTRACKER_MAIL_BUCKET_ID,
                             projectName = BuildConfig.BUGTRACKER_MAIL_PROJECT_NAME,
+                            repoGitHub = BuildConfig.GITHUB_REPO,
                         ).toBundle()
                     )
                     startActivity(this)
