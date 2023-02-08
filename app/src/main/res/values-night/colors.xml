@@ -46,7 +46,7 @@
     <color name="threadBackground">@color/bat</color>
 
     <!-- Texts -->
-    <color name="primaryTextColor">@color/mouse</color>
+    <color name="primaryTextColor">@color/rabbit</color>
     <color name="secondaryTextColor">@color/shark</color>
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="colorOnPrimary">@color/bat</color>
