@@ -22,10 +22,12 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
+import androidx.annotation.IdRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -42,10 +44,12 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -171,6 +175,10 @@ fun Fragment.animatedNavigation(directions: NavDirections, currentClassName: Str
     if (canNavigate(currentClassName)) findNavController().navigate(directions, getAnimatedNavOptions())
 }
 
+fun Fragment.animatedNavigation(@IdRes resId: Int, args: Bundle? = null, currentClassName: String? = null) {
+    if (canNavigate(currentClassName)) findNavController().navigate(resId, args, getAnimatedNavOptions())
+}
+
 fun getAnimatedNavOptions() = NavOptions
     .Builder()
     .setEnterAnim(R.anim.fragment_swipe_enter)
@@ -223,6 +231,29 @@ fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> U
 inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
     removeObservers(viewLifecycleOwner)
     observe(viewLifecycleOwner, observer)
+}
+//endregion
+
+//region Folders
+fun List<Folder>.getMenuFolders(): Triple<Folder?, List<Folder>, List<Folder>> {
+    return toMutableList().let { list ->
+
+        val inbox = list
+            .find { it.role == Folder.FolderRole.INBOX }
+            ?.also(list::remove)
+
+        val defaultFolders = list
+            .filter { it.role != null }
+            .sortedBy { it.role?.order }
+            .also(list::removeAll)
+
+        val customFolders = list
+            .filter { it.parentFolder == null }
+            .sortedByDescending { it.isFavorite }
+            .formatFoldersListWithAllChildren()
+
+        Triple(inbox, defaultFolders, customFolders)
+    }
 }
 //endregion
 

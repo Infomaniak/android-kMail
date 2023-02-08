@@ -45,13 +45,25 @@
             app:drawableTint="?android:attr/colorPrimary"
             tools:text="Folder (Default/Custom)" />
 
-        <TextView
-            android:id="@+id/itemBadge"
-            style="@style/BodySmallMedium.Accent"
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            tools:text="42" />
+            android:layout_height="wrap_content">
 
+            <TextView
+                android:id="@+id/itemBadge"
+                style="@style/BodySmallMedium.Accent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="42" />
+
+            <ImageView
+                android:id="@+id/checkmark"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/mediumIconSize"
+                android:contentDescription="@string/contentDescriptionIconFolderSelected"
+                android:src="@drawable/ic_check"
+                android:visibility="gone"
+                app:tint="?android:attr/colorPrimary" />
+        </FrameLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -274,6 +274,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 toggleFavoriteStatus(threadUid)
                 true
             }
+            SwipeAction.MOVE -> {
+                animatedNavigation(
+                    ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(currentFolderId.value!!, threadUid)
+                )
+                false
+            }
             SwipeAction.QUICKACTIONS_MENU -> {
                 safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadActionsBottomSheetDialog(threadUid))
                 true

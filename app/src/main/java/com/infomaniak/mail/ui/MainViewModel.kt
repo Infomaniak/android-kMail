@@ -39,16 +39,13 @@ import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
-import com.infomaniak.mail.utils.getFoldersIds
-import com.infomaniak.mail.utils.getUids
-import com.infomaniak.mail.utils.handlerIO
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +79,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) {
                 mailboxObjectId?.let {
-                    emitSource(FolderController.getFoldersAsync().map { getMenuFolders(it.list) }.asLiveData())
+                    emitSource(FolderController.getFoldersAsync().map { it.list.getMenuFolders() }.asLiveData())
                 }
             }
         }
@@ -98,7 +95,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Current Folder
-    private val currentFolderId = MutableLiveData<String?>(null)
+    val currentFolderId = MutableLiveData<String?>(null)
 
     val currentFolder = currentFolderId.switchMap { folderId ->
         liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
@@ -220,7 +217,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        if (folderId == currentFolder.value?.id) return@launch
+        if (folderId == currentFolderId.value) return@launch
 
         selectFolder(folderId)
         refreshThreads(folderId = folderId)
@@ -270,7 +267,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
-        folderId: String? = currentFolder.value?.id,
+        folderId: String? = currentFolderId.value,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
 
         if (mailbox == null || folderId == null) return@launch
@@ -309,7 +306,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val thread = ThreadController.getThread(threadUid) ?: return null
 
         val messages = when (message) {
-            null -> MessageController.getArchivableMessages(thread, currentFolderId.value!!)
+            null -> MessageController.getMovableMessages(thread, thread.folderId)
             else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
@@ -325,7 +322,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoDestinationId = message?.folderId ?: thread.folderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + archiveId
         showArchiveSnackbar(message, apiResponse, undoFoldersIds, undoDestinationId)
 
@@ -381,7 +378,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         if (isSuccess) refreshFolders(mailbox, messages.getFoldersIds(exception = trashId), trashId)
 
-        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoDestinationId = message?.folderId ?: thread.folderId
         val undoFoldersIds = (messages.getFoldersIds(exception = undoDestinationId) + trashId).filterNotNull()
         showDeleteSnackbar(isSuccess, shouldPermanentlyDelete, message, undoResource, undoFoldersIds, undoDestinationId)
     }
@@ -416,6 +413,54 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         snackbarFeedback.postValue(snackbarTitle to undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
+    }
+    //endregion
+
+    //region Move
+    fun moveTo(
+        destinationFolderId: String,
+        threadUid: String,
+        messageUid: String? = null,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        val mailbox = currentMailbox.value ?: return@launch
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
+        val messages = when (message) {
+            null -> MessageController.getMovableMessages(thread, thread.folderId)
+            else -> MessageController.getMessageAndDuplicates(thread, message)
+        }
+
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
+
+        if (apiResponse.isSuccess()) {
+            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
+        }
+
+        val undoDestinationId = message?.folderId ?: thread.folderId
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+
+        showMoveSnackbar(message, apiResponse, destinationFolderId, undoFoldersIds, undoDestinationId)
+    }
+
+    private fun showMoveSnackbar(
+        message: Message?,
+        apiResponse: ApiResponse<MoveResult>,
+        destinationFolderId: String,
+        undoFoldersIds: List<String>,
+        undoDestinationId: String?,
+    ) {
+
+        val destinationFolder = FolderController.getFolder(destinationFolderId)
+        val destination = destinationFolder?.role?.folderNameRes?.let { context.getString(it) } ?: destinationFolder?.name
+
+        val snackbarTitle = when {
+            !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
+            message == null -> context.resources.getQuantityString(R.plurals.snackbarThreadMoved, 1, destination)
+            else -> context.getString(R.string.snackbarMessageMoved, destination)
+        }
+
+        val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
+        snackbarFeedback.postValue(snackbarTitle to undoData)
     }
     //endregion
 
@@ -488,7 +533,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
-        val undoDestinationId = message?.folderId ?: currentFolderId.value
+        val undoDestinationId = message?.folderId ?: thread.folderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
         showSpamSnackbar(message, apiResponse, destinationFolderRole, undoFoldersIds, undoDestinationId)
     }
@@ -530,26 +575,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun getMenuFolders(folders: List<Folder>): Triple<Folder?, List<Folder>, List<Folder>> {
-        return folders.toMutableList().let { list ->
-
-            val inbox = list
-                .find { it.role == FolderRole.INBOX }
-                ?.also(list::remove)
-
-            val defaultFolders = list
-                .filter { it.role != null }
-                .sortedBy { it.role?.order }
-                .also(list::removeAll)
-
-            val customFolders = list
-                .filter { it.parentFolder == null }
-                .sortedByDescending { it.isFavorite }
-                .formatFoldersListWithAllChildren()
-
-            Triple(inbox, defaultFolders, customFolders)
-        }
-    }
 
     fun getMessage(messageUid: String) = liveData(Dispatchers.IO) {
         emit(MessageController.getMessage(messageUid))

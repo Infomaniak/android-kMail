@@ -64,8 +64,8 @@ class MenuDrawerFragment : Fragment() {
         AccountUtils.reloadApp?.invoke()
     }
 
-    private val defaultFoldersAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
-    private val customFoldersAdapter = FolderAdapter(openFolder = { folderId -> openFolder(folderId) })
+    private val defaultFoldersAdapter = FolderAdapter(onClick = { folderId -> openFolder(folderId) })
+    private val customFoldersAdapter = FolderAdapter(onClick = { folderId -> openFolder(folderId) })
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root

@@ -29,13 +29,15 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
 import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
 
 class FolderAdapter(
     private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
-    private val openFolder: (folderId: String) -> Unit,
+    private val onClick: (folderId: String) -> Unit,
+    private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
@@ -84,11 +86,12 @@ class FolderAdapter(
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
-        badge = badgeText
+        badge = if (isInMenuDrawer) badgeText else 0
+        selectionStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.MOVE_FRAGMENT
 
         setSelectedState(currentFolderId == id)
 
-        setOnClickListener { openFolder.invoke(id) }
+        setOnClickListener { onClick.invoke(id) }
     }
 
     @SuppressLint("NotifyDataSetChanged")

@@ -26,6 +26,8 @@ import androidx.navigation.fragment.navArgs
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
+import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
+import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.refreshObserve
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
@@ -80,7 +82,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
 
                 override fun onMove() {
-                    notYetImplemented()
+                    animatedNavigation(
+                        resId = R.id.moveFragment,
+                        args = MoveFragmentArgs(mainViewModel.currentFolderId.value!!, threadUid).toBundle(),
+                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
+                    )
                 }
 
                 override fun onPostpone() {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M0.445,0.445C0.73,0.16 1.117,0 1.52,0H6.892C7.174,0 7.451,0.079 7.691,0.227C7.931,0.376 8.124,0.588 8.251,0.84L9.197,2.731C9.236,2.81 9.297,2.877 9.372,2.923C9.448,2.97 9.534,2.994 9.623,2.994H19.486C19.889,2.994 20.275,3.154 20.56,3.439C20.846,3.725 21.006,4.111 21.006,4.514V8.507C21.006,8.795 20.772,9.028 20.484,9.028C20.196,9.028 19.962,8.795 19.962,8.507V4.514C19.962,4.388 19.912,4.267 19.823,4.177C19.733,4.088 19.612,4.038 19.486,4.038H9.623C9.34,4.038 9.063,3.959 8.824,3.811C8.584,3.662 8.39,3.45 8.264,3.198L7.317,1.307C7.278,1.228 7.217,1.161 7.142,1.115C7.067,1.068 6.98,1.044 6.891,1.043H1.52C1.394,1.043 1.272,1.094 1.183,1.183C1.094,1.272 1.043,1.394 1.043,1.52V16.492C1.043,16.618 1.094,16.739 1.183,16.828C1.272,16.918 1.394,16.968 1.52,16.968H8.507C8.795,16.968 9.028,17.201 9.028,17.49C9.028,17.778 8.795,18.011 8.507,18.011H1.52C1.117,18.011 0.73,17.851 0.445,17.566C0.16,17.281 0,16.895 0,16.492V1.52C0,1.117 0.16,0.73 0.445,0.445Z" />
+    <path
+        android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="M10.979,17.49C10.979,13.894 13.894,10.979 17.49,10.979C21.085,10.979 24,13.894 24,17.49C24,21.085 21.085,24 17.49,24C13.894,24 10.979,21.085 10.979,17.49ZM17.49,13.974C17.778,13.974 18.011,14.207 18.011,14.495V16.968H20.484C20.772,16.968 21.006,17.201 21.006,17.49C21.006,17.778 20.772,18.011 20.484,18.011H18.011V20.484C18.011,20.772 17.778,21.006 17.49,21.006C17.201,21.006 16.968,20.772 16.968,20.484V18.011H14.495C14.207,18.011 13.974,17.778 13.974,17.49C13.974,17.201 14.207,16.968 14.495,16.968H16.968V14.495C16.968,14.207 17.201,13.974 17.49,13.974Z" />
+</vector>

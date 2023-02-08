@@ -126,6 +126,7 @@
     <string name="contentDescriptionIconAttachments">Has attachments</string>
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
     <string name="contentDescriptionIconFavorite">Is favorite</string>
+    <string name="contentDescriptionIconFolderSelected">Folder selected</string>
     <string name="contentDescriptionIconNewMail">New</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionUserAvatar">User avatar</string>
@@ -136,7 +137,7 @@
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
-    <string name="emptyFolderDescription">There‘s nothing to see, look at another one :)</string>
+    <string name="emptyFolderDescription">There’s nothing to see, look at another one :)</string>
     <string name="emptyFolderTitle">This folder is empty !</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
