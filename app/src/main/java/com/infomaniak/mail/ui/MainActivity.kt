@@ -28,6 +28,7 @@ import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -53,8 +54,6 @@ class MainActivity : ThemedActivity() {
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
-
-    private var currentDestinationId: Int? = null
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -173,7 +172,6 @@ class MainActivity : ThemedActivity() {
             }
         )
 
-        currentDestinationId = destination.id
         destination.trackDestination()
     }
 
@@ -197,7 +195,7 @@ class MainActivity : ThemedActivity() {
 
     private fun observeSnackbar() {
         mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
-            val anchor: View? = when (currentDestinationId) {
+            val anchor: View? = when (findNavController(R.id.hostFragment).currentDestination?.id) {
                 R.id.threadListFragment -> findViewById(R.id.newMessageFab)
                 R.id.threadFragment -> findViewById(R.id.quickActionBar)
                 else -> null
