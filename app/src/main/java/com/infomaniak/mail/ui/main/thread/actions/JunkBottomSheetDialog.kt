@@ -34,7 +34,7 @@ import com.infomaniak.mail.utils.notYetImplemented
 
 class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
-    lateinit var binding: BottomSheetJunkBinding
+    private lateinit var binding: BottomSheetJunkBinding
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 
@@ -42,11 +42,8 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
-
-        val threadUid = navigationArgs.threadUid
-        val messageUid = navigationArgs.messageUid
 
         if (messageUid == null) {
             handleButtons(threadUid)

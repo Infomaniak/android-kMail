@@ -35,8 +35,8 @@ import com.google.android.material.R as RMaterial
 
 abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
-    lateinit var binding: BottomSheetActionsMenuBinding
-    val mainViewModel: MainViewModel by activityViewModels()
+    protected lateinit var binding: BottomSheetActionsMenuBinding
+    protected val mainViewModel: MainViewModel by activityViewModels()
 
     private var onClickListener: OnActionClick = object : OnActionClick {
         override fun onArchive() = Unit
