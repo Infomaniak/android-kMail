@@ -21,33 +21,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
-import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.views.MenuDrawerItemView
 
-class MoveFragment : Fragment() {
+class MoveFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMoveBinding
     private val navigationArgs: MoveFragmentArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val moveViewModel: MoveViewModel by viewModels()
 
-    private var inboxFolderId: String? = null
+    override val inboxFolder: MenuDrawerItemView by lazy { binding.inboxFolder }
+    override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
+    override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
-    private val defaultFoldersAdapter = FolderAdapter(
-        onClick = { folderId -> moveToFolder(folderId) },
-        isInMenuDrawer = false,
-    )
-    private val customFoldersAdapter = FolderAdapter(
-        onClick = { folderId -> moveToFolder(folderId) },
-        isInMenuDrawer = false,
-    )
+    override val isInMenuDrawer = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMoveBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -55,21 +48,19 @@ class MoveFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setupAdapters()
-        setupListeners()
         observeFolders()
     }
 
-    private fun setupAdapters() = with(binding) {
-        defaultFoldersList.adapter = defaultFoldersAdapter
-        customFoldersList.adapter = customFoldersAdapter
-    }
+    override fun setupListeners() = with(binding) {
+        super.setupListeners()
 
-    private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         iconAddFolder.setOnClickListener { safeNavigate(MoveFragmentDirections.actionMoveFragmentToNewFolderDialog()) }
-        inboxFolder.setOnClickListener { inboxFolderId?.let(::moveToFolder) }
+    }
+
+    override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
+        mainViewModel.moveTo(folderId, threadUid, messageUid)
+        findNavController().popBackStack()
     }
 
     private fun observeFolders() = with(navigationArgs) {
@@ -81,10 +72,5 @@ class MoveFragment : Fragment() {
             defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
             customFoldersAdapter.setFolders(customFolders, folderId)
         }
-    }
-
-    private fun moveToFolder(folderId: String) = with(navigationArgs) {
-        mainViewModel.moveTo(folderId, threadUid, messageUid)
-        findNavController().popBackStack()
     }
 }
