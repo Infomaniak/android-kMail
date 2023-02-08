@@ -66,7 +66,7 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         move.setClosingOnClickListener { onClickListener.onMove() }
         postpone.setClosingOnClickListener { onClickListener.onPostpone() }
         favorite.setClosingOnClickListener { onClickListener.onFavorite() }
-        reportJunk.setOnClickListener { onClickListener.onReportJunk() }
+        reportJunk.setClosingOnClickListener { onClickListener.onReportJunk() }
         print.setClosingOnClickListener { onClickListener.onPrint() }
         reportDisplayProblem.setClosingOnClickListener { onClickListener.onReportDisplayProblem() }
 
@@ -113,8 +113,8 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun ActionItemView.setClosingOnClickListener(forceQuit: Boolean = false, callback: (() -> Unit)) {
         setOnClickListener {
-            callback()
             with(findNavController()) { if (forceQuit) popBackStack(R.id.threadListFragment, false) else popBackStack() }
+            callback()
         }
     }
 
@@ -123,13 +123,6 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
             callback(id)
             findNavController().popBackStack()
         }
-    }
-
-    companion object {
-        const val JUNK_BOTTOM_SHEET_NAV_KEY = "junk_bottom_sheet_nav_key"
-        const val SHOULD_OPEN_JUNK = "should_open_junk"
-        const val MESSAGE_UID = "message_uid"
-        const val THREAD_UID = "thread_uid"
     }
 }
 

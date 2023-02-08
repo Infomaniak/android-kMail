@@ -40,7 +40,6 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
-import com.infomaniak.mail.utils.UiUtils.handleJunkBottomSheet
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -81,8 +80,6 @@ class ThreadFragment : Fragment() {
             observeContacts()
             observeQuickActionBarClicks()
         }
-
-        handleJunkBottomSheet()
     }
 
     private fun setupUi(threadUid: String) = with(binding) {

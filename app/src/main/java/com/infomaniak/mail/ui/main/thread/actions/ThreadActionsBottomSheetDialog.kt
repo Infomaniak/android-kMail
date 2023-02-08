@@ -23,7 +23,7 @@ import androidx.core.view.isGone
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.utils.notYetImplemented
@@ -73,10 +73,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
 
                 override fun onReportJunk() {
-                    setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply {
-                        putBoolean(SHOULD_OPEN_JUNK, true)
-                        putString(THREAD_UID, threadUid)
-                    })
+                    safeNavigate(
+                        R.id.junkBottomSheetDialog,
+                        JunkBottomSheetDialogArgs(threadUid, null).toBundle(),
+                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name
+                    )
                 }
 
                 override fun onPrint() {

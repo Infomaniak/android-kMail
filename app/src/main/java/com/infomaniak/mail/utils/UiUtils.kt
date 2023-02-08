@@ -21,22 +21,13 @@ import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.Color
 import android.os.Build
-import android.os.Bundle
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.graphics.toColor
 import androidx.core.graphics.toColorInt
 import androidx.core.view.isGone
-import androidx.fragment.app.Fragment
-import com.infomaniak.lib.core.utils.getBackNavigationResult
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.Correspondent
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.JUNK_BOTTOM_SHEET_NAV_KEY
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.MESSAGE_UID
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.SHOULD_OPEN_JUNK
-import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog.Companion.THREAD_UID
-import com.infomaniak.mail.ui.main.thread.actions.JunkBottomSheetDialogArgs
 
 object UiUtils {
 
@@ -128,17 +119,6 @@ object UiUtils {
             }
         } else {
             setColor(newColor)
-        }
-    }
-
-    fun Fragment.handleJunkBottomSheet() {
-        getBackNavigationResult<Bundle>(JUNK_BOTTOM_SHEET_NAV_KEY) {
-            val shouldOpenJunk = it.getBoolean(SHOULD_OPEN_JUNK)
-            val messageUid = it.getString(MESSAGE_UID)
-            val threadUid = it.getString(THREAD_UID)!!
-
-            val args = JunkBottomSheetDialogArgs(threadUid, messageUid).toBundle()
-            if (shouldOpenJunk) safeNavigate(R.id.junkBottomSheetDialog, args)
         }
     }
 }

@@ -20,7 +20,8 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.setBackNavigationResult
+import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
@@ -59,11 +60,11 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 }
 
                 override fun onReportJunk() {
-                    setBackNavigationResult(JUNK_BOTTOM_SHEET_NAV_KEY, Bundle().apply {
-                        putBoolean(SHOULD_OPEN_JUNK, true)
-                        putString(MESSAGE_UID, messageUid)
-                        putString(THREAD_UID, threadUid)
-                    })
+                    safeNavigate(
+                        R.id.junkBottomSheetDialog,
+                        JunkBottomSheetDialogArgs(threadUid, messageUid).toBundle(),
+                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name
+                    )
                 }
 
                 override fun onPrint() {
