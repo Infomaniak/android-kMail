@@ -207,7 +207,6 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-
     private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) {
         if (slideOffset == FULLY_SLID) {
             window.statusBarColor = menuDrawerBackgroundColor
