@@ -240,10 +240,18 @@ class ThreadListAdapter(
             }
         }
 
-        if (swipeActionIs(SwipeAction.READ_UNREAD)) {
-            item as Thread
-            val newDrawable = if (item.unseenMessagesCount > 0) R.drawable.ic_envelope_open else R.drawable.ic_envelope
-            (recyclerView as DragDropSwipeRecyclerView).updateSwipeIconWith(SwipeAction.READ_UNREAD, newDrawable)
+        item as Thread
+        val swipeActionVariant = when {
+            swipeActionIs(SwipeAction.READ_UNREAD) -> {
+                SwipeAction.READ_UNREAD to if (item.unseenMessagesCount > 0) R.drawable.ic_envelope_open else R.drawable.ic_envelope
+            }
+            swipeActionIs(SwipeAction.FAVORITE) -> {
+                SwipeAction.FAVORITE to if (item.isFavorite) R.drawable.ic_star_stroked else R.drawable.ic_star
+            }
+            else -> null
+        }
+        swipeActionVariant?.let { (swipeAction, newDrawable) ->
+            (recyclerView as DragDropSwipeRecyclerView).updateSwipeIconWith(swipeAction, newDrawable)
         }
     }
 
