@@ -24,17 +24,17 @@
     android:paddingVertical="@dimen/marginStandardSmall">
 
     <TextView
-        android:id="@+id/confirmLogoutDialogTitle"
         style="@style/BottomSheetTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
-        tools:text="Me déconnecter du compte {adressemail@domain.com}" />
+        android:text="@string/confirmLogoutTitle" />
 
     <TextView
+        android:id="@+id/confirmLogoutDialogDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandardMedium"
-        android:text="@string/confirmLogoutDescription" />
+        tools:text="@string/confirmLogoutDescription" />
 
 </LinearLayout>
