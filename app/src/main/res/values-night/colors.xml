@@ -54,8 +54,7 @@
     <color name="staffOnlyColor">@color/prince_dark</color>
 
     <!-- Separators -->
-    <color name="separatorDarker">@color/bat</color>
-    <color name="separatorLighter">@color/orca</color>
+    <color name="separatorColor">@color/orca</color>
 
     <!-- Icons -->
     <color name="iconColor">@color/mouse</color>

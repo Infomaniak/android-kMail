@@ -78,8 +78,7 @@
     <color name="staffOnlyColor">@color/prince_light</color>
 
     <!-- Separators -->
-    <color name="separatorDarker">#ECECEC</color>
-    <color name="separatorLighter">#ECECEC</color>
+    <color name="separatorColor">@color/mouse</color>
 
     <!-- Icons -->
     <color name="iconColor">@color/elephant</color>

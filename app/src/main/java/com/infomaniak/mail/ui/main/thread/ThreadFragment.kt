@@ -18,11 +18,13 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.content.res.ColorStateList
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -32,6 +34,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Thread
@@ -127,6 +130,9 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupAdapter(threadUid: String) = with(binding) {
+        AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
+            messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 1)))
+        }
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             contacts = mainViewModel.mergedContacts.value ?: emptyMap()
