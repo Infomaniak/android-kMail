@@ -28,6 +28,7 @@ import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -194,8 +195,12 @@ class MainActivity : ThemedActivity() {
 
     private fun observeSnackbar() {
         mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
-            val onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
-            showSnackbar(title, onActionClicked = onActionClicked)
+            val anchor: View? = when (findNavController(R.id.hostFragment).currentDestination?.id) {
+                R.id.threadListFragment -> findViewById(R.id.newMessageFab)
+                R.id.threadFragment -> findViewById(R.id.quickActionBar)
+                else -> null
+            }
+            showSnackbar(title, anchor, onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } })
         }
     }
 }
