@@ -22,24 +22,71 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
 
-open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
+abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
-    lateinit var binding: BottomSheetActionsMenuBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
+    protected lateinit var binding: BottomSheetActionsMenuBinding
+    protected val mainViewModel: MainViewModel by activityViewModels()
+
+    private var onClickListener: OnActionClick = object : OnActionClick {
+        //region Main actions
+        override fun onReply() = Unit
+        override fun onReplyAll() = Unit
+        override fun onForward() = Unit
+        override fun onDelete() = Unit
+        //endregion
+
+        //region Actions
+        override fun onArchive() = Unit
+        override fun onReadUnread() = Unit
+        override fun onMove() = Unit
+        override fun onPostpone() = Unit
+        override fun onFavorite() = Unit
+        override fun onReportJunk() = Unit
+        override fun onPrint() = Unit
+        override fun onReportDisplayProblem() = Unit
+        //endregion
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetActionsMenuBinding.inflate(inflater, container, false).also { binding = it }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        super.onViewCreated(view, savedInstanceState)
+        archive.isGone = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
+
+        archive.setClosingOnClickListener { onClickListener.onArchive() }
+        markAsReadUnread.setOnClickListener { onClickListener.onReadUnread() }
+        move.setClosingOnClickListener { onClickListener.onMove() }
+        postpone.setClosingOnClickListener { onClickListener.onPostpone() }
+        favorite.setClosingOnClickListener { onClickListener.onFavorite() }
+        reportJunk.setClosingOnClickListener { onClickListener.onReportJunk() }
+        print.setClosingOnClickListener { onClickListener.onPrint() }
+        reportDisplayProblem.setClosingOnClickListener { onClickListener.onReportDisplayProblem() }
+
+        mainActions.setClosingOnClickListener { id: Int ->
+            when (id) {
+                R.id.actionReply -> onClickListener.onReply()
+                R.id.actionReplyAll -> onClickListener.onReplyAll()
+                R.id.actionForward -> onClickListener.onForward()
+                R.id.actionDelete -> onClickListener.onDelete()
+            }
+        }
+    }
+
+    fun initOnClickListener(listener: OnActionClick) {
+        onClickListener = listener
     }
 
     private fun computeUnreadStyle(isSeen: Boolean) = if (isSeen) {
@@ -69,22 +116,33 @@ open class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         setText(favoriteText)
     }
 
-    fun setSpamUi(message: Message? = null) {
-        val isSpam = message?.isSpam ?: mainViewModel.isCurrentFolderRole(FolderRole.SPAM)
-        binding.spam.setText(if (isSpam) R.string.actionNonSpam else R.string.actionSpam)
-    }
-
-    fun ActionItemView.setClosingOnClickListener(forceQuit: Boolean = false, callback: (() -> Unit)) {
+    private fun ActionItemView.setClosingOnClickListener(forceQuit: Boolean = false, callback: (() -> Unit)) {
         setOnClickListener {
             with(findNavController()) { if (forceQuit) popBackStack(R.id.threadListFragment, false) else popBackStack() }
             callback()
         }
     }
 
-    fun MainActionsView.setClosingOnClickListener(callback: ((Int) -> Unit)) {
+    private fun MainActionsView.setClosingOnClickListener(callback: ((Int) -> Unit)) {
         setOnItemClickListener { id ->
             callback(id)
             findNavController().popBackStack()
         }
     }
+}
+
+interface OnActionClick {
+    fun onArchive()
+    fun onReadUnread()
+    fun onMove()
+    fun onPostpone()
+    fun onFavorite()
+    fun onReportJunk()
+    fun onPrint()
+    fun onReportDisplayProblem()
+
+    fun onReply()
+    fun onReplyAll()
+    fun onForward()
+    fun onDelete()
 }

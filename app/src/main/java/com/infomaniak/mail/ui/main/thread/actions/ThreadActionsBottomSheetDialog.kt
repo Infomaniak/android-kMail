@@ -20,12 +20,12 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
-import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
@@ -35,54 +35,85 @@ import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
-
-        val threadUid = navigationArgs.threadUid
 
         threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
 
+        binding.postpone.isGone = true
+
         threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
             navigationArgs.messageUidToReplyTo,
         ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
 
-            setSpamUi()
-
-            postpone.isGone = true
-            blockSender.isGone = true
-            phishing.isGone = true
-            rule.isGone = true
-
-            archive.setClosingOnClickListener { mainViewModel.archiveThreadOrMessage(threadUid) }
-            markAsReadUnread.setClosingOnClickListener(forceQuit = true) { mainViewModel.toggleSeenStatus(threadUid) }
-            move.setClosingOnClickListener {
-                animatedNavigation(
-                    resId = R.id.moveFragment,
-                    args = MoveFragmentArgs(mainViewModel.currentFolderId.value!!, threadUid).toBundle(),
-                    currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
-                )
-            }
-            favorite.setClosingOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
-            spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid) }
-            print.setClosingOnClickListener { notYetImplemented() }
-            saveAsPdf.setClosingOnClickListener { notYetImplemented() }
-            reportDisplayProblem.setClosingOnClickListener { notYetImplemented() }
-
-            mainActions.setClosingOnClickListener { id: Int ->
-                when (id) {
-                    R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
-                    R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
-                    R.id.actionForward -> notYetImplemented()
-                    R.id.actionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+            initOnClickListener(object : OnActionClick {
+                //region Main actions
+                override fun onReply() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
                 }
-            }
+
+                override fun onReplyAll() {
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
+                }
+
+                override fun onForward() {
+                    notYetImplemented()
+                }
+
+                override fun onDelete() {
+                    mainViewModel.deleteThreadOrMessage(threadUid)
+                }
+                //endregion
+
+                //region Actions
+                override fun onArchive() {
+                    mainViewModel.archiveThreadOrMessage(threadUid)
+                }
+
+                override fun onReadUnread() {
+                    mainViewModel.toggleSeenStatus(threadUid)
+                    findNavController().popBackStack(R.id.threadListFragment, false)
+                }
+
+                override fun onMove() {
+                    animatedNavigation(
+                        resId = R.id.moveFragment,
+                        args = MoveFragmentArgs(mainViewModel.currentFolderId.value!!, threadUid).toBundle(),
+                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
+                    )
+                }
+
+                override fun onPostpone() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onFavorite() {
+                    mainViewModel.toggleFavoriteStatus(threadUid)
+                }
+
+                override fun onReportJunk() {
+                    safeNavigate(
+                        R.id.junkBottomSheetDialog,
+                        JunkBottomSheetDialogArgs(threadUid, null).toBundle(),
+                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name
+                    )
+                }
+
+                override fun onPrint() {
+                    notYetImplemented()
+                }
+
+                override fun onReportDisplayProblem() {
+                    notYetImplemented()
+                }
+                //endregion
+            })
         }
     }
 }

@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/menuDrawerBackgroundColor"
     android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
@@ -27,6 +28,7 @@
         style="@style/CardViewMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/menuDrawerBackgroundColor"
         app:cardElevation="6dp">
 
         <LinearLayout
@@ -53,19 +55,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settingsButton"
                 style="@style/IconButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:contentDescription="@string/contentDescriptionButtonSettings"
-                android:insetLeft="@dimen/marginStandardVerySmall"
-                android:insetTop="@dimen/marginStandardVerySmall"
-                android:insetRight="@dimen/marginStandardVerySmall"
-                android:insetBottom="@dimen/marginStandardVerySmall"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:padding="@dimen/marginStandardVerySmall"
                 app:icon="@drawable/ic_cog"
-                app:iconSize="24dp"
-                app:iconTint="?android:attr/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent" />
 
         </LinearLayout>
@@ -76,7 +67,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
-        android:background="@color/backgroundColor"
         android:scrollbars="none">
 
         <LinearLayout
@@ -131,6 +121,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/iconColorPrimaryText"
                         tools:visibility="visible" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -208,7 +199,7 @@
 
                 <TextView
                     android:id="@+id/noFolderText"
-                    style="@style/BodySmall.Secondary"
+                    style="@style/BodySmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/marginStandardVerySmall"

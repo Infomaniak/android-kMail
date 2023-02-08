@@ -53,7 +53,6 @@ class MenuDrawerFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
 
     var exitDrawer: (() -> Unit)? = null
-    var isDrawerOpen: (() -> Boolean)? = null
 
     private var inboxFolderId: String? = null
     private var canNavigate = true

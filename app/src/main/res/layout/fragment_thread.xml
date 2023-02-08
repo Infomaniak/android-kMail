@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextAppearance="@style/H2">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical">
@@ -42,6 +42,7 @@
                 style="@style/H2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:ellipsize="end"
                 android:lines="1"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -52,15 +53,13 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/iconFavorite"
                 style="@style/IconButton"
-                android:layout_gravity="center_vertical|end"
                 android:layout_marginEnd="@dimen/marginStandardMedium"
                 app:icon="@drawable/ic_star"
-                app:iconSize="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

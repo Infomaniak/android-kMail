@@ -15,15 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.thread.actions
+package com.infomaniak.mail.utils
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import kotlinx.coroutines.Dispatchers
+class ApiErrorException(override val message: String?) : Exception() {
 
-class MessageActionsViewModel : ViewModel() {
-    fun getMessage(messageUid: String) = liveData(Dispatchers.IO) {
-        emit(MessageController.getMessage(messageUid))
+    object ErrorCodes {
+        const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
     }
 }

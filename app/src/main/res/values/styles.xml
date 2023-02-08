@@ -162,7 +162,7 @@
         <item name="android:fontFamily">@font/suisseintl_medium</item>
     </style>
 
-    <style name="IconButton" parent="Widget.Material3.Button.TextButton">
+    <style name="IconButtonSmall" parent="Widget.Material3.Button.TextButton">
         <item name="android:insetBottom">0dp</item>
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
@@ -176,7 +176,21 @@
         <item name="iconTint">@color/iconColor</item>
     </style>
 
-    <style name="EditorIconButton" parent="IconButton">
+    <style name="IconButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:insetBottom">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetLeft">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetRight">@dimen/marginStandardVerySmall</item>
+        <item name="android:insetTop">@dimen/marginStandardVerySmall</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="cornerRadius">@dimen/roundCornerRadius</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconSize">@dimen/marginStandard</item>
+        <item name="iconTint">?attr/colorPrimary</item>
+    </style>
+
+    <style name="EditorIconButton" parent="IconButtonSmall">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textColor">@color/iconColor</item>
@@ -269,7 +283,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:paddingEnd">@dimen/marginStandard</item>
         <item name="android:paddingStart">@dimen/marginStandard</item>
-        <item name="cardBackgroundColor">@color/backgroundColor</item>
+        <item name="cardBackgroundColor">@android:color/transparent</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
         <item name="shapeAppearanceOverlay">@style/MenuDrawerItemShapeAppearance</item>
     </style>
@@ -317,7 +331,7 @@
     <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base" />
 
     <style name="BottomSheetDialogThemeModalStyle" parent="Widget.Material3.BottomSheet">
-        <item name="backgroundTint">@color/backgroundColor</item>
+        <item name="backgroundTint">@color/backgroundColorSecondary</item>
         <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
     </style>
 
@@ -381,7 +395,7 @@
     <!-- Dialog -->
 
     <style name="DialogStyle" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="android:background">@color/dialogBackground</item>
+        <item name="android:background">@color/backgroundColorTertiary</item>
         <item name="buttonBarNegativeButtonStyle">@style/DeletePositiveButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="colorControlNormal">?attr/colorControlNormal</item>

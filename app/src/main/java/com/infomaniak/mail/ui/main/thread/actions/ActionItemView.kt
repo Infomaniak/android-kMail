@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,13 @@ import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.ItemBottomSheetActionBinding
+import com.infomaniak.mail.utils.AccountUtils
 
 class ActionItemView @JvmOverloads constructor(
     context: Context,
@@ -44,6 +47,17 @@ class ActionItemView @JvmOverloads constructor(
                 button.icon = getDrawable(R.styleable.ActionItemView_icon)
                 button.text = getString(R.styleable.ActionItemView_text)
                 divider.isVisible = getBoolean(R.styleable.ActionItemView_visibleDivider, true)
+
+                if (getBoolean(R.styleable.ActionItemView_staffOnly, false)) {
+                    if (isInEditMode || AccountUtils.currentUser?.isStaff == true) {
+                        button.apply {
+                            setIconTintResource(R.color.staffOnlyColor)
+                            setTextColor(AppCompatResources.getColorStateList(context, R.color.staffOnlyColor))
+                        }
+                    } else {
+                        isGone = true
+                    }
+                }
             }
         }
     }

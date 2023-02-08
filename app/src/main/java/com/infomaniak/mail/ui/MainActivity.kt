@@ -23,11 +23,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
@@ -53,14 +55,15 @@ class MainActivity : ThemedActivity() {
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
+    private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, backgroundColor, slideOffset)
+            colorSystemBarsWithMenuDrawer(slideOffset)
         }
 
         override fun onDrawerOpened(drawerView: View) {
-            window.statusBarColor = getColor(R.color.backgroundColor)
+            colorSystemBarsWithMenuDrawer()
             (binding.menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
         }
 
@@ -94,6 +97,11 @@ class MainActivity : ThemedActivity() {
     override fun onStart() {
         super.onStart()
         SyncMessagesWorker.cancelWork(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
     override fun onStop() {
@@ -136,10 +144,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun setupMenuDrawerCallbacks() = with(binding) {
-        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.apply {
-            exitDrawer = { drawerLayout.close() }
-            isDrawerOpen = { drawerLayout.isOpen }
-        }
+        (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.exitDrawer = { drawerLayout.close() }
     }
 
     private fun registerMainPermissions(permissionUtils: PermissionUtils) {
@@ -154,6 +159,7 @@ class MainActivity : ThemedActivity() {
         setDrawerLockMode(destination.id == R.id.threadListFragment)
 
         when (destination.id) {
+            R.id.junkBottomSheetDialog,
             R.id.messageActionBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
@@ -166,7 +172,11 @@ class MainActivity : ThemedActivity() {
 
         window.navigationBarColor = getColor(
             when (destination.id) {
-                R.id.threadFragment -> R.color.backgroundSecondaryColor
+                R.id.threadFragment -> R.color.backgroundAccentuated
+                R.id.messageActionBottomSheetDialog,
+                R.id.replyBottomSheetDialog,
+                R.id.detailedContactBottomSheetDialog,
+                R.id.threadActionsBottomSheetDialog -> R.color.backgroundColorSecondary
                 else -> R.color.backgroundColor
             }
         )
@@ -194,8 +204,26 @@ class MainActivity : ThemedActivity() {
 
     private fun observeSnackbar() {
         mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
-            val onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } }
-            showSnackbar(title, onActionClicked = onActionClicked)
+            val anchor: View? = when (findNavController(R.id.hostFragment).currentDestination?.id) {
+                R.id.threadListFragment -> findViewById(R.id.newMessageFab)
+                R.id.threadFragment -> findViewById(R.id.quickActionBar)
+                else -> null
+            }
+            showSnackbar(title, anchor, onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } })
         }
+    }
+
+    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) {
+        if (slideOffset == FULLY_SLID) {
+            window.statusBarColor = menuDrawerBackgroundColor
+            window.navigationBarColor = menuDrawerBackgroundColor
+        } else {
+            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackgroundColor, slideOffset)
+            window.navigationBarColor = UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackgroundColor, slideOffset)
+        }
+    }
+
+    private companion object {
+        const val FULLY_SLID = 1.0f
     }
 }

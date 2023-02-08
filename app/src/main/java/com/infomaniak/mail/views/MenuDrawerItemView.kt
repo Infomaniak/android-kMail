@@ -18,12 +18,12 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.infomaniak.lib.core.utils.getAttributes
@@ -78,12 +78,6 @@ class MenuDrawerItemView @JvmOverloads constructor(
             value?.let { binding.itemName.setTextSize(TypedValue.COMPLEX_UNIT_PX, it.toFloat()) }
         }
 
-    var textWeight: Int? = null
-        set(value) {
-            field = value
-            value?.let { binding.itemName.typeface = ResourcesCompat.getFont(context, value) }
-        }
-
     init {
         attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
             val defaultTextSize = binding.itemName.textSize.toInt()
@@ -95,7 +89,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
             text = getString(R.styleable.MenuDrawerItemView_text)
             textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
             getResourceId(R.styleable.MenuDrawerItemView_textWeight, 0).also { fontFamily ->
-                if (fontFamily > 0) textWeight = fontFamily
+                if (fontFamily > 0) binding.itemName.typeface = ResourcesCompat.getFont(context, fontFamily)
             }
         }
     }
@@ -104,17 +98,13 @@ class MenuDrawerItemView @JvmOverloads constructor(
         val (color, textAppearance) = if (isSelected && selectionStyle == SelectionStyle.MENU_DRAWER) {
             context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
         } else {
-            ContextCompat.getColor(context, R.color.backgroundColor) to R.style.BodyMedium
+            Color.TRANSPARENT to R.style.BodyMedium
         }
 
         checkmark.isVisible = isSelected && selectionStyle == SelectionStyle.MOVE_FRAGMENT
 
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
-    }
-
-    fun setBadgeVisibility(isVisible: Boolean) {
-        binding.itemBadge.isVisible = isVisible
     }
 
     override fun setOnClickListener(onClickListener: OnClickListener?) {

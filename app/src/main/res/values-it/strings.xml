@@ -20,7 +20,6 @@
     <string name="accentColorPinkTitle">Pink</string>
     <string name="actionArchive">Archive</string>
     <string name="actionBlockSender">Block sender</string>
-    <string name="actionCreateRule">Create a rule</string>
     <string name="actionDelete">Delete</string>
     <string name="actionEditMenu">Edit menu</string>
     <string name="actionForward">Forward</string>
@@ -36,14 +35,12 @@
     <string name="actionReplyAll">Reply all</string>
     <string name="actionReportDisplayProblem">Report a display problem</string>
     <string name="actionReportJunk">Report junk</string>
-    <string name="actionSavePDF">Save as PDF</string>
     <string name="actionShortMarkAsRead">Read</string>
     <string name="actionShortMarkAsUnread">Unread</string>
     <string name="actionShortStar">Favorites</string>
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
     <string name="actionUnstar">Delete from favorites</string>
-    <string name="actionsMenuTitle">What would you like to do?</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
     <string name="attachmentActionCamera">Camera</string>
@@ -122,7 +119,6 @@
     <string name="contentDescriptionIconAttachments">Has attachments</string>
     <string name="contentDescriptionIconCalendar">Has Calendar event</string>
     <string name="contentDescriptionIconFavorite">Is favorite</string>
-    <string name="contentDescriptionIconFolderSelected">Folder selected</string>
     <string name="contentDescriptionIconNewMail">New</string>
     <string name="contentDescriptionIconStorage">Storage status</string>
     <string name="contentDescriptionUserAvatar">User avatar</string>
@@ -133,7 +129,7 @@
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
-    <string name="emptyFolderDescription">There’s nothing to see, look at another one :)</string>
+    <string name="emptyFolderDescription">There‘s nothing to see, look at another one :)</string>
     <string name="emptyFolderTitle">This folder is empty !</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>

@@ -18,16 +18,16 @@
 <resources>
 
     <!-- Primary colors -->
-    <color name="pinkMail">@color/mail_pink_light</color>
-    <color name="pinkMailInverse">@color/mail_pink_dark</color>
-    <color name="pinkMailSecondary">#F7E8EF</color>
-    <color name="pinkBoardingSecondaryBackground">@color/pinkMailSecondary</color>
-    <color name="pinkMailRipple">#1EBC0055</color>
+    <color name="pinkMail">@color/pink_mail_primary_light</color>
+    <color name="pinkMailInverse">@color/pink_mail_primary_dark</color>
+    <color name="pinkMailContainer">@color/pink_mail_container_light</color>
+    <color name="pinkBoardingSecondaryBackground">@color/pinkMailContainer</color>
+    <color name="pinkMailRipple">@color/pink_mail_ripple_light</color>
     <color name="blueMail">@color/primary</color>
-    <color name="blueMailInverse">@color/mail_blue_dark</color>
-    <color name="blueMailSecondary">#F4F6FD</color>
-    <color name="blueBoardingSecondaryBackground">@color/blueMailSecondary</color>
-    <color name="blueMailRipple">#1E0098FF</color>
+    <color name="blueMailInverse">@color/blue_mail_primary_dark</color>
+    <color name="blueMailContainer">@color/blue_mail_container_light</color>
+    <color name="blueBoardingSecondaryBackground">@color/blueMailContainer</color>
+    <color name="blueMailRipple">@color/blue_mail_ripple_light</color>
 
     <!-- Context / errors -->
     <color name="orangeWarning">#FF8500</color>
@@ -35,22 +35,38 @@
     <color name="redDestructiveActionTransparent">#1EF44336</color>
 
     <!-- Color Tones -->
-    <color name="mail_pink_light">#BC0055</color>
-    <color name="mail_pink_dark">#E07FA3</color>
-    <color name="mail_blue_light">@color/infomaniak</color>
-    <color name="mail_blue_dark">#4CB7FF</color>
+    <color name="pink_mail_primary_light">#BC0055</color>
+    <color name="pink_mail_primary_dark">#EF8BA4</color>
+    <color name="pink_mail_ripple_light">#1EBC0055</color>
+    <color name="pink_mail_ripple_dark">#1EEF8BA4</color>
+    <color name="pink_mail_container_light">#F7E8EF</color>
+    <color name="pink_mail_container_dark">#5D0F2B</color>
+
+    <color name="blue_mail_primary_light">@color/infomaniak</color>
+    <color name="blue_mail_primary_dark">#4CB7FF</color>
+    <color name="blue_mail_ripple_light">#1E0098FF</color>
+    <color name="blue_mail_ripple_dark">#1E4CB7FF</color>
+    <color name="blue_mail_container_light">#F4F6FD</color>
+    <color name="blue_mail_container_dark">#0F3256</color>
+
+    <color name="prince_light">#673AB7</color>
+    <color name="prince_dark">#956DDD</color>
+
 
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/white</color>
+    <color name="backgroundColorSecondary">@color/white</color>
+    <color name="backgroundColorTertiary">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/orca</color>
-    <color name="backgroundSecondaryColor">@color/swan</color>
+    <color name="backgroundAccentuated">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadBackground">@color/rabbit</color>
-    <color name="dialogBackground">@color/white</color>
+
+    <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
@@ -59,6 +75,7 @@
     <color name="colorOnPrimary">@color/white</color>
     <color name="snackbarTextColor">@color/mouse</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
+    <color name="staffOnlyColor">@color/prince_light</color>
 
     <!-- Separators -->
     <color name="separatorDarker">#ECECEC</color>
@@ -66,6 +83,7 @@
 
     <!-- Icons -->
     <color name="iconColor">@color/elephant</color>
+    <color name="iconColorPrimaryText">@color/primaryTextColor</color>
     <color name="iconSecondaryColor">@color/elephant</color>
     <color name="favoriteYellow">#F1BE41</color>
     <color name="swipeActionIconColor">@color/white</color>

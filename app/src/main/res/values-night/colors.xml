@@ -16,16 +16,16 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <resources>
-    <color name="pinkMail">@color/mail_pink_dark</color>
-    <color name="pinkMailInverse">@color/mail_pink_light</color>
-    <color name="pinkMailSecondary">#2A0F1B</color>
+    <color name="pinkMail">@color/pink_mail_primary_dark</color>
+    <color name="pinkMailInverse">@color/pink_mail_primary_light</color>
+    <color name="pinkMailContainer">@color/pink_mail_container_dark</color>
     <color name="pinkBoardingSecondaryBackground">@color/black</color>
-    <color name="pinkMailRipple">#1EE07FA3</color>
-    <color name="blueMail">@color/mail_blue_dark</color>
-    <color name="blueMailInverse">@color/mail_blue_light</color>
-    <color name="blueMailSecondary">#292E3D</color>
+    <color name="pinkMailRipple">@color/pink_mail_ripple_dark</color>
+    <color name="blueMail">@color/blue_mail_primary_dark</color>
+    <color name="blueMailInverse">@color/blue_mail_primary_light</color>
+    <color name="blueMailContainer">@color/blue_mail_container_dark</color>
     <color name="blueBoardingSecondaryBackground">@color/black</color>
-    <color name="blueMailRipple">#1E4CB7FF</color>
+    <color name="blueMailRipple">@color/blue_mail_ripple_dark</color>
 
     <!-- Context / errors -->
     <color name="orangeWarning">#FFAA4C</color>
@@ -35,21 +35,23 @@
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/orca</color>
     <color name="backgroundColor">#101010</color>
-    <color name="backgroundHeaderColor">@color/bat</color>
+    <color name="backgroundColorSecondary">@color/bat</color>
+    <color name="backgroundColorTertiary">@color/orca</color>
+    <color name="backgroundHeaderColor">#212121</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/rabbit</color>
-    <color name="backgroundSecondaryColor">@color/bat</color>
+    <color name="backgroundAccentuated">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
     <color name="threadBackground">@color/bat</color>
-    <color name="dialogBackground">@color/orca</color>
 
     <!-- Texts -->
-    <color name="primaryTextColor">@color/mouse</color>
+    <color name="primaryTextColor">@color/rabbit</color>
     <color name="secondaryTextColor">@color/shark</color>
     <color name="tertiaryTextColor">@color/elephant</color>
     <color name="colorOnPrimary">@color/bat</color>
     <color name="snackbarTextColor">@color/orca</color>
+    <color name="staffOnlyColor">@color/prince_dark</color>
 
     <!-- Separators -->
     <color name="separatorDarker">@color/bat</color>
