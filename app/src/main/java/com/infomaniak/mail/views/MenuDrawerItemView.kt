@@ -77,12 +77,6 @@ class MenuDrawerItemView @JvmOverloads constructor(
             value?.let { binding.itemName.setTextSize(TypedValue.COMPLEX_UNIT_PX, it.toFloat()) }
         }
 
-    var textWeight: Int? = null
-        set(value) {
-            field = value
-            value?.let { binding.itemName.typeface = ResourcesCompat.getFont(context, value) }
-        }
-
     init {
         attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
             val defaultTextSize = binding.itemName.textSize.toInt()
@@ -93,7 +87,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
             text = getString(R.styleable.MenuDrawerItemView_text)
             textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
             getResourceId(R.styleable.MenuDrawerItemView_textWeight, 0).also { fontFamily ->
-                if (fontFamily > 0) textWeight = fontFamily
+                if (fontFamily > 0) binding.itemName.typeface = ResourcesCompat.getFont(context, fontFamily)
             }
         }
     }

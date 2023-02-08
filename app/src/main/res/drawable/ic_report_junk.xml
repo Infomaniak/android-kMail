@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Infomaniak kMail - Android
+  ~ Copyright (C) 2023 Infomaniak Network SA
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="M20.948,1.682C20.982,1.783 21,1.891 21,2V9.5C21,9.776 21.224,10 21.5,10C21.776,10 22,9.776 22,9.5V2C22,1.47 21.789,0.961 21.414,0.586C21.039,0.211 20.53,0 20,0H2C1.47,0 0.961,0.211 0.586,0.586C0.211,0.961 0,1.47 0,2V13C0,13.53 0.211,14.039 0.586,14.414C0.961,14.789 1.47,15 2,15H9.5C9.776,15 10,14.776 10,14.5C10,14.224 9.776,14 9.5,14H2C1.735,14 1.48,13.895 1.293,13.707C1.105,13.52 1,13.265 1,13V2C1,1.891 1.018,1.783 1.052,1.682L10.688,9.39C10.87,9.536 11.13,9.536 11.312,9.39L20.948,1.682ZM1.821,1.016L11,8.36L20.179,1.016C20.12,1.005 20.06,1 20,1H2C1.94,1 1.88,1.005 1.821,1.016Z" />
+    <path
+        android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="M22.114,12.922C23.28,14.097 24,15.714 24,17.5C24,21.09 21.09,24 17.5,24C13.91,24 11,21.09 11,17.5C11,13.91 13.91,11 17.5,11C19.286,11 20.903,11.72 22.078,12.886C22.084,12.892 22.091,12.897 22.097,12.903C22.103,12.909 22.108,12.915 22.114,12.922ZM12,17.5C12,14.462 14.462,12 17.5,12C18.839,12 20.066,12.478 21.02,13.273L13.273,21.02C12.478,20.066 12,18.839 12,17.5ZM13.981,21.727C14.934,22.522 16.161,23 17.5,23C20.538,23 23,20.538 23,17.5C23,16.161 22.522,14.934 21.727,13.981L13.981,21.727Z" />
+</vector>
