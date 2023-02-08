@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
     android:viewportWidth="33"
     android:viewportHeight="8">
     <path
-        android:fillColor="#1A1A1A"
+        android:fillColor="#333333"
         android:pathData="M33,8l-33,-0l-0,-8l33,-0z" />
     <path
         android:fillColor="?android:attr/colorPrimary"

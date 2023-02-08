@@ -65,7 +65,7 @@
     <color name="cardViewStrokeColor">@color/orca</color>
 
     <!-- Progressbar -->
-    <color name="progressbarTrackColor">@color/elephant</color>
+    <color name="progressbarTrackColor">@color/orca</color>
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>

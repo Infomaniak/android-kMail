@@ -46,11 +46,13 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_LEFT
 import com.infomaniak.mail.data.LocalSettings.Companion.DEFAULT_SWIPE_ACTION_RIGHT
 import com.infomaniak.mail.data.LocalSettings.SwipeAction
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Thread
@@ -64,6 +66,7 @@ import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.isValid
 import java.util.Date
+import com.infomaniak.lib.core.R as RCore
 
 class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -90,6 +93,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupDensityDependentUi()
         setupOnRefresh()
         setupAdapter()
         setupListeners()
@@ -133,6 +137,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onRefresh() {
         mainViewModel.forceRefreshThreads()
+    }
+
+    private fun setupDensityDependentUi() = with(binding) {
+        val paddingTop = resources.getDimension(RCore.dimen.marginStandardMedium).toInt()
+        threadsList.setPaddingRelative(top = if (localSettings.threadDensity == COMPACT) paddingTop else 0)
     }
 
     private fun setupOnRefresh() {

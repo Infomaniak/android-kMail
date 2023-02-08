@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@ class ItemSettingView @JvmOverloads constructor(
 
                 chevron.isVisible = action == Action.CHEVRON
                 toggle.isVisible = action == Action.TOGGLE
+                openExternal.isVisible = action == Action.OPEN_EXTERNAL
 
                 if (!getBoolean(R.styleable.ItemSettingView_ripple, true)) root.background = null
             }
@@ -102,5 +103,6 @@ class ItemSettingView @JvmOverloads constructor(
         NONE,
         CHEVRON,
         TOGGLE,
+        OPEN_EXTERNAL,
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,10 @@ import android.Manifest
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -40,6 +38,7 @@ import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.lib.core.utils.clearStack
+import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.mail.MatomoMail.addTrackingCallbackForDebugLog
 import com.infomaniak.mail.MatomoMail.buildTracker
@@ -139,10 +138,7 @@ class ApplicationMain : Application(), ImageLoaderFactory {
         )
         val notificationText = getString(R.string.refreshTokenError)
 
-        if (ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.POST_NOTIFICATIONS,
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (hasPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS))) {
             val notificationManagerCompat = NotificationManagerCompat.from(this)
             showGeneralNotification(notificationText).apply {
                 setContentIntent(pendingIntent)
@@ -150,7 +146,9 @@ class ApplicationMain : Application(), ImageLoaderFactory {
                 notificationManagerCompat.notify(UUID.randomUUID().hashCode(), build())
             }
         } else {
-            Toast.makeText(this, notificationText, Toast.LENGTH_LONG).show()
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(this@ApplicationMain, notificationText, Toast.LENGTH_LONG).show()
+            }
         }
 
         CoroutineScope(Dispatchers.IO).launch { AccountUtils.removeUser(this@ApplicationMain, user) }
