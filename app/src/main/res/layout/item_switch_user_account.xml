@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/marginStandardSmall"
         android:layout_marginVertical="@dimen/marginStandardVerySmall"
-        app:cardBackgroundColor="@color/backgroundColor"
+        app:cardBackgroundColor="@color/backgroundColorSecondary"
         app:cardCornerRadius="10dp"
         app:rippleColor="?attr/colorControlHighlight"
         app:strokeColor="@color/cardViewStrokeColor"

@@ -35,14 +35,15 @@
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/orca</color>
     <color name="backgroundColor">#101010</color>
+    <color name="backgroundColorSecondary">@color/bat</color>
+    <color name="backgroundColorTertiary">@color/orca</color>
     <color name="backgroundHeaderColor">@color/bat</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/rabbit</color>
-    <color name="backgroundSecondaryColor">@color/bat</color>
+    <color name="backgroundAccentuated">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
     <color name="threadBackground">@color/bat</color>
-    <color name="dialogBackground">@color/orca</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/mouse</color>

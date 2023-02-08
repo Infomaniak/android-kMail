@@ -18,12 +18,12 @@
 package com.infomaniak.mail.views
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -102,7 +102,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
         val (color, textAppearance) = if (isSelected) {
             Pair(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer), R.style.BodyMedium_Accent)
         } else {
-            Pair(ContextCompat.getColor(context, R.color.backgroundColor), R.style.BodyMedium)
+            Pair(Color.TRANSPARENT, R.style.BodyMedium)
         }
 
         root.setCardBackgroundColor(color)

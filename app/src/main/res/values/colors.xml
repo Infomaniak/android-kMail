@@ -43,14 +43,17 @@
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
     <color name="backgroundColor">@color/white</color>
+    <color name="backgroundColorSecondary">@color/white</color>
+    <color name="backgroundColorTertiary">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/orca</color>
-    <color name="backgroundSecondaryColor">@color/swan</color>
+    <color name="backgroundAccentuated">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadBackground">@color/rabbit</color>
-    <color name="dialogBackground">@color/white</color>
+
+    <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>

@@ -283,7 +283,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:paddingEnd">@dimen/marginStandard</item>
         <item name="android:paddingStart">@dimen/marginStandard</item>
-        <item name="cardBackgroundColor">@color/backgroundColor</item>
+        <item name="cardBackgroundColor">@android:color/transparent</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
         <item name="shapeAppearanceOverlay">@style/MenuDrawerItemShapeAppearance</item>
     </style>
@@ -331,7 +331,7 @@
     <style name="BottomSheetDialogTheme" parent="BottomSheetDialogTheme.Base" />
 
     <style name="BottomSheetDialogThemeModalStyle" parent="Widget.Material3.BottomSheet">
-        <item name="backgroundTint">@color/backgroundColor</item>
+        <item name="backgroundTint">@color/backgroundColorSecondary</item>
         <item name="shapeAppearanceOverlay">@style/BottomSheetDialogThemeShapeAppearanceOverlay</item>
     </style>
 
@@ -395,7 +395,7 @@
     <!-- Dialog -->
 
     <style name="DialogStyle" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="android:background">@color/dialogBackground</item>
+        <item name="android:background">@color/backgroundColorTertiary</item>
         <item name="buttonBarNegativeButtonStyle">@style/DeletePositiveButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="colorControlNormal">?attr/colorControlNormal</item>

@@ -188,7 +188,7 @@ class ThreadListAdapter(
         threadCount.setTextAppearance(R.style.Label_Secondary)
         threadCountCardview.apply {
             setStrokeColor(context.getColor(R.color.cardViewStrokeColor))
-            setCardBackgroundColor(context.getColor(R.color.dialogBackground))
+            setCardBackgroundColor(context.getColor(R.color.backgroundColorTertiary))
         }
     }
 
