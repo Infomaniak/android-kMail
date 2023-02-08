@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
@@ -53,7 +54,7 @@ class MainActivity : ThemedActivity() {
 
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
-    private val menuDrawerBackground: Int by lazy { getColor(R.color.menuDrawerBackground) }
+    private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -206,13 +207,18 @@ class MainActivity : ThemedActivity() {
         }
     }
 
-    private fun colorSystemBarsWithMenuDrawer(slideOffset: Float = 1.0f) {
-        if (slideOffset == 1.0f) {
-            window.statusBarColor = menuDrawerBackground
-            window.navigationBarColor = menuDrawerBackground
+
+    private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) {
+        if (slideOffset == FULLY_SLID) {
+            window.statusBarColor = menuDrawerBackgroundColor
+            window.navigationBarColor = menuDrawerBackgroundColor
         } else {
-            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackground, slideOffset)
-            window.navigationBarColor = UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackground, slideOffset)
+            window.statusBarColor = UiUtils.pointBetweenColors(backgroundHeaderColor, menuDrawerBackgroundColor, slideOffset)
+            window.navigationBarColor = UiUtils.pointBetweenColors(backgroundColor, menuDrawerBackgroundColor, slideOffset)
         }
+    }
+
+    private companion object {
+        const val FULLY_SLID = 1.0f
     }
 }

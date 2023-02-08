@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/menuDrawerBackground"
+    android:background="@color/menuDrawerBackgroundColor"
     android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
@@ -28,7 +28,7 @@
         style="@style/CardViewMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/menuDrawerBackground"
+        app:cardBackgroundColor="@color/menuDrawerBackgroundColor"
         app:cardElevation="6dp">
 
         <LinearLayout
