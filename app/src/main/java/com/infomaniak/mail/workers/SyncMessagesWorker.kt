@@ -42,6 +42,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.ApiErrorException
+import com.infomaniak.mail.utils.ApiErrorException.*
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
 import com.infomaniak.mail.utils.formatSubject
 import com.infomaniak.mail.utils.htmlToText
@@ -69,12 +70,12 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 // Don't launch sync if the mailbox's notifications have been disabled by the user
                 if (mailbox.isNotificationsBlocked()) return@loopMailboxes
 
-                // Update local with remote
                 val realm = RealmDatabase.newMailboxContentInstance(user.id, mailbox.mailboxId)
                 val folder = FolderController.getFolder(FolderRole.INBOX, realm) ?: return@loopMailboxes
                 if (folder.cursor == null) return@loopMailboxes
-
                 val okHttpClient = AccountUtils.getHttpClient(user.id)
+
+                // Update local with remote
                 val newMessagesThreads = runCatching {
                     MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, realm)
                 }.getOrElse {
@@ -168,7 +169,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
     private fun handleApiError(exception: ApiErrorException) {
         when (ApiController.json.decodeFromString<ApiResponse<Any>>(exception.message!!).error?.code) {
-            "folder__not_exists" -> Unit
+            ErrorCodes.FOLDER_DOESNT_EXIST.code -> Unit
             else -> Sentry.captureException(exception)
         }
     }
