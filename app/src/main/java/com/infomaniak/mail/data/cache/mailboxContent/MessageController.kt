@@ -25,8 +25,10 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
@@ -114,6 +116,29 @@ object MessageController {
 
     fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
         return listOf(message) + thread.duplicates.query("${Message::messageId.name} == '${message.messageId}'").find()
+    }
+
+    fun searchMessages(searchQuery: String?, filters: Set<ThreadFilter>, folderId: String?): List<Message> {
+        val queriesList = mutableListOf<String>().apply {
+            filters.forEach { filter ->
+                when (filter) {
+                    ThreadFilter.SEEN -> add("${Message::isSeen.name} == true")
+                    ThreadFilter.UNSEEN -> add("${Message::isSeen.name} == false")
+                    ThreadFilter.STARRED -> add("${Message::isFavorite.name} == true")
+                    ThreadFilter.FOLDER -> add(byFolderId(folderId!!))
+                    ThreadFilter.ATTACHMENTS -> add("${Message::hasAttachments.name} == true")
+                    else -> Unit
+                }
+            }
+        }
+
+        if (!searchQuery.isNullOrBlank()) {
+            val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS $searchQuery"
+            val containsSubject = "${Message::subject.name} CONTAINS $searchQuery"
+            queriesList.add("$containsBody OR $containsSubject")
+        }
+
+        return defaultRealm.query<Message>(queriesList.joinToString(" AND ") { it }).find()
     }
     //endregion
 

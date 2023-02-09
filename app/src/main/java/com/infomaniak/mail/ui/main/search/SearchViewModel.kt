@@ -19,12 +19,15 @@ package com.infomaniak.mail.ui.main.search
 
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
+import io.realm.kotlin.ext.toRealmList
 import kotlinx.coroutines.Dispatchers
 
 class SearchViewModel : ViewModel() {
@@ -81,13 +84,18 @@ class SearchViewModel : ViewModel() {
         searchQuery(searchQuery.value ?: "")
     }
 
-    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>) = liveData<List<Thread>>(Dispatchers.IO) {
+    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>) = liveData(Dispatchers.IO) {
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = selectedFolder?.id ?: currentFolderId
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters(query, filters), resourceNext)
-        val threads = apiResponse.data?.threads?.let(ThreadController::getThreadsWithLocalMessages)
-        resourceNext = apiResponse.data?.resourceNext ?: ""
-        emit(threads ?: emptyList())
+        if (apiResponse.isSuccess()) {
+            val threads = apiResponse.data?.threads?.let(ThreadController::getThreadsWithLocalMessages)
+            emit(threads ?: emptyList())
+            resourceNext = apiResponse.data?.resourceNext ?: ""
+        } else if (resourceNext.isNullOrBlank()) {
+            val threads = MessageController.searchMessages(query, filters, selectedFolder?.id).convertToThreads()
+            emit(threads)
+        }
     }
 
     private fun searchFilters(query: String?, filters: Set<ThreadFilter>): String {
@@ -128,6 +136,25 @@ class SearchViewModel : ViewModel() {
         }
 
         this.selectedFilters.value = filters?.apply { add(filter) }
+    }
+
+    private fun List<Message>.convertToThreads(): List<Thread> {
+        return this.map { message ->
+            Thread().apply {
+                this.uid = "search-${message.uid}"
+                this.messages = listOf(message).toRealmList()
+                this.unseenMessagesCount = 0
+                this.from = message.from
+                this.to = message.to
+                this.date = message.date
+                this.hasAttachments = message.hasAttachments
+                this.isFavorite = message.isFavorite
+                this.isAnswered = message.isAnswered
+                this.isForwarded = message.isForwarded
+                this.size = message.size
+                this.subject = message.subject
+            }
+        }
     }
 
 }
