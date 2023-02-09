@@ -31,7 +31,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
@@ -88,19 +90,38 @@ class ThreadFragment : Fragment() {
     }
 
     private fun setupUi(threadUid: String) = with(binding) {
-
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
             val removed = appBarLayout.height - total
-            val progress = ((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0)
-            val opacity = ((progress / total) * 255).roundToInt()
+            val progress = (((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0) / total).toFloat() // [0,1]
+            val opacity = (progress * 255).roundToInt()
 
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
             toolbarSubject.setTextColor(textColor)
         }
+
+        var headerColorState = HeaderState.LOWERED
+        messagesList.addOnScrollListener(object : OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val isAtTheTop = !recyclerView.canScrollVertically(-1)
+                if (headerColorState == HeaderState.ELEVATED && !isAtTheTop) return
+
+                val newColor = context.getColor(if (isAtTheTop) R.color.backgroundColor else R.color.elevatedBackground)
+                headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
+
+                val oldColor = requireActivity().window.statusBarColor
+                UiUtils.animateColorChange(oldColor, newColor, 150L, true) { color ->
+                    toolbar.setBackgroundColor(color)
+                    appBar.backgroundTintList = ColorStateList.valueOf(color)
+                    requireActivity().window.statusBarColor = color
+                }
+            }
+        })
 
         iconFavorite.setOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
 
@@ -131,7 +152,7 @@ class ThreadFragment : Fragment() {
 
     private fun setupAdapter(threadUid: String) = with(binding) {
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
-            messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 1)))
+            messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
         }
         messagesList.adapter = threadAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -252,6 +273,11 @@ class ThreadFragment : Fragment() {
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
         // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
         findNavController().popBackStack()
+    }
+
+    enum class HeaderState {
+        ELEVATED,
+        LOWERED
     }
 
     private companion object {

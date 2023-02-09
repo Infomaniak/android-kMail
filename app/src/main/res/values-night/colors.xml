@@ -41,7 +41,7 @@
     <color name="backgroundLoginWebviewColor">@color/black</color>
     <color name="backgroundOnBoardingColor">@color/bat</color>
     <color name="backgroundSnackbarColor">@color/rabbit</color>
-    <color name="backgroundAccentuated">@color/bat</color>
+    <color name="elevatedBackground">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
     <color name="threadBackground">@color/bat</color>
 

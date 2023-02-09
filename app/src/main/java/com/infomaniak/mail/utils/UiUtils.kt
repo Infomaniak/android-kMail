@@ -109,7 +109,7 @@ object UiUtils {
         @ColorInt newColor: Int,
         duration: Long = 150L,
         animate: Boolean = true,
-        setColor: (Int) -> Unit,
+        setColor: (color: Int) -> Unit,
     ) {
         if (animate) {
             ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
