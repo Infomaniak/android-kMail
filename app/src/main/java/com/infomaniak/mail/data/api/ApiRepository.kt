@@ -23,6 +23,7 @@ import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.Thread.ThreadResult
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.draft.Draft
@@ -203,6 +204,11 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun undoAction(undoResources: String): ApiResponse<Boolean> {
         return callApi(url = ApiRoutes.resource(undoResources), method = POST)
+    }
+
+    fun searchThreads(mailboxUuid: String, folderId: String, filters: String, resource: String?): ApiResponse<ThreadResult> {
+        return if (resource.isNullOrBlank()) callApi(ApiRoutes.search(mailboxUuid, folderId, filters), GET)
+        else callApi("${ApiRoutes.resource(resource)}&$filters", GET)
     }
 
     /**

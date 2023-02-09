@@ -80,9 +80,17 @@ object ApiRoutes {
 
     fun starMessage(mailboxUuid: String, star: Boolean): String = "${message(mailboxUuid)}/${if (star) "star" else "unstar"}"
 
-    // fun search(mailboxUuid: String, folderId: String, searchText: String): String {
-    //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
-    // }
+    fun search(
+        mailboxUuid: String,
+        folderId: String,
+        filters: String,
+        offset: Int = 0,
+        isDraftFolder: Boolean = false,
+    ): String {
+        val offset = "offset=$offset"
+        val thread = "thread=${if (isDraftFolder) "off" else "on"}"
+        return "${folder(mailboxUuid, folderId)}/message?$offset&$thread&$filters"
+    }
 
     fun getMessagesUids(mailboxUuid: String, folderId: String): String {
         return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${Utils.MAX_NUMBER_OF_MESSAGES_TO_FETCH}"
