@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
@@ -24,6 +25,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
@@ -46,6 +48,7 @@ import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
+import com.infomaniak.mail.utils.UiUtils.animateColorChange
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -59,6 +62,8 @@ class ThreadFragment : Fragment() {
     private val threadViewModel: ThreadViewModel by viewModels()
 
     private val threadAdapter by lazy { ThreadAdapter() }
+
+    private var valueAnimator: ValueAnimator? = null
 
     // When opening the Thread, we want to scroll to the last Message, but only once.
     private var shouldScrollToBottom = AtomicBoolean(true)
@@ -75,7 +80,7 @@ class ThreadFragment : Fragment() {
         threadViewModel.openThread(navigationArgs.threadUid).observe(viewLifecycleOwner) { result ->
 
             if (result == null) {
-                findNavController().popBackStack()
+                leaveThread()
                 return@observe
             }
 
@@ -87,10 +92,12 @@ class ThreadFragment : Fragment() {
             observeContacts()
             observeQuickActionBarClicks()
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { leaveThread() }
     }
 
     private fun setupUi(threadUid: String) = with(binding) {
-        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        toolbar.setNavigationOnClickListener { leaveThread() }
 
         val defaultTextColor = context.getColor(R.color.primaryTextColor)
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -114,11 +121,14 @@ class ThreadFragment : Fragment() {
                 val newColor = context.getColor(if (isAtTheTop) R.color.backgroundColor else R.color.elevatedBackground)
                 headerColorState = if (isAtTheTop) HeaderState.LOWERED else HeaderState.ELEVATED
 
-                val oldColor = requireActivity().window.statusBarColor
-                UiUtils.animateColorChange(oldColor, newColor, 150L, true) { color ->
+                val oldColor = appBar.backgroundTintList!!.defaultColor
+                if (oldColor == newColor) return
+
+                valueAnimator?.cancel()
+                valueAnimator = animateColorChange(oldColor, newColor, animate = true) { color ->
                     toolbar.setBackgroundColor(color)
                     appBar.backgroundTintList = ColorStateList.valueOf(color)
-                    requireActivity().window.statusBarColor = color
+                    activity?.window?.statusBarColor = color
                 }
             }
         })
@@ -272,6 +282,7 @@ class ThreadFragment : Fragment() {
         // TODO: When opening a Thread via a Notification, the action of leaving this fragment
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
         // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
+        valueAnimator?.cancel()
         findNavController().popBackStack()
     }
 

@@ -110,9 +110,9 @@ object UiUtils {
         duration: Long = 150L,
         animate: Boolean = true,
         setColor: (color: Int) -> Unit,
-    ) {
+    ): ValueAnimator? {
         if (animate) {
-            ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
+            return ValueAnimator.ofObject(ArgbEvaluator(), oldColor, newColor).apply {
                 setDuration(duration)
                 addUpdateListener { animator -> setColor(animator.animatedValue as Int) }
                 start()
@@ -120,5 +120,7 @@ object UiUtils {
         } else {
             setColor(newColor)
         }
+
+        return null
     }
 }
