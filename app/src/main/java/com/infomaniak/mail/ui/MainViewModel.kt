@@ -311,25 +311,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return null
-        val destinationFolderId = destinationFolder.id
 
         val messages = getMessagesToMove(thread, message)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         var impactedFoldersIds: List<String>? = null
         if (apiResponse.isSuccess()) {
-            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolderId)
+            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
             if (withRefresh) {
-                refreshFolders(mailbox, messagesFoldersIds, destinationFolderId)
+                refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id)
             } else {
                 impactedFoldersIds = messagesFoldersIds
             }
         }
 
-        val undoDestinationId = message?.folderId ?: thread.folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-        showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
 
         return impactedFoldersIds
     }
@@ -420,19 +417,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
-        val undoDestinationId = message?.folderId ?: thread.folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-
-        showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
     }
 
     private fun showMoveSnackbar(
+        threadFolderId: String,
         message: Message?,
+        messages: List<Message>,
         apiResponse: ApiResponse<MoveResult>,
         destinationFolder: Folder,
-        undoFoldersIds: List<String>,
-        undoDestinationId: String?,
     ) {
+        val undoDestinationId = message?.folderId ?: threadFolderId
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id
 
         val destination = destinationFolder.role?.folderNameRes?.let(context::getString) ?: destinationFolder.name
 
@@ -512,23 +508,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return@launch
-        val destinationFolderId = destinationFolder.id
 
         val messages = when (message) {
             null -> MessageController.getUnscheduledMessages(thread)
             else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
+            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolder.id), destinationFolder.id)
         }
 
         if (displaySnackbar) {
-            val undoDestinationId = message?.folderId ?: thread.folderId
-            val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-            showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
         }
     }
     //endregion
