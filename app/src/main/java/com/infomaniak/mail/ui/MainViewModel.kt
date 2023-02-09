@@ -169,10 +169,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
         if (userId != AppSettings.DEFAULT_ID && mailboxId != AppSettings.DEFAULT_ID) {
+
             val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
             selectMailbox(mailbox)
-            val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
-            selectFolder(folder.id)
+
+            if (currentFolderId.value == null) {
+                val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
+                selectFolder(folder.id)
+            }
         }
     }
 
@@ -187,10 +191,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         selectMailbox(mailbox)
         updateSignatures(mailbox)
         updateFolders(mailbox)
-        FolderController.getFolder(DEFAULT_SELECTED_FOLDER)?.let { folder ->
-            selectFolder(folder.id)
-            refreshThreads(mailbox, folder.id)
-        }
+
+        val folder =
+            currentFolderId.value?.let(FolderController::getFolder)
+                ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER)
+                ?: return@launch
+
+        selectFolder(folder.id)
+        refreshThreads(mailbox, folder.id)
         DraftsActionsWorker.scheduleWork(context)
     }
 
