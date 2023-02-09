@@ -192,13 +192,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateSignatures(mailbox)
         updateFolders(mailbox)
 
-        val folder =
-            currentFolderId.value?.let(FolderController::getFolder)
-                ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER)
-                ?: return@launch
+        (currentFolderId.value?.let(FolderController::getFolder)
+            ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))?.let { folder ->
+            selectFolder(folder.id)
+            refreshThreads(mailbox, folder.id)
+        }
 
-        selectFolder(folder.id)
-        refreshThreads(mailbox, folder.id)
         DraftsActionsWorker.scheduleWork(context)
     }
 
