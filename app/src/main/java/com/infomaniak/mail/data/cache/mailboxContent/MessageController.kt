@@ -133,12 +133,15 @@ object MessageController {
         }
 
         if (!searchQuery.isNullOrBlank()) {
-            val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS $searchQuery"
-            val containsSubject = "${Message::subject.name} CONTAINS $searchQuery"
-            queriesList.add("$containsBody OR $containsSubject")
+            val containsSubject = "${Message::subject.name} CONTAINS[c] '$searchQuery'"
+            val containsPreview = "${Message::preview.name} CONTAINS[c] '$searchQuery'"
+            val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] '$searchQuery'"
+            queriesList.add("($containsSubject OR $containsPreview OR $containsBody)")
         }
 
-        return defaultRealm.query<Message>(queriesList.joinToString(" AND ") { it }).find()
+        return defaultRealm.writeBlocking {
+            query<Message>(queriesList.joinToString(" AND ") { it }).find().copyFromRealm()
+        }
     }
     //endregion
 
