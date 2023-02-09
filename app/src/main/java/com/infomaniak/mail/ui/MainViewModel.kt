@@ -48,6 +48,7 @@ import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
+import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
@@ -82,7 +83,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     emitSource(FolderController.getFoldersAsync().map { it.list.getMenuFolders() }.asLiveData())
                 }
             }
-        }
+        }.also { currentFoldersLive = it }
+    private var currentFoldersLive: LiveData<Triple<Folder?, List<Folder>, List<Folder>>>? = null
 
     /**
      * This LiveData value should never be accessed directly.
@@ -91,7 +93,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val currentQuotasLiveToObserve
         get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
             liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
-        }
+        }.also { currentQuotasLive = it }
+    private var currentQuotasLive: LiveData<Quotas?>? = null
     //endregion
 
     //region Current Folder
@@ -108,7 +111,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val currentFolderLiveToObserve
         get() = currentFolderId.switchMap { folderId ->
             liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
-        }
+        }.also { currentFolderLive = it }
+    private var currentFolderLive: LiveData<Folder>? = null
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
@@ -121,10 +125,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             liveData(Dispatchers.IO) {
                 if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
             }
-        }
+        }.also { currentThreadsLive = it }
+    private var currentThreadsLive: LiveData<ResultsChange<Thread>>? = null
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
+
+    fun removeMenuDrawerObservers(viewLifecycleOwner: LifecycleOwner) {
+        currentQuotasLive?.removeObservers(viewLifecycleOwner)
+        currentQuotasLive = null
+
+        currentFoldersLive?.removeObservers(viewLifecycleOwner)
+        currentFoldersLive = null
+    }
+
+    fun removeThreadListObservers(viewLifecycleOwner: LifecycleOwner) {
+        currentFolderLive?.removeObservers(viewLifecycleOwner)
+        currentFolderLive = null
+
+        currentThreadsLive?.removeObservers(viewLifecycleOwner)
+        currentThreadsLive = null
+    }
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!

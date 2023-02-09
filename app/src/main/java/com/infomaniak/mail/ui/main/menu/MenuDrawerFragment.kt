@@ -78,8 +78,17 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeCurrentMailbox()
         observeMailboxesLive()
         observeCurrentFolder()
-        observeFoldersLive()
+    }
+
+    override fun onStart() {
+        super.onStart()
         observeQuotas()
+        observeFoldersLive()
+    }
+
+    override fun onStop() {
+        mainViewModel.removeMenuDrawerObservers(viewLifecycleOwner)
+        super.onStop()
     }
 
     override fun setupListeners() = with(binding) {
