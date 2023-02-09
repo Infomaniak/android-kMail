@@ -75,6 +75,11 @@ class SearchViewModel : ViewModel() {
         }
     }
 
+    fun nextPage() {
+        if (resourceNext.isNullOrBlank()) return
+        searchQuery(searchQuery.value ?: "")
+    }
+
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>) = liveData<List<Thread>>(Dispatchers.IO) {
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = selectedFolder?.id ?: currentFolderId
