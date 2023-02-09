@@ -28,8 +28,8 @@
     <color name="blueMailRipple">@color/blue_mail_ripple_dark</color>
 
     <!-- Context / errors -->
-    <color name="orangeWarning">#FFAA4C</color>
-    <color name="redDestructiveAction">#FC8878</color>
+    <color name="orangeWarning">@color/orange_dark</color>
+    <color name="redDestructiveAction">@color/red_dark</color>
     <color name="redDestructiveActionTransparent">#1EFC8878</color>
 
     <!-- Backgrounds -->
@@ -58,6 +58,7 @@
     <!-- Icons -->
     <color name="iconColor">@color/mouse</color>
     <color name="iconSecondaryColor">@color/shark</color>
+    <color name="favoriteYellow">@color/yellow_dark</color>
     <color name="swipeActionIconColor">@color/bat</color>
 
     <!-- Cardview -->
@@ -68,15 +69,16 @@
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
-    <color name="swipeMove">#00C7B3</color>
-    <color name="swipeReadUnread">#0AB2F5</color>
-    <color name="swipeFavorite">#FCD65A</color>
-    <color name="swipePostpone">#4CB7FF</color>
+    <color name="swipeMove">@color/fougere_dark</color>
+    <color name="swipeReadUnread">@color/dark_blue_dark</color>
+    <color name="swipeFavorite">@color/favoriteYellow</color>
+    <color name="swipePostpone">@color/light_blue_dark</color>
     <color name="swipeSpam">@color/orangeWarning</color>
-    <color name="swipeArchive">#CC8FD6</color>
-    <color name="swipeQuickActionMenu">#F1F1F1</color>
+    <color name="swipeArchive">@color/mauve_dark</color>
+    <color name="swipeQuickActionMenu">@color/app_blue_dark</color>
+    <color name="swipeInbox">@color/shark</color>
     <color name="swipeNone">@color/progressbarTrackColor</color>
-    <color name="swipeReadAndArchive">#956DDD</color>
+    <color name="swipeReadAndArchive">@color/prince_dark</color>
 
     <!-- Other -->
     <color name="textInputStrokeColor">@color/shark</color>

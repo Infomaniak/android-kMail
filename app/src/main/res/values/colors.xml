@@ -30,8 +30,8 @@
     <color name="blueMailRipple">@color/blue_mail_ripple_light</color>
 
     <!-- Context / errors -->
-    <color name="orangeWarning">#FF8500</color>
-    <color name="redDestructiveAction">#F44336</color>
+    <color name="orangeWarning">@color/orange_light</color>
+    <color name="redDestructiveAction">@color/red_light</color>
     <color name="redDestructiveActionTransparent">#1EF44336</color>
 
     <!-- Color Tones -->
@@ -49,6 +49,22 @@
     <color name="blue_mail_container_light">#F4F6FD</color>
     <color name="blue_mail_container_dark">#0F3256</color>
 
+    <color name="yellow_light">#FFC10A</color>
+    <color name="yellow_dark">#FFDF9E</color>
+    <color name="orange_light">#FF8500</color>
+    <color name="orange_dark">#FFAA4C</color>
+    <color name="red_light">#F44336</color>
+    <color name="red_dark">#FC8878</color>
+    <color name="fougere_light">#009688</color>
+    <color name="fougere_dark">#00C7B3</color>
+    <color name="dark_blue_light">#006AB2</color>
+    <color name="dark_blue_dark">#0AB2F5</color>
+    <color name="light_blue_light">#4CB7FF</color>
+    <color name="light_blue_dark">#A3DAFF</color>
+    <color name="app_blue_light">#85A2B6</color>
+    <color name="app_blue_dark">#AFC2CF</color>
+    <color name="mauve_light">#BA68C8</color>
+    <color name="mauve_dark">#CC8FD6</color>
     <color name="prince_light">#673AB7</color>
     <color name="prince_dark">#956DDD</color>
 
@@ -83,7 +99,7 @@
     <color name="iconColor">@color/elephant</color>
     <color name="iconColorPrimaryText">@color/primaryTextColor</color>
     <color name="iconSecondaryColor">@color/elephant</color>
-    <color name="favoriteYellow">#F1BE41</color>
+    <color name="favoriteYellow">@color/yellow_light</color>
     <color name="swipeActionIconColor">@color/white</color>
 
     <!-- Cardview -->
@@ -94,15 +110,16 @@
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
-    <color name="swipeMove">#009688</color>
-    <color name="swipeReadUnread">#006AB2</color>
-    <color name="swipeFavorite">#FFC10A</color>
-    <color name="swipePostpone">#4CB7FF</color>
+    <color name="swipeMove">@color/fougere_light</color>
+    <color name="swipeReadUnread">@color/dark_blue_light</color>
+    <color name="swipeFavorite">@color/favoriteYellow</color>
+    <color name="swipePostpone">@color/light_blue_light</color>
     <color name="swipeSpam">@color/orangeWarning</color>
-    <color name="swipeArchive">#BA68C8</color>
-    <color name="swipeQuickActionMenu">#85A2B6</color>
+    <color name="swipeArchive">@color/mauve_light</color>
+    <color name="swipeQuickActionMenu">@color/app_blue_light</color>
+    <color name="swipeInbox">@color/shark</color>
     <color name="swipeNone">@color/progressbarTrackColor</color>
-    <color name="swipeReadAndArchive">#673AB7</color>
+    <color name="swipeReadAndArchive">@color/prince_light</color>
 
     <!-- Other -->
     <color name="textInputStrokeColor">@color/mouse</color>
