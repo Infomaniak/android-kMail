@@ -28,6 +28,7 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
@@ -106,6 +107,15 @@ object ThreadController {
 
     fun getThreadAsync(uid: String): Flow<SingleQueryChange<Thread>> {
         return getThreadQuery(uid, defaultRealm).asFlow()
+    }
+
+    fun getThreadsWithLocalMessages(apiThreads: List<Thread>): List<Thread> {
+        return apiThreads.map { thread ->
+            MessageController.getMessage(thread.messages.first().uid)?.let { message ->
+                thread.messages = listOf(message).toRealmList()
+            }
+            thread
+        }
     }
     //endregion
 

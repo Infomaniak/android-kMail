@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.search
 
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Thread
@@ -84,9 +85,9 @@ class SearchViewModel : ViewModel() {
         val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
         val folderId = selectedFolder?.id ?: currentFolderId
         val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters(query, filters), resourceNext)
-
+        val threads = apiResponse.data?.threads?.let(ThreadController::getThreadsWithLocalMessages)
         resourceNext = apiResponse.data?.resourceNext ?: ""
-        emit(apiResponse.data?.threads ?: emptyList())
+        emit(threads ?: emptyList())
     }
 
     private fun searchFilters(query: String?, filters: Set<ThreadFilter>): String {
