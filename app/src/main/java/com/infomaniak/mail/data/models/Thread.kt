@@ -15,12 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+
 package com.infomaniak.mail.data.models
 
 import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -39,8 +43,12 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.util.Date
 
+@Serializable
 class Thread : RealmObject {
 
     @PrimaryKey
@@ -203,6 +211,25 @@ class Thread : RealmObject {
         ATTACHMENTS(R.string.searchFilterAttachment),
         FOLDER(R.string.searchFilterFolder),
     }
+
+    @Serializable
+    data class ThreadResult(
+        val threads: List<Thread>? = null,
+        @SerialName("total_messages_count")
+        val totalMessagesCount: Int,
+        @SerialName("messages_count")
+        val messagesCount: Int,
+        @SerialName("current_offset")
+        val currentOffset: Int,
+        @SerialName("thread_mode")
+        val threadMode: String,
+        @SerialName("folder_unseen_messages")
+        val folderUnseenMessages: Int,
+        @SerialName("resource_previous")
+        val resourcePrevious: String?,
+        @SerialName("resource_next")
+        val resourceNext: String?,
+    )
 
     companion object {
         const val FORMAT_DAY_OF_THE_WEEK = "EEE"
