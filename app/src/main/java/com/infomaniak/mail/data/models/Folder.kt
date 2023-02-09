@@ -68,8 +68,8 @@ class Folder : RealmObject {
     var messages: RealmList<Message> = realmListOf()
     //endregion
 
-    private val parentFolders by backlinks(Folder::children)
-    val parentFolder get() = parentFolders.firstOrNull()
+    private val _parents by backlinks(Folder::children)
+    val parent get() = _parents.singleOrNull()
 
     val role: FolderRole?
         get() = enumValueOfOrNull<FolderRole>(_role)
