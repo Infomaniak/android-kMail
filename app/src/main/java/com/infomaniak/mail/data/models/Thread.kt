@@ -63,8 +63,8 @@ class Thread : RealmObject {
     var isForwarded: Boolean = false
     var isScheduled: Boolean = false
 
-    private val parentFolders by backlinks(Folder::threads)
-    private val parentFolder get() = parentFolders.first()
+    private val _folders by backlinks(Folder::threads)
+    val folder get() = _folders.single()
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
@@ -178,11 +178,11 @@ class Thread : RealmObject {
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> {
-        return if (parentFolder.role == FolderRole.DRAFT) to else from
+        return if (folder.role == FolderRole.DRAFT) to else from
     }
 
     fun computePreview(): String {
-        val message = if (parentFolder.role == FolderRole.SENT) {
+        val message = if (folder.role == FolderRole.SENT) {
             messages.lastOrNull { it.folderId == folderId } ?: messages.last()
         } else {
             messages.last()
