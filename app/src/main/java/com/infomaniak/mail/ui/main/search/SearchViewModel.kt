@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.search
 
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -28,12 +29,9 @@ import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.toRealmList
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 
 class SearchViewModel : ViewModel() {
-
-    private val searchFolder: Folder? = null
-    private val lastSearch: String = ""
 
     private val searchQuery = MutableLiveData<String>()
     val selectedFilters = MutableLiveData(mutableSetOf<ThreadFilter>())
@@ -41,6 +39,8 @@ class SearchViewModel : ViewModel() {
     private lateinit var currentFolderId: String
     private var selectedFolder: Folder? = null
     private var resourceNext: String? = null
+
+    private var fetchThreadsJob: Job? = null
 
     val searchResults = observeSearchAndFilters().switchMap { (query, filters) -> fetchThreads(query, filters) }
     val hasNextPage get() = !resourceNext.isNullOrBlank()
@@ -56,15 +56,17 @@ class SearchViewModel : ViewModel() {
     }
 
     fun refreshSearch() {
-        resourceNext = ""
+        resourceNext = null
         searchQuery(searchQuery.value ?: "")
     }
 
     fun searchQuery(query: String) {
+        resourceNext = null
         searchQuery.value = query
     }
 
     fun selectFolder(folder: Folder?) {
+        resourceNext = null
         if (selectedFilters.value?.contains(ThreadFilter.FOLDER) == false) {
             selectedFilters.value = selectedFilters.value?.apply { add(ThreadFilter.FOLDER) }
         }
@@ -72,6 +74,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun toggleFilter(filter: ThreadFilter) {
+        resourceNext = null
         if (selectedFilters.value?.contains(filter) == true) {
             selectedFilters.value = selectedFilters.value?.apply { remove(filter) }
         } else {
@@ -84,17 +87,34 @@ class SearchViewModel : ViewModel() {
         searchQuery(searchQuery.value ?: "")
     }
 
-    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>) = liveData(Dispatchers.IO) {
-        val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
-        val folderId = selectedFolder?.id ?: currentFolderId
-        val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters(query, filters), resourceNext)
-        if (apiResponse.isSuccess()) {
-            val threads = apiResponse.data?.threads?.let(ThreadController::getThreadsWithLocalMessages)
-            emit(threads ?: emptyList())
-            resourceNext = apiResponse.data?.resourceNext ?: ""
-        } else if (resourceNext.isNullOrBlank()) {
-            val threads = MessageController.searchMessages(query, filters, selectedFolder?.id).convertToThreads()
-            emit(threads)
+    override fun onCleared() {
+        viewModelScope.launch {
+            fetchThreadsJob?.cancelAndJoin()
+            deleteRealmSearchData()
+        }
+        super.onCleared()
+    }
+
+    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
+        fetchThreadsJob?.cancel()
+        fetchThreadsJob = Job()
+        return liveData(Dispatchers.IO + fetchThreadsJob!!) {
+            val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+            val folderId = selectedFolder?.id ?: currentFolderId
+
+            if (!hasNextPage) deleteRealmSearchData()
+
+            val apiResponse =
+                ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters(query, filters), resourceNext)
+            if (apiResponse.isSuccess()) {
+                val threads = apiResponse.data?.threads?.let(ThreadController::getThreadsWithLocalMessages)
+                emit(threads ?: emptyList())
+                resourceNext = apiResponse.data?.resourceNext ?: ""
+            } else if (resourceNext.isNullOrBlank()) {
+                val threads = MessageController.searchMessages(query, filters, selectedFolder?.id).convertToThreads()
+                ThreadController.saveThreads(threads)
+                emit(threads)
+            }
         }
     }
 
@@ -154,6 +174,13 @@ class SearchViewModel : ViewModel() {
                 this.size = message.size
                 this.subject = message.subject
             }
+        }
+    }
+
+    private suspend fun deleteRealmSearchData() = withContext(Dispatchers.IO) {
+        RealmDatabase.mailboxContent().writeBlocking {
+            MessageController.deleteSearchMessages(this)
+            ThreadController.deleteSearchThreads(this)
         }
     }
 

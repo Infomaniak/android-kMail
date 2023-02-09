@@ -157,6 +157,10 @@ object MessageController {
             realm.delete(message)
         }
     }
+
+    fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
+        delete(query<Thread>("${Message::isFromSearch.name} == true").find())
+    }
     //endregion
 
     //region New API routes

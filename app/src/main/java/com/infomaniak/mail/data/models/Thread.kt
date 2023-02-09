@@ -45,6 +45,7 @@ import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
 import java.util.Date
 
@@ -70,6 +71,11 @@ class Thread : RealmObject {
     var isAnswered: Boolean = false
     var isForwarded: Boolean = false
     var isScheduled: Boolean = false
+
+    //region Local data
+    @Transient
+    var isFromSearch: Boolean = false
+    //endregion
 
     private val parentFolders by backlinks(Folder::threads)
     private val parentFolder get() = parentFolders.first()

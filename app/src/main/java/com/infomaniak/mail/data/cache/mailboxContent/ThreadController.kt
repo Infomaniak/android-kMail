@@ -23,6 +23,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.copyListToRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -110,11 +111,15 @@ object ThreadController {
     }
 
     fun getThreadsWithLocalMessages(apiThreads: List<Thread>): List<Thread> {
-        return apiThreads.map { thread ->
-            MessageController.getMessage(thread.messages.first().uid)?.let { message ->
-                thread.messages = listOf(message).toRealmList()
+        return defaultRealm.writeBlocking {
+            apiThreads.map { thread ->
+                thread.isFromSearch = true
+                MessageController.getMessage(thread.messages.first().uid)?.let { message ->
+                    thread.messages = listOf(message.apply { isFromSearch = true }).toRealmList()
+                }
+                copyToRealm(thread, UpdatePolicy.ERROR)
+                thread
             }
-            thread
         }
     }
     //endregion
@@ -124,6 +129,10 @@ object ThreadController {
 
     fun deleteThreads(folderId: String, realm: MutableRealm) {
         realm.delete(getThreadsQuery(folderId, realm = realm))
+    }
+
+    fun deleteSearchThreads(realm: MutableRealm) = with(realm) {
+        delete(query<Thread>("${Thread::isFromSearch.name} == true").find())
     }
 
     fun fetchIncompleteMessages(
@@ -173,6 +182,10 @@ object ThreadController {
                 MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
             }
         }
+    }
+
+    fun saveThreads(threads: List<Thread>) {
+        defaultRealm.writeBlocking { copyListToRealm(threads) }
     }
     //endregion
 }
