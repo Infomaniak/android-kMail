@@ -221,9 +221,9 @@ class ThreadListAdapter(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) = updateDynamicIcons(item)
+    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) = updateDynamicIcons(item as Thread)
 
-    private fun updateDynamicIcons(item: Any) {
+    private fun updateDynamicIcons(item: Thread) {
 
         fun swipeActionIs(swipeAction: SwipeAction): Boolean {
             return localSettings.swipeLeft == swipeAction || localSettings.swipeRight == swipeAction
@@ -240,13 +240,12 @@ class ThreadListAdapter(
             }
         }
 
-        item as Thread
         val swipeActionVariant = when {
             swipeActionIs(SwipeAction.READ_UNREAD) -> {
                 SwipeAction.READ_UNREAD to if (item.unseenMessagesCount > 0) R.drawable.ic_envelope_open else R.drawable.ic_envelope
             }
             swipeActionIs(SwipeAction.FAVORITE) -> {
-                SwipeAction.FAVORITE to if (item.isFavorite) R.drawable.ic_star_stroked else R.drawable.ic_star
+                SwipeAction.FAVORITE to if (item.isFavorite) R.drawable.ic_unstar else R.drawable.ic_star
             }
             else -> null
         }
