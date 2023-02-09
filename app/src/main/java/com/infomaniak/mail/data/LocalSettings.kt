@@ -136,7 +136,7 @@ class LocalSettings private constructor(context: Context) {
         get() = getEnum(SWIPE_LEFT_KEY, INITIAL_SWIPE_ACTION)
         set(value) = putEnum(SWIPE_LEFT_KEY, value)
 
-    enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes private val colorRes: Int, @DrawableRes val iconRes: Int?) {
+    enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?) {
         DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin),
         ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder),
         READ_UNREAD(R.string.settingsSwipeActionReadUnread, R.color.swipeReadUnread, R.drawable.ic_envelope),
@@ -146,6 +146,7 @@ class LocalSettings private constructor(context: Context) {
         SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam),
         READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive, R.color.swipeReadAndArchive, R.drawable.ic_archive_folder),
         QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu, R.color.swipeQuickActionMenu, R.drawable.ic_param_dots),
+        INBOX(0, R.color.swipeInbox, R.drawable.ic_drawer_inbox),
         TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null),
         NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null);
 
