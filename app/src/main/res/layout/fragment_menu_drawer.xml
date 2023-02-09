@@ -281,7 +281,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/contentDescriptionIconStorage"
-                    android:src="@drawable/ic_drawer_mailbox"
+                    android:src="@drawable/ic_drawer_inbox"
                     app:layout_constraintBottom_toBottomOf="@id/storageIndicator"
                     app:layout_constraintEnd_toEndOf="@id/storageIndicator"
                     app:layout_constraintStart_toStartOf="@id/storageIndicator"
