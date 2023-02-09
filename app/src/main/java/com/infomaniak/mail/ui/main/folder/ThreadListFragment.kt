@@ -339,6 +339,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             waitingBeforeNotifyAdapter = isRecoveringFinished
             beforeUpdateAdapter = { threads ->
                 currentThreadsCount = threads.count()
+                Log.d("UI", "Received threads (${currentThreadsCount})")
                 updateThreadsVisibility()
             }
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
@@ -368,6 +369,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLiveToObserve.refreshObserve(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
+            Log.d("UI", "Received cursor (${currentFolderCursor})")
             updateThreadsVisibility()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
@@ -431,8 +433,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun updateThreadsVisibility() = with(threadListViewModel) {
-        Log.d("UI", "Received threads (${currentThreadsCount})")
-
         if (currentFolderCursor != null && currentThreadsCount == 0) {
             displayNoEmailView()
         } else {
