@@ -305,27 +305,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         withRefresh: Boolean = true,
     ): List<String>? {
         val mailbox = currentMailbox.value ?: return null
-        val archiveFolder = FolderController.getFolder(FolderRole.ARCHIVE) ?: return null
         val thread = ThreadController.getThread(threadUid) ?: return null
 
-        val archiveId = archiveFolder.id
+        val isArchived = message?.let { it.parentFolder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
+
+        val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
+        val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return null
+        val destinationFolderId = destinationFolder.id
+
         val messages = getMessagesToMove(thread, message)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), archiveId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
 
         var impactedFoldersIds: List<String>? = null
         if (apiResponse.isSuccess()) {
-            val messagesFoldersIds = messages.getFoldersIds(exception = archiveId)
+            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolderId)
             if (withRefresh) {
-                refreshFolders(mailbox, messagesFoldersIds, archiveId)
+                refreshFolders(mailbox, messagesFoldersIds, destinationFolderId)
             } else {
                 impactedFoldersIds = messagesFoldersIds
             }
         }
 
         val undoDestinationId = message?.folderId ?: thread.folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + archiveId
-        showMoveSnackbar(message, apiResponse, archiveFolder, undoFoldersIds, undoDestinationId)
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+        showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
 
         return impactedFoldersIds
     }
