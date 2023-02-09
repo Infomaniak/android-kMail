@@ -120,7 +120,7 @@ class Message : RealmObject {
 
     val threads by backlinks(Thread::messages)
 
-    val parentsFromDuplicate by backlinks(Thread::duplicates)
+    val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
     private val _folders by backlinks(Folder::messages)
     val folder get() = _folders.single()
