@@ -219,7 +219,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeThreadLive() {
-        threadViewModel.threadLive(navigationArgs.threadUid).refreshObserve(viewLifecycleOwner, ::onThreadUpdate)
+        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner, ::onThreadUpdate)
     }
 
     private fun observeMessagesLive() {

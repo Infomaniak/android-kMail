@@ -88,7 +88,7 @@ class MainActivity : ThemedActivity() {
         mainViewModel.updateUserInfo()
         mainViewModel.loadCurrentMailbox()
 
-        mainViewModel.observeRealmMergedContacts()
+        mainViewModel.observeMergedContactsLive()
         permissionUtils.requestMainPermissionsIfNeeded()
 
         observeSnackbar()

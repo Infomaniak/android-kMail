@@ -184,7 +184,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeContacts() {
-        newMessageViewModel.getMergedContacts().observe(viewLifecycleOwner, ::updateContactsAdapter)
+        newMessageViewModel.mergedContacts.observe(viewLifecycleOwner, ::updateContactsAdapter)
     }
 
     private fun updateContactsAdapter(allContacts: List<MergedContact>) = with(binding) {
@@ -301,7 +301,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun observeMailboxes() {
-        newMessageViewModel.observeMailboxes().observe(viewLifecycleOwner) {
+        newMessageViewModel.mailboxes.observe(viewLifecycleOwner) {
             setupFromField(it.first, it.second)
         }
     }

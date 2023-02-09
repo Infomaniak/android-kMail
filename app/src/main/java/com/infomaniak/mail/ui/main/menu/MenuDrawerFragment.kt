@@ -180,7 +180,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeMailboxesLive() = with(binding) {
-        mainViewModel.observeMailboxesLive().refreshObserve(viewLifecycleOwner) { mailboxes ->
+        mainViewModel.mailboxesLive.observe(viewLifecycleOwner) { mailboxes ->
 
             val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
 
@@ -207,28 +207,28 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeFoldersLive() = with(mainViewModel) {
-        currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+        currentFoldersLiveToObserve.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { inboxFolder.badge = it }
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolderId = currentFolderId.value ?: return@refreshObserve
+            val currentFolderId = currentFolderId.value ?: return@observe
             defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
             customFoldersAdapter.setFolders(customFolders, currentFolderId)
         }
     }
 
     private fun observeQuotas() = with(binding) {
-        mainViewModel.currentQuotasLiveToObserve.refreshObserve(viewLifecycleOwner) { quotas ->
+        mainViewModel.currentQuotasLiveToObserve.observe(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
             storageLayout.isVisible = isLimited
             storageDivider.isVisible = isLimited
 
             if (isLimited) {
-                storageText.text = quotas?.getText(context) ?: return@refreshObserve
+                storageText.text = quotas?.getText(context) ?: return@observe
                 storageIndicator.progress = quotas.getProgress()
             }
         }

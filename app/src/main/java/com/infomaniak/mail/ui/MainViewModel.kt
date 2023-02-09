@@ -132,8 +132,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         addSource(currentFilter) { value = value?.first to it }
     }
 
-    fun observeMailboxesLive(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
-        emitSource(MailboxController.getMailboxesAsync(userId).asLiveData())
+    val mailboxesLive = liveData(Dispatchers.IO) {
+        emitSource(MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData())
     }
 
     private fun selectMailbox(mailbox: Mailbox) {
@@ -250,7 +250,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun observeRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
+    fun observeMergedContactsLive() = viewModelScope.launch(Dispatchers.IO) {
         MergedContactController.getMergedContactsAsync().collect { contacts ->
             // TODO: We had this issue: https://sentry.infomaniak.com/share/issue/111cc162315d4873844c9b79be5b2491/
             // TODO: We fixed it by doing an `associate` with `copyFromRealm`, instead of an `associateBy`.

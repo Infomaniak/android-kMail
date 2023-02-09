@@ -18,11 +18,13 @@
 package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -30,14 +32,16 @@ import kotlinx.coroutines.launch
 
 class ManageMailAddressViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun observeAccounts(): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
+    val observeAccountsLive = liveData(Dispatchers.IO) {
         AccountUtils.currentUser?.let { user ->
 
             updateMailboxes(user)
 
-            emitSource(MailboxController.getMailboxesAsync().map { mailboxes ->
-                mailboxes.list.filter { it.userId == user.id }
-            }.asLiveData())
+            emitSource(
+                MailboxController.getMailboxesAsync()
+                    .map { mailboxes -> mailboxes.list.filter { it.userId == user.id } }
+                    .asLiveData()
+            )
         }
 
     }

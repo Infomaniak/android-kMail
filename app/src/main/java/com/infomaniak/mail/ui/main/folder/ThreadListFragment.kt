@@ -367,7 +367,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
-        mainViewModel.currentFolderLiveToObserve.refreshObserve(viewLifecycleOwner) { folder ->
+        mainViewModel.currentFolderLiveToObserve.observe(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
             Log.d("UI", "Received cursor (${currentFolderCursor})")
             updateThreadsVisibility()
