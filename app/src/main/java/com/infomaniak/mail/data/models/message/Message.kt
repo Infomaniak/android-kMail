@@ -119,7 +119,6 @@ class Message : RealmObject {
     //endregion
 
     val threads by backlinks(Thread::messages)
-    val originalThread get() = threads.single { it.folder.id == folder.id }
 
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
