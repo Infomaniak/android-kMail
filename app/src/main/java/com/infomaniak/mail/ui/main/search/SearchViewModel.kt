@@ -33,6 +33,7 @@ import com.infomaniak.mail.utils.AccountUtils
 import io.realm.kotlin.ext.toRealmList
 import io.sentry.Sentry
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.map
 
 class SearchViewModel : ViewModel() {
 
@@ -100,13 +101,12 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
-        suspend fun ApiResponse<Thread.ThreadResult>.getThreads(): List<Thread>? {
-            return runCatching {
+        suspend fun ApiResponse<Thread.ThreadResult>.keepOldMessagesData() {
+            runCatching {
                 this.data?.threads?.let { ThreadController.getThreadsWithLocalMessages(it) }
             }.getOrElse { exception ->
                 exception.printStackTrace()
                 if (fetchThreadsJob?.isActive == true) Sentry.captureException(exception)
-                emptyList()
             }
         }
 
@@ -122,13 +122,14 @@ class SearchViewModel : ViewModel() {
             val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
             if (apiResponse.isSuccess()) {
-                emit(apiResponse.getThreads() ?: emptyList())
+                apiResponse.keepOldMessagesData()
                 resourceNext = apiResponse.data?.resourceNext ?: ""
             } else if (resourceNext.isNullOrBlank()) {
                 val threads = MessageController.searchMessages(query, filters, selectedFolder?.id).convertToThreads()
                 ThreadController.saveThreads(threads)
-                emit(threads)
             }
+
+            emitSource(ThreadController.getSearchThreadsAsync().map { it.list }.asLiveData(Dispatchers.IO))
         }
     }
 

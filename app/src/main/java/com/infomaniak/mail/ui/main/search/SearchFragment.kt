@@ -22,11 +22,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 
 class SearchFragment : Fragment() {
 
+    private val searchViewModel by viewModels<SearchViewModel>()
+    private val navigationArgs by navArgs<SearchFragmentArgs>()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_search, container, false)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        searchViewModel.init(navigationArgs.currentFolderId)
+        observeFilters()
+        observeSearchResults()
+    }
+
+    private fun observeFilters() {
+        searchViewModel.selectedFilters.observe(viewLifecycleOwner) {
+            // TODO: handle selected filters in ui
+        }
+    }
+    private fun observeSearchResults() {
+        searchViewModel.searchResults.observe(viewLifecycleOwner) {
+            // TODO: handle search results
+        }
+    }
+
 }

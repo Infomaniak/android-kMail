@@ -106,6 +106,10 @@ object ThreadController {
         return getThreadsQuery(folderId, defaultRealm, filter).asFlow()
     }
 
+    fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
+        return defaultRealm.query<Thread>("${Thread::isFromSearch.name} == true").asFlow()
+    }
+
     fun getThread(uid: String, realm: TypedRealm = defaultRealm): Thread? {
         return getThreadQuery(uid, realm).find()
     }
