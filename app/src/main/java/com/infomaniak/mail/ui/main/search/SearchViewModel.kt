@@ -21,16 +21,15 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
-import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.AccountUtils
-import io.realm.kotlin.ext.toRealmList
+import com.infomaniak.mail.utils.SearchUtils
+import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
@@ -83,7 +82,7 @@ class SearchViewModel : ViewModel() {
         if (selectedFilters.value?.contains(filter) == true) {
             selectedFilters.value = selectedFilters.value?.apply { remove(filter) }
         } else {
-            selectFilter(filter)
+            selectedFilters.value = SearchUtils.selectFilter(filter, selectedFilters.value)
         }
     }
 
@@ -95,7 +94,7 @@ class SearchViewModel : ViewModel() {
     override fun onCleared() {
         CoroutineScope(Dispatchers.IO).launch {
             fetchThreadsJob?.cancelAndJoin()
-            deleteRealmSearchData()
+            SearchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
         }
         super.onCleared()
@@ -119,12 +118,12 @@ class SearchViewModel : ViewModel() {
         fetchThreadsJob?.cancel()
         fetchThreadsJob = Job()
         return liveData(Dispatchers.IO + fetchThreadsJob!!) {
-            if (!hasNextPage && resourcePrevious.isNullOrBlank()) deleteRealmSearchData()
+            if (!hasNextPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
 
             if (fetchThreadsJob?.isCancelled == true) return@liveData
             val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
             val folderId = selectedFolder?.id ?: currentFolderId
-            val searchFilters = searchFilters(query, filters)
+            val searchFilters = SearchUtils.searchFilters(query, filters)
             val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
             if (apiResponse.isSuccess()) {
@@ -134,78 +133,11 @@ class SearchViewModel : ViewModel() {
                     resourcePrevious = data?.resourcePrevious
                 }
             } else if (resourceNext.isNullOrBlank()) {
-                val threads = MessageController.searchMessages(query, filters, selectedFolder?.id).convertToThreads()
+                val threads = MessageController.searchMessages(query, filters, selectedFolder?.id).convertToSearchThreads()
                 ThreadController.saveThreads(threads)
             }
 
             emitSource(ThreadController.getSearchThreadsAsync().map { it.list }.asLiveData(Dispatchers.IO))
-        }
-    }
-
-    private fun searchFilters(query: String?, filters: Set<ThreadFilter>): String {
-        val filtersQuery = StringBuilder("severywhere=${if (filters.contains(ThreadFilter.FOLDER)) "0" else "1"}")
-        if (!query.isNullOrBlank()) filtersQuery.append("&scontains=$query")
-
-        with(filters) {
-            when {
-                contains(ThreadFilter.ATTACHMENTS) -> filtersQuery.append("&sattachments=yes")
-                contains(ThreadFilter.SEEN) -> filtersQuery.append("&filters=seen")
-                contains(ThreadFilter.UNSEEN) -> filtersQuery.append("&filters=unseen")
-                contains(ThreadFilter.STARRED) -> filtersQuery.append("&filters=starred")
-                else -> Unit
-            }
-        }
-        return filtersQuery.toString()
-    }
-
-    private fun selectFilter(filter: ThreadFilter) {
-        val selectedFilters = selectedFilters.value
-        val filters = when (filter) {
-            ThreadFilter.SEEN -> {
-                selectedFilters?.apply {
-                    removeAll(arrayOf(ThreadFilter.UNSEEN, ThreadFilter.STARRED))
-                }
-            }
-            ThreadFilter.UNSEEN -> {
-                selectedFilters?.apply {
-                    removeAll(arrayOf(ThreadFilter.SEEN, ThreadFilter.STARRED))
-                }
-            }
-            ThreadFilter.STARRED -> {
-                selectedFilters?.apply {
-                    removeAll(arrayOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN))
-                }
-            }
-            else -> selectedFilters
-        }
-
-        this.selectedFilters.value = filters?.apply { add(filter) }
-    }
-
-    private fun List<Message>.convertToThreads(): List<Thread> {
-        return this.map { message ->
-            Thread().apply {
-                this.uid = "search-${message.uid}"
-                this.messages = listOf(message).toRealmList()
-                this.unseenMessagesCount = 0
-                this.from = message.from
-                this.to = message.to
-                this.date = message.date
-                this.hasAttachments = message.hasAttachments
-                this.isFavorite = message.isFavorite
-                this.isAnswered = message.isAnswered
-                this.isForwarded = message.isForwarded
-                this.size = message.size
-                this.subject = message.subject
-            }
-        }
-    }
-
-    private suspend fun deleteRealmSearchData() = withContext(Dispatchers.IO) {
-        RealmDatabase.mailboxContent().writeBlocking {
-            Log.i(TAG, "SearchViewModel>deleteRealmSearchData: remove old search data")
-            MessageController.deleteSearchMessages(this)
-            ThreadController.deleteSearchThreads(this)
         }
     }
 
