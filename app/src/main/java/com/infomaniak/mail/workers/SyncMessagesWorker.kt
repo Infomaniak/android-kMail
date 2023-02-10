@@ -109,7 +109,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
         isChannelBlocked || isGroupBlocked
     }
 
-    private fun Thread.showNotification(
+    private suspend fun Thread.showNotification(
         userId: Int,
         mailbox: Mailbox,
         unReadThreadsCount: Int,

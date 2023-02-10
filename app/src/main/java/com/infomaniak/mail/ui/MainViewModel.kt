@@ -309,7 +309,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         archiveThreadOrMessageSync(threadUid, message)
     }
 
-    private fun archiveThreadOrMessageSync(
+    private suspend fun archiveThreadOrMessageSync(
         threadUid: String,
         message: Message? = null,
         withRefresh: Boolean = true,
@@ -472,7 +472,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun markAsUnseen(mailbox: Mailbox, thread: Thread, message: Message? = null) {
+    private suspend fun markAsUnseen(mailbox: Mailbox, thread: Thread, message: Message? = null) {
 
         val messages = when (message) {
             null -> MessageController.getLastMessageToExecuteAction(thread)
