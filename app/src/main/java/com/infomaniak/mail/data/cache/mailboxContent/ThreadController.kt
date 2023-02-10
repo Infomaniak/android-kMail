@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -32,7 +33,10 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 
 object ThreadController {
@@ -108,12 +112,12 @@ object ThreadController {
     //region Edit data
     fun MutableRealm.upsertThread(thread: Thread): Thread = copyToRealm(thread, UpdatePolicy.ALL)
 
-    fun fetchIncompleteMessages(
+    suspend fun fetchIncompleteMessages(
         messages: List<Message>,
         mailbox: Mailbox,
         okHttpClient: OkHttpClient? = null,
         realm: Realm = defaultRealm,
-    ) {
+    ) = withContext(Dispatchers.IO) {
 
         val impactedFoldersIds = mutableSetOf<String>()
 
@@ -152,7 +156,11 @@ object ThreadController {
 
         impactedFoldersIds.forEach { folderId ->
             FolderController.getFolder(folderId, realm)?.let { folder ->
-                MessageController.fetchFolderMessages(mailbox, folder, okHttpClient, realm)
+                fetchFolderMessagesJob?.cancel()
+                fetchFolderMessagesJob = launch {
+                    MessageController.fetchFolderMessages(this, mailbox, folder, okHttpClient, realm)
+                }
+                fetchFolderMessagesJob?.join()
             }
         }
     }
