@@ -83,7 +83,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         val messages = MessageController.getMessageAndDuplicates(thread, message)
         val isSuccess = ApiRepository.deleteMessages(mailbox.uuid, messages.getUids()).isSuccess()
-        if (isSuccess) MessageController.fetchCurrentFolderMessages(mailbox, message.folderId)
+        if (isSuccess) MessageController.fetchCurrentFolderMessages(mailbox, message.folder)
     }
 
     fun clickOnQuickActionBar(threadUid: String, menuId: Int) = viewModelScope.launch(Dispatchers.IO) {

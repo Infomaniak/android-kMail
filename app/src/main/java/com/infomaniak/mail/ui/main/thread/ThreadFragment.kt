@@ -275,7 +275,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun onMessagesUpdate(messages: List<Message>) {
-        Log.i("UI", "Received messages (${messages.size})")
+        Log.i("UI", "Received ${messages.size} messages")
         threadViewModel.fetchIncompleteMessages(messages)
         binding.messagesList.setBackgroundResource(if (messages.count() == 1) R.color.backgroundColor else R.color.threadBackground)
     }
