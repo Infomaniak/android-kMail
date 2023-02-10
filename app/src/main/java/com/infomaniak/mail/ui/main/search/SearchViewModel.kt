@@ -43,6 +43,7 @@ class SearchViewModel : ViewModel() {
     private lateinit var currentFolderId: String
     private var selectedFolder: Folder? = null
     private var resourceNext: String? = null
+    private var resourcePrevious: String? = null
 
     private var fetchThreadsJob: Job? = null
 
@@ -60,17 +61,17 @@ class SearchViewModel : ViewModel() {
     }
 
     fun refreshSearch() {
-        resourceNext = null
+        resetPagination()
         searchQuery(searchQuery.value ?: "")
     }
 
     fun searchQuery(query: String) {
-        resourceNext = null
+        resetPagination()
         searchQuery.value = query
     }
 
     fun selectFolder(folder: Folder?) {
-        resourceNext = null
+        resetPagination()
         if (selectedFilters.value?.contains(ThreadFilter.FOLDER) == false) {
             selectedFilters.value = selectedFilters.value?.apply { add(ThreadFilter.FOLDER) }
         }
@@ -78,7 +79,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun toggleFilter(filter: ThreadFilter) {
-        resourceNext = null
+        resetPagination()
         if (selectedFilters.value?.contains(filter) == true) {
             selectedFilters.value = selectedFilters.value?.apply { remove(filter) }
         } else {
@@ -100,6 +101,11 @@ class SearchViewModel : ViewModel() {
         super.onCleared()
     }
 
+    private fun resetPagination() {
+        resourceNext = null
+        resourcePrevious = null
+    }
+
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
         suspend fun ApiResponse<Thread.ThreadResult>.keepOldMessagesData() {
             runCatching {
@@ -113,7 +119,7 @@ class SearchViewModel : ViewModel() {
         fetchThreadsJob?.cancel()
         fetchThreadsJob = Job()
         return liveData(Dispatchers.IO + fetchThreadsJob!!) {
-            if (!hasNextPage) deleteRealmSearchData()
+            if (!hasNextPage && resourcePrevious.isNullOrBlank()) deleteRealmSearchData()
 
             if (fetchThreadsJob?.isCancelled == true) return@liveData
             val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
@@ -122,8 +128,11 @@ class SearchViewModel : ViewModel() {
             val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
             if (apiResponse.isSuccess()) {
-                apiResponse.keepOldMessagesData()
-                resourceNext = apiResponse.data?.resourceNext ?: ""
+                with(apiResponse) {
+                    keepOldMessagesData()
+                    resourceNext = data?.resourceNext
+                    resourcePrevious = data?.resourcePrevious
+                }
             } else if (resourceNext.isNullOrBlank()) {
                 val threads = MessageController.searchMessages(query, filters, selectedFolder?.id).convertToThreads()
                 ThreadController.saveThreads(threads)
