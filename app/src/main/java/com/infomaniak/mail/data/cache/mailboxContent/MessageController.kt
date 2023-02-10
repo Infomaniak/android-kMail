@@ -190,7 +190,7 @@ object MessageController {
         mailbox: Mailbox,
         okHttpClient: OkHttpClient?,
         realm: Realm,
-    ) = with(messagesUids) {
+    ): List<Thread> = with(messagesUids) {
 
         Log.i(
             "API",
@@ -199,14 +199,14 @@ object MessageController {
 
         val newMessagesThreads = handleAddedUids(addedShortUids, folder, mailbox.uuid, cursor, okHttpClient, realm)
 
-        realm.writeBlocking {
+        return@with realm.writeBlocking {
 
-            val impactedFolders = newMessagesThreads.map { it.folderId }.toMutableSet()
+            val impactedFoldersIds = newMessagesThreads.map { it.folderId }.toMutableSet()
 
-            impactedFolders += handleDeletedUids(deletedUids)
-            impactedFolders += handleUpdatedUids(updatedMessages, folder.id)
+            impactedFoldersIds += handleDeletedUids(deletedUids)
+            impactedFoldersIds += handleUpdatedUids(updatedMessages, folder.id)
 
-            impactedFolders.forEach { folderId ->
+            impactedFoldersIds.forEach { folderId ->
                 FolderController.refreshUnreadCount(folderId, mailbox.objectId, realm = this)
             }
 
@@ -214,9 +214,9 @@ object MessageController {
                 it.lastUpdatedAt = Date().toRealmInstant()
                 it.cursor = cursor
             }
-        }
 
-        return@with newMessagesThreads
+            return@writeBlocking newMessagesThreads
+        }
     }
 
     private fun handleAddedUids(

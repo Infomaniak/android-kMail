@@ -100,7 +100,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
     val currentThreadsLiveToObserve = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
-        folder?.id?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
+        folder?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role

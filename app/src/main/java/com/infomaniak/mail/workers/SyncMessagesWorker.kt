@@ -85,7 +85,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
 
                 // Notify all new messages
-                val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder.id, realm)
+                val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
                 newMessagesThreads.forEach { thread ->
                     thread.showNotification(user.id, mailbox, unReadThreadsCount, realm, okHttpClient)
                 }
