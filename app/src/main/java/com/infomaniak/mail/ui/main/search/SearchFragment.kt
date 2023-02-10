@@ -38,8 +38,15 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         searchViewModel.init(navigationArgs.currentFolderId)
+        observeFolders()
         observeFilters()
         observeSearchResults()
+    }
+
+    private fun observeFolders() {
+        searchViewModel.foldersLive.observe(viewLifecycleOwner) {
+            // TODO: handle folders ui
+        }
     }
 
     private fun observeFilters() {

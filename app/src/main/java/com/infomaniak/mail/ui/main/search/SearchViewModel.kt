@@ -21,6 +21,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.mail.data.api.ApiRepository
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
@@ -47,6 +48,8 @@ class SearchViewModel : ViewModel() {
     private var fetchThreadsJob: Job? = null
 
     val searchResults = observeSearchAndFilters().switchMap { (query, filters) -> fetchThreads(query, filters) }
+    val foldersLive = FolderController.getFoldersAsync().map { it.list }.asLiveData(Dispatchers.IO)
+
     val hasNextPage get() = !resourceNext.isNullOrBlank()
 
     private fun observeSearchAndFilters() = MediatorLiveData<Pair<String?, Set<ThreadFilter>>>().apply {
