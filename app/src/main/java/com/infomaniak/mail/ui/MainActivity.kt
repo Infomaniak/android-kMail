@@ -163,8 +163,9 @@ class MainActivity : ThemedActivity() {
             R.id.messageActionBottomSheetDialog,
             R.id.replyBottomSheetDialog,
             R.id.detailedContactBottomSheetDialog,
+            R.id.threadFragment,
             R.id.threadActionsBottomSheetDialog -> null
-            R.id.searchFragment, R.id.threadFragment -> R.color.backgroundColor
+            R.id.searchFragment -> R.color.backgroundColor
             else -> R.color.backgroundHeaderColor
         }?.let {
             window.statusBarColor = getColor(it)

@@ -69,7 +69,10 @@ class ThreadFragment : Fragment() {
     private var shouldScrollToBottom = AtomicBoolean(true)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return FragmentThreadBinding.inflate(inflater, container, false).also { binding = it }.root
+        return FragmentThreadBinding.inflate(inflater, container, false).also {
+            binding = it
+            requireActivity().window.statusBarColor = requireContext().getColor(R.color.backgroundColor)
+        }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
