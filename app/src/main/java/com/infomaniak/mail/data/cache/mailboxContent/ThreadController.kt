@@ -28,12 +28,16 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
 import io.realm.kotlin.query.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 
 object ThreadController {
@@ -110,14 +114,17 @@ object ThreadController {
         return getThreadQuery(uid, defaultRealm).asFlow()
     }
 
-    fun getThreadsWithLocalMessages(apiThreads: List<Thread>): List<Thread> {
-        return defaultRealm.writeBlocking {
+    suspend fun getThreadsWithLocalMessages(apiThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
+        defaultRealm.writeBlocking {
             apiThreads.map { thread ->
+                ensureActive()
                 thread.isFromSearch = true
-                MessageController.getMessage(thread.messages.first().uid)?.let { message ->
-                    thread.messages = listOf(message.apply { isFromSearch = true }).toRealmList()
+                MessageController.getMessage(thread.messages.first().uid, this)?.let { message ->
+                    thread.messages = listOf(message.copyFromRealm()).toRealmList()
+                } ?: run {
+                    thread.messages.first().isFromSearch = true
                 }
-                copyToRealm(thread, UpdatePolicy.ERROR)
+                upsertThread(thread)
                 thread
             }
         }
