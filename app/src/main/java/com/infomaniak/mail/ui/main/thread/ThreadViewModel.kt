@@ -90,6 +90,7 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     override fun onCleared() {
+        // TODO: Have a real cache management to make the deletion automatically when it is necessary
         LocalStorageUtils.deleteAttachmentsCaches(getApplication())
         super.onCleared()
     }
