@@ -29,10 +29,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.SharedViewModelUtils
-import com.infomaniak.mail.utils.getUids
-import com.infomaniak.mail.utils.handlerIO
+import com.infomaniak.mail.utils.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
@@ -90,5 +87,10 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         val message = MessageController.getMessageToReplyTo(thread)
         quickActionBarClicks.postValue(message to menuId)
+    }
+
+    override fun onCleared() {
+        LocalStorageUtils.deleteAttachmentsCaches(getApplication())
+        super.onCleared()
     }
 }
