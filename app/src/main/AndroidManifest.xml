@@ -24,6 +24,15 @@
         android:name="android.permission.POST_NOTIFICATIONS"
         android:minSdkVersion="33" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:mimeType="*/*"
+                android:scheme="*" />
+        </intent>
+    </queries>
+
     <application
         android:name=".ApplicationMain"
         android:allowBackup="false"
@@ -112,6 +121,18 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="@string/ATTACHMENTS_AUTHORITY"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/exposed_files_path"
+                tools:replace="android:resource" />
+        </provider>
 
     </application>
 </manifest>
