@@ -67,7 +67,7 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         archive.isGone = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
 
         archive.setClosingOnClickListener { onClickListener.onArchive() }
-        markAsReadUnread.setOnClickListener { onClickListener.onReadUnread() }
+        markAsReadUnread.setClosingOnClickListener { onClickListener.onReadUnread() }
         move.setClosingOnClickListener { onClickListener.onMove() }
         postpone.setClosingOnClickListener { onClickListener.onPostpone() }
         favorite.setClosingOnClickListener { onClickListener.onFavorite() }
