@@ -146,7 +146,7 @@ class LocalSettings private constructor(context: Context) {
         SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam),
         READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive, R.color.swipeReadAndArchive, R.drawable.ic_archive_folder),
         QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu, R.color.swipeQuickActionMenu, R.drawable.ic_param_dots),
-        INBOX(0, R.color.swipeInbox, R.drawable.ic_drawer_inbox),
+        INBOX(R.string.actionMoveToInbox, R.color.swipeInbox, R.drawable.ic_drawer_inbox),
         TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null),
         NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null);
 
