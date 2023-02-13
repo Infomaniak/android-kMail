@@ -218,7 +218,6 @@
     <string name="searchNoHistoryDescription">Lancez votre recherche par contact ou par mots clés</string>
     <string name="searchNoResultsDescription">Nous n’avons rien trouvé correspondant à votre recherche</string>
     <string name="searchNoResultsTitle">Aucun résultats</string>
-    <string name="searchViewHint">Rechercher un message</string>
     <string name="send">Envoyer</string>
     <string name="sentFolder">Messages envoyés</string>
     <string name="settingsAccentColor">Couleur d’accentuation</string>
