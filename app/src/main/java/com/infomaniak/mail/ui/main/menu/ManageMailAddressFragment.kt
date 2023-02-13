@@ -73,7 +73,7 @@ class ManageMailAddressFragment : Fragment() {
 
         mailboxesRecyclerView.apply {
             adapter = simpleMailboxAdapter
-            ResourcesCompat.getDrawable(resources, R.drawable.setting_divider, null)?.let {
+            ResourcesCompat.getDrawable(resources, R.drawable.divider, null)?.let {
                 addItemDecoration(DividerItemDecorator(it))
             }
         }

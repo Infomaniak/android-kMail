@@ -15,468 +15,433 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/marginStandardSmall"
-    android:layout_marginVertical="@dimen/marginStandardVerySmall"
-    app:cardBackgroundColor="@color/backgroundColor"
-    app:cardCornerRadius="8dp"
-    app:strokeWidth="0dp">
+    android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/messageHeader"
+        style="@style/CardViewMail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/messageHeader"
-            style="@style/CardViewMail"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/messageHeaderLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginVertical="@dimen/marginStandardMedium"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/messageHeaderLayout"
-                android:layout_width="match_parent"
+            <com.infomaniak.mail.views.AvatarView
+                android:id="@+id/userAvatar"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/expeditorName"
+                style="@style/BodyMedium"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginVertical="@dimen/marginStandardMedium"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_marginStart="@dimen/marginStandardMedium"
+                android:ellipsize="end"
+                android:lines="1"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/userAvatar"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@tools:sample/full_names" />
 
-                <com.infomaniak.mail.views.AvatarView
-                    android:id="@+id/userAvatar"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:src="@tools:sample/avatars" />
+            <TextView
+                android:id="@+id/subjectTextView"
+                style="@style/BodySmall.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/recipientLayout"
+                app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="@id/expeditorName"
+                app:layout_constraintTop_toBottomOf="@id/expeditorName"
+                tools:text="Invitation à notre dernier évènement" />
+
+            <LinearLayout
+                android:id="@+id/recipientLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:gravity="center_vertical"
+                android:paddingVertical="@dimen/marginStandardVerySmall"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toEndOf="@id/userAvatar"
+                app:layout_constraintTop_toBottomOf="@id/subjectTextView"
+                tools:ignore="UseCompoundDrawables">
 
                 <TextView
-                    android:id="@+id/expeditorName"
-                    style="@style/BodyMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardMedium"
-                    android:ellipsize="end"
-                    android:lines="1"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@id/shortMessageDate"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toEndOf="@id/userAvatar"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="@tools:sample/full_names" />
-
-                <TextView
-                    android:id="@+id/subjectTextView"
+                    android:id="@+id/recipient"
                     style="@style/BodySmall.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/marginStandardSmall"
+                    android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@id/recipientLayout"
-                    app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
+                    tools:ignore="InefficientWeight"
+                    tools:text="Myriam Rais, George Li, +3" />
+
+                <ImageView
+                    android:id="@+id/recipientChevron"
+                    android:layout_width="@dimen/chevronSize"
+                    android:layout_height="@dimen/chevronSize"
+                    android:layout_marginHorizontal="@dimen/marginStandardSmall"
+                    android:src="@drawable/ic_chevron_down"
                     app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="@id/expeditorName"
-                    app:layout_constraintTop_toBottomOf="@id/expeditorName"
-                    tools:text="Invitation à notre dernier évènement" />
+                    app:tint="@color/iconSecondaryColor"
+                    tools:ignore="ContentDescription" />
+            </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/recipientLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:gravity="center_vertical"
-                    android:paddingVertical="@dimen/marginStandardVerySmall"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toEndOf="@id/userAvatar"
-                    app:layout_constraintTop_toBottomOf="@id/subjectTextView"
-                    tools:ignore="UseCompoundDrawables">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/recipientOverlayedButton"
+                style="@style/TextButton"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:cornerRadius="@dimen/smallCornerRadius"
+                app:layout_constraintBottom_toBottomOf="@id/recipientLayout"
+                app:layout_constraintEnd_toEndOf="@id/recipientLayout"
+                app:layout_constraintStart_toStartOf="@id/recipientLayout"
+                app:layout_constraintTop_toTopOf="@id/recipientLayout" />
 
-                    <TextView
-                        android:id="@+id/recipient"
-                        style="@style/BodySmall.Secondary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/marginStandardSmall"
-                        android:layout_weight="1"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        tools:ignore="InefficientWeight"
-                        tools:text="Myriam Rais, George Li, +3" />
+            <TextView
+                android:id="@+id/shortMessageDate"
+                style="@style/Label.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/marginStandardSmall"
+                android:layout_marginEnd="@dimen/marginStandardSmall"
+                app:layout_constraintBottom_toBottomOf="@id/expeditorName"
+                app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
+                app:layout_constraintStart_toEndOf="@id/expeditorName"
+                app:layout_constraintTop_toTopOf="@+id/expeditorName"
+                tools:text="9 déc 2021 à 11:00" />
 
-                    <ImageView
-                        android:id="@+id/recipientChevron"
-                        android:layout_width="@dimen/chevronSize"
-                        android:layout_height="@dimen/chevronSize"
-                        android:layout_marginHorizontal="@dimen/marginStandardSmall"
-                        android:src="@drawable/ic_chevron_down"
-                        app:layout_constraintHorizontal_bias="0"
-                        app:tint="@color/iconSecondaryColor"
-                        tools:ignore="ContentDescription" />
-                </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteDraftButton"
+                style="@style/IconButton"
+                android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
+                android:visibility="gone"
+                app:icon="@drawable/ic_bin"
+                app:iconTint="@color/redDestructiveAction"
+                app:layout_constraintEnd_toStartOf="@id/replyButton"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/recipientOverlayedButton"
-                    style="@style/TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:cornerRadius="@dimen/smallCornerRadius"
-                    app:layout_constraintBottom_toBottomOf="@id/recipientLayout"
-                    app:layout_constraintEnd_toEndOf="@id/recipientLayout"
-                    app:layout_constraintStart_toStartOf="@id/recipientLayout"
-                    app:layout_constraintTop_toTopOf="@id/recipientLayout" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/replyButton"
+                style="@style/IconButton"
+                android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
+                app:icon="@drawable/ic_email_action_reply"
+                app:layout_constraintEnd_toStartOf="@id/menuButton"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/shortMessageDate"
-                    style="@style/Label.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/marginStandardSmall"
-                    android:layout_marginEnd="@dimen/marginStandardSmall"
-                    app:layout_constraintBottom_toBottomOf="@id/expeditorName"
-                    app:layout_constraintEnd_toStartOf="@id/deleteDraftButton"
-                    app:layout_constraintStart_toEndOf="@id/expeditorName"
-                    app:layout_constraintTop_toTopOf="@+id/expeditorName"
-                    tools:text="9 déc 2021 à 11:00" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menuButton"
+                style="@style/IconButton"
+                android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
+                app:icon="@drawable/ic_param_dots"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/deleteDraftButton"
-                    style="@style/IconButton"
-                    android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_bin"
-                    app:iconTint="@color/redDestructiveAction"
-                    app:layout_constraintEnd_toStartOf="@id/replyButton"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/replyButton"
-                    style="@style/IconButton"
-                    android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
-                    app:icon="@drawable/ic_email_action_reply"
-                    app:layout_constraintEnd_toStartOf="@id/menuButton"
-                    app:layout_constraintTop_toTopOf="parent" />
+    </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/menuButton"
-                    style="@style/IconButton"
-                    android:contentDescription="@string/contentDescriptionButtonDeleteDraft"
-                    app:icon="@drawable/ic_param_dots"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/fromPrefix"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:text="@string/fromTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/messageHeader" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fromRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/fromPrefix"
+        tools:ignore="RtlSymmetry"
+        tools:itemCount="2"
+        tools:listitem="@layout/item_detailed_contact" />
 
-        </com.google.android.material.card.MaterialCardView>
+    <TextView
+        android:id="@+id/toPrefix"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:text="@string/toTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fromRecyclerView" />
 
-        <TextView
-            android:id="@+id/fromPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:text="@string/fromTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/messageHeader" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/toRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/toPrefix"
+        tools:ignore="RtlSymmetry"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_detailed_contact" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/fromRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/fromPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="2"
-            tools:listitem="@layout/item_detailed_contact" />
+    <TextView
+        android:id="@+id/ccPrefix"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:text="@string/ccTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toRecyclerView" />
 
-        <TextView
-            android:id="@+id/toPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:text="@string/toTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fromRecyclerView" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ccRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/ccPrefix"
+        tools:ignore="RtlSymmetry"
+        tools:itemCount="2"
+        tools:listitem="@layout/item_detailed_contact" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/toRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/toPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="3"
-            tools:listitem="@layout/item_detailed_contact" />
+    <TextView
+        android:id="@+id/bccPrefix"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:text="@string/bccTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ccRecyclerView" />
 
-        <TextView
-            android:id="@+id/ccPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:text="@string/ccTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toRecyclerView" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bccRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardSmall"
+        android:paddingStart="@dimen/marginStandardVerySmall"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/bccPrefix"
+        tools:ignore="RtlSymmetry"
+        tools:itemCount="1"
+        tools:listitem="@layout/item_detailed_contact" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/ccRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/ccPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="2"
-            tools:listitem="@layout/item_detailed_contact" />
+    <ImageView
+        android:id="@+id/detailedMessagePrefix"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:layout_marginTop="@dimen/marginStandardSmall"
+        android:src="@drawable/ic_calendar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
+        app:tint="@color/iconSecondaryColor"
+        tools:ignore="ContentDescription" />
 
-        <TextView
-            android:id="@+id/bccPrefix"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:text="@string/bccTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ccRecyclerView" />
+    <TextView
+        android:id="@+id/detailedMessageDate"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardMedium"
+        app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
+        app:layout_constraintStart_toEndOf="@id/prefixBarrier"
+        app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
+        tools:text="10 juin 2022, 16:36" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/bccRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:paddingStart="@dimen/marginStandardVerySmall"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/bccPrefix"
-            tools:ignore="RtlSymmetry"
-            tools:itemCount="1"
-            tools:listitem="@layout/item_detailed_contact" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/prefixBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="right"
+        app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
 
-        <ImageView
-            android:id="@+id/detailedMessagePrefix"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
-            android:src="@drawable/ic_calendar"
-            app:layout_constraintBottom_toTopOf="@id/headerDivider"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
-            app:tint="@color/iconSecondaryColor"
-            tools:ignore="ContentDescription" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/attachmentsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/marginStandardMedium"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/alternativeMargin"
+        android:paddingBottom="@dimen/marginStandardMedium"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detailedMessageDate"
+        app:layout_goneMarginTop="@dimen/marginStandardSmall"
+        tools:listitem="@layout/item_attachment" />
 
-        <TextView
-            android:id="@+id/detailedMessageDate"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/attachmentsIcon"
+        android:layout_width="@dimen/mediumIconSize"
+        android:layout_height="@dimen/mediumIconSize"
+        android:layout_marginStart="@dimen/marginStandardMedium"
+        android:src="@drawable/ic_attachment"
+        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
+        app:tint="@color/iconSecondaryColor"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/attachmentsSizeText"
+        style="@style/BodySmall.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
+        app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
+        app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
+        tools:text="4 pièces jointes (3 MB)" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/attachmentsDownloadAllButton"
+        style="@style/TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
+        android:text="@string/buttonDownloadAll"
+        app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
+        app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
+        app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/messageLoader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
+
+        <com.infomaniak.lib.core.views.LoaderTextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            app:layout_constraintBottom_toBottomOf="@id/detailedMessagePrefix"
-            app:layout_constraintStart_toEndOf="@id/prefixBarrier"
-            app:layout_constraintTop_toTopOf="@id/detailedMessagePrefix"
-            tools:text="10 juin 2022, 16:36" />
+            android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:textSize="12sp" />
 
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/prefixBarrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="right"
-            app:constraint_referenced_ids="fromPrefix,toPrefix,ccPrefix,bccPrefix,detailedMessagePrefix" />
-
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/headerDivider"
+        <com.infomaniak.lib.core.views.LoaderTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            app:dividerColor="@color/separatorDarker"
-            app:layout_constraintBottom_toTopOf="@id/attachmentsRecyclerView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detailedMessagePrefix" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/attachmentsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:paddingHorizontal="@dimen/alternativeMargin"
-            android:paddingVertical="@dimen/marginStandardMedium"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerDivider"
-            tools:listitem="@layout/item_attachment" />
-
-        <ImageView
-            android:id="@+id/attachmentsIcon"
-            android:layout_width="@dimen/mediumIconSize"
-            android:layout_height="@dimen/mediumIconSize"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:src="@drawable/ic_attachment"
-            app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
-            app:tint="@color/iconSecondaryColor"
-            tools:ignore="ContentDescription" />
-
-        <TextView
-            android:id="@+id/attachmentsSizeText"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardVerySmall"
-            app:layout_constraintEnd_toStartOf="@id/attachmentsDownloadAllButton"
-            app:layout_constraintStart_toEndOf="@id/attachmentsIcon"
-            app:layout_constraintTop_toBottomOf="@id/attachmentsRecyclerView"
-            tools:text="4 pièces jointes (3 MB)" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/attachmentsDownloadAllButton"
-            style="@style/TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:text="@string/buttonDownloadAll"
-            app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
-            app:layout_constraintStart_toEndOf="@id/attachmentsSizeText"
-            app:layout_constraintTop_toTopOf="@id/attachmentsSizeText" />
-
-        <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/attachmentsDivider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/marginStandardSmall"
-            android:layout_marginTop="@dimen/marginStandardSmall"
-            android:layout_marginBottom="@dimen/marginStandardMedium"
-            app:dividerColor="@color/separatorDarker"
-            app:layout_constraintBottom_toTopOf="@id/webViewFrameLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attachmentsSizeText" />
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/messageLoader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attachmentsDivider">
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:textSize="12sp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:textSize="12sp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:textSize="12sp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:textSize="12sp" />
-
-            <com.infomaniak.lib.core.views.LoaderTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/marginStandardMedium"
-                android:layout_marginBottom="@dimen/marginStandardVerySmall"
-                android:textSize="12sp" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <FrameLayout
-            android:id="@+id/webViewFrameLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/attachmentsDivider">
+            android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:textSize="12sp" />
 
-            <WebView
-                android:id="@+id/messageBody"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="horizontal" />
-        </FrameLayout>
-
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/attachmentsGroup"
+        <com.infomaniak.lib.core.views.LoaderTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton,attachmentsDivider,headerDivider"
-            tools:visibility="visible" />
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:textSize="12sp" />
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/ccGroup"
-            android:layout_width="wrap_content"
+        <com.infomaniak.lib.core.views.LoaderTextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:constraint_referenced_ids="ccRecyclerView,ccPrefix"
-            tools:visibility="visible" />
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:textSize="12sp" />
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/bccGroup"
-            android:layout_width="wrap_content"
+        <com.infomaniak.lib.core.views.LoaderTextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:constraint_referenced_ids="bccRecyclerView,bccPrefix"
-            tools:visibility="visible" />
+            android:layout_marginHorizontal="@dimen/marginStandardMedium"
+            android:layout_marginBottom="@dimen/marginStandardVerySmall"
+            android:textSize="12sp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/detailedFieldsGroup"
-            android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/webViewFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
+
+        <WebView
+            android:id="@+id/messageBody"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:constraint_referenced_ids="fromPrefix,fromRecyclerView,toPrefix,toRecyclerView,detailedMessagePrefix,detailedMessageDate"
-            tools:visibility="visible" />
+            android:scrollbars="horizontal" />
+    </FrameLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/attachmentsGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="attachmentsIcon,attachmentsSizeText,attachmentsDownloadAllButton"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/ccGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="ccRecyclerView,ccPrefix"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/bccGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="bccRecyclerView,bccPrefix"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/detailedFieldsGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="fromPrefix,fromRecyclerView,toPrefix,toRecyclerView,detailedMessagePrefix,detailedMessageDate"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

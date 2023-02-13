@@ -62,7 +62,7 @@
     <color name="backgroundLoginWebviewColor">@color/background</color>
     <color name="backgroundOnBoardingColor">@color/white</color>
     <color name="backgroundSnackbarColor">@color/orca</color>
-    <color name="backgroundAccentuated">@color/swan</color>
+    <color name="elevatedBackground">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
     <color name="threadBackground">@color/rabbit</color>
 
@@ -78,8 +78,7 @@
     <color name="staffOnlyColor">@color/prince_light</color>
 
     <!-- Separators -->
-    <color name="separatorDarker">#ECECEC</color>
-    <color name="separatorLighter">#ECECEC</color>
+    <color name="separatorColor">@color/mouse</color>
 
     <!-- Icons -->
     <color name="iconColor">@color/elephant</color>

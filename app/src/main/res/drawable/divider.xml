@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2022-2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -17,6 +17,6 @@
   -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/separatorDarker" />
+    <solid android:color="@color/separatorColor" />
     <size android:height="1dp" />
 </shape>
