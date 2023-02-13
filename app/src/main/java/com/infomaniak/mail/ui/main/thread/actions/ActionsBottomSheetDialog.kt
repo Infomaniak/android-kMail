@@ -116,9 +116,9 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         setText(favoriteText)
     }
 
-    private fun ActionItemView.setClosingOnClickListener(forceQuit: Boolean = false, callback: (() -> Unit)) {
+    private fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {
         setOnClickListener {
-            with(findNavController()) { if (forceQuit) popBackStack(R.id.threadListFragment, false) else popBackStack() }
+            findNavController().popBackStack()
             callback()
         }
     }

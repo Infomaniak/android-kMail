@@ -78,7 +78,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
                 override fun onReadUnread() {
                     mainViewModel.toggleSeenStatus(threadUid)
-                    findNavController().popBackStack(R.id.threadListFragment, false)
+                    findNavController().popBackStack(R.id.threadFragment, true)
                 }
 
                 override fun onMove() {
