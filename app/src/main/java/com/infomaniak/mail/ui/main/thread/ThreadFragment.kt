@@ -106,7 +106,7 @@ class ThreadFragment : Fragment() {
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             val total = appBarLayout.height * COLLAPSE_TITLE_THRESHOLD
             val removed = appBarLayout.height - total
-            val progress = (((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0) / total).toFloat() // [0,1]
+            val progress = (((-verticalOffset.toFloat()) - removed).coerceAtLeast(0.0) / total).toFloat() // Between 0 and 1
             val opacity = (progress * 255).roundToInt()
 
             val textColor = ColorUtils.setAlphaComponent(defaultTextColor, opacity)
@@ -291,7 +291,7 @@ class ThreadFragment : Fragment() {
 
     enum class HeaderState {
         ELEVATED,
-        LOWERED
+        LOWERED,
     }
 
     private companion object {
