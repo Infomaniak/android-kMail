@@ -17,73 +17,39 @@
   -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardViewMail"
     android:layout_width="match_parent"
     android:layout_height="@dimen/searchViewHeight"
     app:cardBackgroundColor="@color/searchBarBackgroundColor"
     app:cardCornerRadius="20dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/marginStandardSmall"
+        android:padding="0dp"
+        app:boxStrokeColor="@null"
+        app:boxStrokeWidth="0dp"
+        app:endIconDrawable="@drawable/ic_close_search"
+        app:endIconMode="clear_text"
+        app:hintEnabled="false"
+        app:placeholderText="@string/searchFieldPlaceholder"
+        app:placeholderTextColor="@color/tertiaryTextColor">
 
-        <ImageView
-            android:id="@+id/iconSearch"
-            android:layout_width="@dimen/iconImageSize"
-            android:layout_height="@dimen/iconImageSize"
-            android:layout_marginStart="@dimen/marginStandardMedium"
-            android:src="@drawable/ic_search"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
-
-        <EditText
-            android:id="@+id/searchView"
-            style="@style/BodySmall.Secondary"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:background="@android:color/transparent"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchTextInput"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="@dimen/marginStandardSmall"
             android:hint="@string/searchFieldPlaceholder"
             android:imeOptions="actionSearch"
             android:importantForAutofill="no"
             android:inputType="textFilter"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/filterButton"
-            app:layout_constraintStart_toEndOf="@id/iconSearch"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="LabelFor" />
+            android:lines="1"
+            android:padding="0dp"
+            android:textColorHint="@color/tertiaryTextColor" />
 
-        <TextView
-            android:id="@+id/searchViewText"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginHorizontal="@dimen/marginStandardMedium"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:hint="@string/searchFieldPlaceholder"
-            android:maxLines="1"
-            android:textSize="16sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/filterButton"
-            app:layout_constraintStart_toEndOf="@id/iconSearch"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/filterButton"
-            style="@style/IconButtonSmall"
-            android:layout_width="@dimen/iconImageSize"
-            android:layout_height="@dimen/iconImageSize"
-            android:layout_marginEnd="@dimen/marginStandardMedium"
-            android:contentDescription="@string/contentDescriptionButtonFilterSearch"
-            app:icon="@drawable/ic_filter"
-            app:iconTint="@color/shark"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </com.google.android.material.textfield.TextInputLayout>
 </com.google.android.material.card.MaterialCardView>

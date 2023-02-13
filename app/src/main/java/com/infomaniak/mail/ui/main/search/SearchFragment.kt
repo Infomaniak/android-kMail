@@ -1,6 +1,6 @@
 /*
  * Infomaniak kMail - Android
- * Copyright (C) 2022 Infomaniak Network SA
+ * Copyright (C) 2022-2023 Infomaniak Network SA
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,55 @@
 package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
+import com.infomaniak.mail.databinding.FragmentSearchBinding
+import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 
 class SearchFragment : Fragment() {
 
+    private lateinit var binding: FragmentSearchBinding
+    private val mainViewModel by activityViewModels<MainViewModel>()
     private val searchViewModel by viewModels<SearchViewModel>()
     private val navigationArgs by navArgs<SearchFragmentArgs>()
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
+    private val threadAdapter by lazy {
+        ThreadListAdapter(
+            requireContext(),
+            localSettings.threadDensity,
+            null,
+            mainViewModel.mergedContacts.value ?: emptyMap(),
+            {}
+        )
+    }
+    private val folders = mutableListOf<Folder?>()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_search, container, false)
+        return FragmentSearchBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         searchViewModel.init(navigationArgs.dummyFolderId)
+        setUi()
         observeVisibilityModeUpdates()
-        observeFolders()
+        // observeFolders()
         observeSearchResults()
     }
 
@@ -75,6 +100,70 @@ class SearchFragment : Fragment() {
         searchViewModel.visibilityMode.observe(viewLifecycleOwner) { updateUi(it) }
     }
 
+    private fun setUi() = with(binding) {
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+
+        val popupMenu = createPopupMenu()
+
+        folderDropDown.setOnClickListener {
+            folderDropDown.isChecked = !folderDropDown.isChecked // Cancels the auto check // TODO : any better solution ? -> button ?
+            popupMenu.show()
+        }
+
+        popupMenu.setOnMenuItemClickListener {
+            folderDropDown.apply {
+                text = it.title
+                isChecked = it.itemId != 0
+            }
+            searchViewModel.selectFolder(folders[it.itemId])
+            true
+        }
+
+        attachments.setOnCheckedChangeListener { _, isChecked ->
+            searchViewModel.setFilter(ThreadFilter.ATTACHMENTS)
+        }
+
+        mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
+            searchViewModel.setFilter(
+                when (chipGroup.checkedChipId) {
+                    R.id.read -> ThreadFilter.SEEN
+                    R.id.unread -> ThreadFilter.UNSEEN
+                    R.id.favorites -> ThreadFilter.STARRED
+                    else -> throw IllegalStateException("Cannot check a chip other than read, unread or favorites")
+                }
+            )
+        }
+
+        searchBar.searchTextInput.doOnTextChanged { text, _, _, _ ->
+            if ((text?.length ?: 0) > 3) {
+                searchViewModel.searchQuery(text.toString())
+            } else {
+                // TODO : Empty search results
+            }
+        }
+
+        mailRecyclerView.adapter = threadAdapter
+    }
+
+    private fun createPopupMenu(): PopupMenu = with(binding) {
+        val popupMenu = PopupMenu(context, folderDropDown)
+        searchViewModel.folders.observe(viewLifecycleOwner) { realmFolders ->
+            folders.clear()
+
+            folders.add(null)
+            popupMenu.menu.add(Menu.NONE, folders.lastIndex, Menu.NONE, getString(R.string.searchFilterFolder))
+
+            realmFolders.forEach { folder ->
+                folders.add(folder)
+                popupMenu.menu.add(Menu.NONE, folders.lastIndex, Menu.NONE, folder.getLocalizedName(requireContext()))
+            }
+
+            // TODO : Cleanly separate elements and order them
+            // TODO : popupMenu.menu.getItem(0).icon
+        }
+        return popupMenu
+    }
+
     private fun observeFolders() {
         searchViewModel.folders.observe(viewLifecycleOwner) {
             // TODO: handle folders ui
@@ -85,6 +174,9 @@ class SearchFragment : Fragment() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) {
             // TODO: - handle search results
             // TODO: - handle visibility mode
+            Log.e("gibran", "observeSearchResults - recieved threads: ${it.map { it.subject }}")
+            threadAdapter.dataSet = it
+            threadAdapter.notifyDataSetChanged()
         }
     }
 
@@ -92,4 +184,7 @@ class SearchFragment : Fragment() {
         RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS
     }
 
+    // private companion object {
+    //     const val NO_FOLDER = 0
+    // }
 }

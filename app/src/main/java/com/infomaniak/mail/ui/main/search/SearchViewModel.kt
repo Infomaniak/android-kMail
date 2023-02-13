@@ -86,7 +86,7 @@ class SearchViewModel : ViewModel() {
         selectedFolder = folder
     }
 
-    fun toggleFilter(filter: ThreadFilter) {
+    fun setFilter(filter: ThreadFilter) {
         resetPagination()
         if (selectedFilters.contains(filter)) filter.unselect() else filter.select()
     }

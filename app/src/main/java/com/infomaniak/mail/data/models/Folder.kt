@@ -93,7 +93,7 @@ class Folder : RealmObject {
     }
 
     fun getLocalizedName(context: Context): String {
-        return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name
+        return role?.folderNameRes?.let(context::getString) ?: name
     }
 
     enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
