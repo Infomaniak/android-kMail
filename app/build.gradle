@@ -41,7 +41,6 @@ android {
         buildConfigField 'String', 'GITHUB_REPO', '"android-mail"'
 
         resValue 'string', 'ATTACHMENTS_AUTHORITY', 'com.infomaniak.mail.attachments'
-        resValue 'string', 'EXPOSED_ATTACHMENTS_DIR', 'attachments_cache'
 
     }
 
