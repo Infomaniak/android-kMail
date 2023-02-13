@@ -57,6 +57,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     var onReplyClicked: ((Message) -> Unit)? = null
     var onMenuClicked: ((Message) -> Unit)? = null
 
+    private val plainTextMargin by lazy { 10.toPx() } // Experimentally measured
+
     override fun updateList(itemList: List<Message>) {
         messages = itemList
     }
@@ -110,16 +112,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         }
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let {
-            var html = if (context.isNightModeEnabled() && it.type == Utils.TEXT_HTML) {
-                context.injectCssInHtml(R.raw.custom_dark_mode, it.value)
-            } else {
-                it.value
+            var styledBody = it.value
+            if (it.type == Utils.TEXT_HTML) {
+                if (context.isNightModeEnabled()) styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody)
+                styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
+                styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
             }
 
-            html = context.injectCssInHtml(R.raw.remove_margin, html)
-            html = context.injectCssInHtml(R.raw.add_padding, html)
+            val margin = if (it.type == Utils.TEXT_HTML) NO_MARGIN else plainTextMargin
+            messageBody.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
 
-            messageBody.loadDataWithBaseURL("", html, it.type, Utils.UTF_8, "")
+            messageBody.loadDataWithBaseURL("", styledBody, it.type, Utils.UTF_8, "")
         }
     }
 
@@ -313,6 +316,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+
+        const val NO_MARGIN = 0
     }
 
     class ThreadViewHolder(
