@@ -25,15 +25,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
+import com.infomaniak.mail.databinding.DialogWithDescriptionBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.notYetImplemented
 
 class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetJunkBinding
+    private val dialogBinding by lazy { DialogWithDescriptionBinding.inflate(layoutInflater) }
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 
@@ -57,7 +60,24 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
         setSpamUi(message)
 
         spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid, message) }
-        phishing.setClosingOnClickListener { notYetImplemented() }
+        phishing.setClosingOnClickListener {
+            dialogBinding.dialogTitle.text = context?.getString(R.string.reportPhishingTitle)
+            dialogBinding.dialogDescription.text = context?.getString(R.string.reportPhishingDescription)
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogBinding.root)
+                .setPositiveButton(R.string.buttonReport) { _, _ ->
+                    message?.let {
+                        with(mainViewModel) {
+                            reportPhishing(message)
+                            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message)
+                        }
+                    }
+                }
+                .setNegativeButton(R.string.buttonCancel, null)
+                .create()
+                .show()
+        }
         blockSender.setClosingOnClickListener { notYetImplemented() }
     }
 

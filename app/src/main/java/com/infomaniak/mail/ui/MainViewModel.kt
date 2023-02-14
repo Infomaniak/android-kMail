@@ -519,6 +519,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun reportPhishing(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+
+        val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
+
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            R.string.snackbarReportPhishingConfirmation
+        } else {
+            RCore.string.anErrorHasOccurred
+        }
+
+        snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
+    }
+
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid))
     }
