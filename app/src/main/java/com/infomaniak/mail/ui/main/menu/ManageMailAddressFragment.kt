@@ -77,12 +77,19 @@ class ManageMailAddressFragment : Fragment() {
             }
         }
 
-        manageMailAddressViewModel.observeAccountsLive.observe(viewLifecycleOwner) { mailboxes ->
-            simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
-        }
+        observeAccountsLive()
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
+    }
+
+    private fun observeAccountsLive() = with(manageMailAddressViewModel) {
+
+        updateMailboxes()
+
+        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes ->
+            simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
+        }
     }
 }

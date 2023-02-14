@@ -65,7 +65,6 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         AccountUtils.reloadApp?.invoke()
     }
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
     }

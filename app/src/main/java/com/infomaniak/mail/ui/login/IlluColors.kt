@@ -124,7 +124,6 @@ class IlluColors(val keyPath: KeyPath, val color: Colors) {
         BORDER("Contour"),
     }
 
-
     companion object {
 
         private fun keyPath(

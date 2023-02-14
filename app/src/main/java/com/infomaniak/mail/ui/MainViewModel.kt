@@ -64,6 +64,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
     val snackbarFeedback = SingleLiveEvent<Pair<String, UndoData?>>()
 
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var forceRefreshJob: Job? = null
 
     //region Current Mailbox
@@ -75,11 +76,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFoldersLive = _currentMailboxObjectId.flatMapLatest {
         it?.let { FolderController.getFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
-    }.asLiveData(Dispatchers.IO)
+    }.asLiveData(coroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
         it?.let(QuotasController::getQuotasAsync) ?: emptyFlow()
-    }.asLiveData(Dispatchers.IO)
+    }.asLiveData(coroutineContext)
     //endregion
 
     //region Current Folder
@@ -88,17 +89,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFolder = _currentFolderId.mapLatest {
         it?.let(FolderController::getFolder)
-    }.asLiveData(Dispatchers.IO)
+    }.asLiveData(coroutineContext)
 
     val currentFolderLive = _currentFolderId.flatMapLatest {
         it?.let(FolderController::getFolderAsync) ?: emptyFlow()
-    }.asLiveData(Dispatchers.IO)
+    }.asLiveData(coroutineContext)
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
     val currentThreadsLiveToObserve = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
         folder?.id?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
-    }.asLiveData(Dispatchers.IO)
+    }.asLiveData(coroutineContext)
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
@@ -109,9 +110,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         addSource(currentFilter) { value = value?.first to it }
     }.asFlow()
 
-    val mailboxesLive = liveData(Dispatchers.IO) {
-        emitSource(MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData())
-    }
+    val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
 
     private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != _currentMailboxObjectId.value) {
@@ -521,8 +520,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
-    fun getMessage(messageUid: String) = liveData(Dispatchers.IO) {
+    fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid))
     }
 

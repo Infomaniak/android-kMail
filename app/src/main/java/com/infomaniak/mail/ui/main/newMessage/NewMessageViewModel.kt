@@ -53,6 +53,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     var draft: Draft = Draft()
 
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var autoSaveJob: Job? = null
 
     var isAutoCompletionOpened = false
@@ -145,11 +146,11 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    val mergedContacts = liveData(Dispatchers.IO) {
+    val mergedContacts = liveData(coroutineContext) {
         emit(MergedContactController.getMergedContacts(sorted = true))
     }
 
-    val mailboxes = liveData(Dispatchers.IO) {
+    val mailboxes = liveData(coroutineContext) {
 
         val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
 
