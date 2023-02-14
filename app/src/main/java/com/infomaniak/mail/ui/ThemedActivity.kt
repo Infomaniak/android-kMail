@@ -21,11 +21,23 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.utils.AccountUtils
+import io.sentry.Sentry
+import kotlinx.coroutines.runBlocking
 
 open class ThemedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(LocalSettings.getInstance(this).accentColor.theme)
+
+        if (AccountUtils.currentUser == null) runBlocking {
+            AccountUtils.requestCurrentUser()
+            Sentry.withScope { scope ->
+                scope.setExtra("has been fixed", "${AccountUtils.currentUser != null}")
+                Sentry.captureMessage("ThemedActivity> the current user is null")
+            }
+        }
+
         super.onCreate(savedInstanceState)
         trackScreen()
     }
