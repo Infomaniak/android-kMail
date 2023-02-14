@@ -42,15 +42,16 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var fetchMessagesJob: Job? = null
 
     private val mailbox by lazy { MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!! }
 
-    fun threadLive(threadUid: String) = liveData(Dispatchers.IO) {
+    fun threadLive(threadUid: String) = liveData(coroutineContext) {
         emitSource(ThreadController.getThreadAsync(threadUid).map { it.obj }.asLiveData())
     }
 
-    fun messagesLive(threadUid: String) = liveData(Dispatchers.IO) {
+    fun messagesLive(threadUid: String) = liveData(coroutineContext) {
         MessageController.getSortedMessages(threadUid)?.asFlow()?.asLiveData()?.let { emitSource(it) }
     }
 

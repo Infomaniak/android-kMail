@@ -32,8 +32,6 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.userInfo.MergedContactController
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.Companion.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME
@@ -55,6 +53,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     var draft: Draft = Draft()
 
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var autoSaveJob: Job? = null
 
     var isAutoCompletionOpened = false
@@ -147,11 +146,11 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun getMergedContacts(): LiveData<List<MergedContact>> = liveData(Dispatchers.IO) {
+    val mergedContacts = liveData(coroutineContext) {
         emit(MergedContactController.getMergedContacts(sorted = true))
     }
 
-    fun observeMailboxes(): LiveData<Pair<List<Mailbox>, Int>> = liveData(Dispatchers.IO) {
+    val mailboxes = liveData(coroutineContext) {
 
         val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
 

@@ -227,11 +227,6 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
 }
-
-inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
-    removeObservers(viewLifecycleOwner)
-    observe(viewLifecycleOwner, observer)
-}
 //endregion
 
 //region Folders

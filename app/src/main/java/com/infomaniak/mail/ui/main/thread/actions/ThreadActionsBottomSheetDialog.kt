@@ -29,7 +29,6 @@ import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.refreshObserve
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
 class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
@@ -40,7 +39,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        threadActionsViewModel.threadLive(threadUid).refreshObserve(viewLifecycleOwner) { thread ->
+        threadActionsViewModel.threadLive(threadUid).observe(viewLifecycleOwner) { thread ->
             setMarkAsReadUi(thread.unseenMessagesCount == 0)
             setFavoriteUi(thread.isFavorite)
         }
@@ -84,7 +83,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 override fun onMove() {
                     animatedNavigation(
                         resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(mainViewModel.currentFolderId.value!!, threadUid).toBundle(),
+                        args = MoveFragmentArgs(mainViewModel.currentFolderId!!, threadUid).toBundle(),
                         currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
                     )
                 }

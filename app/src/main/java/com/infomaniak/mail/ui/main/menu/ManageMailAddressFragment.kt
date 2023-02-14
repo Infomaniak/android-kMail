@@ -34,7 +34,6 @@ import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
 import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.refreshObserve
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -78,12 +77,19 @@ class ManageMailAddressFragment : Fragment() {
             }
         }
 
-        manageMailAddressViewModel.observeAccounts().refreshObserve(viewLifecycleOwner) { mailboxes ->
-            simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
-        }
+        observeAccountsLive()
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
+    }
+
+    private fun observeAccountsLive() = with(manageMailAddressViewModel) {
+
+        updateMailboxes()
+
+        observeAccountsLive.observe(viewLifecycleOwner) { mailboxes ->
+            simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
+        }
     }
 }

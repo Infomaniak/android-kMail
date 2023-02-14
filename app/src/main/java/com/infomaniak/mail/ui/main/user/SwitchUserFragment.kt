@@ -24,11 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.map
-import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.AppSettings
 import com.infomaniak.mail.databinding.FragmentSwitchUserBinding
@@ -75,12 +71,6 @@ class SwitchUserFragment : Fragment() {
     }
 
     private fun observeAccounts() {
-        switchUserViewModel.getAllUsers().observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
-    }
-
-    class SwitchUserViewModel : ViewModel() {
-        fun getAllUsers(): LiveData<List<User>> {
-            return AccountUtils.getAllUsers().map { users -> users.sortedBy { it.displayName } }
-        }
+        switchUserViewModel.allUsers.observe(viewLifecycleOwner, accountsAdapter::initializeAccounts)
     }
 }

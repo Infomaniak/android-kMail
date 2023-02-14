@@ -219,7 +219,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeThreadLive() {
-        threadViewModel.threadLive(navigationArgs.threadUid).refreshObserve(viewLifecycleOwner, ::onThreadUpdate)
+        threadViewModel.threadLive(navigationArgs.threadUid).observe(viewLifecycleOwner, ::onThreadUpdate)
     }
 
     private fun observeMessagesLive() {
@@ -244,7 +244,7 @@ class ThreadFragment : Fragment() {
     private fun downloadAllAttachments(message: Message) {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return,
-            folderId = mainViewModel.currentFolderId.value ?: return,
+            folderId = mainViewModel.currentFolderId ?: return,
             messageId = message.shortUid,
         )
         val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }

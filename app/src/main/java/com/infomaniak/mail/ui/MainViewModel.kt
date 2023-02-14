@@ -49,11 +49,13 @@ import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.infomaniak.lib.core.R as RCore
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication<Application>()
@@ -62,66 +64,42 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
     val snackbarFeedback = SingleLiveEvent<Pair<String, UndoData?>>()
 
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var forceRefreshJob: Job? = null
 
     //region Current Mailbox
-    private val currentMailboxObjectId = MutableLiveData<String?>(null)
+    private val _currentMailboxObjectId = MutableStateFlow<String?>(null)
 
-    val currentMailbox = currentMailboxObjectId.switchMap { mailboxObjectId ->
-        liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
-    }
+    val currentMailbox = _currentMailboxObjectId.mapLatest {
+        it?.let(MailboxController::getMailbox)
+    }.asLiveData(Dispatchers.IO)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentFoldersLiveToObserve
-        get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
-            liveData(Dispatchers.IO) {
-                mailboxObjectId?.let {
-                    emitSource(FolderController.getFoldersAsync().map { it.list.getMenuFolders() }.asLiveData())
-                }
-            }
-        }
+    val currentFoldersLive = _currentMailboxObjectId.flatMapLatest {
+        it?.let { FolderController.getFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
+    }.asLiveData(coroutineContext)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentQuotasLiveToObserve
-        get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
-            liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
-        }
+    val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
+        it?.let(QuotasController::getQuotasAsync) ?: emptyFlow()
+    }.asLiveData(coroutineContext)
     //endregion
 
     //region Current Folder
-    val currentFolderId = MutableLiveData<String?>(null)
+    private val _currentFolderId = MutableStateFlow<String?>(null)
+    val currentFolderId get() = _currentFolderId.value
 
-    val currentFolder = currentFolderId.switchMap { folderId ->
-        liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
-    }
+    val currentFolder = _currentFolderId.mapLatest {
+        it?.let(FolderController::getFolder)
+    }.asLiveData(coroutineContext)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentFolderLiveToObserve
-        get() = currentFolderId.switchMap { folderId ->
-            liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
-        }
+    val currentFolderLive = _currentFolderId.flatMapLatest {
+        it?.let(FolderController::getFolderAsync) ?: emptyFlow()
+    }.asLiveData(coroutineContext)
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentThreadsLiveToObserve
-        get() = observeFolderAndFilter().switchMap { (folder, filter) ->
-            liveData(Dispatchers.IO) {
-                if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
-            }
-        }
+    val currentThreadsLiveToObserve = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
+        folder?.id?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
+    }.asLiveData(coroutineContext)
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
@@ -130,26 +108,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
         addSource(currentFilter) { value = value?.first to it }
-    }
+    }.asFlow()
 
-    fun observeMailboxesLive(userId: Int = AccountUtils.currentUserId): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
-        emitSource(MailboxController.getMailboxesAsync(userId).asLiveData())
-    }
+    val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
 
     private fun selectMailbox(mailbox: Mailbox) {
-        if (mailbox.objectId != currentMailboxObjectId.value) {
+        if (mailbox.objectId != _currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxEmail = mailbox.email
-            currentMailboxObjectId.postValue(mailbox.objectId)
-            currentFolderId.postValue(null)
+            _currentMailboxObjectId.value = mailbox.objectId
+            _currentFolderId.value = null
         }
     }
 
     private fun selectFolder(folderId: String) {
-        if (folderId != currentFolderId.value) {
+        if (folderId != currentFolderId) {
             Log.d(TAG, "Select folder: $folderId")
-            currentFolderId.postValue(folderId)
+            _currentFolderId.value = folderId
         }
     }
 
@@ -173,7 +149,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
             selectMailbox(mailbox)
 
-            if (currentFolderId.value == null) {
+            if (currentFolderId == null) {
                 val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
                 selectFolder(folder.id)
             }
@@ -192,7 +168,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateSignatures(mailbox)
         updateFolders(mailbox)
 
-        (currentFolderId.value?.let(FolderController::getFolder)
+        (currentFolderId?.let(FolderController::getFolder)
             ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))?.let { folder ->
             selectFolder(folder.id)
             refreshThreads(mailbox, folder.id)
@@ -224,7 +200,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        if (folderId == currentFolderId.value) return@launch
+        if (folderId == currentFolderId) return@launch
 
         selectFolder(folderId)
         refreshThreads(folderId = folderId)
@@ -250,7 +226,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun observeRealmMergedContacts() = viewModelScope.launch(Dispatchers.IO) {
+    fun observeMergedContactsLive() = viewModelScope.launch(Dispatchers.IO) {
         MergedContactController.getMergedContactsAsync().collect { contacts ->
             // TODO: We had this issue: https://sentry.infomaniak.com/share/issue/111cc162315d4873844c9b79be5b2491/
             // TODO: We fixed it by doing an `associate` with `copyFromRealm`, instead of an `associateBy`.
@@ -274,7 +250,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
-        folderId: String? = currentFolderId.value,
+        folderId: String? = currentFolderId,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
 
         if (mailbox == null || folderId == null) return@launch
@@ -447,7 +423,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getMessagesToMove(thread: Thread, message: Message?) = when (message) {
-        null -> MessageController.getMovableMessages(thread, currentFolderId.value!!)
+        null -> MessageController.getMovableMessages(thread, currentFolderId!!)
         else -> MessageController.getMessageAndDuplicates(thread, message)
     }
     //endregion
@@ -544,8 +520,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
-    fun getMessage(messageUid: String) = liveData(Dispatchers.IO) {
+    fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid))
     }
 
