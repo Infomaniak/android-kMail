@@ -44,7 +44,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:navigationContentDescription="@string/contentDescriptionButtonMenu"
                 app:navigationIcon="@drawable/ic_burger"
-                app:navigationIconTint="?android:attr/colorPrimary"
                 tools:title="Boite de réception">
 
                 <LinearLayout
