@@ -78,7 +78,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeMailboxesLive()
         observeCurrentFolder()
         observeFoldersLive()
-        observeQuotas()
+        observeQuotasLive()
     }
 
     override fun setupListeners() = with(binding) {
@@ -219,7 +219,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         }
     }
 
-    private fun observeQuotas() = with(binding) {
+    private fun observeQuotasLive() = with(binding) {
         mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
