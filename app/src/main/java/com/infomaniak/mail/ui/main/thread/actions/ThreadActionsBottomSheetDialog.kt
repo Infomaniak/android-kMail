@@ -20,10 +20,10 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
@@ -45,10 +45,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.postpone.isGone = true
+        setSpamUi()
 
         threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
-            navigationArgs.messageUidToReplyTo,
+            messageUidToReplyTo,
         ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
 
             initOnClickListener(object : OnActionClick {
@@ -96,13 +97,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     mainViewModel.toggleFavoriteStatus(threadUid)
                 }
 
-                override fun onReportJunk() {
-                    safeNavigate(
-                        R.id.junkBottomSheetDialog,
-                        JunkBottomSheetDialogArgs(threadUid, null).toBundle(),
-                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name
-                    )
+                override fun onSpam() {
+                    mainViewModel.toggleSpamOrHam(threadUid)
                 }
+
+                override fun onReportJunk() = Unit
 
                 override fun onPrint() {
                     notYetImplemented()
@@ -114,5 +113,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 //endregion
             })
         }
+    }
+
+    private fun setSpamUi() = with(binding) {
+        reportJunk.isGone = true
+        spam.isVisible = true
+        spam.setText(if (mainViewModel.isSpam(null)) R.string.actionNonSpam else R.string.actionSpam)
     }
 }

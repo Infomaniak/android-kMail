@@ -86,6 +86,8 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     mainViewModel.toggleFavoriteStatus(threadUid, message)
                 }
 
+                override fun onSpam() = Unit
+
                 override fun onReportJunk() {
                     safeNavigate(
                         R.id.junkBottomSheetDialog,
