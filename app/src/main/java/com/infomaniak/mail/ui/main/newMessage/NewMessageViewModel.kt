@@ -69,6 +69,21 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     private var isNewMessage = false
 
+    val mergedContacts = liveData(coroutineContext) {
+        emit(MergedContactController.getMergedContacts(sorted = true))
+    }
+
+    val mailboxes = liveData(coroutineContext) {
+
+        val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
+
+        val currentMailboxIndex = mailboxes.indexOfFirst {
+            it.userId == AccountUtils.currentUserId && it.mailboxId == AccountUtils.currentMailboxId
+        }
+
+        emit(mailboxes to currentMailboxIndex)
+    }
+
     fun initDraftAndViewModel(navigationArgs: NewMessageActivityArgs): LiveData<Boolean> = liveData(Dispatchers.IO) {
         with(navigationArgs) {
             val isSuccess = RealmDatabase.mailboxContent().writeBlocking {
@@ -144,21 +159,6 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 draft.messageUid = localDraft.messageUid
             }
         }
-    }
-
-    val mergedContacts = liveData(coroutineContext) {
-        emit(MergedContactController.getMergedContacts(sorted = true))
-    }
-
-    val mailboxes = liveData(coroutineContext) {
-
-        val mailboxes = MailboxController.getMailboxes(AccountUtils.currentUserId)
-
-        val currentMailboxIndex = mailboxes.indexOfFirst {
-            it.userId == AccountUtils.currentUserId && it.mailboxId == AccountUtils.currentMailboxId
-        }
-
-        emit(mailboxes to currentMailboxIndex)
     }
 
     fun addRecipientToField(recipient: Recipient, type: FieldType) = with(draft) {

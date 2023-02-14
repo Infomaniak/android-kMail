@@ -67,6 +67,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var forceRefreshJob: Job? = null
 
+    val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
+
     //region Current Mailbox
     private val _currentMailboxObjectId = MutableStateFlow<String?>(null)
 
@@ -109,8 +111,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         addSource(currentFolder) { value = it to value!!.second }
         addSource(currentFilter) { value = value?.first to it }
     }.asFlow()
-
-    val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
 
     private fun selectMailbox(mailbox: Mailbox) {
         if (mailbox.objectId != _currentMailboxObjectId.value) {
