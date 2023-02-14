@@ -243,7 +243,7 @@ fun List<Folder>.getMenuFolders(): Triple<Folder?, List<Folder>, List<Folder>> {
             .also(list::removeAll)
 
         val customFolders = list
-            .filter { it.parentFolder == null }
+            .filter { it.parent == null }
             .sortedByDescending { it.isFavorite }
             .formatFoldersListWithAllChildren()
 

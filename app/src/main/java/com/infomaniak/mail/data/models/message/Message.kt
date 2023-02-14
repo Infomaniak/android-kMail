@@ -118,11 +118,12 @@ class Message : RealmObject {
     var detailsAreExpanded = false
     //endregion
 
-    val parentsFromMessage by backlinks(Thread::messages)
-    val parentsFromDuplicate by backlinks(Thread::duplicates)
+    val threads by backlinks(Thread::messages)
 
-    private val parentFolders by backlinks(Folder::messages)
-    val parentFolder get() = parentFolders.first()
+    val threadsDuplicatedIn by backlinks(Thread::duplicates)
+
+    private val _folders by backlinks(Folder::messages)
+    val folder get() = _folders.single()
 
     inline val shortUid get() = uid.split("@").first().toLong()
     inline val sender get() = from.first()
