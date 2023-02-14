@@ -67,12 +67,7 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
             MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogBinding.root)
                 .setPositiveButton(R.string.buttonReport) { _, _ ->
-                    message?.let {
-                        with(mainViewModel) {
-                            reportPhishing(message)
-                            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message)
-                        }
-                    }
+                    message?.let { mainViewModel.reportPhishing(threadUid, it) }
                 }
                 .setNegativeButton(R.string.buttonCancel, null)
                 .create()

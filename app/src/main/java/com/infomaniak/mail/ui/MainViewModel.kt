@@ -478,7 +478,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Spam
-    fun toggleSpamOrHam(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSpamOrHam(
+        threadUid: String,
+        message: Message? = null,
+        displaySnackbar: Boolean = true,
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
@@ -497,9 +501,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
-        val undoDestinationId = message?.folderId ?: thread.folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-        showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        if (displaySnackbar) {
+            val undoDestinationId = message?.folderId ?: thread.folderId
+            val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+            showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        }
     }
     //endregion
 
@@ -519,12 +525,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun reportPhishing(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+    fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
         val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
 
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
 
         val snackbarTitle = if (apiResponse.isSuccess()) {
+            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, false)
             R.string.snackbarReportPhishingConfirmation
         } else {
             RCore.string.anErrorHasOccurred
