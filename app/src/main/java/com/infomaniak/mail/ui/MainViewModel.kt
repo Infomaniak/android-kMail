@@ -68,45 +68,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var forceRefreshJob: Job? = null
 
     //region Current Mailbox
-    private val currentMailboxObjectId = MutableLiveData<String?>(null)
+    private val _currentMailboxObjectId = MutableStateFlow<String?>(null)
 
-    val currentMailbox = currentMailboxObjectId.switchMap { mailboxObjectId ->
-        liveData(Dispatchers.IO) { mailboxObjectId?.let(MailboxController::getMailbox)?.let { emit(it) } }
-    }
+    val currentMailbox = _currentMailboxObjectId.mapLatest {
+        it?.let(MailboxController::getMailbox)
+    }.asLiveData(Dispatchers.IO)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentFoldersLiveToObserve
-        get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
-            liveData(Dispatchers.IO) {
-                mailboxObjectId?.let {
-                    emitSource(FolderController.getFoldersAsync().map { it.list.getMenuFolders() }.asLiveData())
-                }
-            }
-        }.also { currentFoldersLive = it }
-    private var currentFoldersLive: LiveData<Triple<Folder?, List<Folder>, List<Folder>>>? = null
+    val currentFoldersLive = _currentMailboxObjectId.flatMapLatest {
+        it?.let { FolderController.getFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
+    }.asLiveData(Dispatchers.IO)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentQuotasLiveToObserve
-        get() = currentMailboxObjectId.switchMap { mailboxObjectId ->
-            liveData(Dispatchers.IO) { mailboxObjectId?.let { emitSource(QuotasController.getQuotasAsync(it).asLiveData()) } }
-        }.also { currentQuotasLive = it }
-    private var currentQuotasLive: LiveData<Quotas?>? = null
+    val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
+        it?.let(QuotasController::getQuotasAsync) ?: emptyFlow()
+    }.asLiveData(Dispatchers.IO)
     //endregion
 
     //region Current Folder
     private val _currentFolderId = MutableStateFlow<String?>(null)
     val currentFolderId get() = _currentFolderId.value
 
-    val currentFolder = _currentFolderId.mapLatest { it?.let(FolderController::getFolder) }.asLiveData(Dispatchers.IO)
+    val currentFolder = _currentFolderId.mapLatest {
+        it?.let(FolderController::getFolder)
+    }.asLiveData(Dispatchers.IO)
 
-    val currentFolderLive =
-        _currentFolderId.flatMapLatest { it?.let(FolderController::getFolderAsync) ?: emptyFlow() }.asLiveData(Dispatchers.IO)
+    val currentFolderLive = _currentFolderId.flatMapLatest {
+        it?.let(FolderController::getFolderAsync) ?: emptyFlow()
+    }.asLiveData(Dispatchers.IO)
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
@@ -125,15 +112,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    fun removeMenuDrawerObservers(viewLifecycleOwner: LifecycleOwner) {
-        currentQuotasLive?.removeObservers(viewLifecycleOwner)
-        currentQuotasLive = null
-
-        currentFoldersLive?.removeObservers(viewLifecycleOwner)
-        currentFoldersLive = null
-    }
-
-    fun removeThreadListObservers(viewLifecycleOwner: LifecycleOwner) {
+    fun removeObservers(viewLifecycleOwner: LifecycleOwner) {
         currentThreadsLive?.removeObservers(viewLifecycleOwner)
         currentThreadsLive = null
     }
@@ -149,11 +128,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun selectMailbox(mailbox: Mailbox) {
-        if (mailbox.objectId != currentMailboxObjectId.value) {
+        if (mailbox.objectId != _currentMailboxObjectId.value) {
             Log.d(TAG, "Select mailbox: ${mailbox.email}")
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxEmail = mailbox.email
-            currentMailboxObjectId.postValue(mailbox.objectId)
+            _currentMailboxObjectId.value = mailbox.objectId
             _currentFolderId.value = null
         }
     }

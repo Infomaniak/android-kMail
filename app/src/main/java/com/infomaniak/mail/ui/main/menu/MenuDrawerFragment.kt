@@ -78,17 +78,8 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeCurrentMailbox()
         observeMailboxesLive()
         observeCurrentFolder()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        observeQuotas()
         observeFoldersLive()
-    }
-
-    override fun onStop() {
-        mainViewModel.removeMenuDrawerObservers(viewLifecycleOwner)
-        super.onStop()
+        observeQuotas()
     }
 
     override fun setupListeners() = with(binding) {
@@ -175,7 +166,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeCurrentMailbox() {
-        mainViewModel.currentMailbox.observe(viewLifecycleOwner) { mailbox ->
+        mainViewModel.currentMailbox.observeNotNull(viewLifecycleOwner) { mailbox ->
             binding.mailboxSwitcherText.text = mailbox.email
 
             // Make sure you always cancel all mailbox current notifications, whenever it is visible by the user.
@@ -216,7 +207,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeFoldersLive() = with(mainViewModel) {
-        currentFoldersLiveToObserve.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+        currentFoldersLive.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { inboxFolder.badge = it }
@@ -230,7 +221,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeQuotas() = with(binding) {
-        mainViewModel.currentQuotasLiveToObserve.observe(viewLifecycleOwner) { quotas ->
+        mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
             storageLayout.isVisible = isLimited

@@ -114,7 +114,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onStop() {
-        mainViewModel.removeThreadListObservers(viewLifecycleOwner)
+        mainViewModel.removeObservers(viewLifecycleOwner)
         super.onStop()
     }
 
