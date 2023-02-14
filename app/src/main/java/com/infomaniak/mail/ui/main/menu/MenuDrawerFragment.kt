@@ -207,7 +207,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeCurrentFolder() {
-        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+        mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
             binding.inboxFolder.setSelectedState(folder.role == FolderRole.INBOX)
 
             defaultFoldersAdapter.updateSelectedState(folder.id)
@@ -223,9 +223,9 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolderId = currentFolderId.value ?: return@observe
-            defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
-            customFoldersAdapter.setFolders(customFolders, currentFolderId)
+            val newCurrentFolderId = currentFolderId ?: return@observe
+            defaultFoldersAdapter.setFolders(defaultFolders, newCurrentFolderId)
+            customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
         }
     }
 

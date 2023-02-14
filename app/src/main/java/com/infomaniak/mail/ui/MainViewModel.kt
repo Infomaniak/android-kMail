@@ -50,11 +50,13 @@ import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.infomaniak.lib.core.R as RCore
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication<Application>()
@@ -98,21 +100,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Current Folder
-    val currentFolderId = MutableLiveData<String?>(null)
+    private val _currentFolderId = MutableStateFlow<String?>(null)
+    val currentFolderId get() = _currentFolderId.value
 
-    val currentFolder = currentFolderId.switchMap { folderId ->
-        liveData(Dispatchers.IO) { folderId?.let(FolderController::getFolder)?.let { emit(it) } }
-    }
+    val currentFolder = _currentFolderId.mapLatest { it?.let(FolderController::getFolder) }.asLiveData(Dispatchers.IO)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentFolderLiveToObserve
-        get() = currentFolderId.switchMap { folderId ->
-            liveData(Dispatchers.IO) { folderId?.let { emitSource(FolderController.getFolderAsync(it).asLiveData()) } }
-        }.also { currentFolderLive = it }
-    private var currentFolderLive: LiveData<Folder>? = null
+    val currentFolderLive =
+        _currentFolderId.flatMapLatest { it?.let(FolderController::getFolderAsync) ?: emptyFlow() }.asLiveData(Dispatchers.IO)
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
@@ -140,9 +134,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeThreadListObservers(viewLifecycleOwner: LifecycleOwner) {
-        currentFolderLive?.removeObservers(viewLifecycleOwner)
-        currentFolderLive = null
-
         currentThreadsLive?.removeObservers(viewLifecycleOwner)
         currentThreadsLive = null
     }
@@ -163,14 +154,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (mailbox.mailboxId != AccountUtils.currentMailboxId) AccountUtils.currentMailboxId = mailbox.mailboxId
             AccountUtils.currentMailboxEmail = mailbox.email
             currentMailboxObjectId.postValue(mailbox.objectId)
-            currentFolderId.postValue(null)
+            _currentFolderId.value = null
         }
     }
 
     private fun selectFolder(folderId: String) {
-        if (folderId != currentFolderId.value) {
+        if (folderId != currentFolderId) {
             Log.d(TAG, "Select folder: $folderId")
-            currentFolderId.postValue(folderId)
+            _currentFolderId.value = folderId
         }
     }
 
@@ -194,7 +185,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val mailbox = MailboxController.getMailbox(userId, mailboxId) ?: return
             selectMailbox(mailbox)
 
-            if (currentFolderId.value == null) {
+            if (currentFolderId == null) {
                 val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
                 selectFolder(folder.id)
             }
@@ -213,7 +204,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateSignatures(mailbox)
         updateFolders(mailbox)
 
-        (currentFolderId.value?.let(FolderController::getFolder)
+        (currentFolderId?.let(FolderController::getFolder)
             ?: FolderController.getFolder(DEFAULT_SELECTED_FOLDER))?.let { folder ->
             selectFolder(folder.id)
             refreshThreads(mailbox, folder.id)
@@ -245,7 +236,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun openFolder(folderId: String) = viewModelScope.launch(Dispatchers.IO) {
-        if (folderId == currentFolderId.value) return@launch
+        if (folderId == currentFolderId) return@launch
 
         selectFolder(folderId)
         refreshThreads(folderId = folderId)
@@ -295,7 +286,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun refreshThreads(
         mailbox: Mailbox? = currentMailbox.value,
-        folderId: String? = currentFolderId.value,
+        folderId: String? = currentFolderId,
     ) = viewModelScope.launch(viewModelScope.handlerIO) {
 
         if (mailbox == null || folderId == null) return@launch
@@ -468,7 +459,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getMessagesToMove(thread: Thread, message: Message?) = when (message) {
-        null -> MessageController.getMovableMessages(thread, currentFolderId.value!!)
+        null -> MessageController.getMovableMessages(thread, currentFolderId!!)
         else -> MessageController.getMessageAndDuplicates(thread, message)
     }
     //endregion

@@ -102,6 +102,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         observeDownloadState()
         observeCurrentFolder()
+        observeCurrentFolderLive()
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
@@ -109,7 +110,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onStart() {
         super.onStart()
-        observeCurrentFolderLive()
         observeCurrentThreads()
     }
 
@@ -285,7 +285,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             }
             SwipeAction.MOVE -> {
                 animatedNavigation(
-                    ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(currentFolderId.value!!, threadUid)
+                    ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(currentFolderId!!, threadUid)
                 )
                 false
             }
@@ -367,7 +367,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolder() {
-        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+        mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
             lastUpdatedDate = null
             clearFilter()
             displayFolderName(folder)
@@ -376,7 +376,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
-        mainViewModel.currentFolderLiveToObserve.observe(viewLifecycleOwner) { folder ->
+        mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
             Log.d("UI", "Received cursor (${currentFolderCursor})")
             updateThreadsVisibility()
