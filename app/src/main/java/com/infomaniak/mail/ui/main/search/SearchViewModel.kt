@@ -48,7 +48,7 @@ class SearchViewModel : ViewModel() {
     private var fetchThreadsJob: Job? = null
 
     val searchResults = observeSearchAndFilters().switchMap { (query, filters) -> fetchThreads(query, filters) }
-    val foldersLive = FolderController.getFoldersAsync().map { it.list }.asLiveData(Dispatchers.IO)
+    val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
 
     val hasNextPage get() = !resourceNext.isNullOrBlank()
 

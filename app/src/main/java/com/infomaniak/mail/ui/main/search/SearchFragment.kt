@@ -44,7 +44,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeFolders() {
-        searchViewModel.foldersLive.observe(viewLifecycleOwner) {
+        searchViewModel.folders.observe(viewLifecycleOwner) {
             // TODO: handle folders ui
         }
     }
@@ -54,6 +54,7 @@ class SearchFragment : Fragment() {
             // TODO: handle selected filters in ui
         }
     }
+
     private fun observeSearchResults() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) {
             // TODO: handle search results
