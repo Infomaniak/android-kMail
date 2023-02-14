@@ -42,7 +42,6 @@ class SearchFragment : Fragment() {
         searchViewModel.init(navigationArgs.currentFolderId)
         observeVisibilityModeUpdates()
         observeFolders()
-        observeFilters()
         observeSearchResults()
     }
 
@@ -79,12 +78,6 @@ class SearchFragment : Fragment() {
     private fun observeFolders() {
         searchViewModel.folders.observe(viewLifecycleOwner) {
             // TODO: handle folders ui
-        }
-    }
-
-    private fun observeFilters() {
-        searchViewModel.selectedFilters.observe(viewLifecycleOwner) {
-            // TODO: handle selected filters in ui
         }
     }
 

@@ -48,27 +48,27 @@ object SearchUtils {
         return filtersQuery.toString()
     }
 
-    fun selectFilter(filter: ThreadFilter, selectedFilters: MutableSet<ThreadFilter>?): MutableSet<ThreadFilter>? {
+    fun selectFilter(filter: ThreadFilter, selectedFilters: MutableSet<ThreadFilter>): MutableSet<ThreadFilter> {
         val filters = when (filter) {
             ThreadFilter.SEEN -> {
-                selectedFilters?.apply {
+                selectedFilters.apply {
                     removeAll(arrayOf(ThreadFilter.UNSEEN, ThreadFilter.STARRED))
                 }
             }
             ThreadFilter.UNSEEN -> {
-                selectedFilters?.apply {
+                selectedFilters.apply {
                     removeAll(arrayOf(ThreadFilter.SEEN, ThreadFilter.STARRED))
                 }
             }
             ThreadFilter.STARRED -> {
-                selectedFilters?.apply {
+                selectedFilters.apply {
                     removeAll(arrayOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN))
                 }
             }
             else -> selectedFilters
         }
 
-        return filters?.apply { add(filter) }
+        return filters.apply { add(filter) }
     }
 
     fun List<Message>.convertToSearchThreads(): List<Thread> {

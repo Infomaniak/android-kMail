@@ -39,7 +39,8 @@ import kotlinx.coroutines.flow.map
 class SearchViewModel : ViewModel() {
 
     private val searchQuery = MutableLiveData<String>()
-    val selectedFilters = MutableLiveData(mutableSetOf<ThreadFilter>())
+    private val _selectedFilters = MutableLiveData<MutableSet<ThreadFilter>>()
+    private inline val selectedFilters get() = _selectedFilters.value ?: mutableSetOf()
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
 
     private lateinit var currentFolderId: String
@@ -55,9 +56,8 @@ class SearchViewModel : ViewModel() {
     val hasNextPage get() = !resourceNext.isNullOrBlank()
 
     private fun observeSearchAndFilters() = MediatorLiveData<Pair<String?, Set<ThreadFilter>>>().apply {
-        value = searchQuery.value to selectedFilters.value!!
-        addSource(searchQuery) { value = it to value!!.second }
-        addSource(selectedFilters) { value = value?.first to it }
+        addSource(searchQuery) { value = it to (value?.second ?: selectedFilters) }
+        addSource(_selectedFilters) { value = value?.first to it }
     }
 
     fun init(currentFolderId: String) {
@@ -76,7 +76,7 @@ class SearchViewModel : ViewModel() {
 
     fun selectFolder(folder: Folder?) {
         resetPagination()
-        if (folder == null && selectedFilters.value?.contains(ThreadFilter.FOLDER) == true) {
+        if (folder == null && selectedFilters.contains(ThreadFilter.FOLDER)) {
             ThreadFilter.FOLDER.unSelect()
         } else if (folder != null) {
             ThreadFilter.FOLDER.select()
@@ -86,7 +86,7 @@ class SearchViewModel : ViewModel() {
 
     fun toggleFilter(filter: ThreadFilter) {
         resetPagination()
-        if (selectedFilters.value?.contains(filter) == true) filter.unSelect() else filter.select()
+        if (selectedFilters.contains(filter)) filter.unSelect() else filter.select()
     }
 
     fun nextPage() {
@@ -104,11 +104,11 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun ThreadFilter.select() {
-        selectedFilters.value = SearchUtils.selectFilter(this, selectedFilters.value)
+        _selectedFilters.value = SearchUtils.selectFilter(this, selectedFilters)
     }
 
     private fun ThreadFilter.unSelect() {
-        selectedFilters.value = selectedFilters.value?.apply { remove(this@unSelect) }
+        _selectedFilters.value = selectedFilters.apply { remove(this@unSelect) }
     }
 
     private fun resetPagination() {
