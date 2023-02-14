@@ -187,7 +187,7 @@ class ThreadListAdapter(
         newMailBullet.isInvisible = true
         threadCount.setTextAppearance(R.style.Label_Secondary)
         threadCountCardview.apply {
-            setStrokeColor(context.getColor(R.color.cardViewStrokeColor))
+            strokeColor = context.getColor(R.color.cardViewStrokeColor)
             setCardBackgroundColor(context.getColor(R.color.backgroundColorTertiary))
         }
     }
@@ -196,7 +196,7 @@ class ThreadListAdapter(
         newMailBullet.isVisible = true
         threadCount.setTextAppearance(R.style.LabelMedium)
         threadCountCardview.apply {
-            setStrokeColor(context.getColor(R.color.primaryTextColor))
+            strokeColor = context.getColor(R.color.primaryTextColor)
             setCardBackgroundColor(context.getColor(R.color.backgroundColor))
         }
     }
