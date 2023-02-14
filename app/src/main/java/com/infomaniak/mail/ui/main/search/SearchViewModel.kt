@@ -28,6 +28,7 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
+import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
@@ -39,6 +40,7 @@ class SearchViewModel : ViewModel() {
 
     private val searchQuery = MutableLiveData<String>()
     val selectedFilters = MutableLiveData(mutableSetOf<ThreadFilter>())
+    val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
 
     private lateinit var currentFolderId: String
     private var selectedFolder: Folder? = null
