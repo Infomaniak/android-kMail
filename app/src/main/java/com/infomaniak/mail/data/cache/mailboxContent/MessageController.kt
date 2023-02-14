@@ -37,7 +37,6 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
-import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
 import okhttp3.OkHttpClient
@@ -48,17 +47,9 @@ object MessageController {
 
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
-    private fun byFolderId(folderId: String) = "${Message::folderId.name} == '$folderId'"
     private val isNotDraft = "${Message::isDraft.name} == false"
-    private val isNotScheduled = "${Message::isScheduled.name} == false"
-    private val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
-            "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
 
     //region Queries
-    private fun getMessagesQuery(folderId: String, realm: TypedRealm): RealmQuery<Message> {
-        return realm.query(byFolderId(folderId))
-    }
-
     private fun getMessageQuery(uid: String, realm: TypedRealm): RealmSingleQuery<Message> {
         val byUid = "${Message::uid.name} == '$uid'"
         return realm.query<Message>(byUid).first()
@@ -66,10 +57,6 @@ object MessageController {
     //endregion
 
     //region Get data
-    fun getMessages(folderId: String, realm: TypedRealm = defaultRealm): RealmResults<Message> {
-        return getMessagesQuery(folderId, realm).find()
-    }
-
     fun getSortedMessages(threadUid: String): RealmQuery<Message>? {
         return ThreadController.getThread(threadUid)?.messages?.query()?.sort(Message::date.name, Sort.ASCENDING)
     }
@@ -79,6 +66,10 @@ object MessageController {
     }
 
     fun getMessageToReplyTo(thread: Thread): Message = with(thread) {
+
+        val isNotFromMe = "SUBQUERY(${Message::from.name}, \$recipient, " +
+                "\$recipient.${Recipient::email.name} != '${AccountUtils.currentMailboxEmail}').@count > 0"
+
         return messages.query("$isNotDraft AND $isNotFromMe").find().lastOrNull()
             ?: messages.query(isNotDraft).find().lastOrNull()
             ?: messages.last()
@@ -93,9 +84,15 @@ object MessageController {
         return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
     }
 
-    fun getMovableMessages(thread: Thread, folderId: String) = getMessagesAndDuplicates(thread, byFolderId(folderId))
+    fun getMovableMessages(thread: Thread, folderId: String): List<Message> {
+        val byFolderId = "${Message::folderId.name} == '$folderId'"
+        return getMessagesAndDuplicates(thread, byFolderId)
+    }
 
-    fun getUnscheduledMessages(thread: Thread) = getMessagesAndDuplicates(thread, isNotScheduled)
+    fun getUnscheduledMessages(thread: Thread): List<Message> {
+        val isNotScheduled = "${Message::isScheduled.name} == false"
+        return getMessagesAndDuplicates(thread, isNotScheduled)
+    }
 
     fun getLastMessageToExecuteAction(thread: Thread): List<Message> {
         val message = thread.messages.query(isNotDraft).find().lastOrNull() ?: thread.messages.last()
@@ -137,12 +134,10 @@ object MessageController {
     //region New API routes
     fun fetchCurrentFolderMessages(
         mailbox: Mailbox,
-        folderId: String,
+        folder: Folder,
         okHttpClient: OkHttpClient? = null,
         realm: Realm = defaultRealm,
     ): List<Thread> {
-
-        val folder = FolderController.getFolder(folderId, realm) ?: return emptyList()
 
         val newMessagesThreads = fetchFolderMessages(mailbox, folder, okHttpClient, realm)
 
@@ -232,7 +227,7 @@ object MessageController {
 
             var pageStart = 0
             val pageSize = ApiRepository.PER_PAGE
-            val uids = getUniquesUidsWithNewestFirst(folder.id, shortUids)
+            val uids = getUniquesUidsWithNewestFirst(folder, shortUids)
 
             while (pageStart < uids.count()) {
 
@@ -422,8 +417,8 @@ object MessageController {
         }
     }
 
-    private fun getUniquesUidsWithNewestFirst(folderId: String, remoteUids: List<String>): List<String> {
-        val localUids = getMessages(folderId).map { it.uid.toShortUid() }.toSet()
+    private fun getUniquesUidsWithNewestFirst(folder: Folder, remoteUids: List<String>): List<String> {
+        val localUids = folder.messages.map { it.uid.toShortUid() }.toSet()
         val uniqueUids = remoteUids.subtract(localUids)
         return uniqueUids.reversed()
     }

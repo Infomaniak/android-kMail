@@ -75,7 +75,6 @@ class Thread : RealmObject {
         messagesIds += newMessage.messageIds
 
         val folderRole = FolderController.getFolder(folderId, realm)?.role
-
         val isInTrash = newMessage.isInTrash(realm)
 
         // If the Message is deleted, but we are not in the Trash: ignore it, just leave.

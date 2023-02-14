@@ -77,7 +77,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
                 // Update local with remote
                 val newMessagesThreads = runCatching {
-                    MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, realm)
+                    MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, realm)
                 }.getOrElse {
                     if (it is ApiErrorException) handleApiErrors(it) else throw it
                     return@loopMailboxes

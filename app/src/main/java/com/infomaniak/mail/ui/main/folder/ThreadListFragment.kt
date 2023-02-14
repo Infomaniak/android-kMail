@@ -339,7 +339,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             waitingBeforeNotifyAdapter = isRecoveringFinished
             beforeUpdateAdapter = { threads ->
                 currentThreadsCount = threads.count()
-                Log.d("UI", "Received threads (${currentThreadsCount})")
+                Log.i("UI", "Received $currentThreadsCount threads")
                 updateThreadsVisibility()
             }
             afterUpdateAdapter = { threads -> if (firstMessageHasChanged(threads)) scrollToTop() }
@@ -369,7 +369,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observeCurrentFolderLive() = with(threadListViewModel) {
         mainViewModel.currentFolderLive.observe(viewLifecycleOwner) { folder ->
             currentFolderCursor = folder.cursor
-            Log.d("UI", "Received cursor (${currentFolderCursor})")
+            Log.i("UI", "Received cursor: $currentFolderCursor")
             updateThreadsVisibility()
             updateUpdatedAt(folder.lastUpdatedAt?.toDate())
             updateUnreadCount(folder.unreadCount)
@@ -428,7 +428,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun displayFolderName(folder: Folder) {
         val folderName = folder.getLocalizedName(binding.context)
-        Log.d("UI", "Received folder name (${folderName})")
+        Log.i("UI", "Received folder name: $folderName")
         binding.toolbar.title = folderName
     }
 

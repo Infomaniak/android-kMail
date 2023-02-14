@@ -255,11 +255,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         if (mailbox == null || folderId == null) return@launch
 
-        isDownloadingChanges.postValue(true)
-
-        MessageController.fetchCurrentFolderMessages(mailbox, folderId)
-
-        isDownloadingChanges.postValue(false)
+        FolderController.getFolder(folderId)?.let { folder ->
+            isDownloadingChanges.postValue(true)
+            MessageController.fetchCurrentFolderMessages(mailbox, folder)
+            isDownloadingChanges.postValue(false)
+        }
     }
 
     //region Archive
