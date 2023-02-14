@@ -52,33 +52,37 @@ object ApiRoutes {
         return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
     }
 
-    private fun message(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
+    private fun message(mailboxUuid: String, folderId: String, messageId: Long): String {
+        return "${folder(mailboxUuid, folderId)}/message/$messageId"
+    }
 
-    fun moveMessage(mailboxUuid: String) = "${message(mailboxUuid)}/move"
+    private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
-    fun deleteMessage(mailboxUuid: String) = "${message(mailboxUuid)}/delete"
+    fun moveMessages(mailboxUuid: String) = "${messages(mailboxUuid)}/move"
+
+    fun deleteMessages(mailboxUuid: String) = "${messages(mailboxUuid)}/delete"
+
+    fun messagesSeen(mailboxUuid: String) = "${messages(mailboxUuid)}/seen"
+
+    fun messagesUnseen(mailboxUuid: String) = "${messages(mailboxUuid)}/unseen"
+
+    fun starMessages(mailboxUuid: String, star: Boolean): String = "${messages(mailboxUuid)}/${if (star) "star" else "unstar"}"
+
+    // fun messageSafe(mailboxUuid: String) = "${message(mailboxUuid)}/safe"
 
     fun draft(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/draft"
 
     fun draft(mailboxUuid: String, draftRemoteUuid: String) = "${draft(mailboxUuid)}/$draftRemoteUuid"
 
-    fun messageSeen(mailboxUuid: String) = "${message(mailboxUuid)}/seen"
-
-    fun messageUnseen(mailboxUuid: String) = "${message(mailboxUuid)}/unseen"
-
-    // fun messageSafe(mailboxUuid: String) = "${message(mailboxUuid)}/safe"
-
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
     fun downloadAttachment(mailboxUuid: String, folderId: String, messageId: Long, attachmentId: String): String {
-        return "${folder(mailboxUuid, folderId)}/message/$messageId/attachment/$attachmentId"
+        return "${message(mailboxUuid, folderId, messageId)}/attachment/$attachmentId"
     }
 
     fun downloadAttachments(mailboxUuid: String, folderId: String, messageId: Long): String {
-        return "${folder(mailboxUuid, folderId)}/message/$messageId/attachmentsArchive"
+        return "${message(mailboxUuid, folderId, messageId)}/attachmentsArchive"
     }
-
-    fun starMessage(mailboxUuid: String, star: Boolean): String = "${message(mailboxUuid)}/${if (star) "star" else "unstar"}"
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): String {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
