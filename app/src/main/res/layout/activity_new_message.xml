@@ -27,11 +27,19 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        app:contentInsetEnd="@dimen/marginStandardSmall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/new_message_menu"
-        app:navigationIcon="@drawable/ic_close" />
+        app:navigationIcon="@drawable/ic_close">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sendButton"
+            style="@style/IconButton"
+            android:layout_gravity="end"
+            app:icon="@drawable/ic_send" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"

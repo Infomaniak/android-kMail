@@ -64,6 +64,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
+    val isSendingAllowed = MutableLiveData(false)
 
     private var snapshot: DraftSnapshot? = null
 
@@ -104,6 +105,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             if (isSuccess) {
                 splitSignatureFromBody()
                 saveDraftSnapshot()
+                isSendingAllowed.postValue(draft.to.isNotEmpty())
             }
 
             emit(isSuccess)
@@ -168,6 +170,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.add(recipient)
+        isSendingAllowed.value = to.isNotEmpty()
         saveDraftDebouncing()
     }
 
@@ -178,6 +181,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.remove(recipient)
+        isSendingAllowed.value = to.isNotEmpty()
         saveDraftDebouncing()
     }
 
