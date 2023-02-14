@@ -17,23 +17,34 @@
  */
 package com.infomaniak.mail.ui.main.menu
 
-import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.DialogNewFolderBinding
-import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.ui.MainViewModel
 
 class NewFolderDialog : DialogFragment() {
 
     private val binding by lazy { DialogNewFolderBinding.inflate(layoutInflater) }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return MaterialAlertDialogBuilder(requireContext())
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private val navigationArgs: NewFolderDialogArgs by navArgs()
+
+    override fun onCreateDialog(savedInstanceState: Bundle?) = with(navigationArgs) {
+        MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setPositiveButton(R.string.newFolderDialogPositiveButton) { _, _ ->
-                notYetImplemented()
+                val folderName = binding.folderName.text.toString()
+                if (threadUid == null) {
+                    mainViewModel.createNewFolder(folderName)
+                } else {
+                    mainViewModel.moveToNewFolder(folderName, threadUid, messageUid)
+                    findNavController().popBackStack(R.id.moveFragment, true)
+                }
             }
             .setNegativeButton(R.string.buttonCancel, null)
             .create()
