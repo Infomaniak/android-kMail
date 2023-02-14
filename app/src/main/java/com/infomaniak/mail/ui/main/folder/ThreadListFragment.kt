@@ -100,22 +100,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupUserAvatar()
         setupUnreadCountChip()
 
+        observeCurrentThreads()
         observeDownloadState()
         observeCurrentFolder()
         observeCurrentFolderLive()
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        observeCurrentThreads()
-    }
-
-    override fun onStop() {
-        mainViewModel.removeObservers(viewLifecycleOwner)
-        super.onStop()
     }
 
     override fun onResume(): Unit = with(binding) {

@@ -48,7 +48,6 @@ import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
-import io.realm.kotlin.notifications.ResultsChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -97,31 +96,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentFilter = SingleLiveEvent(ThreadFilter.ALL)
 
-    /**
-     * This LiveData value should never be accessed directly.
-     * The overridden `get()` will make it null.
-     */
-    val currentThreadsLiveToObserve
-        get() = observeFolderAndFilter().switchMap { (folder, filter) ->
-            liveData(Dispatchers.IO) {
-                if (folder != null) emitSource(ThreadController.getThreadsAsync(folder.id, filter).asLiveData())
-            }
-        }.also { currentThreadsLive = it }
-    private var currentThreadsLive: LiveData<ResultsChange<Thread>>? = null
+    val currentThreadsLiveToObserve = observeFolderAndFilter().flatMapLatest { (folder, filter) ->
+        folder?.id?.let { ThreadController.getThreadsAsync(it, filter) } ?: emptyFlow()
+    }.asLiveData(Dispatchers.IO)
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
-
-    fun removeObservers(viewLifecycleOwner: LifecycleOwner) {
-        currentThreadsLive?.removeObservers(viewLifecycleOwner)
-        currentThreadsLive = null
-    }
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
         addSource(currentFilter) { value = value?.first to it }
-    }
+    }.asFlow()
 
     val mailboxesLive = liveData(Dispatchers.IO) {
         emitSource(MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData())
