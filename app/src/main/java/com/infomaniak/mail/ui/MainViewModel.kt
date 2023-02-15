@@ -307,7 +307,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return null
         val thread = ThreadController.getThread(threadUid) ?: return null
 
-        val isArchived = message?.let { it.parentFolder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
+        val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
 
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
         val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return null
@@ -521,7 +521,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (displaySnackbar) {
-        showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
+            showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
         }
     }
     //endregion

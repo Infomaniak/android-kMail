@@ -57,10 +57,10 @@
     <color name="red_dark">#FC8878</color>
     <color name="fougere_light">#009688</color>
     <color name="fougere_dark">#00C7B3</color>
-    <color name="dark_blue_light">#006AB2</color>
-    <color name="dark_blue_dark">#0AB2F5</color>
-    <color name="light_blue_light">#4CB7FF</color>
-    <color name="light_blue_dark">#A3DAFF</color>
+    <color name="cobalt_light">#006AB2</color>
+    <color name="cobalt_dark">#0AB2F5</color>
+    <color name="azur_light">#4CB7FF</color>
+    <color name="azur_dark">#A3DAFF</color>
     <color name="app_blue_light">#85A2B6</color>
     <color name="app_blue_dark">#AFC2CF</color>
     <color name="mauve_light">#BA68C8</color>
@@ -111,9 +111,9 @@
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
     <color name="swipeMove">@color/fougere_light</color>
-    <color name="swipeReadUnread">@color/dark_blue_light</color>
+    <color name="swipeReadUnread">@color/cobalt_light</color>
     <color name="swipeFavorite">@color/favoriteYellow</color>
-    <color name="swipePostpone">@color/light_blue_light</color>
+    <color name="swipePostpone">@color/azur_light</color>
     <color name="swipeSpam">@color/orangeWarning</color>
     <color name="swipeArchive">@color/mauve_light</color>
     <color name="swipeQuickActionMenu">@color/app_blue_light</color>

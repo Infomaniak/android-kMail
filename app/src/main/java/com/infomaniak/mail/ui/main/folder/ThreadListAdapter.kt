@@ -227,8 +227,8 @@ class ThreadListAdapter(
 
     private fun updateDynamicIcons(item: Thread) {
 
-        fun getResourcesVariants(folderRole: FolderRole, swipeAction: SwipeAction): SwipeActionInfo {
-            return SwipeActionInfo(if (item.parentFolder.role == folderRole) SwipeAction.INBOX else swipeAction)
+        fun getSwipeActionVariantsInfo(folderRole: FolderRole, swipeAction: SwipeAction): SwipeActionInfo {
+            return SwipeActionInfo(if (item.folder.role == folderRole) SwipeAction.INBOX else swipeAction)
         }
 
         fun getSwipeActionVariant(swipeAction: SwipeAction) = when (swipeAction) {
@@ -244,29 +244,22 @@ class ThreadListAdapter(
                     drawableId = if (item.isFavorite) R.drawable.ic_unstar else R.drawable.ic_star,
                 )
             }
-            SwipeAction.ARCHIVE, SwipeAction.READ_AND_ARCHIVE -> getResourcesVariants(FolderRole.ARCHIVE, swipeAction)
-            SwipeAction.SPAM -> getResourcesVariants(FolderRole.SPAM, swipeAction)
+            SwipeAction.ARCHIVE, SwipeAction.READ_AND_ARCHIVE -> getSwipeActionVariantsInfo(FolderRole.ARCHIVE, swipeAction)
+            SwipeAction.SPAM -> getSwipeActionVariantsInfo(FolderRole.SPAM, swipeAction)
             else -> null
         }
 
-        fun DragDropSwipeRecyclerView.updateSwipeIconWith(
-            leftSwipeActionInfo: SwipeActionInfo?,
-            rightSwipeActionInfo: SwipeActionInfo?
-        ) {
-            leftSwipeActionInfo?.let {
-                behindSwipedItemIconDrawableId = it.drawableId
-                behindSwipedItemBackgroundColor = context.getColor(it.backgroundColorId)
+        (recyclerView as DragDropSwipeRecyclerView).apply {
+            getSwipeActionVariant(localSettings.swipeLeft)?.let { leftSwipeActionInfo ->
+                behindSwipedItemIconDrawableId = leftSwipeActionInfo.drawableId
+                behindSwipedItemBackgroundColor = context.getColor(leftSwipeActionInfo.backgroundColorId)
             }
-            rightSwipeActionInfo?.let {
-                behindSwipedItemIconSecondaryDrawableId = it.drawableId
-                behindSwipedItemBackgroundSecondaryColor = context.getColor(it.backgroundColorId)
+
+            getSwipeActionVariant(localSettings.swipeRight)?.let { rightSwipeActionInfo ->
+                behindSwipedItemIconSecondaryDrawableId = rightSwipeActionInfo.drawableId
+                behindSwipedItemBackgroundSecondaryColor = context.getColor(rightSwipeActionInfo.backgroundColorId)
             }
         }
-
-        (recyclerView as DragDropSwipeRecyclerView).updateSwipeIconWith(
-            getSwipeActionVariant(localSettings.swipeLeft),
-            getSwipeActionVariant(localSettings.swipeRight)
-        )
     }
 
     override fun onIsSwiping(
@@ -354,10 +347,7 @@ class ThreadListAdapter(
         @ColorRes val backgroundColorId: Int,
         @DrawableRes val drawableId: Int?,
     ) {
-        constructor(swipeAction: SwipeAction) : this(
-            swipeAction.colorRes,
-            swipeAction.iconRes
-        )
+        constructor(swipeAction: SwipeAction) : this(swipeAction.colorRes, swipeAction.iconRes)
     }
 
     private companion object {
