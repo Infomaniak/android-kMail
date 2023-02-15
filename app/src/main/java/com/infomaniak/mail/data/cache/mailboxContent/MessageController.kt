@@ -21,7 +21,6 @@ import android.util.Log
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.upsertThread
-import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
@@ -64,10 +63,6 @@ object MessageController {
 
     fun getMessage(uid: String, realm: TypedRealm = defaultRealm): Message? {
         return getMessageQuery(uid, realm).find()
-    }
-
-    fun getAttachment(resource: String): Attachment {
-        return defaultRealm.query<Attachment>("${Attachment::resource.name} == '$resource'").first().find()!!
     }
 
     fun getMessageToReplyTo(thread: Thread): Message = with(thread) {

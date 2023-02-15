@@ -26,7 +26,7 @@ import androidx.lifecycle.viewModelScope
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.api.ApiRoutes
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import kotlinx.coroutines.Dispatchers
 import okhttp3.Request
@@ -43,7 +43,7 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
 
     fun downloadAttachment(resource: String): LiveData<Intent?> {
         return liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
-            val attachment = MessageController.getAttachment(resource).also { attachment = it }
+            val attachment = AttachmentController.getAttachment(resource).also { attachment = it }
             val attachmentFile = attachment.getCacheFile(getApplication())
 
             if (attachmentFile.exists()) {
