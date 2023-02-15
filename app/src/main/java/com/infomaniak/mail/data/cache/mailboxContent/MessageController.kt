@@ -261,7 +261,8 @@ object MessageController {
 
         messages.forEach { message ->
 
-            folder.messages.add(message)
+            if (!folder.messages.contains(message)) folder.messages.add(message)
+
             message.initMessageIds()
             message.isSpam = folder.role == FolderRole.SPAM
 
