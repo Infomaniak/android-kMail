@@ -44,6 +44,7 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -199,13 +200,7 @@ class ThreadFragment : Fragment() {
             }
             onAttachmentClicked = { attachment ->
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
-                    findNavController().navigate(
-                        ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
-                            attachmentResource = attachment.resource!!,
-                            attachmentName = attachment.name,
-                            attachmentType = attachment.getFileTypeFromExtension(),
-                        )
-                    )
+                    attachment.display()
                 } else {
                     Toast.makeText(requireContext(), R.string.webViewCantHandleAction, Toast.LENGTH_SHORT).show()
                 }
@@ -226,6 +221,20 @@ class ThreadFragment : Fragment() {
                     )
                 )
             }
+        }
+    }
+
+    private fun Attachment.display() {
+        if (getCacheFile(requireContext()).exists()) {
+            startActivity(openWithIntent(requireContext()))
+        } else {
+            findNavController().navigate(
+                ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
+                    attachmentResource = resource!!,
+                    attachmentName = name,
+                    attachmentType = getFileTypeFromExtension(),
+                )
+            )
         }
     }
 
