@@ -105,7 +105,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             if (isSuccess) {
                 splitSignatureFromBody()
                 saveDraftSnapshot()
-                isSendingAllowed.postValue(draft.to.isNotEmpty())
+                updateIsSendingAllowed()
             }
 
             emit(isSuccess)
@@ -170,7 +170,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.add(recipient)
-        isSendingAllowed.value = to.isNotEmpty()
+        if (type == FieldType.TO) updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
@@ -181,7 +181,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.remove(recipient)
-        isSendingAllowed.value = to.isNotEmpty()
+        if (type == FieldType.TO) updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
@@ -233,6 +233,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
+
+    private fun updateIsSendingAllowed() {
+        isSendingAllowed.postValue(draft.to.isNotEmpty())
+    }
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
