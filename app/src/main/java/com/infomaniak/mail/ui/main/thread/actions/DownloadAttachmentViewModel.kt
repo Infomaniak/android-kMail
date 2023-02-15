@@ -74,7 +74,7 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
     }
 
     override fun onCleared() {
-        // If we end up with an incomplete cached viewModel we delete it
+        // If we end up with an incomplete cached Attachment, we delete it
         attachment?.getCacheFile(getApplication())?.delete()
         super.onCleared()
     }
