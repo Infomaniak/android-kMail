@@ -25,31 +25,25 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogConfirmLogoutBinding
+import com.infomaniak.mail.databinding.DialogWithDescriptionBinding
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
 import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
 import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
+import com.infomaniak.mail.utils.createAlert
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ManageMailAddressFragment : Fragment() {
 
     private lateinit var binding: FragmentManageMailAddressBinding
-    private val dialogBinding by lazy { DialogConfirmLogoutBinding.inflate(layoutInflater) }
+    private val dialogBinding by lazy { DialogWithDescriptionBinding.inflate(layoutInflater) }
     private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
 
-    private val alertDialog by lazy {
-        MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogBinding.root)
-            .setPositiveButton(R.string.buttonConfirm) { _, _ -> removeCurrentUser() }
-            .setNegativeButton(R.string.buttonCancel, null)
-            .create()
-    }
+    private val logoutAlert by lazy { initLogoutAlert() }
 
     private var simpleMailboxAdapter = SimpleMailboxAdapter()
 
@@ -58,20 +52,14 @@ class ManageMailAddressFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        var logoutDescriptionWithUserEmail = ""
-
         AccountUtils.currentUser?.let { user ->
             avatar.loadAvatar(user)
             mail.text = user.email
-            logoutDescriptionWithUserEmail = getString(R.string.confirmLogoutDescription, user.email)
         }
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
 
-        disconnectAccountButton.setOnClickListener {
-            dialogBinding.confirmLogoutDialogDescription.text = logoutDescriptionWithUserEmail
-            alertDialog.show()
-        }
+        disconnectAccountButton.setOnClickListener { logoutAlert.show() }
 
         mailboxesRecyclerView.apply {
             adapter = simpleMailboxAdapter
@@ -95,4 +83,10 @@ class ManageMailAddressFragment : Fragment() {
             simpleMailboxAdapter.updateMailboxes(mailboxes.map { it.email })
         }
     }
+
+    private fun initLogoutAlert() = dialogBinding.createAlert(
+        title = getString(R.string.confirmLogoutTitle),
+        description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
+        onPositiveButtonClicked = ::removeCurrentUser,
+    )
 }
