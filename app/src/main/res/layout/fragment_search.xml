@@ -40,7 +40,8 @@
                 app:contentInsetEnd="@dimen/marginStandardMedium"
                 app:layout_collapseMode="pin">
 
-                <include android:id="@+id/searchBar"
+                <include
+                    android:id="@+id/searchBar"
                     layout="@layout/item_search_view" />
 
             </com.google.android.material.appbar.MaterialToolbar>
@@ -136,12 +137,48 @@
         </HorizontalScrollView>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-        android:id="@+id/mailRecyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+            android:id="@+id/mailRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <LinearLayout
+            android:id="@+id/recentSearchesLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/SettingHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/recentSearchesTitle" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recentSearchesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <com.infomaniak.mail.ui.main.EmptyStateView
+            android:id="@+id/noResultsEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:visibility="gone"
+            app:description="@string/searchNoResultsDescription"
+            app:icon="@drawable/ic_search"
+            app:title="@string/searchNoResultsTitle"
+            tools:visibility="visible" />
+    </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

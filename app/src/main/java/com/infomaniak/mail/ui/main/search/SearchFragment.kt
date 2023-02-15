@@ -18,12 +18,13 @@
 package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -75,10 +76,12 @@ class SearchFragment : Fragment() {
         super.onStop()
     }
 
-    private fun updateUi(mode: VisibilityMode) {
+    private fun updateUi(mode: VisibilityMode) = with(binding) {
 
         fun displayRecentSearches() {
-            // TODO
+            recentSearchesLayout.isVisible = true
+            mailRecyclerView.isGone = true
+            noResultsEmptyState.isGone = true
         }
 
         fun displayLoadingView() {
@@ -86,7 +89,11 @@ class SearchFragment : Fragment() {
         }
 
         fun displaySearchResult(mode: VisibilityMode) {
-            // TODO
+            recentSearchesLayout.isGone = true
+            mailRecyclerView.isVisible = mode == VisibilityMode.RESULTS
+            noResultsEmptyState.isGone = mode == VisibilityMode.RESULTS
+
+
         }
 
         when (mode) {
@@ -106,7 +113,8 @@ class SearchFragment : Fragment() {
         val popupMenu = createPopupMenu()
 
         folderDropDown.setOnClickListener {
-            folderDropDown.isChecked = !folderDropDown.isChecked // Cancels the auto check // TODO : any better solution ? -> button ?
+            folderDropDown.isChecked =
+                !folderDropDown.isChecked // Cancels the auto check // TODO : any better solution ? -> button ?
             popupMenu.show()
         }
 
@@ -120,26 +128,20 @@ class SearchFragment : Fragment() {
         }
 
         attachments.setOnCheckedChangeListener { _, isChecked ->
-            searchViewModel.setFilter(ThreadFilter.ATTACHMENTS)
+            searchViewModel.toggleFilter(ThreadFilter.ATTACHMENTS)
         }
 
         mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
-            searchViewModel.setFilter(
-                when (chipGroup.checkedChipId) {
-                    R.id.read -> ThreadFilter.SEEN
-                    R.id.unread -> ThreadFilter.UNSEEN
-                    R.id.favorites -> ThreadFilter.STARRED
-                    else -> throw IllegalStateException("Cannot check a chip other than read, unread or favorites")
-                }
-            )
+            when (chipGroup.checkedChipId) {
+                R.id.read -> searchViewModel.toggleFilter(ThreadFilter.SEEN)
+                R.id.unread -> searchViewModel.toggleFilter(ThreadFilter.UNSEEN)
+                R.id.favorites -> searchViewModel.toggleFilter(ThreadFilter.STARRED)
+                else -> searchViewModel.unSelectMutuallyExclusiveFilters()
+            }
         }
 
         searchBar.searchTextInput.doOnTextChanged { text, _, _, _ ->
-            if ((text?.length ?: 0) > 3) {
-                searchViewModel.searchQuery(text.toString())
-            } else {
-                // TODO : Empty search results
-            }
+            searchViewModel.searchQuery(text.toString())
         }
 
         mailRecyclerView.adapter = threadAdapter
@@ -172,9 +174,8 @@ class SearchFragment : Fragment() {
 
     private fun observeSearchResults() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) {
-            // TODO: - handle search results
             // TODO: - handle visibility mode
-            Log.e("gibran", "observeSearchResults - recieved threads: ${it.map { it.subject }}")
+
             threadAdapter.dataSet = it
             threadAdapter.notifyDataSetChanged()
         }
@@ -183,8 +184,4 @@ class SearchFragment : Fragment() {
     enum class VisibilityMode {
         RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS
     }
-
-    // private companion object {
-    //     const val NO_FOLDER = 0
-    // }
 }
