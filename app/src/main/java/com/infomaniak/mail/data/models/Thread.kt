@@ -60,15 +60,18 @@ class Thread : RealmObject {
     var messagesIds: RealmSet<String> = realmSetOf()
 
     var date: RealmInstant = Date().toRealmInstant()
+    @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     var size: Int = 0
+    @SerialName("has_attachments")
     var hasAttachments: Boolean = false
     var hasDrafts: Boolean = false
     var isFavorite: Boolean = false
     var isAnswered: Boolean = false
+    @SerialName("forwarded")
     var isForwarded: Boolean = false
     var isScheduled: Boolean = false
 
