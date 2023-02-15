@@ -27,6 +27,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
@@ -36,16 +37,20 @@ import kotlinx.coroutines.flow.mapNotNull
 
 object FolderController {
 
+    private const val SEARCH_FOLDER_ID = "search_folder_id"
+
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
+
+    private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
 
     //region Queries
     private fun getFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-        return realm.query()
+        return realm.query(isNotSearch)
     }
 
     private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
         val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "'$it'" }}}"
-        return realm.query(checkIsNotInExceptions)
+        return realm.query("$checkIsNotInExceptions AND $isNotSearch")
     }
 
     private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {
@@ -75,6 +80,12 @@ object FolderController {
         return getFolderQuery(Folder::_role.name, role.name, realm).find()
     }
 
+    fun getOrCreateSearchFolder(realm: MutableRealm): Folder {
+        return getFolderQuery(Folder::id.name, SEARCH_FOLDER_ID, realm).find() ?: let {
+            realm.copyToRealm(Folder().apply { this.id = SEARCH_FOLDER_ID })
+        }
+    }
+
     fun getFolderAsync(id: String): Flow<Folder> {
         return getFolderQuery(Folder::id.name, id, defaultRealm).asFlow().mapNotNull { it.obj }
     }
@@ -97,6 +108,11 @@ object FolderController {
             Log.d(RealmDatabase.TAG, "Folders: Save new data")
             insertNewData(remoteFolders)
         }
+    }
+
+    fun deleteSearchData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
+        messages = realmListOf()
+        threads = realmListOf()
     }
 
     private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {

@@ -23,7 +23,6 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.copyListToRealm
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
@@ -67,7 +66,8 @@ object ThreadController {
     ): RealmQuery<Thread> {
 
         val byFolderId = "${Thread::folderId.name} == '$folderId'"
-        val query = realm.query<Thread>(byFolderId).sort(Thread::date.name, Sort.DESCENDING)
+        val notFromSearch = "${Thread::isFromSearch.name} == false"
+        val query = realm.query<Thread>("$byFolderId AND $notFromSearch").sort(Thread::date.name, Sort.DESCENDING)
 
         return if (filter == ThreadFilter.ALL) {
             query
@@ -120,17 +120,21 @@ object ThreadController {
 
     suspend fun getThreadsWithLocalMessages(apiThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
         defaultRealm.writeBlocking {
+            val searchFolder = FolderController.getOrCreateSearchFolder(this)
             apiThreads.map { thread ->
                 ensureActive()
+                val remoteMessage = thread.messages.first()
                 thread.isFromSearch = true
+                thread.folderId = remoteMessage.folderId
                 MessageController.getMessage(thread.messages.first().uid, this)?.let { message ->
                     thread.messages = listOf(message.copyFromRealm()).toRealmList()
                 } ?: run {
-                    thread.messages.first().isFromSearch = true
+                    remoteMessage.isFromSearch = true
                 }
-                upsertThread(thread)
+                // upsertThread(thread)
+                searchFolder.messages.add(thread.messages.single())
                 thread
-            }
+            }.also { searchFolder.threads = it.toRealmList() }
         }
     }
     //endregion
@@ -195,8 +199,13 @@ object ThreadController {
         }
     }
 
-    fun saveThreads(threads: List<Thread>) {
-        defaultRealm.writeBlocking { copyListToRealm(threads) }
+    fun saveThreads(threads: List<Thread>, searchMessages: List<Message>) {
+        defaultRealm.writeBlocking {
+            with(FolderController.getOrCreateSearchFolder(this)) {
+                this.messages = searchMessages.toRealmList()
+                this.threads = threads.toRealmList()
+            }
+        }
     }
     //endregion
 }
