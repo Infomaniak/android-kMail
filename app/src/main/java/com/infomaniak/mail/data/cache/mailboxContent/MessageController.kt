@@ -256,7 +256,7 @@ object MessageController {
         // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
         val allThreads = ThreadController.getThreads(realm = this).toMutableList()
 
-        val idsOfFoldersWithSpecificBehavior = FolderController.getIdsOfFoldersWithSpecificBehavior(realm = this)
+        val idsOfFoldersWithIncompleteThreads = FolderController.getIdsOfFoldersWithIncompleteThreads(realm = this)
         val threadsToUpsert = mutableMapOf<String, Thread>()
 
         messages.forEach { message ->
@@ -270,7 +270,7 @@ object MessageController {
             // TODO: Temporary Realm crash fix (`getThreadsQuery(messageIds: Set<String>)` is broken), remove this when it's fixed.
             val existingThreads = allThreads.filter { it.messagesIds.any { id -> message.messageIds.contains(id) } }
 
-            createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithSpecificBehavior)?.let { newThread ->
+            createNewThreadIfRequired(existingThreads, message, idsOfFoldersWithIncompleteThreads)?.let { newThread ->
                 upsertThread(newThread).also {
                     folder.threads.add(it)
                     threadsToUpsert[it.uid] = it
@@ -280,6 +280,7 @@ object MessageController {
             }
 
             existingThreads.forEach { thread ->
+                thread.messagesIds += message.messageIds
                 thread.addMessageWithConditions(message, realm = this)
                 threadsToUpsert[thread.uid] = upsertThread(thread)
             }
@@ -300,7 +301,7 @@ object MessageController {
     private fun TypedRealm.createNewThreadIfRequired(
         existingThreads: List<Thread>,
         newMessage: Message,
-        idsOfFoldersWithSpecificBehavior: List<String>,
+        idsOfFoldersWithIncompleteThreads: List<String>,
     ): Thread? {
         var newThread: Thread? = null
 
@@ -309,16 +310,22 @@ object MessageController {
             newThread = newMessage.toThread()
             newThread.addFirstMessage(newMessage)
 
-            val referenceThread = existingThreads.firstOrNull { !idsOfFoldersWithSpecificBehavior.contains(it.folderId) }
-
-            if (referenceThread == null) {
-                existingThreads.forEach { thread -> addPreviousMessagesToThread(newThread, thread) }
-            } else {
-                addPreviousMessagesToThread(newThread, referenceThread)
-            }
+            val referenceThread = getReferenceThread(existingThreads, idsOfFoldersWithIncompleteThreads)
+            if (referenceThread != null) addPreviousMessagesToThread(newThread, referenceThread)
         }
 
         return newThread
+    }
+
+    /**
+     * We need to add 2 things to a new Thread:
+     * - the previous Messages `messagesIds`
+     * - the previous Messages, depending on conditions (for example, we don't want deleted Messages outside of the Trash)
+     * If there is no `existingThread` with all the Messages, we fallback on an `incompleteThread` to get its `messagesIds`.
+     */
+    private fun getReferenceThread(existingThreads: List<Thread>, idsOfFoldersWithIncompleteThreads: List<String>): Thread? {
+        return existingThreads.firstOrNull { !idsOfFoldersWithIncompleteThreads.contains(it.folderId) }
+            ?: existingThreads.firstOrNull()
     }
 
     private fun TypedRealm.addPreviousMessagesToThread(newThread: Thread, existingThread: Thread) {
