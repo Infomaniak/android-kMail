@@ -27,7 +27,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogWithDescriptionBinding
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
 import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
 import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
@@ -40,7 +39,6 @@ import kotlinx.coroutines.launch
 class ManageMailAddressFragment : Fragment() {
 
     private lateinit var binding: FragmentManageMailAddressBinding
-    private val dialogBinding by lazy { DialogWithDescriptionBinding.inflate(layoutInflater) }
     private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
 
     private val logoutAlert by lazy { initLogoutAlert() }
@@ -84,7 +82,7 @@ class ManageMailAddressFragment : Fragment() {
         }
     }
 
-    private fun initLogoutAlert() = dialogBinding.createAlert(
+    private fun initLogoutAlert() = createAlert(
         title = getString(R.string.confirmLogoutTitle),
         description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
         onPositiveButtonClicked = ::removeCurrentUser,

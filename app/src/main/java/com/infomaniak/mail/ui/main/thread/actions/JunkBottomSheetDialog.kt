@@ -28,7 +28,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
-import com.infomaniak.mail.databinding.DialogWithDescriptionBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.createAlert
 import com.infomaniak.mail.utils.notYetImplemented
@@ -36,7 +35,6 @@ import com.infomaniak.mail.utils.notYetImplemented
 class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetJunkBinding
-    private val dialogBinding by lazy { DialogWithDescriptionBinding.inflate(layoutInflater) }
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
 
@@ -61,7 +59,7 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
         spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid, message) }
         phishing.setClosingOnClickListener {
-            dialogBinding.createAlert(
+            createAlert(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
                 confirmButtonText = R.string.buttonReport,

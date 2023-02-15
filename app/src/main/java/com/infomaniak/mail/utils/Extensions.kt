@@ -29,7 +29,6 @@ import android.util.TypedValue
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -262,16 +261,17 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
-fun DialogWithDescriptionBinding.createAlert(
+fun Fragment.createAlert(
     title: String,
     description: String,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
-): AlertDialog {
+) = with(DialogWithDescriptionBinding.inflate(layoutInflater)) {
+
     dialogTitle.text = title
     dialogDescription.text = description
 
-    return MaterialAlertDialogBuilder(context)
+    MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
         .setNegativeButton(R.string.buttonCancel, null)
