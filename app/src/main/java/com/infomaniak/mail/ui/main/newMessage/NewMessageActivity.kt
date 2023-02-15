@@ -71,9 +71,7 @@ class NewMessageActivity : ThemedActivity() {
             sendButton.isEnabled = it
         }
 
-        sendButton.setOnClickListener {
-            if (newMessageViewModel.isSendingAllowed.value == true) saveDraftAndShowToast(DraftAction.SEND)
-        }
+        sendButton.setOnClickListener { saveDraftAndShowToast(DraftAction.SEND) }
     }
 
     private fun saveDraftAndShowToast(action: DraftAction) = with(newMessageViewModel) {
