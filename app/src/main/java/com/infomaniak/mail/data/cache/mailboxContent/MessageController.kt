@@ -310,17 +310,22 @@ object MessageController {
             newThread = newMessage.toThread()
             newThread.addFirstMessage(newMessage)
 
-            // We need to add 2 things to a new Thread:
-            // - the previous Messages `messagesIds`
-            // - the previous Messages, depending on conditions (for example, we don't want deleted Messages outside of the Trash)
-            // If there is no `existingThread` with all the Messages, we fallback on an `incompleteThread` to get its `messagesIds`.
-            val referenceThread = existingThreads.firstOrNull { !idsOfFoldersWithIncompleteThreads.contains(it.folderId) }
-                ?: existingThreads.firstOrNull()
-
+            val referenceThread = getReferenceThread(existingThreads, idsOfFoldersWithIncompleteThreads)
             if (referenceThread != null) addPreviousMessagesToThread(newThread, referenceThread)
         }
 
         return newThread
+    }
+
+    /**
+     * We need to add 2 things to a new Thread:
+     * - the previous Messages `messagesIds`
+     * - the previous Messages, depending on conditions (for example, we don't want deleted Messages outside of the Trash)
+     * If there is no `existingThread` with all the Messages, we fallback on an `incompleteThread` to get its `messagesIds`.
+     */
+    private fun getReferenceThread(existingThreads: List<Thread>, idsOfFoldersWithIncompleteThreads: List<String>): Thread? {
+        return existingThreads.firstOrNull { !idsOfFoldersWithIncompleteThreads.contains(it.folderId) }
+            ?: existingThreads.firstOrNull()
     }
 
     private fun TypedRealm.addPreviousMessagesToThread(newThread: Thread, existingThread: Thread) {
