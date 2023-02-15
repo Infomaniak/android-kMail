@@ -43,6 +43,14 @@ class ManageMailAddressFragment : Fragment() {
     private val dialogBinding by lazy { DialogConfirmLogoutBinding.inflate(layoutInflater) }
     private val manageMailAddressViewModel: ManageMailAddressViewModel by viewModels()
 
+    private val alertDialog by lazy {
+        MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .setPositiveButton(R.string.buttonConfirm) { _, _ -> removeCurrentUser() }
+            .setNegativeButton(R.string.buttonCancel, null)
+            .create()
+    }
+
     private var simpleMailboxAdapter = SimpleMailboxAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -62,12 +70,7 @@ class ManageMailAddressFragment : Fragment() {
 
         disconnectAccountButton.setOnClickListener {
             dialogBinding.confirmLogoutDialogDescription.text = logoutDescriptionWithUserEmail
-            MaterialAlertDialogBuilder(requireContext())
-                .setView(dialogBinding.root)
-                .setPositiveButton(R.string.buttonConfirm) { _, _ -> removeCurrentUser() }
-                .setNegativeButton(R.string.buttonCancel, null)
-                .create()
-                .show()
+            alertDialog.show()
         }
 
         mailboxesRecyclerView.apply {
