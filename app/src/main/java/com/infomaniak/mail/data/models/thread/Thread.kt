@@ -29,6 +29,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
@@ -42,6 +43,8 @@ import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -81,7 +84,22 @@ class Thread : RealmObject {
     //endregion
 
     private val _folders by backlinks(Folder::threads)
-    val folder get() = _folders.single()
+    val folder
+        get() = run {
+            runCatching {
+                _folders.single()
+            }.getOrElse {
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("folders", "${_folders.map { it.name }}")
+                    scope.setExtra("foldersCount", "${_folders.count()}")
+                    scope.setExtra("threadUid", uid)
+                    scope.setExtra("email", AccountUtils.currentMailboxEmail.toString())
+                    Sentry.captureMessage("Thread has several or 0 parent folders, it should not be possible")
+                }
+                _folders.first()
+            }
+        }
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
