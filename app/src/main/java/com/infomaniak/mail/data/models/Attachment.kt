@@ -80,7 +80,7 @@ class Attachment : EmbeddedRealmObject {
     fun getCacheFile(
         context: Context,
         userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId
+        mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
         val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, userId, mailboxId)
         return File(cacheFolder, name)

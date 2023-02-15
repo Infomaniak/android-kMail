@@ -37,7 +37,7 @@ import java.io.File
 class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
-     * We keep the attachment, in case the ViewModel is destroyed before it finishes downloading
+     * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading
      */
     private var attachment: Attachment? = null
 
@@ -78,5 +78,4 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
         attachment?.getCacheFile(getApplication())?.delete()
         super.onCleared()
     }
-
 }

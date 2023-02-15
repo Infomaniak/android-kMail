@@ -169,7 +169,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun observeOpenAttachment() {
-        getBackNavigationResult<Intent>(DownloadAttachmentProgressDialog.OPEN_WITH) { intent -> startActivity(intent) }
+        getBackNavigationResult<Intent>(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
     }
 
     private fun setupAdapter(threadUid: String) = with(binding) {
@@ -199,12 +199,13 @@ class ThreadFragment : Fragment() {
             }
             onAttachmentClicked = { attachment ->
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
-                    val attachmentDirection = ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
-                        attachmentResource = attachment.resource!!,
-                        attachmentName = attachment.name,
-                        attachmentType = attachment.getFileTypeFromExtension(),
+                    findNavController().navigate(
+                        ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
+                            attachmentResource = attachment.resource!!,
+                            attachmentName = attachment.name,
+                            attachmentType = attachment.getFileTypeFromExtension(),
+                        )
                     )
-                    findNavController().navigate(attachmentDirection)
                 } else {
                     Toast.makeText(requireContext(), R.string.webViewCantHandleAction, Toast.LENGTH_SHORT).show()
                 }
