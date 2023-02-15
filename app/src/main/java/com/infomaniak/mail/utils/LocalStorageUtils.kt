@@ -69,7 +69,7 @@ object LocalStorageUtils {
         }
     }
 
-    fun deleteAttachmentsCaches(context: Context) = context.attachmentsCacheRootDir.deleteRecursively()
+    private fun deleteAttachmentsCaches(context: Context) = context.attachmentsCacheRootDir.deleteRecursively()
 
     fun deleteAttachmentsUploadsDirIfEmpty(
         context: Context,
@@ -91,7 +91,7 @@ object LocalStorageUtils {
     }
 
     fun deleteUserData(context: Context, userId: Int) {
-        context.attachmentsCacheRootDir.deleteRecursively()
+        deleteAttachmentsCaches(context)
         with(context.attachmentsUploadRootDir) {
             File(this, "$userId").deleteRecursively()
             if (this.listFiles()?.isEmpty() == true) deleteRecursively()

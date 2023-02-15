@@ -29,7 +29,10 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.SharedViewModelUtils
+import com.infomaniak.mail.utils.getUids
+import com.infomaniak.mail.utils.handlerIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
@@ -89,9 +92,4 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         quickActionBarClicks.postValue(message to menuId)
     }
 
-    override fun onCleared() {
-        // TODO: Have a real cache management to make the deletion automatically when it is necessary
-        LocalStorageUtils.deleteAttachmentsCaches(getApplication())
-        super.onCleared()
-    }
 }
