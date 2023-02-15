@@ -21,7 +21,6 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -92,8 +91,6 @@ fun Uri.getFileNameAndSize(context: Context): Pair<String, Long>? {
         null
     }
 }
-
-fun Intent.hasSupportedApplications(context: Context) = resolveActivity(context.packageManager) != null
 
 //region Date
 fun RealmInstant.toDate(): Date = Date(epochSeconds * 1_000L + nanosecondsOfSecond / 1_000L)
