@@ -43,7 +43,6 @@
     <color name="backgroundSnackbarColor">@color/rabbit</color>
     <color name="elevatedBackground">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
-    <color name="threadBackground">@color/bat</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/rabbit</color>
