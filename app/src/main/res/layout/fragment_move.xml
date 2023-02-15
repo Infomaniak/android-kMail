@@ -28,7 +28,6 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/background"
         app:contentInsetEnd="0dp"
-        app:navigationIconTint="?android:attr/colorPrimary"
         app:titleTextAppearance="@style/H2">
 
         <LinearLayout

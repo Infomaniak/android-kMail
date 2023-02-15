@@ -80,8 +80,8 @@ class Thread : RealmObject {
     var isFromSearch: Boolean = false
     //endregion
 
-    private val parentFolders by backlinks(Folder::threads)
-    private val parentFolder get() = parentFolders.first()
+    private val _folders by backlinks(Folder::threads)
+    val folder get() = _folders.single()
 
     fun addFirstMessage(message: Message) {
         messagesIds += message.messageIds
@@ -92,7 +92,6 @@ class Thread : RealmObject {
         messagesIds += newMessage.messageIds
 
         val folderRole = FolderController.getFolder(folderId, realm)?.role
-
         val isInTrash = newMessage.isInTrash(realm)
 
         // If the Message is deleted, but we are not in the Trash: ignore it, just leave.
@@ -190,16 +189,16 @@ class Thread : RealmObject {
     fun isOnlyOneDraft(): Boolean = hasDrafts && messages.count() == 1
 
     fun computeAvatarRecipient(): Recipient {
-        val message = messages.lastOrNull { it.parentFolder.role != FolderRole.SENT } ?: messages.last()
+        val message = messages.lastOrNull { it.folder.role != FolderRole.SENT } ?: messages.last()
         return message.from.first()
     }
 
     fun computeDisplayedRecipients(): RealmList<Recipient> {
-        return if (parentFolder.role == FolderRole.DRAFT) to else from
+        return if (folder.role == FolderRole.DRAFT) to else from
     }
 
     fun computePreview(): String {
-        val message = if (parentFolder.role == FolderRole.SENT) {
+        val message = if (folder.role == FolderRole.SENT) {
             messages.lastOrNull { it.folderId == folderId } ?: messages.last()
         } else {
             messages.last()

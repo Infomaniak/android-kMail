@@ -122,8 +122,8 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteLocalFolder(folder: Folder) {
-        deleteMessages(MessageController.getMessages(folder.id, realm = this))
-        ThreadController.deleteThreads(folder.id, realm = this)
+        deleteMessages(folder.messages)
+        ThreadController.deleteThreads(folder, realm = this)
         delete(folder)
     }
 
@@ -149,7 +149,7 @@ object FolderController {
 
         val folder = getFolder(id, realm) ?: return
 
-        val unreadCount = ThreadController.getUnreadThreadsCount(id, realm)
+        val unreadCount = ThreadController.getUnreadThreadsCount(folder)
         folder.unreadCount = unreadCount
 
         if (folder.role == FolderRole.INBOX) {

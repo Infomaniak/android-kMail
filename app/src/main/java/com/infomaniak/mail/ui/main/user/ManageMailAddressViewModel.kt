@@ -18,11 +18,11 @@
 package com.infomaniak.mail.ui.main.user
 
 import android.app.Application
-import androidx.lifecycle.*
-import com.infomaniak.lib.core.models.user.User
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
-import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -30,20 +30,15 @@ import kotlinx.coroutines.launch
 
 class ManageMailAddressViewModel(application: Application) : AndroidViewModel(application) {
 
-    fun observeAccounts(): LiveData<List<Mailbox>> = liveData(Dispatchers.IO) {
-        AccountUtils.currentUser?.let { user ->
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
 
-            updateMailboxes(user)
+    val observeAccountsLive = MailboxController.getMailboxesAsync()
+        .map { mailboxes -> mailboxes.list.filter { it.userId == AccountUtils.currentUserId } }
+        .asLiveData(coroutineContext)
 
-            emitSource(MailboxController.getMailboxesAsync().map { mailboxes ->
-                mailboxes.list.filter { it.userId == user.id }
-            }.asLiveData())
-        }
-
-    }
-
-    private fun updateMailboxes(user: User) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(user.id)).data ?: return@launch
-        MailboxController.updateMailboxes(getApplication(), mailboxes, user.id)
+    fun updateMailboxes() = viewModelScope.launch(Dispatchers.IO) {
+        val userId = AccountUtils.currentUserId
+        val mailboxes = ApiRepository.getMailboxes(AccountUtils.getHttpClient(userId)).data ?: return@launch
+        MailboxController.updateMailboxes(getApplication(), mailboxes, userId)
     }
 }

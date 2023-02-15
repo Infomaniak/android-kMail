@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
@@ -52,25 +53,18 @@ object ThreadController {
         return realm.query("${Thread::folderId.name} == ''")
     }
 
-    private fun getUnreadThreadsCountQuery(folderId: String, realm: TypedRealm): RealmScalarQuery<Long> {
-        val byFolderId = "${Thread::folderId.name} == '$folderId'"
+    private fun getUnreadThreadsCountQuery(folder: Folder): RealmScalarQuery<Long> {
         val unseen = "${Thread::unseenMessagesCount.name} > 0"
-        val query = "$byFolderId AND $unseen"
-        return realm.query<Thread>(query).count()
+        return folder.threads.query(unseen).count()
     }
 
-    private fun getThreadsQuery(
-        folderId: String,
-        realm: TypedRealm,
-        filter: ThreadFilter = ThreadFilter.ALL,
-    ): RealmQuery<Thread> {
+    private fun getThreadsQuery(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): RealmQuery<Thread> {
 
-        val byFolderId = "${Thread::folderId.name} == '$folderId'"
         val notFromSearch = "${Thread::isFromSearch.name} == false"
-        val query = realm.query<Thread>("$byFolderId AND $notFromSearch").sort(Thread::date.name, Sort.DESCENDING)
+        val realmQuery = folder.threads.query(notFromSearch).sort(Thread::date.name, Sort.DESCENDING)
 
         return if (filter == ThreadFilter.ALL) {
-            query
+            realmQuery
         } else {
             val withFilter = when (filter) {
                 ThreadFilter.SEEN -> "${Thread::unseenMessagesCount.name} == 0"
@@ -80,7 +74,7 @@ object ThreadController {
                 ThreadFilter.FOLDER -> TODO()
                 else -> throw IllegalStateException("`${ThreadFilter::class.simpleName}` cannot be `${ThreadFilter.ALL.name}` here.")
             }
-            query.query(withFilter)
+            realmQuery.query(withFilter)
         }
     }
 
@@ -98,12 +92,12 @@ object ThreadController {
         return getOrphanThreadsQuery(realm).find()
     }
 
-    fun getUnreadThreadsCount(folderId: String, realm: TypedRealm): Int {
-        return getUnreadThreadsCountQuery(folderId, realm).find().toInt()
+    fun getUnreadThreadsCount(folder: Folder): Int {
+        return getUnreadThreadsCountQuery(folder).find().toInt()
     }
 
-    fun getThreadsAsync(folderId: String, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
-        return getThreadsQuery(folderId, defaultRealm, filter).asFlow()
+    fun getThreadsAsync(folder: Folder, filter: ThreadFilter = ThreadFilter.ALL): Flow<ResultsChange<Thread>> {
+        return getThreadsQuery(folder, filter).asFlow()
     }
 
     fun getSearchThreadsAsync(): Flow<ResultsChange<Thread>> {
@@ -142,8 +136,8 @@ object ThreadController {
     //region Edit data
     fun MutableRealm.upsertThread(thread: Thread): Thread = copyToRealm(thread, UpdatePolicy.ALL)
 
-    fun deleteThreads(folderId: String, realm: MutableRealm) {
-        realm.delete(getThreadsQuery(folderId, realm = realm))
+    fun deleteThreads(folder: Folder, realm: MutableRealm) {
+        realm.delete(getThreadsQuery(folder))
     }
 
     fun deleteSearchThreads(realm: MutableRealm) = with(realm) {

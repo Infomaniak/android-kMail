@@ -227,11 +227,6 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
 }
-
-inline fun <reified T> LiveData<T>.refreshObserve(viewLifecycleOwner: LifecycleOwner, noinline observer: (T) -> Unit) {
-    removeObservers(viewLifecycleOwner)
-    observe(viewLifecycleOwner, observer)
-}
 //endregion
 
 //region Folders
@@ -248,7 +243,7 @@ fun List<Folder>.getMenuFolders(): Triple<Folder?, List<Folder>, List<Folder>> {
             .also(list::removeAll)
 
         val customFolders = list
-            .filter { it.parentFolder == null }
+            .filter { it.parent == null }
             .sortedByDescending { it.isFavorite }
             .formatFoldersListWithAllChildren()
 

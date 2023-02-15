@@ -64,7 +64,6 @@
     <color name="backgroundSnackbarColor">@color/orca</color>
     <color name="elevatedBackground">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
-    <color name="threadBackground">@color/rabbit</color>
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
 

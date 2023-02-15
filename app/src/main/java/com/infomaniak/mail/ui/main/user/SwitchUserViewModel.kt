@@ -15,18 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.ui.main.user
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.utils.getMenuFolders
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.map
+import com.infomaniak.mail.utils.AccountUtils
 
-class MoveViewModel : ViewModel() {
+class SwitchUserViewModel : ViewModel() {
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
-
-    val currentFolders = liveData(coroutineContext) { emit(FolderController.getFolders().getMenuFolders()) }
+    val allUsers = AccountUtils.getAllUsers().map { users -> users.sortedBy { it.displayName } }
 }

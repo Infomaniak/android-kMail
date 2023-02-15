@@ -142,7 +142,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
             if (times.isNotEmpty()) delay += times.maxOf { it } - timeNow
             delay(min(delay, MAX_REFRESH_DELAY))
 
-            MessageController.fetchCurrentFolderMessages(mailbox, folder.id, okHttpClient, mailboxContentRealm)
+            MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, mailboxContentRealm)
         }
     }
 

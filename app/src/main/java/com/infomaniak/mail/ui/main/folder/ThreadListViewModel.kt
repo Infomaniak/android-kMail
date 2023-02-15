@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var updatedAtJob: Job? = null
 
     val isRecoveringFinished = MutableLiveData(true)
@@ -49,7 +50,7 @@ class ThreadListViewModel : ViewModel() {
         }
     }
 
-    fun navigateToSelectedDraft(message: Message) = liveData(Dispatchers.IO) {
+    fun navigateToSelectedDraft(message: Message) = liveData(coroutineContext) {
         val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
         emit(SelectedDraft(localUuid, message.draftResource, message.uid))
     }

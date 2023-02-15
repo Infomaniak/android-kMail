@@ -18,7 +18,6 @@
 package com.infomaniak.mail.utils
 
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft
@@ -54,8 +53,8 @@ object SentryDebug {
     }
 
     fun sendOrphanMessagesSentry(previousCursor: String?, folder: Folder, realm: Realm) {
-        val orphanMessages = MessageController.getMessages(folder.id, realm).filter {
-            it.parentsFromMessage.isEmpty() && it.parentsFromDuplicate.isEmpty()
+        val orphanMessages = folder.messages.filter {
+            it.threads.isEmpty() && it.threadsDuplicatedIn.isEmpty()
         }
         if (orphanMessages.isNotEmpty()) {
             Sentry.withScope { scope ->

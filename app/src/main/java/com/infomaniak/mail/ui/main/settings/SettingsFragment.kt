@@ -29,7 +29,6 @@ import com.infomaniak.mail.databinding.FragmentSettingsBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
-import com.infomaniak.mail.utils.refreshObserve
 
 class SettingsFragment : Fragment() {
 
@@ -66,7 +65,7 @@ class SettingsFragment : Fragment() {
 
     private fun setupMailboxesAdapter() {
         binding.mailboxesList.adapter = mailboxesAdapter
-        mainViewModel.observeMailboxesLive().refreshObserve(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
+        mainViewModel.mailboxesLive.observe(viewLifecycleOwner, mailboxesAdapter::setMailboxes)
     }
 
     private fun setSubtitlesInitialState() = with(binding) {

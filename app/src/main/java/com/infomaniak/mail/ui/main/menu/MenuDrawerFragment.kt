@@ -65,7 +65,6 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         AccountUtils.reloadApp?.invoke()
     }
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentMenuDrawerBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -79,7 +78,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeMailboxesLive()
         observeCurrentFolder()
         observeFoldersLive()
-        observeQuotas()
+        observeQuotasLive()
     }
 
     override fun setupListeners() = with(binding) {
@@ -166,7 +165,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeCurrentMailbox() {
-        mainViewModel.currentMailbox.observe(viewLifecycleOwner) { mailbox ->
+        mainViewModel.currentMailbox.observeNotNull(viewLifecycleOwner) { mailbox ->
             binding.mailboxSwitcherText.text = mailbox.email
 
             // Make sure you always cancel all mailbox current notifications, whenever it is visible by the user.
@@ -180,7 +179,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeMailboxesLive() = with(binding) {
-        mainViewModel.observeMailboxesLive().refreshObserve(viewLifecycleOwner) { mailboxes ->
+        mainViewModel.mailboxesLive.observe(viewLifecycleOwner) { mailboxes ->
 
             val sortedMailboxes = mailboxes.filterNot { it.mailboxId == AccountUtils.currentMailboxId }
 
@@ -198,7 +197,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeCurrentFolder() {
-        mainViewModel.currentFolder.observe(viewLifecycleOwner) { folder ->
+        mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
             binding.inboxFolder.setSelectedState(folder.role == FolderRole.INBOX)
 
             defaultFoldersAdapter.updateSelectedState(folder.id)
@@ -207,28 +206,28 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun observeFoldersLive() = with(mainViewModel) {
-        currentFoldersLiveToObserve.refreshObserve(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
+        currentFoldersLive.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
             inboxFolderId = inbox?.id
             inbox?.unreadCount?.let { inboxFolder.badge = it }
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 
-            val currentFolderId = currentFolderId.value ?: return@refreshObserve
-            defaultFoldersAdapter.setFolders(defaultFolders, currentFolderId)
-            customFoldersAdapter.setFolders(customFolders, currentFolderId)
+            val newCurrentFolderId = currentFolderId ?: return@observe
+            defaultFoldersAdapter.setFolders(defaultFolders, newCurrentFolderId)
+            customFoldersAdapter.setFolders(customFolders, newCurrentFolderId)
         }
     }
 
-    private fun observeQuotas() = with(binding) {
-        mainViewModel.currentQuotasLiveToObserve.refreshObserve(viewLifecycleOwner) { quotas ->
+    private fun observeQuotasLive() = with(binding) {
+        mainViewModel.currentQuotasLive.observe(viewLifecycleOwner) { quotas ->
             val isLimited = quotas != null
 
             storageLayout.isVisible = isLimited
             storageDivider.isVisible = isLimited
 
             if (isLimited) {
-                storageText.text = quotas?.getText(context) ?: return@refreshObserve
+                storageText.text = quotas?.getText(context) ?: return@observe
                 storageIndicator.progress = quotas.getProgress()
             }
         }
