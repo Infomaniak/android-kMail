@@ -531,7 +531,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
 
         val snackbarTitle = if (apiResponse.isSuccess()) {
-            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, false)
+            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, displaySnackbar = false)
             R.string.snackbarReportPhishingConfirmation
         } else {
             RCore.string.anErrorHasOccurred
