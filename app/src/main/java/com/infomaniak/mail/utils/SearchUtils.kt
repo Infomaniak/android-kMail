@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Thread
@@ -37,8 +38,8 @@ object SearchUtils {
         if (!query.isNullOrBlank()) filtersQuery.append("&scontains=$query")
 
         with(filters) {
+            if (contains(ThreadFilter.ATTACHMENTS)) filtersQuery.append("&sattachments=yes")
             when {
-                contains(ThreadFilter.ATTACHMENTS) -> filtersQuery.append("&sattachments=yes")
                 contains(ThreadFilter.SEEN) -> filtersQuery.append("&filters=seen")
                 contains(ThreadFilter.UNSEEN) -> filtersQuery.append("&filters=unseen")
                 contains(ThreadFilter.STARRED) -> filtersQuery.append("&filters=starred")
@@ -76,7 +77,7 @@ object SearchUtils {
             Thread().apply {
                 this.uid = "search-${message.uid}"
                 this.messages = listOf(message).toRealmList()
-                this.unseenMessagesCount = 0
+                this.unseenMessagesCount = if (message.isSeen) 1 else 0
                 this.from = message.from
                 this.to = message.to
                 this.date = message.date
@@ -86,6 +87,7 @@ object SearchUtils {
                 this.isForwarded = message.isForwarded
                 this.size = message.size
                 this.subject = message.subject
+                this.folderId = message.folderId
             }
         }
     }
@@ -95,6 +97,7 @@ object SearchUtils {
             Log.i(TAG, "SearchUtils>deleteRealmSearchData: remove old search data")
             MessageController.deleteSearchMessages(this)
             ThreadController.deleteSearchThreads(this)
+            FolderController.deleteSearchData(this)
         }
     }
 }
