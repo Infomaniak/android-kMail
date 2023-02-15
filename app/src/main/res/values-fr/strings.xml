@@ -42,6 +42,9 @@
     <string name="actionSpam">Signaler comme spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
     <string name="actionUnstar">Retirer des favoris</string>
+    <string name="addUnknownRecipientAlreadyUsed">L\'adresse mail est déjà utilisée</string>
+    <string name="addUnknownRecipientInvalidEmail">L\'adresse mail n\'est pas valide</string>
+    <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
     <string name="attachmentActionCamera">Appareil photo</string>
@@ -136,6 +139,7 @@
     <string name="emptyFolderTitle">Ce dossier est vide !</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
+    <string name="errorNewFolderAlreadyExists">Ce dossier existe déjà</string>
     <string name="favoritesFolder">Favoris</string>
     <plurals name="folderMessageCount">
         <item quantity="one">Ce dossier contient %d message</item>
@@ -191,7 +195,7 @@
     <string name="onBoardingDescription2">Définissez les actions que vous effectuez le plus souvent au balayage vers la droite et la gauche, et gagnez un temps précieux</string>
     <string name="onBoardingDescription3">Effectuez des actions sur de multiples messages simultanément</string>
     <string name="onBoardingDescription4">Gérez tous vos e-mails Infomaniak depuis l’app !</string>
-    <string name="onBoardingTitle1">Choisissez entre 2 thèmes,\nrose ou bleu ?</string>
+    <string name="onBoardingTitle1">Choisissez une couleur d\'accentuation,\nrose ou bleu ?</string>
     <string name="onBoardingTitle2">Activez les actions de balayage pour gagner du temps</string>
     <string name="onBoardingTitle3">Restez appuyé quelques secondes sur un message pour activer la sélection multiple</string>
     <string name="onBoardingTitle4">Connectez-vous et commencez à utiliser l’app kMail dès maintenant !</string>
@@ -323,6 +327,10 @@
     <string name="threadListSectionThisWeek">Cette semaine</string>
     <string name="threadListSectionToday">Aujourd’hui</string>
     <string name="threadListSectionTwoWeeks">Il y a deux semaines</string>
+    <string name="threadListSpamEmptyButton">Vider le dossier spam</string>
+    <string name="threadListSpamHint">Les messages placés dans le dossier spam pendant plus de 30 jours seront automatiquement supprimés.</string>
+    <string name="threadListTrashEmptyButton">Vider la corbeille</string>
+    <string name="threadListTrashHint">Les messages placés dans la corbeille pendant plus de 30 jours seront automatiquement supprimés.</string>
     <string name="titleMyAccount">Mon compte</string>
     <string name="titleMyAccounts">Mes comptes</string>
     <string name="toTitle">À :</string>

@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import coil.imageLoader
+import coil.load
 import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.utils.getAttributes
@@ -59,6 +60,10 @@ class AvatarView @JvmOverloads constructor(
 
     fun loadAvatar(mergedContact: MergedContact) {
         binding.avatarImage.loadCorrespondentAvatar(mergedContact)
+    }
+
+    fun loadUnknownUserAvatar() {
+        binding.avatarImage.load(R.drawable.ic_unknown_user_avatar)
     }
 
     private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {

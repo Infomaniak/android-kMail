@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
+import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -105,6 +106,7 @@ class RecipientFieldView @JvmOverloads constructor(
                 onAddUnrecognizedContact = {
                     val input = autoCompleteInput.text.toString()
                     if (input.isEmail()) addRecipient(email = input, name = input)
+                    else context.showToast(R.string.addUnknownRecipientInvalidEmail)
                 },
             )
 

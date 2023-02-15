@@ -49,6 +49,9 @@
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
     <string name="actionUnstar">Delete from favorites</string>
+    <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
+    <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
+    <string name="addUnknownRecipientTitle">Add a recipient</string>
     <string name="appSecurityDescription">Protect access to your app by enabling your phone lock.</string>
     <string name="archiveFolder">Archived</string>
     <string name="attachmentActionCamera">Camera</string>
@@ -142,6 +145,7 @@
     <string name="emptyFolderTitle">This folder is empty !</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
+    <string name="errorNewFolderAlreadyExists">This folder already exists</string>
     <string name="favoritesFolder">Favorites</string>
     <plurals name="folderMessageCount">
         <item quantity="one">This folder contains %d message</item>
@@ -194,7 +198,7 @@
     <string name="onBoardingDescription2">Define the actions you perform most often when swiping left and right, and save valuable time</string>
     <string name="onBoardingDescription3">Take action on multiple messages simultaneously</string>
     <string name="onBoardingDescription4">Manage all your Infomaniak emails from the app!</string>
-    <string name="onBoardingTitle1">Choose between 2 themes,\npink or blue ?</string>
+    <string name="onBoardingTitle1">Choose an accent color,\npink or blue ?</string>
     <string name="onBoardingTitle2">Activate swipe actions to save time</string>
     <string name="onBoardingTitle3">Press and hold a message for a few seconds to activate the multiple selection</string>
     <string name="onBoardingTitle4">Log in and start using the kMail app now!</string>
@@ -322,6 +326,10 @@
     <string name="threadListSectionThisWeek">This week</string>
     <string name="threadListSectionToday">Today</string>
     <string name="threadListSectionTwoWeeks">Two weeks ago</string>
+    <string name="threadListSpamEmptyButton">Empty spam</string>
+    <string name="threadListSpamHint">Messages that have been in the spam folder more than 30 days will be automatically deleted.</string>
+    <string name="threadListTrashEmptyButton">Empty trash</string>
+    <string name="threadListTrashHint">Messages that have been in trash more than 30 days will be automatically deleted.</string>
     <string name="titleMyAccount">My account</string>
     <string name="titleMyAccounts">My accounts</string>
     <string name="toTitle">To:</string>
