@@ -126,6 +126,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
+    init {
+        // Delete search data when in case they could not be deleted
+        viewModelScope.launch(Dispatchers.IO) { SearchUtils.deleteRealmSearchData() }
+    }
+
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
