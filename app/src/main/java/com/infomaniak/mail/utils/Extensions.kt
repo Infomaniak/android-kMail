@@ -49,7 +49,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.databinding.DialogWithDescriptionBinding
+import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
@@ -261,12 +261,12 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
 
-fun Fragment.createAlert(
+fun Fragment.createDescriptionDialog(
     title: String,
     description: String,
     @StringRes confirmButtonText: Int = R.string.buttonConfirm,
     onPositiveButtonClicked: () -> Unit,
-) = with(DialogWithDescriptionBinding.inflate(layoutInflater)) {
+) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
 
     dialogTitle.text = title
     dialogDescription.text = description

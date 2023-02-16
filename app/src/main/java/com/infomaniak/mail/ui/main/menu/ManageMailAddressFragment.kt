@@ -32,7 +32,7 @@ import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
 import com.infomaniak.mail.ui.main.user.SimpleMailboxAdapter
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.animatedNavigation
-import com.infomaniak.mail.utils.createAlert
+import com.infomaniak.mail.utils.createDescriptionDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -82,7 +82,7 @@ class ManageMailAddressFragment : Fragment() {
         }
     }
 
-    private fun initLogoutAlert() = createAlert(
+    private fun initLogoutAlert() = createDescriptionDialog(
         title = getString(R.string.confirmLogoutTitle),
         description = AccountUtils.currentUser?.let { getString(R.string.confirmLogoutDescription, it.email) } ?: "",
         onPositiveButtonClicked = ::removeCurrentUser,

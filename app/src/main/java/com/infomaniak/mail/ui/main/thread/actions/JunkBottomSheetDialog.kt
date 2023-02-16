@@ -29,7 +29,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.createAlert
+import com.infomaniak.mail.utils.createDescriptionDialog
 import com.infomaniak.mail.utils.notYetImplemented
 
 class JunkBottomSheetDialog : BottomSheetDialogFragment() {
@@ -59,7 +59,7 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
         spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid, message) }
         phishing.setClosingOnClickListener {
-            createAlert(
+            createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
                 confirmButtonText = R.string.buttonReport,
