@@ -482,8 +482,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-        val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
-        val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
+        val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return@launch
         val destinationFolderId = destinationFolder.id
 
@@ -523,6 +522,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid))
     }
+
+    fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     data class UndoData(
         val resource: String,
