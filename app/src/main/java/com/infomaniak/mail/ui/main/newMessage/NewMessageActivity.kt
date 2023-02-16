@@ -67,10 +67,11 @@ class NewMessageActivity : ThemedActivity() {
 
         toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        toolbar.setOnMenuItemClickListener {
-            if (newMessageViewModel.draft.to.isNotEmpty()) saveDraftAndShowToast(DraftAction.SEND)
-            true
+        newMessageViewModel.isSendingAllowed.observe(this@NewMessageActivity) {
+            sendButton.isEnabled = it
         }
+
+        sendButton.setOnClickListener { saveDraftAndShowToast(DraftAction.SEND) }
     }
 
     private fun saveDraftAndShowToast(action: DraftAction) = with(newMessageViewModel) {
