@@ -36,7 +36,7 @@ object ApiRoutes {
 
     fun folders(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/folder"
 
-    fun folder(mailboxUuid: String, folderId: String) = "${folders(mailboxUuid)}/$folderId"
+    private fun folder(mailboxUuid: String, folderId: String) = "${folders(mailboxUuid)}/$folderId"
 
     // fun renameFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/rename"
 
@@ -52,11 +52,11 @@ object ApiRoutes {
         return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
     }
 
+    private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
+
     private fun message(mailboxUuid: String, folderId: String, messageId: Long): String {
         return "${folder(mailboxUuid, folderId)}/message/$messageId"
     }
-
-    private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
     fun moveMessages(mailboxUuid: String) = "${messages(mailboxUuid)}/move"
 
