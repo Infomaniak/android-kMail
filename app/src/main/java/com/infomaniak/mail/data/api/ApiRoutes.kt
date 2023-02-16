@@ -88,6 +88,10 @@ object ApiRoutes {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
     // }
 
+    fun reportPhishing(mailboxUuid: String, folderId: String, messageId: Long): String {
+        return "${message(mailboxUuid, folderId, messageId)}/report"
+    }
+
     fun getMessagesUids(mailboxUuid: String, folderId: String): String {
         return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${Utils.MAX_NUMBER_OF_MESSAGES_TO_FETCH}"
     }
