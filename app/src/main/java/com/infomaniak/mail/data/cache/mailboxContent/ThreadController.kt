@@ -113,7 +113,15 @@ object ThreadController {
         return getThreadQuery(uid, defaultRealm).asFlow()
     }
 
-    suspend fun getThreadsWithLocalMessages(apiThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
+    /**
+     * Init the search threads that we have recovered from the api
+     * - Format remote threads to make it work with the existing logic
+     * - Keep old messages data if it's already exist in local
+     * - Handle duplicates with the existing logic
+     * @param apiThreads The list of api threads that need to be treated
+     * @return a list of search threads
+     */
+    suspend fun initAndGetSearchFolderThreads(apiThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
 
         fun MutableRealm.keepOldMessagesAndAddToSearchFolder(thread: Thread, searchFolder: Folder) {
             thread.messages.forEach { remoteMessage: Message ->

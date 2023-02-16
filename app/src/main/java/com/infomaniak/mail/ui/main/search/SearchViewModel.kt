@@ -117,9 +117,9 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
-        suspend fun ApiResponse<Thread.ThreadResult>.initThreadsWithSearchFolder() {
+        suspend fun ApiResponse<Thread.ThreadResult>.initSearchFolderThreads() {
             runCatching {
-                this.data?.threads?.let { ThreadController.getThreadsWithLocalMessages(it) }
+                this.data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
             }.getOrElse { exception ->
                 exception.printStackTrace()
                 if (fetchThreadsJob?.isActive == true) Sentry.captureException(exception)
@@ -139,7 +139,7 @@ class SearchViewModel : ViewModel() {
 
             if (apiResponse.isSuccess()) {
                 with(apiResponse) {
-                    initThreadsWithSearchFolder()
+                    initSearchFolderThreads()
                     resourceNext = data?.resourceNext
                     resourcePrevious = data?.resourcePrevious
                 }
