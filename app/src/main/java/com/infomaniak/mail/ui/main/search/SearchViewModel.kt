@@ -130,8 +130,13 @@ class SearchViewModel : ViewModel() {
         fetchThreadsJob = Job()
         return liveData(Dispatchers.IO + fetchThreadsJob!!) {
             if (!hasNextPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
-
             if (fetchThreadsJob?.isCancelled == true) return@liveData
+
+            if (selectedFilters.isEmpty() && searchQuery.value.isNullOrBlank()) {
+                visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
+                return@liveData
+            }
+
             val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
             val folderId = selectedFolder?.id ?: currentFolderId
             val searchFilters = SearchUtils.searchFilters(query, filters)
