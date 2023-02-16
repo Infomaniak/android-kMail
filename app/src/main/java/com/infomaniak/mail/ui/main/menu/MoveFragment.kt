@@ -25,9 +25,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
-import com.infomaniak.mail.utils.createNewFolderInputDialog
+import com.infomaniak.mail.utils.createInputDialog
 import com.infomaniak.mail.views.MenuDrawerItemView
 
 class MoveFragment : MenuFoldersFragment() {
@@ -71,7 +72,11 @@ class MoveFragment : MenuFoldersFragment() {
     }
 
     private fun initNewFolderDialog() = with(navigationArgs) {
-        createNewFolderInputDialog { folderName ->
+        createInputDialog(
+            R.string.newFolderDialogTitle,
+            R.string.newFolderDialogHint,
+            R.string.newFolderDialogMovePositiveButton,
+        ) { folderName ->
             folderName?.let { mainViewModel.moveToNewFolder(it.toString(), threadUid, messageUid) }
             findNavController().popBackStack()
         }

@@ -31,7 +31,6 @@ import android.view.View
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -323,13 +322,4 @@ fun Fragment.createInputDialog(
         .setNegativeButton(R.string.buttonCancel, null)
         .setOnDismissListener { textInput.text?.clear() }
         .create()
-}
-
-fun Fragment.createNewFolderInputDialog(onPositiveButtonClicked: (Editable?) -> Unit): AlertDialog {
-    return createInputDialog(
-        R.string.newFolderDialogTitle,
-        R.string.newFolderDialogHint,
-        R.string.newFolderDialogPositiveButton,
-        onPositiveButtonClicked,
-    )
 }

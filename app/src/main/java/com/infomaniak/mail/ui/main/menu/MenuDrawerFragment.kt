@@ -255,7 +255,11 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun initNewFolderDialog(): AlertDialog {
-        return createNewFolderInputDialog { folderName ->
+        return createInputDialog(
+            R.string.newFolderDialogTitle,
+            R.string.newFolderDialogHint,
+            R.string.newFolderDialogPositiveButton,
+        ) { folderName ->
             folderName?.let { mainViewModel.createNewFolder(it.toString()) }
         }
     }
