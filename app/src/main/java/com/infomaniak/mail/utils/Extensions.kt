@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
@@ -28,10 +29,13 @@ import android.text.Editable
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
+import android.widget.Button
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -51,8 +55,8 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
-import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
+import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
@@ -69,6 +73,7 @@ import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
+import com.google.android.material.R as RMaterial
 
 fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
 
@@ -307,19 +312,43 @@ fun Fragment.createDescriptionDialog(
         .setNegativeButton(R.string.buttonCancel, null)
         .create()
 }
+
+@SuppressLint("ResourceAsColor")
 fun Fragment.createInputDialog(
     @StringRes title: Int,
     @StringRes hint: Int,
     @StringRes confirmButtonText: Int,
     onPositiveButtonClicked: (Editable?) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
+
+    fun Button.setButtonEnablement(isInputEmpty: Boolean) {
+        isEnabled = !isInputEmpty
+
+        val (textColor, backgroundColor) = if (isInputEmpty) {
+            R.color.disabledDialogButtonTextColor to resources.getColor(R.color.backgroundDisabledDialogButton, null)
+        } else {
+            R.color.colorOnPrimary to context.getAttributeColor(RMaterial.attr.colorPrimary)
+        }
+        setTextColor(resources.getColor(textColor, null))
+        setBackgroundColor(backgroundColor)
+    }
+
     dialogTitle.setText(title)
     textInputLayout.setHint(hint)
 
-    MaterialAlertDialogBuilder(context)
+    val dialog = MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text) }
         .setNegativeButton(R.string.buttonCancel, null)
         .setOnDismissListener { textInput.text?.clear() }
         .create()
+
+    dialog.setOnShowListener {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
+            setButtonEnablement(true)
+            textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
+        }
+    }
+
+    dialog
 }
