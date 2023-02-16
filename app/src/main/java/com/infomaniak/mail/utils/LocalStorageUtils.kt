@@ -22,6 +22,7 @@ import android.net.Uri
 import io.sentry.Sentry
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 
 object LocalStorageUtils {
 
@@ -51,7 +52,15 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), localDraftUuid)
     }
 
-    fun copyDataToAttachmentsCache(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {
+    fun saveCacheAttachment(inputStream: InputStream, outputFile: File) = with(outputFile) {
+        if (exists()) delete()
+        inputStream.buffered().use {
+            parentFile?.mkdirs()
+            outputStream().use { output -> inputStream.copyTo(output) }
+        }
+    }
+
+    fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
             val attachmentsCacheDir = getAttachmentsUploadDir(context, localDraftUuid)
             if (!attachmentsCacheDir.exists()) attachmentsCacheDir.mkdirs()

@@ -267,7 +267,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
         if (fileSize > availableSpace) return null to true
 
-        return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, draft.localUuid)
+        return LocalStorageUtils.saveUploadAttachment(getApplication(), uri, fileName, draft.localUuid)
             ?.let { file ->
                 val mimeType = file.path.guessMimeType()
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
