@@ -117,7 +117,7 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
-        suspend fun ApiResponse<Thread.ThreadResult>.keepOldMessagesData() {
+        suspend fun ApiResponse<Thread.ThreadResult>.initThreadsWithSearchFolder() {
             runCatching {
                 this.data?.threads?.let { ThreadController.getThreadsWithLocalMessages(it) }
             }.getOrElse { exception ->
@@ -139,7 +139,7 @@ class SearchViewModel : ViewModel() {
 
             if (apiResponse.isSuccess()) {
                 with(apiResponse) {
-                    keepOldMessagesData()
+                    initThreadsWithSearchFolder()
                     resourceNext = data?.resourceNext
                     resourcePrevious = data?.resourcePrevious
                 }

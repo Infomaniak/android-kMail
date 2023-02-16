@@ -30,6 +30,7 @@ import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.ext.toRealmList
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.SingleQueryChange
@@ -113,6 +114,27 @@ object ThreadController {
     }
 
     suspend fun getThreadsWithLocalMessages(apiThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
+
+        fun MutableRealm.keepOldMessagesAndAddToSearchFolder(thread: Thread, searchFolder: Folder) {
+            thread.messages.forEach { remoteMessage: Message ->
+                MessageController.getMessage(remoteMessage.uid, this)?.let { localMessage ->
+                    val position = thread.messages.indexOfFirst { it.uid == localMessage.uid }
+                    thread.messages[position] = localMessage.copyFromRealm()
+                } ?: run {
+                    remoteMessage.isFromSearch = true
+                }
+                searchFolder.messages.add(remoteMessage)
+            }
+        }
+
+        fun handleDuplicatesMessages(thread: Thread) {
+            if (thread.messages.count() > 1) {
+                val firstMessage = thread.messages.removeAt(0)
+                thread.duplicates = thread.messages
+                thread.messages = realmListOf(firstMessage)
+            }
+        }
+
         defaultRealm.writeBlocking {
             val searchFolder = FolderController.getOrCreateSearchFolder(this)
             apiThreads.map { thread ->
@@ -120,13 +142,10 @@ object ThreadController {
                 val remoteMessage = thread.messages.first()
                 thread.isFromSearch = true
                 thread.folderId = remoteMessage.folderId
-                MessageController.getMessage(thread.messages.first().uid, this)?.let { message ->
-                    thread.messages = listOf(message.copyFromRealm()).toRealmList()
-                } ?: run {
-                    remoteMessage.isFromSearch = true
-                }
-                // upsertThread(thread)
-                searchFolder.messages.add(thread.messages.single())
+
+                keepOldMessagesAndAddToSearchFolder(thread, searchFolder)
+                handleDuplicatesMessages(thread)
+
                 thread
             }.also { searchFolder.threads = it.toRealmList() }
         }
