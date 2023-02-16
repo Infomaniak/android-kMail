@@ -24,12 +24,14 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.Editable
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -50,6 +52,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
@@ -304,4 +307,29 @@ fun Fragment.createDescriptionDialog(
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
         .setNegativeButton(R.string.buttonCancel, null)
         .create()
+}
+fun Fragment.createInputDialog(
+    @StringRes title: Int,
+    @StringRes hint: Int,
+    @StringRes confirmButtonText: Int,
+    onPositiveButtonClicked: (Editable?) -> Unit,
+) = with(DialogInputBinding.inflate(layoutInflater)) {
+    dialogTitle.setText(title)
+    textInputLayout.setHint(hint)
+
+    MaterialAlertDialogBuilder(context)
+        .setView(root)
+        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text) }
+        .setNegativeButton(R.string.buttonCancel, null)
+        .setOnDismissListener { textInput.text?.clear() }
+        .create()
+}
+
+fun Fragment.createNewFolderInputDialog(onPositiveButtonClicked: (Editable?) -> Unit): AlertDialog {
+    return createInputDialog(
+        R.string.newFolderDialogTitle,
+        R.string.newFolderDialogHint,
+        R.string.newFolderDialogPositiveButton,
+        onPositiveButtonClicked,
+    )
 }

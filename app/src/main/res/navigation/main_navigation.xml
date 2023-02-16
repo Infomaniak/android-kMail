@@ -59,7 +59,7 @@
         android:id="@+id/newFolderDialog"
         android:name="com.infomaniak.mail.ui.main.menu.NewFolderDialog"
         android:label="NewFolderDialog"
-        tools:layout="@layout/dialog_new_folder">
+        tools:layout="@layout/dialog_input">
         <argument
             android:name="threadUid"
             android:defaultValue="@null"

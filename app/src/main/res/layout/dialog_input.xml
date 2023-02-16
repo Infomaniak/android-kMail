@@ -25,20 +25,22 @@
     tools:context=".ui.main.menu.NewFolderDialog">
 
     <TextView
+        android:id="@+id/dialogTitle"
         style="@style/BottomSheetTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
-        android:text="@string/newFolderDialogTitle" />
+        tools:text="@string/newFolderDialogTitle" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
-        android:hint="@string/newFolderDialogHint">
+        tools:hint="@string/newFolderDialogHint">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/folderName"
+            android:id="@+id/textInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

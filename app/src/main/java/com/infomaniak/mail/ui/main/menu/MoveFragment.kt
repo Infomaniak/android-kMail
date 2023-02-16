@@ -25,15 +25,18 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
+import com.infomaniak.mail.utils.createNewFolderInputDialog
+import com.infomaniak.mail.views.MenuDrawerItemView
 
 class MoveFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMoveBinding
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
+
+    private val createFolderDialog by lazy { initNewFolderDialog() }
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -52,7 +55,7 @@ class MoveFragment : MenuFoldersFragment() {
 
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        iconAddFolder.setOnClickListener { safeNavigate(MoveFragmentDirections.actionMoveFragmentToNewFolderDialog()) }
+        iconAddFolder.setOnClickListener { createFolderDialog.show() }
     }
 
     private fun observeFolders() = with(navigationArgs) {
@@ -65,5 +68,12 @@ class MoveFragment : MenuFoldersFragment() {
     override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
         mainViewModel.moveTo(folderId, threadUid, messageUid)
         findNavController().popBackStack()
+    }
+
+    private fun initNewFolderDialog() = with(navigationArgs) {
+        createNewFolderInputDialog { folderName ->
+            folderName?.let { mainViewModel.moveToNewFolder(it.toString(), threadUid, messageUid) }
+            findNavController().popBackStack()
+        }
     }
 }

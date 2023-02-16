@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -48,6 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class MenuDrawerFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMenuDrawerBinding
+    private val createFolderDialog by lazy { initNewFolderDialog() }
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -250,5 +252,11 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         customFolders.setIsCollapsed(false)
         advancedActionsLayout.isGone = true
         advancedActions.setIsCollapsed(true)
+    }
+
+    private fun initNewFolderDialog(): AlertDialog {
+        return createNewFolderInputDialog { folderName ->
+            folderName?.let { mainViewModel.createNewFolder(it.toString()) }
+        }
     }
 }

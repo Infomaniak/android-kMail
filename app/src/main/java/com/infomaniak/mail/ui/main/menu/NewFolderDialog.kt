@@ -24,12 +24,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.mail.R
-import com.infomaniak.mail.databinding.DialogNewFolderBinding
+import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.ui.MainViewModel
 
 class NewFolderDialog : DialogFragment() {
 
-    private val binding by lazy { DialogNewFolderBinding.inflate(layoutInflater) }
+    private val binding by lazy { DialogInputBinding.inflate(layoutInflater) }
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val navigationArgs: NewFolderDialogArgs by navArgs()
@@ -38,7 +38,7 @@ class NewFolderDialog : DialogFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setPositiveButton(R.string.newFolderDialogPositiveButton) { _, _ ->
-                val folderName = binding.folderName.text.toString()
+                val folderName = binding.textInput.text.toString()
                 if (threadUid == null) {
                     mainViewModel.createNewFolder(folderName)
                 } else {
