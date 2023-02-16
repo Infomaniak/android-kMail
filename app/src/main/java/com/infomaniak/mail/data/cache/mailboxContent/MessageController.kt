@@ -358,7 +358,7 @@ object MessageController {
                 scope.ensureActive()
                 allExistingMessages.forEach { existingMessage ->
                     scope.ensureActive()
-                    if (!thread.messages.map { it.uid }.contains(existingMessage.uid)) {
+                    if (!thread.messages.contains(existingMessage)) {
                         thread.messagesIds += existingMessage.messageIds
                         thread.addMessageWithConditions(existingMessage, realm = this)
                     }
