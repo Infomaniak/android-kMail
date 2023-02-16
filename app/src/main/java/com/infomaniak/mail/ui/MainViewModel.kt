@@ -483,12 +483,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     //region Spam
-    fun toggleSpamOrHam(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
+    fun toggleSpamOrHam(
+        threadUid: String,
+        message: Message? = null,
+        displaySnackbar: Boolean = true,
+    ) = viewModelScope.launch(Dispatchers.IO) {
         val mailbox = currentMailbox.value ?: return@launch
         val thread = ThreadController.getThread(threadUid) ?: return@launch
 
-        val isSpam = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
-        val destinationFolderRole = if (isSpam) FolderRole.INBOX else FolderRole.SPAM
+        val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
         val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return@launch
         val destinationFolderId = destinationFolder.id
 
@@ -503,9 +506,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
-        val undoDestinationId = message?.folderId ?: thread.folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-        showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        if (displaySnackbar) {
+            val undoDestinationId = message?.folderId ?: thread.folderId
+            val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
+            showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        }
     }
     //endregion
 
@@ -525,9 +530,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+
+        val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
+
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, displaySnackbar = false)
+            R.string.snackbarReportPhishingConfirmation
+        } else {
+            RCore.string.anErrorHasOccurred
+        }
+
+        snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
+    }
+
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid))
     }
+
+    fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     data class UndoData(
         val resource: String,

@@ -148,6 +148,9 @@
         <action
             android:id="@+id/action_threadFragment_to_junkBottomSheetDialog"
             app:destination="@id/junkBottomSheetDialog" />
+        <action
+            android:id="@+id/action_threadFragment_to_downloadAttachmentProgressDialog"
+            app:destination="@id/downloadAttachmentProgressDialog" />
     </fragment>
 
     <dialog
@@ -455,5 +458,21 @@
             android:name="position"
             app:argType="integer" />
     </fragment>
+
+    <dialog
+        android:id="@+id/downloadAttachmentProgressDialog"
+        android:name="com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog"
+        android:label="DownloadAttachmentProgressDialog"
+        tools:layout="@layout/dialog_download_progress">
+        <argument
+            android:name="attachmentResource"
+            app:argType="string" />
+        <argument
+            android:name="attachmentName"
+            app:argType="string" />
+        <argument
+            android:name="attachmentType"
+            app:argType="com.infomaniak.mail.data.models.Attachment$AttachmentType" />
+    </dialog>
 
 </navigation>

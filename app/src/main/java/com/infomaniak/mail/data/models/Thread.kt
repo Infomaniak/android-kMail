@@ -89,18 +89,14 @@ class Thread : RealmObject {
     }
 
     fun addMessageWithConditions(newMessage: Message, realm: TypedRealm) {
-        messagesIds += newMessage.messageIds
 
         val folderRole = FolderController.getFolder(folderId, realm)?.role
         val isInTrash = newMessage.isInTrash(realm)
 
-        // If the Message is deleted, but we are not in the Trash: ignore it, just leave.
-        if (folderRole != FolderRole.TRASH && isInTrash) return
-
         val shouldAddMessage = when (folderRole) {
-            FolderRole.DRAFT -> newMessage.isDraft // Only add draft Messages in Draft folder
-            FolderRole.TRASH -> isInTrash // Only add deleted Messages in Trash folder
-            else -> true
+            FolderRole.DRAFT -> newMessage.isDraft // In Draft folder: only add draft Messages.
+            FolderRole.TRASH -> isInTrash // In Trash folder: only add deleted Messages.
+            else -> !isInTrash // In other folders: only add non-deleted Messages.
         }
 
         if (shouldAddMessage) {

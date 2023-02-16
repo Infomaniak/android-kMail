@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread
 
 import android.animation.ValueAnimator
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
@@ -25,6 +26,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
@@ -37,15 +39,19 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.infomaniak.lib.core.utils.DownloadManagerUtils
+import com.infomaniak.lib.core.utils.getBackNavigationResult
+import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.RealmChangesBinding.Companion.bindResultsChangeToAdapter
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
@@ -94,6 +100,7 @@ class ThreadFragment : Fragment() {
             observeMessagesLive()
             observeContacts()
             observeQuickActionBarClicks()
+            observeOpenAttachment()
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { leaveThread() }
@@ -163,6 +170,10 @@ class ThreadFragment : Fragment() {
         }
     }
 
+    private fun observeOpenAttachment() {
+        getBackNavigationResult<Intent>(DownloadAttachmentProgressDialog.OPEN_WITH, ::startActivity)
+    }
+
     private fun setupAdapter(threadUid: String) = with(binding) {
         AppCompatResources.getDrawable(context, R.drawable.divider)?.let {
             messagesList.addItemDecoration(DividerItemDecorator(InsetDrawable(it, 0)))
@@ -189,7 +200,11 @@ class ThreadFragment : Fragment() {
                 }
             }
             onAttachmentClicked = { attachment ->
-                notYetImplemented()
+                if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
+                    attachment.display()
+                } else {
+                    Toast.makeText(requireContext(), R.string.webViewCantHandleAction, Toast.LENGTH_SHORT).show()
+                }
             }
             onDownloadAllClicked = { message ->
                 downloadAllAttachments(message)
@@ -207,6 +222,20 @@ class ThreadFragment : Fragment() {
                     )
                 )
             }
+        }
+    }
+
+    private fun Attachment.display() {
+        if (getCacheFile(requireContext()).exists()) {
+            startActivity(openWithIntent(requireContext()))
+        } else {
+            findNavController().navigate(
+                ThreadFragmentDirections.actionThreadFragmentToDownloadAttachmentProgressDialog(
+                    attachmentResource = resource!!,
+                    attachmentName = name,
+                    attachmentType = getFileTypeFromExtension(),
+                )
+            )
         }
     }
 

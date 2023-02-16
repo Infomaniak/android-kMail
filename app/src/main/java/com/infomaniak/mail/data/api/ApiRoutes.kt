@@ -36,7 +36,7 @@ object ApiRoutes {
 
     fun folders(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/folder"
 
-    fun folder(mailboxUuid: String, folderId: String) = "${folders(mailboxUuid)}/$folderId"
+    private fun folder(mailboxUuid: String, folderId: String) = "${folders(mailboxUuid)}/$folderId"
 
     // fun renameFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/rename"
 
@@ -52,33 +52,37 @@ object ApiRoutes {
         return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
     }
 
-    private fun message(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
+    private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
-    fun moveMessage(mailboxUuid: String) = "${message(mailboxUuid)}/move"
+    private fun message(mailboxUuid: String, folderId: String, messageId: Long): String {
+        return "${folder(mailboxUuid, folderId)}/message/$messageId"
+    }
 
-    fun deleteMessage(mailboxUuid: String) = "${message(mailboxUuid)}/delete"
+    fun moveMessages(mailboxUuid: String) = "${messages(mailboxUuid)}/move"
+
+    fun deleteMessages(mailboxUuid: String) = "${messages(mailboxUuid)}/delete"
+
+    fun messagesSeen(mailboxUuid: String) = "${messages(mailboxUuid)}/seen"
+
+    fun messagesUnseen(mailboxUuid: String) = "${messages(mailboxUuid)}/unseen"
+
+    fun starMessages(mailboxUuid: String, star: Boolean): String = "${messages(mailboxUuid)}/${if (star) "star" else "unstar"}"
+
+    // fun messageSafe(mailboxUuid: String) = "${message(mailboxUuid)}/safe"
 
     fun draft(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/draft"
 
     fun draft(mailboxUuid: String, draftRemoteUuid: String) = "${draft(mailboxUuid)}/$draftRemoteUuid"
 
-    fun messageSeen(mailboxUuid: String) = "${message(mailboxUuid)}/seen"
-
-    fun messageUnseen(mailboxUuid: String) = "${message(mailboxUuid)}/unseen"
-
-    // fun messageSafe(mailboxUuid: String) = "${message(mailboxUuid)}/safe"
-
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
     fun downloadAttachment(mailboxUuid: String, folderId: String, messageId: Long, attachmentId: String): String {
-        return "${folder(mailboxUuid, folderId)}/message/$messageId/attachment/$attachmentId"
+        return "${message(mailboxUuid, folderId, messageId)}/attachment/$attachmentId"
     }
 
     fun downloadAttachments(mailboxUuid: String, folderId: String, messageId: Long): String {
-        return "${folder(mailboxUuid, folderId)}/message/$messageId/attachmentsArchive"
+        return "${message(mailboxUuid, folderId, messageId)}/attachmentsArchive"
     }
-
-    fun starMessage(mailboxUuid: String, star: Boolean): String = "${message(mailboxUuid)}/${if (star) "star" else "unstar"}"
 
     fun search(
         mailboxUuid: String,
@@ -90,6 +94,10 @@ object ApiRoutes {
         val offset = "offset=$offset"
         val thread = "thread=${if (isDraftFolder) "off" else "on"}"
         return "${folder(mailboxUuid, folderId)}/message?$offset&$thread&$filters"
+    }
+
+    fun reportPhishing(mailboxUuid: String, folderId: String, messageId: Long): String {
+        return "${message(mailboxUuid, folderId, messageId)}/report"
     }
 
     fun getMessagesUids(mailboxUuid: String, folderId: String): String {

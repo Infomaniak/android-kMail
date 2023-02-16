@@ -20,10 +20,10 @@ package com.infomaniak.mail.ui.main.thread.actions
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
@@ -36,7 +36,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(navigationArgs) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
         threadActionsViewModel.threadLive(threadUid).observe(viewLifecycleOwner) { thread ->
@@ -45,20 +45,21 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         }
 
         binding.postpone.isGone = true
+        setSpamUi()
 
         threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
-            navigationArgs.messageUidToReplyTo,
-        ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
+            messageUidToReplyTo,
+        ).observe(viewLifecycleOwner) { messageUidToReply ->
 
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply)
                 }
 
                 override fun onReplyAll() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply)
                 }
 
                 override fun onForward() {
@@ -77,7 +78,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
                 override fun onReadUnread() {
                     mainViewModel.toggleSeenStatus(threadUid)
-                    findNavController().popBackStack(R.id.threadFragment, true)
+                    findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
                 override fun onMove() {
@@ -96,13 +97,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     mainViewModel.toggleFavoriteStatus(threadUid)
                 }
 
-                override fun onReportJunk() {
-                    safeNavigate(
-                        R.id.junkBottomSheetDialog,
-                        JunkBottomSheetDialogArgs(threadUid, null).toBundle(),
-                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name
-                    )
+                override fun onSpam() {
+                    mainViewModel.toggleSpamOrHam(threadUid)
                 }
+
+                override fun onReportJunk() = Unit
 
                 override fun onPrint() {
                     notYetImplemented()
@@ -114,5 +113,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 //endregion
             })
         }
+    }
+
+    private fun setSpamUi() = with(binding) {
+        reportJunk.isGone = true
+        spam.isVisible = true
+        spam.setText(if (mainViewModel.isSpam(null)) R.string.actionNonSpam else R.string.actionSpam)
     }
 }

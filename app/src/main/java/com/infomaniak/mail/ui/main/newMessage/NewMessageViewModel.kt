@@ -64,6 +64,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     val importedAttachments = MutableLiveData<Pair<MutableList<Attachment>, ImportationResult>>()
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
+    val isSendingAllowed = MutableLiveData(false)
 
     private var snapshot: DraftSnapshot? = null
 
@@ -104,6 +105,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             if (isSuccess) {
                 splitSignatureFromBody()
                 saveDraftSnapshot()
+                updateIsSendingAllowed()
             }
 
             emit(isSuccess)
@@ -168,6 +170,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.add(recipient)
+        updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
@@ -178,6 +181,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.remove(recipient)
+        updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
@@ -230,6 +234,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
 
+    private fun updateIsSendingAllowed() {
+        isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())
+    }
+
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
         val newAttachments = mutableListOf<Attachment>()
         var attachmentsSize = draft.attachments.sumOf { it.size }
@@ -267,7 +275,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteAttachmentsDirIfEmpty(getApplication(), draft.localUuid)
+        LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(getApplication(), draft.localUuid)
         autoSaveJob?.cancel()
         super.onCleared()
     }

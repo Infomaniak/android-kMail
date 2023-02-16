@@ -90,7 +90,12 @@ object FolderController {
         return getFolderQuery(Folder::id.name, id, defaultRealm).asFlow().mapNotNull { it.obj }
     }
 
-    fun getIdsOfFoldersWithSpecificBehavior(realm: TypedRealm): List<String> {
+    /**
+     * An "incomplete Thread" is a Thread in a specific Folder where only Messages from this Folder are displayed.
+     * - In the Drafts, we only want to display draft Messages.
+     * - In the Trash, we only want to display deleted Messages.
+     */
+    fun getIdsOfFoldersWithIncompleteThreads(realm: TypedRealm): List<String> {
         return mutableListOf<String>().apply {
             getFolder(FolderRole.DRAFT, realm)?.id?.let(::add)
             getFolder(FolderRole.TRASH, realm)?.id?.let(::add)
