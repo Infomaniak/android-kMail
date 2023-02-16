@@ -28,10 +28,10 @@ import com.infomaniak.lib.core.networking.HttpUtils
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.utils.LocalStorageUtils
 import kotlinx.coroutines.Dispatchers
 import okhttp3.Request
 import okhttp3.Response
-import java.io.BufferedInputStream
 import java.io.File
 
 class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(application) {
@@ -46,7 +46,7 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
             val attachment = AttachmentController.getAttachment(resource).also { attachment = it }
             val attachmentFile = attachment.getCacheFile(getApplication())
 
-            if (attachmentFile.exists()) {
+            if (attachment.hasUsableCache(getApplication(), attachmentFile)) {
                 emit(attachment.openWithIntent(getApplication()))
                 this@DownloadAttachmentViewModel.attachment = null
                 return@liveData
@@ -66,16 +66,15 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
     }
 
     private fun Response.saveAttachmentTo(outputFile: File): Boolean {
-        BufferedInputStream(body?.byteStream() ?: return false).use { input ->
-            outputFile.parentFile?.mkdirs()
-            outputFile.outputStream().use { output -> input.copyTo(output) }
-        }
-        return true
+        return body?.byteStream()?.use {
+            LocalStorageUtils.saveCacheAttachment(it, outputFile)
+            true
+        } ?: false
     }
 
     override fun onCleared() {
         // If we end up with an incomplete cached Attachment, we delete it
-        attachment?.getCacheFile(getApplication())?.delete()
+        attachment?.getCacheFile(getApplication())?.apply { if (exists()) delete() }
         super.onCleared()
     }
 }
