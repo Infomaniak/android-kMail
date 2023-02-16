@@ -19,8 +19,13 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
+import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import io.sentry.Sentry
+import okhttp3.Request
+import okhttp3.Response
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -53,7 +58,21 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), localDraftUuid)
     }
 
-    fun saveCacheAttachment(resource: String, inputStream: InputStream, outputFile: File) = with(outputFile) {
+    fun saveAttachmentToCache(resource: String, cacheFile: File): Boolean {
+        fun Response.saveAttachmentTo(resource: String, outputFile: File): Boolean {
+            if (!isSuccessful) return false
+            return body?.byteStream()?.use { inputStream ->
+                saveCacheAttachment(resource, inputStream, outputFile)
+                true
+            } ?: false
+        }
+
+        val resourceUrl = ApiRoutes.resource(resource)
+        val httpRequest = Request.Builder().url(resourceUrl).headers(HttpUtils.getHeaders(contentType = null)).get().build()
+        return HttpClient.okHttpClient.newCall(httpRequest).execute().saveAttachmentTo(resource, cacheFile)
+    }
+
+    private fun saveCacheAttachment(resource: String, inputStream: InputStream, outputFile: File) = with(outputFile) {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()

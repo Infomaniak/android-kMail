@@ -25,15 +25,11 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
-import okhttp3.Request
-import java.io.File
 
 class MessageWebViewClient(
     private val context: Context,
@@ -48,7 +44,7 @@ class MessageWebViewClient(
                 val cacheFile = attachment.getCacheFile(context)
                 if (!attachment.hasUsableCache(context, cacheFile)) {
                     Log.d(TAG, "shouldInterceptRequest: cache ${attachment.name} with ${attachment.size}")
-                    saveAttachmentToCache(attachment.resource!!, cacheFile)
+                    LocalStorageUtils.saveAttachmentToCache(attachment.resource!!, cacheFile)
                 }
                 Log.i(TAG, "shouldInterceptRequest: load attachment ${attachment.name} from cache with ${cacheFile.length()}")
                 return WebResourceResponse(attachment.mimeType, Utils.UTF_8, cacheFile.inputStream())
@@ -70,15 +66,6 @@ class MessageWebViewClient(
             }
         }
         return true
-    }
-
-    private fun saveAttachmentToCache(resource: String, cacheFile: File) {
-        val resourceUrl = "${BuildConfig.MAIL_API}${resource}"
-        val httpRequest = Request.Builder().url(resourceUrl).build()
-        val response = HttpClient.okHttpClient.newCall(httpRequest).execute()
-        if (response.isSuccessful) {
-            LocalStorageUtils.saveCacheAttachment(resource, response.body!!.byteStream(), cacheFile)
-        }
     }
 
     private companion object {

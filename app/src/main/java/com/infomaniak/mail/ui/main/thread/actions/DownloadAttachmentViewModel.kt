@@ -23,16 +23,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpUtils
-import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.utils.LocalStorageUtils
 import kotlinx.coroutines.Dispatchers
-import okhttp3.Request
-import okhttp3.Response
-import java.io.File
 
 class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -52,24 +46,13 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
                 return@liveData
             }
 
-            val url = ApiRoutes.resource(resource)
-            val request = Request.Builder().url(url).headers(HttpUtils.getHeaders(contentType = null)).get().build()
-            val response = HttpClient.okHttpClient.newCall(request).execute()
-
-            if (response.isSuccessful && response.saveAttachmentTo(attachment.resource!!, attachmentFile)) {
+            if (LocalStorageUtils.saveAttachmentToCache(resource, attachmentFile)) {
                 emit(attachment.openWithIntent(getApplication()))
                 this@DownloadAttachmentViewModel.attachment = null
             } else {
                 emit(null)
             }
         }
-    }
-
-    private fun Response.saveAttachmentTo(resource: String, outputFile: File): Boolean {
-        return body?.byteStream()?.use {
-            LocalStorageUtils.saveCacheAttachment(resource, it, outputFile)
-            true
-        } ?: false
     }
 
     override fun onCleared() {
