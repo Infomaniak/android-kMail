@@ -170,7 +170,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.add(recipient)
-        if (type == FieldType.TO) updateIsSendingAllowed()
+        updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
@@ -181,7 +181,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
             FieldType.BCC -> bcc
         }
         field.remove(recipient)
-        if (type == FieldType.TO) updateIsSendingAllowed()
+        updateIsSendingAllowed()
         saveDraftDebouncing()
     }
 
@@ -235,7 +235,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
 
     private fun updateIsSendingAllowed() {
-        isSendingAllowed.postValue(draft.to.isNotEmpty())
+        isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())
     }
 
     fun importAttachments(uris: List<Uri>) = viewModelScope.launch(Dispatchers.IO) {
