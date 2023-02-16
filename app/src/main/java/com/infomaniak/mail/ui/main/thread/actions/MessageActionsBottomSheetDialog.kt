@@ -92,7 +92,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     safeNavigate(
                         R.id.junkBottomSheetDialog,
                         JunkBottomSheetDialogArgs(threadUid, messageUid).toBundle(),
-                        currentClassName = MessageActionsBottomSheetDialog::class.java.name
+                        currentClassName = MessageActionsBottomSheetDialog::class.java.name,
                     )
                 }
 

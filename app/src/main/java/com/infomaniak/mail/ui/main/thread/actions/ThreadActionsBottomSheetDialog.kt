@@ -36,7 +36,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?): Unit = with(navigationArgs) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
         threadActionsViewModel.threadLive(threadUid).observe(viewLifecycleOwner) { thread ->
@@ -50,16 +50,16 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
             messageUidToReplyTo,
-        ).observe(viewLifecycleOwner) { messageUidToReplyTo ->
+        ).observe(viewLifecycleOwner) { messageUidToReply ->
 
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReplyTo)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply)
                 }
 
                 override fun onReplyAll() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReplyTo)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply)
                 }
 
                 override fun onForward() {
@@ -78,7 +78,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
                 override fun onReadUnread() {
                     mainViewModel.toggleSeenStatus(threadUid)
-                    findNavController().popBackStack(R.id.threadFragment, true)
+                    findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
                 override fun onMove() {
