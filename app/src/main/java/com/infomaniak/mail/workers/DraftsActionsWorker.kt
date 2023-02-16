@@ -177,7 +177,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         val apiResponse = ApiController.json.decodeFromString<ApiResponse<Attachment>>(response.body?.string() ?: "")
         if (apiResponse.isSuccess() && apiResponse.data != null) {
             attachmentFile.delete()
-            LocalStorageUtils.deleteAttachmentsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
+            LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(applicationContext, localDraftUuid, userId, mailbox.mailboxId)
             updateLocalAttachment(localDraftUuid, apiResponse.data!!, realm)
         }
     }

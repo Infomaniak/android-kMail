@@ -18,7 +18,9 @@
 package com.infomaniak.mail.data.models
 
 import android.content.Context
+import android.content.Intent
 import androidx.annotation.DrawableRes
+import androidx.core.content.FileProvider
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
@@ -75,13 +77,31 @@ class Attachment : EmbeddedRealmObject {
         else -> AttachmentType.UNKNOWN
     }
 
+    fun getCacheFile(
+        context: Context,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+    ): File {
+        val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, userId, mailboxId)
+        return File(cacheFolder, name)
+    }
+
     fun getUploadLocalFile(
         context: Context, localDraftUuid: String,
         userId: Int = AccountUtils.currentUserId,
-        mailboxId: Int = AccountUtils.currentMailboxId
+        mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {
-        val cacheFolder = LocalStorageUtils.getAttachmentsCacheDir(context, localDraftUuid, userId, mailboxId)
+        val cacheFolder = LocalStorageUtils.getAttachmentsUploadDir(context, localDraftUuid, userId, mailboxId)
         return File(cacheFolder, name)
+    }
+
+    fun openWithIntent(context: Context): Intent {
+        val uri = FileProvider.getUriForFile(context, context.getString(R.string.ATTACHMENTS_AUTHORITY), getCacheFile(context))
+        return Intent().apply {
+            action = Intent.ACTION_VIEW
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            setDataAndType(uri, mimeType)
+        }
     }
 
     enum class AttachmentDisposition {
