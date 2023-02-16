@@ -32,7 +32,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
-import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
@@ -82,6 +81,7 @@ class MainActivity : ThemedActivity() {
         observeNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
 
+        setupSnackBar()
         setupNavController()
         setupMenuDrawerCallbacks()
 
@@ -90,8 +90,6 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.observeMergedContactsLive()
         permissionUtils.requestMainPermissionsIfNeeded()
-
-        observeSnackbar()
     }
 
     override fun onStart() {
@@ -134,6 +132,18 @@ class MainActivity : ThemedActivity() {
                 level = if (isAvailable) SentryLevel.INFO else SentryLevel.WARNING
             })
             mainViewModel.isInternetAvailable.value = isAvailable
+        }
+    }
+
+    private fun setupSnackBar() {
+        fun getAnchor(): View? = when (findNavController(R.id.hostFragment).currentDestination?.id) {
+            R.id.threadListFragment -> findViewById(R.id.newMessageFab)
+            R.id.threadFragment -> findViewById(R.id.quickActionBar)
+            else -> null
+        }
+
+        mainViewModel.snackBarManager.setup(this, ::getAnchor) {
+            mainViewModel.undoAction(it)
         }
     }
 
@@ -201,17 +211,6 @@ class MainActivity : ThemedActivity() {
 
     private fun setDrawerLockMode(isUnlocked: Boolean) {
         binding.drawerLayout.setDrawerLockMode(if (isUnlocked) LOCK_MODE_UNLOCKED else LOCK_MODE_LOCKED_CLOSED)
-    }
-
-    private fun observeSnackbar() {
-        mainViewModel.snackbarFeedback.observe(this) { (title, undoData) ->
-            val anchor: View? = when (findNavController(R.id.hostFragment).currentDestination?.id) {
-                R.id.threadListFragment -> findViewById(R.id.newMessageFab)
-                R.id.threadFragment -> findViewById(R.id.quickActionBar)
-                else -> null
-            }
-            showSnackbar(title, anchor, onActionClicked = undoData?.let { data -> { mainViewModel.undoAction(data) } })
-        }
     }
 
     private fun colorSystemBarsWithMenuDrawer(@FloatRange(0.0, 1.0) slideOffset: Float = FULLY_SLID) {
