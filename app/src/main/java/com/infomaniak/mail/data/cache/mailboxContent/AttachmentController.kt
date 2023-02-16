@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Attachment
+import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmSingleQuery
 
@@ -27,14 +28,22 @@ object AttachmentController {
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
-    private fun getAttachmentQuery(resource: String): RealmSingleQuery<Attachment> {
-        return defaultRealm.query<Attachment>("${Attachment::resource.name} == '$resource'").first()
+    private fun getAttachmentQuery(resource: String, realm: TypedRealm): RealmSingleQuery<Attachment> {
+        return realm.query<Attachment>("${Attachment::resource.name} == '$resource'").first()
     }
     //endregion
 
     //region Get data
-    fun getAttachment(resource: String): Attachment {
-        return getAttachmentQuery(resource).find()!!
+    fun getAttachment(resource: String, realm: TypedRealm = defaultRealm): Attachment {
+        return getAttachmentQuery(resource, realm).find()!!
+    }
+    //endregion
+
+    //region Edit data
+    fun updateSize(resource: String, newSize: Long) {
+        defaultRealm.writeBlocking {
+            getAttachment(resource, this).size = newSize
+        }
     }
     //endregion
 }

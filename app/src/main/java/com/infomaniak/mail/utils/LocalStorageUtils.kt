@@ -19,6 +19,7 @@ package com.infomaniak.mail.utils
 
 import android.content.Context
 import android.net.Uri
+import com.infomaniak.mail.data.cache.mailboxContent.AttachmentController
 import io.sentry.Sentry
 import java.io.File
 import java.io.FileOutputStream
@@ -52,12 +53,13 @@ object LocalStorageUtils {
         return File(generateRootDir(context.attachmentsUploadRootDir, userId, mailboxId), localDraftUuid)
     }
 
-    fun saveCacheAttachment(inputStream: InputStream, outputFile: File) = with(outputFile) {
+    fun saveCacheAttachment(resource: String, inputStream: InputStream, outputFile: File) = with(outputFile) {
         if (exists()) delete()
         inputStream.buffered().use {
             parentFile?.mkdirs()
             outputStream().use { output -> inputStream.copyTo(output) }
         }
+        AttachmentController.updateSize(resource, outputFile.length())
     }
 
     fun saveUploadAttachment(context: Context, uri: Uri, fileName: String, localDraftUuid: String): File? {

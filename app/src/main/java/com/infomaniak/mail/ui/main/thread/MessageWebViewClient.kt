@@ -48,7 +48,7 @@ class MessageWebViewClient(
                 val cacheFile = attachment.getCacheFile(context)
                 if (!attachment.hasUsableCache(context, cacheFile)) {
                     Log.d(TAG, "shouldInterceptRequest: cache ${attachment.name} with ${attachment.size}")
-                    saveAttachmentToCache(attachment.resource, cacheFile)
+                    saveAttachmentToCache(attachment.resource!!, cacheFile)
                 }
                 Log.i(TAG, "shouldInterceptRequest: load attachment ${attachment.name} from cache with ${cacheFile.length()}")
                 return WebResourceResponse(attachment.mimeType, Utils.UTF_8, cacheFile.inputStream())
@@ -72,12 +72,12 @@ class MessageWebViewClient(
         return true
     }
 
-    private fun saveAttachmentToCache(resource: String?, cacheFile: File) {
+    private fun saveAttachmentToCache(resource: String, cacheFile: File) {
         val resourceUrl = "${BuildConfig.MAIL_API}${resource}"
         val httpRequest = Request.Builder().url(resourceUrl).build()
         val response = HttpClient.okHttpClient.newCall(httpRequest).execute()
         if (response.isSuccessful) {
-            LocalStorageUtils.saveCacheAttachment(response.body!!.byteStream(), cacheFile)
+            LocalStorageUtils.saveCacheAttachment(resource, response.body!!.byteStream(), cacheFile)
         }
     }
 

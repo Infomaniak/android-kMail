@@ -56,7 +56,7 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
             val request = Request.Builder().url(url).headers(HttpUtils.getHeaders(contentType = null)).get().build()
             val response = HttpClient.okHttpClient.newCall(request).execute()
 
-            if (response.isSuccessful && response.saveAttachmentTo(attachmentFile)) {
+            if (response.isSuccessful && response.saveAttachmentTo(attachment.resource!!, attachmentFile)) {
                 emit(attachment.openWithIntent(getApplication()))
                 this@DownloadAttachmentViewModel.attachment = null
             } else {
@@ -65,9 +65,9 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
         }
     }
 
-    private fun Response.saveAttachmentTo(outputFile: File): Boolean {
+    private fun Response.saveAttachmentTo(resource: String, outputFile: File): Boolean {
         return body?.byteStream()?.use {
-            LocalStorageUtils.saveCacheAttachment(it, outputFile)
+            LocalStorageUtils.saveCacheAttachment(resource, it, outputFile)
             true
         } ?: false
     }
