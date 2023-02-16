@@ -90,11 +90,11 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun markMessagesAsSeen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
-        return callApi(ApiRoutes.messageSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
+        return callApi(ApiRoutes.messagesSeen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
     fun markMessagesAsUnseen(mailboxUuid: String, messagesUids: List<String>): ApiResponse<Seen> {
-        return callApi(ApiRoutes.messageUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
+        return callApi(ApiRoutes.messagesUnseen(mailboxUuid), POST, mapOf("uids" to messagesUids))
     }
 
     // fun markAsSafe(mailboxUuid: String, messagesUids: List<String>): ApiResponse<List<Seen>> = callKotlinxApi(ApiRoutes.messageSafe(mailboxUuid), POST, mapOf("uids" to messagesUids))
@@ -128,12 +128,12 @@ object ApiRepository : ApiRepositoryCore() {
     // fun deleteDraft(draftResource: String): ApiResponse<EmptyResponse?> = callApi(ApiRoutes.resource(draftResource), DELETE)
 
     fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {
-        return callApi(ApiRoutes.deleteMessage(mailboxUuid), POST, mapOf("uids" to messageUids))
+        return callApi(ApiRoutes.deleteMessages(mailboxUuid), POST, mapOf("uids" to messageUids))
     }
 
     fun moveMessages(mailboxUuid: String, messagesUids: List<String>, destinationId: String): ApiResponse<MoveResult> {
         return callApi(
-            url = ApiRoutes.moveMessage(mailboxUuid),
+            url = ApiRoutes.moveMessages(mailboxUuid),
             method = POST,
             body = mapOf("uids" to messagesUids, "to" to destinationId),
         )
@@ -154,15 +154,15 @@ object ApiRepository : ApiRepositoryCore() {
     fun getDraft(messageDraftResource: String): ApiResponse<Draft> = callApi(ApiRoutes.resource(messageDraftResource), GET)
 
     fun addToFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<StarMessageResult> {
-        return starMessage(mailboxUuid, messageUids, true)
+        return starMessages(mailboxUuid, messageUids, true)
     }
 
     fun removeFromFavorites(mailboxUuid: String, messageUids: List<String>): ApiResponse<StarMessageResult> {
-        return starMessage(mailboxUuid, messageUids, false)
+        return starMessages(mailboxUuid, messageUids, false)
     }
 
-    private fun starMessage(mailboxUuid: String, messageIds: List<String>, star: Boolean): ApiResponse<StarMessageResult> {
-        return callApi(ApiRoutes.starMessage(mailboxUuid, star), POST, mapOf("uids" to messageIds))
+    private fun starMessages(mailboxUuid: String, messageIds: List<String>, star: Boolean): ApiResponse<StarMessageResult> {
+        return callApi(ApiRoutes.starMessages(mailboxUuid, star), POST, mapOf("uids" to messageIds))
     }
 
     // fun search(mailboxUuid: String, folderId: String, searchText: String): ApiResponse<Thread> = callKotlinxApi(ApiRoutes.search(mailboxUuid, folderId, searchText), GET)
