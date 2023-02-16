@@ -23,8 +23,8 @@ android {
         applicationId 'com.infomaniak.mail'
         minSdk 25
         targetSdk 33
-        versionCode 1_00_000_12
-        versionName '1.0.0-alpha12'
+        versionCode 1_00_000_13
+        versionName '1.0.0-alpha13'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         setProperty "archivesBaseName", "kmail-$versionName ($versionCode)"
@@ -66,17 +66,17 @@ dependencies {
 
     implementation "io.realm.kotlin:library-base:$rootProject.ext.realm_kotlin_version"
 
-    implementation 'com.airbnb.android:lottie:5.2.0'
+    implementation 'com.airbnb.android:lottie:6.0.0'
     implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.1.1'
     implementation 'com.tbuonomo:dotsindicator:4.3'
 
     implementation 'org.jsoup:jsoup:1.15.3'
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+    implementation 'androidx.work:work-runtime-ktx:2.8.0'
     implementation 'androidx.webkit:webkit:1.6.0'
 
     androidTestImplementation 'androidx.test:runner:1.5.2'
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
