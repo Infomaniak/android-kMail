@@ -226,7 +226,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun Attachment.display() {
-        if (getCacheFile(requireContext()).exists()) {
+        if (hasUsableCache(requireContext())) {
             startActivity(openWithIntent(requireContext()))
         } else {
             findNavController().navigate(
