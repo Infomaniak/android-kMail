@@ -126,12 +126,10 @@
             android:name="androidx.core.content.FileProvider"
             android:authorities="@string/ATTACHMENTS_AUTHORITY"
             android:exported="false"
-            android:grantUriPermissions="true"
-            tools:replace="android:authorities">
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/exposed_files_path"
-                tools:replace="android:resource" />
+                android:resource="@xml/exposed_files_path" />
         </provider>
 
     </application>
