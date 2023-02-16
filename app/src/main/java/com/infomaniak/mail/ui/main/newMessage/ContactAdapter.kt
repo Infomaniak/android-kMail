@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
@@ -36,6 +35,7 @@ class ContactAdapter(
     private val usedContacts: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
+    private val setSnackBar: (titleRes: Int) -> Unit,
 ) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
 
     private var allContacts: List<MergedContact> = emptyList()
@@ -73,7 +73,7 @@ class ContactAdapter(
         userEmail.text = searchQuery
         userAvatar.loadUnknownUserAvatar()
         root.setOnClickListener {
-            if (usedContacts.contains(searchQuery)) context.showToast(R.string.addUnknownRecipientAlreadyUsed) else onAddUnrecognizedContact()
+            if (usedContacts.contains(searchQuery)) setSnackBar(R.string.addUnknownRecipientAlreadyUsed) else onAddUnrecognizedContact()
         }
     }
 

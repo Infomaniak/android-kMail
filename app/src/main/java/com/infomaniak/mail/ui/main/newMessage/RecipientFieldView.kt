@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
@@ -29,7 +30,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.hideKeyboard
 import com.infomaniak.lib.core.utils.showKeyboard
-import com.infomaniak.lib.core.utils.showToast
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -53,6 +53,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
+    private var setSnackBar: ((Int) -> Unit) = {}
 
     private var isToggleable = false
     private var isCollapsed = true
@@ -106,8 +107,9 @@ class RecipientFieldView @JvmOverloads constructor(
                 onAddUnrecognizedContact = {
                     val input = autoCompleteInput.text.toString()
                     if (input.isEmail()) addRecipient(email = input, name = input)
-                    else context.showToast(R.string.addUnknownRecipientInvalidEmail)
+                    else setSnackBar(R.string.addUnknownRecipientInvalidEmail)
                 },
+                setSnackBar = { setSnackBar(it) }
             )
 
             autoCompleteInput.apply {
@@ -210,6 +212,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onContactAddedCallback: ((Recipient) -> Unit),
         onContactRemovedCallback: ((Recipient) -> Unit),
         onToggleCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
         autoCompletedContacts = autoComplete
         autoCompletedContacts.adapter = contactAdapter
@@ -218,6 +221,8 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled = onAutoCompletionToggledCallback
         onContactAdded = onContactAddedCallback
         onContactRemoved = onContactRemovedCallback
+
+        setSnackBar = setSnackBarCallback
     }
 
     fun clearField() {
