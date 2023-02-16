@@ -21,8 +21,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/marginStandard"
-    android:paddingVertical="@dimen/marginStandardSmall"
-    tools:context=".ui.main.menu.NewFolderDialog">
+    android:paddingVertical="@dimen/marginStandardSmall">
 
     <TextView
         android:id="@+id/dialogTitle"

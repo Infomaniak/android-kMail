@@ -27,9 +27,6 @@
         android:label="ThreadListFragment"
         tools:layout="@layout/fragment_thread_list">
         <action
-            android:id="@+id/action_threadListFragment_to_newFolderDialog"
-            app:destination="@id/newFolderDialog" />
-        <action
             android:id="@+id/action_threadListFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
@@ -54,23 +51,6 @@
             android:id="@+id/action_threadListFragment_to_moveFragment"
             app:destination="@id/moveFragment" />
     </fragment>
-
-    <dialog
-        android:id="@+id/newFolderDialog"
-        android:name="com.infomaniak.mail.ui.main.menu.NewFolderDialog"
-        android:label="NewFolderDialog"
-        tools:layout="@layout/dialog_input">
-        <argument
-            android:name="threadUid"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="messageUid"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-    </dialog>
 
     <activity
         android:id="@+id/newMessageActivity"
@@ -256,9 +236,6 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
-        <action
-            android:id="@+id/action_moveFragment_to_newFolderDialog"
-            app:destination="@id/newFolderDialog" />
     </fragment>
 
     <fragment
