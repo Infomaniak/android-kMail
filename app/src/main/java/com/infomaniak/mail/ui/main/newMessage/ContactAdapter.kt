@@ -100,7 +100,9 @@ class ContactAdapter(
                 allContacts.forEach {
                     val standardizedEmail = it.email.standardize()
                     val matches = it.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm)
-                    if (matches && constraint == standardizedEmail) displayAddUnknownContactButton = false
+
+                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
+                    if (displayNewContact) displayAddUnknownContactButton = false
 
                     val isAlreadyUsed = usedContacts.contains(standardizedEmail)
                     if (matches && !isAlreadyUsed) finalUserList.add(it)
