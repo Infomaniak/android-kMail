@@ -42,8 +42,8 @@
     <string name="actionSpam">Signaler comme spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
     <string name="actionUnstar">Retirer des favoris</string>
-    <string name="addUnknownRecipientAlreadyUsed">L\'adresse mail est déjà utilisée</string>
-    <string name="addUnknownRecipientInvalidEmail">L\'adresse mail n\'est pas valide</string>
+    <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
+    <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
     <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
     <string name="appSecurityDescription">Protégez l’accès à votre application en activant le verrouillage de votre téléphone.</string>
     <string name="archiveFolder">Archive</string>
@@ -170,6 +170,7 @@
         <item quantity="many">%d de sélectionnés</item>
     </plurals>
     <string name="newFolderDialogHint">Nom du dossier</string>
+    <string name="newFolderDialogMovePositiveButton">Créer et déplacer</string>
     <string name="newFolderDialogPositiveButton">Créer le dossier</string>
     <string name="newFolderDialogTitle">Quel nom de dossier souhaitez-vous utiliser ?</string>
     <plurals name="newMessageNotificationSummary">
@@ -195,7 +196,7 @@
     <string name="onBoardingDescription2">Définissez les actions que vous effectuez le plus souvent au balayage vers la droite et la gauche, et gagnez un temps précieux</string>
     <string name="onBoardingDescription3">Effectuez des actions sur de multiples messages simultanément</string>
     <string name="onBoardingDescription4">Gérez tous vos e-mails Infomaniak depuis l’app !</string>
-    <string name="onBoardingTitle1">Choisissez une couleur d\'accentuation,\nrose ou bleu ?</string>
+    <string name="onBoardingTitle1">Choisissez une couleur d’accentuation,\nrose ou bleu ?</string>
     <string name="onBoardingTitle2">Activez les actions de balayage pour gagner du temps</string>
     <string name="onBoardingTitle3">Restez appuyé quelques secondes sur un message pour activer la sélection multiple</string>
     <string name="onBoardingTitle4">Connectez-vous et commencez à utiliser l’app kMail dès maintenant !</string>
@@ -315,6 +316,12 @@
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Objet :</string>
+    <string name="threadListFlushFolderAlertDescription">Etes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
+    <plurals name="threadListFlushFolderAlertTitle">
+        <item quantity="one">Supprimer %d message</item>
+        <item quantity="other">Supprimer %d messages</item>
+        <item quantity="many">Supprimer %d de messages</item>
+    </plurals>
     <string name="threadListHeaderLastUpdate">Mis à jour %s</string>
     <string name="threadListHeaderLastUpdateNow">à l’instant</string>
     <plurals name="threadListHeaderUnreadCount">

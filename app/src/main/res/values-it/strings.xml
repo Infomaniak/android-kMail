@@ -167,6 +167,7 @@
         <item quantity="other">%d selected</item>
     </plurals>
     <string name="newFolderDialogHint">Folder name</string>
+    <string name="newFolderDialogMovePositiveButton">Create and move</string>
     <string name="newFolderDialogPositiveButton">Create the folder</string>
     <string name="newFolderDialogTitle">What folder name would you like to use?</string>
     <plurals name="newMessageNotificationSummary">
@@ -308,6 +309,11 @@
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Subject:</string>
+    <string name="threadListFlushFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>
+    <plurals name="threadListFlushFolderAlertTitle">
+        <item quantity="one">Delete %d message</item>
+        <item quantity="other">Delete %d messages</item>
+    </plurals>
     <string name="threadListHeaderLastUpdate">Updated %s</string>
     <string name="threadListHeaderLastUpdateNow">now</string>
     <plurals name="threadListHeaderUnreadCount">

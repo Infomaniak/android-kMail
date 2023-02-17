@@ -19,7 +19,6 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
@@ -106,10 +105,13 @@ class RecipientFieldView @JvmOverloads constructor(
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
                     val input = autoCompleteInput.text.toString()
-                    if (input.isEmail()) addRecipient(email = input, name = input)
-                    else setSnackBar(R.string.addUnknownRecipientInvalidEmail)
+                    if (input.isEmail()) {
+                        addRecipient(email = input, name = input)
+                    } else {
+                        setSnackBar(R.string.addUnknownRecipientInvalidEmail)
+                    }
                 },
-                setSnackBar = { setSnackBar(it) }
+                setSnackBar = { setSnackBar(it) },
             )
 
             autoCompleteInput.apply {
