@@ -23,12 +23,13 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 
 class SnackBarManager {
+
     private val snackBarFeedback = SingleLiveEvent<Pair<String, UndoData?>>()
 
     fun setup(
         activity: FragmentActivity,
         getAnchor: (() -> View?)? = null,
-        onActionClicked: ((data: UndoData) -> Unit)? = null
+        onActionClicked: ((data: UndoData) -> Unit)? = null,
     ) {
         snackBarFeedback.observe(activity) { (title, undoData) ->
             activity.showSnackbar(
