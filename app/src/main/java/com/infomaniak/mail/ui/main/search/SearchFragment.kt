@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
+import com.infomaniak.mail.utils.getMenuFolders
 
 class SearchFragment : Fragment() {
 
@@ -143,13 +144,11 @@ class SearchFragment : Fragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
         searchViewModel.folders.observe(viewLifecycleOwner) { realmFolders ->
-            val folders = mutableListOf<Folder?>()
+            val folders = mutableListOf<Folder?>(null)
 
-            folders.add(null)
-
-            realmFolders.forEach { folder ->
-                folders.add(folder)
-            }
+            val (common, custom) = realmFolders.getMenuFolders()
+            folders.addAll(common)
+            folders.addAll(custom)
 
             popupMenu.setAdapter(
                 SearchFolderAdapter(folders) { folder, title ->
@@ -158,7 +157,7 @@ class SearchFragment : Fragment() {
                 }
             )
 
-            // TODO : Cleanly separate elements and order them
+            // TODO : Cleanly separate elements ?
         }
         return popupMenu
     }
