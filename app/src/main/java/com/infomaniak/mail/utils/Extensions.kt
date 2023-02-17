@@ -233,12 +233,8 @@ fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> U
 //endregion
 
 //region Folders
-fun List<Folder>.getMenuFolders(): Triple<Folder?, List<Folder>, List<Folder>> {
+fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
     return toMutableList().let { list ->
-
-        val inbox = list
-            .find { it.role == Folder.FolderRole.INBOX }
-            ?.also(list::remove)
 
         val defaultFolders = list
             .filter { it.role != null }
@@ -250,7 +246,7 @@ fun List<Folder>.getMenuFolders(): Triple<Folder?, List<Folder>, List<Folder>> {
             .sortedByDescending { it.isFavorite }
             .formatFoldersListWithAllChildren()
 
-        Triple(inbox, defaultFolders, customFolders)
+        defaultFolders to customFolders
     }
 }
 //endregion
