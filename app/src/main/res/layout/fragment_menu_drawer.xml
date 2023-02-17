@@ -65,7 +65,7 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:scrollbars="none">
 
@@ -83,9 +83,9 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="@dimen/marginStandard"
                     android:paddingVertical="@dimen/marginStandardVerySmall"
-                    android:paddingStart="@dimen/marginStandardMedium">
+                    android:paddingStart="@dimen/marginStandardMedium"
+                    android:paddingEnd="@dimen/marginStandard">
 
                     <ImageView
                         android:id="@+id/selectedAddressIcon"
@@ -128,24 +128,17 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:id="@+id/mailboxExpandedSwitcher"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/addressesList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/addressesList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_switch_user_mailbox_menu_drawer" />
-
-            </LinearLayout>
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_switch_user_mailbox_menu_drawer"
+                tools:visibility="visible" />
 
             <com.google.android.material.divider.MaterialDivider
                 style="@style/MenuDrawerDivider"
@@ -165,6 +158,7 @@
                 android:id="@+id/defaultFoldersList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
                 android:overScrollMode="never"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="5"
@@ -192,6 +186,7 @@
                     android:id="@+id/customFoldersList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
                     android:overScrollMode="never"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="2"
