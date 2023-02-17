@@ -39,18 +39,15 @@ import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
-import com.infomaniak.mail.views.MenuDrawerItemView
 import kotlinx.coroutines.launch
 
 class MenuDrawerFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMenuDrawerBinding
 
-    override val inboxFolder: MenuDrawerItemView by lazy { binding.inboxFolder }
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
 
@@ -73,6 +70,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         displayVersion()
+        setupListeners()
 
         observeCurrentMailbox()
         observeMailboxesLive()
@@ -81,8 +79,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         observeQuotasLive()
     }
 
-    override fun setupListeners() = with(binding) {
-        super.setupListeners()
+    private fun setupListeners() = with(binding) {
 
         settingsButton.setOnClickListener {
             closeDrawer()
@@ -91,6 +88,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
+
         mailboxSwitcher.setOnClickListener {
             addressesList.apply {
                 isVisible = !isVisible
@@ -98,13 +96,16 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 mailboxSwitcherText.setTextAppearance(if (isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
             }
         }
+
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
+
         customFolders.setOnActionClickListener { // Create new folder
             safeNavigate(
                 directions = ThreadListFragmentDirections.actionThreadListFragmentToNewFolderDialog(),
                 currentClassName = MenuDrawerFragment::class.java.name,
             )
         }
+
         feedback.setOnClickListener {
             closeDrawer()
             if (AccountUtils.currentUser?.isStaff == true) {
@@ -124,17 +125,21 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 context.openUrl(BuildConfig.FEEDBACK_USER_REPORT)
             }
         }
+
         help.setOnClickListener {
             notYetImplemented()
             closeDrawer()
             menuDrawerSafeNavigate(R.id.helpFragment)
         }
+
         advancedActions.setOnClickListener { advancedActionsLayout.isGone = advancedActions.isCollapsed }
+
         importMails.setOnClickListener {
             closeDrawer()
             // TODO: Import mails
             notYetImplemented()
         }
+
         restoreMails.setOnClickListener {
             closeDrawer()
             // TODO: Restore mails
@@ -198,18 +203,13 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     private fun observeCurrentFolder() {
         mainViewModel.currentFolder.observeNotNull(viewLifecycleOwner) { folder ->
-            binding.inboxFolder.setSelectedState(folder.role == FolderRole.INBOX)
-
             defaultFoldersAdapter.updateSelectedState(folder.id)
             customFoldersAdapter.updateSelectedState(folder.id)
         }
     }
 
     private fun observeFoldersLive() = with(mainViewModel) {
-        currentFoldersLive.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
-
-            inboxFolderId = inbox?.id
-            inbox?.unreadCount?.let { inboxFolder.badge = it }
+        currentFoldersLive.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
 
             binding.noFolderText.isVisible = customFolders.isEmpty()
 

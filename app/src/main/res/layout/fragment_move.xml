@@ -79,15 +79,6 @@
                 android:animateLayoutChanges="true"
                 android:orientation="vertical">
 
-                <com.infomaniak.mail.views.MenuDrawerItemView
-                    android:id="@+id/inboxFolder"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_drawer_mailbox"
-                    app:selectionStyle="moveFragment"
-                    app:text="@string/inboxFolder"
-                    tools:badge="32" />
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/defaultFoldersList"
                     android:layout_width="match_parent"
