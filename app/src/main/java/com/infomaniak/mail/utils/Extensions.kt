@@ -239,6 +239,7 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
         val defaultFolders = list
             .filter { it.role != null }
             .sortedBy { it.role?.order }
+            .formatFoldersListWithAllChildren()
             .also(list::removeAll)
 
         val customFolders = list
