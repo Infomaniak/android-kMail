@@ -20,17 +20,16 @@ package com.infomaniak.mail.ui.main.thread
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.utils.showToast
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.utils.LocalStorageUtils
 import com.infomaniak.mail.utils.Utils
-import okhttp3.Request
 
 class MessageWebViewClient(
     private val context: Context,
@@ -41,15 +40,14 @@ class MessageWebViewClient(
 
         if (request?.url?.scheme == CID_SCHEME) {
             val cid = request.url.schemeSpecificPart
-            cidDictionary[cid]?.resource?.let { attachmentResource ->
-                val resourceUrl = "${BuildConfig.MAIL_API}${attachmentResource}"
-                val httpRequest = Request.Builder().url(resourceUrl).build()
-                val response = HttpClient.okHttpClient.newCall(httpRequest).execute()
-                return WebResourceResponse(
-                    null,
-                    response.header("content-encoding", Utils.UTF_8),
-                    response.body!!.byteStream(),
-                )
+            cidDictionary[cid]?.let { attachment ->
+                val cacheFile = attachment.getCacheFile(context)
+                if (!attachment.hasUsableCache(context, cacheFile)) {
+                    Log.d(TAG, "shouldInterceptRequest: cache ${attachment.name} with ${attachment.size}")
+                    LocalStorageUtils.saveAttachmentToCache(attachment.resource!!, cacheFile)
+                }
+                Log.i(TAG, "shouldInterceptRequest: load attachment ${attachment.name} from cache with ${cacheFile.length()}")
+                return WebResourceResponse(attachment.mimeType, Utils.UTF_8, cacheFile.inputStream())
             }
         }
 
@@ -71,6 +69,7 @@ class MessageWebViewClient(
     }
 
     private companion object {
+        val TAG = MessageWebViewClient::class.simpleName
         const val CID_SCHEME = "cid"
     }
 }

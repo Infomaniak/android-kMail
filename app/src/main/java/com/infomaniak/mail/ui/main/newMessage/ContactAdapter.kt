@@ -23,19 +23,26 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.databinding.ItemContactBinding
+import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactType.*
 import com.infomaniak.mail.ui.main.newMessage.ContactAdapter.ContactViewHolder
+import com.infomaniak.mail.utils.context
 
 @SuppressLint("NotifyDataSetChanged")
 class ContactAdapter(
     private val usedContacts: MutableSet<String>,
     private val onContactClicked: (item: MergedContact) -> Unit,
     private val onAddUnrecognizedContact: () -> Unit,
+    private val setSnackBar: (titleRes: Int) -> Unit,
 ) : RecyclerView.Adapter<ContactViewHolder>(), Filterable {
 
     private var allContacts: List<MergedContact> = emptyList()
     private var contacts = mutableListOf<MergedContact>()
+
+    private var displayAddUnknownContactButton = true
+    private var searchQuery = ""
 
     init {
         setHasStableIds(true)
@@ -45,7 +52,15 @@ class ContactAdapter(
         return ContactViewHolder(ItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return if (position < contacts.count()) KNOWN_CONTACT.id else UNKNOWN_CONTACT.id
+    }
+
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int): Unit = with(holder.binding) {
+        if (getItemViewType(position) == KNOWN_CONTACT.id) bindContact(position) else bindAddNewUser()
+    }
+
+    private fun ItemContactBinding.bindContact(position: Int) {
         val contact = contacts[position]
         userName.text = contact.name
         userEmail.text = contact.email
@@ -53,9 +68,18 @@ class ContactAdapter(
         root.setOnClickListener { onContactClicked(contact) }
     }
 
-    override fun getItemCount(): Int = contacts.count()
+    private fun ItemContactBinding.bindAddNewUser() {
+        userName.text = context.getString(R.string.addUnknownRecipientTitle)
+        userEmail.text = searchQuery
+        userAvatar.loadUnknownUserAvatar()
+        root.setOnClickListener {
+            if (usedContacts.contains(searchQuery)) setSnackBar(R.string.addUnknownRecipientAlreadyUsed) else onAddUnrecognizedContact()
+        }
+    }
 
-    override fun getItemId(position: Int): Long = contacts[position].id!!
+    override fun getItemCount(): Int = contacts.count() + if (displayAddUnknownContactButton) 1 else 0
+
+    override fun getItemId(position: Int) = if (getItemViewType(position) == KNOWN_CONTACT.id) contacts[position].id!! else 0
 
     fun addFirstAvailableItem() {
         contacts.firstOrNull()?.let(onContactClicked) ?: onAddUnrecognizedContact()
@@ -71,11 +95,17 @@ class ContactAdapter(
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val searchTerm = constraint?.standardize() ?: ""
 
-                val finalUserList = allContacts.filter {
+                val finalUserList = mutableListOf<MergedContact>()
+                displayAddUnknownContactButton = true
+                allContacts.forEach {
                     val standardizedEmail = it.email.standardize()
-                    val isFound = it.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm)
+                    val matches = it.name.standardize().contains(searchTerm) || standardizedEmail.contains(searchTerm)
+
+                    val displayNewContact = (matches && searchTerm == standardizedEmail && !usedContacts.contains(searchTerm))
+                    if (displayNewContact) displayAddUnknownContactButton = false
+
                     val isAlreadyUsed = usedContacts.contains(standardizedEmail)
-                    isFound && !isAlreadyUsed
+                    if (matches && !isAlreadyUsed) finalUserList.add(it)
                 }
 
                 return FilterResults().apply {
@@ -93,6 +123,7 @@ class ContactAdapter(
     }
 
     fun filterField(text: CharSequence) {
+        searchQuery = text.toString()
         filter.filter(text)
     }
 
@@ -104,6 +135,11 @@ class ContactAdapter(
 
     fun updateContacts(allContacts: List<MergedContact>) {
         this.allContacts = allContacts
+    }
+
+    private enum class ContactType(val id: Int) {
+        KNOWN_CONTACT(0),
+        UNKNOWN_CONTACT(1),
     }
 
     class ContactViewHolder(val binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root)

@@ -50,6 +50,7 @@ class NewMessageActivity : ThemedActivity() {
 
         handleOnBackPressed()
 
+        setupSnackBar()
         setupToolbar()
         setupEditorActions()
         setupEditorFormatActionsToggle()
@@ -61,6 +62,10 @@ class NewMessageActivity : ThemedActivity() {
         onBackPressedDispatcher.addCallback(this@NewMessageActivity) {
             if (isAutoCompletionOpened) newMessageFragment.closeAutoCompletion() else saveDraftAndShowToast(DraftAction.SAVE)
         }
+    }
+
+    private fun setupSnackBar() {
+        newMessageViewModel.snackBarManager.setup(this)
     }
 
     private fun setupToolbar() = with(binding) {

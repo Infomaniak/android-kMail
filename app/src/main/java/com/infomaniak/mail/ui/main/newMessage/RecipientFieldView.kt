@@ -52,6 +52,7 @@ class RecipientFieldView @JvmOverloads constructor(
     private var onToggle: ((isCollapsed: Boolean) -> Unit)? = null
     private var onContactRemoved: ((Recipient) -> Unit)? = null
     private var onContactAdded: ((Recipient) -> Unit)? = null
+    private var setSnackBar: ((Int) -> Unit) = {}
 
     private var isToggleable = false
     private var isCollapsed = true
@@ -104,8 +105,13 @@ class RecipientFieldView @JvmOverloads constructor(
                 onContactClicked = { addRecipient(it.email, it.name) },
                 onAddUnrecognizedContact = {
                     val input = autoCompleteInput.text.toString()
-                    if (input.isEmail()) addRecipient(email = input, name = input)
+                    if (input.isEmail()) {
+                        addRecipient(email = input, name = input)
+                    } else {
+                        setSnackBar(R.string.addUnknownRecipientInvalidEmail)
+                    }
                 },
+                setSnackBar = { setSnackBar(it) },
             )
 
             autoCompleteInput.apply {
@@ -208,6 +214,7 @@ class RecipientFieldView @JvmOverloads constructor(
         onContactAddedCallback: ((Recipient) -> Unit),
         onContactRemovedCallback: ((Recipient) -> Unit),
         onToggleCallback: ((isCollapsed: Boolean) -> Unit)? = null,
+        setSnackBarCallback: (titleRes: Int) -> Unit,
     ) {
         autoCompletedContacts = autoComplete
         autoCompletedContacts.adapter = contactAdapter
@@ -216,6 +223,8 @@ class RecipientFieldView @JvmOverloads constructor(
         onAutoCompletionToggled = onAutoCompletionToggledCallback
         onContactAdded = onContactAddedCallback
         onContactRemoved = onContactRemovedCallback
+
+        setSnackBar = setSnackBarCallback
     }
 
     fun clearField() {

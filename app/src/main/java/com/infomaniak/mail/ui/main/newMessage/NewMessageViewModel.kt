@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.draft.Draft.Companion.INFOMANIAK_SIGNATUR
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.*
@@ -65,6 +66,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
     val isSendingAllowed = MutableLiveData(false)
+    val snackBarManager by lazy { SnackBarManager() }
 
     private var snapshot: DraftSnapshot? = null
 
@@ -267,7 +269,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
         if (fileSize > availableSpace) return null to true
 
-        return LocalStorageUtils.copyDataToAttachmentsCache(getApplication(), uri, fileName, draft.localUuid)
+        return LocalStorageUtils.saveUploadAttachment(getApplication(), uri, fileName, draft.localUuid)
             ?.let { file ->
                 val mimeType = file.path.guessMimeType()
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false

@@ -41,8 +41,8 @@
 
             <com.infomaniak.mail.views.AvatarView
                 android:id="@+id/userAvatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/userAvatarSizeLarge"
+                android:layout_height="@dimen/userAvatarSizeLarge"
                 android:layout_marginBottom="@dimen/marginStandardVerySmall"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

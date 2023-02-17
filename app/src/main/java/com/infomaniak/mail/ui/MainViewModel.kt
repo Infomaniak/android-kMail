@@ -39,6 +39,8 @@ import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.ui.main.SnackBarManager
+import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
@@ -62,7 +64,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
-    val snackbarFeedback = SingleLiveEvent<Pair<String, UndoData?>>()
+    val snackBarManager by lazy { SnackBarManager() }
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var forceRefreshJob: Job? = null
@@ -379,7 +381,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             context.getString(RCore.string.anErrorHasOccurred)
         }
 
-        snackbarFeedback.postValue(snackbarTitle to undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
+        snackBarManager.postValue(snackbarTitle, undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) })
     }
     //endregion
 
@@ -424,7 +426,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val undoData = apiResponse.data?.undoResource?.let { UndoData(it, undoFoldersIds, undoDestinationId) }
-        snackbarFeedback.postValue(snackbarTitle to undoData)
+        snackBarManager.postValue(snackbarTitle, undoData)
     }
 
     private fun getMessagesToMove(thread: Thread, message: Message?) = when (message) {
@@ -526,7 +528,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 RCore.string.anErrorHasOccurred
             }
 
-            snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
+            snackBarManager.postValue(context.getString(snackbarTitle))
         }
     }
 
@@ -542,7 +544,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             RCore.string.anErrorHasOccurred
         }
 
-        snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
+        snackBarManager.postValue(context.getString(snackbarTitle))
     }
 
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
@@ -550,12 +552,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
-
-    data class UndoData(
-        val resource: String,
-        val foldersIds: List<String>,
-        val destinationFolderId: String?,
-    )
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName

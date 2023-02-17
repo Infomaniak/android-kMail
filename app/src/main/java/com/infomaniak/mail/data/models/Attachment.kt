@@ -77,6 +77,15 @@ class Attachment : EmbeddedRealmObject {
         else -> AttachmentType.UNKNOWN
     }
 
+    fun hasUsableCache(
+        context: Context, cacheFile: File? = null,
+        userId: Int = AccountUtils.currentUserId,
+        mailboxId: Int = AccountUtils.currentMailboxId,
+    ): Boolean {
+        val file = cacheFile ?: getCacheFile(context, userId, mailboxId)
+        return file.exists() && file.length() == size
+    }
+
     fun getCacheFile(
         context: Context,
         userId: Int = AccountUtils.currentUserId,

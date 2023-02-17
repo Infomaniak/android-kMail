@@ -28,6 +28,7 @@ import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -39,6 +40,7 @@ import androidx.viewbinding.ViewBinding
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
@@ -47,6 +49,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
@@ -257,3 +260,20 @@ fun List<Message>.getFoldersIds(exception: String? = null) = mapNotNull { if (it
 
 fun List<Message>.getUids(): List<String> = map { it.uid }
 //endregion
+
+fun Fragment.createDescriptionDialog(
+    title: String,
+    description: String,
+    @StringRes confirmButtonText: Int = R.string.buttonConfirm,
+    onPositiveButtonClicked: () -> Unit,
+) = with(DialogDescriptionBinding.inflate(layoutInflater)) {
+
+    dialogTitle.text = title
+    dialogDescription.text = description
+
+    MaterialAlertDialogBuilder(context)
+        .setView(root)
+        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
+        .setNegativeButton(R.string.buttonCancel, null)
+        .create()
+}

@@ -152,6 +152,7 @@ class NewMessageFragment : Fragment() {
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, TO) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, TO) },
             onToggleCallback = ::openAdvancedFields,
+            setSnackBarCallback = ::setSnackBar,
         )
 
         ccField.initRecipientField(
@@ -159,6 +160,7 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(CC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, CC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, CC) },
+            setSnackBarCallback = ::setSnackBar,
         )
 
         bccField.initRecipientField(
@@ -166,12 +168,17 @@ class NewMessageFragment : Fragment() {
             onAutoCompletionToggledCallback = { hasOpened -> toggleAutoCompletion(BCC, hasOpened) },
             onContactAddedCallback = { newMessageViewModel.addRecipientToField(it, BCC) },
             onContactRemovedCallback = { newMessageViewModel.removeRecipientFromField(it, BCC) },
+            setSnackBarCallback = ::setSnackBar,
         )
     }
 
     private fun openAdvancedFields(isCollapsed: Boolean) = with(binding) {
         cc.isGone = isCollapsed
         bcc.isGone = isCollapsed
+    }
+
+    private fun setSnackBar(titleRes: Int) {
+        newMessageViewModel.snackBarManager.setValue(getString(titleRes))
     }
 
     private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {

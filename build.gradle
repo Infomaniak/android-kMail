@@ -4,7 +4,7 @@ buildscript {
     ext.navigation_version = '2.5.3'
     ext.java_version = JavaVersion.VERSION_1_8
     // Realm Kotlin PRODUCTION
-    ext.realm_kotlin_version = '1.6.0'
+    ext.realm_kotlin_version = '1.6.1'
     // Realm Kotlin SNAPSHOT
     // ext.realm_kotlin_version = '1.7.0-SNAPSHOT' // https://github.com/realm/realm-kotlin/blob/master/buildSrc/src/main/kotlin/Config.kt
 
