@@ -50,7 +50,10 @@ class SearchViewModel : ViewModel() {
 
     private var fetchThreadsJob: Job? = null
 
-    val searchResults = observeSearchAndFilters().switchMap { (query, filters) -> fetchThreads(query, filters) }
+    val searchResults = observeSearchAndFilters().switchMap { (query, filters) ->
+        val searchQuery = if (query != null && query.length < MIN_SEARCH_QUERY) null else query
+        fetchThreads(searchQuery, filters)
+    }
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
 
     val hasNextPage get() = !resourceNext.isNullOrBlank()
@@ -160,6 +163,10 @@ class SearchViewModel : ViewModel() {
 
     private companion object {
         val TAG = SearchViewModel::class.simpleName
+        /**
+         * The minimum value allowed for a search query
+         */
+        const val MIN_SEARCH_QUERY = 3
     }
 
 }
