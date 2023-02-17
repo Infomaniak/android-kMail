@@ -39,6 +39,8 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
 import java.util.Date
 import kotlin.math.min
@@ -261,7 +263,25 @@ object MessageController {
 
         messages.forEach { message ->
 
-            if (!folder.messages.contains(message)) folder.messages.add(message)
+            if (folder.messages.contains(message)) {
+                val localMessage = folder.messages.first { it.uid == message.uid }
+                Sentry.withScope { scope ->
+                    scope.level = SentryLevel.ERROR
+                    scope.setExtra("folder.id", folder.id)
+                    scope.setExtra("localMessage.folderId", localMessage.folderId)
+                    scope.setExtra("message.folderId", message.folderId)
+                    scope.setExtra("uid", localMessage.uid)
+                    scope.setExtra("Local messageId", "${localMessage.messageId}")
+                    scope.setExtra("New messageId", "${message.messageId}")
+                    if (localMessage.messageId == message.messageId) {
+                        Sentry.captureMessage("Same message id")
+                    } else {
+                        Sentry.captureMessage("Same message uid")
+                    }
+                }
+            } else {
+                folder.messages.add(message)
+            }
 
             message.initMessageIds()
             message.isSpam = folder.role == FolderRole.SPAM
