@@ -235,7 +235,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     fun onDrawerOpened() {
         canNavigate = true
-        mainViewModel.forceRefreshMailboxes()
+        mainViewModel.forceRefreshMenuDrawerData()
         trackScreen()
     }
 

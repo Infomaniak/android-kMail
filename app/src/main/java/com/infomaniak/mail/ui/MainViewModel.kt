@@ -178,11 +178,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         DraftsActionsWorker.scheduleWork(context)
     }
 
-    fun forceRefreshMailboxes() = viewModelScope.launch(viewModelScope.handlerIO) {
+    fun forceRefreshMenuDrawerData() = viewModelScope.launch(viewModelScope.handlerIO) {
+
         Log.d(TAG, "Force refresh mailboxes")
         val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
         MailboxController.updateMailboxes(context, mailboxes)
-        updateCurrentMailboxQuotas()
+
+        Log.d(TAG, "Force refresh quotas")
+        val mailbox = currentMailbox.value ?: return@launch
+        updateMailboxQuotas(mailbox)
+
+        Log.d(TAG, "Force refresh folders")
+        updateFolders(mailbox)
     }
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch {
@@ -191,8 +198,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun updateCurrentMailboxQuotas() {
-        val mailbox = currentMailbox.value ?: return
+    private fun updateMailboxQuotas(mailbox: Mailbox) {
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
