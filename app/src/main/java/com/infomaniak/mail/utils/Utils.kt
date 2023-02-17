@@ -20,6 +20,8 @@ package com.infomaniak.mail.utils
 import android.content.Context
 import androidx.annotation.RawRes
 import com.infomaniak.mail.data.models.Folder
+import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.Sort
 import org.jsoup.Jsoup
 import java.nio.charset.StandardCharsets
 import java.util.Scanner
@@ -41,7 +43,7 @@ object Utils {
 
             val firstFolder = inputList.removeFirst()
             outputList.add(firstFolder)
-            inputList.addAll(0, firstFolder.children)
+            inputList.addAll(0, firstFolder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
 
             return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
         }

@@ -31,6 +31,7 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 
@@ -40,7 +41,10 @@ object FolderController {
 
     //region Queries
     private fun getFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-        return realm.query()
+        return realm
+            .query<Folder>("${Folder.parentsPropertyName}.@count == 0")
+            .sort(Folder::name.name, Sort.ASCENDING)
+            .sort(Folder::isFavorite.name, Sort.DESCENDING)
     }
 
     private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
@@ -72,7 +76,7 @@ object FolderController {
     }
 
     fun getFolder(role: FolderRole, realm: TypedRealm = defaultRealm): Folder? {
-        return getFolderQuery(Folder::_role.name, role.name, realm).find()
+        return getFolderQuery(Folder.rolePropertyName, role.name, realm).find()
     }
 
     fun getFolderAsync(id: String): Flow<Folder> {
