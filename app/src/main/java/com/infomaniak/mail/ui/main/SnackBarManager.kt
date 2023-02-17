@@ -23,30 +23,29 @@ import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 
 class SnackBarManager {
-    private val snackBarFeedback = SingleLiveEvent<SnackBarData>()
+    private val snackBarFeedback = SingleLiveEvent<Pair<String, UndoData?>>()
 
-    fun setup(activity: FragmentActivity, getAnchor: (() -> View?)? = null, onActionClicked: ((data: UndoData) -> Unit)? = null) {
-        snackBarFeedback.observe(activity) {
+    fun setup(
+        activity: FragmentActivity,
+        getAnchor: (() -> View?)? = null,
+        onActionClicked: ((data: UndoData) -> Unit)? = null
+    ) {
+        snackBarFeedback.observe(activity) { (title, undoData) ->
             activity.showSnackbar(
-                it.title,
+                title,
                 getAnchor?.invoke(),
-                onActionClicked = it.undoData?.let { data -> { onActionClicked?.invoke(data) } }
+                onActionClicked = undoData?.let { data -> { onActionClicked?.invoke(data) } },
             )
         }
     }
 
     fun setValue(title: String, undoData: UndoData? = null) {
-        snackBarFeedback.value = SnackBarData(title, undoData)
+        snackBarFeedback.value = title to undoData
     }
 
     fun postValue(title: String, undoData: UndoData? = null) {
-        snackBarFeedback.postValue(SnackBarData(title, undoData))
+        snackBarFeedback.postValue(title to undoData)
     }
-
-    private data class SnackBarData(
-        val title: String,
-        val undoData: UndoData?
-    )
 
     data class UndoData(
         val resource: String,
