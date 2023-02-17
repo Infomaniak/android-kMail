@@ -92,11 +92,11 @@ class MenuDrawerFragment : MenuFoldersFragment() {
             )
         }
         mailboxSwitcher.setOnClickListener {
-            mailboxExpandedSwitcher.apply {
+            addressesList.apply {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
+                mailboxSwitcherText.setTextAppearance(if (isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
             }
-            mailboxSwitcherText.setTextAppearance(if (mailboxExpandedSwitcher.isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
         }
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
         customFolders.setOnActionClickListener { // Create new folder
@@ -245,7 +245,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     fun closeDropdowns(): Unit = with(binding) {
-        mailboxExpandedSwitcher.isGone = true
+        addressesList.isGone = true
         mailboxExpandButton.rotation = ResourcesCompat.getFloat(resources, R.dimen.angleViewNotRotated)
         customFoldersLayout.isVisible = true
         customFolders.setIsCollapsed(false)

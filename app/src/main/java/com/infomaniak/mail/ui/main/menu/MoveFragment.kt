@@ -58,11 +58,6 @@ class MoveFragment : MenuFoldersFragment() {
         iconAddFolder.setOnClickListener { safeNavigate(MoveFragmentDirections.actionMoveFragmentToNewFolderDialog()) }
     }
 
-    override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
-        mainViewModel.moveTo(folderId, threadUid, messageUid)
-        findNavController().popBackStack()
-    }
-
     private fun observeFolders() = with(navigationArgs) {
         moveViewModel.currentFolders.observe(viewLifecycleOwner) { (inbox, defaultFolders, customFolders) ->
 
@@ -72,5 +67,10 @@ class MoveFragment : MenuFoldersFragment() {
             defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
             customFoldersAdapter.setFolders(customFolders, folderId)
         }
+    }
+
+    override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
+        mainViewModel.moveTo(folderId, threadUid, messageUid)
+        findNavController().popBackStack()
     }
 }
