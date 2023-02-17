@@ -19,7 +19,6 @@ package com.infomaniak.mail.data.cache.mailboxContent
 
 import android.util.Log
 import com.infomaniak.mail.data.cache.RealmDatabase
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController.deleteMessages
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -120,8 +119,8 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteLocalFolder(folder: Folder) {
-        deleteMessages(folder.messages)
-        ThreadController.deleteThreads(folder, realm = this)
+        if (folder.messages.isNotEmpty()) delete(folder.messages)
+        if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }
 
