@@ -65,6 +65,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
     val isSendingAllowed = MutableLiveData(false)
+    val snackbarFeedback = SingleLiveEvent<String>()
 
     private var snapshot: DraftSnapshot? = null
 

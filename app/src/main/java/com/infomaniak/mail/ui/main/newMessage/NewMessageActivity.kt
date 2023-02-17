@@ -25,6 +25,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.databinding.ActivityNewMessageBinding
@@ -55,6 +56,7 @@ class NewMessageActivity : ThemedActivity() {
         setupEditorFormatActionsToggle()
 
         observeCloseActivity()
+        observeSnackBar()
     }
 
     private fun handleOnBackPressed() = with(newMessageViewModel) {
@@ -86,6 +88,12 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun observeCloseActivity() {
         newMessageViewModel.shouldCloseActivity.observeNotNull(this) { if (it) finish() }
+    }
+
+    private fun observeSnackBar() {
+        newMessageViewModel.snackbarFeedback.observe(this) { title ->
+            showSnackbar(title)
+        }
     }
 
     private fun setupEditorActions() = with(binding) {
