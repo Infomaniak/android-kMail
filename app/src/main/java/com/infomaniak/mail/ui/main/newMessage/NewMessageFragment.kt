@@ -178,7 +178,7 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun setSnackBar(titleRes: Int) {
-        newMessageViewModel.snackbarFeedback.value = getString(titleRes)
+        newMessageViewModel.snackBarManager.setValue(getString(titleRes))
     }
 
     private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {

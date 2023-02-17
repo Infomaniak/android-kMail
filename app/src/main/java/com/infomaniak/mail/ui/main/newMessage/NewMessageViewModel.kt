@@ -38,6 +38,7 @@ import com.infomaniak.mail.data.models.draft.Draft.Companion.INFOMANIAK_SIGNATUR
 import com.infomaniak.mail.data.models.draft.Draft.DraftAction
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.draft.Priority
+import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.*
@@ -65,7 +66,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     val shouldCloseActivity = SingleLiveEvent<Boolean?>()
     val isSendingAllowed = MutableLiveData(false)
-    val snackbarFeedback = SingleLiveEvent<String>()
+    val snackBarManager by lazy { SnackBarManager() }
 
     private var snapshot: DraftSnapshot? = null
 
