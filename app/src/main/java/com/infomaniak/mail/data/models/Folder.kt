@@ -96,6 +96,11 @@ class Folder : RealmObject {
         return role?.folderNameRes?.let(context::getString) ?: name
     }
 
+    @DrawableRes
+    fun getIcon(): Int {
+        return role?.folderIconRes ?: if (isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder
+    }
+
     enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
         INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 0),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4),

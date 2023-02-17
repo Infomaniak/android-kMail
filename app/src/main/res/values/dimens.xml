@@ -30,6 +30,7 @@
     <dimen name="userAvatarSizeLarge">40dp</dimen>
     <dimen name="messageDividerHeight">6dp</dimen>
     <dimen name="mediumIconSize">16dp</dimen>
+    <dimen name="maxSearchChipWidth">300dp</dimen>
 
     <!-- Menu Drawer -->
 

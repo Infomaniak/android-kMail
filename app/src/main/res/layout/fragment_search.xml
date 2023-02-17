@@ -94,46 +94,15 @@
                     android:text="@string/searchFilterAttachment"
                     tools:checked="true" />
 
-                <!--<com.google.android.material.textfield.TextInputLayout-->
-                <!--    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
-                <!--    android:layout_width="match_parent"-->
-                <!--    android:layout_height="wrap_content"-->
-                <!--    app:boxStrokeColor="@color/chip_unread_text_color"-->
-                <!--    app:boxStrokeWidth="1dp"-->
-                <!--    app:boxStrokeWidthFocused="1dp"-->
-                <!--    app:endIconMode="none"-->
-                <!--    app:endIconTint="@color/chip_unread_text_color"-->
-                <!--    app:shapeAppearanceOverlay="@style/CircleImageView"-->
-                <!--    app:startIconCheckable="true">-->
-
-                <!--    <com.google.android.material.textfield.MaterialAutoCompleteTextView-->
-                <!--        android:id="@+id/folderDropDown"-->
-                <!--        style="@style/BodyMedium.Accent"-->
-                <!--        android:layout_width="match_parent"-->
-                <!--        android:layout_height="32dp"-->
-                <!--        android:layout_gravity="center_vertical"-->
-                <!--        android:backgroundTint="?attr/colorPrimaryContainer"-->
-                <!--        android:drawableStart="@drawable/ic_check_sharp"-->
-                <!--        android:drawableEnd="@drawable/ic_chevron_down"-->
-                <!--        android:drawablePadding="@dimen/marginStandardSmall"-->
-                <!--        android:drawableTint="@color/chip_unread_text_color"-->
-                <!--        android:inputType="none"-->
-                <!--        android:paddingVertical="0dp"-->
-                <!--        android:paddingStart="@dimen/marginStandardSmall"-->
-                <!--        android:text="@string/searchFilterFolder"-->
-                <!--        app:simpleItems="@array/bugTrackerPriorityArray" />-->
-
-                <!--</com.google.android.material.textfield.TextInputLayout>-->
-
                 <com.google.android.material.chip.Chip
                     android:id="@+id/folderDropDown"
                     style="@style/SearchFilterChip"
                     android:ellipsize="end"
-                    android:maxWidth="250dp"
+                    android:maxWidth="@dimen/maxSearchChipWidth"
                     android:text="@string/searchFilterFolder"
                     app:closeIcon="@drawable/ic_chevron_down" />
-            </LinearLayout>
 
+            </LinearLayout>
         </HorizontalScrollView>
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -19,10 +19,10 @@ package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
+import android.widget.ListPopupWindow
+import android.widget.PopupWindow
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
@@ -56,7 +56,6 @@ class SearchFragment : Fragment() {
             {}
         )
     }
-    private val folders = mutableListOf<Folder?>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSearchBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -92,8 +91,6 @@ class SearchFragment : Fragment() {
             recentSearchesLayout.isGone = true
             mailRecyclerView.isVisible = mode == VisibilityMode.RESULTS
             noResultsEmptyState.isGone = mode == VisibilityMode.RESULTS
-
-
         }
 
         when (mode) {
@@ -113,21 +110,12 @@ class SearchFragment : Fragment() {
         val popupMenu = createPopupMenu()
 
         folderDropDown.setOnClickListener {
-            folderDropDown.isChecked =
-                !folderDropDown.isChecked // Cancels the auto check // TODO : any better solution ? -> button ?
+            // TODO : any better solution ? -> button ?
+            folderDropDown.isChecked = !folderDropDown.isChecked // Cancels the auto check
             popupMenu.show()
         }
 
-        popupMenu.setOnMenuItemClickListener {
-            folderDropDown.apply {
-                text = it.title
-                isChecked = it.itemId != 0
-            }
-            searchViewModel.selectFolder(folders[it.itemId])
-            true
-        }
-
-        attachments.setOnCheckedChangeListener { _, isChecked ->
+        attachments.setOnCheckedChangeListener { _, _ ->
             searchViewModel.toggleFilter(ThreadFilter.ATTACHMENTS)
         }
 
@@ -147,23 +135,40 @@ class SearchFragment : Fragment() {
         mailRecyclerView.adapter = threadAdapter
     }
 
-    private fun createPopupMenu(): PopupMenu = with(binding) {
-        val popupMenu = PopupMenu(context, folderDropDown)
+    private fun createPopupMenu(): ListPopupWindow = with(binding) {
+        val popupMenu = ListPopupWindow(requireContext()).apply {
+            isModal = true
+            inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
+            anchorView = folderDropDown
+            width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
+        }
         searchViewModel.folders.observe(viewLifecycleOwner) { realmFolders ->
-            folders.clear()
+            val folders = mutableListOf<Folder?>()
 
             folders.add(null)
-            popupMenu.menu.add(Menu.NONE, folders.lastIndex, Menu.NONE, getString(R.string.searchFilterFolder))
 
             realmFolders.forEach { folder ->
                 folders.add(folder)
-                popupMenu.menu.add(Menu.NONE, folders.lastIndex, Menu.NONE, folder.getLocalizedName(requireContext()))
             }
 
+            popupMenu.setAdapter(
+                SearchFolderAdapter(folders) { folder, title ->
+                    onFolderSelected(folder, title)
+                    popupMenu.dismiss()
+                }
+            )
+
             // TODO : Cleanly separate elements and order them
-            // TODO : popupMenu.menu.getItem(0).icon
         }
         return popupMenu
+    }
+
+    private fun onFolderSelected(folder: Folder?, title: String) = with(binding) {
+        folderDropDown.apply {
+            text = title
+            isChecked = folder != null
+        }
+        searchViewModel.selectFolder(folder)
     }
 
     private fun observeFolders() {
