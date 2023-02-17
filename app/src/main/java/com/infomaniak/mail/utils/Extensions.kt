@@ -244,6 +244,7 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
 
         val customFolders = list
             .filter { it.parent == null }
+            .sortedBy { it.name }
             .sortedByDescending { it.isFavorite }
             .formatFoldersListWithAllChildren()
 
