@@ -39,8 +39,6 @@ import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmSingleQuery
 import io.realm.kotlin.query.Sort
-import io.sentry.Sentry
-import io.sentry.SentryLevel
 import okhttp3.OkHttpClient
 import java.util.Date
 import kotlin.math.min
@@ -175,8 +173,8 @@ object MessageController {
 
         val updatedThreads = handleMessagesUids(messagesUids, folder, mailbox, okHttpClient, realm)
 
-        SentryDebug.sendOrphanMessagesSentry(previousCursor, folder, realm)
-        SentryDebug.sendOrphanThreadsSentry(previousCursor, folder, realm)
+        SentryDebug.sendOrphanMessages(previousCursor, folder, realm)
+        SentryDebug.sendOrphanThreads(previousCursor, folder, realm)
 
         return updatedThreads
     }
@@ -243,7 +241,7 @@ object MessageController {
                         val threads = createMultiMessagesThreads(messages, findLatest(folder)!!)
                         newMessagesThreads.addAll(threads)
                     }
-                    SentryDebug.sendMissingMessagesSentry(page, messages, folder, newCursor)
+                    SentryDebug.sendMissingMessages(page, messages, folder, newCursor)
                 }
 
                 pageStart += pageSize
@@ -265,27 +263,7 @@ object MessageController {
 
             val existingMessage = folder.messages.firstOrNull { it.uid == message.uid }
             if (existingMessage != null) {
-                Sentry.withScope { scope ->
-                    scope.level = SentryLevel.ERROR
-                    scope.setExtra("folder.id", folder.id)
-                    scope.setExtra("existingMessage.folderId", existingMessage.folderId)
-                    scope.setExtra("message.folderId", message.folderId)
-                    scope.setExtra("uid", existingMessage.uid)
-                    scope.setExtra("Existing messageId", "${existingMessage.messageId}")
-                    scope.setExtra("New messageId", "${message.messageId}")
-                    if (existingMessage.messageId == message.messageId) {
-                        Sentry.captureMessage("Same message id")
-                    } else {
-                        Sentry.captureMessage("Same message uid")
-                    }
-                }
-                Log.d("FolderSingle", "Message's Folder list has more than one element.")
-                Log.d("FolderSingle", "existingMessage.uid: ${existingMessage.uid}")
-                Log.d("FolderSingle", "folder.id: ${folder.id} | folderName: ${folder.name}")
-                Log.d("FolderSingle", "existingMessage.folderId: ${existingMessage.folderId}")
-                Log.d("FolderSingle", "message.folderId: ${message.folderId}")
-                Log.d("FolderSingle", "existingMessage.messageId: ${existingMessage.messageId}")
-                Log.d("FolderSingle", "message.messageId: ${message.messageId}")
+                SentryDebug.sendAlreadyExistingMessage(folder, existingMessage, message)
                 return@forEach
             }
 

@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
 import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
+import com.infomaniak.mail.utils.SentryDebug
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -47,7 +48,10 @@ object ApiRepository : ApiRepositoryCore() {
         method: ApiController.ApiMethod,
         body: Any? = null,
         okHttpClient: OkHttpClient = HttpClient.okHttpClient,
-    ): T = ApiController.callApi(url, method, body, okHttpClient, true)
+    ): T {
+        SentryDebug.addUrlBreadcrumb(url)
+        return ApiController.callApi(url, method, body, okHttpClient, true)
+    }
 
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
