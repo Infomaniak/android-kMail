@@ -263,25 +263,33 @@ object MessageController {
 
         messages.forEach { message ->
 
-            if (folder.messages.contains(message)) {
-                val localMessage = folder.messages.first { it.uid == message.uid }
+            val existingMessage = folder.messages.firstOrNull { it.uid == message.uid }
+            if (existingMessage != null) {
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.ERROR
                     scope.setExtra("folder.id", folder.id)
-                    scope.setExtra("localMessage.folderId", localMessage.folderId)
+                    scope.setExtra("existingMessage.folderId", existingMessage.folderId)
                     scope.setExtra("message.folderId", message.folderId)
-                    scope.setExtra("uid", localMessage.uid)
-                    scope.setExtra("Local messageId", "${localMessage.messageId}")
+                    scope.setExtra("uid", existingMessage.uid)
+                    scope.setExtra("Existing messageId", "${existingMessage.messageId}")
                     scope.setExtra("New messageId", "${message.messageId}")
-                    if (localMessage.messageId == message.messageId) {
+                    if (existingMessage.messageId == message.messageId) {
                         Sentry.captureMessage("Same message id")
                     } else {
                         Sentry.captureMessage("Same message uid")
                     }
                 }
-            } else {
-                folder.messages.add(message)
+                Log.d("FolderSingle", "Message's Folder list has more than one element.")
+                Log.d("FolderSingle", "existingMessage.uid: ${existingMessage.uid}")
+                Log.d("FolderSingle", "folder.id: ${folder.id} | folderName: ${folder.name}")
+                Log.d("FolderSingle", "existingMessage.folderId: ${existingMessage.folderId}")
+                Log.d("FolderSingle", "message.folderId: ${message.folderId}")
+                Log.d("FolderSingle", "existingMessage.messageId: ${existingMessage.messageId}")
+                Log.d("FolderSingle", "message.messageId: ${message.messageId}")
+                return@forEach
             }
+
+            folder.messages.add(message)
 
             message.initMessageIds()
             message.isSpam = folder.role == FolderRole.SPAM

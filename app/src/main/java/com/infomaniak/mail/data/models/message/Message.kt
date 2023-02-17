@@ -221,12 +221,4 @@ class Message : RealmObject {
         uid = this@Message.uid
         folderId = this@Message.folderId
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Message || uid != other.uid) return false
-        return true
-    }
-
-    override fun hashCode(): Int = uid.hashCode()
 }
