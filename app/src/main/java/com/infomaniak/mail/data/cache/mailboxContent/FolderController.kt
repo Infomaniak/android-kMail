@@ -50,9 +50,9 @@ object FolderController {
      * So if this sort logic changes, it needs to be changed in both locations.
      * The other location is in `Utils.formatFoldersListWithAllChildren()`.
      */
-    private fun getFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+    private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = true): RealmQuery<Folder> {
         return realm
-            .query<Folder>("$isNotSearch AND ${Folder.parentsPropertyName}.@count == 0")
+            .query<Folder>("$isNotSearch${if (onlyRoots) " AND ${Folder.parentsPropertyName}.@count == 0" else ""}")
             .sort(Folder::name.name, Sort.ASCENDING)
             .sort(Folder::isFavorite.name, Sort.DESCENDING)
     }
@@ -80,6 +80,21 @@ object FolderController {
         return realmQuery.find()
     }
 
+    fun getFolders(): List<Folder> {
+        fun List<Folder>.sortWithFoldersRoles(): List<Folder> {
+            return sortedWith(Comparator { firstFolder, secondFolder ->
+                val (firstRole, secondRole) = firstFolder.role to secondFolder.role
+                return@Comparator when {
+                    firstRole != null && secondRole != null -> firstRole.order.compareTo(secondRole.order)
+                    firstRole != null -> -1
+                    secondRole != null -> 1
+                    else -> 0
+                }
+            })
+        }
+
+        return getFoldersQuery(defaultRealm, false).find().sortWithFoldersRoles()
+    }
 
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(defaultRealm).asFlow()
