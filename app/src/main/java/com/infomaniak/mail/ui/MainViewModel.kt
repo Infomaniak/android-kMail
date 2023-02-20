@@ -78,7 +78,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }.asLiveData(Dispatchers.IO)
 
     val currentFoldersLive = _currentMailboxObjectId.flatMapLatest {
-        it?.let { FolderController.getFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
+        it?.let { FolderController.getRootsFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {

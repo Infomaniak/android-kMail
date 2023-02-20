@@ -28,5 +28,5 @@ class MoveViewModel : ViewModel() {
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
 
-    val currentFolders = liveData(coroutineContext) { emit(FolderController.getFolders().getMenuFolders()) }
+    val currentFolders = liveData(coroutineContext) { emit(FolderController.getRootsFolders().getMenuFolders()) }
 }

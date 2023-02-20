@@ -68,7 +68,10 @@ object FolderController {
     //endregion
 
     //region Get data
-    fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm = defaultRealm): RealmResults<Folder> {
+    fun getRootsFolders(
+        exceptionsFoldersIds: List<String> = emptyList(),
+        realm: TypedRealm = defaultRealm,
+    ): RealmResults<Folder> {
         val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
             getFoldersQuery(realm)
         } else {
@@ -77,7 +80,8 @@ object FolderController {
         return realmQuery.find()
     }
 
-    fun getFoldersAsync(): Flow<ResultsChange<Folder>> {
+
+    fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(defaultRealm).asFlow()
     }
 
@@ -130,7 +134,7 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {
-        getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
+        getRootsFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
             deleteLocalFolder(folder)
         }
     }
