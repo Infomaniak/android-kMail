@@ -61,12 +61,8 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
-            archive.apply {
-                setText(R.string.actionMoveToInbox)
-                setIconResource(R.drawable.ic_drawer_inbox)
-            }
-        }
+        
+        setArchiveUi()
 
         archive.setClosingOnClickListener { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener { onClickListener.onReadUnread() }
@@ -112,6 +108,13 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
         setIconResource(favoriteIconRes)
         setText(favoriteText)
+    }
+
+    private fun setArchiveUi() = with(binding.archive) {
+        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
+            setIconResource(R.drawable.ic_drawer_inbox)
+            setText(R.string.actionMoveToInbox)
+        }
     }
 
     private fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {
