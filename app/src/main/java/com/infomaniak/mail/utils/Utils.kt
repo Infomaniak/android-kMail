@@ -32,6 +32,11 @@ object Utils {
     const val TEXT_HTML: String = "text/html"
     const val MAX_NUMBER_OF_MESSAGES_TO_FETCH: Int = 500
 
+    /**
+     * The `sortByName` for Folders is done twice in the app, but it's not factorisable.
+     * So if this sort logic changes, it needs to be changed in both locations.
+     * The other location is in `FolderController.getFoldersQuery()`.
+     */
     fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
 
         if (isEmpty()) return this

@@ -40,6 +40,11 @@ object FolderController {
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
     //region Queries
+    /**
+     * The `sortByName` for Folders is done twice in the app, but it's not factorisable.
+     * So if this sort logic changes, it needs to be changed in both locations.
+     * The other location is in `Utils.formatFoldersListWithAllChildren()`.
+     */
     private fun getFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
         return realm
             .query<Folder>("${Folder.parentsPropertyName}.@count == 0")
