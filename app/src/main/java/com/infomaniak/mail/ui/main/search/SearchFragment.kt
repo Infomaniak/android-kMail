@@ -33,8 +33,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
+import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -161,7 +166,8 @@ class SearchFragment : Fragment() {
 
         folderDropDown.setOnClickListener { popupMenu.show() }
         updateFolderDropDownUi(
-            searchViewModel.selectedFolder, requireContext().getLocalizedNameOrAllFolders(searchViewModel.selectedFolder)
+            folder = searchViewModel.selectedFolder,
+            title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.selectedFolder)
         )
 
         attachments.setOnCheckedChangeListener { _, _ ->
@@ -216,6 +222,7 @@ class SearchFragment : Fragment() {
             disableSwipeDirection(DirectionFlag.LEFT)
             disableSwipeDirection(DirectionFlag.RIGHT)
             addStickyDateDecoration(threadListAdapter)
+            setPagination()
         }
 
         recentSearchesRecyclerView.adapter = recentSearchAdapter
@@ -259,6 +266,30 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun DragDropSwipeRecyclerView.setPagination() = with(binding) {
+        scrollListener = object : OnListScrollListener {
+            override fun onListScrollStateChanged(scrollState: ScrollState) = Unit
+
+            override fun onListScrolled(
+                scrollDirection: ScrollDirection,
+                distance: Int
+            ) = with(mailRecyclerView.layoutManager!!) {
+                if (scrollDirection == ScrollDirection.DOWN) {
+                    val visibleItemCount = childCount
+                    val totalItemCount = itemCount
+                    val pastVisibleItems = (this as? LinearLayoutManager)
+                        ?.findFirstVisibleItemPosition()
+                        ?.plus(PAGINATION_TRIGGER_OFFSET)!!
+                    val isLastElement = (visibleItemCount + pastVisibleItems) >= totalItemCount
+
+                    if (isLastElement && searchViewModel.visibilityMode.value != VisibilityMode.LOADING) {
+                        searchViewModel.nextPage()
+                    }
+                }
+            }
+        }
+    }
+
     private fun observeSearchResults() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) {
             threadListAdapter.updateList(it)
@@ -280,5 +311,9 @@ class SearchFragment : Fragment() {
 
     enum class VisibilityMode {
         RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS
+    }
+
+    companion object {
+        const val PAGINATION_TRIGGER_OFFSET = 15
     }
 }
