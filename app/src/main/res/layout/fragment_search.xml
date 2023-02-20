@@ -106,48 +106,54 @@
         </HorizontalScrollView>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-            android:id="@+id/mailRecyclerView"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/recentSearchesLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone">
+            <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                android:id="@+id/mailRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-            <TextView
-                style="@style/SettingHeader"
+            <LinearLayout
+                android:id="@+id/recentSearchesLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/SettingHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recentSearchesTitle" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recentSearchesRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <com.infomaniak.mail.ui.main.EmptyStateView
+                android:id="@+id/noResultsEmptyState"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/recentSearchesTitle" />
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recentSearchesRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-
-        <com.infomaniak.mail.ui.main.EmptyStateView
-            android:id="@+id/noResultsEmptyState"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:visibility="gone"
-            app:description="@string/searchNoResultsDescription"
-            app:icon="@drawable/ic_search"
-            app:title="@string/searchNoResultsTitle"
-            tools:visibility="visible" />
-    </FrameLayout>
+                android:layout_gravity="center_vertical"
+                android:visibility="gone"
+                app:description="@string/searchNoResultsDescription"
+                app:icon="@drawable/ic_search"
+                app:title="@string/searchNoResultsTitle"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

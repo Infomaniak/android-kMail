@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.search
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +32,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
@@ -47,6 +49,10 @@ class SearchFragment : Fragment() {
     private val searchViewModel by viewModels<SearchViewModel>()
     private val navigationArgs by navArgs<SearchFragmentArgs>()
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
+
+    private val showLoadingTimer: CountDownTimer by lazy {
+        Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
+    }
 
     private val threadAdapter by lazy {
         ThreadListAdapter(
@@ -79,16 +85,22 @@ class SearchFragment : Fragment() {
     private fun updateUi(mode: VisibilityMode) = with(binding) {
 
         fun displayRecentSearches() {
+            showLoadingTimer.cancel()
+            swipeRefreshLayout.isRefreshing = false
+
             recentSearchesLayout.isVisible = true
             mailRecyclerView.isGone = true
             noResultsEmptyState.isGone = true
         }
 
         fun displayLoadingView() {
-            // TODO
+            showLoadingTimer.start()
         }
 
         fun displaySearchResult(mode: VisibilityMode) {
+            showLoadingTimer.cancel()
+            swipeRefreshLayout.isRefreshing = false
+
             recentSearchesLayout.isGone = true
             mailRecyclerView.isVisible = mode == VisibilityMode.RESULTS
             noResultsEmptyState.isGone = mode == VisibilityMode.RESULTS
@@ -107,6 +119,7 @@ class SearchFragment : Fragment() {
 
     private fun setUi() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        swipeRefreshLayout.isEnabled = false
 
         val popupMenu = createPopupMenu()
 

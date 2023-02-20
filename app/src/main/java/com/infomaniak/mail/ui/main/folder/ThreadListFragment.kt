@@ -353,7 +353,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 showLoadingTimer.start()
             } else {
                 showLoadingTimer.cancel()
-                if (binding.swipeRefreshLayout.isRefreshing) binding.swipeRefreshLayout.isRefreshing = false
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }
