@@ -33,6 +33,7 @@ import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
+import com.infomaniak.lib.core.utils.CoilUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.login.ApiToken
@@ -43,7 +44,6 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
-import com.infomaniak.mail.utils.Utils.newImageLoader
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -161,5 +161,5 @@ class ApplicationMain : Application(), ImageLoaderFactory {
         override suspend fun getApiToken(): ApiToken = AccountUtils.currentUser!!.apiToken
     }
 
-    override fun newImageLoader(): ImageLoader = newImageLoader(context = this)
+    override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
 }
