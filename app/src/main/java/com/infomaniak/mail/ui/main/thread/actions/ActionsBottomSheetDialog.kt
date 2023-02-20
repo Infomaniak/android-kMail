@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -62,7 +61,12 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        archive.isGone = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
+        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
+            archive.apply {
+                setText(R.string.actionMoveToInbox)
+                setIconResource(R.drawable.ic_drawer_inbox)
+            }
+        }
 
         archive.setClosingOnClickListener { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener { onClickListener.onReadUnread() }
