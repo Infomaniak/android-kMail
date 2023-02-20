@@ -222,42 +222,39 @@ class ThreadListAdapter(
     }
 
     override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) {
-        updateDynamicIcons(item as Thread)
+        (item as Thread).updateDynamicIcons()
     }
 
-    private fun updateDynamicIcons(item: Thread) {
+    private fun Thread.updateDynamicIcons() {
 
-        fun getSwipeActionVariantsInfo(folderRole: FolderRole, swipeAction: SwipeAction): SwipeActionInfo {
-            return SwipeActionInfo(if (item.folder.role == folderRole) SwipeAction.INBOX else swipeAction)
-        }
+        fun computeDynamicAction(folderRole: FolderRole, swipeAction: SwipeAction) = SwipeActionUiData(
+            colorRes = if (folder.role == folderRole) R.color.swipeInbox else swipeAction.colorRes,
+            iconRes = if (folder.role == folderRole) R.drawable.ic_drawer_inbox else swipeAction.iconRes,
+        )
 
-        fun getSwipeActionVariant(swipeAction: SwipeAction) = when (swipeAction) {
-            SwipeAction.READ_UNREAD -> {
-                SwipeActionInfo(
-                    backgroundColorId = swipeAction.colorRes,
-                    drawableId = if (item.unseenMessagesCount > 0) R.drawable.ic_envelope_open else R.drawable.ic_envelope,
-                )
-            }
-            SwipeAction.FAVORITE -> {
-                SwipeActionInfo(
-                    backgroundColorId = swipeAction.colorRes,
-                    drawableId = if (item.isFavorite) R.drawable.ic_unstar else R.drawable.ic_star,
-                )
-            }
-            SwipeAction.ARCHIVE, SwipeAction.READ_AND_ARCHIVE -> getSwipeActionVariantsInfo(FolderRole.ARCHIVE, swipeAction)
-            SwipeAction.SPAM -> getSwipeActionVariantsInfo(FolderRole.SPAM, swipeAction)
+        fun getSwipeActionUiData(swipeAction: SwipeAction) = when (swipeAction) {
+            SwipeAction.READ_UNREAD -> SwipeActionUiData(
+                colorRes = swipeAction.colorRes,
+                iconRes = if (unseenMessagesCount > 0) R.drawable.ic_envelope_open else swipeAction.iconRes,
+            )
+            SwipeAction.FAVORITE -> SwipeActionUiData(
+                colorRes = swipeAction.colorRes,
+                iconRes = if (isFavorite) R.drawable.ic_unstar else swipeAction.iconRes,
+            )
+            SwipeAction.ARCHIVE, SwipeAction.READ_AND_ARCHIVE -> computeDynamicAction(FolderRole.ARCHIVE, swipeAction)
+            SwipeAction.SPAM -> computeDynamicAction(FolderRole.SPAM, swipeAction)
             else -> null
         }
 
         (recyclerView as DragDropSwipeRecyclerView).apply {
-            getSwipeActionVariant(localSettings.swipeLeft)?.let { leftSwipeActionInfo ->
-                behindSwipedItemIconDrawableId = leftSwipeActionInfo.drawableId
-                behindSwipedItemBackgroundColor = context.getColor(leftSwipeActionInfo.backgroundColorId)
+            getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
+                behindSwipedItemBackgroundColor = context.getColor(colorRes)
+                behindSwipedItemIconDrawableId = iconRes
             }
 
-            getSwipeActionVariant(localSettings.swipeRight)?.let { rightSwipeActionInfo ->
-                behindSwipedItemIconSecondaryDrawableId = rightSwipeActionInfo.drawableId
-                behindSwipedItemBackgroundSecondaryColor = context.getColor(rightSwipeActionInfo.backgroundColorId)
+            getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
+                behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
+                behindSwipedItemIconSecondaryDrawableId = iconRes
             }
         }
     }
@@ -343,12 +340,7 @@ class ThreadListAdapter(
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
-    private data class SwipeActionInfo(
-        @ColorRes val backgroundColorId: Int,
-        @DrawableRes val drawableId: Int?,
-    ) {
-        constructor(swipeAction: SwipeAction) : this(swipeAction.colorRes, swipeAction.iconRes)
-    }
+    private data class SwipeActionUiData(@ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?)
 
     private companion object {
         const val SWIPE_ANIMATION_THRESHOLD = 0.15f
