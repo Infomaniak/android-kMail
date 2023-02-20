@@ -121,7 +121,7 @@ object FolderController {
 
     private fun MutableRealm.deleteLocalFolder(folder: Folder) {
         deleteMessages(folder.messages)
-        ThreadController.deleteThreads(folder, realm = this)
+        if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }
 

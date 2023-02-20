@@ -108,10 +108,6 @@ object ThreadController {
     //region Edit data
     fun MutableRealm.upsertThread(thread: Thread): Thread = copyToRealm(thread, UpdatePolicy.ALL)
 
-    fun deleteThreads(folder: Folder, realm: MutableRealm) {
-        realm.delete(getThreadsQuery(folder))
-    }
-
     fun fetchIncompleteMessages(
         messages: List<Message>,
         mailbox: Mailbox,
