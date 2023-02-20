@@ -159,7 +159,12 @@ class SearchViewModel : ViewModel() {
                 ThreadController.saveThreads(threads, searchMessages)
             }
 
-            emitSource(ThreadController.getSearchThreadsAsync().map { it.list }.asLiveData(Dispatchers.IO))
+            emitSource(ThreadController.getSearchThreadsAsync().map {
+                it.list.also { threads ->
+                    val resultsVisibilityMode = if (threads.isEmpty()) VisibilityMode.NO_RESULTS else VisibilityMode.RESULTS
+                    visibilityMode.postValue(resultsVisibilityMode)
+                }
+            }.asLiveData(Dispatchers.IO))
         }
     }
 
