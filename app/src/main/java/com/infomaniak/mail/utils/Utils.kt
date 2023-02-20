@@ -17,9 +17,49 @@
  */
 package com.infomaniak.mail.utils
 
+import android.content.Context
+import coil.ImageLoader
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.infomaniak.lib.core.BuildConfig
+import com.infomaniak.lib.core.networking.HttpUtils
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import java.nio.charset.StandardCharsets
 
 object Utils {
 
     val UTF_8: String = StandardCharsets.UTF_8.name()
+
+    private const val COIL_CACHE_DIR = "coil_cache"
+
+    fun newImageLoader(context: Context, withAuthentication: Boolean = false): ImageLoader {
+        return ImageLoader.Builder(context)
+            .crossfade(true)
+            .okHttpClient {
+                OkHttpClient.Builder().apply {
+                    addInterceptor(Interceptor { chain ->
+                        chain.request().newBuilder()
+                            .apply {
+                                headers(HttpUtils.getHeaders())
+                                removeHeader("Cache-Control")
+                                if (!withAuthentication) removeHeader("Authorization")
+                            }
+                            .build()
+                            .let(chain::proceed)
+                    })
+                    if (BuildConfig.DEBUG) {
+                        addNetworkInterceptor(StethoInterceptor())
+                    }
+                }.build()
+            }
+            .memoryCache {
+                MemoryCache.Builder(context).build()
+            }
+            .diskCache {
+                DiskCache.Builder().directory(context.cacheDir.resolve(COIL_CACHE_DIR)).build()
+            }
+            .build()
+    }
 }

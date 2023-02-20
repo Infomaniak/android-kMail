@@ -33,6 +33,7 @@ import com.infomaniak.mail.data.models.correspondent.Correspondent
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.databinding.ViewAvatarBinding
+import com.infomaniak.mail.utils.Utils.newImageLoader
 
 class AvatarView @JvmOverloads constructor(
     context: Context,
@@ -68,6 +69,6 @@ class AvatarView @JvmOverloads constructor(
 
     private fun ImageView.loadCorrespondentAvatar(correspondent: Correspondent): Disposable = with(correspondent) {
         val avatar = (correspondent as? MergedContact)?.avatar
-        return loadAvatar(email.hashCode(), avatar, initials, context.imageLoader)
+        return loadAvatar(email.hashCode(), avatar, initials, newImageLoader(context, withAuthentication = true))
     }
 }
