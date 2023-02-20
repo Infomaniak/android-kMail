@@ -63,6 +63,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private inline val context: Context get() = getApplication<Application>()
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
+    val isNewFolderCreated = SingleLiveEvent<Boolean>()
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
     val snackBarManager by lazy { SnackBarManager() }
 
@@ -596,7 +597,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             RCore.string.anErrorHasOccurred
         }
-        snackbarFeedback.postValue(context.getString(snackbarTitle) to null)
+        snackBarManager.postValue(context.getString(snackbarTitle), null)
 
         return null
     }
@@ -606,6 +607,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun moveToNewFolder(name: String, threadUid: String, messageUid: String?) = viewModelScope.launch(Dispatchers.IO) {
         val newFolderId = createNewFolderSync(name) ?: return@launch
         moveTo(newFolderId, threadUid, messageUid)
+        isNewFolderCreated.postValue(true)
     }
     //endregion
 

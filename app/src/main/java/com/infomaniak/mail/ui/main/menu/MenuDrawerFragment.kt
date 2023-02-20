@@ -102,12 +102,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
 
-        customFolders.setOnActionClickListener { // Create new folder
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToNewFolderDialog(),
-                currentClassName = MenuDrawerFragment::class.java.name,
-            )
-        }
+        customFolders.setOnActionClickListener { createFolderDialog.show() }
 
         feedback.setOnClickListener {
             closeDrawer()
@@ -256,11 +251,10 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     private fun initNewFolderDialog(): AlertDialog {
         return createInputDialog(
-            R.string.newFolderDialogTitle,
-            R.string.newFolderDialogHint,
-            R.string.newFolderDialogPositiveButton,
-        ) { folderName ->
-            folderName?.let { mainViewModel.createNewFolder(it.toString()) }
-        }
+            title = R.string.newFolderDialogTitle,
+            hint = R.string.newFolderDialogHint,
+            confirmButtonText = R.string.newFolderDialogPositiveButton,
+            onPositiveButtonClicked = { folderName -> folderName?.let { mainViewModel.createNewFolder(it.toString()) } },
+        )
     }
 }

@@ -51,6 +51,7 @@ class MoveFragment : MenuFoldersFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
         observeFolders()
+        observeNewFolderCreation()
     }
 
     private fun setupListeners() = with(binding) {
@@ -62,6 +63,12 @@ class MoveFragment : MenuFoldersFragment() {
         moveViewModel.currentFolders.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
             defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
             customFoldersAdapter.setFolders(customFolders, folderId)
+        }
+    }
+
+    private fun observeNewFolderCreation() {
+        mainViewModel.isNewFolderCreated.observe(viewLifecycleOwner) { isFolderCreated ->
+            if (isFolderCreated) findNavController().popBackStack()
         }
     }
 
@@ -77,7 +84,6 @@ class MoveFragment : MenuFoldersFragment() {
             R.string.newFolderDialogMovePositiveButton,
         ) { folderName ->
             folderName?.let { mainViewModel.moveToNewFolder(it.toString(), threadUid, messageUid) }
-            findNavController().popBackStack()
         }
     }
 }
