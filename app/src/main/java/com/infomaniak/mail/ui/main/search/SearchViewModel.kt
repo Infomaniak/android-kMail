@@ -51,7 +51,7 @@ class SearchViewModel : ViewModel() {
     private var fetchThreadsJob: Job? = null
 
     val searchResults = observeSearchAndFilters().switchMap { (query, filters) ->
-        val searchQuery = if (query != null && query.length < MIN_SEARCH_QUERY) null else query
+        val searchQuery = if (isLengthTooShort(query)) null else query
         fetchThreads(searchQuery, filters)
     }
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
@@ -119,6 +119,8 @@ class SearchViewModel : ViewModel() {
         resourcePrevious = null
     }
 
+    private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
+
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
         suspend fun ApiResponse<Thread.ThreadResult>.initSearchFolderThreads() {
             runCatching {
@@ -134,11 +136,7 @@ class SearchViewModel : ViewModel() {
         return liveData(Dispatchers.IO + fetchThreadsJob!!) {
             if (!hasNextPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
             if (fetchThreadsJob?.isCancelled == true) return@liveData
-
-            if (filters.isEmpty() && query.isNullOrBlank()) {
-                visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
-                return@liveData
-            }
+            if (filters.isEmpty() && query.isNullOrBlank()) return@liveData
 
             visibilityMode.postValue(VisibilityMode.LOADING)
 
@@ -161,7 +159,11 @@ class SearchViewModel : ViewModel() {
 
             emitSource(ThreadController.getSearchThreadsAsync().map {
                 it.list.also { threads ->
-                    val resultsVisibilityMode = if (threads.isEmpty()) VisibilityMode.NO_RESULTS else VisibilityMode.RESULTS
+                    val resultsVisibilityMode = when {
+                        selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) -> VisibilityMode.RECENT_SEARCHES
+                        threads.isEmpty() -> VisibilityMode.NO_RESULTS
+                        else -> VisibilityMode.RESULTS
+                    }
                     visibilityMode.postValue(resultsVisibilityMode)
                 }
             }.asLiveData(Dispatchers.IO))
