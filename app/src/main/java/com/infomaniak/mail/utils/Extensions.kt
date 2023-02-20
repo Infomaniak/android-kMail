@@ -28,6 +28,7 @@ import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
 import androidx.annotation.IdRes
+import androidx.annotation.RawRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -52,12 +53,12 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
-import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
@@ -65,6 +66,7 @@ import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
+import java.util.Scanner
 
 fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
 
@@ -145,6 +147,14 @@ fun Context.formatSubject(subject: String?): String {
         getString(R.string.noSubjectTitle)
     } else {
         subject.replace("\n+".toRegex(), " ")
+    }
+}
+
+fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String): String {
+    val css = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
+    return with(Jsoup.parse(html)) {
+        head().appendElement("style").attr("type", "text/css").appendText(css)
+        html()
     }
 }
 
@@ -246,6 +256,30 @@ fun List<Folder>.getMenuFolders(): Pair<List<Folder>, List<Folder>> {
 
         defaultFolders to customFolders
     }
+}
+
+/**
+ * The `sortByName` for Folders is done twice in the app, but it's not factorisable.
+ * So if this sort logic changes, it needs to be changed in both locations.
+ * The other location is in `FolderController.getFoldersQuery()`.
+ */
+fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
+
+    if (isEmpty()) return this
+
+    tailrec fun formatFolderWithAllChildren(
+        inputList: MutableList<Folder>,
+        outputList: MutableList<Folder> = mutableListOf(),
+    ): List<Folder> {
+
+        val firstFolder = inputList.removeFirst()
+        outputList.add(firstFolder)
+        inputList.addAll(0, firstFolder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
+
+        return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
+    }
+
+    return formatFolderWithAllChildren(toMutableList())
 }
 //endregion
 

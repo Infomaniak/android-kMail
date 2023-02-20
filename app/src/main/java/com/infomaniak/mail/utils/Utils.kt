@@ -17,50 +17,9 @@
  */
 package com.infomaniak.mail.utils
 
-import android.content.Context
-import androidx.annotation.RawRes
-import com.infomaniak.mail.data.models.Folder
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.Sort
-import org.jsoup.Jsoup
 import java.nio.charset.StandardCharsets
-import java.util.Scanner
 
 object Utils {
 
     val UTF_8: String = StandardCharsets.UTF_8.name()
-    const val TEXT_HTML: String = "text/html"
-    const val MAX_NUMBER_OF_MESSAGES_TO_FETCH: Int = 500
-
-    /**
-     * The `sortByName` for Folders is done twice in the app, but it's not factorisable.
-     * So if this sort logic changes, it needs to be changed in both locations.
-     * The other location is in `FolderController.getFoldersQuery()`.
-     */
-    fun List<Folder>.formatFoldersListWithAllChildren(): List<Folder> {
-
-        if (isEmpty()) return this
-
-        tailrec fun formatFolderWithAllChildren(
-            inputList: MutableList<Folder>,
-            outputList: MutableList<Folder> = mutableListOf(),
-        ): List<Folder> {
-
-            val firstFolder = inputList.removeFirst()
-            outputList.add(firstFolder)
-            inputList.addAll(0, firstFolder.children.query().sort(Folder::name.name, Sort.ASCENDING).find())
-
-            return if (inputList.isEmpty()) outputList else formatFolderWithAllChildren(inputList, outputList)
-        }
-
-        return formatFolderWithAllChildren(toMutableList())
-    }
-
-    fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String): String {
-        val css = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
-        return with(Jsoup.parse(html)) {
-            head().appendElement("style").attr("type", "text/css").appendText(css)
-            html()
-        }
-    }
 }
