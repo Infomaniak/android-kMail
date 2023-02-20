@@ -23,19 +23,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.views.MenuDrawerItemView
 
 abstract class MenuFoldersFragment : Fragment() {
 
     protected val mainViewModel: MainViewModel by activityViewModels()
 
-    protected abstract val inboxFolder: MenuDrawerItemView
     protected abstract val defaultFoldersList: RecyclerView
     protected abstract val customFoldersList: RecyclerView
 
     protected open val isInMenuDrawer: Boolean = true
-
-    protected var inboxFolderId: String? = null
 
     protected val defaultFoldersAdapter: FolderAdapter by lazy {
         FolderAdapter(onClick = ::onFolderSelected, isInMenuDrawer = isInMenuDrawer)
@@ -49,13 +45,7 @@ abstract class MenuFoldersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setupListeners()
         setupAdapters()
-    }
-
-    open fun setupListeners() {
-        inboxFolder.setOnClickListener { inboxFolderId?.let(::onFolderSelected) }
     }
 
     open fun setupAdapters() {

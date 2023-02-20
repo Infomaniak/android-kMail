@@ -123,7 +123,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
 
         if (scheduledDates.isNotEmpty()) updateFolderAfterDelay(scheduledDates)
 
-        SentryDebug.sendOrphanDraftsSentry(mailboxContentRealm)
+        SentryDebug.sendOrphanDrafts(mailboxContentRealm)
 
         return if (isFailure) Result.failure() else Result.success()
     }

@@ -46,7 +46,7 @@ object DraftController {
     }
 
     private fun getOrphanDraftsQuery(realm: TypedRealm): RealmQuery<Draft> {
-        return realm.query("${Draft::remoteUuid.name} == nil AND _action == nil")
+        return realm.query("${Draft::remoteUuid.name} == nil AND ${Draft.actionPropertyName} == nil")
     }
 
     private fun getDraftQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Draft> {

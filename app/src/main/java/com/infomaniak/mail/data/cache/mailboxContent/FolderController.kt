@@ -32,6 +32,7 @@ import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.query.RealmSingleQuery
+import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 
@@ -44,8 +45,16 @@ object FolderController {
     private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
 
     //region Queries
+    /**
+     * The `sortByName` for Folders is done twice in the app, but it's not factorisable.
+     * So if this sort logic changes, it needs to be changed in both locations.
+     * The other location is in `Utils.formatFoldersListWithAllChildren()`.
+     */
     private fun getFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
-        return realm.query(isNotSearch)
+        return realm
+            .query<Folder>("$isNotSearch AND ${Folder.parentsPropertyName}.@count == 0")
+            .sort(Folder::name.name, Sort.ASCENDING)
+            .sort(Folder::isFavorite.name, Sort.DESCENDING)
     }
 
     private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
@@ -77,7 +86,7 @@ object FolderController {
     }
 
     fun getFolder(role: FolderRole, realm: TypedRealm = defaultRealm): Folder? {
-        return getFolderQuery(Folder::_role.name, role.name, realm).find()
+        return getFolderQuery(Folder.rolePropertyName, role.name, realm).find()
     }
 
     fun getOrCreateSearchFolder(realm: MutableRealm): Folder {
@@ -128,7 +137,7 @@ object FolderController {
 
     private fun MutableRealm.deleteLocalFolder(folder: Folder) {
         deleteMessages(folder.messages)
-        ThreadController.deleteThreads(folder, realm = this)
+        if (folder.threads.isNotEmpty()) delete(folder.threads)
         delete(folder)
     }
 

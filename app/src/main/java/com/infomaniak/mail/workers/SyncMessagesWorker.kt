@@ -186,7 +186,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 .setInitialDelay(2, TimeUnit.MINUTES)
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.REPLACE, workRequest)
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
         }
 
         fun cancelWork(context: Context) {

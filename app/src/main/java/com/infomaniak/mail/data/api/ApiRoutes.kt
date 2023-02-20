@@ -18,9 +18,10 @@
 package com.infomaniak.mail.data.api
 
 import com.infomaniak.mail.BuildConfig.MAIL_API
-import com.infomaniak.mail.utils.Utils
 
 object ApiRoutes {
+
+    private const val MAX_NUMBER_OF_MESSAGES_TO_FETCH: Int = 500
 
     fun resource(resource: String) = "$MAIL_API$resource"
 
@@ -101,7 +102,7 @@ object ApiRoutes {
     }
 
     fun getMessagesUids(mailboxUuid: String, folderId: String): String {
-        return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${Utils.MAX_NUMBER_OF_MESSAGES_TO_FETCH}"
+        return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${MAX_NUMBER_OF_MESSAGES_TO_FETCH}"
     }
 
     fun getMessagesUidsDelta(mailboxUuid: String, folderId: String, cursor: String): String {

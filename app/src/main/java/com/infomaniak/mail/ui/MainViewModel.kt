@@ -47,7 +47,6 @@ import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
 import com.infomaniak.mail.utils.SharedViewModelUtils.markAsSeen
 import com.infomaniak.mail.utils.SharedViewModelUtils.refreshFolders
-import com.infomaniak.mail.utils.Utils.formatFoldersListWithAllChildren
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import io.realm.kotlin.ext.copyFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -251,7 +250,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun updateFolders(mailbox: Mailbox) {
         ApiRepository.getFolders(mailbox.uuid).data?.let { folders ->
-            FolderController.update(folders.formatFoldersListWithAllChildren())
+            FolderController.update(folders)
         }
     }
 
