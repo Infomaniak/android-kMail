@@ -48,7 +48,7 @@ class Folder : RealmObject {
     var name: String = ""
     @Suppress("PropertyName")
     @SerialName("role")
-    var _role: String? = null
+    private var _role: String? = null
     @SerialName("is_favorite")
     var isFavorite: Boolean = false
     var separator: String = ""
@@ -105,5 +105,10 @@ class Folder : RealmObject {
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7),
         COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1),
         SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2),
+    }
+
+    companion object {
+        val rolePropertyName = Folder::_role.name
+        val parentsPropertyName = Folder::_parents.name
     }
 }
