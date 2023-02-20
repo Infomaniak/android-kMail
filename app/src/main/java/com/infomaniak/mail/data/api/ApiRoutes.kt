@@ -93,6 +93,10 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, messageId)}/report"
     }
 
+    fun blockUser(mailboxUuid: String, folderId: String, messageId: Long): String {
+        return "${message(mailboxUuid, folderId, messageId)}/blacklist"
+    }
+
     fun getMessagesUids(mailboxUuid: String, folderId: String): String {
         return "${getMessages(mailboxUuid, folderId)}/messages_uids?messages=${MAX_NUMBER_OF_MESSAGES_TO_FETCH}"
     }
