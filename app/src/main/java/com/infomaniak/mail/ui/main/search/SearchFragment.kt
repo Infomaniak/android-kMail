@@ -40,6 +40,7 @@ import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
+import com.infomaniak.mail.utils.addStickyDateDecoration
 import com.infomaniak.mail.utils.getMenuFolders
 
 class SearchFragment : Fragment() {
@@ -146,7 +147,10 @@ class SearchFragment : Fragment() {
             searchViewModel.searchQuery(text.toString())
         }
 
-        mailRecyclerView.adapter = threadAdapter
+        mailRecyclerView.apply {
+            adapter = threadAdapter
+            addStickyDateDecoration(threadAdapter)
+        }
     }
 
     private fun createPopupMenu(): ListPopupWindow = with(binding) {
@@ -193,7 +197,7 @@ class SearchFragment : Fragment() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) {
             // TODO: - handle visibility mode
 
-            threadAdapter.dataSet = it
+            threadAdapter.updateList(it)
             threadAdapter.notifyDataSetChanged()
         }
     }

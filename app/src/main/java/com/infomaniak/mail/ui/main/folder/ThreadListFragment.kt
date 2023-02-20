@@ -166,9 +166,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DirectionFlag.DOWN)
             disableDragDirection(DirectionFlag.RIGHT)
             disableDragDirection(DirectionFlag.LEFT)
-            addItemDecoration(HeaderItemDecoration(this, false) { position ->
-                return@HeaderItemDecoration position >= 0 && threadListAdapter.dataSet[position] is String
-            })
+            addStickyDateDecoration(threadListAdapter)
             addItemDecoration(DateSeparatorItemDecoration())
         }
 
