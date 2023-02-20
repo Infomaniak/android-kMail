@@ -135,7 +135,7 @@ class SearchViewModel : ViewModel() {
             if (!hasNextPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
             if (fetchThreadsJob?.isCancelled == true) return@liveData
 
-            if (selectedFilters.isEmpty() && searchQuery.value.isNullOrBlank()) {
+            if (filters.isEmpty() && query.isNullOrBlank()) {
                 visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
                 return@liveData
             }
