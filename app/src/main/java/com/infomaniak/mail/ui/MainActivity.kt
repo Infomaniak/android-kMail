@@ -95,6 +95,7 @@ class MainActivity : ThemedActivity() {
     override fun onStart() {
         super.onStart()
         SyncMessagesWorker.cancelWork(this)
+        mainViewModel.forceRefreshMailboxesAndFolders()
     }
 
     override fun onResume() {
