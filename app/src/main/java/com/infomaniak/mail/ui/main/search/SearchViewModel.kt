@@ -140,6 +140,8 @@ class SearchViewModel : ViewModel() {
                 return@liveData
             }
 
+            visibilityMode.postValue(VisibilityMode.LOADING)
+
             val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
             val folderId = selectedFolder?.id ?: currentFolderId
             val searchFilters = SearchUtils.searchFilters(query, filters)
