@@ -59,8 +59,8 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.Utils.injectCssInHtml
 import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.injectCssInHtml
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial

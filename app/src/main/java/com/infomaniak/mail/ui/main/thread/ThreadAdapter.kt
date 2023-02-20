@@ -39,7 +39,6 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.Utils.injectCssInHtml
 import java.util.*
 
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
@@ -113,13 +112,13 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
         body?.let {
             var styledBody = it.value
-            if (it.type == Utils.TEXT_HTML) {
+            if (it.type == TEXT_HTML) {
                 if (context.isNightModeEnabled()) styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody)
                 styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
                 styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
             }
 
-            val margin = if (it.type == Utils.TEXT_HTML) NO_MARGIN else plainTextMargin
+            val margin = if (it.type == TEXT_HTML) NO_MARGIN else plainTextMargin
             messageBody.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
 
             messageBody.loadDataWithBaseURL("", styledBody, it.type, Utils.UTF_8, "")
@@ -313,6 +312,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private companion object {
+        const val TEXT_HTML: String = "text/html"
+
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
