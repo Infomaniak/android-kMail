@@ -529,22 +529,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
-    fun undoAction(undoData: UndoData) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val mailbox = currentMailbox.value ?: return@launch
-            val (resource, foldersIds, destinationFolderId) = undoData
-
-            val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
-                refreshFolders(mailbox, foldersIds, destinationFolderId)
-                R.string.snackbarMoveCancelled
-            } else {
-                RCore.string.anErrorHasOccurred
-            }
-
-            snackBarManager.postValue(context.getString(snackbarTitle))
-        }
-    }
-
     //region Phishing
     fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
         val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
@@ -575,6 +559,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         snackBarManager.postValue(context.getString(snackbarTitle))
+    }
+    //endregion
+
+    //region Undo action
+    fun undoAction(undoData: UndoData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val mailbox = currentMailbox.value ?: return@launch
+            val (resource, foldersIds, destinationFolderId) = undoData
+
+            val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
+                refreshFolders(mailbox, foldersIds, destinationFolderId)
+                R.string.snackbarMoveCancelled
+            } else {
+                RCore.string.anErrorHasOccurred
+            }
+
+            snackBarManager.postValue(context.getString(snackbarTitle))
+        }
     }
     //endregion
 
