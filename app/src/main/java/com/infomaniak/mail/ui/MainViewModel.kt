@@ -66,7 +66,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val snackBarManager by lazy { SnackBarManager() }
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
-    private var forceRefreshJob: Job? = null
+    private var refreshThreadsJob: Job? = null
+    private var refreshMailboxesAndFoldersJob: Job? = null
+
+    private var isLoadingMailbox = false
 
     val mailboxesLive = MailboxController.getMailboxesAsync(AccountUtils.currentUserId).asLiveData(coroutineContext)
 
@@ -136,9 +139,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateContacts()
     }
 
-    fun loadCurrentMailbox() = viewModelScope.launch(Dispatchers.IO) {
-        loadCurrentMailboxFromLocal()
-        loadCurrentMailboxFromRemote()
+    fun loadCurrentMailbox() {
+        isLoadingMailbox = true
+        viewModelScope.launch(Dispatchers.IO) {
+            loadCurrentMailboxFromLocal()
+            loadCurrentMailboxFromRemote()
+            isLoadingMailbox = false
+        }
     }
 
     private fun loadCurrentMailboxFromLocal() {
@@ -164,7 +171,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
     }
 
-    private fun openMailbox(mailbox: Mailbox) = viewModelScope.launch(Dispatchers.IO) {
+    private fun openMailbox(mailbox: Mailbox) {
         selectMailbox(mailbox)
         updateSignatures(mailbox)
         updateFolders(mailbox)
@@ -178,11 +185,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         DraftsActionsWorker.scheduleWork(context)
     }
 
-    fun forceRefreshMailboxes() = viewModelScope.launch(viewModelScope.handlerIO) {
-        Log.d(TAG, "Force refresh mailboxes")
-        val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
-        MailboxController.updateMailboxes(context, mailboxes)
-        updateCurrentMailboxQuotas()
+    fun forceRefreshMailboxesAndFolders() {
+
+        if (isLoadingMailbox) return
+
+        refreshMailboxesAndFoldersJob?.cancel()
+        refreshMailboxesAndFoldersJob = viewModelScope.launch(viewModelScope.handlerIO) {
+
+            Log.d(TAG, "Force refresh mailboxes")
+            val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
+            MailboxController.updateMailboxes(context, mailboxes)
+
+            Log.d(TAG, "Force refresh quotas")
+            val mailbox = currentMailbox.value ?: return@launch
+            updateMailboxQuotas(mailbox)
+
+            Log.d(TAG, "Force refresh folders")
+            updateFolders(mailbox)
+        }
     }
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch {
@@ -191,8 +211,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun updateCurrentMailboxQuotas() {
-        val mailbox = currentMailbox.value ?: return
+    private fun updateMailboxQuotas(mailbox: Mailbox) {
         if (mailbox.isLimited) with(ApiRepository.getQuotas(mailbox.hostingId, mailbox.mailboxName)) {
             if (isSuccess()) MailboxController.updateMailbox(mailbox.objectId) {
                 it.quotas = data
@@ -208,8 +227,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun forceRefreshThreads() {
-        forceRefreshJob?.cancel()
-        forceRefreshJob = viewModelScope.launch(Dispatchers.IO) {
+        refreshThreadsJob?.cancel()
+        refreshThreadsJob = viewModelScope.launch(Dispatchers.IO) {
             Log.d(TAG, "Force refresh threads")
             refreshThreads()
         }
