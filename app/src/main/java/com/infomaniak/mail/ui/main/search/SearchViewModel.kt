@@ -34,7 +34,6 @@ import com.infomaniak.mail.utils.SearchUtils
 import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
 import io.sentry.Sentry
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.map
 
 class SearchViewModel : ViewModel() {
 
@@ -157,7 +156,7 @@ class SearchViewModel : ViewModel() {
                 ThreadController.saveThreads(threads, searchMessages)
             }
 
-            emitSource(ThreadController.getSearchThreadsAsync().map {
+            emitSource(ThreadController.getSearchThreadsAsync().asLiveData(Dispatchers.IO).map {
                 it.list.also { threads ->
                     val resultsVisibilityMode = when {
                         selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) -> VisibilityMode.RECENT_SEARCHES
@@ -166,7 +165,7 @@ class SearchViewModel : ViewModel() {
                     }
                     visibilityMode.postValue(resultsVisibilityMode)
                 }
-            }.asLiveData(Dispatchers.IO))
+            })
         }
     }
 
