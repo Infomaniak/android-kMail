@@ -95,6 +95,12 @@
             app:nullable="true" />
         <!-- Endregion -->
 
+        <argument
+            android:name="recipient"
+            android:defaultValue="@null"
+            app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
+            app:nullable="true" />
+
     </activity>
 
     <fragment
@@ -165,6 +171,9 @@
         <argument
             android:name="recipient"
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient" />
+        <action
+            android:id="@+id/action_detailedContactBottomSheetDialog_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog

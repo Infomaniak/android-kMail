@@ -17,7 +17,9 @@
  */
 package com.infomaniak.mail.data.models.correspondent
 
+import android.os.Parcel
 import io.realm.kotlin.types.EmbeddedRealmObject
+import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -46,5 +48,19 @@ class Recipient : EmbeddedRealmObject, Correspondent {
         var result = email.hashCode()
         result = 31 * result + name.hashCode()
         return result
+    }
+
+    companion object : Parceler<Recipient> {
+        override fun create(parcel: Parcel): Recipient {
+            val email = parcel.readString()!!
+            val name = parcel.readString()!!
+
+            return Recipient().initLocalValues(email, name)
+        }
+
+        override fun Recipient.write(parcel: Parcel, flags: Int) {
+            parcel.writeString(email)
+            parcel.writeString(name)
+        }
     }
 }
