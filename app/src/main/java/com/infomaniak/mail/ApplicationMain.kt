@@ -28,15 +28,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
 import com.facebook.stetho.Stetho
-import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.TokenInterceptorListener
 import com.infomaniak.lib.core.models.user.User
 import com.infomaniak.lib.core.networking.HttpClient
-import com.infomaniak.lib.core.networking.HttpUtils
+import com.infomaniak.lib.core.utils.CoilUtils
 import com.infomaniak.lib.core.utils.clearStack
 import com.infomaniak.lib.core.utils.hasPermissions
 import com.infomaniak.lib.login.ApiToken
@@ -54,8 +51,6 @@ import io.sentry.android.core.SentryAndroidOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
 import org.matomo.sdk.Tracker
 import java.util.UUID
 
@@ -166,33 +161,5 @@ class ApplicationMain : Application(), ImageLoaderFactory {
         override suspend fun getApiToken(): ApiToken = AccountUtils.currentUser!!.apiToken
     }
 
-    override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(this)
-            .crossfade(true)
-            .okHttpClient {
-                OkHttpClient.Builder().apply {
-                    addInterceptor(Interceptor { chain ->
-                        chain.request().newBuilder().headers(HttpUtils.getHeaders())
-                            .removeHeader("Cache-Control")
-                            .removeHeader("Authorization")
-                            .build()
-                            .let(chain::proceed)
-                    })
-                    if (com.infomaniak.lib.core.BuildConfig.DEBUG) {
-                        addNetworkInterceptor(StethoInterceptor())
-                    }
-                }.build()
-            }
-            .memoryCache {
-                MemoryCache.Builder(this).build()
-            }
-            .diskCache {
-                DiskCache.Builder().directory(cacheDir.resolve(COIL_CACHE_DIR)).build()
-            }
-            .build()
-    }
-
-    private companion object {
-        const val COIL_CACHE_DIR = "coil_cache"
-    }
+    override fun newImageLoader(): ImageLoader = CoilUtils.newImageLoader(applicationContext, tokenInterceptorListener())
 }
