@@ -131,8 +131,8 @@ class Thread : RealmObject {
         updateThread()
 
         // Remove duplicates in Recipients lists
-        from = from.toRecipientsList().distinct().toRealmList()
-        to = to.toRecipientsList().distinct().toRealmList()
+        from = from.copyFromRealm().distinct().toRealmList()
+        to = to.copyFromRealm().distinct().toRealmList()
     }
 
     private fun resetThread() {
@@ -199,10 +199,6 @@ class Thread : RealmObject {
         }
 
         return message.preview
-    }
-
-    private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
-        return map { Recipient().initLocalValues(it.email, it.name) }
     }
 
     enum class ThreadFilter(@IdRes val filterNameRes: Int) {
