@@ -157,8 +157,7 @@
             app:argType="string" />
         <argument
             android:name="messageUid"
-            app:argType="string"
-            app:nullable="true" />
+            app:argType="string" />
     </dialog>
 
     <fragment
