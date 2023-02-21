@@ -59,11 +59,11 @@ class SearchFragment : Fragment() {
 
     private val threadListAdapter by lazy {
         ThreadListAdapter(
-            requireContext(),
-            localSettings.threadDensity,
-            null,
-            mainViewModel.mergedContacts.value ?: emptyMap(),
-            {}
+            context = requireContext(),
+            threadDensity = localSettings.threadDensity,
+            folderRole = null,
+            contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
+            onSwipeFinished = {},
         )
     }
 
