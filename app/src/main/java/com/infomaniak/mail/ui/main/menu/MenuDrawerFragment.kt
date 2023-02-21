@@ -43,6 +43,7 @@ import com.infomaniak.mail.databinding.FragmentMenuDrawerBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListFragmentDirections
 import com.infomaniak.mail.utils.*
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MenuDrawerFragment : MenuFoldersFragment() {
 
@@ -53,7 +54,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
     var exitDrawer: (() -> Unit)? = null
 
-    private var canNavigate = true
+    private var canNavigate = AtomicBoolean(true)
 
     private val addressAdapter = MenuDrawerSwitchUserMailboxesAdapter { selectedMailbox ->
         // TODO: This works, but... The splashscreen blinks.
@@ -163,8 +164,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     private fun menuDrawerSafeNavigate(destinationResId: Int) {
-        if (canNavigate) {
-            canNavigate = false
+        if (canNavigate.compareAndSet(true, false)) {
             findNavController().navigate(destinationResId)
         }
     }
@@ -234,8 +234,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
     }
 
     fun onDrawerOpened() {
-        canNavigate = true
-        mainViewModel.forceRefreshMailboxes()
+        canNavigate.set(true)
         trackScreen()
     }
 
