@@ -57,6 +57,9 @@ class SearchViewModel : ViewModel() {
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
 
     val hasNextPage get() = !resourceNext.isNullOrBlank()
+    var previousSearch: String? = null
+    var previousMutuallyExclusiveChips: Int? = null
+    var previousAttachments: Boolean? = null
 
     private fun observeSearchAndFilters() = MediatorLiveData<Pair<String?, Set<ThreadFilter>>>().apply {
         addSource(searchQuery) { value = it to (value?.second ?: selectedFilters) }

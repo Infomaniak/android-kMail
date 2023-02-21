@@ -177,23 +177,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-            onThreadClicked = { thread ->
-                if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-                    navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-                        safeNavigate(
-                            ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
-                                draftExists = true,
-                                draftLocalUuid = it.draftLocalUuid,
-                                draftResource = it.draftResource,
-                                messageUid = it.messageUid,
-                            )
-                        )
-                    }
-                } else {
-                    safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(thread.uid))
-                }
-            }
+            onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
         }
     }
 

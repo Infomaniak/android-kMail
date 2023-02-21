@@ -32,6 +32,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -55,7 +56,7 @@ class SearchFragment : Fragment() {
         Utils.createRefreshTimer { binding.swipeRefreshLayout.isRefreshing = true }
     }
 
-    private val threadAdapter by lazy {
+    private val threadListAdapter by lazy {
         ThreadListAdapter(
             requireContext(),
             localSettings.threadDensity,
@@ -78,8 +79,13 @@ class SearchFragment : Fragment() {
         observeSearchResults()
     }
 
-    override fun onStop() {
+    override fun onStop() = with(binding) {
         // TODO: localSettings.recentSearches = adapter.list
+        searchViewModel.apply {
+            previousSearch = searchBar.searchTextInput.text.toString()
+            previousAttachments = attachments.isChecked
+            previousMutuallyExclusiveChips = mutuallyExclusiveChipGroup.checkedChipId
+        }
         super.onStop()
     }
 
@@ -107,6 +113,7 @@ class SearchFragment : Fragment() {
             noResultsEmptyState.isGone = mode == VisibilityMode.RESULTS
         }
 
+
         when (mode) {
             VisibilityMode.RECENT_SEARCHES -> displayRecentSearches()
             VisibilityMode.LOADING -> displayLoadingView()
@@ -131,10 +138,20 @@ class SearchFragment : Fragment() {
         }
 
         attachments.setOnCheckedChangeListener { _, _ ->
+            if (searchViewModel.previousAttachments != null) {
+                searchViewModel.previousAttachments = null
+                return@setOnCheckedChangeListener
+            }
+
             searchViewModel.toggleFilter(ThreadFilter.ATTACHMENTS)
         }
 
         mutuallyExclusiveChipGroup.setOnCheckedStateChangeListener { chipGroup, _ ->
+            if (searchViewModel.previousMutuallyExclusiveChips != null) {
+                searchViewModel.previousMutuallyExclusiveChips = null
+                return@setOnCheckedStateChangeListener
+            }
+
             when (chipGroup.checkedChipId) {
                 R.id.read -> searchViewModel.toggleFilter(ThreadFilter.SEEN)
                 R.id.unread -> searchViewModel.toggleFilter(ThreadFilter.UNSEEN)
@@ -144,12 +161,19 @@ class SearchFragment : Fragment() {
         }
 
         searchBar.searchTextInput.doOnTextChanged { text, _, _, _ ->
+            if (searchViewModel.previousSearch != null) {
+                searchViewModel.previousSearch = null
+                return@doOnTextChanged
+            }
             searchViewModel.searchQuery(text.toString())
         }
 
         mailRecyclerView.apply {
-            adapter = threadAdapter
-            addStickyDateDecoration(threadAdapter)
+            adapter = threadListAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+            }
+            addStickyDateDecoration(threadListAdapter)
         }
     }
 
@@ -197,8 +221,8 @@ class SearchFragment : Fragment() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) {
             // TODO: - handle visibility mode
 
-            threadAdapter.updateList(it)
-            threadAdapter.notifyDataSetChanged()
+            threadListAdapter.updateList(it)
+            threadListAdapter.notifyDataSetChanged()
         }
     }
 

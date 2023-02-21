@@ -25,10 +25,7 @@ import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRepository
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.data.cache.mailboxContent.MessageController
-import com.infomaniak.mail.data.cache.mailboxContent.SignatureController
-import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
+import com.infomaniak.mail.data.cache.mailboxContent.*
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.cache.mailboxInfo.QuotasController
 import com.infomaniak.mail.data.cache.userInfo.AddressBookController
@@ -42,6 +39,7 @@ import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.*
+import com.infomaniak.mail.ui.main.folder.ThreadListViewModel
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
@@ -627,8 +625,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
-    companion object {
-        private val TAG: String = MainViewModel::class.java.simpleName
-        private val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
+    fun navigateToSelectedDraft(message: Message) = liveData(coroutineContext) {
+        val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
+        emit(ThreadListViewModel.SelectedDraft(localUuid, message.draftResource, message.uid))
+    }
+
+    private companion object {
+        val TAG: String = MainViewModel::class.java.simpleName
+        val DEFAULT_SELECTED_FOLDER = FolderRole.INBOX
     }
 }
