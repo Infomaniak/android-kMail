@@ -581,10 +581,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
-        emit(MessageController.getMessage(messageUid))
+        emit(MessageController.getMessage(messageUid)!!)
     }
 
-    fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
+    private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
