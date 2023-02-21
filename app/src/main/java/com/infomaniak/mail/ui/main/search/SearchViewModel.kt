@@ -42,7 +42,8 @@ class SearchViewModel : ViewModel() {
     private inline val selectedFilters get() = _selectedFilters.value ?: mutableSetOf()
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
 
-    private lateinit var currentFolderId: String
+    /** It is simply used as a default value for the api */
+    private lateinit var dummyFolderId: String
     private var selectedFolder: Folder? = null
     private var resourceNext: String? = null
     private var resourcePrevious: String? = null
@@ -62,8 +63,8 @@ class SearchViewModel : ViewModel() {
         addSource(_selectedFilters) { value = value?.first to it }
     }
 
-    fun init(currentFolderId: String) {
-        this.currentFolderId = currentFolderId
+    fun init(dummyFolderId: String) {
+        this.dummyFolderId = dummyFolderId
     }
 
     fun refreshSearch() {
@@ -140,7 +141,7 @@ class SearchViewModel : ViewModel() {
             visibilityMode.postValue(VisibilityMode.LOADING)
 
             val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
-            val folderId = selectedFolder?.id ?: currentFolderId
+            val folderId = selectedFolder?.id ?: dummyFolderId
             val searchFilters = SearchUtils.searchFilters(query, filters)
             val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 

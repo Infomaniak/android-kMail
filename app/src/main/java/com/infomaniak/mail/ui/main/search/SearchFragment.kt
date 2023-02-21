@@ -39,7 +39,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        searchViewModel.init(navigationArgs.currentFolderId)
+        searchViewModel.init(navigationArgs.dummyFolderId)
         observeVisibilityModeUpdates()
         observeFolders()
         observeSearchResults()
