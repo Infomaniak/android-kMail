@@ -30,10 +30,7 @@ import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
-import io.realm.kotlin.ext.backlinks
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.realmSetOf
-import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.ext.*
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -116,8 +113,8 @@ class Thread : RealmObject {
         updateThread()
 
         // Remove duplicates in Recipients lists
-        from = from.toRecipientsList().distinct().toRealmList()
-        to = to.toRecipientsList().distinct().toRealmList()
+        from = from.copyFromRealm().distinct().toRealmList()
+        to = to.copyFromRealm().distinct().toRealmList()
     }
 
     private fun resetThread() {
@@ -184,10 +181,6 @@ class Thread : RealmObject {
         }
 
         return message.preview
-    }
-
-    private fun RealmList<Recipient>.toRecipientsList(): List<Recipient> {
-        return map { Recipient().initLocalValues(it.email, it.name) }
     }
 
     enum class ThreadFilter(@IdRes val filterNameRes: Int) {
