@@ -209,12 +209,12 @@ object ApiRepository : ApiRepositoryCore() {
         return callApi(url = ApiRoutes.resource(undoResources), method = POST)
     }
 
-    fun reportPhishing(mailboxUuid: String, folderId: String, messageId: Long): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.reportPhishing(mailboxUuid, folderId, messageId), POST, mapOf("type" to "phishing"))
+    fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.reportPhishing(mailboxUuid, folderId, shortUid), POST, mapOf("type" to "phishing"))
     }
 
-    fun blockUser(mailboxUuid: String, folderId: String, messageId: Long): ApiResponse<Boolean> {
-        return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, messageId), POST)
+    fun blockUser(mailboxUuid: String, folderId: String, shortUid: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
     }
 
     /**

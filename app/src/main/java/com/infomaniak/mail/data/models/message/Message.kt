@@ -31,6 +31,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.utils.toRealmInstant
+import com.infomaniak.mail.utils.toShortUid
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
 import io.realm.kotlin.types.*
@@ -125,7 +126,7 @@ class Message : RealmObject {
     private val _folders by backlinks(Folder::messages)
     val folder get() = _folders.single()
 
-    inline val shortUid get() = uid.split("@").first().toLong()
+    inline val shortUid get() = uid.toShortUid()
     inline val sender get() = from.first()
 
     var priority
