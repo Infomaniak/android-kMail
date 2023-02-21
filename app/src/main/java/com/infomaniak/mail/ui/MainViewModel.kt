@@ -545,6 +545,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //region Phishing
     fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
         val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
 
@@ -559,6 +560,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         snackBarManager.postValue(context.getString(snackbarTitle))
     }
+    //endregion
+
+    //region BlockUser
+    fun blockUser(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+
+        val apiResponse = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)
+
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            R.string.snackbarBlockUserConfirmation
+        } else {
+            RCore.string.anErrorHasOccurred
+        }
+
+        snackBarManager.postValue(context.getString(snackbarTitle))
+    }
+    //endregion
 
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid))
