@@ -167,7 +167,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DirectionFlag.RIGHT)
             disableDragDirection(DirectionFlag.LEFT)
             addStickyDateDecoration(threadListAdapter)
-            addItemDecoration(DateSeparatorItemDecoration())
         }
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->

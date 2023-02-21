@@ -33,6 +33,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.ListOrientation.DirectionFlag
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -173,6 +174,12 @@ class SearchFragment : Fragment() {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
             }
+            disableDragDirection(DirectionFlag.DOWN)
+            disableDragDirection(DirectionFlag.LEFT)
+            disableDragDirection(DirectionFlag.RIGHT)
+            disableDragDirection(DirectionFlag.UP)
+            disableSwipeDirection(DirectionFlag.LEFT)
+            disableSwipeDirection(DirectionFlag.RIGHT)
             addStickyDateDecoration(threadListAdapter)
         }
     }

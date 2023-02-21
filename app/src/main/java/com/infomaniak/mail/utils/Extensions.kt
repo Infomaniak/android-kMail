@@ -58,6 +58,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.ui.login.IlluColors
+import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
@@ -361,4 +362,5 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
     addItemDecoration(HeaderItemDecoration(this, false) { position ->
         return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is String
     })
+    addItemDecoration(DateSeparatorItemDecoration())
 }
