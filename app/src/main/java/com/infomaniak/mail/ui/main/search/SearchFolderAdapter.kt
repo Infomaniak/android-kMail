@@ -32,6 +32,7 @@ import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
+import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 
 class SearchFolderAdapter(
     val folders: List<Folder?>,
@@ -60,7 +61,7 @@ class SearchFolderAdapter(
             findViewById<MaterialButton>(R.id.folderButton).apply {
                 val folder = folders[position]
 
-                val entryName: String = folder?.getLocalizedName(context) ?: context.getString(R.string.searchFilterFolder)
+                val entryName: String = folder.getLocalizedNameOrAllFolders(context)
                 text = entryName
                 setIconResource(folder?.getIcon() ?: 0)
                 setPaddingRelative(if (folder == null) 42.toPx() else 12.toPx())

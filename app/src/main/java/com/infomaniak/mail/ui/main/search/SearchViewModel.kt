@@ -44,7 +44,6 @@ class SearchViewModel : ViewModel() {
 
     /** It is simply used as a default value for the api */
     private lateinit var dummyFolderId: String
-    private var selectedFolder: Folder? = null
     private var resourceNext: String? = null
     private var resourcePrevious: String? = null
 
@@ -56,6 +55,7 @@ class SearchViewModel : ViewModel() {
     }
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
 
+    var selectedFolder: Folder? = null
     val hasNextPage get() = !resourceNext.isNullOrBlank()
     var previousSearch: String? = null
     var previousMutuallyExclusiveChips: Int? = null

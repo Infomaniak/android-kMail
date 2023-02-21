@@ -43,6 +43,7 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.utils.addStickyDateDecoration
+import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.getMenuFolders
 
 class SearchFragment : Fragment() {
@@ -132,11 +133,10 @@ class SearchFragment : Fragment() {
 
         val popupMenu = createPopupMenu()
 
-        folderDropDown.setOnClickListener {
-            // TODO : any better solution ? -> button ?
-            folderDropDown.isChecked = !folderDropDown.isChecked // Cancels the auto check
-            popupMenu.show()
-        }
+        folderDropDown.setOnClickListener { popupMenu.show() }
+        updateFolderDropDownUi(
+            searchViewModel.selectedFolder, searchViewModel.selectedFolder.getLocalizedNameOrAllFolders(requireContext())
+        )
 
         attachments.setOnCheckedChangeListener { _, _ ->
             if (searchViewModel.previousAttachments != null) {
@@ -211,11 +211,17 @@ class SearchFragment : Fragment() {
     }
 
     private fun onFolderSelected(folder: Folder?, title: String) = with(binding) {
-        folderDropDown.apply {
-            text = title
-            isChecked = folder != null
-        }
+        updateFolderDropDownUi(folder, title)
         searchViewModel.selectFolder(folder)
+    }
+
+    private fun updateFolderDropDownUi(folder: Folder?, title: String) = with(binding) {
+        val drawable = if (folder != null) R.drawable.ic_check_sharp else 0
+        folderDropDown.apply {
+            isChecked = folder != null
+            setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, 0, R.drawable.ic_chevron_down, 0)
+            text = title
+        }
     }
 
     private fun observeFolders() {
