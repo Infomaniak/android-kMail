@@ -253,7 +253,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         return createInputDialog(
             title = R.string.newFolderDialogTitle,
             hint = R.string.newFolderDialogHint,
-            confirmButtonText = R.string.newFolderDialogPositiveButton,
+            confirmButtonText = R.string.buttonCreate,
             onPositiveButtonClicked = { folderName -> folderName?.let { mainViewModel.createNewFolder(it.toString()) } },
         )
     }
