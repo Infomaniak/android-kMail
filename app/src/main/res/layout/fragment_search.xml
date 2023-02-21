@@ -48,6 +48,7 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         <HorizontalScrollView
+            android:id="@+id/horizontalScrollViewDummyId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/backgroundColor"
