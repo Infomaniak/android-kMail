@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.createDescriptionDialog
-import com.infomaniak.mail.utils.notYetImplemented
 
 class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -66,7 +65,7 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
                 onPositiveButtonClicked = { message?.let { mainViewModel.reportPhishing(threadUid, it) } },
             ).show()
         }
-        blockSender.setClosingOnClickListener { notYetImplemented() }
+        blockSender.setClosingOnClickListener { message?.let(mainViewModel::blockUser) }
     }
 
     private fun setSpamUi(message: Message?) {
