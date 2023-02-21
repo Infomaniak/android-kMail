@@ -23,7 +23,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -249,12 +248,10 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         advancedActions.setIsCollapsed(true)
     }
 
-    private fun initNewFolderDialog(): AlertDialog {
-        return createInputDialog(
-            title = R.string.newFolderDialogTitle,
-            hint = R.string.newFolderDialogHint,
-            confirmButtonText = R.string.buttonCreate,
-            onPositiveButtonClicked = { folderName -> folderName?.let { mainViewModel.createNewFolder(it.toString()) } },
-        )
-    }
+    private fun initNewFolderDialog() = createInputDialog(
+        title = R.string.newFolderDialogTitle,
+        hint = R.string.newFolderDialogHint,
+        confirmButtonText = R.string.buttonCreate,
+        onPositiveButtonClicked = { folderName -> mainViewModel.createNewFolder(folderName!!.toString()) },
+    )
 }

@@ -79,11 +79,12 @@ class MoveFragment : MenuFoldersFragment() {
 
     private fun initNewFolderDialog() = with(navigationArgs) {
         createInputDialog(
-            R.string.newFolderDialogTitle,
-            R.string.newFolderDialogHint,
-            R.string.newFolderDialogMovePositiveButton,
-        ) { folderName ->
-            folderName?.let { mainViewModel.moveToNewFolder(it.toString(), threadUid, messageUid) }
-        }
+            title = R.string.newFolderDialogTitle,
+            hint = R.string.newFolderDialogHint,
+            confirmButtonText = R.string.newFolderDialogMovePositiveButton,
+            onPositiveButtonClicked = { folderName ->
+                mainViewModel.moveToNewFolder(folderName!!.toString(), threadUid, messageUid)
+            },
+        )
     }
 }

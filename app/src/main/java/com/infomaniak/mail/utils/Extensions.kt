@@ -335,19 +335,18 @@ fun Fragment.createInputDialog(
     dialogTitle.setText(title)
     textInputLayout.setHint(hint)
 
-    val dialog = MaterialAlertDialogBuilder(context)
+    return@with MaterialAlertDialogBuilder(context)
         .setView(root)
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text) }
         .setNegativeButton(R.string.buttonCancel, null)
         .setOnDismissListener { textInput.text?.clear() }
         .create()
-
-    dialog.setOnShowListener {
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
-            setButtonEnablement(true)
-            textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
+        .also { dialog ->
+            dialog.setOnShowListener {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
+                    setButtonEnablement(true)
+                    textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
+                }
+            }
         }
-    }
-
-    dialog
 }

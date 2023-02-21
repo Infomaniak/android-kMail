@@ -586,20 +586,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun createNewFolderSync(name: String): String? {
         val mailbox = currentMailbox.value ?: return null
         val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
-        if (apiResponse.isSuccess()) {
+
+        return if (apiResponse.isSuccess()) {
             updateFolders(mailbox)
-
-            return apiResponse.data?.id
-        }
-
-        val snackbarTitle = if (apiResponse.error?.code == ErrorCodes.FOLDER_ALREADY_EXISTS) {
-            R.string.errorNewFolderAlreadyExists
+            apiResponse.data?.id
         } else {
-            RCore.string.anErrorHasOccurred
+            val snackbarTitle = if (apiResponse.error?.code == ErrorCodes.FOLDER_ALREADY_EXISTS) {
+                R.string.errorNewFolderAlreadyExists
+            } else {
+                RCore.string.anErrorHasOccurred
+            }
+            snackBarManager.postValue(context.getString(snackbarTitle), null)
+            null
         }
-        snackBarManager.postValue(context.getString(snackbarTitle), null)
-
-        return null
     }
 
     fun createNewFolder(name: String) = viewModelScope.launch(Dispatchers.IO) { createNewFolderSync(name) }
