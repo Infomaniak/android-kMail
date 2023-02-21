@@ -33,8 +33,10 @@ import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
+import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -131,8 +133,10 @@ class Thread : RealmObject {
         updateThread()
 
         // Remove duplicates in Recipients lists
-        from = from.copyFromRealm().distinct().toRealmList()
-        to = to.copyFromRealm().distinct().toRealmList()
+        val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
+        val unmanagedTo = if (to.getRealm<Realm>() == null) to else to.copyFromRealm()
+        from = unmanagedFrom.distinct().toRealmList()
+        to = unmanagedTo.distinct().toRealmList()
     }
 
     private fun resetThread() {
