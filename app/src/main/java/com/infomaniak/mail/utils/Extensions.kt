@@ -19,7 +19,6 @@ package com.infomaniak.mail.utils
 
 import android.animation.Animator
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
@@ -313,7 +312,6 @@ fun Fragment.createDescriptionDialog(
         .create()
 }
 
-@SuppressLint("ResourceAsColor")
 fun Fragment.createInputDialog(
     @StringRes title: Int,
     @StringRes hint: Int,
@@ -325,6 +323,7 @@ fun Fragment.createInputDialog(
         isEnabled = !isInputEmpty
 
         val (textColor, backgroundColor) = if (isInputEmpty) {
+            @Suppress("ResourceAsColor")
             R.color.disabledDialogButtonTextColor to resources.getColor(R.color.backgroundDisabledDialogButton, null)
         } else {
             R.color.colorOnPrimary to context.getAttributeColor(RMaterial.attr.colorPrimary)
