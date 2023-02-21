@@ -274,7 +274,7 @@ class ThreadFragment : Fragment() {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return,
             folderId = mainViewModel.currentFolderId ?: return,
-            messageId = message.shortUid,
+            shortUid = message.shortUid,
         )
         val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }
         val name = allAttachmentsFileName(truncatedSubject ?: "")

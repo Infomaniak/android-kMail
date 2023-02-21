@@ -281,6 +281,7 @@
     <string name="settingsTransferEmailsDescription">When forwarding an email, choose the display mode that suits you best</string>
     <string name="settingsTransferEmailsTitle">Transfer emails</string>
     <string name="settingsTransferInBody">In the message body</string>
+    <string name="snackbarBlockUserConfirmation">Sender is now blocked</string>
     <string name="snackbarContactSaved">New contact successfully registered</string>
     <string name="snackbarDisplayProblemReported">Display problem reported</string>
     <string name="snackbarDraftDeleted">Draft deleted</string>

@@ -464,7 +464,7 @@ object MessageController {
     }
 
     private fun getUniquesUidsWithNewestFirst(folder: Folder, remoteUids: List<String>): List<String> {
-        val localUids = folder.messages.map { it.uid.toShortUid() }.toSet()
+        val localUids = folder.messages.map { it.shortUid }.toSet()
         val uniqueUids = remoteUids.subtract(localUids)
         return uniqueUids.reversed()
     }

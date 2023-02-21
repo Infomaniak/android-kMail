@@ -30,7 +30,6 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.createDescriptionDialog
-import com.infomaniak.mail.utils.notYetImplemented
 
 class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -45,32 +44,31 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (messageUid == null) {
-            handleButtons(threadUid)
-        } else {
-            mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
-                handleButtons(threadUid, message)
-            }
+        mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
+            handleButtons(threadUid, message)
         }
     }
 
-    private fun handleButtons(threadUid: String, message: Message? = null) = with(binding) {
+    private fun handleButtons(threadUid: String, message: Message) = with(binding) {
+
         setSpamUi(message)
 
         spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid, message) }
+
         phishing.setClosingOnClickListener {
             createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
                 confirmButtonText = R.string.buttonReport,
-                onPositiveButtonClicked = { message?.let { mainViewModel.reportPhishing(threadUid, it) } },
+                onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
             ).show()
         }
-        blockSender.setClosingOnClickListener { notYetImplemented() }
+
+        blockSender.setClosingOnClickListener { mainViewModel.blockUser(message) }
     }
 
-    private fun setSpamUi(message: Message?) {
-        binding.spam.setText(if (mainViewModel.isSpam(message)) R.string.actionNonSpam else R.string.actionSpam)
+    private fun setSpamUi(message: Message) {
+        binding.spam.setText(if (message.isSpam) R.string.actionNonSpam else R.string.actionSpam)
     }
 
     private fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {

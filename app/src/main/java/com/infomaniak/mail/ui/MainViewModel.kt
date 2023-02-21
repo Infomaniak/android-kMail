@@ -534,6 +534,40 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
+    //region Phishing
+    fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+
+        val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
+
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, displaySnackbar = false)
+            R.string.snackbarReportPhishingConfirmation
+        } else {
+            RCore.string.anErrorHasOccurred
+        }
+
+        snackBarManager.postValue(context.getString(snackbarTitle))
+    }
+    //endregion
+
+    //region BlockUser
+    fun blockUser(message: Message) = viewModelScope.launch(Dispatchers.IO) {
+        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+
+        val apiResponse = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)
+
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            R.string.snackbarBlockUserConfirmation
+        } else {
+            RCore.string.anErrorHasOccurred
+        }
+
+        snackBarManager.postValue(context.getString(snackbarTitle))
+    }
+    //endregion
+
+    //region Undo action
     fun undoAction(undoData: UndoData) {
         viewModelScope.launch(Dispatchers.IO) {
             val mailbox = currentMailbox.value ?: return@launch
@@ -549,27 +583,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             snackBarManager.postValue(context.getString(snackbarTitle))
         }
     }
-
-    fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
-
-        val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
-
-        val snackbarTitle = if (apiResponse.isSuccess()) {
-            if (!isCurrentFolderRole(FolderRole.SPAM)) toggleSpamOrHam(threadUid, message, displaySnackbar = false)
-            R.string.snackbarReportPhishingConfirmation
-        } else {
-            RCore.string.anErrorHasOccurred
-        }
-
-        snackBarManager.postValue(context.getString(snackbarTitle))
-    }
+    //endregion
 
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
-        emit(MessageController.getMessage(messageUid))
+        emit(MessageController.getMessage(messageUid)!!)
     }
 
-    fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
+    private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName

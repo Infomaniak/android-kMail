@@ -55,8 +55,8 @@ object ApiRoutes {
 
     private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
-    private fun message(mailboxUuid: String, folderId: String, messageId: Long): String {
-        return "${folder(mailboxUuid, folderId)}/message/$messageId"
+    private fun message(mailboxUuid: String, folderId: String, shortUid: String): String {
+        return "${folder(mailboxUuid, folderId)}/message/$shortUid"
     }
 
     fun moveMessages(mailboxUuid: String) = "${messages(mailboxUuid)}/move"
@@ -77,12 +77,12 @@ object ApiRoutes {
 
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
-    fun downloadAttachment(mailboxUuid: String, folderId: String, messageId: Long, attachmentId: String): String {
-        return "${message(mailboxUuid, folderId, messageId)}/attachment/$attachmentId"
+    fun downloadAttachment(mailboxUuid: String, folderId: String, shortUid: String, attachmentId: String): String {
+        return "${message(mailboxUuid, folderId, shortUid)}/attachment/$attachmentId"
     }
 
-    fun downloadAttachments(mailboxUuid: String, folderId: String, messageId: Long): String {
-        return "${message(mailboxUuid, folderId, messageId)}/attachmentsArchive"
+    fun downloadAttachments(mailboxUuid: String, folderId: String, shortUid: String): String {
+        return "${message(mailboxUuid, folderId, shortUid)}/attachmentsArchive"
     }
 
     fun search(
@@ -97,8 +97,12 @@ object ApiRoutes {
         return "${folder(mailboxUuid, folderId)}/message?$offset&$thread&$filters"
     }
 
-    fun reportPhishing(mailboxUuid: String, folderId: String, messageId: Long): String {
-        return "${message(mailboxUuid, folderId, messageId)}/report"
+    fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): String {
+        return "${message(mailboxUuid, folderId, shortUid)}/report"
+    }
+
+    fun blockUser(mailboxUuid: String, folderId: String, shortUid: String): String {
+        return "${message(mailboxUuid, folderId, shortUid)}/blacklist"
     }
 
     fun getMessagesUids(mailboxUuid: String, folderId: String): String {
