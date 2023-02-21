@@ -20,13 +20,19 @@ package com.infomaniak.mail.ui.main.menu
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.utils.getMenuFolders
+import com.infomaniak.mail.data.cache.mailboxContent.MessageController
+import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import kotlinx.coroutines.Dispatchers
 
 class MoveViewModel : ViewModel() {
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
 
-    val currentFolders = liveData(coroutineContext) { emit(FolderController.getRootsFolders().getMenuFolders()) }
+    fun message(messageUid: String) = liveData(coroutineContext) {
+        emit(MessageController.getMessage(messageUid)!!.folderId)
+    }
+
+    fun thread(threadUid: String) = liveData(coroutineContext) {
+        emit(ThreadController.getThread(threadUid)!!.folderId)
+    }
 }

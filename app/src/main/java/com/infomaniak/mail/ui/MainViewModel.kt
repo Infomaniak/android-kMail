@@ -457,7 +457,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getMessagesToMove(thread: Thread, message: Message?) = when (message) {
-        null -> MessageController.getMovableMessages(thread, currentFolderId!!)
+        null -> MessageController.getMovableMessages(thread)
         else -> MessageController.getMessageAndDuplicates(thread, message)
     }
     //endregion

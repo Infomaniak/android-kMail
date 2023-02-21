@@ -88,8 +88,8 @@ object MessageController {
         return getMessagesAndDuplicates(thread, "$isFavorite AND $isNotDraft")
     }
 
-    fun getMovableMessages(thread: Thread, folderId: String): List<Message> {
-        val byFolderId = "${Message::folderId.name} == '$folderId'"
+    fun getMovableMessages(thread: Thread): List<Message> {
+        val byFolderId = "${Message::folderId.name} == '${thread.folderId}'"
         return getMessagesAndDuplicates(thread, byFolderId)
     }
 
