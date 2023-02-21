@@ -25,6 +25,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.ui.main.menu.MoveFragmentArgs
 import com.infomaniak.mail.utils.animatedNavigation
@@ -117,7 +118,9 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private fun setSpamUi() = with(binding) {
         reportJunk.isGone = true
-        spam.isVisible = true
-        spam.setText(if (mainViewModel.isSpam(null)) R.string.actionNonSpam else R.string.actionSpam)
+        spam.apply {
+            isVisible = true
+            setText(if (mainViewModel.isCurrentFolderRole(FolderRole.SPAM)) R.string.actionNonSpam else R.string.actionSpam)
+        }
     }
 }

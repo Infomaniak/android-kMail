@@ -584,7 +584,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         emit(MessageController.getMessage(messageUid))
     }
 
-    fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
+    private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)
 
     companion object {
         private val TAG: String = MainViewModel::class.java.simpleName
