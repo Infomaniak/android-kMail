@@ -153,6 +153,7 @@ object ThreadController {
 
                 keepOldMessagesAndAddToSearchFolder(thread, searchFolder)
                 handleDuplicatesMessages(thread)
+                thread.recomputeThread()
 
                 thread
             }.also { searchFolder.threads = it.toRealmList() }

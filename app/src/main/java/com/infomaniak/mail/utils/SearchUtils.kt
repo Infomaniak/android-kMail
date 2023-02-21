@@ -74,20 +74,11 @@ object SearchUtils {
 
     fun List<Message>.convertToSearchThreads(): List<Thread> {
         return this.map { message ->
-            Thread().apply {
+            message.toThread().apply {
                 this.uid = "search-${message.uid}"
                 this.messages = listOf(message).toRealmList()
-                this.unseenMessagesCount = if (message.isSeen) 1 else 0
-                this.from = message.from
-                this.to = message.to
-                this.date = message.date
-                this.hasAttachments = message.hasAttachments
-                this.isFavorite = message.isFavorite
-                this.isAnswered = message.isAnswered
-                this.isForwarded = message.isForwarded
-                this.size = message.size
-                this.subject = message.subject
-                this.folderId = message.folderId
+                this.isFromSearch = true
+                recomputeThread()
             }
         }
     }

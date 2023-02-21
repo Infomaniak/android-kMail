@@ -34,10 +34,7 @@ import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
-import io.realm.kotlin.ext.backlinks
-import io.realm.kotlin.ext.realmListOf
-import io.realm.kotlin.ext.realmSetOf
-import io.realm.kotlin.ext.toRealmList
+import io.realm.kotlin.ext.*
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
@@ -121,11 +118,11 @@ class Thread : RealmObject {
         }
     }
 
-    fun recomputeThread(realm: MutableRealm) {
+    fun recomputeThread(realm: MutableRealm? = null) {
 
         // Delete Thread if empty
         if (messages.none { it.folderId == folderId }) {
-            realm.delete(this)
+            if (isManaged()) realm?.delete(this)
             return
         }
 
