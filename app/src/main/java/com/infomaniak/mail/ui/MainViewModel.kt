@@ -581,7 +581,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
-        emit(MessageController.getMessage(messageUid))
+        emit(MessageController.getMessage(messageUid)!!)
     }
 
     private fun isSpam(message: Message?) = message?.isSpam ?: isCurrentFolderRole(FolderRole.SPAM)

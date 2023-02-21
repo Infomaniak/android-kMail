@@ -45,14 +45,16 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
-            message?.let { handleButtons(threadUid, message) } ?: findNavController().popBackStack()
+            handleButtons(threadUid, message)
         }
     }
 
     private fun handleButtons(threadUid: String, message: Message) = with(binding) {
+
         setSpamUi(message)
 
         spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid, message) }
+
         phishing.setClosingOnClickListener {
             createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
@@ -61,6 +63,7 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
                 onPositiveButtonClicked = { mainViewModel.reportPhishing(threadUid, message) },
             ).show()
         }
+
         blockSender.setClosingOnClickListener { mainViewModel.blockUser(message) }
     }
 

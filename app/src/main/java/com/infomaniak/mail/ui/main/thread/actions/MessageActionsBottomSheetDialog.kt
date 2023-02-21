@@ -37,8 +37,6 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
-            if (message == null) return@observe
-
             setMarkAsReadUi(isSeen)
             setFavoriteUi(isFavorite)
 
