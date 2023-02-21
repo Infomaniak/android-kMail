@@ -55,7 +55,7 @@ object ApiRoutes {
 
     private fun messages(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/message"
 
-    private fun message(mailboxUuid: String, folderId: String, messageId: Long): String {
+    private fun message(mailboxUuid: String, folderId: String, messageId: String): String {
         return "${folder(mailboxUuid, folderId)}/message/$messageId"
     }
 
@@ -77,11 +77,11 @@ object ApiRoutes {
 
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
 
-    fun downloadAttachment(mailboxUuid: String, folderId: String, messageId: Long, attachmentId: String): String {
+    fun downloadAttachment(mailboxUuid: String, folderId: String, messageId: String, attachmentId: String): String {
         return "${message(mailboxUuid, folderId, messageId)}/attachment/$attachmentId"
     }
 
-    fun downloadAttachments(mailboxUuid: String, folderId: String, messageId: Long): String {
+    fun downloadAttachments(mailboxUuid: String, folderId: String, messageId: String): String {
         return "${message(mailboxUuid, folderId, messageId)}/attachmentsArchive"
     }
 
@@ -89,11 +89,11 @@ object ApiRoutes {
     //     return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&scontains=$searchText&severywhere=1&sattachments=no"
     // }
 
-    fun reportPhishing(mailboxUuid: String, folderId: String, messageId: Long): String {
+    fun reportPhishing(mailboxUuid: String, folderId: String, messageId: String): String {
         return "${message(mailboxUuid, folderId, messageId)}/report"
     }
 
-    fun blockUser(mailboxUuid: String, folderId: String, messageId: Long): String {
+    fun blockUser(mailboxUuid: String, folderId: String, messageId: String): String {
         return "${message(mailboxUuid, folderId, messageId)}/blacklist"
     }
 
