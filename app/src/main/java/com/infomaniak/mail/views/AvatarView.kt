@@ -26,6 +26,7 @@ import coil.imageLoader
 import coil.load
 import coil.request.Disposable
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.utils.CoilUtils.simpleImageLoader
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.loadAvatar
 import com.infomaniak.mail.R
@@ -51,7 +52,7 @@ class AvatarView @JvmOverloads constructor(
     override fun setOnClickListener(onClickListener: OnClickListener?) = binding.avatar.setOnClickListener(onClickListener)
 
     fun loadAvatar(user: User): Disposable {
-        return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.imageLoader)
+        return binding.avatarImage.loadAvatar(user.id, user.avatar, user.getInitials(), context.simpleImageLoader)
     }
 
     fun loadAvatar(recipient: Recipient, contacts: Map<Recipient, MergedContact>) {
