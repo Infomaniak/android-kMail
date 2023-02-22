@@ -33,9 +33,9 @@ interface Correspondent : Parcelable {
     fun getNameOrEmail(): String = name.ifBlank { email }
 
     fun computeInitials(): String {
-        val words = getNameOrEmail().replace(Regex("\\p{Punct}"), "").split(" ").filter { it.isNotEmpty() }
+        val words = getNameOrEmail().replace(Regex("\\p{Punct}"), "").split(" ")
 
-        return when (words.count()) {
+        return when (words.count { it.isNotEmpty() }) {
             0 -> ""
             1 -> words.single().first().toString()
             else -> "${words.first().first()}${words.last().first()}"
