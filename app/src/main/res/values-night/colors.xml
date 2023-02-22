@@ -78,4 +78,7 @@
     <color name="swipeNone">@color/progressbarTrackColor</color>
     <color name="swipeReadAndArchive">#956DDD</color>
 
+    <!-- Other -->
+    <color name="textInputStrokeColor">@color/shark</color>
+
 </resources>

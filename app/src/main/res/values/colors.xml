@@ -104,4 +104,7 @@
     <color name="swipeNone">@color/progressbarTrackColor</color>
     <color name="swipeReadAndArchive">#673AB7</color>
 
+    <!-- Other -->
+    <color name="textInputStrokeColor">@color/mouse</color>
+
 </resources>
