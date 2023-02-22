@@ -28,6 +28,7 @@ import android.text.Editable
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
@@ -332,6 +333,17 @@ fun Fragment.createInputDialog(
         setBackgroundColor(backgroundColor)
     }
 
+    fun AlertDialog.setupListener() {
+        setOnShowListener {
+            textInput.requestFocus()
+            window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            getButton(AlertDialog.BUTTON_POSITIVE).apply {
+                setButtonEnablement(true)
+                textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
+            }
+        }
+    }
+
     dialogTitle.setText(title)
     textInputLayout.setHint(hint)
 
@@ -341,12 +353,5 @@ fun Fragment.createInputDialog(
         .setNegativeButton(R.string.buttonCancel, null)
         .setOnDismissListener { textInput.text?.clear() }
         .create()
-        .also { dialog ->
-            dialog.setOnShowListener {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
-                    setButtonEnablement(true)
-                    textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
-                }
-            }
-        }
+        .apply { setupListener() }
 }
