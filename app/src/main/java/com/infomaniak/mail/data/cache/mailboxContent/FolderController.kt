@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.mapNotNull
 
 object FolderController {
 
-    private const val SEARCH_FOLDER_ID = "search_folder_id"
+    const val SEARCH_FOLDER_ID = "search_folder_id"
 
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
@@ -110,7 +110,7 @@ object FolderController {
 
     fun getOrCreateSearchFolder(realm: MutableRealm): Folder {
         return getFolderQuery(Folder::id.name, SEARCH_FOLDER_ID, realm).find() ?: let {
-            realm.copyToRealm(Folder().apply { this.id = SEARCH_FOLDER_ID })
+            realm.copyToRealm(Folder().apply { id = SEARCH_FOLDER_ID })
         }
     }
 
