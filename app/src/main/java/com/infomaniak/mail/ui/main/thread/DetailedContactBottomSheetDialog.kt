@@ -17,6 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +29,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
@@ -58,14 +64,29 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         addToContacts.setOnClickListener { notYetImplemented() }
-        copyAddress.setOnClickListener { notYetImplemented() }
+        copyAddress.setOnClickListener { copyToClipBoard() }
 
         observeContacts()
+    }
+
+    private fun copyToClipBoard() {
+        val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboardManager.setPrimaryClip(ClipData.newPlainText(CLIP_DATA_LABEL, navigationArgs.recipient.email))
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = activity?.findViewById(R.id.quickActionBar))
+        }
+        
+        findNavController().popBackStack()
     }
 
     private fun observeContacts() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
             binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
         }
+    }
+
+    companion object {
+        private const val CLIP_DATA_LABEL = "Recipient's email"
     }
 }
