@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.search
 import android.util.Log
 import androidx.lifecycle.*
 import com.infomaniak.lib.core.models.ApiResponse
+import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
@@ -41,6 +42,7 @@ class SearchViewModel : ViewModel() {
     private val _selectedFilters = MutableLiveData<MutableSet<ThreadFilter>>()
     private inline val selectedFilters get() = _selectedFilters.value ?: mutableSetOf()
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
+    val history = SingleLiveEvent<String>()
 
     /** It is simply used as a default value for the api */
     private lateinit var dummyFolderId: String
@@ -166,6 +168,7 @@ class SearchViewModel : ViewModel() {
             }
 
             emitSource(ThreadController.getSearchThreadsAsync().asLiveData(Dispatchers.IO).map {
+                query?.let(history::postValue)
                 it.list.also { threads ->
                     val resultsVisibilityMode = when {
                         selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) -> VisibilityMode.RECENT_SEARCHES
