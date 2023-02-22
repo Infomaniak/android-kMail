@@ -27,7 +27,8 @@ object ApiRoutes {
 
     fun addressBooks() = "$MAIL_API/api/pim/addressbook"
 
-    fun contacts() = "$MAIL_API/api/pim/contact/all?with=emails,details,others,contacted_times"
+    fun contact() = "$MAIL_API/api/pim/contact"
+    fun contacts() = "${contact()}/all?with=emails,details,others,contacted_times"
 
     fun signatures(mailboxHostingId: Int, mailboxName: String): String {
         return "$MAIL_API/api/securedProxy/1/mail_hostings/$mailboxHostingId/mailboxes/$mailboxName/signatures"

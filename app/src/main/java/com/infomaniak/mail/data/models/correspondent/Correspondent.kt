@@ -42,5 +42,15 @@ interface Correspondent : Parcelable {
         }.uppercase()
     }
 
+    fun computeFirstAndLastName(): Pair<String, String> {
+        val words = getNameOrEmail().trim().replace(Regex("\\s+"), " ").split(" ", limit = 2)
+
+        return when (words.count()) {
+            0 -> "" to ""
+            1 -> words.single() to ""
+            else -> words.first() to words.last()
+        }
+    }
+
     fun displayedName(context: Context): String = if (isMe()) context.getString(R.string.contactMe) else getNameOrEmail()
 }
