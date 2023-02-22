@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "364109398419",
+    "project_id": "kmail-android",
+    "storage_bucket": "kmail-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:364109398419:android:850d126331fbbebbffe866",
+        "android_client_info": {
+          "package_name": "com.infomaniak.mail"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "364109398419-otg5kmlh72ilahs2f71c1v2gig7moph1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrKhF_rkQu61P6eY0bS-b3Zf4zRVyaDzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "364109398419-otg5kmlh72ilahs2f71c1v2gig7moph1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
