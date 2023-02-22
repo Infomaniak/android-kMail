@@ -156,7 +156,7 @@ object ThreadController {
                 thread.recomputeThread()
 
                 thread
-            }.also { searchFolder.threads = it.toRealmList() }
+            }.also { searchFolder.threads.addAll(it) }
         }
     }
     //endregion
