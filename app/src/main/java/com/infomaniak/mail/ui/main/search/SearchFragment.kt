@@ -22,6 +22,7 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.core.view.isGone
@@ -161,12 +162,21 @@ class SearchFragment : Fragment() {
             }
         }
 
-        searchBar.searchTextInput.doOnTextChanged { text, _, _, _ ->
-            if (searchViewModel.previousSearch != null) {
-                searchViewModel.previousSearch = null
-                return@doOnTextChanged
+        searchBar.searchTextInput.apply {
+            doOnTextChanged { text, _, _, _ ->
+                if (searchViewModel.previousSearch != null) {
+                    searchViewModel.previousSearch = null
+                    return@doOnTextChanged
+                }
+                searchViewModel.searchQuery(text.toString())
             }
-            searchViewModel.searchQuery(text.toString())
+
+            setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH && !text.isNullOrBlank()) {
+                    searchViewModel.searchQuery(text.toString())
+                }
+                true // Keep keyboard open
+            }
         }
 
         mailRecyclerView.apply {
