@@ -22,11 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
-import android.widget.Space
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.lib.core.utils.setPaddingRelative
 import com.infomaniak.lib.core.utils.toPx
 import com.infomaniak.mail.R
@@ -39,13 +35,12 @@ class SearchFolderAdapter(
     val onClickListener: (folder: Folder?, title: String) -> Unit
 ) : ListAdapter {
 
-    override fun registerDataSetObserver(observer: DataSetObserver?) {
-        // TODO("Not yet implemented")
-    }
+    val allFolderMargin by lazy { 42.toPx() }
+    val iconFolderMargin by lazy { 12.toPx() }
 
-    override fun unregisterDataSetObserver(observer: DataSetObserver?) {
-        // TODO("Not yet implemented")
-    }
+    override fun registerDataSetObserver(observer: DataSetObserver?) = Unit
+
+    override fun unregisterDataSetObserver(observer: DataSetObserver?) = Unit
 
     override fun getCount(): Int = folders.count()
 
@@ -64,7 +59,7 @@ class SearchFolderAdapter(
                 val entryName: String = folder.getLocalizedNameOrAllFolders(context)
                 text = entryName
                 setIconResource(folder?.getIcon() ?: 0)
-                setPaddingRelative(if (folder == null) 42.toPx() else 12.toPx())
+                setPaddingRelative(if (folder == null) allFolderMargin else iconFolderMargin)
 
                 setOnClickListener { onClickListener(folder, entryName) }
             }

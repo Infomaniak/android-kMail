@@ -78,12 +78,10 @@ class SearchFragment : Fragment() {
         searchViewModel.init(navigationArgs.dummyFolderId)
         setUi()
         observeVisibilityModeUpdates()
-        // observeFolders()
         observeSearchResults()
     }
 
     override fun onStop() = with(binding) {
-        // TODO: localSettings.recentSearches = adapter.list
         searchViewModel.apply {
             previousSearch = searchBar.searchTextInput.text.toString()
             previousAttachments = attachments.isChecked
@@ -214,8 +212,6 @@ class SearchFragment : Fragment() {
                     popupMenu.dismiss()
                 }
             )
-
-            // TODO : Cleanly separate elements ?
         }
         return popupMenu
     }
@@ -234,16 +230,8 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun observeFolders() {
-        searchViewModel.folders.observe(viewLifecycleOwner) {
-            // TODO: handle folders ui
-        }
-    }
-
     private fun observeSearchResults() {
         searchViewModel.searchResults.observe(viewLifecycleOwner) {
-            // TODO: - handle visibility mode
-
             threadListAdapter.updateList(it)
             threadListAdapter.notifyDataSetChanged()
         }
