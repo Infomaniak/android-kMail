@@ -57,8 +57,7 @@
     <color name="separatorColor">@color/orca</color>
 
     <!-- Icons -->
-    <color name="iconColor">@color/mouse</color>
-    <color name="iconSecondaryColor">@color/shark</color>
+    <color name="iconColor">@color/shark</color>
     <color name="favoriteYellow">@color/yellow_dark</color>
     <color name="swipeActionIconColor">@color/bat</color>
 
@@ -78,10 +77,11 @@
     <color name="swipeArchive">@color/mauve_dark</color>
     <color name="swipeQuickActionMenu">@color/app_blue_dark</color>
     <color name="swipeInbox">@color/shark</color>
-    <color name="swipeNone">@color/progressbarTrackColor</color>
+    <color name="swipeNone">@color/elephant</color>
     <color name="swipeReadAndArchive">@color/prince_dark</color>
 
     <!-- Other -->
     <color name="textInputStrokeColor">@color/shark</color>
+    <color name="toggleableTextFormatterBackgroundColor">@color/mouse</color>
 
 </resources>
