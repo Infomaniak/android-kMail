@@ -64,19 +64,19 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         addToContacts.setOnClickListener { notYetImplemented() }
-        copyAddress.setOnClickListener { copyToClipBoard() }
+        copyAddress.setOnClickListener { copyToClipboard() }
 
         observeContacts()
     }
 
-    private fun copyToClipBoard() {
+    private fun copyToClipboard() = with(navigationArgs.recipient) {
         val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboardManager.setPrimaryClip(ClipData.newPlainText(CLIP_DATA_LABEL, navigationArgs.recipient.email))
+        clipboardManager.setPrimaryClip(ClipData.newPlainText(email, email))
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = activity?.findViewById(R.id.quickActionBar))
         }
-        
+
         findNavController().popBackStack()
     }
 
@@ -84,9 +84,5 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
             binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
         }
-    }
-
-    companion object {
-        private const val CLIP_DATA_LABEL = "Recipient's email"
     }
 }
