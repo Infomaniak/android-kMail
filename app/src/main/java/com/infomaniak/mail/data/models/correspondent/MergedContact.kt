@@ -21,8 +21,8 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
-@Suppress("PROPERTY_WONT_BE_SERIALIZED")
 @Parcelize
+@Suppress("PROPERTY_WONT_BE_SERIALIZED")
 class MergedContact : RealmObject, Correspondent {
     @PrimaryKey
     var id: Long? = null
