@@ -19,10 +19,12 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
@@ -179,6 +181,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun addRecipient(email: String, name: String) {
+        Log.e("gibran", "addRecipient: ADDING RECIPIENT");
         if (recipients.isEmpty()) isCollapsed = false
         val recipient = Recipient().initLocalValues(email, name)
         val recipientIsNew = contactAdapter!!.addUsedContact(email)
@@ -191,10 +194,10 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     private fun createChip(recipient: Recipient) {
-        ChipContactBinding.inflate(LayoutInflater.from(context)).root.apply {
+        ChipContactBinding.inflate(LayoutInflater.from(context), binding.itemsChipGroup, true).root.apply {
             text = recipient.getNameOrEmail()
             setOnClickListener { removeRecipient(recipient) }
-            binding.itemsChipGroup.addView(this)
+            // binding.itemsChipGroup.addView(this)
         }
     }
 
@@ -232,6 +235,7 @@ class RecipientFieldView @JvmOverloads constructor(
     }
 
     fun initRecipients(initialRecipients: List<Recipient>) {
+        Log.e("gibran", "initRecipients: INITIALIZING RECIPIENTS");
         initialRecipients.forEach {
             if (recipients.add(it)) {
                 createChip(it)
@@ -239,5 +243,7 @@ class RecipientFieldView @JvmOverloads constructor(
             }
         }
         updateCollapsedChipValues(isCollapsed)
+        invalidate()
+        requestLayout()
     }
 }
