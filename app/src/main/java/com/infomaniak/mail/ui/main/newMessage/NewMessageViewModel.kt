@@ -125,12 +125,13 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         return Draft().apply {
             initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
             initSignature(realm = this@createDraft)
-            if (draftMode == DraftMode.NEW_MAIL) {
-                recipient?.let { to = realmListOf(it) }
-            } else {
-                previousMessageUid
-                    ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
-                    ?.let { message -> setPreviousMessage(draftMode, message) }
+            when (draftMode) {
+                DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
+                DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
+                    previousMessageUid
+                        ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
+                        ?.let { message -> setPreviousMessage(draftMode, message) }
+                }
             }
         }
     }

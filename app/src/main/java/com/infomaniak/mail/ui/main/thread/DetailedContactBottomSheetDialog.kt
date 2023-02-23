@@ -51,7 +51,7 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         writeMail.setOnClickListener {
             safeNavigate(
                 DetailedContactBottomSheetDialogDirections.actionDetailedContactBottomSheetDialogToNewMessageActivity(
-                    recipient = navigationArgs.recipient
+                    recipient = navigationArgs.recipient,
                 )
             )
             findNavController().popBackStack()

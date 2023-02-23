@@ -25,7 +25,6 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-@Suppress("PROPERTY_WONT_BE_SERIALIZED")
 class Recipient : EmbeddedRealmObject, Correspondent {
     override var email: String = ""
     override var name: String = ""
