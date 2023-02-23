@@ -95,8 +95,7 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setupSnackBar() {
-        val activity = requireActivity()
-        detailedContactViewModel.snackBarManager.setup(activity, getAnchor = { activity.findViewById(R.id.quickActionBar) })
+    private fun setupSnackBar() = with(requireActivity()) {
+        detailedContactViewModel.snackBarManager.setup(this, getAnchor = { findViewById(R.id.quickActionBar) })
     }
 }

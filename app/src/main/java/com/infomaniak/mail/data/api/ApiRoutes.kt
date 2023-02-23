@@ -28,6 +28,7 @@ object ApiRoutes {
     fun addressBooks() = "$MAIL_API/api/pim/addressbook"
 
     fun contact() = "$MAIL_API/api/pim/contact"
+
     fun contacts() = "${contact()}/all?with=emails,details,others,contacted_times"
 
     fun signatures(mailboxHostingId: Int, mailboxName: String): String {
