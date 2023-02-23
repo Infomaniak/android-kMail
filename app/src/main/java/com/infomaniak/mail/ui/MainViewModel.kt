@@ -217,7 +217,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch {
         currentMailbox.value?.let {
-            getApplication<Application>().cancelNotification(it.notificationGroupId)
+            context.cancelNotification(it.notificationGroupId)
         }
     }
 
