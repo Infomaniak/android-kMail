@@ -46,7 +46,6 @@ class Folder : RealmObject {
     var id: String = ""
     var path: String = ""
     var name: String = ""
-    @Suppress("PropertyName")
     @SerialName("role")
     private var _role: String? = null
     @SerialName("is_favorite")
