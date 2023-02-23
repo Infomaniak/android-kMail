@@ -22,14 +22,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
 
-abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
+abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
     protected lateinit var binding: BottomSheetActionsMenuBinding
     protected val mainViewModel: MainViewModel by activityViewModels()
@@ -61,7 +59,7 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         setArchiveUi()
 
         archive.setClosingOnClickListener { onClickListener.onArchive() }
@@ -114,20 +112,6 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
             setIconResource(R.drawable.ic_drawer_inbox)
             setText(R.string.actionMoveToInbox)
-        }
-    }
-
-    private fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {
-        setOnClickListener {
-            findNavController().popBackStack()
-            callback()
-        }
-    }
-
-    private fun MainActionsView.setClosingOnClickListener(callback: ((Int) -> Unit)) {
-        setOnItemClickListener { id ->
-            callback(id)
-            findNavController().popBackStack()
         }
     }
 }

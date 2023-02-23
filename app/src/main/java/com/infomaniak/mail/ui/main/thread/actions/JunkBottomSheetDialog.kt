@@ -22,20 +22,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.createDescriptionDialog
 
-class JunkBottomSheetDialog : BottomSheetDialogFragment() {
+class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private lateinit var binding: BottomSheetJunkBinding
     private val navigationArgs: JunkBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    override val currentClassName: String by lazy { JunkBottomSheetDialog::class.java.name }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetJunkBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -69,12 +69,5 @@ class JunkBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun setSpamUi(message: Message) {
         binding.spam.setText(if (message.isSpam) R.string.actionNonSpam else R.string.actionSpam)
-    }
-
-    private fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {
-        setOnClickListener {
-            callback()
-            findNavController().popBackStack()
-        }
     }
 }
