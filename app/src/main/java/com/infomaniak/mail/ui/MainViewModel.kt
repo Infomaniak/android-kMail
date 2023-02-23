@@ -168,9 +168,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadCurrentMailboxFromRemote() {
         Log.d(TAG, "Load current mailbox from remote")
-        val mailboxes = ApiRepository.getMailboxes().data ?: return
-        MailboxController.updateMailboxes(context, mailboxes)
-        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
+        with(ApiRepository.getMailboxes()) {
+            if (isSuccess()) {
+                val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
+                if (isCurrentMailboxDeleted) return
+                MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
+            }
+        }
     }
 
     private fun openMailbox(mailbox: Mailbox) {
@@ -195,11 +199,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshMailboxesAndFoldersJob = viewModelScope.launch(viewModelScope.handlerIO) {
 
             Log.d(TAG, "Force refresh mailboxes")
-            val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
-            MailboxController.updateMailboxes(context, mailboxes)
+            with(ApiRepository.getMailboxes()) {
+                if (isSuccess()) {
+                    val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
+                    if (isCurrentMailboxDeleted) return@launch
+                }
+            }
 
             Log.d(TAG, "Force refresh quotas")
-            val mailbox = currentMailbox.value ?: return@launch
+            val mailbox = currentMailbox.value!!
             updateMailboxQuotas(mailbox)
 
             Log.d(TAG, "Force refresh folders")
@@ -286,10 +294,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Archive
     fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
+        val mailbox = currentMailbox.value!!
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
         val messagesFoldersIds = mutableListOf<String>()
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)!!
 
         if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
         archiveThreadOrMessageSync(threadUid, withRefresh = false)?.also(messagesFoldersIds::addAll)
@@ -306,8 +314,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         message: Message? = null,
         withRefresh: Boolean = true,
     ): List<String>? {
-        val mailbox = currentMailbox.value ?: return null
-        val thread = ThreadController.getThread(threadUid) ?: return null
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
         val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
 
@@ -336,8 +344,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Delete
     fun deleteThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -407,10 +415,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         threadUid: String,
         messageUid: String? = null,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val destinationFolder = FolderController.getFolder(destinationFolderId) ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
+        val mailbox = currentMailbox.value!!
+        val destinationFolder = FolderController.getFolder(destinationFolderId)!!
+        val thread = ThreadController.getThread(threadUid)!!
+        val message = messageUid?.let { MessageController.getMessage(messageUid)!! }
         val messages = getMessagesToMove(thread, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
@@ -452,8 +460,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Seen
     fun toggleSeenStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
         val isSeen = message?.isSeen ?: (thread.unseenMessagesCount == 0)
 
@@ -479,8 +487,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Favorite
     fun toggleFavoriteStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
         val messages = when {
             message != null -> MessageController.getMessageAndDuplicates(thread, message)
@@ -505,11 +513,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
         val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
-        val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return@launch
+        val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
 
         val messages = when (message) {
             null -> MessageController.getUnscheduledMessages(thread)
@@ -530,7 +538,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Phishing
     fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid!!
 
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
 
@@ -547,7 +555,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region BlockUser
     fun blockUser(message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid!!
 
         val apiResponse = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)
 
@@ -564,7 +572,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Undo action
     fun undoAction(undoData: UndoData) {
         viewModelScope.launch(Dispatchers.IO) {
-            val mailbox = currentMailbox.value ?: return@launch
+            val mailbox = currentMailbox.value!!
             val (resource, foldersIds, destinationFolderId) = undoData
 
             val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
