@@ -94,8 +94,9 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
-        initFocus()
         initDraftAndViewModel()
+
+        focusCorrectView()
 
         doAfterSubjectChange()
         doAfterBodyChange()
@@ -136,15 +137,6 @@ class NewMessageFragment : Fragment() {
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
     }
 
-    private fun initFocus() = with(binding) {
-        when (newMessageActivityArgs.draftMode) {
-            DraftMode.REPLY,
-            DraftMode.REPLY_ALL -> bodyText.requestFocus()
-            DraftMode.NEW_MAIL,
-            DraftMode.FORWARD -> toField.requestFocus()
-        }
-    }
-
     private fun initDraftAndViewModel() {
         newMessageViewModel.initDraftAndViewModel(newMessageActivityArgs).observe(viewLifecycleOwner) { isSuccess ->
             if (isSuccess) {
@@ -153,6 +145,15 @@ class NewMessageFragment : Fragment() {
             } else {
                 requireActivity().finish()
             }
+        }
+    }
+
+    private fun focusCorrectView() = with(binding) {
+        when (newMessageActivityArgs.draftMode) {
+            DraftMode.REPLY,
+            DraftMode.REPLY_ALL -> bodyText.requestFocus()
+            DraftMode.NEW_MAIL,
+            DraftMode.FORWARD -> toField.requestFocus()
         }
     }
 
