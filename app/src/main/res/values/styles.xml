@@ -146,7 +146,7 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="backgroundTint">?android:attr/colorPrimary</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">16dp</item>
         <item name="fontFamily">@font/suisseintl_medium</item>
         <item name="layout_constraintWidth_max">500dp</item>
     </style>
