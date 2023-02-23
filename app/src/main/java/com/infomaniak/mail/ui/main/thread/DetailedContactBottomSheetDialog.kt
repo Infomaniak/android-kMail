@@ -22,8 +22,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
@@ -46,7 +48,15 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         userAvatar.loadAvatar(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
         fillInUserNameAndEmail(navigationArgs.recipient, name, email)
 
-        writeMail.setOnClickListener { notYetImplemented() }
+        writeMail.setOnClickListener {
+            safeNavigate(
+                DetailedContactBottomSheetDialogDirections.actionDetailedContactBottomSheetDialogToNewMessageActivity(
+                    recipient = navigationArgs.recipient,
+                )
+            )
+            findNavController().popBackStack()
+        }
+
         addToContacts.setOnClickListener { notYetImplemented() }
         copyAddress.setOnClickListener { notYetImplemented() }
 
