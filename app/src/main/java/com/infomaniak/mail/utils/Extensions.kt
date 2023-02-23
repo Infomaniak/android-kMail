@@ -24,13 +24,17 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.text.Editable
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
+import android.widget.Button
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -51,6 +55,7 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
+import com.infomaniak.mail.databinding.DialogInputBinding
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
 import io.realm.kotlin.MutableRealm
@@ -67,6 +72,7 @@ import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
+import com.google.android.material.R as RMaterial
 
 fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
 
@@ -304,4 +310,46 @@ fun Fragment.createDescriptionDialog(
         .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked() }
         .setNegativeButton(R.string.buttonCancel, null)
         .create()
+}
+
+fun Fragment.createInputDialog(
+    @StringRes title: Int,
+    @StringRes hint: Int,
+    @StringRes confirmButtonText: Int,
+    onPositiveButtonClicked: (Editable?) -> Unit,
+) = with(DialogInputBinding.inflate(layoutInflater)) {
+
+    fun Button.setButtonEnablement(isInputEmpty: Boolean) {
+        isEnabled = !isInputEmpty
+
+        val (textColor, backgroundColor) = if (isInputEmpty) {
+            @Suppress("ResourceAsColor")
+            R.color.disabledDialogButtonTextColor to resources.getColor(R.color.backgroundDisabledDialogButton, null)
+        } else {
+            R.color.colorOnPrimary to context.getAttributeColor(RMaterial.attr.colorPrimary)
+        }
+        setTextColor(resources.getColor(textColor, null))
+        setBackgroundColor(backgroundColor)
+    }
+
+    fun AlertDialog.setupOnShowListener() = apply {
+        setOnShowListener {
+            showKeyboard()
+            getButton(AlertDialog.BUTTON_POSITIVE).apply {
+                setButtonEnablement(true)
+                textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
+            }
+        }
+    }
+
+    dialogTitle.setText(title)
+    textInputLayout.setHint(hint)
+
+    return@with MaterialAlertDialogBuilder(context)
+        .setView(root)
+        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text) }
+        .setNegativeButton(R.string.buttonCancel, null)
+        .setOnDismissListener { textInput.text?.clear() }
+        .create()
+        .setupOnShowListener()
 }

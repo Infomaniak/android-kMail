@@ -64,6 +64,7 @@
     <color name="backgroundSnackbarColor">@color/orca</color>
     <color name="elevatedBackground">@color/swan</color>
     <color name="backgroundDisabledPrimaryButton">@color/shark</color>
+    <color name="backgroundDisabledDialogButton">@color/mouse</color>
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
 
@@ -75,6 +76,7 @@
     <color name="snackbarTextColor">@color/mouse</color>
     <color name="draftTextColor">@color/redDestructiveAction</color>
     <color name="staffOnlyColor">@color/prince_light</color>
+    <color name="disabledDialogButtonTextColor">@color/shark</color>
 
     <!-- Separators -->
     <color name="separatorColor">@color/mouse</color>

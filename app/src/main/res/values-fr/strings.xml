@@ -131,7 +131,6 @@
     <string name="createFolderName">Nom du dossier</string>
     <string name="createFolderNoParent">Aucun</string>
     <string name="createFolderParent">Dossier parent</string>
-    <string name="createFolderTitle">Quel sera le nom de ce dossier ?</string>
     <string name="dateTitle">Date :</string>
     <string name="draftFolder">Brouillons</string>
     <string name="draftPrefix">(Brouillon)</string>
@@ -171,8 +170,7 @@
     </plurals>
     <string name="newFolderDialogHint">Nom du dossier</string>
     <string name="newFolderDialogMovePositiveButton">Créer et déplacer</string>
-    <string name="newFolderDialogPositiveButton">Créer le dossier</string>
-    <string name="newFolderDialogTitle">Quel nom de dossier souhaitez-vous utiliser ?</string>
+    <string name="newFolderDialogTitle">Nouveau dossier</string>
     <plurals name="newMessageNotificationSummary">
         <item quantity="one">%d nouveau message</item>
         <item quantity="other">%d nouveaux messages</item>
@@ -317,12 +315,18 @@
     <string name="socialNetworksFolder">Réseaux sociaux</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Objet :</string>
-    <string name="threadListFlushFolderAlertDescription">Etes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
-    <plurals name="threadListFlushFolderAlertTitle">
+    <plurals name="threadListDeletionConfirmationAlertDescription">
+        <item quantity="one">Etes-vous sûr de vouloir supprimer ce message définitivement ?</item>
+        <item quantity="other">Etes-vous sûr de vouloir supprimer ces messages définitivement ?</item>
+    </plurals>
+    <plurals name="threadListDeletionConfirmationAlertTitle">
         <item quantity="one">Supprimer %d message</item>
         <item quantity="other">Supprimer %d messages</item>
         <item quantity="many">Supprimer %d de messages</item>
     </plurals>
+    <string name="threadListEmptyFolderAlertDescription">Etes-vous sûr de vouloir supprimer définitivement tous les messages de ce dossier ?</string>
+    <string name="threadListEmptySpamButton">Vider le dossier spam</string>
+    <string name="threadListEmptyTrashButton">Vider la corbeille</string>
     <string name="threadListHeaderLastUpdate">Mis à jour %s</string>
     <string name="threadListHeaderLastUpdateNow">à l’instant</string>
     <plurals name="threadListHeaderUnreadCount">
@@ -335,9 +339,7 @@
     <string name="threadListSectionThisWeek">Cette semaine</string>
     <string name="threadListSectionToday">Aujourd’hui</string>
     <string name="threadListSectionTwoWeeks">Il y a deux semaines</string>
-    <string name="threadListSpamEmptyButton">Vider le dossier spam</string>
     <string name="threadListSpamHint">Les messages placés dans le dossier spam pendant plus de 30 jours seront automatiquement supprimés.</string>
-    <string name="threadListTrashEmptyButton">Vider la corbeille</string>
     <string name="threadListTrashHint">Les messages placés dans la corbeille pendant plus de 30 jours seront automatiquement supprimés.</string>
     <string name="titleMyAccount">Mon compte</string>
     <string name="titleMyAccounts">Mes comptes</string>

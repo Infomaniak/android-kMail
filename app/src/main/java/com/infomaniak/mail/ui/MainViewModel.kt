@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
@@ -62,6 +63,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private inline val context: Context get() = getApplication<Application>()
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
+    val isNewFolderCreated = SingleLiveEvent<Boolean>()
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
     val snackBarManager by lazy { SnackBarManager() }
 
@@ -577,6 +579,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             snackBarManager.postValue(context.getString(snackbarTitle))
         }
+    }
+    //endregion
+
+    //region New Folder
+    private fun createNewFolderSync(name: String): String? {
+        val mailbox = currentMailbox.value ?: return null
+        val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
+
+        return if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+            apiResponse.data?.id
+        } else {
+            val snackbarTitle = if (apiResponse.error?.code == ErrorCodes.FOLDER_ALREADY_EXISTS) {
+                R.string.errorNewFolderAlreadyExists
+            } else {
+                RCore.string.anErrorHasOccurred
+            }
+            snackBarManager.postValue(context.getString(snackbarTitle), null)
+            null
+        }
+    }
+
+    fun createNewFolder(name: String) = viewModelScope.launch(Dispatchers.IO) { createNewFolderSync(name) }
+
+    fun moveToNewFolder(name: String, threadUid: String, messageUid: String?) = viewModelScope.launch(Dispatchers.IO) {
+        val newFolderId = createNewFolderSync(name) ?: return@launch
+        moveTo(newFolderId, threadUid, messageUid)
+        isNewFolderCreated.postValue(true)
     }
     //endregion
 
