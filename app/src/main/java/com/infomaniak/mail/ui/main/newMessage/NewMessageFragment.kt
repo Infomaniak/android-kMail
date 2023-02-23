@@ -53,6 +53,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
@@ -93,6 +94,7 @@ class NewMessageFragment : Fragment() {
         filePicker = FilePicker(this@NewMessageFragment)
 
         initUi()
+        initFocus()
         initDraftAndViewModel()
 
         doAfterSubjectChange()
@@ -132,6 +134,15 @@ class NewMessageFragment : Fragment() {
 
         bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
         setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
+    }
+
+    private fun initFocus() = with(binding) {
+        when (newMessageActivityArgs.draftMode) {
+            DraftMode.REPLY,
+            DraftMode.REPLY_ALL -> bodyText.requestFocus()
+            DraftMode.NEW_MAIL,
+            DraftMode.FORWARD -> toField.requestFocus()
+        }
     }
 
     private fun initDraftAndViewModel() {
