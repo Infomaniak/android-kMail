@@ -21,7 +21,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.workers.SyncMessagesWorker
+import com.infomaniak.mail.workers.SyncMailboxesWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ class RebootReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.IO).launch {
             val appNotStarted = AccountUtils.currentUser == null
             if (intent?.action == Intent.ACTION_BOOT_COMPLETED && appNotStarted && AccountUtils.getAllUsersCount() > 0) {
-                SyncMessagesWorker.scheduleWork(context)
+                SyncMailboxesWorker.scheduleWork(context)
             }
         }
     }
