@@ -35,14 +35,16 @@ import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
+import com.infomaniak.mail.checkPlayServices
 import com.infomaniak.mail.databinding.ActivityMainBinding
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.workers.SyncMessagesWorker
+import com.infomaniak.mail.workers.SyncMailboxesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+
 
 class MainActivity : ThemedActivity() {
 
@@ -90,11 +92,13 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.observeMergedContactsLive()
         permissionUtils.requestMainPermissionsIfNeeded()
+
+        checkPlayServices()
     }
 
     override fun onStart() {
         super.onStart()
-        SyncMessagesWorker.cancelWork(this)
+        if (!checkPlayServices()) SyncMailboxesWorker.cancelWork(this)
         mainViewModel.forceRefreshMailboxesAndFolders()
     }
 
@@ -105,7 +109,7 @@ class MainActivity : ThemedActivity() {
 
     override fun onStop() {
         // When you change user you don't want to launch the work
-        if (!isFinishing) SyncMessagesWorker.scheduleWork(this)
+        if (!isFinishing && !checkPlayServices()) SyncMailboxesWorker.scheduleWork(this)
         super.onStop()
     }
 
@@ -114,7 +118,7 @@ class MainActivity : ThemedActivity() {
             (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
         } else {
             // Schedule here because the activity is in finishing state and it'll be ignore by the stop lifecycle
-            SyncMessagesWorker.scheduleWork(this@MainActivity)
+            SyncMailboxesWorker.scheduleWork(this@MainActivity)
             super.onBackPressed()
         }
     }
