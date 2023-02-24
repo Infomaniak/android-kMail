@@ -43,7 +43,7 @@ object ApiRepository : ApiRepositoryCore() {
 
     const val PER_PAGE = 50
 
-    private inline fun <reified T> callApi(
+    inline fun <reified T> callApi(
         url: String,
         method: ApiController.ApiMethod,
         body: Any? = null,
