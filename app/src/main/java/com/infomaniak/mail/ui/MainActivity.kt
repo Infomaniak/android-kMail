@@ -22,6 +22,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
@@ -76,6 +77,7 @@ class MainActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        handleOnBackPressed()
 
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         observeNetworkStatus()
@@ -103,20 +105,22 @@ class MainActivity : ThemedActivity() {
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
+    private fun handleOnBackPressed() = with(binding) {
+        onBackPressedDispatcher.addCallback(this@MainActivity) {
+            if (drawerLayout.isOpen) {
+                (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
+            } else {
+                // Schedule here because the Activity is in finishing state so it'll be ignored by the onStop lifecycle.
+                SyncMessagesWorker.scheduleWork(this@MainActivity)
+                finish()
+            }
+        }
+    }
+
     override fun onStop() {
         // When you change user you don't want to launch the work
         if (!isFinishing) SyncMessagesWorker.scheduleWork(this)
         super.onStop()
-    }
-
-    override fun onBackPressed(): Unit = with(binding) {
-        if (drawerLayout.isOpen) {
-            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
-        } else {
-            // Schedule here because the activity is in finishing state and it'll be ignore by the stop lifecycle
-            SyncMessagesWorker.scheduleWork(this@MainActivity)
-            super.onBackPressed()
-        }
     }
 
     override fun onDestroy() {
