@@ -79,8 +79,9 @@ class NewMessageActivity : ThemedActivity() {
     }
 
     private fun saveDraftAndShowToast(action: DraftAction) = with(newMessageViewModel) {
-        saveToLocalAndFinish(action)
-        if (shouldExecuteAction(action)) displayDraftActionToast(action)
+        val shouldExecuteAction = shouldExecuteAction(action)
+        if (shouldExecuteAction) displayDraftActionToast(action)
+        saveToLocalAndFinish(action, shouldExecuteAction)
     }
 
     private fun displayDraftActionToast(action: DraftAction) {

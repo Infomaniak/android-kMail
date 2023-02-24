@@ -213,10 +213,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
+    fun saveToLocalAndFinish(action: DraftAction, shouldExecuteAction: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         autoSaveJob?.cancel()
 
-        if (shouldExecuteAction(action)) {
+        if (shouldExecuteAction) {
             saveDraftToLocal(action)
         } else if (isNewMessage) {
             RealmDatabase.mailboxContent().writeBlocking {
