@@ -78,10 +78,10 @@ class NewMessageActivity : ThemedActivity() {
         sendButton.setOnClickListener { saveDraftAndShowToast(DraftAction.SEND) }
     }
 
-    private fun saveDraftAndShowToast(action: DraftAction) = with(newMessageViewModel) {
-        val shouldExecuteAction = shouldExecuteAction(action)
-        if (shouldExecuteAction) displayDraftActionToast(action)
-        saveToLocalAndFinish(action, shouldExecuteAction)
+    private fun saveDraftAndShowToast(action: DraftAction) {
+        newMessageViewModel.saveToLocalAndFinish(action) {
+            displayDraftActionToast(action)
+        }
     }
 
     private fun displayDraftActionToast(action: DraftAction) {
