@@ -219,8 +219,6 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         return scheduledDate
     }
 
-    private fun Data.getIntOrNull(key: String) = getInt(key, 0).run { if (this == 0) null else this }
-
     companion object {
         private const val TAG = "DraftsActionsWorker"
         private const val USER_ID_KEY = "userId"
