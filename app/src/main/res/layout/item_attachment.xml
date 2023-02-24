@@ -83,7 +83,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="gone"
-            app:icon="@drawable/ic_close"
+            app:icon="@drawable/ic_close_thin"
             app:iconSize="@dimen/mediumIconSize"
             app:iconTint="@color/iconColor"
             app:layout_constraintBottom_toBottomOf="parent"
