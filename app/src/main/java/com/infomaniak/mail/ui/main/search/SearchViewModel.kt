@@ -93,7 +93,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun nextPage() {
-        if (resourceNext.isNullOrBlank()) return
+        if (!hasNextPage) return
         searchQuery(query = searchQuery.value ?: "", resetPagination = false)
     }
 
@@ -154,7 +154,7 @@ class SearchViewModel : ViewModel() {
                     resourceNext = data?.resourceNext
                     resourcePrevious = data?.resourcePrevious
                 }
-            } else if (resourceNext.isNullOrBlank()) {
+            } else if (!hasNextPage) {
                 val searchMessages = MessageController.searchMessages(query, filters, selectedFolder?.id)
                 val threads = searchMessages.convertToSearchThreads()
                 ThreadController.saveThreads(threads, searchMessages)
