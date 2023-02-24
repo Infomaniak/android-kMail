@@ -143,7 +143,7 @@ object MessageController {
 
         fetchFolderMessagesJob?.cancel()
         val job = async {
-            val newMessagesThreads = fetchFolderMessages(this, mailbox, folder, okHttpClient, realm)
+            val impactedCurrentFolderThreads = fetchFolderMessages(this, mailbox, folder, okHttpClient, realm)
 
             val roles = when (folder.role) {
                 FolderRole.INBOX -> listOf(FolderRole.SENT, FolderRole.DRAFT)
@@ -158,7 +158,7 @@ object MessageController {
                 }
             }
 
-            return@async newMessagesThreads
+            return@async impactedCurrentFolderThreads
         }
 
         fetchFolderMessagesJob = job
@@ -181,12 +181,12 @@ object MessageController {
         } ?: return emptyList()
         scope.ensureActive()
 
-        val updatedThreads = handleMessagesUids(scope, messagesUids, folder, mailbox, okHttpClient, realm)
+        val impactedCurrentFolderThreads = handleMessagesUids(scope, messagesUids, folder, mailbox, okHttpClient, realm)
 
         SentryDebug.sendOrphanMessages(previousCursor, folder, realm)
         SentryDebug.sendOrphanThreads(previousCursor, folder, realm)
 
-        return updatedThreads
+        return impactedCurrentFolderThreads
     }
 
     private fun handleMessagesUids(
@@ -215,7 +215,7 @@ object MessageController {
 
         return@with realm.writeBlocking {
 
-            val newMessagesThreads = impactedThreads.filter { it.folderId == folder.id }
+            val impactedCurrentFolderThreads = impactedThreads.filter { it.folderId == folder.id }
             val impactedFoldersIds = (impactedThreads.map { it.folderId } + folder.id).toMutableSet()
 
             impactedFoldersIds += handleDeletedUids(scope, deletedUids)
@@ -231,7 +231,7 @@ object MessageController {
                 it.cursor = cursor
             }
 
-            return@writeBlocking newMessagesThreads
+            return@writeBlocking impactedCurrentFolderThreads
         }
     }
 

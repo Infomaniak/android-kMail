@@ -76,17 +76,17 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
                 val okHttpClient = AccountUtils.getHttpClient(user.id)
 
                 // Update local with remote
-                val newMessagesThreads = runCatching {
+                val impactedCurrentFolderThreads = runCatching {
                     MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, realm)
                 }.getOrElse {
                     if (it is ApiErrorException) handleApiErrors(it) else throw it
                     return@loopMailboxes
                 }
-                Log.d(TAG, "launchWork: ${mailbox.email} has ${newMessagesThreads.count()} new messages")
+                Log.d(TAG, "launchWork: ${mailbox.email} has ${impactedCurrentFolderThreads.count()} new messages")
 
                 // Notify all new messages
                 val unReadThreadsCount = ThreadController.getUnreadThreadsCount(folder)
-                newMessagesThreads.forEach { thread ->
+                impactedCurrentFolderThreads.forEach { thread ->
                     thread.showNotification(user.id, mailbox, unReadThreadsCount, realm, okHttpClient)
                 }
 
