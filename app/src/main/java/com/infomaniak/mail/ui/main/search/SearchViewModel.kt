@@ -179,11 +179,12 @@ class SearchViewModel : ViewModel() {
     }
 
     private companion object {
+
         val TAG = SearchViewModel::class.simpleName
+
         /**
          * The minimum value allowed for a search query
          */
         const val MIN_SEARCH_QUERY = 3
     }
-
 }

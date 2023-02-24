@@ -91,5 +91,4 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
         val message = MessageController.getMessageToReplyTo(thread)
         quickActionBarClicks.postValue(message to menuId)
     }
-
 }
