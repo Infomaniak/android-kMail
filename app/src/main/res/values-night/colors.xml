@@ -19,12 +19,12 @@
     <color name="pinkMail">@color/pink_mail_primary_dark</color>
     <color name="pinkMailInverse">@color/pink_mail_primary_light</color>
     <color name="pinkMailContainer">@color/pink_mail_container_dark</color>
-    <color name="pinkBoardingSecondaryBackground">@color/black</color>
+    <color name="pinkBoardingSecondaryBackground">@color/bat</color>
     <color name="pinkMailRipple">@color/pink_mail_ripple_dark</color>
     <color name="blueMail">@color/blue_mail_primary_dark</color>
     <color name="blueMailInverse">@color/blue_mail_primary_light</color>
     <color name="blueMailContainer">@color/blue_mail_container_dark</color>
-    <color name="blueBoardingSecondaryBackground">@color/black</color>
+    <color name="blueBoardingSecondaryBackground">@color/bat</color>
     <color name="blueMailRipple">@color/blue_mail_ripple_dark</color>
 
     <!-- Context / errors -->
@@ -39,7 +39,7 @@
     <color name="backgroundColorTertiary">@color/orca</color>
     <color name="backgroundHeaderColor">#212121</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
-    <color name="backgroundOnBoardingColor">@color/bat</color>
+    <color name="backgroundOnBoardingColor">@color/black</color>
     <color name="backgroundSnackbarColor">@color/rabbit</color>
     <color name="elevatedBackground">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
