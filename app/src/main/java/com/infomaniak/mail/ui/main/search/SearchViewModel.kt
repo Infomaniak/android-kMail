@@ -68,7 +68,6 @@ class SearchViewModel : ViewModel() {
     }
 
     fun refreshSearch() {
-        resetPagination()
         searchQuery(searchQuery.value ?: "")
     }
 
