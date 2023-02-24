@@ -68,7 +68,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private lateinit var mailbox: Mailbox
     private var userId: Int by Delegates.notNull()
 
-    private val dateFormatWithTimezone = SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT)
+    private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
         Log.d(TAG, "Work started")
