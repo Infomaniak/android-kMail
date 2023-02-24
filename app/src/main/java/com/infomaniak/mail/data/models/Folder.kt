@@ -46,7 +46,6 @@ class Folder : RealmObject {
     var id: String = ""
     var path: String = ""
     var name: String = ""
-    @Suppress("PropertyName")
     @SerialName("role")
     private var _role: String? = null
     @SerialName("is_favorite")
@@ -97,7 +96,7 @@ class Folder : RealmObject {
     }
 
     enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
-        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_mailbox, 0),
+        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 0),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4),
         SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 5),

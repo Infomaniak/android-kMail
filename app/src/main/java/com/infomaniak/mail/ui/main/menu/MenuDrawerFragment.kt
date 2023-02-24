@@ -48,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class MenuDrawerFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMenuDrawerBinding
+    private val createFolderDialog by lazy { initNewFolderDialog() }
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -100,12 +101,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
 
         customFolders.setOnClickListener { customFoldersLayout.isGone = customFolders.isCollapsed }
 
-        customFolders.setOnActionClickListener { // Create new folder
-            safeNavigate(
-                directions = ThreadListFragmentDirections.actionThreadListFragmentToNewFolderDialog(),
-                currentClassName = MenuDrawerFragment::class.java.name,
-            )
-        }
+        customFolders.setOnActionClickListener { createFolderDialog.show() }
 
         feedback.setOnClickListener {
             closeDrawer()
@@ -251,4 +247,11 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         advancedActionsLayout.isGone = true
         advancedActions.setIsCollapsed(true)
     }
+
+    private fun initNewFolderDialog() = createInputDialog(
+        title = R.string.newFolderDialogTitle,
+        hint = R.string.newFolderDialogHint,
+        confirmButtonText = R.string.buttonCreate,
+        onPositiveButtonClicked = { folderName -> mainViewModel.createNewFolder(folderName!!.toString()) },
+    )
 }

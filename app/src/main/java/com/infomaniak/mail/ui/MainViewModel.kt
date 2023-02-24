@@ -42,6 +42,7 @@ import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.ui.main.SnackBarManager
 import com.infomaniak.mail.ui.main.SnackBarManager.*
 import com.infomaniak.mail.utils.*
+import com.infomaniak.mail.utils.ApiErrorException.ErrorCodes
 import com.infomaniak.mail.utils.ContactUtils.getPhoneContacts
 import com.infomaniak.mail.utils.ContactUtils.mergeApiContactsIntoPhoneContacts
 import com.infomaniak.mail.utils.NotificationUtils.cancelNotification
@@ -62,6 +63,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private inline val context: Context get() = getApplication<Application>()
     val isInternetAvailable = SingleLiveEvent<Boolean>()
     var isDownloadingChanges = MutableLiveData(false)
+    val isNewFolderCreated = SingleLiveEvent<Boolean>()
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
     val snackBarManager by lazy { SnackBarManager() }
 
@@ -171,9 +173,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun loadCurrentMailboxFromRemote() {
         Log.d(TAG, "Load current mailbox from remote")
-        val mailboxes = ApiRepository.getMailboxes().data ?: return
-        MailboxController.updateMailboxes(context, mailboxes)
-        MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
+        with(ApiRepository.getMailboxes()) {
+            if (isSuccess()) {
+                val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
+                if (isCurrentMailboxDeleted) return
+                MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)?.let(::openMailbox)
+            }
+        }
     }
 
     private fun openMailbox(mailbox: Mailbox) {
@@ -198,11 +204,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshMailboxesAndFoldersJob = viewModelScope.launch(viewModelScope.handlerIO) {
 
             Log.d(TAG, "Force refresh mailboxes")
-            val mailboxes = ApiRepository.getMailboxes().data ?: return@launch
-            MailboxController.updateMailboxes(context, mailboxes)
+            with(ApiRepository.getMailboxes()) {
+                if (isSuccess()) {
+                    val isCurrentMailboxDeleted = MailboxController.updateMailboxes(context, data!!)
+                    if (isCurrentMailboxDeleted) return@launch
+                }
+            }
 
             Log.d(TAG, "Force refresh quotas")
-            val mailbox = currentMailbox.value ?: return@launch
+            val mailbox = currentMailbox.value!!
             updateMailboxQuotas(mailbox)
 
             Log.d(TAG, "Force refresh folders")
@@ -212,7 +222,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissCurrentMailboxNotifications() = viewModelScope.launch {
         currentMailbox.value?.let {
-            getApplication<Application>().cancelNotification(it.notificationGroupId)
+            context.cancelNotification(it.notificationGroupId)
         }
     }
 
@@ -289,10 +299,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Archive
     fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
+        val mailbox = currentMailbox.value!!
         val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
         val messagesFoldersIds = mutableListOf<String>()
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val thread = ThreadController.getThread(threadUid)!!
 
         if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
         archiveThreadOrMessageSync(threadUid, withRefresh = false)?.also(messagesFoldersIds::addAll)
@@ -309,28 +319,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         message: Message? = null,
         withRefresh: Boolean = true,
     ): List<String>? {
-        val mailbox = currentMailbox.value ?: return null
-        val archiveFolder = FolderController.getFolder(FolderRole.ARCHIVE) ?: return null
-        val thread = ThreadController.getThread(threadUid) ?: return null
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
-        val archiveId = archiveFolder.id
+        val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
+
+        val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
+        val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return null
+
         val messages = getMessagesToMove(thread, message)
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), archiveId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         var impactedFoldersIds: List<String>? = null
         if (apiResponse.isSuccess()) {
-            val messagesFoldersIds = messages.getFoldersIds(exception = archiveId)
+            val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
             if (withRefresh) {
-                refreshFolders(mailbox, messagesFoldersIds, archiveId)
+                refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id)
             } else {
                 impactedFoldersIds = messagesFoldersIds
             }
         }
 
-        val undoDestinationId = message?.folderId ?: thread.folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + archiveId
-        showMoveSnackbar(message, apiResponse, archiveFolder, undoFoldersIds, undoDestinationId)
+        showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
 
         return impactedFoldersIds
     }
@@ -338,8 +349,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Delete
     fun deleteThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
         var trashId: String? = null
         var undoResource: String? = null
 
@@ -409,10 +420,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         threadUid: String,
         messageUid: String? = null,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val destinationFolder = FolderController.getFolder(destinationFolderId) ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
-        val message = messageUid?.let { MessageController.getMessage(messageUid) ?: return@launch }
+        val mailbox = currentMailbox.value!!
+        val destinationFolder = FolderController.getFolder(destinationFolderId)!!
+        val thread = ThreadController.getThread(threadUid)!!
+        val message = messageUid?.let { MessageController.getMessage(messageUid)!! }
         val messages = getMessagesToMove(thread, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
@@ -421,19 +432,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
         }
 
-        val undoDestinationId = message?.folderId ?: thread.folderId
-        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-
-        showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+        showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
     }
 
     private fun showMoveSnackbar(
+        threadFolderId: String,
         message: Message?,
+        messages: List<Message>,
         apiResponse: ApiResponse<MoveResult>,
         destinationFolder: Folder,
-        undoFoldersIds: List<String>,
-        undoDestinationId: String?,
     ) {
+        val undoDestinationId = message?.folderId ?: threadFolderId
+        val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id
 
         val destination = destinationFolder.role?.folderNameRes?.let(context::getString) ?: destinationFolder.name
 
@@ -455,8 +465,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Seen
     fun toggleSeenStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
         val isSeen = message?.isSeen ?: (thread.unseenMessagesCount == 0)
 
@@ -482,8 +492,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Favorite
     fun toggleFavoriteStatus(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
         val messages = when {
             message != null -> MessageController.getMessageAndDuplicates(thread, message)
@@ -508,35 +518,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         message: Message? = null,
         displaySnackbar: Boolean = true,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value ?: return@launch
-        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val mailbox = currentMailbox.value!!
+        val thread = ThreadController.getThread(threadUid)!!
 
         val destinationFolderRole = if (isSpam(message)) FolderRole.INBOX else FolderRole.SPAM
-        val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return@launch
-        val destinationFolderId = destinationFolder.id
+        val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
 
         val messages = when (message) {
             null -> MessageController.getUnscheduledMessages(thread)
             else -> MessageController.getMessageAndDuplicates(thread, message)
         }
 
-        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolderId)
+        val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
         if (apiResponse.isSuccess()) {
-            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolderId), destinationFolderId)
+            refreshFolders(mailbox, messages.getFoldersIds(exception = destinationFolder.id), destinationFolder.id)
         }
 
         if (displaySnackbar) {
-            val undoDestinationId = message?.folderId ?: thread.folderId
-            val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolderId
-            showMoveSnackbar(message, apiResponse, destinationFolder, undoFoldersIds, undoDestinationId)
+            showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
         }
     }
     //endregion
 
     //region Phishing
     fun reportPhishing(threadUid: String, message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid!!
 
         val apiResponse = ApiRepository.reportPhishing(mailboxUuid, message.folderId, message.shortUid)
 
@@ -553,7 +560,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region BlockUser
     fun blockUser(message: Message) = viewModelScope.launch(Dispatchers.IO) {
-        val mailboxUuid = currentMailbox.value?.uuid ?: return@launch
+        val mailboxUuid = currentMailbox.value?.uuid!!
 
         val apiResponse = ApiRepository.blockUser(mailboxUuid, message.folderId, message.shortUid)
 
@@ -570,7 +577,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //region Undo action
     fun undoAction(undoData: UndoData) {
         viewModelScope.launch(Dispatchers.IO) {
-            val mailbox = currentMailbox.value ?: return@launch
+            val mailbox = currentMailbox.value!!
             val (resource, foldersIds, destinationFolderId) = undoData
 
             val snackbarTitle = if (ApiRepository.undoAction(resource).data == true) {
@@ -582,6 +589,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             snackBarManager.postValue(context.getString(snackbarTitle))
         }
+    }
+    //endregion
+
+    //region New Folder
+    private fun createNewFolderSync(name: String): String? {
+        val mailbox = currentMailbox.value ?: return null
+        val apiResponse = ApiRepository.createFolder(mailbox.uuid, name)
+
+        return if (apiResponse.isSuccess()) {
+            updateFolders(mailbox)
+            apiResponse.data?.id
+        } else {
+            val snackbarTitle = if (apiResponse.error?.code == ErrorCodes.FOLDER_ALREADY_EXISTS) {
+                R.string.errorNewFolderAlreadyExists
+            } else {
+                RCore.string.anErrorHasOccurred
+            }
+            snackBarManager.postValue(context.getString(snackbarTitle), null)
+            null
+        }
+    }
+
+    fun createNewFolder(name: String) = viewModelScope.launch(Dispatchers.IO) { createNewFolderSync(name) }
+
+    fun moveToNewFolder(name: String, threadUid: String, messageUid: String?) = viewModelScope.launch(Dispatchers.IO) {
+        val newFolderId = createNewFolderSync(name) ?: return@launch
+        moveTo(newFolderId, threadUid, messageUid)
+        isNewFolderCreated.postValue(true)
     }
     //endregion
 

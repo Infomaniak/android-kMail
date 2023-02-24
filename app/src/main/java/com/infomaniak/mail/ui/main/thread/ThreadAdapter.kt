@@ -62,8 +62,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         messages = itemList
     }
 
-    private fun lastIndex() = messages.lastIndex
-
     override fun getItemCount() = messages.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {

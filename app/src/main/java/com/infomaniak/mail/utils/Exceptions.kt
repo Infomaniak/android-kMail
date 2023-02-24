@@ -21,5 +21,6 @@ class ApiErrorException(override val message: String?) : Exception() {
 
     object ErrorCodes {
         const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
+        const val FOLDER_ALREADY_EXISTS = "folder__destination_already_exists"
     }
 }

@@ -20,11 +20,11 @@ package com.infomaniak.mail.ui.main.folder
 import android.content.Context
 import android.graphics.Canvas
 import android.os.Build
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -221,29 +221,41 @@ class ThreadListAdapter(
         // seeAllText.text = "See all $threadsNumber"
     }
 
-    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) = updateDynamicIcons(item)
+    override fun onSwipeStarted(item: Any, viewHolder: ThreadViewHolder) {
+        (item as Thread).updateDynamicIcons()
+    }
 
-    private fun updateDynamicIcons(item: Any) {
+    private fun Thread.updateDynamicIcons() {
 
-        fun swipeActionIs(swipeAction: SwipeAction): Boolean {
-            return localSettings.swipeLeft == swipeAction || localSettings.swipeRight == swipeAction
+        fun computeDynamicAction(folderRole: FolderRole, swipeAction: SwipeAction) = SwipeActionUiData(
+            colorRes = if (folder.role == folderRole) R.color.swipeInbox else swipeAction.colorRes,
+            iconRes = if (folder.role == folderRole) R.drawable.ic_drawer_inbox else swipeAction.iconRes,
+        )
+
+        fun getSwipeActionUiData(swipeAction: SwipeAction) = when (swipeAction) {
+            SwipeAction.READ_UNREAD -> SwipeActionUiData(
+                colorRes = swipeAction.colorRes,
+                iconRes = if (unseenMessagesCount > 0) R.drawable.ic_envelope_open else swipeAction.iconRes,
+            )
+            SwipeAction.FAVORITE -> SwipeActionUiData(
+                colorRes = swipeAction.colorRes,
+                iconRes = if (isFavorite) R.drawable.ic_unstar else swipeAction.iconRes,
+            )
+            SwipeAction.ARCHIVE, SwipeAction.READ_AND_ARCHIVE -> computeDynamicAction(FolderRole.ARCHIVE, swipeAction)
+            SwipeAction.SPAM -> computeDynamicAction(FolderRole.SPAM, swipeAction)
+            else -> null
         }
 
-        fun DragDropSwipeRecyclerView.updateSwipeIconWith(swipeAction: SwipeAction, @DrawableRes drawable: Int) {
-            when (swipeAction) {
-                localSettings.swipeRight -> behindSwipedItemIconSecondaryDrawableId = drawable
-                localSettings.swipeLeft -> behindSwipedItemIconDrawableId = drawable
-                else -> Log.w(
-                    "SwipeAction",
-                    "updateSwipeIconWith: Can't find which direction should update for ${swipeAction.name}"
-                )
+        (recyclerView as DragDropSwipeRecyclerView).apply {
+            getSwipeActionUiData(localSettings.swipeLeft)?.let { (colorRes, iconRes) ->
+                behindSwipedItemBackgroundColor = context.getColor(colorRes)
+                behindSwipedItemIconDrawableId = iconRes
             }
-        }
 
-        if (swipeActionIs(SwipeAction.READ_UNREAD)) {
-            item as Thread
-            val newDrawable = if (item.unseenMessagesCount > 0) R.drawable.ic_envelope_open else R.drawable.ic_envelope
-            (recyclerView as DragDropSwipeRecyclerView).updateSwipeIconWith(SwipeAction.READ_UNREAD, newDrawable)
+            getSwipeActionUiData(localSettings.swipeRight)?.let { (colorRes, iconRes) ->
+                behindSwipedItemBackgroundSecondaryColor = context.getColor(colorRes)
+                behindSwipedItemIconSecondaryDrawableId = iconRes
+            }
         }
     }
 
@@ -327,6 +339,8 @@ class ThreadListAdapter(
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
+
+    private data class SwipeActionUiData(@ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?)
 
     private companion object {
         const val SWIPE_ANIMATION_THRESHOLD = 0.15f

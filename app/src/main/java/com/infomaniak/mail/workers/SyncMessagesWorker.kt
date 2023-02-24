@@ -153,7 +153,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
             ?.let { "\n${it.htmlToText().trim()}" } // TODO: remove body history
             ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
             ?: ""
-        val formattedPreview = preview.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces
+        val formattedPreview = preview.replace(multipleWhitespaces, "\n") // Ignore multiple/start whitespaces
         val description = "$subject$formattedPreview"
 
         // Show message notification
@@ -176,6 +176,8 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
     companion object {
         private const val TAG = "SyncMessagesWorker"
+
+        private val multipleWhitespaces = "\\n+\\s*|\\s{2,}|\\t".toRegex()
 
         fun scheduleWork(context: Context) {
             Log.d(TAG, "Work scheduled")

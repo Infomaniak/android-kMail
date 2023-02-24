@@ -39,16 +39,6 @@ object ApiRoutes {
 
     private fun folder(mailboxUuid: String, folderId: String) = "${folders(mailboxUuid)}/$folderId"
 
-    // fun renameFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/rename"
-
-    // fun favoriteFolder(mailboxUuid: String, folderId: String, favorite: Boolean): String {
-    //     return "${folder(mailboxUuid, folderId)}/${if (favorite) "favorite" else "unfavorite"}"
-    // }
-
-    // fun readFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/read"
-
-    // fun flushFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/flush"
-
     fun quotas(mailboxHostingId: Int, mailboxName: String): String {
         return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
     }
@@ -69,17 +59,11 @@ object ApiRoutes {
 
     fun starMessages(mailboxUuid: String, star: Boolean): String = "${messages(mailboxUuid)}/${if (star) "star" else "unstar"}"
 
-    // fun messageSafe(mailboxUuid: String) = "${message(mailboxUuid)}/safe"
-
     fun draft(mailboxUuid: String) = "$MAIL_API/api/mail/$mailboxUuid/draft"
 
     fun draft(mailboxUuid: String, draftRemoteUuid: String) = "${draft(mailboxUuid)}/$draftRemoteUuid"
 
     fun createAttachment(mailboxUuid: String) = "${draft(mailboxUuid)}/attachment"
-
-    fun downloadAttachment(mailboxUuid: String, folderId: String, shortUid: String, attachmentId: String): String {
-        return "${message(mailboxUuid, folderId, shortUid)}/attachment/$attachmentId"
-    }
 
     fun downloadAttachments(mailboxUuid: String, folderId: String, shortUid: String): String {
         return "${message(mailboxUuid, folderId, shortUid)}/attachmentsArchive"

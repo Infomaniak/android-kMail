@@ -99,7 +99,7 @@ object MailboxController {
     //endregion
 
     //region Edit data
-    fun updateMailboxes(context: Context, mailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId) {
+    fun updateMailboxes(context: Context, mailboxes: List<Mailbox>, userId: Int = AccountUtils.currentUserId): Boolean {
 
         context.initMailNotificationChannel(mailboxes)
 
@@ -111,10 +111,10 @@ object MailboxController {
             }
         }
 
-        update(remoteMailboxes, userId)
+        return update(remoteMailboxes, userId)
     }
 
-    private fun update(remoteMailboxes: List<Mailbox>, userId: Int) {
+    private fun update(remoteMailboxes: List<Mailbox>, userId: Int): Boolean {
 
         // Get current data
         Log.d(RealmDatabase.TAG, "Mailboxes: Get current data")
@@ -129,7 +129,7 @@ object MailboxController {
             return@writeBlocking deleteOutdatedData(remoteMailboxes, userId)
         }
 
-        if (isCurrentMailboxDeleted) AccountUtils.reloadApp()
+        return isCurrentMailboxDeleted.also { if (it) AccountUtils.reloadApp }
     }
 
     private fun MutableRealm.upsertMailboxes(localQuotas: Map<String, Quotas?>, remoteMailboxes: List<Mailbox>) {
