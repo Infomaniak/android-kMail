@@ -112,16 +112,18 @@ object AccountUtils : CredentialManager() {
 
         userDatabase.userDao().delete(user)
         RealmDatabase.removeUserData(context, user.id)
+        val localSettings = LocalSettings.getInstance(context)
+        localSettings.removeRegisteredFirebaseUser(userId = user.id)
 
         if (currentUserId == user.id) {
-            if (getAllUsersCount() == 0) resetSettings(context)
+            if (getAllUsersCount() == 0) resetSettings(context, localSettings)
             withContext(Dispatchers.Main) { reloadApp?.invoke() }
         }
     }
 
-    private fun resetSettings(context: Context) {
+    private fun resetSettings(context: Context, localSettings: LocalSettings) {
         AppSettingsController.removeAppSettings()
-        LocalSettings.getInstance(context).removeSettings()
+        localSettings.removeSettings()
         with(WorkManager.getInstance(context)) {
             cancelAllWork()
             pruneWork()

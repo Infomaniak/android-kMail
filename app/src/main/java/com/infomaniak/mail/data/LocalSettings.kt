@@ -188,6 +188,10 @@ class LocalSettings private constructor(context: Context) {
         firebaseRegisteredUsers = firebaseRegisteredUsers.apply { add(userId.toString()) }
     }
 
+    fun removeRegisteredFirebaseUser(userId: Int) {
+        firebaseRegisteredUsers = firebaseRegisteredUsers.filterNot { it == userId.toString() }.toMutableSet()
+    }
+
     fun clearRegisteredFirebaseUsers() {
         Log.i(TAG, "clearRegisteredFirebaseUsers: called")
         firebaseRegisteredUsers = mutableSetOf()
