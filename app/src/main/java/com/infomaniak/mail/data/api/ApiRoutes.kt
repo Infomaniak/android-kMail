@@ -69,14 +69,8 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, shortUid)}/attachmentsArchive"
     }
 
-    fun search(
-        mailboxUuid: String,
-        folderId: String,
-        filters: String,
-        isDraftFolder: Boolean = false,
-    ): String {
-        val thread = "thread=${if (isDraftFolder) "off" else "on"}"
-        return "${folder(mailboxUuid, folderId)}/message?offset=0&$thread&$filters"
+    fun search(mailboxUuid: String, folderId: String, filters: String): String {
+        return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&$filters"
     }
 
     fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): String {
