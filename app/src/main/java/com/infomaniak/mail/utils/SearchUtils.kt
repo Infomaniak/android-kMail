@@ -35,7 +35,7 @@ object SearchUtils {
 
     fun searchFilters(query: String?, filters: Set<ThreadFilter>): String {
         val filtersQuery = StringBuilder("severywhere=${if (filters.contains(ThreadFilter.FOLDER)) "0" else "1"}")
-        if (!query.isNullOrBlank()) filtersQuery.append("&scontains=$query")
+        if (query?.isNotBlank() == true) filtersQuery.append("&scontains=$query")
 
         with(filters) {
             if (contains(ThreadFilter.ATTACHMENTS)) filtersQuery.append("&sattachments=yes")
@@ -66,9 +66,9 @@ object SearchUtils {
     fun List<Message>.convertToSearchThreads(): List<Thread> {
         return this.map { message ->
             message.toThread().apply {
-                this.uid = "search-${message.uid}"
-                this.messages = listOf(message).toRealmList()
-                this.isFromSearch = true
+                uid = "search-${message.uid}"
+                messages = listOf(message).toRealmList()
+                isFromSearch = true
                 recomputeThread()
             }
         }

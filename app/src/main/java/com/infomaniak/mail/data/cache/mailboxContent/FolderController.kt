@@ -110,7 +110,7 @@ object FolderController {
 
     fun getOrCreateSearchFolder(realm: MutableRealm): Folder {
         return getFolderQuery(Folder::id.name, SEARCH_FOLDER_ID, realm).find() ?: let {
-            realm.copyToRealm(Folder().apply { this.id = SEARCH_FOLDER_ID })
+            realm.copyToRealm(Folder().apply { id = SEARCH_FOLDER_ID })
         }
     }
 
