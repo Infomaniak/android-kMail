@@ -56,6 +56,7 @@ class SearchViewModel : ViewModel() {
         val searchQuery = if (isLengthTooShort(query)) null else query
         fetchThreads(searchQuery, filters)
     }
+
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
 
     var selectedFolder: Folder? = null
@@ -133,6 +134,7 @@ class SearchViewModel : ViewModel() {
     private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
+
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
                 this.data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
