@@ -121,16 +121,16 @@ object ThreadController {
      * - Format remote Threads to make them work with the existing logic
      * - Keep old Messages data if it's already existing in local
      * - Handle Duplicates with the existing logic
-     * @param apiThreads The list of API Threads that need to be treated
+     * @param remoteThreads The list of API Threads that need to be treated
      * @return a list of search Threads
      */
-    suspend fun initAndGetSearchFolderThreads(apiThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
+    suspend fun initAndGetSearchFolderThreads(remoteThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
 
-        fun MutableRealm.keepOldMessagesAndAddToSearchFolder(thread: Thread, searchFolder: Folder) {
-            thread.messages.forEach { remoteMessage: Message ->
+        fun MutableRealm.keepOldMessagesAndAddToSearchFolder(remoteThread: Thread, searchFolder: Folder) {
+            remoteThread.messages.forEach { remoteMessage: Message ->
                 MessageController.getMessage(remoteMessage.uid, this)?.let { localMessage ->
-                    val position = thread.messages.indexOfFirst { it.uid == localMessage.uid }
-                    thread.messages[position] = localMessage.copyFromRealm()
+                    val position = remoteThread.messages.indexOfFirst { it.uid == localMessage.uid }
+                    remoteThread.messages[position] = localMessage.copyFromRealm()
                 } ?: run {
                     remoteMessage.isFromSearch = true
                 }
@@ -146,20 +146,20 @@ object ThreadController {
             }
         }
 
-        defaultRealm.writeBlocking {
+        return@withContext defaultRealm.writeBlocking {
             val searchFolder = FolderController.getOrCreateSearchFolder(this)
-            apiThreads.map { thread ->
+            remoteThreads.map { remoteThread ->
                 ensureActive()
-                val remoteMessage = thread.messages.first()
-                thread.isFromSearch = true
-                thread.folderId = remoteMessage.folderId
+                val remoteMessage = remoteThread.messages.first()
+                remoteThread.isFromSearch = true
+                remoteThread.folderId = remoteMessage.folderId
 
-                keepOldMessagesAndAddToSearchFolder(thread, searchFolder)
-                thread.handleDuplicatesMessages()
-                thread.recomputeThread()
+                keepOldMessagesAndAddToSearchFolder(remoteThread, searchFolder)
+                remoteThread.handleDuplicatesMessages()
+                remoteThread.recomputeThread()
 
-                thread
-            }.also { searchFolder.threads.addAll(it) }
+                return@map remoteThread
+            }.also(searchFolder.threads::addAll)
         }
     }
     //endregion
