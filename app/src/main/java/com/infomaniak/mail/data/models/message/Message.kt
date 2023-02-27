@@ -127,7 +127,7 @@ class Message : RealmObject {
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
     private val _folders by backlinks(Folder::messages)
-    val folder get() = _folders.single { if (_folders.count() == 1) true else it.id != SEARCH_FOLDER_ID }
+    val folder get() = _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
 
     inline val shortUid get() = uid.toShortUid()
     inline val sender get() = from.first()
