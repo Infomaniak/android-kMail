@@ -30,7 +30,6 @@ import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.mail.BuildConfig
@@ -56,6 +55,10 @@ class MainActivity : ThemedActivity() {
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
+
+    private val navController by lazy {
+        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
+    }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -106,14 +109,23 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun handleOnBackPressed() = with(binding) {
-        onBackPressedDispatcher.addCallback(this@MainActivity) {
-            if (drawerLayout.isOpen) {
-                (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
-            } else {
+
+        fun closeDrawer() {
+            (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
+        }
+
+        fun popBack() {
+            if (navController.currentDestination?.id == R.id.threadListFragment) {
                 // Schedule here because the Activity is in finishing state so it'll be ignored by the onStop lifecycle.
                 SyncMessagesWorker.scheduleWork(this@MainActivity)
                 finish()
+            } else {
+                navController.popBackStack()
             }
+        }
+
+        onBackPressedDispatcher.addCallback(this@MainActivity) {
+            if (drawerLayout.isOpen) closeDrawer() else popBack()
         }
     }
 
@@ -141,7 +153,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun setupSnackBar() {
-        fun getAnchor(): View? = when (findNavController(R.id.hostFragment).currentDestination?.id) {
+        fun getAnchor(): View? = when (navController.currentDestination?.id) {
             R.id.threadListFragment -> findViewById(R.id.newMessageFab)
             R.id.threadFragment -> findViewById(R.id.quickActionBar)
             else -> null
@@ -153,9 +165,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun setupNavController() {
-        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment)
-            .navController
-            .addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
+        navController.addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
     }
 
     private fun setupMenuDrawerCallbacks() = with(binding) {

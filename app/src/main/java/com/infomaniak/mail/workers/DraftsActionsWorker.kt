@@ -54,6 +54,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.properties.Delegates
 
@@ -66,6 +67,8 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
     private var mailboxId: Int = AppSettings.DEFAULT_ID
     private lateinit var mailbox: Mailbox
     private var userId: Int by Delegates.notNull()
+
+    private val dateFormatWithTimezone by lazy { SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT) }
 
     override suspend fun launchWork(): Result = withContext(Dispatchers.IO) {
         Log.d(TAG, "Work started")
@@ -135,11 +138,9 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
         if (folder?.cursor != null) {
 
             val timeNow = Date().time
-            val simpleDateFormat = SimpleDateFormat(FORMAT_DATE_WITH_TIMEZONE, Locale.ROOT)
-
-            val times = scheduledDates.mapNotNull { simpleDateFormat.parse(it)?.time }
+            val times = scheduledDates.mapNotNull { dateFormatWithTimezone.parse(it)?.time }
             var delay = REFRESH_DELAY
-            if (times.isNotEmpty()) delay += times.maxOf { it } - timeNow
+            if (times.isNotEmpty()) delay += max(times.maxOf { it } - timeNow, 0L)
             delay(min(delay, MAX_REFRESH_DELAY))
 
             MessageController.fetchCurrentFolderMessages(mailbox, folder, okHttpClient, mailboxContentRealm)
@@ -203,6 +204,7 @@ class DraftsActionsWorker(appContext: Context, params: WorkerParameters) : BaseC
                         it.messageUid = data?.messageUid
                         it.action = null
                     }
+                    scheduledDate = dateFormatWithTimezone.format(Date())
                 }
             }
             DraftAction.SEND -> with(ApiRepository.sendDraft(mailboxUuid, draft, okHttpClient)) {
