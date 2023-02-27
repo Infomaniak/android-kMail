@@ -117,12 +117,12 @@ object ThreadController {
     }
 
     /**
-     * Init the search threads that we have recovered from the api
-     * - Format remote threads to make it work with the existing logic
-     * - Keep old messages data if it's already exist in local
-     * - Handle duplicates with the existing logic
-     * @param apiThreads The list of api threads that need to be treated
-     * @return a list of search threads
+     * Init the search Threads that we have recovered from the API.
+     * - Format remote Threads to make them work with the existing logic
+     * - Keep old Messages data if it's already existing in local
+     * - Handle Duplicates with the existing logic
+     * @param apiThreads The list of API Threads that need to be treated
+     * @return a list of search Threads
      */
     suspend fun initAndGetSearchFolderThreads(apiThreads: List<Thread>): List<Thread> = withContext(Dispatchers.IO) {
 
