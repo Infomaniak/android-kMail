@@ -61,9 +61,9 @@ class MoveFragment : MenuFoldersFragment() {
 
     private fun observeFolderId() = with(navigationArgs) {
         messageUid?.let {
-            moveViewModel.message(messageUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
+            moveViewModel.getFolderIdByMessage(messageUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
         } ?: run {
-            moveViewModel.thread(threadUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
+            moveViewModel.getFolderIdByThread(threadUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
         }
     }
 

@@ -28,11 +28,11 @@ class MoveViewModel : ViewModel() {
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
 
-    fun message(messageUid: String) = liveData(coroutineContext) {
+    fun getFolderIdByMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid)!!.folderId)
     }
 
-    fun thread(threadUid: String) = liveData(coroutineContext) {
+    fun getFolderIdByThread(threadUid: String) = liveData(coroutineContext) {
         emit(ThreadController.getThread(threadUid)!!.folderId)
     }
 }

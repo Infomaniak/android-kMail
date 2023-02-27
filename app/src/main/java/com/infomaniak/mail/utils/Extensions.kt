@@ -365,6 +365,6 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
     addItemDecoration(DateSeparatorItemDecoration())
 }
 
-fun Folder?.getLocalizedNameOrAllFolders(context: Context): String {
-    return this?.getLocalizedName(context) ?: context.getString(R.string.searchFilterFolder)
+fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
+    return folder?.getLocalizedName(this) ?: getString(R.string.searchFilterFolder)
 }

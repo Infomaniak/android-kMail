@@ -56,7 +56,7 @@ class SearchFolderAdapter(
             findViewById<MaterialButton>(R.id.folderButton).apply {
                 val folder = folders[position]
 
-                val entryName: String = folder.getLocalizedNameOrAllFolders(context)
+                val entryName: String = context.getLocalizedNameOrAllFolders(folder)
                 text = entryName
                 setIconResource(folder?.getIcon() ?: 0)
                 setPaddingRelative(if (folder == null) allFolderMargin else iconFolderMargin)

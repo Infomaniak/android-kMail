@@ -133,7 +133,7 @@ class SearchFragment : Fragment() {
 
         folderDropDown.setOnClickListener { popupMenu.show() }
         updateFolderDropDownUi(
-            searchViewModel.selectedFolder, searchViewModel.selectedFolder.getLocalizedNameOrAllFolders(requireContext())
+            searchViewModel.selectedFolder, requireContext().getLocalizedNameOrAllFolders(searchViewModel.selectedFolder)
         )
 
         attachments.setOnCheckedChangeListener { _, _ ->
