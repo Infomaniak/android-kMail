@@ -109,7 +109,7 @@ class SearchViewModel : ViewModel() {
         _selectedFilters.value = SearchUtils.selectFilter(this, selectedFilters)
     }
 
-    private fun ThreadFilter.unSelect() {
+    private fun ThreadFilter.unselect() {
         _selectedFilters.value = selectedFilters.apply { remove(this@unSelect) }
     }
 
