@@ -28,12 +28,14 @@
         <attr name="badge" format="integer" />
         <attr name="icon" />
         <attr name="indent" format="dimension" />
-        <attr name="text" />
-        <attr name="textSize" format="dimension" />
-        <attr name="textWeight" format="reference" />
-        <attr name="selectionStyle" format="enum">
+        <attr name="itemStyle" format="enum">
             <enum name="menuDrawer" value="0" />
-            <enum name="moveFragment" value="1" />
+            <enum name="other" value="1" />
+        </attr>
+        <attr name="text" />
+        <attr name="textWeight" format="enum">
+            <enum name="regular" value="0" />
+            <enum name="medium" value="1" />
         </attr>
     </declare-styleable>
 

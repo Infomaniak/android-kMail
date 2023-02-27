@@ -45,6 +45,7 @@ import androidx.viewbinding.ViewBinding
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
@@ -54,10 +55,16 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.IlluColors
+import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
+import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
+import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -216,6 +223,24 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
         ).toBundle(),
     )
 }
+
+fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
+    if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
+        mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+            safeNavigate(
+                R.id.newMessageActivity,
+                NewMessageActivityArgs(
+                    draftExists = true,
+                    draftLocalUuid = it.draftLocalUuid,
+                    draftResource = it.draftResource,
+                    messageUid = it.messageUid,
+                ).toBundle(),
+            )
+        }
+    } else {
+        safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
+    }
+}
 //endregion
 
 //region API
@@ -352,4 +377,15 @@ fun Fragment.createInputDialog(
         .setOnDismissListener { textInput.text?.clear() }
         .create()
         .setupOnShowListener()
+}
+
+fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter) {
+    addItemDecoration(HeaderItemDecoration(this, false) { position ->
+        return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is String
+    })
+    addItemDecoration(DateSeparatorItemDecoration())
+}
+
+fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
+    return folder?.getLocalizedName(this) ?: getString(R.string.searchFilterFolder)
 }

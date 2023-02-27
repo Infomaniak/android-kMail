@@ -166,10 +166,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             disableDragDirection(DirectionFlag.DOWN)
             disableDragDirection(DirectionFlag.RIGHT)
             disableDragDirection(DirectionFlag.LEFT)
-            addItemDecoration(HeaderItemDecoration(this, false) { position ->
-                return@HeaderItemDecoration position >= 0 && threadListAdapter.dataSet[position] is String
-            })
-            addItemDecoration(DateSeparatorItemDecoration())
+            addStickyDateDecoration(threadListAdapter)
         }
 
         mainViewModel.isInternetAvailable.observe(viewLifecycleOwner) { isAvailable ->
@@ -179,23 +176,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-
-            onThreadClicked = { thread ->
-                if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-                    navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-                        safeNavigate(
-                            ThreadListFragmentDirections.actionThreadListFragmentToNewMessageActivity(
-                                draftExists = true,
-                                draftLocalUuid = it.draftLocalUuid,
-                                draftResource = it.draftResource,
-                                messageUid = it.messageUid,
-                            )
-                        )
-                    }
-                } else {
-                    safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToThreadFragment(thread.uid))
-                }
-            }
+            onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
         }
     }
 
@@ -276,9 +257,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 true
             }
             SwipeAction.MOVE -> {
-                animatedNavigation(
-                    ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(currentFolderId!!, threadUid)
-                )
+                animatedNavigation(ThreadListFragmentDirections.actionThreadListFragmentToMoveFragment(threadUid))
                 false
             }
             SwipeAction.QUICKACTIONS_MENU -> {
@@ -353,7 +332,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 showLoadingTimer.start()
             } else {
                 showLoadingTimer.cancel()
-                if (binding.swipeRefreshLayout.isRefreshing) binding.swipeRefreshLayout.isRefreshing = false
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
     }

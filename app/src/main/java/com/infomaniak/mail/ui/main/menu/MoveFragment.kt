@@ -50,7 +50,7 @@ class MoveFragment : MenuFoldersFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
-        observeFolders()
+        observeFolderId()
         observeNewFolderCreation()
     }
 
@@ -59,11 +59,18 @@ class MoveFragment : MenuFoldersFragment() {
         iconAddFolder.setOnClickListener { createFolderDialog.show() }
     }
 
-    private fun observeFolders() = with(navigationArgs) {
-        moveViewModel.currentFolders.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
-            defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
-            customFoldersAdapter.setFolders(customFolders, folderId)
+    private fun observeFolderId() = with(navigationArgs) {
+        messageUid?.let {
+            moveViewModel.getFolderIdByMessage(messageUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
+        } ?: run {
+            moveViewModel.getFolderIdByThread(threadUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
         }
+    }
+
+    private fun setAdaptersFolders(folderId: String) {
+        val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
+        defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
+        customFoldersAdapter.setFolders(customFolders, folderId)
     }
 
     private fun observeNewFolderCreation() {

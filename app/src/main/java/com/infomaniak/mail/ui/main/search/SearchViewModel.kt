@@ -44,7 +44,6 @@ class SearchViewModel : ViewModel() {
 
     /** It is simply used as a default value for the API */
     private lateinit var dummyFolderId: String
-    private var selectedFolder: Folder? = null
     private var resourceNext: String? = null
     private var resourcePrevious: String? = null
 
@@ -56,6 +55,13 @@ class SearchViewModel : ViewModel() {
         fetchThreads(searchQuery, filters)
     }
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
+
+    var selectedFolder: Folder? = null
+    val hasNextPage get() = !resourceNext.isNullOrBlank()
+    var previousSearch: String? = null
+    var previousMutuallyExclusiveChips: Int? = null
+    var previousAttachments: Boolean? = null
+
     private fun observeSearchAndFilters() = MediatorLiveData<Pair<String?, Set<ThreadFilter>>>().apply {
         addSource(searchQuery) { value = it to (value?.second ?: selectedFilters) }
         addSource(_selectedFilters) { value = value?.first to it }
@@ -87,6 +93,13 @@ class SearchViewModel : ViewModel() {
     fun toggleFilter(filter: ThreadFilter) {
         resetPagination()
         if (selectedFilters.contains(filter)) filter.unselect() else filter.select()
+    }
+
+    fun unselectMutuallyExclusiveFilters() {
+        resetPagination()
+        _selectedFilters.value = selectedFilters.apply {
+            removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))
+        }
     }
 
     fun nextPage() {
@@ -167,11 +180,12 @@ class SearchViewModel : ViewModel() {
     }
 
     private companion object {
+
         val TAG = SearchViewModel::class.simpleName
+
         /**
          * The minimum value allowed for a search query
          */
         const val MIN_SEARCH_QUERY = 3
     }
-
 }

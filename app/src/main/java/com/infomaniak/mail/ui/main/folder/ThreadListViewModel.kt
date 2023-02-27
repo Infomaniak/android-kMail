@@ -20,10 +20,7 @@ package com.infomaniak.mail.ui.main.folder
 import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.DraftController
-import com.infomaniak.mail.data.models.message.Message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -31,7 +28,6 @@ import kotlinx.coroutines.launch
 
 class ThreadListViewModel : ViewModel() {
 
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var updatedAtJob: Job? = null
 
     val isRecoveringFinished = MutableLiveData(true)
@@ -48,11 +44,6 @@ class ThreadListViewModel : ViewModel() {
                 updatedAtTrigger.postValue(Unit)
             }
         }
-    }
-
-    fun navigateToSelectedDraft(message: Message) = liveData(coroutineContext) {
-        val localUuid = DraftController.getDraftByMessageUid(message.uid)?.localUuid
-        emit(SelectedDraft(localUuid, message.draftResource, message.uid))
     }
 
     data class SelectedDraft(

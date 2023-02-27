@@ -25,11 +25,12 @@
     <dimen name="iconButtonSize">32dp</dimen>
     <dimen name="iconImageSize">20dp</dimen>
     <dimen name="noMailTextViewSize">300dp</dimen>
-    <dimen name="searchViewHeight">40dp</dimen>
+    <dimen name="searchViewHeight">38dp</dimen>
     <dimen name="smallCornerRadius">6dp</dimen>
     <dimen name="userAvatarSizeLarge">40dp</dimen>
     <dimen name="messageDividerHeight">6dp</dimen>
     <dimen name="mediumIconSize">16dp</dimen>
+    <dimen name="maxSearchChipWidth">300dp</dimen>
 
     <!-- Menu Drawer -->
 

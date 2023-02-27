@@ -29,7 +29,7 @@ import com.infomaniak.mail.data.models.Folder.*
 import com.infomaniak.mail.databinding.ItemFolderMenuDrawerBinding
 import com.infomaniak.mail.ui.main.menu.FolderAdapter.FolderViewHolder
 import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.views.MenuDrawerItemView.SelectionStyle
+import com.infomaniak.mail.views.MenuDrawerItemView.*
 import kotlin.math.min
 import com.infomaniak.lib.core.R as RCore
 
@@ -87,7 +87,8 @@ class FolderAdapter(
         icon = AppCompatResources.getDrawable(context, iconId)
         indent = context.resources.getDimension(RCore.dimen.marginStandard).toInt() * (folderIndent ?: 0)
         badge = if (isInMenuDrawer) badgeText else 0
-        selectionStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.MOVE_FRAGMENT
+        itemStyle = if (isInMenuDrawer) SelectionStyle.MENU_DRAWER else SelectionStyle.OTHER
+        textWeight = if (isInMenuDrawer) TextWeight.MEDIUM else TextWeight.REGULAR
 
         setSelectedState(currentFolderId == id)
 

@@ -21,11 +21,12 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isVisible
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
@@ -34,6 +35,7 @@ import com.infomaniak.mail.utils.UiUtils.formatUnreadCount
 import com.infomaniak.mail.utils.context
 import com.infomaniak.mail.utils.getAttributeColor
 import com.google.android.material.R as RMaterial
+import com.infomaniak.lib.core.R as RCore
 
 class MenuDrawerItemView @JvmOverloads constructor(
     context: Context,
@@ -42,6 +44,9 @@ class MenuDrawerItemView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     val binding by lazy { ItemMenuDrawerBinding.inflate(LayoutInflater.from(context), this, true) }
+
+    private val regular by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_regular) }
+    private val medium by lazy { ResourcesCompat.getFont(context, RCore.font.suisseintl_medium) }
 
     var badge: Int = 0
         set(value) {
@@ -64,7 +69,24 @@ class MenuDrawerItemView @JvmOverloads constructor(
             binding.itemName.setMarginsRelative(start = value)
         }
 
-    var selectionStyle = SelectionStyle.MENU_DRAWER
+    var itemStyle = SelectionStyle.MENU_DRAWER
+        set(value) {
+            field = value
+            if (value == SelectionStyle.MENU_DRAWER) {
+                binding.root.apply {
+                    context.obtainStyledAttributes(R.style.MenuDrawerItem, intArrayOf(android.R.attr.layout_marginStart)).let {
+                        setMarginsRelative(it.getDimensionPixelSizeOrThrow(0))
+                        it.recycle()
+                    }
+                    ShapeAppearanceModel.builder(context, 0, R.style.MenuDrawerItemShapeAppearance).build()
+                }
+            } else {
+                binding.root.apply {
+                    setMarginsRelative(0)
+                    shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0f).build()
+                }
+            }
+        }
 
     var text: CharSequence? = null
         set(value) {
@@ -72,36 +94,31 @@ class MenuDrawerItemView @JvmOverloads constructor(
             binding.itemName.text = value
         }
 
-    var textSize: Int? = null
-        set(value) {
-            field = value
-            value?.let { binding.itemName.setTextSize(TypedValue.COMPLEX_UNIT_PX, it.toFloat()) }
+    var textWeight = TextWeight.MEDIUM
+        set(fontFamily) {
+            field = fontFamily
+            binding.itemName.typeface = if (fontFamily == TextWeight.MEDIUM) medium else regular
         }
 
     init {
         attrs?.getAttributes(context, R.styleable.MenuDrawerItemView) {
-            val defaultTextSize = binding.itemName.textSize.toInt()
-
             badge = getInteger(R.styleable.MenuDrawerItemView_badge, badge)
             icon = getDrawable(R.styleable.MenuDrawerItemView_icon)
             indent = getDimensionPixelSize(R.styleable.MenuDrawerItemView_indent, indent)
-            selectionStyle = SelectionStyle.values()[getInteger(R.styleable.MenuDrawerItemView_selectionStyle, 0)]
+            itemStyle = SelectionStyle.values()[getInteger(R.styleable.MenuDrawerItemView_itemStyle, 0)]
             text = getString(R.styleable.MenuDrawerItemView_text)
-            textSize = getDimensionPixelSize(R.styleable.MenuDrawerItemView_textSize, defaultTextSize)
-            getResourceId(R.styleable.MenuDrawerItemView_textWeight, 0).also { fontFamily ->
-                if (fontFamily > 0) binding.itemName.typeface = ResourcesCompat.getFont(context, fontFamily)
-            }
+            textWeight = TextWeight.values()[getInteger(R.styleable.MenuDrawerItemView_textWeight, 0)]
         }
     }
 
     fun setSelectedState(isSelected: Boolean) = with(binding) {
-        val (color, textAppearance) = if (isSelected && selectionStyle == SelectionStyle.MENU_DRAWER) {
+        val (color, textAppearance) = if (isSelected && itemStyle == SelectionStyle.MENU_DRAWER) {
             context.getAttributeColor(RMaterial.attr.colorPrimaryContainer) to R.style.BodyMedium_Accent
         } else {
-            Color.TRANSPARENT to R.style.BodyMedium
+            Color.TRANSPARENT to if (textWeight == TextWeight.MEDIUM) R.style.BodyMedium else R.style.Body
         }
 
-        checkmark.isVisible = isSelected && selectionStyle == SelectionStyle.MOVE_FRAGMENT
+        checkmark.isVisible = isSelected && itemStyle == SelectionStyle.OTHER
 
         root.setCardBackgroundColor(color)
         itemName.setTextAppearance(textAppearance)
@@ -112,6 +129,10 @@ class MenuDrawerItemView @JvmOverloads constructor(
     }
 
     enum class SelectionStyle {
-        MENU_DRAWER, MOVE_FRAGMENT
+        MENU_DRAWER, OTHER
+    }
+
+    enum class TextWeight {
+        REGULAR, MEDIUM
     }
 }
