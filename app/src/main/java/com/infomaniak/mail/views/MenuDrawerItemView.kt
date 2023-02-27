@@ -25,7 +25,9 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.view.isVisible
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.infomaniak.lib.core.utils.getAttributes
 import com.infomaniak.lib.core.utils.setMarginsRelative
 import com.infomaniak.mail.R
@@ -65,6 +67,23 @@ class MenuDrawerItemView @JvmOverloads constructor(
         }
 
     var selectionStyle = SelectionStyle.MENU_DRAWER
+        set(value) {
+            field = value
+            if (value == SelectionStyle.MOVE_FRAGMENT) {
+                binding.root.apply {
+                    setMarginsRelative(0)
+                    shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0f).build()
+                }
+            } else {
+                binding.root.apply {
+                    context.obtainStyledAttributes(R.style.MenuDrawerItem, intArrayOf(android.R.attr.layout_marginStart)).let {
+                        setMarginsRelative(it.getDimensionPixelSizeOrThrow(0))
+                        it.recycle()
+                    }
+                    ShapeAppearanceModel.builder(context, 0, R.style.MenuDrawerItemShapeAppearance).build()
+                }
+            }
+        }
 
     var text: CharSequence? = null
         set(value) {
