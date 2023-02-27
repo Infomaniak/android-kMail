@@ -167,7 +167,7 @@ class SearchFragment : Fragment() {
         folderDropDown.setOnClickListener { popupMenu.show() }
         updateFolderDropDownUi(
             folder = searchViewModel.selectedFolder,
-            title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.selectedFolder)
+            title = requireContext().getLocalizedNameOrAllFolders(searchViewModel.selectedFolder),
         )
 
         attachments.setOnCheckedChangeListener { _, _ ->
@@ -313,7 +313,7 @@ class SearchFragment : Fragment() {
         RECENT_SEARCHES, LOADING, NO_RESULTS, RESULTS
     }
 
-    companion object {
+    private companion object {
         const val PAGINATION_TRIGGER_OFFSET = 15
     }
 }
