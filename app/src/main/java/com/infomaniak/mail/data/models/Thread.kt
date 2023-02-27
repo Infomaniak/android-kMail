@@ -214,15 +214,6 @@ class Thread : RealmObject {
         FOLDER(R.string.searchFilterFolder),
     }
 
-    @Serializable
-    data class ThreadResult(
-        val threads: List<Thread>? = null,
-        @SerialName("resource_previous")
-        val resourcePrevious: String?,
-        @SerialName("resource_next")
-        val resourceNext: String?,
-    )
-
     companion object {
         const val FORMAT_DAY_OF_THE_WEEK = "EEE"
     }

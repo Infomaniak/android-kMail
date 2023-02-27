@@ -23,7 +23,6 @@ import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.mail.data.models.*
-import com.infomaniak.mail.data.models.Thread.ThreadResult
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.draft.Draft
@@ -35,6 +34,7 @@ import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
 import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
+import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.utils.SentryDebug
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

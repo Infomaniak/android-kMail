@@ -28,10 +28,10 @@ import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
+import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.ui.main.search.SearchFragment.VisibilityMode
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
-import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 
@@ -121,7 +121,7 @@ class SearchViewModel : ViewModel() {
     private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
-        suspend fun ApiResponse<Thread.ThreadResult>.initSearchFolderThreads() {
+        suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
                 this.data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
             }.getOrElse { exception ->
