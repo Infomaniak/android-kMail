@@ -98,9 +98,8 @@
     <color name="separatorColor">@color/mouse</color>
 
     <!-- Icons -->
-    <color name="iconColor">@color/elephant</color>
     <color name="iconColorPrimaryText">@color/primaryTextColor</color>
-    <color name="iconSecondaryColor">@color/elephant</color>
+    <color name="iconColor">@color/elephant</color>
     <color name="favoriteYellow">@color/yellow_light</color>
     <color name="swipeActionIconColor">@color/white</color>
 
@@ -120,10 +119,11 @@
     <color name="swipeArchive">@color/mauve_light</color>
     <color name="swipeQuickActionMenu">@color/app_blue_light</color>
     <color name="swipeInbox">@color/shark</color>
-    <color name="swipeNone">@color/progressbarTrackColor</color>
+    <color name="swipeNone">@color/shark</color>
     <color name="swipeReadAndArchive">@color/prince_light</color>
 
     <!-- Other -->
     <color name="textInputStrokeColor">@color/mouse</color>
+    <color name="toggleableTextFormatterBackgroundColor">@color/elephant</color>
 
 </resources>

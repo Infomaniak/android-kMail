@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:elevation="3dp"
         android:text="@string/settingsSwipeActionToDefine"
-        android:textColor="@color/iconColor"
+        android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/swipeBackground"
         app:layout_constraintStart_toEndOf="@id/swipeForeground"

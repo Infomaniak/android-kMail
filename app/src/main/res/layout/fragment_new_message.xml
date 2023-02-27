@@ -268,7 +268,6 @@
                     android:minHeight="0dp"
                     android:padding="@dimen/marginStandardVerySmall"
                     app:icon="@drawable/ic_close"
-                    app:iconTint="@color/iconColor"
                     app:layout_constraintDimensionRatio="1"
                     app:layout_constraintEnd_toEndOf="@id/signatureWebView"
                     app:layout_constraintTop_toTopOf="@id/signatureWebView" />

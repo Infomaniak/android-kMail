@@ -114,7 +114,7 @@
                     android:layout_marginHorizontal="@dimen/marginStandardSmall"
                     android:src="@drawable/ic_chevron_down"
                     app:layout_constraintHorizontal_bias="0"
-                    app:tint="@color/iconSecondaryColor"
+                    app:tint="@color/iconColor"
                     tools:ignore="ContentDescription" />
             </LinearLayout>
 
@@ -281,7 +281,7 @@
         android:src="@drawable/ic_calendar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bccRecyclerView"
-        app:tint="@color/iconSecondaryColor"
+        app:tint="@color/iconColor"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -327,7 +327,7 @@
         app:layout_constraintBottom_toBottomOf="@id/attachmentsSizeText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/attachmentsSizeText"
-        app:tint="@color/iconSecondaryColor"
+        app:tint="@color/iconColor"
         tools:ignore="ContentDescription" />
 
     <TextView
