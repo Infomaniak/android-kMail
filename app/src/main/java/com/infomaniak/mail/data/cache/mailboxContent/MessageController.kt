@@ -25,8 +25,10 @@ import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
+import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
@@ -114,6 +116,32 @@ object MessageController {
     fun getMessageAndDuplicates(thread: Thread, message: Message): List<Message> {
         return listOf(message) + thread.duplicates.query("${Message::messageId.name} == '${message.messageId}'").find()
     }
+
+    fun searchMessages(searchQuery: String?, filters: Set<ThreadFilter>, folderId: String?): List<Message> {
+        val queriesList = mutableListOf<String>().apply {
+            filters.forEach { filter ->
+                when (filter) {
+                    ThreadFilter.SEEN -> add("${Message::isSeen.name} == true")
+                    ThreadFilter.UNSEEN -> add("${Message::isSeen.name} == false")
+                    ThreadFilter.STARRED -> add("${Message::isFavorite.name} == true")
+                    ThreadFilter.FOLDER -> add("${Message::folderId.name} == '$folderId'")
+                    ThreadFilter.ATTACHMENTS -> add("${Message::hasAttachments.name} == true")
+                    else -> Unit
+                }
+            }
+        }
+
+        if (searchQuery?.isNotBlank() == true) {
+            val containsSubject = "${Message::subject.name} CONTAINS[c] '$searchQuery'"
+            val containsPreview = "${Message::preview.name} CONTAINS[c] '$searchQuery'"
+            val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] '$searchQuery'"
+            queriesList.add("($containsSubject OR $containsPreview OR $containsBody)")
+        }
+
+        return defaultRealm.writeBlocking {
+            query<Message>(queriesList.joinToString(" AND ") { it }).find().copyFromRealm()
+        }
+    }
     //endregion
 
     //region Edit data
@@ -130,6 +158,10 @@ object MessageController {
             DraftController.getDraftByMessageUid(message.uid, realm)?.let(realm::delete)
             realm.delete(message)
         }
+    }
+
+    fun deleteSearchMessages(realm: MutableRealm) = with(realm) {
+        delete(query<Message>("${Message::isFromSearch.name} == true").find())
     }
     //endregion
 

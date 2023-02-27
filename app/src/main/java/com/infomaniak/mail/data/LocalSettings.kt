@@ -20,9 +20,12 @@ package com.infomaniak.mail.data
 import android.content.Context
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
+import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.R
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
 class LocalSettings private constructor(context: Context) {
 
@@ -173,6 +176,12 @@ class LocalSettings private constructor(context: Context) {
     }
     //endregion
 
+    //region Recent searches
+    var recentSearches: List<String>
+        get() = json.decodeFromString(sharedPreferences.getString(RECENT_SEARCHES_KEY, "[]") ?: "[]")
+        set(value) = sharedPreferences.transaction { putString(RECENT_SEARCHES_KEY, json.encodeToString(value)) }
+    //endregion
+
     //region Utils
     private inline fun <reified T : Enum<T>> getEnum(key: String, default: T): T {
         return enumValueOfOrNull<T>(sharedPreferences.getString(key, default.name)) ?: default
@@ -215,6 +224,7 @@ class LocalSettings private constructor(context: Context) {
         private const val SWIPE_RIGHT_KEY = "swipeRightKey"
         private const val SWIPE_LEFT_KEY = "swipeLeftKey"
         private const val EXTERNAL_CONTENT_KEY = "externalContentKey"
+        private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
         //endregion
 
         @Volatile

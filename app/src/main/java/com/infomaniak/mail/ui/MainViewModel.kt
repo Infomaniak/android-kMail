@@ -83,7 +83,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }.asLiveData(Dispatchers.IO)
 
     val currentFoldersLive = _currentMailboxObjectId.flatMapLatest {
-        it?.let { FolderController.getFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
+        it?.let { FolderController.getRootsFoldersAsync().map { results -> results.list.getMenuFolders() } } ?: emptyFlow()
     }.asLiveData(coroutineContext)
 
     val currentQuotasLive = _currentMailboxObjectId.flatMapLatest {
@@ -111,6 +111,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
+
+    init {
+        // Delete search data in case they couldn't be deleted at the end of the previous Search.
+        viewModelScope.launch(Dispatchers.IO) { SearchUtils.deleteRealmSearchData() }
+    }
 
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!

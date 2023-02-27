@@ -15,18 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.menu
+package com.infomaniak.mail.data.models.thread
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
-import com.infomaniak.mail.data.cache.mailboxContent.FolderController
-import com.infomaniak.mail.utils.getMenuFolders
-import kotlinx.coroutines.Dispatchers
+import com.infomaniak.mail.data.models.Thread
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class MoveViewModel : ViewModel() {
-
-    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
-
-    val currentFolders = liveData(coroutineContext) { emit(FolderController.getRootsFolders().getMenuFolders()) }
-}
+@Serializable
+data class ThreadResult(
+    val threads: List<Thread>? = null,
+    @SerialName("resource_previous")
+    val resourcePrevious: String?,
+    @SerialName("resource_next")
+    val resourceNext: String?,
+)

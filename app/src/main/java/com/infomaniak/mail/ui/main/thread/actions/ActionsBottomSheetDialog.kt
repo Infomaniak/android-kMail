@@ -61,7 +61,7 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         setArchiveUi()
 
         archive.setClosingOnClickListener { onClickListener.onArchive() }

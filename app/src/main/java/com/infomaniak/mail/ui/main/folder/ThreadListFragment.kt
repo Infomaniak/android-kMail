@@ -204,8 +204,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         toolbar.setNavigationOnClickListener { (activity as? MainActivity)?.binding?.drawerLayout?.open() }
 
         searchButton.setOnClickListener {
-            notYetImplemented()
-            // safeNavigate(ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment())
+            safeNavigate(
+                ThreadListFragmentDirections.actionThreadListFragmentToSearchFragment(dummyFolderId = mainViewModel.currentFolderId!!)
+            )
         }
 
         userAvatar.setOnClickListener {

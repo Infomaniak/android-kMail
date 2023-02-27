@@ -111,6 +111,8 @@ class Message : RealmObject {
     var messageIds: RealmSet<String> = realmSetOf()
     @Transient
     var draftLocalUuid: String? = null
+    @Transient
+    var isFromSearch: Boolean = false
     //endregion
 
     //region UI data (Ignore & Transient)

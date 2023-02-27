@@ -69,6 +69,10 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, shortUid)}/attachmentsArchive"
     }
 
+    fun search(mailboxUuid: String, folderId: String, filters: String): String {
+        return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&$filters"
+    }
+
     fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): String {
         return "${message(mailboxUuid, folderId, shortUid)}/report"
     }

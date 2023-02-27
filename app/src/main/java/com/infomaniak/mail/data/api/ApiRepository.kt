@@ -34,6 +34,7 @@ import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsResult
 import com.infomaniak.mail.data.models.message.DeleteMessageResult
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.signature.SignaturesResult
+import com.infomaniak.mail.data.models.thread.ThreadResult
 import com.infomaniak.mail.utils.SentryDebug
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -185,6 +186,14 @@ object ApiRepository : ApiRepositoryCore() {
 
     fun blockUser(mailboxUuid: String, folderId: String, shortUid: String): ApiResponse<Boolean> {
         return callApi(ApiRoutes.blockUser(mailboxUuid, folderId, shortUid), POST)
+    }
+
+    fun searchThreads(mailboxUuid: String, folderId: String, filters: String, resource: String?): ApiResponse<ThreadResult> {
+        return if (resource.isNullOrBlank()) {
+            callApi(ApiRoutes.search(mailboxUuid, folderId, filters), GET)
+        } else {
+            callApi("${ApiRoutes.resource(resource)}&$filters", GET)
+        }
     }
 
     /**
