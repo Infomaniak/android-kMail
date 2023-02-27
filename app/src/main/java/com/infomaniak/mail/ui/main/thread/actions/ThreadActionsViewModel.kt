@@ -20,7 +20,7 @@ package com.infomaniak.mail.ui.main.thread.actions
 import androidx.lifecycle.*
 import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
-import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.thread.Thread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.mapNotNull
 
