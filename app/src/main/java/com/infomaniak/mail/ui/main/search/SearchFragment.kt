@@ -114,7 +114,10 @@ class SearchFragment : Fragment() {
 
         fun displayRecentSearches() {
             showLoadingTimer.cancel()
-            swipeRefreshLayout.isRefreshing = false
+            swipeRefreshLayout.apply {
+                isRefreshing = false
+                isEnabled = false
+            }
 
             recentSearchesLayout.isVisible = true
             recentSearchesRecyclerView.scrollToPosition(0)
@@ -128,7 +131,10 @@ class SearchFragment : Fragment() {
 
         fun displaySearchResult(mode: VisibilityMode) {
             showLoadingTimer.cancel()
-            swipeRefreshLayout.isRefreshing = false
+            swipeRefreshLayout.apply {
+                isRefreshing = false
+                isEnabled = true
+            }
 
             recentSearchesLayout.isGone = true
             val thereAreResults = mode == VisibilityMode.RESULTS
@@ -149,7 +155,7 @@ class SearchFragment : Fragment() {
 
     private fun setUi() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        swipeRefreshLayout.isEnabled = false
+        swipeRefreshLayout.setOnRefreshListener { searchViewModel.refreshSearch() }
 
         val popupMenu = createPopupMenu()
 
