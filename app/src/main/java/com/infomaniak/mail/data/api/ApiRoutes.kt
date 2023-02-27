@@ -75,9 +75,8 @@ object ApiRoutes {
         filters: String,
         isDraftFolder: Boolean = false,
     ): String {
-        val offset = "offset=${ApiRepository.PER_PAGE}"
         val thread = "thread=${if (isDraftFolder) "off" else "on"}"
-        return "${folder(mailboxUuid, folderId)}/message?$offset&$thread&$filters"
+        return "${folder(mailboxUuid, folderId)}/message?offset=0&$thread&$filters"
     }
 
     fun reportPhishing(mailboxUuid: String, folderId: String, shortUid: String): String {
