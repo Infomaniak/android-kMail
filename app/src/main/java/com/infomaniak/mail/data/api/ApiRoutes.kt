@@ -73,10 +73,9 @@ object ApiRoutes {
         mailboxUuid: String,
         folderId: String,
         filters: String,
-        offset: Int = 0,
         isDraftFolder: Boolean = false,
     ): String {
-        val offset = "offset=$offset"
+        val offset = "offset=${ApiRepository.PER_PAGE}"
         val thread = "thread=${if (isDraftFolder) "off" else "on"}"
         return "${folder(mailboxUuid, folderId)}/message?$offset&$thread&$filters"
     }

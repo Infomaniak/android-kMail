@@ -79,7 +79,7 @@ class SearchViewModel : ViewModel() {
     fun selectFolder(folder: Folder?) {
         resetPagination()
         if (folder == null && selectedFilters.contains(ThreadFilter.FOLDER)) {
-            ThreadFilter.FOLDER.unSelect()
+            ThreadFilter.FOLDER.unselect()
         } else if (folder != null) {
             ThreadFilter.FOLDER.select()
         }
@@ -88,7 +88,7 @@ class SearchViewModel : ViewModel() {
 
     fun toggleFilter(filter: ThreadFilter) {
         resetPagination()
-        if (selectedFilters.contains(filter)) filter.unSelect() else filter.select()
+        if (selectedFilters.contains(filter)) filter.unselect() else filter.select()
     }
 
     fun nextPage() {
@@ -110,7 +110,7 @@ class SearchViewModel : ViewModel() {
     }
 
     private fun ThreadFilter.unselect() {
-        _selectedFilters.value = selectedFilters.apply { remove(this@unSelect) }
+        _selectedFilters.value = selectedFilters.apply { remove(this@unselect) }
     }
 
     private fun resetPagination() {

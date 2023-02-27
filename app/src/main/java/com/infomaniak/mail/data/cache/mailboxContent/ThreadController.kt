@@ -137,11 +137,11 @@ object ThreadController {
             }
         }
 
-        fun handleDuplicatesMessages(thread: Thread) {
-            if (thread.messages.count() > 1) {
-                val firstMessage = thread.messages.removeAt(0)
-                thread.duplicates = thread.messages
-                thread.messages = realmListOf(firstMessage)
+        fun Thread.handleDuplicatesMessages() {
+            if (messages.count() > 1) {
+                val firstMessage = messages.removeAt(0)
+                duplicates = messages
+                messages = realmListOf(firstMessage)
             }
         }
 
@@ -154,7 +154,7 @@ object ThreadController {
                 thread.folderId = remoteMessage.folderId
 
                 keepOldMessagesAndAddToSearchFolder(thread, searchFolder)
-                handleDuplicatesMessages(thread)
+                thread.handleDuplicatesMessages()
                 thread.recomputeThread()
 
                 thread
