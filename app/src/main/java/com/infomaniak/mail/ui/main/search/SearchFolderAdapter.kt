@@ -22,21 +22,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListAdapter
-import com.google.android.material.button.MaterialButton
-import com.infomaniak.lib.core.utils.setPaddingRelative
-import com.infomaniak.lib.core.utils.toPx
+import androidx.appcompat.content.res.AppCompatResources
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.databinding.ItemSearchFolderBinding
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
+import com.infomaniak.mail.views.MenuDrawerItemView
 
 class SearchFolderAdapter(
     val folders: List<Folder?>,
     val onClickListener: (folder: Folder?, title: String) -> Unit
 ) : ListAdapter {
 
-    val allFolderMargin by lazy { 42.toPx() }
-    val iconFolderMargin by lazy { 12.toPx() }
+    private var selectedFolder: Folder? = null
 
     override fun registerDataSetObserver(observer: DataSetObserver?) = Unit
 
@@ -53,15 +51,19 @@ class SearchFolderAdapter(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val context = parent!!.context
         (convertView ?: ItemSearchFolderBinding.inflate(LayoutInflater.from(context), parent, false).root).apply {
-            findViewById<MaterialButton>(R.id.folderButton).apply {
+            findViewById<MenuDrawerItemView>(R.id.menuDrawerItem).apply {
                 val folder = folders[position]
 
                 val entryName: String = context.getLocalizedNameOrAllFolders(folder)
                 text = entryName
-                setIconResource(folder?.getIcon() ?: 0)
-                setPaddingRelative(if (folder == null) allFolderMargin else iconFolderMargin)
+                icon = AppCompatResources.getDrawable(context, folder?.getIcon() ?: R.drawable.ic_folder)
 
-                setOnClickListener { onClickListener(folder, entryName) }
+                setSelectedState(folder == selectedFolder)
+
+                setOnClickListener {
+                    selectedFolder = folder
+                    onClickListener(folder, entryName)
+                }
             }
             return this
         }

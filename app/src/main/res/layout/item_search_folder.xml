@@ -15,32 +15,12 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.infomaniak.mail.views.MenuDrawerItemView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/menuDrawerItem"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/folderButton"
-        style="@style/TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/backgroundColorTertiary"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:insetLeft="0dp"
-        android:insetTop="0dp"
-        android:insetRight="0dp"
-        android:insetBottom="0dp"
-        android:maxLines="2"
-        android:paddingHorizontal="@dimen/alternativeMargin"
-        android:textColor="@color/primaryTextColor"
-        app:cornerRadius="0dp"
-        app:iconPadding="@dimen/alternativeMargin"
-        app:iconSize="18dp"
-        app:iconTint="?attr/colorPrimary"
-        tools:icon="@drawable/ic_archive_folder"
-        tools:text="Boîte de réception" />
-
-</LinearLayout>
+    android:layout_height="wrap_content"
+    app:selectionStyle="moveFragment"
+    tools:icon="@drawable/ic_folder"
+    tools:text="@string/searchFilterFolder" />
