@@ -59,7 +59,6 @@ class SearchViewModel : ViewModel() {
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
 
     var selectedFolder: Folder? = null
-    val hasNextPage get() = !resourceNext.isNullOrBlank()
     var previousSearch: String? = null
     var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
