@@ -45,10 +45,7 @@ import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
@@ -213,11 +210,12 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
+    fun saveToLocalAndFinish(action: DraftAction, displayToast: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         autoSaveJob?.cancel()
 
         if (shouldExecuteAction(action)) {
             saveDraftToLocal(action)
+            withContext(Dispatchers.Main) { displayToast() }
         } else if (isNewMessage) {
             RealmDatabase.mailboxContent().writeBlocking {
                 DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
@@ -238,7 +236,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
+    private fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
 
     private fun updateIsSendingAllowed() {
         isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())

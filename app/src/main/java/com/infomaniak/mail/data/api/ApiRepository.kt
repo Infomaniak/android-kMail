@@ -189,8 +189,11 @@ object ApiRepository : ApiRepositoryCore() {
     }
 
     fun searchThreads(mailboxUuid: String, folderId: String, filters: String, resource: String?): ApiResponse<ThreadResult> {
-        return if (resource.isNullOrBlank()) callApi(ApiRoutes.search(mailboxUuid, folderId, filters), GET)
-        else callApi("${ApiRoutes.resource(resource)}&$filters", GET)
+        return if (resource.isNullOrBlank()) {
+            callApi(ApiRoutes.search(mailboxUuid, folderId, filters), GET)
+        } else {
+            callApi("${ApiRoutes.resource(resource)}&$filters", GET)
+        }
     }
 
     /**
