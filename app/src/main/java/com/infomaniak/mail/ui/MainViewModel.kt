@@ -113,7 +113,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     init {
-        // Delete search data when in case they could not be deleted
+        // Delete search data in case they couldn't be deleted at the end of the previous Search.
         viewModelScope.launch(Dispatchers.IO) { SearchUtils.deleteRealmSearchData() }
     }
 
