@@ -21,6 +21,7 @@
     android:id="@+id/menuDrawerItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:selectionStyle="moveFragment"
+    app:itemStyle="other"
+    app:textWeight="regular"
     tools:icon="@drawable/ic_folder"
     tools:text="@string/searchFilterFolder" />
