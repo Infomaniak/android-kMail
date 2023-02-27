@@ -131,7 +131,7 @@ object MessageController {
             }
         }
 
-        if (!searchQuery.isNullOrBlank()) {
+        if (searchQuery?.isNotBlank() == true) {
             val containsSubject = "${Message::subject.name} CONTAINS[c] '$searchQuery'"
             val containsPreview = "${Message::preview.name} CONTAINS[c] '$searchQuery'"
             val containsBody = "${Message::body.name}.${Body::value.name} CONTAINS[c] '$searchQuery'"

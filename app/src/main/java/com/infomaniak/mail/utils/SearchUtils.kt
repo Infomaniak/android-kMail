@@ -50,26 +50,17 @@ object SearchUtils {
     }
 
     fun selectFilter(filter: ThreadFilter, selectedFilters: MutableSet<ThreadFilter>): MutableSet<ThreadFilter> {
-        val filters = when (filter) {
-            ThreadFilter.SEEN -> {
-                selectedFilters.apply {
-                    removeAll(arrayOf(ThreadFilter.UNSEEN, ThreadFilter.STARRED))
-                }
-            }
-            ThreadFilter.UNSEEN -> {
-                selectedFilters.apply {
-                    removeAll(arrayOf(ThreadFilter.SEEN, ThreadFilter.STARRED))
-                }
-            }
-            ThreadFilter.STARRED -> {
-                selectedFilters.apply {
-                    removeAll(arrayOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN))
-                }
-            }
-            else -> selectedFilters
+        val filtersToRemove = when (filter) {
+            ThreadFilter.SEEN -> setOf(ThreadFilter.UNSEEN, ThreadFilter.STARRED)
+            ThreadFilter.UNSEEN -> setOf(ThreadFilter.SEEN, ThreadFilter.STARRED)
+            ThreadFilter.STARRED -> setOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN)
+            else -> emptySet()
         }
 
-        return filters.apply { add(filter) }
+        return selectedFilters.apply {
+            removeAll(filtersToRemove)
+            add(filter)
+        }
     }
 
     fun List<Message>.convertToSearchThreads(): List<Thread> {

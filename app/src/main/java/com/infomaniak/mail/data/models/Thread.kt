@@ -217,16 +217,6 @@ class Thread : RealmObject {
     @Serializable
     data class ThreadResult(
         val threads: List<Thread>? = null,
-        @SerialName("total_messages_count")
-        val totalMessagesCount: Int,
-        @SerialName("messages_count")
-        val messagesCount: Int,
-        @SerialName("current_offset")
-        val currentOffset: Int,
-        @SerialName("thread_mode")
-        val threadMode: String,
-        @SerialName("folder_unseen_messages")
-        val folderUnseenMessages: Int,
         @SerialName("resource_previous")
         val resourcePrevious: String?,
         @SerialName("resource_next")

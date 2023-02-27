@@ -147,12 +147,10 @@ class SearchViewModel : ViewModel() {
             val searchFilters = SearchUtils.searchFilters(query, filters)
             val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
-            if (apiResponse.isSuccess()) {
-                with(apiResponse) {
-                    initSearchFolderThreads()
-                    resourceNext = data?.resourceNext
-                    resourcePrevious = data?.resourcePrevious
-                }
+            if (apiResponse.isSuccess()) with(apiResponse) {
+                initSearchFolderThreads()
+                resourceNext = data?.resourceNext
+                resourcePrevious = data?.resourcePrevious
             } else if (!hasNextPage) {
                 val searchMessages = MessageController.searchMessages(query, filters, selectedFolder?.id)
                 val threads = searchMessages.convertToSearchThreads()
