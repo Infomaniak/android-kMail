@@ -24,6 +24,7 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
 import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
@@ -223,11 +224,11 @@ object ThreadController {
         }
     }
 
-    fun saveThreads(threads: List<Thread>, searchMessages: List<Message>) {
+    fun saveThreads(searchMessages: List<Message>) {
         defaultRealm.writeBlocking {
-            with(FolderController.getOrCreateSearchFolder(this)) {
-                this.messages = searchMessages.toRealmList()
-                this.threads = threads.toRealmList()
+            FolderController.getOrCreateSearchFolder(this).apply {
+                messages = searchMessages.toRealmList()
+                threads = searchMessages.convertToSearchThreads().toRealmList()
             }
         }
     }

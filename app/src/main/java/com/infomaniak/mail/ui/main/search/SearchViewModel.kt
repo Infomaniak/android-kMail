@@ -152,9 +152,7 @@ class SearchViewModel : ViewModel() {
                 resourceNext = data?.resourceNext
                 resourcePrevious = data?.resourcePrevious
             } else if (!hasNextPage) {
-                val searchMessages = MessageController.searchMessages(query, filters, selectedFolder?.id)
-                val threads = searchMessages.convertToSearchThreads()
-                ThreadController.saveThreads(threads, searchMessages)
+                ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, filters, folderId))
             }
 
             emitSource(ThreadController.getSearchThreadsAsync().asLiveData(Dispatchers.IO).map {
