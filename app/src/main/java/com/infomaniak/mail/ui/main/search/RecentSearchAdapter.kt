@@ -68,9 +68,7 @@ class RecentSearchAdapter(
         }
     }
 
-    fun getSearchQueries(): MutableList<String> {
-        return searchQueries
-    }
+    fun getSearchQueries(): MutableList<String> = searchQueries
 
     class RecentSearchViewHolder(val binding: ItemRecentSearchBinding) : RecyclerView.ViewHolder(binding.root)
 

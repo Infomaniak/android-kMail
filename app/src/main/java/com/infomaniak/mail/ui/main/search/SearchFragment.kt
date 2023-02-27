@@ -81,7 +81,7 @@ class SearchFragment : Fragment() {
             },
             onSearchQueryDeleted = { isThereHistory ->
                 updateHistoryEmptyStateVisibility(isThereHistory)
-            }
+            },
         )
     }
 
