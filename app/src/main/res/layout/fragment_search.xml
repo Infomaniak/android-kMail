@@ -140,26 +140,45 @@
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-            <LinearLayout
+
+            <FrameLayout
                 android:id="@+id/recentSearchesLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 android:visibility="gone">
 
+                <LinearLayout
+                    android:id="@+id/recentSearches"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        style="@style/SettingHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/recentSearchesTitle" />
+
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recentSearchesRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                </LinearLayout>
+
                 <TextView
+                    android:id="@+id/noHistory"
                     style="@style/SettingHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/recentSearchesTitle" />
+                    android:gravity="center_horizontal"
+                    android:text="@string/searchNoHistoryDescription" />
 
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recentSearchesRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
+            </FrameLayout>
 
             <com.infomaniak.mail.ui.main.EmptyStateView
                 android:id="@+id/noResultsEmptyState"
@@ -171,6 +190,7 @@
                 app:icon="@drawable/ic_search"
                 app:title="@string/searchNoResultsTitle"
                 tools:visibility="visible" />
+
         </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

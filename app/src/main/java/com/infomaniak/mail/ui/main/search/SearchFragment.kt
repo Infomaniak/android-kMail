@@ -69,6 +69,22 @@ class SearchFragment : Fragment() {
         )
     }
 
+    private val recentSearchAdapter by lazy {
+        RecentSearchAdapter(
+            searchQueries = localSettings.recentSearches.toMutableList(),
+            onSearchQueryClicked = {
+                with(binding.searchBar.searchTextInput) {
+                    setText(it)
+                    requestFocus()
+                    setSelection(it.count())
+                }
+            },
+            onSearchQueryDeleted = { isThereHistory ->
+                updateHistoryEmptyStateVisibility(isThereHistory)
+            },
+        )
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return FragmentSearchBinding.inflate(inflater, container, false).also { binding = it }.root
     }
@@ -79,14 +95,18 @@ class SearchFragment : Fragment() {
         setUi()
         observeVisibilityModeUpdates()
         observeSearchResults()
+        observeHistory()
     }
 
     override fun onStop() = with(binding) {
+        localSettings.recentSearches = recentSearchAdapter.getSearchQueries()
+
         searchViewModel.apply {
             previousSearch = searchBar.searchTextInput.text.toString()
             previousAttachments = attachments.isChecked
             previousMutuallyExclusiveChips = mutuallyExclusiveChipGroup.checkedChipId
         }
+
         super.onStop()
     }
 
@@ -97,6 +117,7 @@ class SearchFragment : Fragment() {
             swipeRefreshLayout.isRefreshing = false
 
             recentSearchesLayout.isVisible = true
+            recentSearchesRecyclerView.scrollToPosition(0)
             mailRecyclerView.isGone = true
             noResultsEmptyState.isGone = true
         }
@@ -190,6 +211,9 @@ class SearchFragment : Fragment() {
             disableSwipeDirection(DirectionFlag.RIGHT)
             addStickyDateDecoration(threadListAdapter)
         }
+
+        recentSearchesRecyclerView.adapter = recentSearchAdapter
+        updateHistoryEmptyStateVisibility(recentSearchAdapter.getSearchQueries().isNotEmpty())
     }
 
     private fun createPopupMenu(): ListPopupWindow = with(binding) {
@@ -234,6 +258,18 @@ class SearchFragment : Fragment() {
             threadListAdapter.updateList(it)
             threadListAdapter.notifyDataSetChanged()
         }
+    }
+
+    private fun observeHistory() {
+        searchViewModel.history.observe(viewLifecycleOwner) {
+            recentSearchAdapter.addSearchQuery(it)
+            updateHistoryEmptyStateVisibility(true)
+        }
+    }
+
+    private fun updateHistoryEmptyStateVisibility(isThereHistory: Boolean) = with(binding) {
+        recentSearches.isVisible = isThereHistory
+        noHistory.isGone = isThereHistory
     }
 
     enum class VisibilityMode {
