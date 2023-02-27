@@ -55,13 +55,16 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.DialogDescriptionBinding
 import com.infomaniak.mail.databinding.DialogInputBinding
+import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.login.IlluColors
 import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -219,6 +222,24 @@ fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: 
             previousMessageUid = messageUid,
         ).toBundle(),
     )
+}
+
+fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
+    if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
+        mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
+            safeNavigate(
+                R.id.newMessageActivity,
+                NewMessageActivityArgs(
+                    draftExists = true,
+                    draftLocalUuid = it.draftLocalUuid,
+                    draftResource = it.draftResource,
+                    messageUid = it.messageUid,
+                ).toBundle(),
+            )
+        }
+    } else {
+        safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
+    }
 }
 //endregion
 

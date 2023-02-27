@@ -94,7 +94,7 @@ class SearchViewModel : ViewModel() {
         if (selectedFilters.contains(filter)) filter.unselect() else filter.select()
     }
 
-    fun unSelectMutuallyExclusiveFilters() {
+    fun unselectMutuallyExclusiveFilters() {
         resetPagination()
         _selectedFilters.value = selectedFilters.apply {
             removeAll(listOf(ThreadFilter.SEEN, ThreadFilter.UNSEEN, ThreadFilter.STARRED))

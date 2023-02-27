@@ -45,6 +45,7 @@ import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.utils.addStickyDateDecoration
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
+import com.infomaniak.mail.utils.navigateToThread
 
 class SearchFragment : Fragment() {
 
@@ -109,10 +110,10 @@ class SearchFragment : Fragment() {
             swipeRefreshLayout.isRefreshing = false
 
             recentSearchesLayout.isGone = true
-            mailRecyclerView.isVisible = mode == VisibilityMode.RESULTS
-            noResultsEmptyState.isGone = mode == VisibilityMode.RESULTS
+            val thereAreResults = mode == VisibilityMode.RESULTS
+            mailRecyclerView.isVisible = thereAreResults
+            noResultsEmptyState.isGone = thereAreResults
         }
-
 
         when (mode) {
             VisibilityMode.RECENT_SEARCHES -> displayRecentSearches()
@@ -155,7 +156,7 @@ class SearchFragment : Fragment() {
                 R.id.read -> searchViewModel.toggleFilter(ThreadFilter.SEEN)
                 R.id.unread -> searchViewModel.toggleFilter(ThreadFilter.UNSEEN)
                 R.id.favorites -> searchViewModel.toggleFilter(ThreadFilter.STARRED)
-                else -> searchViewModel.unSelectMutuallyExclusiveFilters()
+                else -> searchViewModel.unselectMutuallyExclusiveFilters()
             }
         }
 
@@ -198,6 +199,7 @@ class SearchFragment : Fragment() {
             anchorView = folderDropDown
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
+
         searchViewModel.folders.observe(viewLifecycleOwner) { realmFolders ->
             val folders = realmFolders.toMutableList<Folder?>()
             folders.add(0, null)
@@ -209,6 +211,7 @@ class SearchFragment : Fragment() {
                 }
             )
         }
+
         return popupMenu
     }
 

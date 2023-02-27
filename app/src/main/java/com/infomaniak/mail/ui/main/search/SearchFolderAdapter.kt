@@ -65,6 +65,7 @@ class SearchFolderAdapter(
                     onClickListener(folder, entryName)
                 }
             }
+
             return this
         }
     }

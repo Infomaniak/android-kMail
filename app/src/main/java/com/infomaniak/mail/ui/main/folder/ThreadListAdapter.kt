@@ -338,24 +338,6 @@ class ThreadListAdapter(
         folderRole = newRole
     }
 
-    fun Fragment.navigateToThread(thread: Thread, mainViewModel: MainViewModel) {
-        if (thread.isOnlyOneDraft()) { // Directly go to NewMessage screen
-            mainViewModel.navigateToSelectedDraft(thread.messages.first()).observe(viewLifecycleOwner) {
-                safeNavigate(
-                    R.id.newMessageActivity,
-                    NewMessageActivityArgs(
-                        draftExists = true,
-                        draftLocalUuid = it.draftLocalUuid,
-                        draftResource = it.draftResource,
-                        messageUid = it.messageUid,
-                    ).toBundle(),
-                )
-            }
-        } else {
-            safeNavigate(R.id.threadFragment, ThreadFragmentArgs(thread.uid).toBundle())
-        }
-    }
-
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
