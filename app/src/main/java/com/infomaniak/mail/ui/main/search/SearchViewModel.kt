@@ -42,7 +42,7 @@ class SearchViewModel : ViewModel() {
     private inline val selectedFilters get() = _selectedFilters.value ?: mutableSetOf()
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
 
-    /** It is simply used as a default value for the api */
+    /** It is simply used as a default value for the API */
     private lateinit var dummyFolderId: String
     private var selectedFolder: Folder? = null
     private var resourceNext: String? = null
