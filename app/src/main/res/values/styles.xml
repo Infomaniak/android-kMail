@@ -302,30 +302,33 @@
 
     <!-- Chips -->
 
-    <style name="EmailAddressChip" parent="Widget.Material3.Chip.Input">
-        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+    <style name="BaseChipNoCheckedIcon" parent="Widget.Material3.Chip.Input">
         <item name="checkedIcon">@null</item>
         <item name="checkedIconEnabled">false</item>
-        <item name="chipBackgroundColor">?attr/colorPrimaryContainer</item>
         <item name="chipCornerRadius">100dp</item>
         <item name="chipStrokeWidth">0dp</item>
+    </style>
+
+    <style name="ChipNoIcons" parent="BaseChipNoCheckedIcon">
         <item name="closeIcon">@null</item>
         <item name="closeIconEnabled">false</item>
     </style>
 
-    <style name="SearchFilterChip" parent="Widget.Material3.Chip.Input">
+    <style name="EmailAddressChip" parent="ChipNoIcons">
+        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+        <item name="chipBackgroundColor">?attr/colorPrimaryContainer</item>
+    </style>
+
+    <style name="SearchFilterChip" parent="ChipNoIcons">
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:textColor">@color/chip_unread_text_color</item>
         <item name="checkedIcon">@drawable/ic_check_sharp</item>
         <item name="checkedIconTint">?attr/colorOnPrimary</item>
         <item name="chipBackgroundColor">@color/chip_unread_background</item>
-        <item name="chipCornerRadius">100dp</item>
         <item name="chipIconSize">18dp</item>
         <item name="chipStrokeColor">?attr/colorPrimary</item>
         <item name="chipStrokeWidth">1dp</item>
-        <item name="closeIcon">@null</item>
-        <item name="closeIconEnabled">false</item>
         <item name="closeIconEndPadding">@dimen/marginStandardSmall</item>
         <item name="closeIconSize">@dimen/alternativeMargin</item>
         <item name="closeIconTint">@color/chip_unread_text_color</item>
@@ -333,16 +336,12 @@
         <item name="strokeColor">?attr/colorPrimary</item>
     </style>
 
-    <style name="UnreadChip" parent="Widget.Material3.Chip.Input">
+    <style name="UnreadChip" parent="BaseChipNoCheckedIcon">
         <item name="android:textColor">@color/chip_unread_text_color</item>
-        <item name="checkedIcon">@null</item>
-        <item name="checkedIconEnabled">false</item>
+        <item name="android:textSize">14sp</item>
         <item name="chipBackgroundColor">@color/chip_unread_background</item>
-        <item name="chipCornerRadius">100dp</item>
-        <item name="chipStrokeWidth">0dp</item>
         <item name="closeIconTint">?attr/colorOnPrimary</item>
     </style>
-
 
     <!-- Bottom sheet -->
 
