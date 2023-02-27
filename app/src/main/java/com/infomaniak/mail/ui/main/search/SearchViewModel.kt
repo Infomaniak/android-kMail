@@ -49,15 +49,13 @@ class SearchViewModel : ViewModel() {
     private var resourcePrevious: String? = null
 
     private var fetchThreadsJob: Job? = null
+    private val hasNoNextPage get() = resourceNext.isNullOrBlank()
 
     val searchResults = observeSearchAndFilters().switchMap { (query, filters) ->
         val searchQuery = if (isLengthTooShort(query)) null else query
         fetchThreads(searchQuery, filters)
     }
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
-
-    val hasNextPage get() = !resourceNext.isNullOrBlank()
-
     private fun observeSearchAndFilters() = MediatorLiveData<Pair<String?, Set<ThreadFilter>>>().apply {
         addSource(searchQuery) { value = it to (value?.second ?: selectedFilters) }
         addSource(_selectedFilters) { value = value?.first to it }
@@ -92,7 +90,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun nextPage() {
-        if (!hasNextPage) return
+        if (hasNoNextPage) return
         searchQuery(query = searchQuery.value ?: "", resetPagination = false)
     }
 
@@ -133,7 +131,7 @@ class SearchViewModel : ViewModel() {
         fetchThreadsJob?.cancel()
         fetchThreadsJob = Job()
         return liveData(Dispatchers.IO + fetchThreadsJob!!) {
-            if (!hasNextPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
+            if (hasNoNextPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
             if (fetchThreadsJob?.isCancelled == true) return@liveData
             if (filters.isEmpty() && query.isNullOrBlank()) {
                 visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
@@ -151,7 +149,7 @@ class SearchViewModel : ViewModel() {
                 initSearchFolderThreads()
                 resourceNext = data?.resourceNext
                 resourcePrevious = data?.resourcePrevious
-            } else if (!hasNextPage) {
+            } else if (hasNoNextPage) {
                 ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, filters, folderId))
             }
 
