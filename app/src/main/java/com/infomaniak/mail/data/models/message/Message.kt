@@ -23,6 +23,7 @@ import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.cache.mailboxContent.FolderController.SEARCH_FOLDER_ID
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
@@ -126,7 +127,7 @@ class Message : RealmObject {
     val threadsDuplicatedIn by backlinks(Thread::duplicates)
 
     private val _folders by backlinks(Folder::messages)
-    val folder get() = _folders.single()
+    val folder get() = _folders.single { _folders.count() == 1 || it.id != SEARCH_FOLDER_ID }
 
     inline val shortUid get() = uid.toShortUid()
     inline val sender get() = from.first()

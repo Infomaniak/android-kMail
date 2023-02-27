@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.mapNotNull
 
 object FolderController {
 
-    private const val SEARCH_FOLDER_ID = "search_folder_id"
+    const val SEARCH_FOLDER_ID = "search_folder_id"
 
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
 
