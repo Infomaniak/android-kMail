@@ -73,7 +73,6 @@ class SearchFolderAdapter(
 
     override fun isEmpty(): Boolean = folders.isEmpty()
 
-    // TODO : add separators between common and custom folders ?
     override fun areAllItemsEnabled(): Boolean = true
 
     override fun isEnabled(position: Int): Boolean = true
