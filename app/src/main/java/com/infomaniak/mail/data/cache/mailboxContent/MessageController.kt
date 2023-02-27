@@ -24,12 +24,12 @@ import com.infomaniak.mail.data.cache.mailboxContent.ThreadController.upsertThre
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.Thread
-import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
 import com.infomaniak.mail.data.models.message.Body
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
 import io.realm.kotlin.MutableRealm

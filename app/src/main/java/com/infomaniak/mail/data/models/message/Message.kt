@@ -26,10 +26,10 @@ import com.infomaniak.mail.data.cache.mailboxContent.FolderController
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
-import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Priority
 import com.infomaniak.mail.data.models.getMessages.GetMessagesUidsDeltaResult.MessageFlags
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.utils.toRealmInstant
 import com.infomaniak.mail.utils.toShortUid
 import io.realm.kotlin.TypedRealm

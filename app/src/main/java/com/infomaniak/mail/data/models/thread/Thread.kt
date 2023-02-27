@@ -17,7 +17,7 @@
  */
 @file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
 
-package com.infomaniak.mail.data.models
+package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import androidx.annotation.IdRes
@@ -26,6 +26,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
