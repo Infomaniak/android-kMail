@@ -17,7 +17,6 @@
  */
 package com.infomaniak.mail.data.models.thread
 
-import com.infomaniak.mail.data.models.Thread
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -21,9 +21,9 @@ import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.Thread
-import com.infomaniak.mail.data.models.Thread.ThreadFilter
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
+import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.utils.SearchUtils.convertToSearchThreads
 import com.infomaniak.mail.utils.SharedViewModelUtils.fetchFolderMessagesJob
 import io.realm.kotlin.MutableRealm
