@@ -19,7 +19,9 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -36,6 +38,8 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.lightTheme.isVisible = requireContext().isNightModeEnabled()
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
@@ -62,6 +66,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
 
                 //region Actions
+                override fun onViewInLight() {
+                    notYetImplemented()
+                }
+
                 override fun onArchive() {
                     mainViewModel.archiveThreadOrMessage(threadUid, message)
                 }

@@ -47,6 +47,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             setFavoriteUi(thread.isFavorite)
         }
 
+        binding.lightTheme.isGone = true
         binding.postpone.isGone = true
         setSpamUi()
 
@@ -75,6 +76,8 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
 
                 //region Actions
+                override fun onViewInLight() = Unit
+
                 override fun onArchive() {
                     mainViewModel.archiveThreadOrMessage(threadUid)
                 }
