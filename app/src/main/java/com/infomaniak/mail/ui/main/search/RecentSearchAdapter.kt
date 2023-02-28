@@ -48,11 +48,14 @@ class RecentSearchAdapter(
 
     override fun getItemCount(): Int = searchQueries.count()
 
-    fun addSearchQuery(searchQuery: String) = with(searchQueries) {
+    /**
+     * Returns `true` if insertion is successful.
+     */
+    fun addSearchQuery(searchQuery: String): Boolean = with(searchQueries) {
         val previousCopyPosition = indexOf(searchQuery)
 
         if (previousCopyPosition == 0) {
-            return@with
+            return@with false
         } else if (previousCopyPosition != -1) {
             // Place search query back at the top if it already exists instead of making it appear twice
             removeAt(previousCopyPosition)
@@ -66,6 +69,8 @@ class RecentSearchAdapter(
             notifyItemRemoved(lastIndex)
             removeLast()
         }
+
+        return true
     }
 
     fun getSearchQueries(): MutableList<String> = searchQueries

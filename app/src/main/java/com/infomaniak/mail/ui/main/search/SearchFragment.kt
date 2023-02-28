@@ -105,8 +105,6 @@ class SearchFragment : Fragment() {
     }
 
     override fun onStop() = with(binding) {
-        localSettings.recentSearches = recentSearchAdapter.getSearchQueries()
-
         searchViewModel.apply {
             previousSearch = searchBar.searchTextInput.text.toString()
             previousAttachments = attachments.isChecked
@@ -300,7 +298,8 @@ class SearchFragment : Fragment() {
 
     private fun observeHistory() {
         searchViewModel.history.observe(viewLifecycleOwner) {
-            recentSearchAdapter.addSearchQuery(it)
+            val hasInsertedSuccessfully = recentSearchAdapter.addSearchQuery(it)
+            if (hasInsertedSuccessfully) localSettings.recentSearches = recentSearchAdapter.getSearchQueries()
             updateHistoryEmptyStateVisibility(true)
         }
     }
