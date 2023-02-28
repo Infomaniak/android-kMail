@@ -55,9 +55,10 @@ import com.infomaniak.mail.utils.navigateToThread
 class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
+    private val navigationArgs by navArgs<SearchFragmentArgs>()
     private val mainViewModel by activityViewModels<MainViewModel>()
     private val searchViewModel by viewModels<SearchViewModel>()
-    private val navigationArgs by navArgs<SearchFragmentArgs>()
+
     private val localSettings by lazy { LocalSettings.getInstance(requireContext()) }
 
     private val showLoadingTimer: CountDownTimer by lazy {

@@ -64,7 +64,7 @@ object SearchUtils {
     }
 
     fun List<Message>.convertToSearchThreads(): List<Thread> {
-        return this.map { message ->
+        return map { message ->
             message.toThread().apply {
                 uid = "search-${message.uid}"
                 messages = listOf(message).toRealmList()

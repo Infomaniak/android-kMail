@@ -51,8 +51,9 @@ object FolderController {
      * The other location is in `Utils.formatFoldersListWithAllChildren()`.
      */
     private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = true): RealmQuery<Folder> {
+        val rootsQuery = if (onlyRoots) " AND ${Folder.parentsPropertyName}.@count == 0" else ""
         return realm
-            .query<Folder>("$isNotSearch${if (onlyRoots) " AND ${Folder.parentsPropertyName}.@count == 0" else ""}")
+            .query<Folder>(isNotSearch + rootsQuery)
             .sort(Folder::name.name, Sort.ASCENDING)
             .sort(Folder::isFavorite.name, Sort.DESCENDING)
     }
@@ -81,6 +82,7 @@ object FolderController {
     }
 
     fun getFolders(): List<Folder> {
+
         fun List<Folder>.sortWithFoldersRoles(): List<Folder> {
             return sortedWith(Comparator { firstFolder, secondFolder ->
                 val (firstRole, secondRole) = firstFolder.role to secondFolder.role

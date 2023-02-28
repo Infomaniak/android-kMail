@@ -49,7 +49,7 @@ object UiUtils {
 
     private fun pointBetweenColor(from: Float, to: Float, percent: Float): Float = from + percent * (to - from)
 
-    // Delete everything when api 25 is not supported anymore
+    // TODO: Delete everything when API 25 is not supported anymore.
     private fun pointBetweenColors25(from: Int, to: Int, percent: Float): Int {
         data class Color(
             @ColorInt val a: Int,

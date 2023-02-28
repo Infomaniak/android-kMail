@@ -83,7 +83,7 @@ class MenuDrawerItemView @JvmOverloads constructor(
             } else {
                 binding.root.apply {
                     setMarginsRelative(0)
-                    shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0f).build()
+                    shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCornerSizes(0.0f).build()
                 }
             }
         }

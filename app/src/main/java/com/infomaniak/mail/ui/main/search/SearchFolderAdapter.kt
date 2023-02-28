@@ -31,7 +31,7 @@ import com.infomaniak.mail.views.MenuDrawerItemView
 
 class SearchFolderAdapter(
     val folders: List<Folder?>,
-    val onClickListener: (folder: Folder?, title: String) -> Unit
+    val onClickListener: (folder: Folder?, title: String) -> Unit,
 ) : ListAdapter {
 
     private var selectedFolder: Folder? = null

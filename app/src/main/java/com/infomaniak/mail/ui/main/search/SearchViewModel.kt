@@ -50,12 +50,13 @@ class SearchViewModel : ViewModel() {
     private var resourcePrevious: String? = null
 
     private var fetchThreadsJob: Job? = null
-    private val hasNoNextPage get() = resourceNext.isNullOrBlank()
+    private val isLastPage get() = resourceNext.isNullOrBlank()
 
     val searchResults = observeSearchAndFilters().switchMap { (query, filters) ->
         val searchQuery = if (isLengthTooShort(query)) null else query
         fetchThreads(searchQuery, filters)
     }
+
     val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
 
     var selectedFolder: Folder? = null
@@ -104,7 +105,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun nextPage() {
-        if (hasNoNextPage) return
+        if (isLastPage) return
         searchQuery(query = searchQuery.value ?: "", resetPagination = false)
     }
 
@@ -133,6 +134,7 @@ class SearchViewModel : ViewModel() {
     private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
     private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
+
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
                 this.data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
@@ -145,7 +147,7 @@ class SearchViewModel : ViewModel() {
         fetchThreadsJob?.cancel()
         fetchThreadsJob = Job()
         return liveData(Dispatchers.IO + fetchThreadsJob!!) {
-            if (hasNoNextPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
+            if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
             if (fetchThreadsJob?.isCancelled == true) return@liveData
             if (filters.isEmpty() && query.isNullOrBlank()) {
                 visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
@@ -163,7 +165,7 @@ class SearchViewModel : ViewModel() {
                 initSearchFolderThreads()
                 resourceNext = data?.resourceNext
                 resourcePrevious = data?.resourcePrevious
-            } else if (hasNoNextPage) {
+            } else if (isLastPage) {
                 ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, filters, folderId))
             }
 

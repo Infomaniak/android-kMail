@@ -178,7 +178,7 @@ class LocalSettings private constructor(context: Context) {
 
     //region Recent searches
     var recentSearches: List<String>
-        get() = json.decodeFromString(sharedPreferences.getString(RECENT_SEARCHES_KEY, "[]") ?: "[]")
+        get() = json.decodeFromString(sharedPreferences.getString(RECENT_SEARCHES_KEY, DEFAULT_RECENT_SEARCHES)!!)
         set(value) = sharedPreferences.transaction { putString(RECENT_SEARCHES_KEY, json.encodeToString(value)) }
     //endregion
 
@@ -204,11 +204,12 @@ class LocalSettings private constructor(context: Context) {
 
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
         private val DEFAULT_THEME = Theme.SYSTEM
-        val DEFAULT_ACCENT_COLOR = AccentColor.PINK
+        private val DEFAULT_ACCENT_COLOR = AccentColor.PINK
         private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
+        private const val DEFAULT_RECENT_SEARCHES = "[]"
         //endregion
 
         //region Keys
