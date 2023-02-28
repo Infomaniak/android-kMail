@@ -340,7 +340,7 @@ fun Fragment.createInputDialog(
     @StringRes title: Int,
     @StringRes hint: Int,
     @StringRes confirmButtonText: Int,
-    onErrorCheck: (CharSequence?) -> String?,
+    onErrorCheck: (CharSequence) -> String?,
     onPositiveButtonClicked: (CharSequence?) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
 

@@ -54,13 +54,14 @@ abstract class MenuFoldersFragment : Fragment() {
         customFoldersList.adapter = customFoldersAdapter
     }
 
-    protected fun checkIfFolderAlreadyExists(folderName: CharSequence?): String? {
+    protected fun checkIfFolderAlreadyExists(folderName: CharSequence): String? {
         val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
+        val allFolders = defaultFolders + customFolders
 
-        return if ((defaultFolders + customFolders).any { it.name == folderName.toString() }) {
-            context?.getString(R.string.errorNewFolderAlreadyExists)
-        } else {
-            null
+        return when {
+            folderName.length > 255 -> context?.getString(R.string.errorNewFolderNameTooLong)
+            allFolders.any { it.name == folderName.toString() } -> context?.getString(R.string.errorNewFolderAlreadyExists)
+            else -> null
         }
     }
 }
