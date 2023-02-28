@@ -347,13 +347,11 @@ fun Fragment.createInputDialog(
     fun Button.setButtonEnablement(isInputEmpty: Boolean) {
         isEnabled = !isInputEmpty
 
-        val (textColor, backgroundColor) = if (isInputEmpty) {
-            @Suppress("ResourceAsColor")
-            R.color.disabledDialogButtonTextColor to resources.getColor(R.color.backgroundDisabledDialogButton, null)
+        val backgroundColor = if (isInputEmpty) {
+            resources.getColor(R.color.backgroundDisabledPrimaryButton, null)
         } else {
-            R.color.colorOnPrimary to context.getAttributeColor(RMaterial.attr.colorPrimary)
+            context.getAttributeColor(RMaterial.attr.colorPrimary)
         }
-        setTextColor(resources.getColor(textColor, null))
         setBackgroundColor(backgroundColor)
     }
 
