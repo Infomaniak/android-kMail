@@ -42,6 +42,7 @@
     <string name="actionSpam">Signaler comme spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
     <string name="actionUnstar">Retirer des favoris</string>
+    <string name="actionViewInLight">Voir en thème clair</string>
     <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
     <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
     <string name="addUnknownRecipientTitle">Ajoutez un destinataire</string>
@@ -138,7 +139,8 @@
     <string name="emptyFolderTitle">Ce dossier est vide !</string>
     <string name="errorLoginDescription">La connexion a échoué.</string>
     <string name="errorLoginTitle">Erreur de connexion</string>
-    <string name="errorNewFolderAlreadyExists">Ce dossier existe déjà</string>
+    <string name="errorNewFolderAlreadyExists">Un dossier de ce nom existe déjà</string>
+    <string name="errorNewFolderNameTooLong">Le nom du dossier ne doit pas dépasser 255 caractères</string>
     <string name="favoritesFolder">Favoris</string>
     <plurals name="folderMessageCount">
         <item quantity="one">Ce dossier contient %d message</item>
@@ -348,5 +350,5 @@
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="webViewCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
-    <string name="workInProgressTitle">Cette fonctionnalité est en cours de développement.</string>
+    <string name="workInProgressTitle">Disponible prochainement</string>
 </resources>

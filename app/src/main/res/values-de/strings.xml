@@ -42,6 +42,7 @@
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
     <string name="actionUnstar">Delete from favorites</string>
+    <string name="actionViewInLight">View in light theme</string>
     <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
     <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
     <string name="addUnknownRecipientTitle">Add a recipient</string>
@@ -137,7 +138,8 @@
     <string name="emptyFolderTitle">This folder is empty !</string>
     <string name="errorLoginDescription">The connection failed.</string>
     <string name="errorLoginTitle">Login error</string>
-    <string name="errorNewFolderAlreadyExists">This folder already exists</string>
+    <string name="errorNewFolderAlreadyExists">A folder with this name already exists</string>
+    <string name="errorNewFolderNameTooLong">The folder name should not exceed 255 characters</string>
     <string name="favoritesFolder">Favorites</string>
     <plurals name="folderMessageCount">
         <item quantity="one">This folder contains %d message</item>
@@ -339,5 +341,5 @@
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
     <string name="webViewCantHandleAction">No application has been found to handle this action</string>
-    <string name="workInProgressTitle">This feature is currently under development.</string>
+    <string name="workInProgressTitle">Available soon</string>
 </resources>
