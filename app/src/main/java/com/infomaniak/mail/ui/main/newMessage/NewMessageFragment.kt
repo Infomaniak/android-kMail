@@ -35,8 +35,6 @@ import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.core.net.MailTo
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -132,9 +130,6 @@ class NewMessageFragment : Fragment() {
                 }
             })
         }
-
-        bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
-        setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
     }
 
     private fun initDraftAndViewModel() {
@@ -191,15 +186,6 @@ class NewMessageFragment : Fragment() {
 
     private fun setSnackBar(titleRes: Int) {
         newMessageViewModel.snackBarManager.setValue(getString(titleRes))
-    }
-
-    private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
-        ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->
-            insets.also {
-                val isKeyboardVisible = it.isVisible(WindowInsetsCompat.Type.ime())
-                callback(isKeyboardVisible)
-            }
-        }
     }
 
     private fun observeContacts() {
@@ -408,10 +394,6 @@ class NewMessageFragment : Fragment() {
 
         draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
         draft.attachments.removeAt(position)
-    }
-
-    private fun toggleEditor(hasFocus: Boolean) {
-        (activity as NewMessageActivity).toggleEditor(hasFocus)
     }
 
     enum class FieldType {
