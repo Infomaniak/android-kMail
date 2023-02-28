@@ -66,6 +66,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
     val snackBarManager by lazy { SnackBarManager() }
 
+    val toggleLightThemeForMessage = SingleLiveEvent<Message>()
+
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var refreshThreadsJob: Job? = null
     private var refreshMailboxesAndFoldersJob: Job? = null

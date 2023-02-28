@@ -67,7 +67,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 //region Actions
                 override fun onViewInLight() {
-                    notYetImplemented()
+                    mainViewModel.toggleLightThemeForMessage.value = message
                 }
 
                 override fun onArchive() {

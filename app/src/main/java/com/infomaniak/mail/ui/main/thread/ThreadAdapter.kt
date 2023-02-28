@@ -42,11 +42,12 @@ import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.copyFromRealm
 import java.util.*
 
+
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
 
     var messages = listOf<Message>()
         private set
-    var expandedMap = mutableMapOf<String, Boolean>()
+    var isExpandedMap = mutableMapOf<String, Boolean>()
     var contacts: Map<Recipient, MergedContact> = emptyMap()
 
     var onContactClicked: ((contact: Recipient) -> Unit)? = null
@@ -80,39 +81,72 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 newItem.isFavorite == oldItem.isFavorite
     }
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) = with(holder) {
         val message = messages[position]
 
-        if (expandedMap[message.uid] == null) {
-            expandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
-        }
+        val payload = payloads.firstOrNull()
+        if (payload is NotificationType) {
+            if (payload == NotificationType.AVATAR && !message.isDraft) {
+                binding.userAvatar.loadAvatar(message.from.first(), contacts)
+            } else if (payload == NotificationType.TOGGLE_LIGHT_MODE) {
+                isThemeTheSame = !isThemeTheSame
+                val webViewSettings = binding.messageBody.settings
 
-        if (payloads.firstOrNull() is Unit && !message.isDraft) {
-            holder.binding.userAvatar.loadAvatar(message.from.first(), contacts)
-        }
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+                    WebSettingsCompat.setAlgorithmicDarkeningAllowed(webViewSettings, isThemeTheSame)
+                }
 
-        super.onBindViewHolder(holder, position, payloads)
+                webViewSettings.javaScriptEnabled = true
+                if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
+                webViewSettings.javaScriptEnabled = false
+            }
+        } else {
+            super.onBindViewHolder(this, position, payloads)
+        }
     }
 
-    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder.binding) {
+    private fun ThreadViewHolder.addBackgroundJs() {
+        val css = binding.context.readRawResource(R.raw.custom_dark_mode)
+        binding.messageBody.evaluateJavascript(
+            """ var style = document.createElement('style');
+                document.head.appendChild(style);
+                style.id = "$DARK_BACKGROUND_STYLE_ID"
+                style.innerHTML = `$css`
+            """.trimIndent(),
+            null
+        )
+    }
+
+    private fun ThreadViewHolder.removeBackgroundJs() {
+        val removeBackgroundStyleScript = "document.getElementById(\"$DARK_BACKGROUND_STYLE_ID\").remove()"
+        binding.messageBody.evaluateJavascript(removeBackgroundStyleScript, null)
+    }
+
+    override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder) {
         val message = messages[position]
 
-        holder.bindHeader(message)
-        holder.bindAttachment(message)
+        if (isExpandedMap[message.uid] == null) {
+            isExpandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
+        }
+
+        bindHeader(message)
+        bindAttachment(message)
         loadBodyInWebView(message.body)
 
-        displayExpandedCollapsedMessage(message)
+        binding.displayExpandedCollapsedMessage(message)
     }
 
-    private fun ItemMessageBinding.loadBodyInWebView(body: Body?) {
+    private fun ThreadViewHolder.loadBodyInWebView(body: Body?) = with(binding) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, true)
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, isThemeTheSame)
         }
-        // TODO: Make prettier webview, Add button to hide / display the conversation inside message body like webapp ?
+        // TODO: Make prettier WebView, Add button to hide / display the conversation inside message body like webapp ?
         body?.let {
             var styledBody = it.value
             if (it.type == TEXT_HTML) {
-                if (context.isNightModeEnabled()) styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody)
+                if (context.isNightModeEnabled()) {
+                    styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
+                }
                 styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
                 styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
             }
@@ -180,14 +214,14 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private fun ItemMessageBinding.handleHeaderClick(message: Message) {
         messageHeader.setOnClickListener {
-            if (expandedMap[message.uid] == true) {
-                expandedMap[message.uid] = false
+            if (isExpandedMap[message.uid] == true) {
+                isExpandedMap[message.uid] = false
                 displayExpandedCollapsedMessage(message)
             } else {
                 if (message.isDraft) {
                     onDraftClicked?.invoke(message)
                 } else {
-                    expandedMap[message.uid] = true
+                    isExpandedMap[message.uid] = true
                     displayExpandedCollapsedMessage(message)
                 }
             }
@@ -245,7 +279,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
-        val isExpanded = expandedMap[message.uid]!!
+        val isExpanded = isExpandedMap[message.uid]!!
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
         if (isExpanded) displayAttachments(message.attachments) else hideAttachments()
@@ -307,7 +341,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
         contacts = newContacts
-        notifyItemRangeChanged(0, itemCount, Unit)
+        notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
+    }
+
+    fun toggleLightMode(message: Message) {
+        val index = messages.indexOfFirst { it.uid == message.uid }
+        notifyItemChanged(index, NotificationType.TOGGLE_LIGHT_MODE)
+    }
+
+    private enum class NotificationType {
+        AVATAR,
+        TOGGLE_LIGHT_MODE
     }
 
     private companion object {
@@ -316,6 +360,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         const val FORMAT_EMAIL_DATE_HOUR = "HH:mm"
         const val FORMAT_EMAIL_DATE_SHORT_DATE = "d MMM"
         const val FORMAT_EMAIL_DATE_LONG_DATE = "d MMM yyyy"
+
+        const val DARK_BACKGROUND_STYLE_ID = "dark_background_style"
 
         const val NO_MARGIN = 0
     }
@@ -331,6 +377,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         val ccAdapter = DetailedRecipientAdapter(onContactClicked)
         val bccAdapter = DetailedRecipientAdapter(onContactClicked)
         val attachmentAdapter = AttachmentAdapter { onAttachmentClicked?.invoke(it) }
+
+        var isThemeTheSame = true
 
         private var doesWebViewNeedInit = true
 
