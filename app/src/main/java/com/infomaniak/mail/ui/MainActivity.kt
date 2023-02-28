@@ -37,6 +37,7 @@ import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.checkPlayServices
 import com.infomaniak.mail.databinding.ActivityMainBinding
+import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
@@ -57,6 +58,7 @@ class MainActivity : ThemedActivity() {
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
+    private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -82,6 +84,7 @@ class MainActivity : ThemedActivity() {
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         observeNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
+        registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
         setupSnackBar()
         setupNavController()
