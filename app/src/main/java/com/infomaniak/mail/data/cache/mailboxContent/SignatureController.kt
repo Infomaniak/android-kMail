@@ -23,19 +23,13 @@ import com.infomaniak.mail.data.models.signature.Signature
 import com.infomaniak.mail.utils.update
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.RealmSingleQuery
 
 object SignatureController {
 
-    //region Queries
-    private fun getDefaultSignatureQuery(realm: TypedRealm): RealmSingleQuery<Signature> {
-        return realm.query<Signature>("${Signature::isDefault.name} == true").first()
-    }
-    //endregion
-
     //region Get data
-    fun getDefaultSignature(realm: TypedRealm): Signature? {
-        return getDefaultSignatureQuery(realm).find()
+    fun getDefaultSignature(realm: TypedRealm): Signature {
+        return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()
+            ?: realm.query<Signature>().first().find()!!
     }
     //endregion
 
