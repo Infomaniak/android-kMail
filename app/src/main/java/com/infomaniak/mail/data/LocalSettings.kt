@@ -181,7 +181,7 @@ class LocalSettings private constructor(context: Context) {
     var recentSearches: List<String>
         get() = json.decodeFromString(sharedPreferences.getString(RECENT_SEARCHES_KEY, DEFAULT_RECENT_SEARCHES)!!)
         set(value) = sharedPreferences.transaction { putString(RECENT_SEARCHES_KEY, json.encodeToString(value)) }
-	//endregion
+    //endregion
 
     //region Firebase
     var firebaseToken: String?

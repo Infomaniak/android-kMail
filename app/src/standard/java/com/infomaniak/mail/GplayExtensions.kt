@@ -24,9 +24,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.ktx.messaging
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
