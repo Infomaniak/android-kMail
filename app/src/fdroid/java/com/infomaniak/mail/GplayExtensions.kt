@@ -17,9 +17,10 @@
  */
 package com.infomaniak.mail
 
+import android.content.Context
 import androidx.fragment.app.FragmentActivity
 
-fun FragmentActivity.checkPlayServices() = false
+fun FragmentActivity.checkPlayServices() = Unit
 
 fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
 

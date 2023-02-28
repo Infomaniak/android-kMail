@@ -41,7 +41,6 @@ import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.workers.SyncMailboxesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -95,33 +94,23 @@ class MainActivity : ThemedActivity() {
 
         mainViewModel.observeMergedContactsLive()
         permissionUtils.requestMainPermissionsIfNeeded()
-
-        checkPlayServices()
     }
 
     override fun onStart() {
         super.onStart()
-        if (!checkPlayServices()) SyncMailboxesWorker.cancelWork(this)
         mainViewModel.forceRefreshMailboxesAndFolders()
     }
 
     override fun onResume() {
         super.onResume()
+        checkPlayServices()
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
-    }
-
-    override fun onStop() {
-        // When you change user you don't want to launch the work
-        if (!isFinishing && !checkPlayServices()) SyncMailboxesWorker.scheduleWork(this)
-        super.onStop()
     }
 
     override fun onBackPressed(): Unit = with(binding) {
         if (drawerLayout.isOpen) {
             (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
         } else {
-            // Schedule here because the activity is in finishing state and it'll be ignore by the stop lifecycle
-            SyncMailboxesWorker.scheduleWork(this@MainActivity)
             super.onBackPressed()
         }
     }

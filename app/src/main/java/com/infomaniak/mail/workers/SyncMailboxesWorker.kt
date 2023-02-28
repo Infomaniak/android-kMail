@@ -23,6 +23,7 @@ import androidx.work.*
 import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_INTERVAL_MILLIS
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.isGooglePlayServicesNotAvailable
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.FetchMessagesManager
 import kotlinx.coroutines.Dispatchers
@@ -56,16 +57,19 @@ class SyncMailboxesWorker(appContext: Context, params: WorkerParameters) : BaseC
         /** To support the old services, we do not change the name */
         private const val TAG = "SyncMessagesWorker"
 
-        fun scheduleWork(context: Context) {
-            Log.d(TAG, "Work scheduled")
+        suspend fun scheduleWorkIfNeeded(context: Context) = withContext(Dispatchers.IO) {
+            if (context.isGooglePlayServicesNotAvailable() && AccountUtils.getAllUsersCount() > 0) {
+                Log.d(TAG, "Work scheduled")
 
-            val workRequest = PeriodicWorkRequestBuilder<SyncMailboxesWorker>(MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
-                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                // We start with a delayed duration, so that when the app is rebooted the service is not launched
-                .setInitialDelay(2, TimeUnit.MINUTES)
-                .build()
+                val workRequest =
+                    PeriodicWorkRequestBuilder<SyncMailboxesWorker>(MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
+                        .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                        // We start with a delayed duration, so that when the app is rebooted the service is not launched
+                        // .setInitialDelay(2, TimeUnit.MINUTES)
+                        .build()
 
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
+            }
         }
 
         fun cancelWork(context: Context) {

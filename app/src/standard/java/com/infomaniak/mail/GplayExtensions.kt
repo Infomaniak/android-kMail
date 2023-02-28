@@ -24,7 +24,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.ktx.messaging
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
@@ -32,20 +34,18 @@ import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-fun FragmentActivity.checkPlayServices(): Boolean {
+fun FragmentActivity.checkPlayServices() {
     val apiAvailability = GoogleApiAvailability.getInstance()
     val errorCode = apiAvailability.isGooglePlayServicesAvailable(this)
 
-    return if (errorCode == ConnectionResult.SUCCESS) {
+    if (errorCode == ConnectionResult.SUCCESS) {
         checkFirebaseRegistration()
-        true
     } else {
         if (apiAvailability.isUserResolvableError(errorCode)) {
             apiAvailability.makeGooglePlayServicesAvailable(this)
         } else {
             Toast.makeText(this, "need play services", Toast.LENGTH_SHORT).show()
         }
-        false
     }
 
 }
