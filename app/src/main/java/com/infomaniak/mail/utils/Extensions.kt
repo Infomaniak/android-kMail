@@ -24,7 +24,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.text.Editable
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
@@ -341,13 +340,14 @@ fun Fragment.createInputDialog(
     @StringRes title: Int,
     @StringRes hint: Int,
     @StringRes confirmButtonText: Int,
-    onPositiveButtonClicked: (Editable?) -> Unit,
+    onErrorCheck: (CharSequence?) -> String?,
+    onPositiveButtonClicked: (CharSequence?) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
 
-    fun Button.setButtonEnablement(isInputEmpty: Boolean) {
-        isEnabled = !isInputEmpty
+    fun Button.setButtonEnablement(shouldDisable: Boolean) {
+        isEnabled = !shouldDisable
 
-        val backgroundColor = if (isInputEmpty) {
+        val backgroundColor = if (shouldDisable) {
             resources.getColor(R.color.backgroundDisabledPrimaryButton, null)
         } else {
             context.getAttributeColor(RMaterial.attr.colorPrimary)
@@ -360,7 +360,11 @@ fun Fragment.createInputDialog(
             showKeyboard()
             getButton(AlertDialog.BUTTON_POSITIVE).apply {
                 setButtonEnablement(true)
-                textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
+                textInput.doAfterTextChanged {
+                    val error = if (it.isNullOrBlank()) null else onErrorCheck(it.trim())
+                    setButtonEnablement(it.isNullOrBlank() || error != null)
+                    textInputLayout.error = error
+                }
             }
         }
     }
@@ -370,7 +374,7 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text) }
+        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text?.trim()) }
         .setNegativeButton(R.string.buttonCancel, null)
         .setOnDismissListener { textInput.text?.clear() }
         .create()
