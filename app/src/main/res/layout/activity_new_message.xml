@@ -70,10 +70,10 @@
             android:layout_height="40dp"
             android:orientation="horizontal">
 
-            <View
+            <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/backgroundColorTertiary"
+                app:dividerColor="@color/backgroundColorTertiary"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
