@@ -479,8 +479,9 @@
     </style>
 
     <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
+        <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
+        <item name="boxStrokeErrorColor">@color/redDestructiveAction</item>
     </style>
 
     <style name="PopupMenuStyle" parent="Widget.Material3.PopupMenu.Overflow">
