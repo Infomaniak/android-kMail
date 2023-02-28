@@ -44,10 +44,8 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType
 import com.infomaniak.mail.utils.*
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.ext.copyFromRealm
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import io.realm.kotlin.ext.realmListOf
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
@@ -99,7 +97,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                         }
                 } else {
                     isNewMessage = true
-                    createDraft(draftMode, previousMessageUid)
+                    createDraft(draftMode, previousMessageUid, recipient)
                 }
                 true
             }
@@ -120,14 +118,17 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?): Draft {
+    private fun MutableRealm.createDraft(draftMode: DraftMode, previousMessageUid: String?, recipient: Recipient?): Draft {
         return Draft().apply {
             initLocalValues(priority = Priority.NORMAL, mimeType = ClipDescription.MIMETYPE_TEXT_HTML)
             initSignature(realm = this@createDraft)
-            if (draftMode != DraftMode.NEW_MAIL) {
-                previousMessageUid
-                    ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
-                    ?.let { message -> setPreviousMessage(draftMode, message) }
+            when (draftMode) {
+                DraftMode.NEW_MAIL -> recipient?.let { to = realmListOf(it) }
+                DraftMode.REPLY, DraftMode.REPLY_ALL, DraftMode.FORWARD -> {
+                    previousMessageUid
+                        ?.let { uid -> MessageController.getMessage(uid, realm = this@createDraft) }
+                        ?.let { message -> setPreviousMessage(draftMode, message) }
+                }
             }
         }
     }
@@ -209,11 +210,12 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun saveToLocalAndFinish(action: DraftAction) = viewModelScope.launch(Dispatchers.IO) {
+    fun saveToLocalAndFinish(action: DraftAction, displayToast: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
         autoSaveJob?.cancel()
 
         if (shouldExecuteAction(action)) {
             saveDraftToLocal(action)
+            withContext(Dispatchers.Main) { displayToast() }
         } else if (isNewMessage) {
             RealmDatabase.mailboxContent().writeBlocking {
                 DraftController.getDraft(draft.localUuid, realm = this)?.let(::delete)
@@ -234,7 +236,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
+    private fun shouldExecuteAction(action: DraftAction) = action == DraftAction.SEND || snapshot?.hasChanges() == true
 
     private fun updateIsSendingAllowed() {
         isSendingAllowed.postValue(draft.to.isNotEmpty() || draft.cc.isNotEmpty() || draft.bcc.isNotEmpty())

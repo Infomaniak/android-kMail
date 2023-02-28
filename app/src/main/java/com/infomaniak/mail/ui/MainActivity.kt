@@ -22,6 +22,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
@@ -29,7 +30,6 @@ import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.mail.BuildConfig
@@ -59,6 +59,10 @@ class MainActivity : ThemedActivity() {
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
     private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
+    private val navController by lazy {
+        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
+    }
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             colorSystemBarsWithMenuDrawer(slideOffset)
@@ -79,6 +83,7 @@ class MainActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        handleOnBackPressed()
 
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         observeNetworkStatus()
@@ -107,11 +112,22 @@ class MainActivity : ThemedActivity() {
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
-    override fun onBackPressed(): Unit = with(binding) {
-        if (drawerLayout.isOpen) {
+    private fun handleOnBackPressed() = with(binding) {
+
+        fun closeDrawer() {
             (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
-        } else {
-            super.onBackPressed()
+        }
+
+        fun popBack() {
+            if (navController.currentDestination?.id == R.id.threadListFragment) {
+                finish()
+            } else {
+                navController.popBackStack()
+            }
+        }
+
+        onBackPressedDispatcher.addCallback(this@MainActivity) {
+            if (drawerLayout.isOpen) closeDrawer() else popBack()
         }
     }
 
@@ -133,7 +149,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun setupSnackBar() {
-        fun getAnchor(): View? = when (findNavController(R.id.hostFragment).currentDestination?.id) {
+        fun getAnchor(): View? = when (navController.currentDestination?.id) {
             R.id.threadListFragment -> findViewById(R.id.newMessageFab)
             R.id.threadFragment -> findViewById(R.id.quickActionBar)
             else -> null
@@ -145,9 +161,7 @@ class MainActivity : ThemedActivity() {
     }
 
     private fun setupNavController() {
-        (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment)
-            .navController
-            .addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
+        navController.addOnDestinationChangedListener { _, destination, _ -> onDestinationChanged(destination) }
     }
 
     private fun setupMenuDrawerCallbacks() = with(binding) {

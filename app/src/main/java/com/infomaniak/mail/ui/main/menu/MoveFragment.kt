@@ -25,15 +25,18 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
-import com.infomaniak.lib.core.utils.safeNavigate
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.FragmentMoveBinding
+import com.infomaniak.mail.utils.createInputDialog
 
 class MoveFragment : MenuFoldersFragment() {
 
     private lateinit var binding: FragmentMoveBinding
     private val navigationArgs: MoveFragmentArgs by navArgs()
     private val moveViewModel: MoveViewModel by viewModels()
+
+    private val createFolderDialog by lazy { initNewFolderDialog() }
 
     override val defaultFoldersList: RecyclerView by lazy { binding.defaultFoldersList }
     override val customFoldersList: RecyclerView by lazy { binding.customFoldersList }
@@ -47,23 +50,48 @@ class MoveFragment : MenuFoldersFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
-        observeFolders()
+        observeFolderId()
+        observeNewFolderCreation()
     }
 
     private fun setupListeners() = with(binding) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        iconAddFolder.setOnClickListener { safeNavigate(MoveFragmentDirections.actionMoveFragmentToNewFolderDialog()) }
+        iconAddFolder.setOnClickListener { createFolderDialog.show() }
     }
 
-    private fun observeFolders() = with(navigationArgs) {
-        moveViewModel.currentFolders.observe(viewLifecycleOwner) { (defaultFolders, customFolders) ->
-            defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
-            customFoldersAdapter.setFolders(customFolders, folderId)
+    private fun observeFolderId() = with(navigationArgs) {
+        messageUid?.let {
+            moveViewModel.getFolderIdByMessage(messageUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
+        } ?: run {
+            moveViewModel.getFolderIdByThread(threadUid).observe(viewLifecycleOwner, ::setAdaptersFolders)
+        }
+    }
+
+    private fun setAdaptersFolders(folderId: String) {
+        val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
+        defaultFoldersAdapter.setFolders(defaultFolders.filterNot { it.role == FolderRole.DRAFT }, folderId)
+        customFoldersAdapter.setFolders(customFolders, folderId)
+    }
+
+    private fun observeNewFolderCreation() {
+        mainViewModel.isNewFolderCreated.observe(viewLifecycleOwner) { isFolderCreated ->
+            if (isFolderCreated) findNavController().popBackStack()
         }
     }
 
     override fun onFolderSelected(folderId: String): Unit = with(navigationArgs) {
         mainViewModel.moveTo(folderId, threadUid, messageUid)
         findNavController().popBackStack()
+    }
+
+    private fun initNewFolderDialog() = with(navigationArgs) {
+        createInputDialog(
+            title = R.string.newFolderDialogTitle,
+            hint = R.string.newFolderDialogHint,
+            confirmButtonText = R.string.newFolderDialogMovePositiveButton,
+            onPositiveButtonClicked = { folderName ->
+                mainViewModel.moveToNewFolder(folderName!!.toString(), threadUid, messageUid)
+            },
+        )
     }
 }

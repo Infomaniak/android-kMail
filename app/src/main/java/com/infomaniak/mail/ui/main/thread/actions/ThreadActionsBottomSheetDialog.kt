@@ -85,7 +85,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                 override fun onMove() {
                     animatedNavigation(
                         resId = R.id.moveFragment,
-                        args = MoveFragmentArgs(mainViewModel.currentFolderId!!, threadUid).toBundle(),
+                        args = MoveFragmentArgs(threadUid).toBundle(),
                         currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
                     )
                 }

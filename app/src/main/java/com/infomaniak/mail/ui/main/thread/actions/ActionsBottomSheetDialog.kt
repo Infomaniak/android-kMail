@@ -17,12 +17,10 @@
  */
 package com.infomaniak.mail.ui.main.thread.actions
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -30,8 +28,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.databinding.BottomSheetActionsMenuBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.utils.getAttributeColor
-import com.google.android.material.R as RMaterial
 
 abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -65,7 +61,8 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        archive.isGone = mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)
+
+        setArchiveUi()
 
         archive.setClosingOnClickListener { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener { onClickListener.onReadUnread() }
@@ -97,12 +94,8 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
         R.drawable.ic_envelope_open to R.string.actionMarkAsRead
     }
 
-    private fun computeFavoriteStyle(context: Context, isFavorite: Boolean): Triple<Int, Int, Int> {
-        return if (isFavorite) {
-            Triple(R.drawable.ic_star_filled, context.getColor(R.color.favoriteYellow), R.string.actionUnstar)
-        } else {
-            Triple(R.drawable.ic_star, context.getAttributeColor(RMaterial.attr.colorPrimary), R.string.actionStar)
-        }
+    private fun computeFavoriteStyle(isFavorite: Boolean): Pair<Int, Int> {
+        return if (isFavorite) R.drawable.ic_unstar to R.string.actionUnstar else R.drawable.ic_star to R.string.actionStar
     }
 
     fun setMarkAsReadUi(isSeen: Boolean) = with(binding.markAsReadUnread) {
@@ -112,10 +105,16 @@ abstract class ActionsBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     fun setFavoriteUi(isFavorite: Boolean) = with(binding.favorite) {
-        val (favoriteIconRes, favoriteTint, favoriteText) = computeFavoriteStyle(context, isFavorite)
+        val (favoriteIconRes, favoriteText) = computeFavoriteStyle(isFavorite)
         setIconResource(favoriteIconRes)
-        setIconTint(favoriteTint)
         setText(favoriteText)
+    }
+
+    private fun setArchiveUi() = with(binding.archive) {
+        if (mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE)) {
+            setIconResource(R.drawable.ic_drawer_inbox)
+            setText(R.string.actionMoveToInbox)
+        }
     }
 
     private fun ActionItemView.setClosingOnClickListener(callback: (() -> Unit)) {

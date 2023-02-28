@@ -27,9 +27,6 @@
         android:label="ThreadListFragment"
         tools:layout="@layout/fragment_thread_list">
         <action
-            android:id="@+id/action_threadListFragment_to_newFolderDialog"
-            app:destination="@id/newFolderDialog" />
-        <action
             android:id="@+id/action_threadListFragment_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
         <action
@@ -54,12 +51,6 @@
             android:id="@+id/action_threadListFragment_to_moveFragment"
             app:destination="@id/moveFragment" />
     </fragment>
-
-    <dialog
-        android:id="@+id/newFolderDialog"
-        android:name="com.infomaniak.mail.ui.main.menu.NewFolderDialog"
-        android:label="NewFolderDialog"
-        tools:layout="@layout/dialog_new_folder" />
 
     <activity
         android:id="@+id/newMessageActivity"
@@ -104,6 +95,12 @@
             app:nullable="true" />
         <!-- Endregion -->
 
+        <argument
+            android:name="recipient"
+            android:defaultValue="@null"
+            app:argType="com.infomaniak.mail.data.models.correspondent.Recipient"
+            app:nullable="true" />
+
     </activity>
 
     <fragment
@@ -111,9 +108,15 @@
         android:name="com.infomaniak.mail.ui.main.search.SearchFragment"
         android:label="SearchFragment"
         tools:layout="@layout/fragment_search">
+        <argument
+            android:name="dummyFolderId"
+            app:argType="string" />
         <action
             android:id="@+id/action_searchFragment_to_detailedContactBottomSheetDialog"
             app:destination="@id/detailedContactBottomSheetDialog" />
+        <action
+            android:id="@+id/action_searchFragment_to_threadFragment"
+            app:destination="@id/threadFragment" />
     </fragment>
 
     <fragment
@@ -174,6 +177,9 @@
         <argument
             android:name="recipient"
             app:argType="com.infomaniak.mail.data.models.correspondent.Recipient" />
+        <action
+            android:id="@+id/action_detailedContactBottomSheetDialog_to_newMessageActivity"
+            app:destination="@id/newMessageActivity" />
     </dialog>
 
     <dialog
@@ -235,9 +241,6 @@
         android:label="MoveFragment"
         tools:layout="@layout/fragment_move">
         <argument
-            android:name="folderId"
-            app:argType="string" />
-        <argument
             android:name="threadUid"
             app:argType="string" />
         <argument
@@ -245,9 +248,6 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
-        <action
-            android:id="@+id/action_moveFragment_to_newFolderDialog"
-            app:destination="@id/newFolderDialog" />
     </fragment>
 
     <fragment

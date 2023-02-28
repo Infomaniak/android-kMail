@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Infomaniak kMail - Android
-  ~ Copyright (C) 2022 Infomaniak Network SA
+  ~ Copyright (C) 2023 Infomaniak Network SA
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -15,13 +15,13 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="12dp"
-    android:height="12dp"
-    android:tint="@color/iconColor"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="#000"
-        android:pathData="M11.972,19C12.634,19.001 13.264,18.717 13.701,18.22L23.512,7.068C24.157,6.3 24.07,5.157 23.317,4.494C22.564,3.832 21.419,3.892 20.739,4.629L12.16,14.381C12.113,14.436 12.044,14.467 11.972,14.467C11.9,14.467 11.832,14.436 11.784,14.381L3.205,4.629C2.525,3.892 1.381,3.832 0.627,4.494C-0.126,5.157 -0.213,6.3 0.432,7.068L10.24,18.216C10.678,18.714 11.309,19 11.972,19Z" />
-</vector>
+<com.infomaniak.mail.views.MenuDrawerItemView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/menuDrawerItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:itemStyle="other"
+    app:textWeight="regular"
+    tools:icon="@drawable/ic_folder"
+    tools:text="@string/searchFilterFolder" />

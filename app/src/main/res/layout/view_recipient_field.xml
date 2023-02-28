@@ -119,7 +119,6 @@
         style="@style/IconButtonSmall"
         android:layout_marginEnd="@dimen/marginStandardMedium"
         app:icon="@drawable/ic_chevron_down"
-        app:iconTint="@color/iconSecondaryColor"
         app:layout_constraintBottom_toBottomOf="@id/singleLineGuide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/singleLineGuide" />

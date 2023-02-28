@@ -21,9 +21,12 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
+import com.infomaniak.lib.core.api.ApiController.json
 import com.infomaniak.lib.core.utils.Utils.enumValueOfOrNull
 import com.infomaniak.lib.core.utils.transaction
 import com.infomaniak.mail.R
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
 class LocalSettings private constructor(context: Context) {
 
@@ -137,7 +140,7 @@ class LocalSettings private constructor(context: Context) {
         get() = getEnum(SWIPE_LEFT_KEY, INITIAL_SWIPE_ACTION)
         set(value) = putEnum(SWIPE_LEFT_KEY, value)
 
-    enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes private val colorRes: Int, @DrawableRes val iconRes: Int?) {
+    enum class SwipeAction(@StringRes val nameRes: Int, @ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?) {
         DELETE(R.string.actionDelete, R.color.swipeDelete, R.drawable.ic_bin),
         ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder),
         READ_UNREAD(R.string.settingsSwipeActionReadUnread, R.color.swipeReadUnread, R.drawable.ic_envelope),
@@ -145,7 +148,7 @@ class LocalSettings private constructor(context: Context) {
         FAVORITE(R.string.favoritesFolder, R.color.swipeFavorite, R.drawable.ic_star),
         POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock),
         SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam),
-        READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive, R.color.swipeReadAndArchive, R.drawable.ic_drawer_mailbox),
+        READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive, R.color.swipeReadAndArchive, R.drawable.ic_archive_folder),
         QUICKACTIONS_MENU(R.string.settingsSwipeActionQuickActionsMenu, R.color.swipeQuickActionMenu, R.drawable.ic_param_dots),
         TUTORIAL(R.string.settingsSwipeActionNone, R.color.progressbarTrackColor, null),
         NONE(R.string.settingsSwipeActionNone, R.color.swipeNone, null);
@@ -173,6 +176,12 @@ class LocalSettings private constructor(context: Context) {
         ASK_ME("false", R.string.settingsOptionAskMe),
     }
     //endregion
+
+    //region Recent searches
+    var recentSearches: List<String>
+        get() = json.decodeFromString(sharedPreferences.getString(RECENT_SEARCHES_KEY, DEFAULT_RECENT_SEARCHES)!!)
+        set(value) = sharedPreferences.transaction { putString(RECENT_SEARCHES_KEY, json.encodeToString(value)) }
+	//endregion
 
     //region Firebase
     var firebaseToken: String?
@@ -222,11 +231,12 @@ class LocalSettings private constructor(context: Context) {
 
         private val DEFAULT_THREAD_DENSITY = ThreadDensity.LARGE
         private val DEFAULT_THEME = Theme.SYSTEM
-        val DEFAULT_ACCENT_COLOR = AccentColor.PINK
+        private val DEFAULT_ACCENT_COLOR = AccentColor.PINK
         private val INITIAL_SWIPE_ACTION = SwipeAction.TUTORIAL
         val DEFAULT_SWIPE_ACTION_RIGHT = SwipeAction.READ_UNREAD
         val DEFAULT_SWIPE_ACTION_LEFT = SwipeAction.DELETE
         private val DEFAULT_EXTERNAL_CONTENT = ExternalContent.ASK_ME
+        private const val DEFAULT_RECENT_SEARCHES = "[]"
         //endregion
 
         //region Keys
@@ -242,6 +252,7 @@ class LocalSettings private constructor(context: Context) {
         private const val SWIPE_RIGHT_KEY = "swipeRightKey"
         private const val SWIPE_LEFT_KEY = "swipeLeftKey"
         private const val EXTERNAL_CONTENT_KEY = "externalContentKey"
+        private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
         private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"
         private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
         //endregion

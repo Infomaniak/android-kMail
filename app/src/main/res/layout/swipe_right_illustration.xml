@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settingsSwipeActionToDefine"
-            android:textColor="@color/iconColor" />
+            android:textColor="@color/primaryTextColor" />
 
         <ImageView
             android:id="@+id/swipeIcon"

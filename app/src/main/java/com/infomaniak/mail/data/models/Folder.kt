@@ -27,6 +27,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.RealmInstantSerializer
 import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import io.realm.kotlin.ext.backlinks
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.RealmInstant
@@ -46,7 +47,6 @@ class Folder : RealmObject {
     var id: String = ""
     var path: String = ""
     var name: String = ""
-    @Suppress("PropertyName")
     @SerialName("role")
     private var _role: String? = null
     @SerialName("is_favorite")
@@ -93,11 +93,16 @@ class Folder : RealmObject {
     }
 
     fun getLocalizedName(context: Context): String {
-        return enumValueOfOrNull<FolderRole>(_role)?.folderNameRes?.let(context::getString) ?: name
+        return role?.folderNameRes?.let(context::getString) ?: name
+    }
+
+    @DrawableRes
+    fun getIcon(): Int {
+        return role?.folderIconRes ?: if (isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder
     }
 
     enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
-        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_mailbox, 0),
+        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 0),
         DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4),
         SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 5),

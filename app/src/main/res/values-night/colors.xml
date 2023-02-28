@@ -19,17 +19,17 @@
     <color name="pinkMail">@color/pink_mail_primary_dark</color>
     <color name="pinkMailInverse">@color/pink_mail_primary_light</color>
     <color name="pinkMailContainer">@color/pink_mail_container_dark</color>
-    <color name="pinkBoardingSecondaryBackground">@color/black</color>
+    <color name="pinkBoardingSecondaryBackground">@color/bat</color>
     <color name="pinkMailRipple">@color/pink_mail_ripple_dark</color>
     <color name="blueMail">@color/blue_mail_primary_dark</color>
     <color name="blueMailInverse">@color/blue_mail_primary_light</color>
     <color name="blueMailContainer">@color/blue_mail_container_dark</color>
-    <color name="blueBoardingSecondaryBackground">@color/black</color>
+    <color name="blueBoardingSecondaryBackground">@color/bat</color>
     <color name="blueMailRipple">@color/blue_mail_ripple_dark</color>
 
     <!-- Context / errors -->
-    <color name="orangeWarning">#FFAA4C</color>
-    <color name="redDestructiveAction">#FC8878</color>
+    <color name="orangeWarning">@color/orange_dark</color>
+    <color name="redDestructiveAction">@color/red_dark</color>
     <color name="redDestructiveActionTransparent">#1EFC8878</color>
 
     <!-- Backgrounds -->
@@ -39,10 +39,11 @@
     <color name="backgroundColorTertiary">@color/orca</color>
     <color name="backgroundHeaderColor">#212121</color>
     <color name="backgroundLoginWebviewColor">@color/black</color>
-    <color name="backgroundOnBoardingColor">@color/bat</color>
+    <color name="backgroundOnBoardingColor">@color/black</color>
     <color name="backgroundSnackbarColor">@color/rabbit</color>
     <color name="elevatedBackground">@color/bat</color>
     <color name="backgroundDisabledPrimaryButton">@color/orca</color>
+    <color name="backgroundDisabledDialogButton">@color/elephant</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/rabbit</color>
@@ -56,8 +57,8 @@
     <color name="separatorColor">@color/orca</color>
 
     <!-- Icons -->
-    <color name="iconColor">@color/mouse</color>
-    <color name="iconSecondaryColor">@color/shark</color>
+    <color name="iconColor">@color/shark</color>
+    <color name="favoriteYellow">@color/yellow_dark</color>
     <color name="swipeActionIconColor">@color/bat</color>
 
     <!-- Cardview -->
@@ -68,14 +69,19 @@
 
     <!-- Swipe actions -->
     <color name="swipeDelete">@color/redDestructiveAction</color>
-    <color name="swipeMove">#00C7B3</color>
-    <color name="swipeReadUnread">#0AB2F5</color>
-    <color name="swipeFavorite">#FCD65A</color>
-    <color name="swipePostpone">#4CB7FF</color>
+    <color name="swipeMove">@color/fougere_dark</color>
+    <color name="swipeReadUnread">@color/cobalt_dark</color>
+    <color name="swipeFavorite">@color/favoriteYellow</color>
+    <color name="swipePostpone">@color/azur_dark</color>
     <color name="swipeSpam">@color/orangeWarning</color>
-    <color name="swipeArchive">#CC8FD6</color>
-    <color name="swipeQuickActionMenu">#F1F1F1</color>
-    <color name="swipeNone">@color/progressbarTrackColor</color>
-    <color name="swipeReadAndArchive">#956DDD</color>
+    <color name="swipeArchive">@color/mauve_dark</color>
+    <color name="swipeQuickActionMenu">@color/app_blue_dark</color>
+    <color name="swipeInbox">@color/shark</color>
+    <color name="swipeNone">@color/elephant</color>
+    <color name="swipeReadAndArchive">@color/prince_dark</color>
+
+    <!-- Other -->
+    <color name="textInputStrokeColor">@color/shark</color>
+    <color name="toggleableTextFormatterBackgroundColor">@color/mouse</color>
 
 </resources>

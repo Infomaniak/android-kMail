@@ -53,6 +53,7 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
+import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.FragmentNewMessageBinding
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
@@ -94,6 +95,8 @@ class NewMessageFragment : Fragment() {
 
         initUi()
         initDraftAndViewModel()
+
+        focusCorrectView()
 
         doAfterSubjectChange()
         doAfterBodyChange()
@@ -142,6 +145,15 @@ class NewMessageFragment : Fragment() {
             } else {
                 requireActivity().finish()
             }
+        }
+    }
+
+    private fun focusCorrectView() = with(binding) {
+        when (newMessageActivityArgs.draftMode) {
+            DraftMode.REPLY,
+            DraftMode.REPLY_ALL -> bodyText.requestFocus()
+            DraftMode.NEW_MAIL,
+            DraftMode.FORWARD -> toField.requestFocus()
         }
     }
 

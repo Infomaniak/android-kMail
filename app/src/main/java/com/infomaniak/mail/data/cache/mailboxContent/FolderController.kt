@@ -27,6 +27,7 @@ import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.RealmResults
@@ -37,7 +38,11 @@ import kotlinx.coroutines.flow.mapNotNull
 
 object FolderController {
 
+    const val SEARCH_FOLDER_ID = "search_folder_id"
+
     private inline val defaultRealm get() = RealmDatabase.mailboxContent()
+
+    private val isNotSearch = "${Folder::id.name} != '$SEARCH_FOLDER_ID'"
 
     //region Queries
     /**
@@ -45,16 +50,17 @@ object FolderController {
      * So if this sort logic changes, it needs to be changed in both locations.
      * The other location is in `Utils.formatFoldersListWithAllChildren()`.
      */
-    private fun getFoldersQuery(realm: TypedRealm): RealmQuery<Folder> {
+    private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = true): RealmQuery<Folder> {
+        val rootsQuery = if (onlyRoots) " AND ${Folder.parentsPropertyName}.@count == 0" else ""
         return realm
-            .query<Folder>("${Folder.parentsPropertyName}.@count == 0")
+            .query<Folder>(isNotSearch + rootsQuery)
             .sort(Folder::name.name, Sort.ASCENDING)
             .sort(Folder::isFavorite.name, Sort.DESCENDING)
     }
 
     private fun getFoldersQuery(exceptionsFoldersIds: List<String>, realm: TypedRealm): RealmQuery<Folder> {
         val checkIsNotInExceptions = "NOT ${Folder::id.name} IN {${exceptionsFoldersIds.joinToString { "'$it'" }}}"
-        return realm.query(checkIsNotInExceptions)
+        return realm.query("$checkIsNotInExceptions AND $isNotSearch")
     }
 
     private fun getFolderQuery(key: String, value: String, realm: TypedRealm): RealmSingleQuery<Folder> {
@@ -63,7 +69,10 @@ object FolderController {
     //endregion
 
     //region Get data
-    fun getFolders(exceptionsFoldersIds: List<String> = emptyList(), realm: TypedRealm = defaultRealm): RealmResults<Folder> {
+    fun getRootsFolders(
+        exceptionsFoldersIds: List<String> = emptyList(),
+        realm: TypedRealm = defaultRealm,
+    ): RealmResults<Folder> {
         val realmQuery = if (exceptionsFoldersIds.isEmpty()) {
             getFoldersQuery(realm)
         } else {
@@ -72,7 +81,24 @@ object FolderController {
         return realmQuery.find()
     }
 
-    fun getFoldersAsync(): Flow<ResultsChange<Folder>> {
+    fun getFolders(): List<Folder> {
+
+        fun List<Folder>.sortWithFoldersRoles(): List<Folder> {
+            return sortedWith(Comparator { firstFolder, secondFolder ->
+                val (firstRole, secondRole) = firstFolder.role to secondFolder.role
+                return@Comparator when {
+                    firstRole != null && secondRole != null -> firstRole.order.compareTo(secondRole.order)
+                    firstRole != null -> -1
+                    secondRole != null -> 1
+                    else -> 0
+                }
+            })
+        }
+
+        return getFoldersQuery(defaultRealm, false).find().sortWithFoldersRoles()
+    }
+
+    fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
         return getFoldersQuery(defaultRealm).asFlow()
     }
 
@@ -82,6 +108,12 @@ object FolderController {
 
     fun getFolder(role: FolderRole, realm: TypedRealm = defaultRealm): Folder? {
         return getFolderQuery(Folder.rolePropertyName, role.name, realm).find()
+    }
+
+    fun getOrCreateSearchFolder(realm: MutableRealm): Folder {
+        return getFolderQuery(Folder::id.name, SEARCH_FOLDER_ID, realm).find() ?: let {
+            realm.copyToRealm(Folder().apply { id = SEARCH_FOLDER_ID })
+        }
     }
 
     fun getFolderAsync(id: String): Flow<Folder> {
@@ -113,8 +145,13 @@ object FolderController {
         }
     }
 
+    fun deleteSearchData(realm: MutableRealm) = with(getOrCreateSearchFolder(realm)) {
+        messages = realmListOf()
+        threads = realmListOf()
+    }
+
     private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {
-        getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
+        getRootsFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
             deleteLocalFolder(folder)
         }
     }

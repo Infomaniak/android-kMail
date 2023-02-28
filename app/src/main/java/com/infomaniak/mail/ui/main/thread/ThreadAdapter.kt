@@ -62,8 +62,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         messages = itemList
     }
 
-    private fun lastIndex() = messages.lastIndex
-
     override fun getItemCount() = messages.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThreadViewHolder {
@@ -280,7 +278,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         ccGroup.isGone = true
         bccGroup.isGone = true
         detailedFieldsGroup.isGone = true
-        recipientChevron.rotation = 0f
+        recipientChevron.rotation = 0.0f
     }
 
     private fun ItemMessageBinding.setHeaderState(message: Message, isExpanded: Boolean) = with(message) {
@@ -349,7 +347,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             if (doesWebViewNeedInit) {
                 val cidDictionary = mutableMapOf<String, Attachment>()
                 attachments.forEach {
-                    if (!it.contentId.isNullOrBlank()) cidDictionary[it.contentId as String] = it
+                    if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it
                 }
                 binding.messageBody.webViewClient = MessageWebViewClient(binding.context, cidDictionary)
                 doesWebViewNeedInit = false

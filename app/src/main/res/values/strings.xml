@@ -137,7 +137,6 @@
     <string name="createFolderName">Name of the folder</string>
     <string name="createFolderNoParent">None</string>
     <string name="createFolderParent">Parent folder</string>
-    <string name="createFolderTitle">What will this folder be called?</string>
     <string name="dateTitle">Date:</string>
     <string name="draftFolder">Drafts</string>
     <string name="draftPrefix">(Draft)</string>
@@ -175,8 +174,7 @@
     </plurals>
     <string name="newFolderDialogHint">Folder name</string>
     <string name="newFolderDialogMovePositiveButton">Create and move</string>
-    <string name="newFolderDialogPositiveButton">Create the folder</string>
-    <string name="newFolderDialogTitle">What folder name would you like to use?</string>
+    <string name="newFolderDialogTitle">New folder</string>
     <plurals name="newMessageNotificationSummary">
         <item quantity="one">%d new message</item>
         <item quantity="other">%d new messages</item>
@@ -223,7 +221,6 @@
     <string name="searchNoHistoryDescription">Search by contact or keywords</string>
     <string name="searchNoResultsDescription">No messages matching your search</string>
     <string name="searchNoResultsTitle">No results</string>
-    <string name="searchViewHint">Search for a message</string>
     <string name="send">Send</string>
     <string name="sentFolder">Sent messages</string>
     <string name="settingsAccentColor">Accent color</string>
@@ -317,11 +314,17 @@
     <string name="socialNetworksFolder">Social networks</string>
     <string name="spamFolder">Spam</string>
     <string name="subjectTitle">Subject:</string>
-    <string name="threadListFlushFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>
-    <plurals name="threadListFlushFolderAlertTitle">
+    <plurals name="threadListDeletionConfirmationAlertDescription">
+        <item quantity="one">Are you sure you want to delete this message permanently?</item>
+        <item quantity="other">Are you sure you want to delete these messages permanently?</item>
+    </plurals>
+    <plurals name="threadListDeletionConfirmationAlertTitle">
         <item quantity="one">Delete %d message</item>
         <item quantity="other">Delete %d messages</item>
     </plurals>
+    <string name="threadListEmptyFolderAlertDescription">Are you sure you want to permanently delete all the messages in this folder?</string>
+    <string name="threadListEmptySpamButton">Empty spam</string>
+    <string name="threadListEmptyTrashButton">Empty trash</string>
     <string name="threadListHeaderLastUpdate">Updated %s</string>
     <string name="threadListHeaderLastUpdateNow">now</string>
     <plurals name="threadListHeaderUnreadCount">
@@ -333,9 +336,7 @@
     <string name="threadListSectionThisWeek">This week</string>
     <string name="threadListSectionToday">Today</string>
     <string name="threadListSectionTwoWeeks">Two weeks ago</string>
-    <string name="threadListSpamEmptyButton">Empty spam</string>
     <string name="threadListSpamHint">Messages that have been in the spam folder more than 30 days will be automatically deleted.</string>
-    <string name="threadListTrashEmptyButton">Empty trash</string>
     <string name="threadListTrashHint">Messages that have been in trash more than 30 days will be automatically deleted.</string>
     <string name="titleMyAccount">My account</string>
     <string name="titleMyAccounts">My accounts</string>

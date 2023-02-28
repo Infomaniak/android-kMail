@@ -53,6 +53,10 @@
         <item name="android:textColor">@color/secondaryTextColor</item>
     </style>
 
+    <style name="Body.Tertiary">
+        <item name="android:textColor">@color/tertiaryTextColor</item>
+    </style>
+
     <style name="Body.Error">
         <item name="android:textColor">@color/redDestructiveAction</item>
     </style>
@@ -146,7 +150,7 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="backgroundTint">?android:attr/colorPrimary</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">16dp</item>
         <item name="fontFamily">@font/suisseintl_medium</item>
         <item name="layout_constraintWidth_max">500dp</item>
     </style>
@@ -193,7 +197,6 @@
     <style name="EditorIconButton" parent="IconButtonSmall">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:letterSpacing">0</item>
-        <item name="android:textColor">@color/iconColor</item>
         <item name="android:textSize">10sp</item>
         <item name="cornerRadius">0dp</item>
         <item name="iconSize">20dp</item>
@@ -298,27 +301,46 @@
 
     <!-- Chips -->
 
-    <style name="EmailAddressChip" parent="Widget.Material3.Chip.Input">
-        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+    <style name="BaseChipNoCheckedIcon" parent="Widget.Material3.Chip.Input">
         <item name="checkedIcon">@null</item>
         <item name="checkedIconEnabled">false</item>
-        <item name="chipBackgroundColor">?attr/colorPrimaryContainer</item>
-        <item name="chipCornerRadius">100dp</item>
+        <item name="chipCornerRadius">@dimen/roundCornerRadius</item>
         <item name="chipStrokeWidth">0dp</item>
+    </style>
+
+    <style name="ChipNoIcons" parent="BaseChipNoCheckedIcon">
         <item name="closeIcon">@null</item>
         <item name="closeIconEnabled">false</item>
     </style>
 
-    <style name="UnreadChip" parent="Widget.Material3.Chip.Input">
-        <item name="android:textColor">@color/chip_unread_text_color</item>
-        <item name="checkedIcon">@null</item>
-        <item name="checkedIconEnabled">false</item>
-        <item name="chipBackgroundColor">@color/chip_unread_background</item>
-        <item name="chipCornerRadius">100dp</item>
-        <item name="chipStrokeWidth">0dp</item>
-        <item name="closeIconTint">?attr/colorOnPrimary</item>
+    <style name="EmailAddressChip" parent="ChipNoIcons">
+        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+        <item name="chipBackgroundColor">?attr/colorPrimaryContainer</item>
     </style>
 
+    <style name="SearchFilterChip" parent="ChipNoIcons">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/chip_unread_text_color</item>
+        <item name="checkedIcon">@drawable/ic_check_sharp</item>
+        <item name="checkedIconTint">?attr/colorOnPrimary</item>
+        <item name="chipBackgroundColor">@color/chip_unread_background</item>
+        <item name="chipIconSize">18dp</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="closeIconEndPadding">@dimen/marginStandardSmall</item>
+        <item name="closeIconSize">@dimen/alternativeMargin</item>
+        <item name="closeIconTint">@color/chip_unread_text_color</item>
+        <item name="iconStartPadding">@dimen/marginStandardSmall</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="UnreadChip" parent="BaseChipNoCheckedIcon">
+        <item name="android:textColor">@color/chip_unread_text_color</item>
+        <item name="android:textSize">14sp</item>
+        <item name="chipBackgroundColor">@color/chip_unread_background</item>
+        <item name="closeIconTint">?attr/colorOnPrimary</item>
+    </style>
 
     <!-- Bottom sheet -->
 
@@ -386,8 +408,8 @@
 
     <style name="ToggleableTextFormatterItemView">
         <item name="backgroundColor">@android:color/transparent</item>
-        <item name="iconColor">@color/iconColor</item>
-        <item name="selectedBackgroundColor">@color/iconColor</item>
+        <item name="iconColor">@color/toggleableTextFormatterBackgroundColor</item>
+        <item name="selectedBackgroundColor">@color/toggleableTextFormatterBackgroundColor</item>
         <item name="selectedIconColor">@color/backgroundCardview</item>
     </style>
 
@@ -459,6 +481,10 @@
     <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/text_input_layout_box_color</item>
         <item name="android:textColorHint">@color/tertiaryTextColor</item>
+    </style>
+
+    <style name="PopupMenuStyle" parent="Widget.Material3.PopupMenu.Overflow">
+        <item name="android:popupBackground">@color/backgroundColorTertiary</item>
     </style>
 
 </resources>

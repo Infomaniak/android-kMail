@@ -23,6 +23,7 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -92,8 +93,8 @@ class LoginActivity : AppCompatActivity() {
         lockOrientationForSmallScreens()
 
         super.onCreate(savedInstanceState)
-
         setContentView(root)
+        handleOnBackPressed()
 
         infomaniakLogin = InfomaniakLogin(
             context = this@LoginActivity,
@@ -148,8 +149,10 @@ class LoginActivity : AppCompatActivity() {
         trackScreen()
     }
 
-    override fun onBackPressed() = with(binding) {
-        if (introViewpager.currentItem == 0) super.onBackPressed() else introViewpager.currentItem -= 1
+    private fun handleOnBackPressed() = with(binding) {
+        onBackPressedDispatcher.addCallback(this@LoginActivity) {
+            if (introViewpager.currentItem == 0) finish() else introViewpager.currentItem -= 1
+        }
     }
 
     private fun updateUi(accentColor: AccentColor) = with(binding) {

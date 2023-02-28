@@ -46,9 +46,9 @@ import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
-import com.infomaniak.mail.data.models.Thread
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.FragmentThreadBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.thread.actions.DownloadAttachmentProgressDialog
@@ -273,7 +273,7 @@ class ThreadFragment : Fragment() {
     private fun downloadAllAttachments(message: Message) {
         val url = ApiRoutes.downloadAttachments(
             mailboxUuid = mainViewModel.currentMailbox.value?.uuid ?: return,
-            folderId = mainViewModel.currentFolderId ?: return,
+            folderId = message.folderId,
             shortUid = message.shortUid,
         )
         val truncatedSubject = message.subject?.let { it.substring(0..min(30, it.lastIndex)) }

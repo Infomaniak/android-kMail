@@ -15,13 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.data.models
+@file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+
+package com.infomaniak.mail.data.models.thread
 
 import android.content.Context
 import androidx.annotation.IdRes
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.RealmInstantSerializer
+import com.infomaniak.mail.data.api.RealmListSerializer
 import com.infomaniak.mail.data.cache.mailboxContent.FolderController
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
@@ -29,15 +34,22 @@ import com.infomaniak.mail.utils.isSmallerThanDays
 import com.infomaniak.mail.utils.toDate
 import com.infomaniak.mail.utils.toRealmInstant
 import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.ext.*
+import io.realm.kotlin.internal.getRealm
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.RealmSet
 import io.realm.kotlin.types.annotations.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import kotlinx.serialization.UseSerializers
 import java.util.Date
 
+@Serializable
 class Thread : RealmObject {
 
     @PrimaryKey
@@ -48,17 +60,26 @@ class Thread : RealmObject {
     var messagesIds: RealmSet<String> = realmSetOf()
 
     var date: RealmInstant = Date().toRealmInstant()
+    @SerialName("unseen_messages")
     var unseenMessagesCount: Int = 0
     var from: RealmList<Recipient> = realmListOf()
     var to: RealmList<Recipient> = realmListOf()
     var subject: String? = null
     var size: Int = 0
+    @SerialName("has_attachments")
     var hasAttachments: Boolean = false
     var hasDrafts: Boolean = false
+    @SerialName("flagged")
     var isFavorite: Boolean = false
     var isAnswered: Boolean = false
+    @SerialName("forwarded")
     var isForwarded: Boolean = false
     var isScheduled: Boolean = false
+
+    //region Local data
+    @Transient
+    var isFromSearch: Boolean = false
+    //endregion
 
     private val _folders by backlinks(Folder::threads)
     val folder get() = _folders.single()
@@ -100,11 +121,11 @@ class Thread : RealmObject {
         }
     }
 
-    fun recomputeThread(realm: MutableRealm) {
+    fun recomputeThread(realm: MutableRealm? = null) {
 
         // Delete Thread if empty
         if (messages.none { it.folderId == folderId }) {
-            realm.delete(this)
+            if (isManaged()) realm?.delete(this)
             return
         }
 
@@ -113,8 +134,10 @@ class Thread : RealmObject {
         updateThread()
 
         // Remove duplicates in Recipients lists
-        from = from.copyFromRealm().distinct().toRealmList()
-        to = to.copyFromRealm().distinct().toRealmList()
+        val unmanagedFrom = if (from.getRealm<Realm>() == null) from else from.copyFromRealm()
+        val unmanagedTo = if (to.getRealm<Realm>() == null) to else to.copyFromRealm()
+        from = unmanagedFrom.distinct().toRealmList()
+        to = unmanagedTo.distinct().toRealmList()
     }
 
     private fun resetThread() {

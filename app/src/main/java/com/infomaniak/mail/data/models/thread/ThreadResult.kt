@@ -15,12 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.utils
+package com.infomaniak.mail.data.models.thread
 
-class ApiErrorException(override val message: String?) : Exception() {
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-    object ErrorCodes {
-        const val FOLDER_DOES_NOT_EXIST = "folder__not_exists"
-        const val FOLDER_ALREADY_EXISTS = "folder__destination_already_exists"
-    }
-}
+@Serializable
+data class ThreadResult(
+    val threads: List<Thread>? = null,
+    @SerialName("resource_previous")
+    val resourcePrevious: String?,
+    @SerialName("resource_next")
+    val resourceNext: String?,
+)

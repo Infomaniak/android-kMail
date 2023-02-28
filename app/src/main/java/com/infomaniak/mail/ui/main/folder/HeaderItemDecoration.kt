@@ -189,11 +189,11 @@ class HeaderItemDecoration(
             clipRect(0, paddingTop, width, paddingTop + currentHeader.height)
         } else {
             saveLayerAlpha(
-                RectF(0f, 0f, width.toFloat(), height.toFloat()),
+                RectF(0.0f, 0.0f, width.toFloat(), height.toFloat()),
                 (((nextHeader.top - paddingTop) / nextHeader.height.toFloat()) * 255).toInt()
             )
         }
-        translate(0f, (nextHeader.top - currentHeader.height).toFloat())
+        translate(0.0f, (nextHeader.top - currentHeader.height).toFloat())
 
         currentHeader.draw(this)
         if (shouldFadeOutHeader) {
@@ -204,7 +204,7 @@ class HeaderItemDecoration(
 
     private fun drawHeader(c: Canvas, header: View, paddingTop: Int) = with(c) {
         save()
-        translate(0f, paddingTop.toFloat())
+        translate(0.0f, paddingTop.toFloat())
         header.draw(this)
         restore()
     }

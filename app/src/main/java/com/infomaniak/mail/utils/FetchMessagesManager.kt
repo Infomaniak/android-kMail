@@ -34,7 +34,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxContent.ThreadController
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Mailbox
-import com.infomaniak.mail.data.models.Thread
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
@@ -75,7 +75,7 @@ class FetchMessagesManager(private val context: Context) {
         realm.close()
     }
 
-    private fun Thread.showNotification(
+    private suspend fun Thread.showNotification(
         userId: Int,
         mailbox: Mailbox,
         unReadThreadsCount: Int,
