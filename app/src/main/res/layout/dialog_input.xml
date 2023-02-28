@@ -38,6 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/marginStandard"
         app:errorEnabled="true"
+        app:errorIconDrawable="@null"
         tools:hint="@string/newFolderDialogHint">
 
         <com.google.android.material.textfield.TextInputEditText
