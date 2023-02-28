@@ -26,13 +26,14 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import com.infomaniak.mail.data.LocalSettings
+import com.infomaniak.mail.firebase.ProcessMessageNotificationsWorker
 import com.infomaniak.mail.firebase.RegisterUserDeviceWorker
 import com.infomaniak.mail.utils.AccountUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 fun FragmentActivity.checkPlayServices(): Boolean {
-    val apiAvailability: GoogleApiAvailability = GoogleApiAvailability.getInstance()
+    val apiAvailability = GoogleApiAvailability.getInstance()
     val errorCode = apiAvailability.isGooglePlayServicesAvailable(this)
 
     return if (errorCode == ConnectionResult.SUCCESS) {
@@ -47,6 +48,10 @@ fun FragmentActivity.checkPlayServices(): Boolean {
         false
     }
 
+}
+
+fun Context.cancelFirebaseProcessWorks() {
+    ProcessMessageNotificationsWorker.cancelWorks(this)
 }
 
 private fun FragmentActivity.checkFirebaseRegistration() {

@@ -71,6 +71,10 @@ class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParam
             WorkManager.getInstance(context).enqueueUniqueWork(workName, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
         }
 
+        fun cancelWorks(context: Context) {
+            WorkManager.getInstance(context).cancelAllWorkByTag(TAG)
+        }
+
         private fun workName(userId: Int, mailboxId: Int) = "${userId}_$mailboxId"
     }
 }

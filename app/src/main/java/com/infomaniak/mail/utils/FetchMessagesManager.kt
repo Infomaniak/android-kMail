@@ -50,7 +50,7 @@ class FetchMessagesManager(private val context: Context) {
 
     suspend fun execute(userId: Int, mailbox: Mailbox, mailboxContentRealm: Realm? = null) {
         // Don't launch sync if the mailbox's notifications have been disabled by the user
-        if (mailbox.isNotificationsBlocked()) return
+        if (mailbox.isNotificationsBlocked(notificationManagerCompat)) return
 
         val realm = mailboxContentRealm ?: RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         val folder = FolderController.getFolder(Folder.FolderRole.INBOX, realm) ?: return
@@ -73,12 +73,6 @@ class FetchMessagesManager(private val context: Context) {
         }
 
         realm.close()
-    }
-
-    private fun Mailbox.isNotificationsBlocked(): Boolean = with(notificationManagerCompat) {
-        val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
-        val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
-        isChannelBlocked || isGroupBlocked
     }
 
     private fun Thread.showNotification(

@@ -89,6 +89,7 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'androidx.work:work-runtime-ktx:2.8.0'
     implementation 'androidx.webkit:webkit:1.6.0'
+    implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
 
     androidTestImplementation 'androidx.test:runner:1.5.2'
     testImplementation 'org.junit.jupiter:junit-jupiter'

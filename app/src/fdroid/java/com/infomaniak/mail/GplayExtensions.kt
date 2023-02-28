@@ -20,3 +20,5 @@ package com.infomaniak.mail
 import androidx.fragment.app.FragmentActivity
 
 fun FragmentActivity.checkPlayServices() = false
+
+fun Context.cancelFirebaseProcessWorks() = Unit
