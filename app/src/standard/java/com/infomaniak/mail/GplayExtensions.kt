@@ -50,6 +50,10 @@ fun FragmentActivity.checkPlayServices(): Boolean {
 
 }
 
+fun Context.isGooglePlayServicesNotAvailable(): Boolean = with(GoogleApiAvailability.getInstance()) {
+    return isGooglePlayServicesAvailable(this@isGooglePlayServicesNotAvailable) != ConnectionResult.SUCCESS
+}
+
 fun Context.cancelFirebaseProcessWorks() {
     ProcessMessageNotificationsWorker.cancelWorks(this)
 }

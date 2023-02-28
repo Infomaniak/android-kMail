@@ -21,4 +21,6 @@ import androidx.fragment.app.FragmentActivity
 
 fun FragmentActivity.checkPlayServices() = false
 
+fun Context.isGooglePlayServicesNotAvailable(): Boolean = true
+
 fun Context.cancelFirebaseProcessWorks() = Unit
