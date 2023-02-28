@@ -51,8 +51,11 @@ import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.utils.addStickyDateDecoration
+import com.infomaniak.mail.utils.debounce
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
 import com.infomaniak.mail.utils.navigateToThread
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 class SearchFragment : Fragment() {
 
@@ -313,11 +316,13 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeHistory() {
-        searchViewModel.history.observe(viewLifecycleOwner) {
-            val hasInsertedSuccessfully = recentSearchAdapter.addSearchQuery(it)
-            if (hasInsertedSuccessfully) localSettings.recentSearches = recentSearchAdapter.getSearchQueries()
-            updateHistoryEmptyStateVisibility(true)
-        }
+        searchViewModel.history
+            .debounce(HISTORY_DEBOUNCE_DURATION, CoroutineScope(Dispatchers.Main))
+            .observe(viewLifecycleOwner) {
+                val hasInsertedSuccessfully = recentSearchAdapter.addSearchQuery(it)
+                if (hasInsertedSuccessfully) localSettings.recentSearches = recentSearchAdapter.getSearchQueries()
+                updateHistoryEmptyStateVisibility(true)
+            }
     }
 
     private fun updateHistoryEmptyStateVisibility(isThereHistory: Boolean) = with(binding) {
@@ -331,5 +336,6 @@ class SearchFragment : Fragment() {
 
     private companion object {
         const val PAGINATION_TRIGGER_OFFSET = 15
+        const val HISTORY_DEBOUNCE_DURATION = 2_000L
     }
 }

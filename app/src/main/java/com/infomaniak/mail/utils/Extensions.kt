@@ -37,6 +37,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.navigation.NavDirections
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
@@ -81,6 +82,10 @@ import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmInstant
 import io.realm.kotlin.types.RealmObject
 import io.sentry.Sentry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import org.jsoup.Jsoup
 import java.util.Calendar
@@ -287,6 +292,20 @@ fun MutableRealm.copyListToRealm(items: List<RealmObject>, alsoCopyManagedItems:
 //region LiveData
 fun <T> LiveData<T?>.observeNotNull(owner: LifecycleOwner, observer: (t: T) -> Unit) {
     observe(owner) { it?.let(observer) }
+}
+
+fun <T> LiveData<T>.debounce(duration: Long, scope: CoroutineScope) = MediatorLiveData<T>().also { mediator ->
+
+    val source = this
+    var job: Job? = null
+
+    mediator.addSource(source) {
+        job?.cancel()
+        job = scope.launch {
+            delay(duration)
+            mediator.value = source.value
+        }
+    }
 }
 //endregion
 
