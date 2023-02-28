@@ -35,7 +35,11 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import io.sentry.Sentry
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SearchViewModel : ViewModel() {
 
     private val searchQuery = MutableLiveData<String>()
@@ -43,6 +47,8 @@ class SearchViewModel : ViewModel() {
     private inline val selectedFilters get() = _selectedFilters.value ?: mutableSetOf()
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
+
+    private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
 
     /** It is simply used as a default value for the API */
     private lateinit var dummyFolderId: String
@@ -52,12 +58,14 @@ class SearchViewModel : ViewModel() {
     private var fetchThreadsJob: Job? = null
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults = observeSearchAndFilters().switchMap { (query, filters) ->
-        val searchQuery = if (isLengthTooShort(query)) null else query
-        fetchThreads(searchQuery, filters)
-    }
+    val searchResults = observeSearchAndFilters()
+        .debounce(SEARCH_DEBOUNCE_DURATION)
+        .flatMapLatest { (query, filters) ->
+            val searchQuery = if (isLengthTooShort(query)) null else query
+            fetchThreads(searchQuery, filters)
+        }.asLiveData(coroutineContext)
 
-    val folders = liveData(viewModelScope.coroutineContext + Dispatchers.IO) { emit(FolderController.getFolders()) }
+    val folders = liveData(coroutineContext) { emit(FolderController.getFolders()) }
 
     var selectedFolder: Folder? = null
     var previousSearch: String? = null
@@ -67,7 +75,7 @@ class SearchViewModel : ViewModel() {
     private fun observeSearchAndFilters() = MediatorLiveData<Pair<String?, Set<ThreadFilter>>>().apply {
         addSource(searchQuery) { value = it to (value?.second ?: selectedFilters) }
         addSource(_selectedFilters) { value = value?.first to it }
-    }
+    }.asFlow()
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
@@ -110,7 +118,7 @@ class SearchViewModel : ViewModel() {
     }
 
     override fun onCleared() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(coroutineContext).launch {
             fetchThreadsJob?.cancelAndJoin()
             SearchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
@@ -133,7 +141,7 @@ class SearchViewModel : ViewModel() {
 
     private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
-    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): LiveData<List<Thread>> {
+    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): Flow<List<Thread>> {
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
@@ -146,7 +154,9 @@ class SearchViewModel : ViewModel() {
 
         fetchThreadsJob?.cancel()
         fetchThreadsJob = Job()
-        return liveData(Dispatchers.IO + fetchThreadsJob!!) {
+
+        return liveData(coroutineContext + fetchThreadsJob!!) {
+
             if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
             if (fetchThreadsJob?.isCancelled == true) return@liveData
             if (filters.isEmpty() && query.isNullOrBlank()) {
@@ -169,7 +179,7 @@ class SearchViewModel : ViewModel() {
                 ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, filters, folderId))
             }
 
-            emitSource(ThreadController.getSearchThreadsAsync().asLiveData(Dispatchers.IO).map {
+            emitSource(ThreadController.getSearchThreadsAsync().asLiveData(coroutineContext).map {
                 query?.let(history::postValue)
                 it.list.also { threads ->
                     val resultsVisibilityMode = when {
@@ -180,7 +190,7 @@ class SearchViewModel : ViewModel() {
                     visibilityMode.postValue(resultsVisibilityMode)
                 }
             })
-        }
+        }.asFlow()
     }
 
     private companion object {
@@ -191,5 +201,7 @@ class SearchViewModel : ViewModel() {
          * The minimum value allowed for a search query
          */
         const val MIN_SEARCH_QUERY = 3
+
+        const val SEARCH_DEBOUNCE_DURATION = 750L
     }
 }
