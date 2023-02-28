@@ -81,8 +81,10 @@ class NewMessageActivity : ThemedActivity() {
 
     private fun setupSystemBars() {
         val backgroundColor = getColor(R.color.newMessageBackgroundColor)
-        window.statusBarColor = backgroundColor
-        window.navigationBarColor = backgroundColor
+        window.apply {
+            statusBarColor = backgroundColor
+            navigationBarColor = backgroundColor
+        }
     }
 
     private fun saveDraftAndShowToast(action: DraftAction) {
