@@ -27,6 +27,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:background="@color/newMessageBackgroundColor"
         app:contentInsetEnd="@dimen/marginStandardSmall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,6 +59,7 @@
         style="@style/CardViewMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/newMessageBackgroundColor"
         android:visibility="gone"
         app:cardElevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -69,6 +71,12 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:orientation="horizontal">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/backgroundColorTertiary"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/editorTextOptions"
