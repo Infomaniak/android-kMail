@@ -620,9 +620,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     //endregion
 
     fun addContact(recipient: Recipient) = viewModelScope.launch(Dispatchers.IO) {
-        val apiResponse = ApiRepository.addContact(AddressBookController.getDefaultAddressBook().id, recipient)
 
-        val snackbarTitle = if (apiResponse.isSuccess()) {
+        val isSuccess = ApiRepository.addContact(AddressBookController.getDefaultAddressBook().id, recipient).isSuccess()
+
+        val snackbarTitle = if (isSuccess) {
             updateUserInfo()
             R.string.snackbarContactSaved
         } else {
