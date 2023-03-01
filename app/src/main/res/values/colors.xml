@@ -83,6 +83,7 @@
     <color name="backgroundDisabledDialogButton">@color/mouse</color>
 
     <color name="menuDrawerBackgroundColor">@color/backgroundColorSecondary</color>
+    <color name="newMessageBackgroundColor">@color/backgroundColorSecondary</color>
 
     <!-- Texts -->
     <color name="primaryTextColor">@color/orca</color>
