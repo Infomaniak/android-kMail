@@ -28,8 +28,7 @@ object SignatureController {
 
     //region Get data
     fun getDefaultSignature(realm: TypedRealm): Signature {
-        return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()
-            ?: realm.query<Signature>().first().find()!!
+        return realm.query<Signature>("${Signature::isDefault.name} == true").first().find()!!
     }
     //endregion
 
