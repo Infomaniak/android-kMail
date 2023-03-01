@@ -80,7 +80,7 @@ class ThreadListAdapter(
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
-    var onFlushClicked: (() -> Unit)? = null
+    var onFlushClicked: ((dialogTitle: String) -> Unit)? = null
 
     init {
         setHasStableIds(true)
@@ -233,8 +233,9 @@ class ThreadListAdapter(
         flushText.text = context.getString(hintTextId)
 
         flushButton.apply {
-            text = context.getString(buttonTextId)
-            setOnClickListener { onFlushClicked?.invoke() }
+            val buttonText = context.getString(buttonTextId)
+            text = buttonText
+            setOnClickListener { onFlushClicked?.invoke(buttonText) }
         }
     }
 
