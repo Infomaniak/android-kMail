@@ -59,6 +59,7 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun setupListeners() = with(binding) {
+
         writeMail.setOnClickListener {
             safeNavigate(
                 DetailedContactBottomSheetDialogDirections.actionDetailedContactBottomSheetDialogToNewMessageActivity(
