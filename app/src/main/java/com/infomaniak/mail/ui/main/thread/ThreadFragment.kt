@@ -97,6 +97,7 @@ class ThreadFragment : Fragment() {
             setupUi(threadUid)
             setupAdapter(threadUid)
             threadAdapter.isExpandedMap = result.second
+            threadAdapter.isThemeTheSameMap = result.third
             observeMessagesLive()
             observeContacts()
             observeQuickActionBarClicks()
@@ -223,6 +224,7 @@ class ThreadFragment : Fragment() {
                         threadUid = navigationArgs.threadUid,
                         isFavorite = message.isFavorite,
                         isSeen = message.isSeen,
+                        isThemeTheSame = threadAdapter.isThemeTheSameMap[message.uid]!!,
                     )
                 )
             }

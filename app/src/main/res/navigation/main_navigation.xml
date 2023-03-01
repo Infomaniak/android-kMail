@@ -199,6 +199,9 @@
         <argument
             android:name="isSeen"
             app:argType="boolean" />
+        <argument
+            android:name="isThemeTheSame"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_messageActionsBottomSheet_to_newMessageActivity"
             app:destination="@id/newMessageActivity" />
