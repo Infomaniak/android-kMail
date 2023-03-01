@@ -344,13 +344,13 @@ fun Fragment.createInputDialog(
     onPositiveButtonClicked: (CharSequence?) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
 
-    fun Button.setButtonEnablement(shouldDisable: Boolean) {
-        isEnabled = !shouldDisable
+    fun Button.setButtonEnablement(shouldEnable: Boolean) {
+        isEnabled = shouldEnable
 
-        val backgroundColor = if (shouldDisable) {
-            resources.getColor(R.color.backgroundDisabledPrimaryButton, null)
-        } else {
+        val backgroundColor = if (shouldEnable) {
             context.getAttributeColor(RMaterial.attr.colorPrimary)
+        } else {
+            resources.getColor(R.color.backgroundDisabledPrimaryButton, null)
         }
         setBackgroundColor(backgroundColor)
     }
@@ -359,10 +359,10 @@ fun Fragment.createInputDialog(
         setOnShowListener {
             showKeyboard()
             getButton(AlertDialog.BUTTON_POSITIVE).apply {
-                setButtonEnablement(true)
+                setButtonEnablement(false)
                 textInput.doAfterTextChanged {
                     val error = if (it.isNullOrBlank()) null else onErrorCheck(it.trim())
-                    setButtonEnablement(it.isNullOrBlank() || error != null)
+                    setButtonEnablement(it?.isNotBlank() == true && error == null)
                     textInputLayout.error = error
                 }
             }
