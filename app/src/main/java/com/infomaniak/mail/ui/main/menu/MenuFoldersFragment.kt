@@ -54,7 +54,7 @@ abstract class MenuFoldersFragment : Fragment() {
         customFoldersList.adapter = customFoldersAdapter
     }
 
-    protected fun checkIfFolderAlreadyExists(folderName: CharSequence): String? {
+    protected fun checkForFolderCreationErrors(folderName: CharSequence): String? {
         val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
         val allFolders = defaultFolders + customFolders
 
