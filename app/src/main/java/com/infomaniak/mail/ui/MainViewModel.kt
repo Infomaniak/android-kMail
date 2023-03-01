@@ -444,7 +444,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val undoDestinationId = message?.folderId ?: threadFolderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id
 
-        val destination = destinationFolder.role?.folderNameRes?.let(context::getString) ?: destinationFolder.name
+        val destination = destinationFolder.getLocalizedName(context)
 
         val snackbarTitle = when {
             !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)

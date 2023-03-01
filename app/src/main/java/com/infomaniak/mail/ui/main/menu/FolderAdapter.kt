@@ -55,7 +55,10 @@ class FolderAdapter(
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) = with(holder.binding) {
+
         val folder = folders[position]
+
+        val folderName = folder.getLocalizedName(context)
 
         val badge = when (folder.role) {
             FolderRole.DRAFT -> folder.threads.count()
@@ -64,10 +67,10 @@ class FolderAdapter(
         }
 
         folder.role?.let {
-            setFolderUi(folder.id, context.getString(it.folderNameRes), it.folderIconRes, badge)
+            setFolderUi(folder.id, folderName, it.folderIconRes, badge)
         } ?: setFolderUi(
             id = folder.id,
-            name = folder.name,
+            name = folderName,
             iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
             badgeText = badge,
             folderIndent = min(folder.path.split(folder.separator).size - 1, MAX_SUB_FOLDERS_INDENT),
