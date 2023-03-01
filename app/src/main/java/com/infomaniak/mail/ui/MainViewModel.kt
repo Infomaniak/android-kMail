@@ -619,6 +619,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     //endregion
 
+    fun addContact(recipient: Recipient) = viewModelScope.launch(Dispatchers.IO) {
+        val apiResponse = ApiRepository.addContact(AddressBookController.getDefaultAddressBook().id, recipient)
+
+        val snackbarTitle = if (apiResponse.isSuccess()) {
+            updateUserInfo()
+            R.string.snackbarContactSaved
+        } else {
+            RCore.string.anErrorHasOccurred
+        }
+
+        snackBarManager.postValue(getApplication<Application>().getString(snackbarTitle))
+    }
+
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid)!!)
     }
