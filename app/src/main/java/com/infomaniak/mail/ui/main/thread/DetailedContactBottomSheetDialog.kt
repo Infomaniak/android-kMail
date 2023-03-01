@@ -26,7 +26,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -43,7 +42,6 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetDetailedContactBinding
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val detailedContactViewModel: DetailedContactViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -56,7 +54,6 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         fillInUserNameAndEmail(navigationArgs.recipient, name, email)
 
         setupListeners()
-        setupSnackBar()
 
         observeContacts()
     }
@@ -72,9 +69,10 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         }
 
         addToContacts.setOnClickListener {
-            detailedContactViewModel.addContact(navigationArgs.recipient)
+            mainViewModel.addContact(navigationArgs.recipient)
             findNavController().popBackStack()
         }
+
         copyAddress.setOnClickListener { copyToClipboard() }
     }
 
@@ -93,9 +91,5 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         mainViewModel.mergedContacts.observeNotNull(viewLifecycleOwner) {
             binding.userAvatar.loadAvatar(navigationArgs.recipient, it)
         }
-    }
-
-    private fun setupSnackBar() = with(requireActivity()) {
-        detailedContactViewModel.snackBarManager.setup(this, getAnchor = { findViewById(R.id.quickActionBar) })
     }
 }
