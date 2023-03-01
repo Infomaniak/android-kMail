@@ -35,16 +35,14 @@ import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.SearchUtils
 import io.sentry.Sentry
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SearchViewModel : ViewModel() {
 
-    private val searchQuery = MutableLiveData<String>()
-    private val _selectedFilters = MutableLiveData<MutableSet<ThreadFilter>>()
-    private inline val selectedFilters get() = _selectedFilters.value ?: mutableSetOf()
+    private val searchQuery = MutableStateFlow("")
+    private val _selectedFilters = MutableStateFlow(emptySet<ThreadFilter>())
+    private inline val selectedFilters get() = _selectedFilters.value.toMutableSet()
     val visibilityMode = MutableLiveData(VisibilityMode.RECENT_SEARCHES)
     val history = SingleLiveEvent<String>()
 
@@ -55,15 +53,12 @@ class SearchViewModel : ViewModel() {
     private var resourceNext: String? = null
     private var resourcePrevious: String? = null
 
-    private var fetchThreadsJob: Job? = null
     private val isLastPage get() = resourceNext.isNullOrBlank()
 
-    val searchResults = observeSearchAndFilters()
-        .debounce(SEARCH_DEBOUNCE_DURATION)
-        .flatMapLatest { (query, filters) ->
-            val searchQuery = if (isLengthTooShort(query)) null else query
-            fetchThreads(searchQuery, filters)
-        }.asLiveData(coroutineContext)
+    val searchResults = observeSearchAndFilters().flatMapLatest { (query, filters) ->
+        val searchQuery = if (isLengthTooShort(query)) null else query
+        fetchThreads(searchQuery, filters)
+    }.asLiveData(coroutineContext)
 
     val folders = liveData(coroutineContext) { emit(FolderController.getFolders()) }
 
@@ -72,10 +67,9 @@ class SearchViewModel : ViewModel() {
     var previousMutuallyExclusiveChips: Int? = null
     var previousAttachments: Boolean? = null
 
-    private fun observeSearchAndFilters() = MediatorLiveData<Pair<String?, Set<ThreadFilter>>>().apply {
-        addSource(searchQuery) { value = it to (value?.second ?: selectedFilters) }
-        addSource(_selectedFilters) { value = value?.first to it }
-    }.asFlow()
+    private fun observeSearchAndFilters() = searchQuery.combine(_selectedFilters) { query, filters ->
+        query to filters
+    }.debounce(SEARCH_DEBOUNCE_DURATION)
 
     fun init(dummyFolderId: String) {
         this.dummyFolderId = dummyFolderId
@@ -119,7 +113,6 @@ class SearchViewModel : ViewModel() {
 
     override fun onCleared() {
         CoroutineScope(coroutineContext).launch {
-            fetchThreadsJob?.cancelAndJoin()
             SearchUtils.deleteRealmSearchData()
             Log.i(TAG, "SearchViewModel>onCleared: called")
         }
@@ -141,56 +134,49 @@ class SearchViewModel : ViewModel() {
 
     private fun isLengthTooShort(query: String?) = query == null || query.length < MIN_SEARCH_QUERY
 
-    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): Flow<List<Thread>> {
+    private fun fetchThreads(query: String?, filters: Set<ThreadFilter>): Flow<List<Thread>> = flow {
 
         suspend fun ApiResponse<ThreadResult>.initSearchFolderThreads() {
             runCatching {
                 this.data?.threads?.let { ThreadController.initAndGetSearchFolderThreads(it) }
             }.getOrElse { exception ->
                 exception.printStackTrace()
-                if (fetchThreadsJob?.isActive == true) Sentry.captureException(exception)
+                Sentry.captureException(exception)
             }
         }
 
-        fetchThreadsJob?.cancel()
-        fetchThreadsJob = Job()
+        if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
+        if (filters.isEmpty() && query.isNullOrBlank()) {
+            visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
+            return@flow
+        }
 
-        return liveData(coroutineContext + fetchThreadsJob!!) {
+        visibilityMode.postValue(VisibilityMode.LOADING)
 
-            if (isLastPage && resourcePrevious.isNullOrBlank()) SearchUtils.deleteRealmSearchData()
-            if (fetchThreadsJob?.isCancelled == true) return@liveData
-            if (filters.isEmpty() && query.isNullOrBlank()) {
-                visibilityMode.postValue(VisibilityMode.RECENT_SEARCHES)
-                return@liveData
-            }
+        val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
+        val folderId = selectedFolder?.id ?: dummyFolderId
+        val searchFilters = SearchUtils.searchFilters(query, filters)
+        val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
 
-            visibilityMode.postValue(VisibilityMode.LOADING)
+        if (apiResponse.isSuccess()) with(apiResponse) {
+            initSearchFolderThreads()
+            resourceNext = data?.resourceNext
+            resourcePrevious = data?.resourcePrevious
+        } else if (isLastPage) {
+            ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, filters, folderId))
+        }
 
-            val currentMailbox = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!
-            val folderId = selectedFolder?.id ?: dummyFolderId
-            val searchFilters = SearchUtils.searchFilters(query, filters)
-            val apiResponse = ApiRepository.searchThreads(currentMailbox.uuid, folderId, searchFilters, resourceNext)
-
-            if (apiResponse.isSuccess()) with(apiResponse) {
-                initSearchFolderThreads()
-                resourceNext = data?.resourceNext
-                resourcePrevious = data?.resourcePrevious
-            } else if (isLastPage) {
-                ThreadController.saveThreads(searchMessages = MessageController.searchMessages(query, filters, folderId))
-            }
-
-            emitSource(ThreadController.getSearchThreadsAsync().asLiveData(coroutineContext).map {
-                query?.let(history::postValue)
-                it.list.also { threads ->
-                    val resultsVisibilityMode = when {
-                        selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) -> VisibilityMode.RECENT_SEARCHES
-                        threads.isEmpty() -> VisibilityMode.NO_RESULTS
-                        else -> VisibilityMode.RESULTS
-                    }
-                    visibilityMode.postValue(resultsVisibilityMode)
+        emitAll(ThreadController.getSearchThreadsAsync().mapLatest {
+            query?.let(history::postValue)
+            it.list.also { threads ->
+                val resultsVisibilityMode = when {
+                    selectedFilters.isEmpty() && isLengthTooShort(searchQuery.value) -> VisibilityMode.RECENT_SEARCHES
+                    threads.isEmpty() -> VisibilityMode.NO_RESULTS
+                    else -> VisibilityMode.RESULTS
                 }
-            })
-        }.asFlow()
+                visibilityMode.postValue(resultsVisibilityMode)
+            }
+        })
     }
 
     private companion object {
@@ -202,6 +188,6 @@ class SearchViewModel : ViewModel() {
          */
         const val MIN_SEARCH_QUERY = 3
 
-        const val SEARCH_DEBOUNCE_DURATION = 750L
+        const val SEARCH_DEBOUNCE_DURATION = 500L
     }
 }
