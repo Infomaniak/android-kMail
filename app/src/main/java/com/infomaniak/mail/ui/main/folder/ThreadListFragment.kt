@@ -153,7 +153,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter = ThreadListAdapter(
             context = requireContext(),
             threadDensity = localSettings.threadDensity,
-            folderRole = FolderRole.INBOX,
+            folderRole = mainViewModel.currentFolder.value?.role,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
         )
@@ -177,6 +177,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
+            onFlushClicked = { dialogTitle ->
+                createDescriptionDialog(
+                    title = dialogTitle,
+                    description = getString(R.string.threadListEmptyFolderAlertDescription),
+                    onPositiveButtonClicked = { notYetImplemented() },
+                ).show()
+            }
         }
     }
 
