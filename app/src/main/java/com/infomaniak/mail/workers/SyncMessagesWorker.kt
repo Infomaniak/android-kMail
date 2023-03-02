@@ -40,12 +40,9 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.ui.LaunchActivityArgs
-import com.infomaniak.mail.utils.AccountUtils
-import com.infomaniak.mail.utils.ApiErrorException
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.ApiErrorException.*
 import com.infomaniak.mail.utils.NotificationUtils.showNewMessageNotification
-import com.infomaniak.mail.utils.formatSubject
-import com.infomaniak.mail.utils.htmlToText
 import io.realm.kotlin.Realm
 import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
@@ -150,7 +147,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
         val subject = applicationContext.formatSubject(message.subject)
         val preview = message.body?.value?.ifBlank { null }
-            ?.let { "\n${it.htmlToText().trim()}" } // TODO: remove body history
+            ?.let { "\n${MessageBodyUtils.splitBodyAndQuote(it).messageBody.htmlToText()}" }
             ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
             ?: ""
         val formattedPreview = preview.replace(multipleWhitespaces, "\n") // Ignore multiple/start whitespaces
