@@ -66,6 +66,8 @@ android {
             dimension 'distribution'
             apply plugin: 'com.google.gms.google-services'
 
+            getIsDefault().set(true)
+
             dependencies {
                 implementation 'com.google.firebase:firebase-messaging-ktx:23.1.1'
             }
