@@ -48,6 +48,7 @@ import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.databinding.CardviewThreadItemBinding
 import com.infomaniak.mail.databinding.ItemThreadDateSeparatorBinding
+import com.infomaniak.mail.databinding.ItemThreadFlushFolderButtonBinding
 import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
@@ -79,6 +80,7 @@ class ThreadListAdapter(
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
 
     var onThreadClicked: ((thread: Thread) -> Unit)? = null
+    var onFlushClicked: (() -> Unit)? = null
 
     init {
         setHasStableIds(true)
@@ -93,6 +95,7 @@ class ThreadListAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = when (viewType) {
             R.layout.item_thread_date_separator -> ItemThreadDateSeparatorBinding.inflate(layoutInflater, parent, false)
+            R.layout.item_thread_flush_folder_button -> ItemThreadFlushFolderButtonBinding.inflate(layoutInflater, parent, false)
             R.layout.item_thread_see_all_button -> ItemThreadSeeAllButtonBinding.inflate(layoutInflater, parent, false)
             else -> CardviewThreadItemBinding.inflate(layoutInflater, parent, false)
         }
@@ -114,14 +117,19 @@ class ThreadListAdapter(
         when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (this as CardviewThreadItemBinding).displayThread(item as Thread)
             DisplayType.DATE_SEPARATOR.layout -> (this as ItemThreadDateSeparatorBinding).displayDateSeparator(item as String)
+            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (this as ItemThreadFlushFolderButtonBinding).displayFlushFolderButton(item as FolderRole)
             DisplayType.SEE_ALL_BUTTON.layout -> (this as ItemThreadSeeAllButtonBinding).displaySeeAllButton(item)
         }
     }
 
-    override fun getItemViewType(position: Int): Int = when {
-        dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
-        displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
-        else -> DisplayType.THREAD.layout
+    override fun getItemViewType(position: Int): Int {
+        val item = dataSet[position]
+        return when {
+            item is String -> DisplayType.DATE_SEPARATOR.layout
+            item is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
+            displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
+            else -> DisplayType.THREAD.layout
+        }
     }
 
     override fun getItemId(position: Int): Long {
@@ -212,6 +220,22 @@ class ThreadListAdapter(
             dateTopMarginOther to DATE_BOTTOM_MARGIN_OTHER
         }
         root.setMarginsRelative(top = topMargin, bottom = bottomMargin)
+    }
+
+    private fun ItemThreadFlushFolderButtonBinding.displayFlushFolderButton(folderRole: FolderRole) {
+
+        val (hintTextId, buttonTextId) = when (folderRole) {
+            FolderRole.TRASH -> R.string.threadListTrashHint to R.string.threadListEmptyTrashButton
+            FolderRole.SPAM -> R.string.threadListSpamHint to R.string.threadListEmptySpamButton
+            else -> throw IllegalStateException("We are trying to flush a non-flushable folder.")
+        }
+
+        flushText.text = context.getString(hintTextId)
+
+        flushButton.apply {
+            text = context.getString(buttonTextId)
+            setOnClickListener { onFlushClicked?.invoke() }
+        }
     }
 
     private fun ItemThreadSeeAllButtonBinding.displaySeeAllButton(item: Any) {
@@ -310,6 +334,7 @@ class ThreadListAdapter(
     override fun getViewToTouchToStartDraggingItem(item: Any, viewHolder: ThreadViewHolder, position: Int): View? {
         return when (getItemViewType(position)) {
             DisplayType.THREAD.layout -> (viewHolder.binding as CardviewThreadItemBinding).goneHandle
+            DisplayType.FLUSH_FOLDER_BUTTON.layout -> (viewHolder.binding as ItemThreadFlushFolderButtonBinding).goneHandle
             else -> null
         }
     }
@@ -321,7 +346,7 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
-        dataSet = formatList(itemList, recyclerView.context, threadDensity)
+        dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity)
     }
 
     fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
@@ -336,6 +361,7 @@ class ThreadListAdapter(
     private enum class DisplayType(val layout: Int) {
         THREAD(R.layout.cardview_thread_item),
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
+        FLUSH_FOLDER_BUTTON(R.layout.item_thread_flush_folder_button),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
     }
 
@@ -349,11 +375,20 @@ class ThreadListAdapter(
         const val FULL_MONTH = "MMMM"
         const val MONTH_AND_YEAR = "MMMM yyyy"
 
-        fun formatList(threads: List<Thread>, context: Context, threadDensity: ThreadDensity): MutableList<Any> {
-            if (threadDensity == COMPACT) return threads.toMutableList()
+        fun formatList(
+            threads: List<Thread>,
+            context: Context,
+            folderRole: FolderRole?,
+            threadDensity: ThreadDensity,
+        ): MutableList<Any> {
+
+            val formattedList = mutableListOf<Any>()
+
+            if (folderRole == FolderRole.TRASH || folderRole == FolderRole.SPAM) formattedList.add(folderRole)
+
+            if (threadDensity == COMPACT) return formattedList.apply { addAll(threads) }
 
             var previousSectionTitle = ""
-            val formattedList = mutableListOf<Any>()
 
             threads.forEach { thread ->
                 val sectionTitle = thread.getSectionTitle(context)
