@@ -240,6 +240,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshThreads(folderId = folderId)
     }
 
+    fun flushFolder() = viewModelScope.launch(Dispatchers.IO) {
+
+        val isSuccess = ApiRepository.flushFolder(
+            mailboxUuid = currentMailbox.value?.uuid ?: return@launch,
+            folderId = currentFolderId ?: return@launch,
+        ).isSuccess()
+
+        if (isSuccess) {
+            forceRefreshThreads()
+        } else {
+            snackBarManager.postValue(context.getString(RCore.string.anErrorHasOccurred))
+        }
+    }
+
     fun forceRefreshThreads() {
         refreshThreadsJob?.cancel()
         refreshThreadsJob = viewModelScope.launch(Dispatchers.IO) {
