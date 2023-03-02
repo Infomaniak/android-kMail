@@ -417,10 +417,11 @@
     <!-- Dialog -->
 
     <style name="DialogStyle" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="android:background">@color/backgroundColorTertiary</item>
         <item name="buttonBarNegativeButtonStyle">@style/DeletePositiveButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="colorControlNormal">?attr/colorControlNormal</item>
+        <item name="colorSurface">@color/backgroundColorTertiary</item>
+        <item name="elevationOverlayEnabled">false</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlayDialogRounded</item>
     </style>
 
