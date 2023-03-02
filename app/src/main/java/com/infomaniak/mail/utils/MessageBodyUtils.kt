@@ -44,6 +44,16 @@ object MessageBodyUtils {
         return MessageBodyQuote(messageBody = body, quote = quote)
     }
 
+    private fun handleBlockQuote(htmlDocumentWithoutQuote: Document, htmlQuotes: MutableList<Element>) {
+        var quotedContentElements = htmlDocumentWithoutQuote.selectFirst(blockquote)
+
+        while (quotedContentElements != null) {
+            htmlQuotes.add(quotedContentElements)
+            quotedContentElements.remove()
+            quotedContentElements = htmlDocumentWithoutQuote.selectFirst(blockquote)
+        }
+    }
+
     private fun handleQuoteDescriptors(htmlDocumentWithoutQuote: Document, htmlQuotes: MutableList<Element>): String {
         var currentQuoteDescriptor = ""
         for (quoteDescriptor in quoteDescriptors) {
@@ -58,20 +68,10 @@ object MessageBodyUtils {
         return currentQuoteDescriptor
     }
 
-    private fun handleBlockQuote(htmlDocumentWithoutQuote: Document, htmlQuotes: MutableList<Element>) {
-        var quotedContentElements = htmlDocumentWithoutQuote.selectFirst(blockquote)
-
-        while (quotedContentElements != null) {
-            htmlQuotes.add(quotedContentElements)
-            quotedContentElements.remove()
-            quotedContentElements = htmlDocumentWithoutQuote.selectFirst(blockquote)
-        }
-    }
-
     private fun splitBodyAndQuote(
         htmlQuotes: MutableList<Element>,
         htmlDocumentWithQuote: Document,
-        currentQuoteDescriptor: String
+        currentQuoteDescriptor: String,
     ): Pair<String, String?> {
         return htmlQuotes.lastOrNull()?.let { htmlQuote ->
             val quotedContentElements = htmlDocumentWithQuote.select(currentQuoteDescriptor)
