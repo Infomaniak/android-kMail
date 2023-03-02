@@ -17,15 +17,15 @@
  */
 package com.infomaniak.mail.firebase
 
+import com.infomaniak.lib.core.BuildConfig.INFOMANIAK_API
 import com.infomaniak.lib.core.api.ApiController.ApiMethod.POST
 import com.infomaniak.lib.core.models.ApiResponse
-import com.infomaniak.mail.BuildConfig.API_V1
 import com.infomaniak.mail.data.api.ApiRepository
 import okhttp3.OkHttpClient
 
 object FirebaseApiRepository {
 
-    private const val registerDevice = "$API_V1/devices/register"
+    private const val registerDevice = "$INFOMANIAK_API/devices/register"
 
     fun registerForNotifications(registrationInfos: RegistrationInfos, okHttpClient: OkHttpClient): ApiResponse<Boolean> {
         return ApiRepository.callApi(registerDevice, POST, registrationInfos, okHttpClient)
