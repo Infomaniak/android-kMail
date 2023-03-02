@@ -22,10 +22,10 @@ import android.content.Context
 import android.provider.Settings
 
 class RegistrationInfos private constructor(
-    val token: String,
-    val name: String,
-    val os: String = OS_NAME,
-    val model: String = DEVICE_MODEL,
+    private val token: String,
+    private val name: String,
+    private val os: String = OS_NAME,
+    private val model: String = DEVICE_MODEL,
 ) {
 
     constructor(context: Context, token: String) : this(token = token, name = getDeviceName(context.contentResolver))

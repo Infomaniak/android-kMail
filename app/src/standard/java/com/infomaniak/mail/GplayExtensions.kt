@@ -77,7 +77,7 @@ private suspend fun checkFirebaseRegistration(context: Context) = withContext(Di
         }
 
         val token = task.result
-        Log.d("firebase", "checkFirebaseRegistration: token is different ${token == localSettings.firebaseToken}")
+        Log.d("firebase", "checkFirebaseRegistration: token is different ${token != localSettings.firebaseToken}")
         if (token != localSettings.firebaseToken) localSettings.clearRegisteredFirebaseUsers()
 
         localSettings.firebaseToken = token

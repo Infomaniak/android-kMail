@@ -65,7 +65,7 @@ class SyncMailboxesWorker(appContext: Context, params: WorkerParameters) : BaseC
                     PeriodicWorkRequestBuilder<SyncMailboxesWorker>(MIN_PERIODIC_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
                         .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                         // We start with a delayed duration, so that when the app is rebooted the service is not launched
-                        // .setInitialDelay(2, TimeUnit.MINUTES)
+                        .setInitialDelay(2, TimeUnit.MINUTES)
                         .build()
 
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.UPDATE, workRequest)
