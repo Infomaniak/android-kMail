@@ -46,7 +46,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.i(TAG, "onMessageReceived: $message")
+        Log.i(TAG, "onMessageReceived: ${message.data}")
 
         val userId = message.data["user_id"]?.toInt() ?: return
         val mailboxId = message.data["mailbox_id"]?.toInt() ?: return
@@ -75,7 +75,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         Log.i(TAG, "processMessageInBackground: called")
         MailboxController.getMailbox(userId, mailboxId, realmMailboxInfo)?.let { mailbox ->
             // Ignore if the mailbox notification channel is blocked
-            if (mailbox.isNotificationsBlocked(notificationManagerCompat)) return
+            if (mailbox.areNotificationsBlocked(notificationManagerCompat)) return
         }
 
         ProcessMessageNotificationsWorker.scheduleWork(this, userId, mailboxId, messageUid)

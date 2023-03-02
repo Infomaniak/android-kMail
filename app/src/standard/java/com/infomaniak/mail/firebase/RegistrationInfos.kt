@@ -24,13 +24,16 @@ import android.provider.Settings
 class RegistrationInfos private constructor(
     val token: String,
     val name: String,
-    val os: String = "android",
-    val model: String = android.os.Build.MODEL,
+    val os: String = OS_NAME,
+    val model: String = DEVICE_MODEL,
 ) {
 
     constructor(context: Context, token: String) : this(token = token, name = getDeviceName(context.contentResolver))
 
-    companion object {
+    private companion object {
+        private const val OS_NAME = "android"
+        private val DEVICE_MODEL = android.os.Build.MODEL
+
         private fun getDeviceName(contentResolver: ContentResolver): String {
             return Settings.Global.getString(contentResolver, "device_name")
         }
