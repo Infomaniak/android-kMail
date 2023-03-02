@@ -177,7 +177,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         threadListAdapter.apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             onThreadClicked = { thread -> navigateToThread(thread, mainViewModel) }
-            onFlushClicked = { notYetImplemented() }
+            onFlushClicked = { dialogTitle ->
+                createDescriptionDialog(
+                    title = dialogTitle,
+                    description = getString(R.string.threadListEmptyFolderAlertDescription),
+                    onPositiveButtonClicked = { notYetImplemented() },
+                ).show()
+            }
         }
     }
 
