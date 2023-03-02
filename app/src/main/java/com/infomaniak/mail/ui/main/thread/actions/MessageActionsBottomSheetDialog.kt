@@ -28,9 +28,11 @@ import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
-class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
+class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: MessageActionsBottomSheetDialogArgs by navArgs()
+
+    override val currentClassName: String by lazy { MessageActionsBottomSheetDialog::class.java.name }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,11 +45,11 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid, currentClassName)
                 }
 
                 override fun onReplyAll() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid, currentClassName)
                 }
 
                 override fun onForward() {
@@ -72,7 +74,7 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     animatedNavigation(
                         resId = R.id.moveFragment,
                         args = MoveFragmentArgs(threadUid, messageUid).toBundle(),
-                        currentClassName = MessageActionsBottomSheetDialog::class.java.name,
+                        currentClassName = currentClassName,
                     )
                 }
 
@@ -88,9 +90,9 @@ class MessageActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
                 override fun onReportJunk() {
                     safeNavigate(
-                        R.id.junkBottomSheetDialog,
-                        JunkBottomSheetDialogArgs(threadUid, messageUid).toBundle(),
-                        currentClassName = MessageActionsBottomSheetDialog::class.java.name,
+                        resId = R.id.junkBottomSheetDialog,
+                        args = JunkBottomSheetDialogArgs(threadUid, messageUid).toBundle(),
+                        currentClassName = currentClassName,
                     )
                 }
 

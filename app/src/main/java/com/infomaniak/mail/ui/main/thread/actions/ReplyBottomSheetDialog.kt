@@ -21,32 +21,31 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.databinding.BottomSheetReplyBinding
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
-open class ReplyBottomSheetDialog : BottomSheetDialogFragment() {
+open class ReplyBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private lateinit var binding: BottomSheetReplyBinding
     private val navigationArgs: ReplyBottomSheetDialogArgs by navArgs()
+
+    override val currentClassName: String by lazy { ReplyBottomSheetDialog::class.java.name }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetReplyBinding.inflate(inflater, container, false).also { binding = it }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainActions.setOnItemClickListener { id: Int ->
+        binding.mainActions.setClosingOnClickListener { id: Int ->
             when (id) {
-                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, navigationArgs.messageUid)
-                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, navigationArgs.messageUid)
+                R.id.actionReply -> safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUid, currentClassName)
+                R.id.actionReplyAll -> safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUid, currentClassName)
             }
-            findNavController().popBackStack()
         }
     }
 }

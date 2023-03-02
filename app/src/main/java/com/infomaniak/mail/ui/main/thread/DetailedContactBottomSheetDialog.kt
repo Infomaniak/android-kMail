@@ -28,20 +28,23 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
+import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.ui.main.thread.actions.ActionsBottomSheetDialog
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
 import com.infomaniak.mail.utils.observeNotNull
 
-class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
+class DetailedContactBottomSheetDialog : ActionsBottomSheetDialog() {
 
     private lateinit var binding: BottomSheetDetailedContactBinding
     private val navigationArgs: DetailedContactBottomSheetDialogArgs by navArgs()
     private val mainViewModel: MainViewModel by activityViewModels()
+
+    override val currentClassName: String by lazy { DetailedContactBottomSheetDialog::class.java.name }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return BottomSheetDetailedContactBinding.inflate(inflater, container, false).also { binding = it }.root
@@ -60,21 +63,15 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun setupListeners() = with(binding) {
 
-        writeMail.setOnClickListener {
+        writeMail.setClosingOnClickListener {
             safeNavigate(
-                DetailedContactBottomSheetDialogDirections.actionDetailedContactBottomSheetDialogToNewMessageActivity(
-                    recipient = navigationArgs.recipient,
-                )
+                resId = R.id.newMessageActivity,
+                args = NewMessageActivityArgs(recipient = navigationArgs.recipient).toBundle(),
+                currentClassName = currentClassName,
             )
-            findNavController().popBackStack()
         }
-
-        addToContacts.setOnClickListener {
-            mainViewModel.addContact(navigationArgs.recipient)
-            findNavController().popBackStack()
-        }
-
-        copyAddress.setOnClickListener { copyToClipboard() }
+        addToContacts.setClosingOnClickListener { mainViewModel.addContact(navigationArgs.recipient) }
+        copyAddress.setClosingOnClickListener { copyToClipboard() }
     }
 
     private fun copyToClipboard() = with(navigationArgs.recipient) {
@@ -84,8 +81,6 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             showSnackbar(R.string.snackbarEmailCopiedToClipboard, anchor = activity?.findViewById(R.id.quickActionBar))
         }
-
-        findNavController().popBackStack()
     }
 
     private fun observeContacts() {

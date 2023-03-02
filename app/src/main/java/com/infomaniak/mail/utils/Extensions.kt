@@ -213,14 +213,11 @@ fun getAnimatedNavOptions() = NavOptions
     .setPopExitAnim(R.anim.fragment_swipe_pop_exit)
     .build()
 
-fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: String) {
+fun Fragment.safeNavigateToNewMessageActivity(draftMode: DraftMode, messageUid: String, currentClassName: String) {
     safeNavigate(
-        R.id.newMessageActivity,
-        NewMessageActivityArgs(
-            draftExists = false,
-            draftMode = draftMode,
-            previousMessageUid = messageUid,
-        ).toBundle(),
+        resId = R.id.newMessageActivity,
+        args = NewMessageActivityArgs(draftExists = false, draftMode = draftMode, previousMessageUid = messageUid).toBundle(),
+        currentClassName = currentClassName,
     )
 }
 
