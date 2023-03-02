@@ -247,7 +247,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             folderId = currentFolderId ?: return@launch,
         ).isSuccess()
 
-        if (isSuccess) forceRefreshThreads()
+        if (isSuccess) {
+            forceRefreshThreads()
+        } else {
+            snackBarManager.postValue(context.getString(RCore.string.anErrorHasOccurred))
+        }
     }
 
     fun forceRefreshThreads() {
