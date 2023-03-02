@@ -27,7 +27,6 @@ import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
-import android.widget.Button
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
@@ -78,7 +77,6 @@ import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
-import com.google.android.material.R as RMaterial
 
 fun Fragment.notYetImplemented() = showSnackbar(getString(R.string.workInProgressTitle))
 
@@ -344,25 +342,14 @@ fun Fragment.createInputDialog(
     onPositiveButtonClicked: (CharSequence?) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
 
-    fun Button.setButtonEnablement(shouldEnable: Boolean) {
-        isEnabled = shouldEnable
-
-        val backgroundColor = if (shouldEnable) {
-            context.getAttributeColor(RMaterial.attr.colorPrimary)
-        } else {
-            resources.getColor(R.color.backgroundDisabledPrimaryButton, null)
-        }
-        setBackgroundColor(backgroundColor)
-    }
-
     fun AlertDialog.setupOnShowListener() = apply {
         setOnShowListener {
             showKeyboard()
             getButton(AlertDialog.BUTTON_POSITIVE).apply {
-                setButtonEnablement(false)
+                isEnabled = false
                 textInput.doAfterTextChanged {
                     val error = if (it.isNullOrBlank()) null else onErrorCheck(it.trim())
-                    setButtonEnablement(it?.isNotBlank() == true && error == null)
+                    isEnabled = it?.isNotBlank() == true && error == null
                     textInputLayout.error = error
                 }
             }
