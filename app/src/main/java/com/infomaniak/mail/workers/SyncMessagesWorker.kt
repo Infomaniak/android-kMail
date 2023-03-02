@@ -147,7 +147,7 @@ class SyncMessagesWorker(appContext: Context, params: WorkerParameters) : BaseCo
 
         val subject = applicationContext.formatSubject(message.subject)
         val preview = message.body?.value?.ifBlank { null }
-            ?.let { "\n${MessageBodyUtils.splitBodyAndQuote(it).messageBody.htmlToText()}" }
+            ?.let { "\n${MessageBodyUtils.splitBodyAndQuote(it).messageBody.htmlToText().trim()}" }
             ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
             ?: ""
         val formattedPreview = preview.replace(multipleWhitespaces, "\n") // Ignore multiple/start whitespaces
