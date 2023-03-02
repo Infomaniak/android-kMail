@@ -444,7 +444,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val undoDestinationId = message?.folderId ?: threadFolderId
         val undoFoldersIds = messages.getFoldersIds(exception = undoDestinationId) + destinationFolder.id
 
-        val destination = destinationFolder.role?.folderNameRes?.let(context::getString) ?: destinationFolder.name
+        val destination = destinationFolder.getLocalizedName(context)
 
         val snackbarTitle = when {
             !apiResponse.isSuccess() -> context.getString(RCore.string.anErrorHasOccurred)
@@ -618,6 +618,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isNewFolderCreated.postValue(true)
     }
     //endregion
+
+    fun addContact(recipient: Recipient) = viewModelScope.launch(Dispatchers.IO) {
+
+        val isSuccess = ApiRepository.addContact(AddressBookController.getDefaultAddressBook().id, recipient).isSuccess()
+
+        val snackbarTitle = if (isSuccess) {
+            updateUserInfo()
+            R.string.snackbarContactSaved
+        } else {
+            RCore.string.anErrorHasOccurred
+        }
+
+        snackBarManager.postValue(getApplication<Application>().getString(snackbarTitle))
+    }
 
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
         emit(MessageController.getMessage(messageUid)!!)

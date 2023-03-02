@@ -175,8 +175,7 @@ class ThreadListAdapter(
             else -> {
                 recipients.joinToString(", ") {
                     with(it.displayedName(context)) {
-                        val delimiter = if (isEmail()) "@" else " "
-                        substringBefore(delimiter)
+                        if (isEmail()) substringBefore("@") else it.computeFirstAndLastName().first
                     }
                 }
             }

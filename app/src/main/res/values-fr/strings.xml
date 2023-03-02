@@ -348,5 +348,5 @@
     <string name="urlEntryTitle">Créer un lien hypertexte</string>
     <string name="urlPlaceholder">URL</string>
     <string name="webViewCantHandleAction">Aucune application n’a été trouvée pour gérer cette action</string>
-    <string name="workInProgressTitle">Cette fonctionnalité est en cours de développement.</string>
+    <string name="workInProgressTitle">Disponible prochainement</string>
 </resources>

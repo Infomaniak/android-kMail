@@ -25,6 +25,7 @@ import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.mail.data.models.*
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.SaveDraftResult
 import com.infomaniak.mail.data.models.draft.SendDraftResult
@@ -57,6 +58,19 @@ object ApiRepository : ApiRepositoryCore() {
     fun getAddressBooks(): ApiResponse<AddressBooksResult> = callApi(ApiRoutes.addressBooks(), GET)
 
     fun getContacts(): ApiResponse<List<Contact>> = callApi(ApiRoutes.contacts(), GET)
+
+    fun addContact(addressBookId: Int, recipient: Recipient): ApiResponse<Int> {
+        val (firstName, lastName) = recipient.computeFirstAndLastName()
+
+        val body = mapOf(
+            "addressbookId" to addressBookId,
+            "firstname" to firstName,
+            "lastname" to lastName,
+            "emails" to arrayOf(mapOf("value" to recipient.email, "type" to "HOME")),
+        )
+
+        return callApi(ApiRoutes.contact(), POST, body)
+    }
 
     fun getSignatures(mailboxHostingId: Int, mailboxName: String): ApiResponse<SignaturesResult> {
         return callApi(ApiRoutes.signatures(mailboxHostingId, mailboxName), GET)

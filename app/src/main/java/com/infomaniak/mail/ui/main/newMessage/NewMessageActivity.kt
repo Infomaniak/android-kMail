@@ -51,6 +51,7 @@ class NewMessageActivity : ThemedActivity() {
 
         setupSnackBar()
         setupToolbar()
+        setupSystemBars()
         setupEditorActions()
         setupEditorFormatActionsToggle()
 
@@ -76,6 +77,14 @@ class NewMessageActivity : ThemedActivity() {
         }
 
         sendButton.setOnClickListener { saveDraftAndShowToast(DraftAction.SEND) }
+    }
+
+    private fun setupSystemBars() {
+        val backgroundColor = getColor(R.color.newMessageBackgroundColor)
+        window.apply {
+            statusBarColor = backgroundColor
+            navigationBarColor = backgroundColor
+        }
     }
 
     private fun saveDraftAndShowToast(action: DraftAction) {
@@ -108,14 +117,6 @@ class NewMessageActivity : ThemedActivity() {
         editorTextOptions.setOnClickListener {
             newMessageViewModel.isEditorExpanded = !newMessageViewModel.isEditorExpanded
             updateEditorVisibility(newMessageViewModel.isEditorExpanded)
-        }
-    }
-
-    fun toggleEditor(isVisible: Boolean) {
-        binding.editor.isVisible = isVisible
-        if (!isVisible) {
-            newMessageViewModel.isEditorExpanded = false
-            updateEditorVisibility(false)
         }
     }
 

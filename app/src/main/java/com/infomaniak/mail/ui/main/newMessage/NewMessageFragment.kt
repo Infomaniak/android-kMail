@@ -35,8 +35,6 @@ import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.core.net.MailTo
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -132,9 +130,6 @@ class NewMessageFragment : Fragment() {
                 }
             })
         }
-
-        bodyText.setOnFocusChangeListener { _, hasFocus -> toggleEditor(hasFocus) }
-        setOnKeyboardListener { isOpened -> toggleEditor(bodyText.hasFocus() && isOpened) }
     }
 
     private fun initDraftAndViewModel() {
@@ -193,15 +188,6 @@ class NewMessageFragment : Fragment() {
         newMessageViewModel.snackBarManager.setValue(getString(titleRes))
     }
 
-    private fun setOnKeyboardListener(callback: (isOpened: Boolean) -> Unit) {
-        ViewCompat.setOnApplyWindowInsetsListener(requireActivity().window.decorView) { _, insets ->
-            insets.also {
-                val isKeyboardVisible = it.isVisible(WindowInsetsCompat.Type.ime())
-                callback(isKeyboardVisible)
-            }
-        }
-    }
-
     private fun observeContacts() {
         newMessageViewModel.mergedContacts.observe(viewLifecycleOwner, ::updateContactsAdapter)
     }
@@ -231,7 +217,11 @@ class NewMessageFragment : Fragment() {
         bodyText.setText(draft.uiBody)
 
         draft.uiSignature?.let { html ->
-            var signature = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode, html) else html
+            var signature = if (context.isNightModeEnabled()) {
+                context.injectCssInHtml(R.raw.custom_dark_mode_signature, html)
+            } else {
+                html
+            }
             signature = context.injectCssInHtml(R.raw.remove_margin, signature)
             signatureWebView.loadDataWithBaseURL("", signature, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
 
@@ -404,10 +394,6 @@ class NewMessageFragment : Fragment() {
 
         draft.attachments[position].getUploadLocalFile(requireContext(), draft.localUuid).delete()
         draft.attachments.removeAt(position)
-    }
-
-    private fun toggleEditor(hasFocus: Boolean) {
-        (activity as NewMessageActivity).toggleEditor(hasFocus)
     }
 
     enum class FieldType {
