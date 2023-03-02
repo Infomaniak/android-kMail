@@ -19,6 +19,7 @@ package com.infomaniak.mail.data.models.correspondent
 
 import android.content.Context
 import android.os.Parcelable
+import com.infomaniak.lib.core.utils.firstOrEmpty
 import com.infomaniak.mail.R
 import com.infomaniak.mail.utils.AccountUtils
 
@@ -35,7 +36,7 @@ interface Correspondent : Parcelable {
     fun computeInitials(): String {
         val (firstName, lastName) = computeFirstAndLastName()
         val first = firstName.replace(Regex("\\p{Punct}"), "").first()
-        val last = lastName.replace(Regex("\\p{Punct}"), "").first()
+        val last = lastName.replace(Regex("\\p{Punct}"), "").firstOrEmpty()
 
         return "$first$last".uppercase()
     }
