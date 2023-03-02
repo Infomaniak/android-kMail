@@ -181,7 +181,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 createDescriptionDialog(
                     title = dialogTitle,
                     description = getString(R.string.threadListEmptyFolderAlertDescription),
-                    onPositiveButtonClicked = { notYetImplemented() },
+                    onPositiveButtonClicked = { mainViewModel.flushFolder() },
                 ).show()
             }
         }

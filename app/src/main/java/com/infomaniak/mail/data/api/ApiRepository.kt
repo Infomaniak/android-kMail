@@ -210,6 +210,10 @@ object ApiRepository : ApiRepositoryCore() {
         }
     }
 
+    fun flushFolder(mailboxUuid: String, folderId: String): ApiResponse<Boolean> {
+        return callApi(ApiRoutes.flushFolder(mailboxUuid, folderId), POST)
+    }
+
     /**
      * RealmLists cannot be null, so they have to be empty when there is no data.
      * But the kMail API doesn't support empty lists, so we have to replace them with a `null` value.

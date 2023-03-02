@@ -41,6 +41,8 @@ object ApiRoutes {
 
     private fun folder(mailboxUuid: String, folderId: String) = "${folders(mailboxUuid)}/$folderId"
 
+    fun flushFolder(mailboxUuid: String, folderId: String) = "${folder(mailboxUuid, folderId)}/flush"
+
     fun quotas(mailboxHostingId: Int, mailboxName: String): String {
         return "$MAIL_API/api/mailbox/quotas?mailbox=$mailboxName&product_id=$mailboxHostingId"
     }
