@@ -126,11 +126,20 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         initMapForNewMessage(message, position)
 
-        bindHeader(message)
-        bindAttachment(message)
-        loadBodyInWebView(message)
+        var messageQuote: String? = null
+        message.body?.let { body ->
+            val split = MessageBodyUtils.splitBodyAndQuote(body.value)
+            val messageBody = split.messageBody
+            messageQuote = split.quote
 
-        binding.displayExpandedCollapsedMessage(message)
+            loadBodyInWebView(message.uid, messageBody, body.type)
+            loadQuoteInWebView(message.uid, messageQuote, body.type)
+        }
+
+        bindHeader(message, messageQuote)
+        bindAttachment(message)
+
+        binding.displayExpandedCollapsedMessage(message, messageQuote)
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -141,29 +150,62 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
-    private fun ThreadViewHolder.loadBodyInWebView(message: Message) = with(binding) {
+    private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String?, type: String) = with(binding) {
+
+        if (body == null) return@with
+
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, isThemeTheSameMap[message.uid]!!)
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, isThemeTheSameMap[uid]!!)
         }
-        // TODO: Make prettier WebView, add button to hide/display the conversation inside Message body like WebApp ?
-        message.body?.let {
-            var styledBody = it.value
-            if (it.type == TEXT_HTML) {
-                if (context.isNightModeEnabled() && isThemeTheSameMap[message.uid]!!) {
-                    styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
-                }
-                styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
-                styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
+
+        var styledBody = body
+        if (type == TEXT_HTML) {
+            if (context.isNightModeEnabled() && isThemeTheSameMap[uid]!!) {
+                styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
             }
-
-            val margin = if (it.type == TEXT_HTML) NO_MARGIN else plainTextMargin
-            messageBody.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
-
-            messageBody.loadDataWithBaseURL("", styledBody, it.type, Utils.UTF_8, "")
+            styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
+            styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
         }
+
+        val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
+        messageBody.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
+
+        messageBody.loadDataWithBaseURL("", styledBody, type, Utils.UTF_8, "")
     }
 
-    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
+    private fun ThreadViewHolder.loadQuoteInWebView(uid: String, quote: String?, type: String) = with(binding) {
+
+        if (quote == null) return@with
+
+        quoteButton.setOnClickListener {
+            if (quoteFrameLayout.isVisible) {
+                quoteButton.text = context.getString(R.string.messageShowQuotedText)
+                quoteFrameLayout.isGone = true
+            } else {
+                quoteButton.text = context.getString(R.string.messageHideQuotedText)
+                quoteFrameLayout.isVisible = true
+            }
+        }
+
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageQuote.settings, isThemeTheSameMap[uid]!!)
+        }
+
+        var styledQuote = quote
+        if (type == TEXT_HTML) {
+            if (context.isNightModeEnabled() && isThemeTheSameMap[uid]!!) {
+                styledQuote = context.injectCssInHtml(R.raw.custom_dark_mode, styledQuote, DARK_BACKGROUND_STYLE_ID)
+            }
+            styledQuote = context.injectCssInHtml(R.raw.remove_margin, styledQuote)
+            styledQuote = context.injectCssInHtml(R.raw.add_padding, styledQuote)
+        }
+        val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
+        messageQuote.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
+
+        messageQuote.loadDataWithBaseURL("", styledQuote, type, Utils.UTF_8, "")
+    }
+
+    private fun ThreadViewHolder.bindHeader(message: Message, quote: String?) = with(binding) {
         val messageDate = message.date.toDate()
 
         if (message.isDraft) {
@@ -187,7 +229,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         initWebViewClientIfNeeded(message.attachments)
 
-        handleHeaderClick(message)
+        handleHeaderClick(message, quote)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -217,17 +259,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
-    private fun ItemMessageBinding.handleHeaderClick(message: Message) {
+    private fun ItemMessageBinding.handleHeaderClick(message: Message, quote: String?) {
         messageHeader.setOnClickListener {
             if (isExpandedMap[message.uid] == true) {
                 isExpandedMap[message.uid] = false
-                displayExpandedCollapsedMessage(message)
+                displayExpandedCollapsedMessage(message, quote)
             } else {
                 if (message.isDraft) {
                     onDraftClicked?.invoke(message)
                 } else {
                     isExpandedMap[message.uid] = true
-                    displayExpandedCollapsedMessage(message)
+                    displayExpandedCollapsedMessage(message, quote)
                 }
             }
         }
@@ -283,17 +325,32 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
+    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message, quote: String?) {
         val isExpanded = isExpandedMap[message.uid]!!
+
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
-        if (isExpanded) displayAttachments(message.attachments) else hideAttachments()
+
+        if (isExpanded) {
+            displayAttachments(message.attachments)
+            quoteButton.isGone = if (quote == null) {
+                true
+            } else {
+                quoteButton.text = context.getString(R.string.messageShowQuotedText)
+                false
+            }
+        } else {
+            hideAttachments()
+            quoteButton.isGone = true
+        }
+
+        quoteFrameLayout.isGone = true
 
         if (message.body?.value == null) {
             messageLoader.isVisible = isExpanded
-            webViewFrameLayout.isVisible = false
+            webViewFrameLayout.isGone = true
         } else {
-            messageLoader.isVisible = false
+            messageLoader.isGone = true
             webViewFrameLayout.isVisible = isExpanded
         }
     }
