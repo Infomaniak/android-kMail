@@ -35,8 +35,8 @@
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/marginStandardVerySmall"
         android:paddingEnd="@dimen/marginStandardMedium"
-        tools:layout_marginBottom="@dimen/alternativeMargin"
-        tools:layout_marginTop="@dimen/alternativeMargin">
+        tools:layout_marginBottom="@dimen/marginStandardSmall"
+        tools:layout_marginTop="@dimen/marginStandardSmall">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/newMailBullet"

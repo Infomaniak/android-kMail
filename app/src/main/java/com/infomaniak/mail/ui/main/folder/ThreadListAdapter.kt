@@ -70,11 +70,8 @@ class ThreadListAdapter(
     private val localSettings by lazy { LocalSettings.getInstance(context) }
 
     private val cardCornerRadius by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
-    private val threadMarginLarge by lazy { context.resources.getDimension(R.dimen.alternativeMargin).toInt() }
+    private val threadMarginCompact by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
     private val threadMarginOther by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
-    private val dateTopMarginLarge by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
-    private val dateBottomMarginLarge by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
-    private val dateTopMarginOther by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -165,7 +162,7 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
-        val margin = if (threadDensity == LARGE) threadMarginLarge else threadMarginOther
+        val margin = if (threadDensity == COMPACT) threadMarginCompact else threadMarginOther
         threadCard.setMarginsRelative(top = margin, bottom = margin)
 
         expeditorAvatar.isVisible = threadDensity == LARGE
@@ -209,17 +206,7 @@ class ThreadListAdapter(
     }
 
     private fun ItemThreadDateSeparatorBinding.displayDateSeparator(title: String) {
-        setupDateSeparatorDensityDependentUi()
         sectionTitle.text = title
-    }
-
-    private fun ItemThreadDateSeparatorBinding.setupDateSeparatorDensityDependentUi() {
-        val (topMargin, bottomMargin) = if (threadDensity == LARGE) {
-            dateTopMarginLarge to dateBottomMarginLarge
-        } else {
-            dateTopMarginOther to DATE_BOTTOM_MARGIN_OTHER
-        }
-        root.setMarginsRelative(top = topMargin, bottom = bottomMargin)
     }
 
     private fun ItemThreadFlushFolderButtonBinding.displayFlushFolderButton(folderRole: FolderRole) {

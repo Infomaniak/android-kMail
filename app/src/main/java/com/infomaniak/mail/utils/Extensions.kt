@@ -375,7 +375,7 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
     addItemDecoration(HeaderItemDecoration(this, false) { position ->
         return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is String
     })
-    addItemDecoration(DateSeparatorItemDecoration())
+    // addItemDecoration(DateSeparatorItemDecoration())
 }
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
