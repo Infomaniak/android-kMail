@@ -46,6 +46,7 @@
         android:layout_marginStart="@dimen/marginStandardVerySmall"
         app:icon="@drawable/ic_bin"
         app:iconPadding="@dimen/marginStandardSmall"
+        app:iconSize="@dimen/marginStandardMedium"
         tools:text="@string/threadListEmptyTrashButton" />
 
     <com.google.android.material.divider.MaterialDivider
