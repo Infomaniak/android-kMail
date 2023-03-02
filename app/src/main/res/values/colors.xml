@@ -49,6 +49,9 @@
     <color name="blue_mail_container_light">#F4F6FD</color>
     <color name="blue_mail_container_dark">#0F3256</color>
 
+    <color name="background_color_light">@color/white</color>
+    <color name="background_color_dark">#101010</color>
+
     <color name="yellow_light">#FFC10A</color>
     <color name="yellow_dark">#FFDF9E</color>
     <color name="orange_light">#FF8500</color>
@@ -68,10 +71,9 @@
     <color name="prince_light">#673AB7</color>
     <color name="prince_dark">#956DDD</color>
 
-
     <!-- Backgrounds -->
     <color name="searchBarBackgroundColor">@color/polar_bear</color>
-    <color name="backgroundColor">@color/white</color>
+    <color name="backgroundColor">@color/background_color_light</color>
     <color name="backgroundColorSecondary">@color/white</color>
     <color name="backgroundColorTertiary">@color/white</color>
     <color name="backgroundHeaderColor">@color/background</color>
@@ -102,7 +104,7 @@
     <color name="favoriteYellow">@color/yellow_light</color>
     <color name="swipeActionIconColor">@color/white</color>
 
-    <!-- Cardview -->
+    <!-- CardView -->
     <color name="cardViewStrokeColor">@color/mouse</color>
 
     <!-- Progressbar -->

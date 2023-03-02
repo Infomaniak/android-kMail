@@ -403,7 +403,7 @@
         android:id="@+id/webViewFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="@id/quoteButton"
+        app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
@@ -415,33 +415,41 @@
             android:scrollbars="horizontal" />
     </FrameLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/quoteButton"
-        style="@style/TextButton"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/quoteButtonFrameLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:insetLeft="@dimen/alternativeMargin"
-        android:insetTop="@dimen/marginStandardVerySmall"
-        android:insetRight="@dimen/alternativeMargin"
-        android:insetBottom="@dimen/marginStandardVerySmall"
-        android:minHeight="0dp"
-        android:padding="@dimen/marginStandardVerySmall"
-        android:text="@string/messageShowQuotedText"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/quoteFrameLayout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/webViewFrameLayout"
-        tools:visibility="visible" />
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/quoteButton"
+            style="@style/TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:insetLeft="@dimen/alternativeMargin"
+            android:insetTop="@dimen/marginStandardVerySmall"
+            android:insetRight="@dimen/alternativeMargin"
+            android:insetBottom="@dimen/marginStandardVerySmall"
+            android:minHeight="0dp"
+            android:padding="@dimen/marginStandardVerySmall"
+            android:text="@string/messageShowQuotedText" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/quoteFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/marginStandardMedium"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/quoteButton"
+        app:layout_constraintTop_toBottomOf="@id/quoteButtonFrameLayout"
         tools:visibility="visible">
 
         <WebView
