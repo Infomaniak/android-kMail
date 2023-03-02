@@ -25,7 +25,7 @@ object MessageBodyUtils {
 
     private const val blockquote = "blockquote"
 
-    private val quoteDescriptors = listOf(
+    private val quoteDescriptors = arrayOf(
         ".ik_mail_quote",
         ".gmail_extra",
         ".gmail_quote",
@@ -35,7 +35,7 @@ object MessageBodyUtils {
     fun splitBodyAndQuote(messageBody: String): MessageBodyQuote {
         val htmlDocumentWithQuote = Jsoup.parse(messageBody)
         val htmlDocumentWithoutQuote = Jsoup.parse(messageBody)
-        val htmlQuotes: MutableList<Element> = mutableListOf()
+        val htmlQuotes = mutableListOf<Element>()
 
         handleBlockQuote(htmlDocumentWithoutQuote, htmlQuotes)
         val currentQuoteDescriptor = handleQuoteDescriptors(htmlDocumentWithoutQuote, htmlQuotes).ifEmpty { blockquote }
@@ -73,23 +73,23 @@ object MessageBodyUtils {
         htmlDocumentWithQuote: Document,
         currentQuoteDescriptor: String
     ): Pair<String, String?> {
-        return htmlQuotes.lastOrNull()?.let {
+        return htmlQuotes.lastOrNull()?.let { htmlQuote ->
             val quotedContentElements = htmlDocumentWithQuote.select(currentQuoteDescriptor)
             if (currentQuoteDescriptor == blockquote) {
                 for (quoteElement in quotedContentElements) {
-                    if (quoteElement.toString() == it.toString()) {
+                    if (quoteElement.toString() == htmlQuote.toString()) {
                         quoteElement.remove()
                         break
                     }
                 }
-                htmlDocumentWithQuote.toString() to it.toString()
+                htmlDocumentWithQuote.toString() to htmlQuote.toString()
             } else {
                 val firstQuotedContent = quotedContentElements.first()
                 firstQuotedContent?.remove()
                 htmlDocumentWithQuote.toString() to firstQuotedContent.toString()
             }
 
-            htmlDocumentWithQuote.toString() to it.toString()
+            htmlDocumentWithQuote.toString() to htmlQuote.toString()
         } ?: (htmlDocumentWithQuote.toString() to null)
     }
 
