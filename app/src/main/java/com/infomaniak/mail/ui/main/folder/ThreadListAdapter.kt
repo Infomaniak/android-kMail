@@ -122,11 +122,14 @@ class ThreadListAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int = when {
-        dataSet[position] is String -> DisplayType.DATE_SEPARATOR.layout
-        dataSet[position] is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
-        displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
-        else -> DisplayType.THREAD.layout
+    override fun getItemViewType(position: Int): Int {
+        val item = dataSet[position]
+        return when {
+            item is String -> DisplayType.DATE_SEPARATOR.layout
+            item is FolderRole -> DisplayType.FLUSH_FOLDER_BUTTON.layout
+            displaySeeAllButton -> DisplayType.SEE_ALL_BUTTON.layout
+            else -> DisplayType.THREAD.layout
+        }
     }
 
     override fun getItemId(position: Int): Long {
