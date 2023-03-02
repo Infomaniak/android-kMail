@@ -35,7 +35,6 @@ import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.BottomSheetDetailedContactBinding
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.UiUtils.fillInUserNameAndEmail
-import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.observeNotNull
 
 class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
@@ -54,6 +53,13 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
         userAvatar.loadAvatar(navigationArgs.recipient, mainViewModel.mergedContacts.value ?: emptyMap())
         fillInUserNameAndEmail(navigationArgs.recipient, name, email)
 
+        setupListeners()
+
+        observeContacts()
+    }
+
+    private fun setupListeners() = with(binding) {
+
         writeMail.setOnClickListener {
             safeNavigate(
                 DetailedContactBottomSheetDialogDirections.actionDetailedContactBottomSheetDialogToNewMessageActivity(
@@ -63,10 +69,12 @@ class DetailedContactBottomSheetDialog : BottomSheetDialogFragment() {
             findNavController().popBackStack()
         }
 
-        addToContacts.setOnClickListener { notYetImplemented() }
-        copyAddress.setOnClickListener { copyToClipboard() }
+        addToContacts.setOnClickListener {
+            mainViewModel.addContact(navigationArgs.recipient)
+            findNavController().popBackStack()
+        }
 
-        observeContacts()
+        copyAddress.setOnClickListener { copyToClipboard() }
     }
 
     private fun copyToClipboard() = with(navigationArgs.recipient) {
