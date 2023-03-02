@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.ui.MainViewModel
 import com.infomaniak.mail.utils.IRegisterFirebaseBroadcastReceiver
 
@@ -32,14 +33,18 @@ class RegisterFirebaseBroadcastReceiver : DefaultLifecycleObserver, IRegisterFir
 
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private var forceRefreshThreads: (() -> Unit)? = null
+    private var mainViewModel: MainViewModel? = null
 
     private val firebaseBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            forceRefreshThreads?.invoke()
+            if (mainViewModel?.currentFolder?.value?.role == Folder.FolderRole.INBOX) {
+                forceRefreshThreads?.invoke()
+            }
         }
     }
 
     override fun initFirebaseBroadcastReceiver(activity: FragmentActivity, mainViewModel: MainViewModel) {
+        this.mainViewModel = mainViewModel
         localBroadcastManager = LocalBroadcastManager.getInstance(activity)
         forceRefreshThreads = { mainViewModel.forceRefreshThreads() }
         activity.lifecycle.addObserver(this)
