@@ -89,6 +89,7 @@ class MoveFragment : MenuFoldersFragment() {
             title = R.string.newFolderDialogTitle,
             hint = R.string.newFolderDialogHint,
             confirmButtonText = R.string.newFolderDialogMovePositiveButton,
+            onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
             onPositiveButtonClicked = { folderName ->
                 mainViewModel.moveToNewFolder(folderName!!.toString(), threadUid, messageUid)
             },

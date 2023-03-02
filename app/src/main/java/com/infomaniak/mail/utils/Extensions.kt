@@ -24,11 +24,9 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.text.Editable
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
-import android.widget.Button
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
@@ -79,7 +77,6 @@ import org.jsoup.Jsoup
 import java.util.Calendar
 import java.util.Date
 import java.util.Scanner
-import com.google.android.material.R as RMaterial
 
 fun Fragment.notYetImplemented() = showSnackbar(getString(R.string.workInProgressTitle))
 
@@ -338,28 +335,20 @@ fun Fragment.createInputDialog(
     @StringRes title: Int,
     @StringRes hint: Int,
     @StringRes confirmButtonText: Int,
-    onPositiveButtonClicked: (Editable?) -> Unit,
+    onErrorCheck: (CharSequence) -> String?,
+    onPositiveButtonClicked: (CharSequence?) -> Unit,
 ) = with(DialogInputBinding.inflate(layoutInflater)) {
-
-    fun Button.setButtonEnablement(isInputEmpty: Boolean) {
-        isEnabled = !isInputEmpty
-
-        val (textColor, backgroundColor) = if (isInputEmpty) {
-            @Suppress("ResourceAsColor")
-            R.color.disabledDialogButtonTextColor to resources.getColor(R.color.backgroundDisabledDialogButton, null)
-        } else {
-            R.color.colorOnPrimary to context.getAttributeColor(RMaterial.attr.colorPrimary)
-        }
-        setTextColor(resources.getColor(textColor, null))
-        setBackgroundColor(backgroundColor)
-    }
 
     fun AlertDialog.setupOnShowListener() = apply {
         setOnShowListener {
             showKeyboard()
             getButton(AlertDialog.BUTTON_POSITIVE).apply {
-                setButtonEnablement(true)
-                textInput.doAfterTextChanged { setButtonEnablement(it.isNullOrBlank()) }
+                isEnabled = false
+                textInput.doAfterTextChanged {
+                    val error = if (it.isNullOrBlank()) null else onErrorCheck(it.trim())
+                    isEnabled = it?.isNotBlank() == true && error == null
+                    textInputLayout.error = error
+                }
             }
         }
     }
@@ -369,7 +358,7 @@ fun Fragment.createInputDialog(
 
     return@with MaterialAlertDialogBuilder(context)
         .setView(root)
-        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text) }
+        .setPositiveButton(confirmButtonText) { _, _ -> onPositiveButtonClicked(textInput.text?.trim()) }
         .setNegativeButton(R.string.buttonCancel, null)
         .setOnDismissListener { textInput.text?.clear() }
         .create()
