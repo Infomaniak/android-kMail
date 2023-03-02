@@ -339,5 +339,5 @@
     <string name="urlEntryTitle">Create a hyperlink</string>
     <string name="urlPlaceholder">URL</string>
     <string name="webViewCantHandleAction">No application has been found to handle this action</string>
-    <string name="workInProgressTitle">This feature is currently under development.</string>
+    <string name="workInProgressTitle">Available soon</string>
 </resources>

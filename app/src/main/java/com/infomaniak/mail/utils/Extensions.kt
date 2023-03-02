@@ -81,9 +81,9 @@ import java.util.Date
 import java.util.Scanner
 import com.google.android.material.R as RMaterial
 
-fun Fragment.notYetImplemented() = showSnackbar("This feature is currently under development.")
+fun Fragment.notYetImplemented() = showSnackbar(getString(R.string.workInProgressTitle))
 
-fun Activity.notYetImplemented() = showSnackbar("This feature is currently under development.")
+fun Activity.notYetImplemented() = showSnackbar(getString(R.string.workInProgressTitle))
 
 fun String.isEmail(): Boolean = Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
