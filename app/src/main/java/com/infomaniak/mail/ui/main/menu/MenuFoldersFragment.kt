@@ -22,6 +22,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.R
 import com.infomaniak.mail.ui.MainViewModel
 
 abstract class MenuFoldersFragment : Fragment() {
@@ -51,5 +52,16 @@ abstract class MenuFoldersFragment : Fragment() {
     open fun setupAdapters() {
         defaultFoldersList.adapter = defaultFoldersAdapter
         customFoldersList.adapter = customFoldersAdapter
+    }
+
+    protected fun checkForFolderCreationErrors(folderName: CharSequence): String? {
+        val (defaultFolders, customFolders) = mainViewModel.currentFoldersLive.value!!
+        val allFolders = defaultFolders + customFolders
+
+        return when {
+            folderName.length > 255 -> context?.getString(R.string.errorNewFolderNameTooLong)
+            allFolders.any { it.name == folderName.toString() } -> context?.getString(R.string.errorNewFolderAlreadyExists)
+            else -> null
+        }
     }
 }

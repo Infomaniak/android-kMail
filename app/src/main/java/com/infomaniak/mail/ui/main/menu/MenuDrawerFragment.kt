@@ -252,6 +252,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         title = R.string.newFolderDialogTitle,
         hint = R.string.newFolderDialogHint,
         confirmButtonText = R.string.buttonCreate,
+        onErrorCheck = { folderName -> checkForFolderCreationErrors(folderName) },
         onPositiveButtonClicked = { folderName -> mainViewModel.createNewFolder(folderName!!.toString()) },
     )
 }

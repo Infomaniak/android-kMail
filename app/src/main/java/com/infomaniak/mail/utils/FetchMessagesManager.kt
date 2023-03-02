@@ -119,7 +119,7 @@ class FetchMessagesManager(private val context: Context) {
 
         val subject = context.formatSubject(message.subject)
         val preview = message.body?.value?.ifBlank { null }
-            ?.let { "\n${it.htmlToText().trim()}" } // TODO: remove body history
+            ?.let { "\n${MessageBodyUtils.splitBodyAndQuote(it).messageBody.htmlToText().trim()}" }
             ?: message.preview.ifBlank { null }?.let { "\n${it.trim()}" }
             ?: ""
         val formattedPreview = preview.replace("\\n+\\s*".toRegex(), "\n") // Ignore multiple/start whitespaces

@@ -44,7 +44,6 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="collapsingToolbarLayoutStyle">@style/AppThemeCollapsingToolbarLayoutTheme</item>
         <item name="colorError">@color/redDestructiveAction</item>
-        <item name="textInputStyle">@style/TextInputLayout</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorOnSurfaceInverse">@color/snackbarTextColor</item>
         <item name="colorSurfaceInverse">@color/backgroundSnackbarColor</item>
@@ -54,6 +53,7 @@
         <item name="snackbarButtonStyle">@style/SnackbarButtonStyle</item>
         <item name="snackbarStyle">@style/SnackbarStyle</item>
         <item name="snackbarTextViewStyle">@style/SnackbarTextViewStyle</item>
+        <item name="textInputStyle">@style/TextInputLayout</item>
         <item name="toolbarStyle">@style/AppThemeToolbarTheme</item>
     </style>
 

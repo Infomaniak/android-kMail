@@ -241,7 +241,7 @@ class ThreadFragment : Fragment() {
 
     private fun replyTo(message: Message) {
         if (message.getRecipientForReplyTo(true).second.isEmpty()) {
-            safeNavigateToNewMessageActivity(DraftMode.REPLY, message.uid)
+            safeNavigateToNewMessageActivity(DraftMode.REPLY, message.uid, ThreadFragment::class.java.name)
         } else {
             safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = message.uid))
         }

@@ -32,10 +32,12 @@ import com.infomaniak.mail.utils.animatedNavigation
 import com.infomaniak.mail.utils.notYetImplemented
 import com.infomaniak.mail.utils.safeNavigateToNewMessageActivity
 
-class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
+class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
     private val navigationArgs: ThreadActionsBottomSheetDialogArgs by navArgs()
     private val threadActionsViewModel: ThreadActionsViewModel by viewModels()
+
+    override val currentClassName: String by lazy { ThreadActionsBottomSheetDialog::class.java.name }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
@@ -56,11 +58,11 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply, currentClassName)
                 }
 
                 override fun onReplyAll() {
-                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply)
+                    safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply, currentClassName)
                 }
 
                 override fun onForward() {
@@ -86,7 +88,7 @@ class ThreadActionsBottomSheetDialog : ActionsBottomSheetDialog() {
                     animatedNavigation(
                         resId = R.id.moveFragment,
                         args = MoveFragmentArgs(threadUid).toBundle(),
-                        currentClassName = ThreadActionsBottomSheetDialog::class.java.name,
+                        currentClassName = currentClassName,
                     )
                 }
 
