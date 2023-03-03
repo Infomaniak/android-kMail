@@ -120,6 +120,9 @@ class Message : RealmObject {
     @Ignore
     @Transient
     var detailsAreExpanded = false
+    @Ignore
+    @Transient
+    var hasQuote = false
     //endregion
 
     val threads by backlinks(Thread::messages)

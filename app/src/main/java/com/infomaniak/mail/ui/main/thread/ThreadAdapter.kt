@@ -149,21 +149,20 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         initMapForNewMessage(message, position)
 
-        var messageQuote: String? = null
         message.body?.let { body ->
-            val split = MessageBodyUtils.splitBodyAndQuote(body.value)
-            val messageBody = split.messageBody
-            messageQuote = split.quote
+            val (messageBody, messageQuote) = MessageBodyUtils.splitBodyAndQuote(body.value)
+
+            message.hasQuote = messageQuote != null
 
             loadBodyInWebView(message.uid, messageBody, body.type)
             binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
             loadQuoteInWebView(message.uid, messageQuote, body.type)
         }
 
-        bindHeader(message, messageQuote)
+        bindHeader(message)
         bindAttachment(message)
 
-        binding.displayExpandedCollapsedMessage(message, messageQuote)
+        binding.displayExpandedCollapsedMessage(message)
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -229,7 +228,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         messageQuote.loadDataWithBaseURL("", styledQuote, type, Utils.UTF_8, "")
     }
 
-    private fun ThreadViewHolder.bindHeader(message: Message, quote: String?) = with(binding) {
+    private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
         val messageDate = message.date.toDate()
 
         if (message.isDraft) {
@@ -253,7 +252,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         initWebViewClientIfNeeded(message.attachments)
 
-        handleHeaderClick(message, quote)
+        handleHeaderClick(message)
         handleExpandDetailsClick(message)
         bindRecipientDetails(message, messageDate)
     }
@@ -283,17 +282,17 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         )
     }
 
-    private fun ItemMessageBinding.handleHeaderClick(message: Message, quote: String?) {
+    private fun ItemMessageBinding.handleHeaderClick(message: Message) {
         messageHeader.setOnClickListener {
             if (isExpandedMap[message.uid] == true) {
                 isExpandedMap[message.uid] = false
-                displayExpandedCollapsedMessage(message, quote)
+                displayExpandedCollapsedMessage(message)
             } else {
                 if (message.isDraft) {
                     onDraftClicked?.invoke(message)
                 } else {
                     isExpandedMap[message.uid] = true
-                    displayExpandedCollapsedMessage(message, quote)
+                    displayExpandedCollapsedMessage(message)
                 }
             }
         }
@@ -349,7 +348,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message, quote: String?) {
+    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
         val isExpanded = isExpandedMap[message.uid]!!
 
         collapseMessageDetails(message)
@@ -357,10 +356,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         if (isExpanded) {
             displayAttachments(message.attachments)
-            quoteButtonFrameLayout.isGone = if (quote == null) {
+            quoteButtonFrameLayout.isVisible = if (message.hasQuote) {
+                quoteButton.text = context.getString(R.string.messageShowQuotedText)
                 true
             } else {
-                quoteButton.text = context.getString(R.string.messageShowQuotedText)
                 false
             }
         } else {
