@@ -226,7 +226,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun Attachment.display() {
-        if (hasUsableCache(requireContext())) {
+        if (hasUsableCache(requireContext()) || isInlineCachedFile(requireContext())) {
             startActivity(openWithIntent(requireContext()))
         } else {
             findNavController().navigate(
