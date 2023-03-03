@@ -61,16 +61,13 @@ android {
     buildFeatures { viewBinding true }
 
     flavorDimensions 'distribution'
+
     productFlavors {
         standard {
             dimension 'distribution'
             apply plugin: 'com.google.gms.google-services'
-
             getIsDefault().set(true)
-
-            dependencies {
-                implementation 'com.google.firebase:firebase-messaging-ktx:23.1.1'
-            }
+            dependencies { implementation 'com.google.firebase:firebase-messaging-ktx:23.1.1' }
         }
         fdroid { dimension 'distribution' }
     }

@@ -80,7 +80,7 @@ class FetchMessagesManager(private val context: Context) {
         mailbox: Mailbox,
         unReadThreadsCount: Int,
         realm: Realm,
-        okHttpClient: OkHttpClient
+        okHttpClient: OkHttpClient,
     ) {
 
         fun contentIntent(isSummary: Boolean): PendingIntent {
@@ -127,6 +127,7 @@ class FetchMessagesManager(private val context: Context) {
 
         // Show message notification
         showNotification(subject, false, message.sender.displayedName(context), description)
+
         // Show group summary notification
         val summaryText = context.resources.getQuantityString(
             R.plurals.newMessageNotificationSummary,

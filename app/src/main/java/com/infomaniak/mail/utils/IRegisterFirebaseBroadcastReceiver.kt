@@ -23,5 +23,4 @@ import com.infomaniak.mail.ui.MainViewModel
 interface IRegisterFirebaseBroadcastReceiver {
 
     fun initFirebaseBroadcastReceiver(activity: FragmentActivity, mainViewModel: MainViewModel) = Unit
-
 }

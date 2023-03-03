@@ -42,7 +42,8 @@ fun FragmentActivity.checkPlayServices() {
         if (apiAvailability.isUserResolvableError(errorCode)) {
             apiAvailability.makeGooglePlayServicesAvailable(this)
         } else {
-            Toast.makeText(this, "need play services", Toast.LENGTH_SHORT).show()
+            // TODO: Translate this
+            Toast.makeText(this, "Need Play Services", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -63,6 +64,7 @@ private fun FragmentActivity.checkFirebaseRegistration() {
 }
 
 private suspend fun checkFirebaseRegistration(context: Context) = withContext(Dispatchers.IO) {
+
     val localSettings = LocalSettings.getInstance(context)
     val registeredUsersIds = localSettings.firebaseRegisteredUsers.map { it.toInt() }.toSet()
     val noNeedUsersRegistration = AccountUtils.getAllUsersSync().map { it.id }.minus(registeredUsersIds).isEmpty()

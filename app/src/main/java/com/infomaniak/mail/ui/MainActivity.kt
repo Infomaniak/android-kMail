@@ -45,7 +45,6 @@ import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
 
-
 class MainActivity : ThemedActivity() {
 
     // This binding is not private because it's used in ThreadListFragment (`(activity as? MainActivity)?.binding`)

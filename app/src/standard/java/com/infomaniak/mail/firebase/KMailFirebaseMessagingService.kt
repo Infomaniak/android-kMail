@@ -74,7 +74,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
     private fun processMessageInBackground(userId: Int, mailboxId: Int, messageUid: String) {
         Log.i(TAG, "processMessageInBackground: called")
         MailboxController.getMailbox(userId, mailboxId, realmMailboxInfo)?.let { mailbox ->
-            // Ignore if the mailbox notification channel is blocked
+            // Ignore if the Mailbox notification channel is blocked
             if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
         }
 

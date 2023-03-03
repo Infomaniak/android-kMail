@@ -31,10 +31,10 @@ class RegistrationInfos private constructor(
     constructor(context: Context, token: String) : this(token = token, name = getDeviceName(context.contentResolver))
 
     private companion object {
-        private const val OS_NAME = "android"
-        private val DEVICE_MODEL = android.os.Build.MODEL
+        const val OS_NAME = "android"
+        val DEVICE_MODEL: String = android.os.Build.MODEL
 
-        private fun getDeviceName(contentResolver: ContentResolver): String {
+        fun getDeviceName(contentResolver: ContentResolver): String {
             return Settings.Global.getString(contentResolver, "device_name")
         }
     }
