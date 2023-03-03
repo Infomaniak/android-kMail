@@ -32,13 +32,12 @@ import com.infomaniak.mail.utils.IRegisterFirebaseBroadcastReceiver
 class RegisterFirebaseBroadcastReceiver : DefaultLifecycleObserver, IRegisterFirebaseBroadcastReceiver {
 
     private lateinit var localBroadcastManager: LocalBroadcastManager
-    private var forceRefreshThreads: (() -> Unit)? = null
     private var mainViewModel: MainViewModel? = null
 
     private val firebaseBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (mainViewModel?.currentFolder?.value?.role == Folder.FolderRole.INBOX) {
-                forceRefreshThreads?.invoke()
+                mainViewModel?.forceRefreshThreads()
             }
         }
     }
@@ -46,7 +45,6 @@ class RegisterFirebaseBroadcastReceiver : DefaultLifecycleObserver, IRegisterFir
     override fun initFirebaseBroadcastReceiver(activity: FragmentActivity, mainViewModel: MainViewModel) {
         this.mainViewModel = mainViewModel
         localBroadcastManager = LocalBroadcastManager.getInstance(activity)
-        forceRefreshThreads = { mainViewModel.forceRefreshThreads() }
         activity.lifecycle.addObserver(this)
     }
 
