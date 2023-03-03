@@ -48,7 +48,6 @@ import com.infomaniak.lib.core.utils.showProgress
 import com.infomaniak.lib.login.ApiToken
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.lib.login.InfomaniakLogin.ErrorStatus
-import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
@@ -59,6 +58,8 @@ import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.databinding.ActivityLoginBinding
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.UiUtils.animateColorChange
+import com.infomaniak.mail.utils.context
+import com.infomaniak.mail.utils.getInfomaniakLogin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,11 +97,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(root)
         handleOnBackPressed()
 
-        infomaniakLogin = InfomaniakLogin(
-            context = this@LoginActivity,
-            appUID = BuildConfig.APPLICATION_ID,
-            clientID = BuildConfig.CLIENT_ID,
-        )
+        infomaniakLogin = context.getInfomaniakLogin()
 
         val introPagerAdapter = IntroPagerAdapter(supportFragmentManager, lifecycle, navigationArgs.isFirstAccount)
         introViewpager.apply {
