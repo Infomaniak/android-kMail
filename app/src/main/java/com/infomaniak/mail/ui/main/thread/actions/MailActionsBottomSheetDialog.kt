@@ -41,7 +41,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
         //endregion
 
         //region Actions
-        override fun onViewInLight() = Unit
         override fun onArchive() = Unit
         override fun onReadUnread() = Unit
         override fun onMove() = Unit
@@ -63,7 +62,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setArchiveUi()
 
-        lightTheme.setClosingOnClickListener { onClickListener.onViewInLight() }
         archive.setClosingOnClickListener { onClickListener.onArchive() }
         markAsReadUnread.setClosingOnClickListener { onClickListener.onReadUnread() }
         move.setClosingOnClickListener { onClickListener.onMove() }
@@ -119,7 +117,6 @@ abstract class MailActionsBottomSheetDialog : ActionsBottomSheetDialog() {
 }
 
 interface OnActionClick {
-    fun onViewInLight()
     fun onArchive()
     fun onReadUnread()
     fun onMove()

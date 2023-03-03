@@ -39,15 +39,16 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.lightTheme.apply {
-            isVisible = requireContext().isNightModeEnabled()
-            setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
-        }
-
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 
             setMarkAsReadUi(isSeen)
             setFavoriteUi(isFavorite)
+
+            binding.lightTheme.apply {
+                isVisible = requireContext().isNightModeEnabled()
+                setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
+                setClosingOnClickListener { mainViewModel.toggleLightThemeForMessage.value = message }
+            }
 
             initOnClickListener(object : OnActionClick {
                 //region Main actions
@@ -69,10 +70,6 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 //endregion
 
                 //region Actions
-                override fun onViewInLight() {
-                    mainViewModel.toggleLightThemeForMessage.value = message
-                }
-
                 override fun onArchive() {
                     mainViewModel.archiveThreadOrMessage(threadUid, message)
                 }
