@@ -17,8 +17,7 @@
  */
 package com.infomaniak.mail.ui.main.thread
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -38,7 +37,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class ThreadViewModel(application: Application) : AndroidViewModel(application) {
+class ThreadViewModel : ViewModel() {
 
     val quickActionBarClicks = SingleLiveEvent<Pair<Message, Int>>()
 

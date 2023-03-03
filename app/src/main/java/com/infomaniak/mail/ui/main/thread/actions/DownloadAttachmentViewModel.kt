@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.thread.actions
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -30,6 +31,8 @@ import kotlinx.coroutines.Dispatchers
 
 class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(application) {
 
+    private inline val context: Context get() = getApplication<Application>()
+
     /**
      * We keep the Attachment, in case the ViewModel is destroyed before it finishes downloading
      */
@@ -38,16 +41,16 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
     fun downloadAttachment(resource: String): LiveData<Intent?> {
         return liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
             val attachment = AttachmentController.getAttachment(resource).also { attachment = it }
-            val attachmentFile = attachment.getCacheFile(getApplication())
+            val attachmentFile = attachment.getCacheFile(context)
 
-            if (attachment.hasUsableCache(getApplication(), attachmentFile)) {
-                emit(attachment.openWithIntent(getApplication()))
+            if (attachment.hasUsableCache(context, attachmentFile)) {
+                emit(attachment.openWithIntent(context))
                 this@DownloadAttachmentViewModel.attachment = null
                 return@liveData
             }
 
             if (LocalStorageUtils.saveAttachmentToCache(resource, attachmentFile)) {
-                emit(attachment.openWithIntent(getApplication()))
+                emit(attachment.openWithIntent(context))
                 this@DownloadAttachmentViewModel.attachment = null
             } else {
                 emit(null)
@@ -57,7 +60,7 @@ class DownloadAttachmentViewModel(application: Application) : AndroidViewModel(a
 
     override fun onCleared() {
         // If we end up with an incomplete cached Attachment, we delete it
-        attachment?.getCacheFile(getApplication())?.apply { if (exists()) delete() }
+        attachment?.getCacheFile(context)?.apply { if (exists()) delete() }
         super.onCleared()
     }
 }
