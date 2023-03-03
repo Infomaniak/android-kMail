@@ -19,6 +19,7 @@ package com.infomaniak.mail.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.infomaniak.lib.core.api.ApiController
 import io.sentry.Sentry
@@ -48,6 +49,8 @@ abstract class BaseCoroutineWorker(appContext: Context, params: WorkerParameters
             onFinish()
         }
     }
+
+    protected fun Data.getIntOrNull(key: String) = getInt(key, 0).run { if (this == 0) null else this }
 
     companion object {
         private const val MAX_RETRIES = 3

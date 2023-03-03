@@ -18,6 +18,7 @@
 package com.infomaniak.mail.data
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.infomaniak.lib.core.api.ApiController.json
@@ -182,6 +183,30 @@ class LocalSettings private constructor(context: Context) {
         set(value) = sharedPreferences.transaction { putString(RECENT_SEARCHES_KEY, json.encodeToString(value)) }
     //endregion
 
+    //region Firebase
+    var firebaseToken: String?
+        get() = sharedPreferences.getString(FIREBASE_TOKEN_KEY, null)
+        set(value) = sharedPreferences.transaction { putString(FIREBASE_TOKEN_KEY, value) }
+
+    var firebaseRegisteredUsers: MutableSet<String>
+        get() = sharedPreferences.getStringSet(FIREBASE_REGISTERED_USERS_KEY, emptySet())!!.mapNotNull { it }.toMutableSet()
+        private set(value) = sharedPreferences.transaction { putStringSet(FIREBASE_REGISTERED_USERS_KEY, value) }
+
+    fun markUserAsRegisteredByFirebase(userId: Int) {
+        Log.i(TAG, "markUserAsRegisteredByFirebase: $userId has been registered")
+        firebaseRegisteredUsers = firebaseRegisteredUsers.apply { add(userId.toString()) }
+    }
+
+    fun removeRegisteredFirebaseUser(userId: Int) {
+        firebaseRegisteredUsers = firebaseRegisteredUsers.filterNot { it == userId.toString() }.toMutableSet()
+    }
+
+    fun clearRegisteredFirebaseUsers() {
+        Log.i(TAG, "clearRegisteredFirebaseUsers: called")
+        firebaseRegisteredUsers = mutableSetOf()
+    }
+    //endregion
+
     //region Utils
     private inline fun <reified T : Enum<T>> getEnum(key: String, default: T): T {
         return enumValueOfOrNull<T>(sharedPreferences.getString(key, default.name)) ?: default
@@ -193,6 +218,8 @@ class LocalSettings private constructor(context: Context) {
     //endregion
 
     companion object {
+
+        private val TAG = LocalSettings::class.simpleName
 
         //region Default values
         private const val DEFAULT_CANCEL_DELAY = 10
@@ -226,6 +253,8 @@ class LocalSettings private constructor(context: Context) {
         private const val SWIPE_LEFT_KEY = "swipeLeftKey"
         private const val EXTERNAL_CONTENT_KEY = "externalContentKey"
         private const val RECENT_SEARCHES_KEY = "recentSearchesKey"
+        private const val FIREBASE_TOKEN_KEY = "firebaseTokenKey"
+        private const val FIREBASE_REGISTERED_USERS_KEY = "firebaseRegisteredUsersKey"
         //endregion
 
         @Volatile

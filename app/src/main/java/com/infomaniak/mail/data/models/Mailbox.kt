@@ -17,6 +17,7 @@
  */
 package com.infomaniak.mail.data.models
 
+import androidx.core.app.NotificationManagerCompat
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import kotlinx.serialization.SerialName
@@ -95,5 +96,11 @@ class Mailbox : RealmObject {
         this.inboxUnreadCount = inboxUnreadCount
 
         return this
+    }
+
+    fun notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {
+        val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
+        val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
+        isChannelBlocked || isGroupBlocked
     }
 }

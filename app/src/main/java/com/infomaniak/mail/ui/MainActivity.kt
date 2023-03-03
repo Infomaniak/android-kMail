@@ -35,11 +35,12 @@ import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
+import com.infomaniak.mail.checkPlayServices
 import com.infomaniak.mail.databinding.ActivityMainBinding
+import com.infomaniak.mail.firebase.RegisterFirebaseBroadcastReceiver
 import com.infomaniak.mail.ui.main.menu.MenuDrawerFragment
 import com.infomaniak.mail.utils.PermissionUtils
 import com.infomaniak.mail.utils.UiUtils
-import com.infomaniak.mail.workers.SyncMessagesWorker
 import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import io.sentry.SentryLevel
@@ -55,6 +56,7 @@ class MainActivity : ThemedActivity() {
     private val backgroundColor: Int by lazy { getColor(R.color.backgroundColor) }
     private val backgroundHeaderColor: Int by lazy { getColor(R.color.backgroundHeaderColor) }
     private val menuDrawerBackgroundColor: Int by lazy { getColor(R.color.menuDrawerBackgroundColor) }
+    private val registerFirebaseBroadcastReceiver by lazy { RegisterFirebaseBroadcastReceiver() }
 
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.hostFragment) as NavHostFragment).navController
@@ -85,6 +87,7 @@ class MainActivity : ThemedActivity() {
         // TODO: Does the NewMessageActivity still crash when there is too much recipients?
         observeNetworkStatus()
         binding.drawerLayout.addDrawerListener(drawerListener)
+        registerFirebaseBroadcastReceiver.initFirebaseBroadcastReceiver(this, mainViewModel)
 
         setupSnackBar()
         setupNavController()
@@ -99,12 +102,12 @@ class MainActivity : ThemedActivity() {
 
     override fun onStart() {
         super.onStart()
-        SyncMessagesWorker.cancelWork(this)
         mainViewModel.forceRefreshMailboxesAndFolders()
     }
 
     override fun onResume() {
         super.onResume()
+        checkPlayServices()
         if (binding.drawerLayout.isOpen) colorSystemBarsWithMenuDrawer()
     }
 
@@ -116,8 +119,6 @@ class MainActivity : ThemedActivity() {
 
         fun popBack() {
             if (navController.currentDestination?.id == R.id.threadListFragment) {
-                // Schedule here because the Activity is in finishing state so it'll be ignored by the onStop lifecycle.
-                SyncMessagesWorker.scheduleWork(this@MainActivity)
                 finish()
             } else {
                 navController.popBackStack()
@@ -127,12 +128,6 @@ class MainActivity : ThemedActivity() {
         onBackPressedDispatcher.addCallback(this@MainActivity) {
             if (drawerLayout.isOpen) closeDrawer() else popBack()
         }
-    }
-
-    override fun onStop() {
-        // When you change user you don't want to launch the work
-        if (!isFinishing) SyncMessagesWorker.scheduleWork(this)
-        super.onStop()
     }
 
     override fun onDestroy() {

@@ -31,6 +31,7 @@ android {
 
         buildConfigField 'String', 'CLIENT_ID', '"E90BC22D-67A8-452C-BE93-28DA33588CA4"'
         buildConfigField 'String', 'FEEDBACK_USER_REPORT', '"https://feedback.userreport.com/9f60b46d-7299-4887-b79d-c756cf474c4d#ideas/popular"'
+        buildConfigField 'String', 'INFOMANIAK_API', '"https://api.infomaniak.com/1"'
         buildConfigField 'String', 'MAIL_API', '"https://mail.infomaniak.com"'
         // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail.preprod.dev.infomaniak.ch"'
         // buildConfigField 'String', 'MAIL_API_PREPROD', '"https://mail-mr-3651.preprod.dev.infomaniak.ch"'
@@ -58,6 +59,18 @@ android {
     kotlinOptions { jvmTarget = rootProject.ext.java_version }
 
     buildFeatures { viewBinding true }
+
+    flavorDimensions 'distribution'
+
+    productFlavors {
+        standard {
+            dimension 'distribution'
+            apply plugin: 'com.google.gms.google-services'
+            getIsDefault().set(true)
+            dependencies { implementation 'com.google.firebase:firebase-messaging-ktx:23.1.1' }
+        }
+        fdroid { dimension 'distribution' }
+    }
 }
 
 dependencies {
@@ -73,8 +86,9 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.4'
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
     implementation 'androidx.webkit:webkit:1.6.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.0'
 
     androidTestImplementation 'androidx.test:runner:1.5.2'
     testImplementation 'org.junit.jupiter:junit-jupiter'

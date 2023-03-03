@@ -26,6 +26,10 @@ import android.os.StrictMode
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.facebook.stetho.Stetho
@@ -44,6 +48,7 @@ import com.infomaniak.mail.ui.LaunchActivity
 import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.NotificationUtils.initNotificationChannel
 import com.infomaniak.mail.utils.NotificationUtils.showGeneralNotification
+import com.infomaniak.mail.workers.SyncMailboxesWorker
 import io.sentry.SentryEvent
 import io.sentry.SentryOptions
 import io.sentry.android.core.SentryAndroid
@@ -54,12 +59,16 @@ import kotlinx.coroutines.launch
 import org.matomo.sdk.Tracker
 import java.util.UUID
 
-class ApplicationMain : Application(), ImageLoaderFactory {
+class ApplicationMain : Application(), ImageLoaderFactory, DefaultLifecycleObserver {
 
     val matomoTracker: Tracker by lazy { buildTracker() }
+    var isAppInBackground = true
+        private set
 
     override fun onCreate() {
-        super.onCreate()
+        super<Application>.onCreate()
+
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         if (BuildConfig.DEBUG) configureDebugMode()
         configureSentry()
@@ -72,6 +81,17 @@ class ApplicationMain : Application(), ImageLoaderFactory {
 
         // TODO: Remove before going into production
         addTrackingCallbackForDebugLog()
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        isAppInBackground = false
+        cancelFirebaseProcessWorks()
+        SyncMailboxesWorker.cancelWork(this)
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        isAppInBackground = true
+        owner.lifecycleScope.launch { SyncMailboxesWorker.scheduleWorkIfNeeded(this@ApplicationMain) }
     }
 
     private fun configureDebugMode() {
