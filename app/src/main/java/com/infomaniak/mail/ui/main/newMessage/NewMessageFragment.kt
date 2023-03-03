@@ -111,8 +111,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun initUi() = with(binding) {
+
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(signatureWebView.settings, true)
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(quoteWebView.settings, true)
         }
 
         attachmentsRecyclerView.adapter = attachmentAdapter
@@ -211,9 +213,15 @@ class NewMessageFragment : Fragment() {
     private fun populateUiWithViewModel() = with(binding) {
         val draft = newMessageViewModel.draft
 
+        toField.initRecipients(draft.to)
+        ccField.initRecipients(draft.cc)
+        bccField.initRecipients(draft.bcc)
+
+        subjectTextField.setText(draft.subject)
+
         attachmentAdapter.addAll(draft.attachments)
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
-        subjectTextField.setText(draft.subject)
+
         bodyText.setText(draft.uiBody)
 
         draft.uiSignature?.let { html ->
@@ -232,9 +240,17 @@ class NewMessageFragment : Fragment() {
             separatedSignature.isVisible = true
         }
 
-        toField.initRecipients(draft.to)
-        ccField.initRecipients(draft.cc)
-        bccField.initRecipients(draft.bcc)
+        draft.uiQuote?.let { html ->
+            var quote = if (context.isNightModeEnabled()) {
+                context.injectCssInHtml(R.raw.custom_dark_mode_signature, html)
+            } else {
+                html
+            }
+            quote = context.injectCssInHtml(R.raw.remove_margin, quote)
+            quoteWebView.loadDataWithBaseURL("", quote, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
+
+            quoteWebView.isVisible = true
+        }
     }
 
     private fun populateViewModelWithExternalMailData() {

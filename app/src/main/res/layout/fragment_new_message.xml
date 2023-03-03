@@ -273,6 +273,17 @@
                     app:layout_constraintEnd_toEndOf="@id/signatureWebView"
                     app:layout_constraintTop_toTopOf="@id/signatureWebView" />
 
+                <WebView
+                    android:id="@+id/quoteWebView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/marginStandardMedium"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/signatureWebView"
+                    tools:visibility="visible" />
+
                 <androidx.constraintlayout.widget.Group
                     android:id="@+id/separatedSignature"
                     android:layout_width="wrap_content"

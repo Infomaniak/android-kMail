@@ -17,11 +17,15 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
 import com.infomaniak.lib.core.utils.contains
+import com.infomaniak.mail.R
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -92,7 +96,7 @@ object DraftController {
     //endregion
 
     //region Open Draft
-    fun Draft.setPreviousMessage(draftMode: DraftMode, previousMessage: Message) {
+    fun Draft.setPreviousMessage(draftMode: DraftMode, previousMessage: Message, context: Context) {
 
         inReplyTo = previousMessage.messageId
 
@@ -110,6 +114,41 @@ object DraftController {
         cc = ccList.toRealmList()
 
         subject = formatSubject(draftMode, previousMessage.subject ?: "")
+
+        if (draftMode == DraftMode.FORWARD) body += forwardQuote(previousMessage, context)
+    }
+
+    private fun forwardQuote(message: Message, context: Context): String {
+
+        fun Recipient.forwardedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
+
+        val messageForwardHeader = context.getString(R.string.messageForwardHeader)
+        val fromTitle = context.getString(R.string.fromTitle)
+        val dateTitle = context.getString(R.string.dateTitle)
+        val subjectTitle = context.getString(R.string.subjectTitle)
+        val toTitle = context.getString(R.string.toTitle)
+        val ccTitle = context.getString(R.string.ccTitle)
+        val previousBody = message.body?.value ?: ""
+
+        val ccList = if (message.cc.isNotEmpty()) {
+            "<div>$ccTitle ${message.cc.joinToString(", ") { it.forwardedDisplay() }}<br></div>"
+        } else {
+            ""
+        }
+
+        return """
+            <div class="${Draft.INFOMANIAK_QUOTE_HTML_CLASS_NAME}">
+            <div>---------- $messageForwardHeader ---------<br></div>
+            <div>$fromTitle ${message.from.first().forwardedDisplay()}<br></div>
+            <div>$dateTitle ${message.date.toDate()}<br></div>
+            <div>$subjectTitle ${message.subject}<br></div>
+            <div>$toTitle ${message.to.joinToString(", ") { it.forwardedDisplay() }}<br></div>
+            $ccList
+            <div><br></div>
+            <div><br></div>
+            $previousBody
+            </div>
+        """.trimIndent()
     }
 
     private fun formatSubject(draftMode: DraftMode, subject: String): String {
