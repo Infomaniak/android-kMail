@@ -125,17 +125,21 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int): Unit = with(holder) {
         val message = messages[position]
 
-        if (isExpandedMap[message.uid] == null) {
-            isExpandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
-        }
-
-        if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
+        initMapForNewMessage(message, position)
 
         bindHeader(message)
         bindAttachment(message)
         loadBodyInWebView(message)
 
         binding.displayExpandedCollapsedMessage(message)
+    }
+
+    private fun initMapForNewMessage(message: Message, position: Int) {
+        if (isExpandedMap[message.uid] == null) {
+            isExpandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
+        }
+
+        if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
     private fun ThreadViewHolder.loadBodyInWebView(message: Message) = with(binding) {
