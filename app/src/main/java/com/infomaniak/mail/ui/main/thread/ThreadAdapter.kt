@@ -101,9 +101,6 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
-
-        if (!context.isNightModeEnabled()) return
-
         if (isThemeTheSame) {
             quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_dark))
             quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
@@ -155,7 +152,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             message.hasQuote = messageQuote != null
 
             loadBodyInWebView(message.uid, messageBody, body.type)
-            binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
+            if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
             loadQuoteInWebView(message.uid, messageQuote, body.type)
         }
 
@@ -173,9 +170,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
     }
 
-    private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String?, type: String) = with(binding) {
-
-        if (body == null) return@with
+    private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
 
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, isThemeTheSameMap[uid]!!)
