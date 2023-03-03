@@ -152,8 +152,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             message.hasQuote = messageQuote != null
 
             loadBodyInWebView(message.uid, messageBody, body.type)
-            if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
             loadQuoteInWebView(message.uid, messageQuote, body.type)
+            if (binding.context.isNightModeEnabled()) binding.toggleQuoteButtonTheme(isThemeTheSameMap[message.uid]!!)
         }
 
         bindHeader(message)
@@ -171,24 +171,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
-
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, isThemeTheSameMap[uid]!!)
-        }
-
-        var styledBody = body
-        if (type == TEXT_HTML) {
-            if (context.isNightModeEnabled() && isThemeTheSameMap[uid]!!) {
-                styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
-            }
-            styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
-            styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
-        }
-
-        val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
-        messageBody.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
-
-        messageBody.loadDataWithBaseURL("", styledBody, type, Utils.UTF_8, "")
+        messageBody.applyContentWebview(uid, body, type)
     }
 
     private fun ThreadViewHolder.loadQuoteInWebView(uid: String, quote: String?, type: String) = with(binding) {
@@ -205,22 +188,27 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             }
         }
 
+        messageQuote.applyContentWebview(uid, quote, type)
+    }
+
+    private fun WebView.applyContentWebview(uid: String, webviewBody: String, type: String) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
-            WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageQuote.settings, isThemeTheSameMap[uid]!!)
+            WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSameMap[uid]!!)
         }
 
-        var styledQuote = quote
+        var styledBody = webviewBody
         if (type == TEXT_HTML) {
             if (context.isNightModeEnabled() && isThemeTheSameMap[uid]!!) {
-                styledQuote = context.injectCssInHtml(R.raw.custom_dark_mode, styledQuote, DARK_BACKGROUND_STYLE_ID)
+                styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
             }
-            styledQuote = context.injectCssInHtml(R.raw.remove_margin, styledQuote)
-            styledQuote = context.injectCssInHtml(R.raw.add_padding, styledQuote)
+            styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
+            styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
         }
-        val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
-        messageQuote.setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
 
-        messageQuote.loadDataWithBaseURL("", styledQuote, type, Utils.UTF_8, "")
+        val margin = if (type == TEXT_HTML) NO_MARGIN else plainTextMargin
+        setMarginsRelative(margin, NO_MARGIN, margin, NO_MARGIN)
+
+        loadDataWithBaseURL("", styledBody, type, Utils.UTF_8, "")
     }
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
