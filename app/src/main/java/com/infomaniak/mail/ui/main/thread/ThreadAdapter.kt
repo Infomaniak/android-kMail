@@ -146,7 +146,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         message.body?.let {
             var styledBody = it.value
             if (it.type == TEXT_HTML) {
-                if (context.isNightModeEnabled()) {
+                if (context.isNightModeEnabled() && isThemeTheSameMap[message.uid]!!) {
                     styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
                 }
                 styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
