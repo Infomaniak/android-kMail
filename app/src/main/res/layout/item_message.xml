@@ -431,6 +431,7 @@
             style="@style/TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/marginStandardMedium"
             android:insetLeft="@dimen/alternativeMargin"
             android:insetTop="@dimen/marginStandardVerySmall"
             android:insetRight="@dimen/alternativeMargin"
