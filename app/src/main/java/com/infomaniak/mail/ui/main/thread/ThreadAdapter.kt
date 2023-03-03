@@ -91,9 +91,9 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             } else if (payload == NotificationType.TOGGLE_LIGHT_MODE) {
                 val isThemeTheSame = !isThemeTheSameMap[message.uid]!!
                 isThemeTheSameMap[message.uid] = isThemeTheSame
-                messageBody.toggleWebViewTheme(isThemeTheSame)
+                bodyWebView.toggleWebViewTheme(isThemeTheSame)
                 toggleQuoteButtonTheme(isThemeTheSame)
-                messageQuote.toggleWebViewTheme(isThemeTheSame)
+                quoteWebView.toggleWebViewTheme(isThemeTheSame)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -171,7 +171,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     }
 
     private fun ThreadViewHolder.loadBodyInWebView(uid: String, body: String, type: String) = with(binding) {
-        messageBody.applyContentWebview(uid, body, type)
+        bodyWebView.applyWebViewContent(uid, body, type)
     }
 
     private fun ThreadViewHolder.loadQuoteInWebView(uid: String, quote: String?, type: String) = with(binding) {
@@ -188,15 +188,16 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             }
         }
 
-        messageQuote.applyContentWebview(uid, quote, type)
+        quoteWebView.applyWebViewContent(uid, quote, type)
     }
 
-    private fun WebView.applyContentWebview(uid: String, webviewBody: String, type: String) {
+    private fun WebView.applyWebViewContent(uid: String, bodyWebView: String, type: String) {
+
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, isThemeTheSameMap[uid]!!)
         }
 
-        var styledBody = webviewBody
+        var styledBody = bodyWebView
         if (type == TEXT_HTML) {
             if (context.isNightModeEnabled() && isThemeTheSameMap[uid]!!) {
                 styledBody = context.injectCssInHtml(R.raw.custom_dark_mode, styledBody, DARK_BACKGROUND_STYLE_ID)
@@ -354,10 +355,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         if (message.body?.value == null) {
             messageLoader.isVisible = isExpanded
-            webViewFrameLayout.isGone = true
+            bodyFrameLayout.isGone = true
         } else {
             messageLoader.isGone = true
-            webViewFrameLayout.isVisible = isExpanded
+            bodyFrameLayout.isVisible = isExpanded
         }
     }
 
@@ -460,7 +461,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         fun initWebViewClientIfNeeded(attachments: List<Attachment>) {
             if (doesWebViewNeedInit) {
-                binding.messageBody.initWebViewClient(attachments)
+                binding.bodyWebView.initWebViewClient(attachments)
                 doesWebViewNeedInit = false
             }
         }

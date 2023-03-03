@@ -400,7 +400,7 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <FrameLayout
-        android:id="@+id/webViewFrameLayout"
+        android:id="@+id/bodyFrameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@id/quoteButtonFrameLayout"
@@ -409,7 +409,7 @@
         app:layout_constraintTop_toBottomOf="@id/attachmentsDownloadAllButton">
 
         <WebView
-            android:id="@+id/messageBody"
+            android:id="@+id/bodyWebView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="horizontal" />
@@ -423,7 +423,7 @@
         app:layout_constraintBottom_toTopOf="@id/quoteFrameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/webViewFrameLayout"
+        app:layout_constraintTop_toBottomOf="@id/bodyFrameLayout"
         tools:visibility="visible">
 
         <com.google.android.material.button.MaterialButton
@@ -454,7 +454,7 @@
         tools:visibility="visible">
 
         <WebView
-            android:id="@+id/messageQuote"
+            android:id="@+id/quoteWebView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scrollbars="horizontal" />
