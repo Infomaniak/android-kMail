@@ -162,13 +162,17 @@ fun Context.formatSubject(subject: String?): String {
     }
 }
 
-fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String): String {
-    val css = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
+fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String, id: String? = null): String {
+    val css = readRawResource(cssResId)
     return with(Jsoup.parse(html)) {
-        head().appendElement("style").attr("type", "text/css").appendText(css)
+        head().appendElement("style").attr("type", "text/css").appendText(css).also { element ->
+            id?.let { element.id(it) }
+        }
         html()
     }
 }
+
+fun Context.readRawResource(cssResId: Int): String = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
 
 fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     addAnimatorListener(object : Animator.AnimatorListener {

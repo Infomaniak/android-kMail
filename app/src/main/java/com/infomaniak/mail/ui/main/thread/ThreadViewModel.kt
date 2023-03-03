@@ -62,12 +62,14 @@ class ThreadViewModel(application: Application) : AndroidViewModel(application) 
             return@liveData
         }
 
-        val expandedMap = mutableMapOf<String, Boolean>()
+        val isExpandedMap = mutableMapOf<String, Boolean>()
+        val isThemeTheSameMap = mutableMapOf<String, Boolean>()
         thread.messages.forEachIndexed { index, message ->
-            expandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+            isExpandedMap[message.uid] = message.shouldBeExpanded(index, thread.messages.lastIndex)
+            isThemeTheSameMap[message.uid] = true
         }
 
-        emit(thread to expandedMap)
+        emit(Triple(thread, isExpandedMap, isThemeTheSameMap))
 
         if (thread.unseenMessagesCount > 0) SharedViewModelUtils.markAsSeen(mailbox, thread)
     }

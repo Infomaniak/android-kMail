@@ -19,7 +19,9 @@ package com.infomaniak.mail.ui.main.thread.actions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -41,6 +43,14 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
             setMarkAsReadUi(isSeen)
             setFavoriteUi(isFavorite)
+
+            binding.lightTheme.apply {
+                if (requireContext().isNightModeEnabled()) {
+                    isVisible = true
+                    setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
+                    setClosingOnClickListener { mainViewModel.toggleLightThemeForMessage.value = message }
+                }
+            }
 
             initOnClickListener(object : OnActionClick {
                 //region Main actions

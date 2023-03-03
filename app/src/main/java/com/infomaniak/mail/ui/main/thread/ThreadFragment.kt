@@ -96,12 +96,15 @@ class ThreadFragment : Fragment() {
             val threadUid = result.first.uid
             setupUi(threadUid)
             setupAdapter(threadUid)
-            threadAdapter.expandedMap = result.second
+            threadAdapter.isExpandedMap = result.second
+            threadAdapter.isThemeTheSameMap = result.third
             observeMessagesLive()
             observeContacts()
             observeQuickActionBarClicks()
             observeOpenAttachment()
         }
+
+        mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { leaveThread() }
     }
@@ -219,6 +222,7 @@ class ThreadFragment : Fragment() {
                         threadUid = navigationArgs.threadUid,
                         isFavorite = message.isFavorite,
                         isSeen = message.isSeen,
+                        isThemeTheSame = threadAdapter.isThemeTheSameMap[message.uid]!!,
                     )
                 )
             }
@@ -259,7 +263,7 @@ class ThreadFragment : Fragment() {
                 beforeUpdateAdapter = ::onMessagesUpdate
                 afterUpdateAdapter = {
                     if (shouldScrollToBottom.compareAndSet(true, false)) {
-                        val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.expandedMap[it.uid] == true }
+                        val indexToScroll = threadAdapter.messages.indexOfFirst { threadAdapter.isExpandedMap[it.uid] == true }
                         binding.messagesList.scrollToPosition(indexToScroll)
                     }
                 }
