@@ -98,7 +98,7 @@ class Mailbox : RealmObject {
         return this
     }
 
-    fun areNotificationsBlocked(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {
+    fun notificationsIsDisabled(notificationManagerCompat: NotificationManagerCompat): Boolean = with(notificationManagerCompat) {
         val isGroupBlocked = getNotificationChannelGroupCompat(channelGroupId)?.isBlocked == true
         val isChannelBlocked = getNotificationChannelCompat(channelId)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
         isChannelBlocked || isGroupBlocked

@@ -31,10 +31,10 @@ import com.infomaniak.mail.utils.AccountUtils
 
 class KMailFirebaseMessagingService : FirebaseMessagingService() {
 
-    private val localSettings by lazy { LocalSettings.getInstance(this) }
-    private val realmMailboxInfo by lazy { RealmDatabase.newMailboxInfoInstance }
-    private val notificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
     private val applicationMain by lazy { application as ApplicationMain }
+    private val localSettings by lazy { LocalSettings.getInstance(this) }
+    private val notificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
+    private val realmMailboxInfo by lazy { RealmDatabase.newMailboxInfoInstance }
 
     override fun onNewToken(token: String) {
         Log.i(TAG, "onNewToken: new token received")
@@ -75,7 +75,7 @@ class KMailFirebaseMessagingService : FirebaseMessagingService() {
         Log.i(TAG, "processMessageInBackground: called")
         MailboxController.getMailbox(userId, mailboxId, realmMailboxInfo)?.let { mailbox ->
             // Ignore if the mailbox notification channel is blocked
-            if (mailbox.areNotificationsBlocked(notificationManagerCompat)) return
+            if (mailbox.notificationsIsDisabled(notificationManagerCompat)) return
         }
 
         ProcessMessageNotificationsWorker.scheduleWork(this, userId, mailboxId, messageUid)
