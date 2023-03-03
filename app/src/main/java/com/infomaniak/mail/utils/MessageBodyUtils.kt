@@ -26,10 +26,22 @@ object MessageBodyUtils {
     private const val blockquote = "blockquote"
 
     private val quoteDescriptors = arrayOf(
-        ".ik_mail_quote",
+        "#divRplyFwdMsg", // Outlook
+        "#isForwardContent",
+        "#isReplyContent",
+        "#mailcontent:not(table)",
+        "#origbody",
+        "#oriMsgHtmlSeperator",
+        "#reply139content",
         ".gmail_extra",
         ".gmail_quote",
+        ".ik_mail_quote",
+        ".moz-cite-prefix",
+        ".protonmail_quote",
         ".yahoo_quoted",
+        ".zmail_extra", // Zoho
+        "[name=\"quote\"]", // GMX
+        "blockquote[type=\"cite\"]",
     )
 
     fun splitBodyAndQuote(messageBody: String): MessageBodyQuote {
