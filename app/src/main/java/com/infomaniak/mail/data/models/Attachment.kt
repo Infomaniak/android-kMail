@@ -86,6 +86,10 @@ class Attachment : EmbeddedRealmObject {
         return file.exists() && file.length() == size
     }
 
+    fun isInlineCachedFile(context: Context): Boolean {
+        return getCacheFile(context).exists() && disposition == AttachmentDisposition.INLINE
+    }
+
     fun getCacheFile(
         context: Context,
         userId: Int = AccountUtils.currentUserId,
