@@ -19,6 +19,7 @@ package com.infomaniak.mail.ui.main.newMessage
 
 import android.app.Application
 import android.content.ClipDescription
+import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.*
@@ -54,6 +55,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
 
     private val coroutineContext = viewModelScope.coroutineContext + Dispatchers.IO
     private var autoSaveJob: Job? = null
+    private inline val context: Context get() = getApplication<Application>()
 
     var isAutoCompletionOpened = false
     var isEditorExpanded = false
@@ -268,10 +270,10 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun importAttachment(uri: Uri, availableSpace: Long): Pair<Attachment?, Boolean>? {
-        val (fileName, fileSize) = uri.getFileNameAndSize(getApplication()) ?: return null
+        val (fileName, fileSize) = uri.getFileNameAndSize(context) ?: return null
         if (fileSize > availableSpace) return null to true
 
-        return LocalStorageUtils.saveUploadAttachment(getApplication(), uri, fileName, draft.localUuid)
+        return LocalStorageUtils.saveUploadAttachment(context, uri, fileName, draft.localUuid)
             ?.let { file ->
                 val mimeType = file.path.guessMimeType()
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
@@ -279,7 +281,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     override fun onCleared() {
-        LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(getApplication(), draft.localUuid)
+        LocalStorageUtils.deleteAttachmentsUploadsDirIfEmpty(context, draft.localUuid)
         autoSaveJob?.cancel()
         super.onCleared()
     }

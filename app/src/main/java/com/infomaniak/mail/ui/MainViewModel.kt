@@ -646,7 +646,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             RCore.string.anErrorHasOccurred
         }
 
-        snackBarManager.postValue(getApplication<Application>().getString(snackbarTitle))
+        snackBarManager.postValue(context.getString(snackbarTitle))
     }
 
     fun getMessage(messageUid: String) = liveData(coroutineContext) {
