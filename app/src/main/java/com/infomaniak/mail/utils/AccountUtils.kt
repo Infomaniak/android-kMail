@@ -19,11 +19,13 @@ package com.infomaniak.mail.utils
 
 import android.app.NotificationManager
 import android.content.Context
+import android.util.Log
 import androidx.work.WorkManager
 import com.infomaniak.lib.core.InfomaniakCore
 import com.infomaniak.lib.core.auth.CredentialManager
 import com.infomaniak.lib.core.auth.TokenAuthenticator
 import com.infomaniak.lib.core.models.user.User
+import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.lib.core.room.UserDatabase
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.cache.RealmDatabase
@@ -110,6 +112,17 @@ object AccountUtils : CredentialManager() {
 
     suspend fun removeUser(context: Context, user: User) {
 
+        fun logoutUserToken() {
+            CoroutineScope(Dispatchers.IO).launch {
+                context.getInfomaniakLogin().deleteToken(
+                    okHttpClient = HttpClient.okHttpClientNoInterceptor,
+                    token = user.apiToken,
+                    onError = { Log.e("DeleteTokenError", "API response error: $it") },
+                )
+            }
+        }
+
+        logoutUserToken()
         userDatabase.userDao().delete(user)
         RealmDatabase.removeUserData(context, user.id)
 

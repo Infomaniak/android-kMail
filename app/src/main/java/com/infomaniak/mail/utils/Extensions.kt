@@ -49,6 +49,8 @@ import com.infomaniak.lib.core.api.ApiController
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
+import com.infomaniak.lib.login.InfomaniakLogin
+import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -374,4 +376,8 @@ fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
     return folder?.getLocalizedName(this) ?: getString(R.string.searchFilterFolder)
+}
+
+fun Context.getInfomaniakLogin(): InfomaniakLogin {
+    return InfomaniakLogin(this, appUID = BuildConfig.APPLICATION_ID, clientID = BuildConfig.CLIENT_ID)
 }
