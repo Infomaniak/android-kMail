@@ -25,6 +25,7 @@ import com.infomaniak.mail.data.cache.mailboxContent.MessageController
 import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.utils.FetchMessagesManager
 import com.infomaniak.mail.workers.BaseCoroutineWorker
+import io.sentry.Sentry
 import kotlinx.coroutines.Dispatchers
 
 class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParameters) : BaseCoroutineWorker(appContext, params) {
@@ -37,7 +38,15 @@ class ProcessMessageNotificationsWorker(appContext: Context, params: WorkerParam
         val userId = inputData.getIntOrNull(USER_ID_KEY) ?: return@with Result.success()
         val mailboxId = inputData.getIntOrNull(MAILBOX_ID_KEY) ?: return@with Result.success()
         val messageUid = inputData.getString(MESSAGE_UID_KEY) ?: return@with Result.success()
-        val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: return@with Result.success()
+        val mailbox = MailboxController.getMailbox(userId, mailboxId, mailboxInfoRealm) ?: run {
+            Sentry.withScope { scope ->
+                scope.setExtra("userId", userId.toString())
+                scope.setExtra("mailboxId", mailboxId.toString())
+                scope.setExtra("messageUid", messageUid)
+                Sentry.captureMessage("We should not have received this notification")
+            }
+            return@with Result.success()
+        }
 
         val mailboxContentRealm = RealmDatabase.newMailboxContentInstance(userId, mailbox.mailboxId)
         MessageController.getMessage(messageUid, mailboxContentRealm)?.let { return@with Result.success() }
