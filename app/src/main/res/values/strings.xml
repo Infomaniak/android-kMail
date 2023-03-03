@@ -49,6 +49,7 @@
     <string name="actionSpam">Report spam</string>
     <string name="actionStar">Add to favorites</string>
     <string name="actionUnstar">Delete from favorites</string>
+    <string name="actionViewInDark">View in dark theme</string>
     <string name="actionViewInLight">View in light theme</string>
     <string name="addUnknownRecipientAlreadyUsed">The email is already used</string>
     <string name="addUnknownRecipientInvalidEmail">The email is invalid</string>
@@ -154,6 +155,7 @@
     </plurals>
     <string name="folderNoMessageCount">This folder contains no messages</string>
     <string name="fromTitle">From:</string>
+    <string name="googlePlayServicesAreRequired">Google Play Services are required</string>
     <string name="helpChatbot">Chatbot</string>
     <string name="helpFAQ">FAQ</string>
     <string name="inboxFolder">Inbox</string>
@@ -164,8 +166,10 @@
     <string name="messageDetailsDateAt">%1$s at %2$s</string>
     <string name="messageDetailsYesterday">Yesterday</string>
     <string name="messageForwardHeader">Forwarded message</string>
+    <string name="messageHideQuotedText">Hide quoted text</string>
     <string name="messageIsDraftOption">Draft</string>
     <string name="messageReplyHeader">On %1$s, %2$s wrote:</string>
+    <string name="messageShowQuotedText">Show quoted text</string>
     <string name="moreStorageText1">Your mailbox is full and you can‘t receive any more messages 🥲</string>
     <string name="moreStorageText2">You will soon be able to unblock the limits of your ik.me email address (storage limit, sending, forwarding, …)</string>
     <string name="moreStorageTitle">Is your box full? Get more storage!</string>

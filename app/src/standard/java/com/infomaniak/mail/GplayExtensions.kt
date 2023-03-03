@@ -42,11 +42,9 @@ fun FragmentActivity.checkPlayServices() {
         if (apiAvailability.isUserResolvableError(errorCode)) {
             apiAvailability.makeGooglePlayServicesAvailable(this)
         } else {
-            // TODO: Translate this
-            Toast.makeText(this, "Need Play Services", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.googlePlayServicesAreRequired, Toast.LENGTH_SHORT).show()
         }
     }
-
 }
 
 fun Context.isGooglePlayServicesNotAvailable(): Boolean = with(GoogleApiAvailability.getInstance()) {

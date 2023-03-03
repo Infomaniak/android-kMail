@@ -42,6 +42,7 @@
     <string name="actionSpam">Signaler comme spam</string>
     <string name="actionStar">Ajouter aux favoris</string>
     <string name="actionUnstar">Retirer des favoris</string>
+    <string name="actionViewInDark">Voir en thème sombre</string>
     <string name="actionViewInLight">Voir en thème clair</string>
     <string name="addUnknownRecipientAlreadyUsed">L’adresse mail est déjà utilisée</string>
     <string name="addUnknownRecipientInvalidEmail">L’adresse mail n’est pas valide</string>
@@ -149,6 +150,7 @@
     </plurals>
     <string name="folderNoMessageCount">Ce dossier ne contient aucun message</string>
     <string name="fromTitle">De :</string>
+    <string name="googlePlayServicesAreRequired">Les Google Play Services sont requis</string>
     <string name="helpChatbot">Chatbot</string>
     <string name="helpFAQ">FAQ</string>
     <string name="inboxFolder">Boîte de réception</string>
@@ -159,8 +161,10 @@
     <string name="messageDetailsDateAt">%1$s à %2$s</string>
     <string name="messageDetailsYesterday">Hier</string>
     <string name="messageForwardHeader">Message transféré</string>
+    <string name="messageHideQuotedText">Masquer le contenu développé</string>
     <string name="messageIsDraftOption">Brouillon</string>
     <string name="messageReplyHeader">Le %1$s, %2$s a écrit :</string>
+    <string name="messageShowQuotedText">Afficher le contenu abrégé</string>
     <string name="moreStorageText1">Votre boite est pleine et vous ne pouvez plus recevoir de nouveaux messages 🥲</string>
     <string name="moreStorageText2">Vous pourrez prochainement débloquer les limites de votre adresse mail ik.me (stockage limite, envoi, redirection, …)</string>
     <string name="moreStorageTitle">Votre boite est pleine ? Obtenez plus de stockage !</string>
