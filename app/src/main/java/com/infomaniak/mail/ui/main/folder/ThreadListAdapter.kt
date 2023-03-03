@@ -18,6 +18,7 @@
 package com.infomaniak.mail.ui.main.folder
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
 import android.os.Build
 import android.view.HapticFeedbackConstants
@@ -53,6 +54,7 @@ import com.infomaniak.mail.databinding.ItemThreadSeeAllButtonBinding
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import kotlin.math.abs
+import com.google.android.material.R as RMaterial
 import com.infomaniak.lib.core.R as RCore
 
 // TODO: Do we want to extract features from LoaderAdapter (in Core) and put them here?
@@ -63,6 +65,7 @@ class ThreadListAdapter(
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
     private val onSwipeFinished: () -> Unit,
+    private val multiSelection: MultiSelectionListener<String>,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private lateinit var recyclerView: RecyclerView
@@ -137,28 +140,56 @@ class ThreadListAdapter(
         }
     }
 
-    private fun CardviewThreadItemBinding.displayThread(thread: Thread) = with(thread) {
+    private fun CardviewThreadItemBinding.displayThread(thread: Thread) {
         setupThreadDensityDependentUi()
 
-        displayAvatar(thread = this)
-        expeditor.text = formatRecipientNames(computeDisplayedRecipients())
-        mailSubject.text = context.formatSubject(subject)
-        mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
-        mailDate.text = formatDate(context)
+        displayAvatar(thread)
 
-        draftPrefix.isVisible = hasDrafts
+        with(thread) {
+            expeditor.text = formatRecipientNames(computeDisplayedRecipients())
+            mailSubject.text = context.formatSubject(subject)
+            mailBodyPreview.text = computePreview().ifBlank { context.getString(R.string.noBodyTitle) }
+            mailDate.text = formatDate(context)
 
-        iconAttachment.isVisible = hasAttachments
-        iconCalendar.isGone = true // TODO: See with API when we should display this icon
-        iconFavorite.isVisible = isFavorite
+            draftPrefix.isVisible = hasDrafts
 
-        val messagesCount = messages.count()
-        threadCount.text = messagesCount.toString()
-        threadCountCardview.isVisible = messagesCount > 1
+            iconAttachment.isVisible = hasAttachments
+            iconCalendar.isGone = true // TODO: See with API when we should display this icon
+            iconFavorite.isVisible = isFavorite
 
-        if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+            val messagesCount = messages.count()
+            threadCount.text = messagesCount.toString()
+            threadCountCardview.isVisible = messagesCount > 1
 
-        root.setOnClickListener { onThreadClicked?.invoke(this@with) }
+            if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
+
+            displaySelectedState(multiSelection.selectedItems.value?.contains(uid) == true)
+        }
+
+        root.setOnClickListener {
+            if (multiSelection.isEnabled.value == true) toggleSelection(thread.uid) else onThreadClicked?.invoke(thread)
+        }
+        root.setOnLongClickListener {
+            toggleSelection(thread.uid)
+            true
+        }
+    }
+
+    private fun CardviewThreadItemBinding.toggleSelection(threadUid: String) = with(multiSelection) {
+        isEnabled.value = true
+        selectedItems.value?.let {
+            if (it.contains(threadUid)) it.remove(threadUid) else it.add(threadUid)
+            displaySelectedState(it.contains(threadUid))
+        }
+    }
+
+    private fun CardviewThreadItemBinding.displaySelectedState(isSelected: Boolean) {
+        // TODO : Modify the ui accordingly
+        root.backgroundTintList = if (isSelected) {
+            ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
+        } else {
+            context.getColorStateList(R.color.backgroundColor)
+        }
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {

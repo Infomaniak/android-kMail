@@ -111,6 +111,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         observeUpdatedAtTriggers()
         observeContacts()
         observerDraftsActionsCompletedWorks()
+        observerMultiSelection()
     }
 
     override fun onResume(): Unit = with(binding) {
@@ -160,6 +161,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             folderRole = mainViewModel.currentFolder.value?.role,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
+            multiSelection = object : MultiSelectionListener<String> {
+                override var isEnabled by threadListViewModel::isMultiSelectOn
+                override val selectedItems by threadListViewModel::selectedThreadUids
+            }
         )
 
         binding.threadsList.apply {
@@ -196,6 +201,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         toolbar.setNavigationOnClickListener {
             trackMenuDrawerEvent("openByButton")
             (activity as? MainActivity)?.binding?.drawerLayout?.open()
+        }
+
+        cancel.setOnClickListener {
+            threadListViewModel.isMultiSelectOn.value = false
+            threadListViewModel.selectedThreadUids.value?.clear()
+            // threadListAdapter.updateSelection() // TODO
         }
 
         searchButton.setOnClickListener {
@@ -389,6 +400,17 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         WorkManager.getInstance(requireContext()).pruneWork().state.observe(viewLifecycleOwner) {
             if (it is Operation.State.FAILURE || it is Operation.State.SUCCESS) observeDraftsActions()
+        }
+    }
+
+    private fun observerMultiSelection() = with(binding) {
+        threadListViewModel.isMultiSelectOn.observe(viewLifecycleOwner) {
+            toolbar.isGone = it
+            toolbarSelection.isVisible = it
+        }
+
+        threadListViewModel.selectedThreadUids.observe(viewLifecycleOwner) {
+            selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, it.count(), it.count())
         }
     }
 
