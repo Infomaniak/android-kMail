@@ -45,6 +45,7 @@ class MessageWebViewClient(
                 if (!attachment.hasUsableCache(context, cacheFile)) {
                     Log.d(TAG, "shouldInterceptRequest: cache ${attachment.name} with ${attachment.size}")
                     LocalStorageUtils.saveAttachmentToCache(attachment.resource!!, cacheFile)
+                    attachment.size = cacheFile.length()
                 }
                 Log.i(TAG, "shouldInterceptRequest: load attachment ${attachment.name} from cache with ${cacheFile.length()}")
                 return WebResourceResponse(attachment.mimeType, Utils.UTF_8, cacheFile.inputStream())
