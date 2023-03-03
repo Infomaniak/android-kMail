@@ -39,8 +39,10 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(navigationArgs) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.lightTheme.isVisible = requireContext().isNightModeEnabled()
-        binding.lightTheme.setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
+        binding.lightTheme.apply {
+            isVisible = requireContext().isNightModeEnabled()
+            setText(if (isThemeTheSame) R.string.actionViewInLight else R.string.actionViewInDark)
+        }
 
         mainViewModel.getMessage(messageUid).observe(viewLifecycleOwner) { message ->
 

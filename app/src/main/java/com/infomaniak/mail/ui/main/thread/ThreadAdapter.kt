@@ -95,6 +95,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                     WebSettingsCompat.setAlgorithmicDarkeningAllowed(webViewSettings, isThemeTheSameMap[message.uid]!!)
                 }
 
+                @SuppressLint("SetJavaScriptEnabled")
                 webViewSettings.javaScriptEnabled = true
                 if (isThemeTheSameMap[message.uid]!!) addBackgroundJs() else removeBackgroundJs()
                 webViewSettings.javaScriptEnabled = false
@@ -107,12 +108,12 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     private fun ThreadViewHolder.addBackgroundJs() {
         val css = binding.context.readRawResource(R.raw.custom_dark_mode)
         binding.messageBody.evaluateJavascript(
-            """ var style = document.createElement('style');
-                document.head.appendChild(style);
+            """ var style = document.createElement('style')
+                document.head.appendChild(style)
                 style.id = "$DARK_BACKGROUND_STYLE_ID"
                 style.innerHTML = `$css`
             """.trimIndent(),
-            null
+            null,
         )
     }
 
@@ -128,9 +129,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             isExpandedMap[message.uid] = message.shouldBeExpanded(position, messages.lastIndex)
         }
 
-        if (isThemeTheSameMap[message.uid] == null) {
-            isThemeTheSameMap[message.uid] = true
-        }
+        if (isThemeTheSameMap[message.uid] == null) isThemeTheSameMap[message.uid] = true
 
         bindHeader(message)
         bindAttachment(message)
@@ -143,7 +142,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(messageBody.settings, isThemeTheSameMap[message.uid]!!)
         }
-        // TODO: Make prettier WebView, Add button to hide / display the conversation inside message body like webapp ?
+        // TODO: Make prettier WebView, add button to hide/display the conversation inside Message body like WebApp ?
         message.body?.let {
             var styledBody = it.value
             if (it.type == TEXT_HTML) {
@@ -354,7 +353,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
     private enum class NotificationType {
         AVATAR,
-        TOGGLE_LIGHT_MODE
+        TOGGLE_LIGHT_MODE,
     }
 
     private companion object {

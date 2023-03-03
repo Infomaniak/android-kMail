@@ -172,9 +172,7 @@ fun Context.injectCssInHtml(@RawRes cssResId: Int, html: String, id: String? = n
     }
 }
 
-fun Context.readRawResource(cssResId: Int): String {
-    return Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
-}
+fun Context.readRawResource(cssResId: Int): String = Scanner(resources.openRawResource(cssResId)).useDelimiter("\\A").next()
 
 fun LottieAnimationView.repeatFrame(firstFrame: Int, lastFrame: Int) {
     addAnimatorListener(object : Animator.AnimatorListener {

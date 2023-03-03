@@ -104,9 +104,7 @@ class ThreadFragment : Fragment() {
             observeOpenAttachment()
         }
 
-        mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner) {
-            threadAdapter.toggleLightMode(it)
-        }
+        mainViewModel.toggleLightThemeForMessage.observe(viewLifecycleOwner, threadAdapter::toggleLightMode)
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) { leaveThread() }
     }
