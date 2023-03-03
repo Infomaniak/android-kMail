@@ -39,6 +39,7 @@ import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
 import io.realm.kotlin.ext.copyFromRealm
+import org.jsoup.Jsoup
 import java.util.*
 
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
@@ -108,7 +109,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
     private fun ThreadViewHolder.addBackgroundJs() {
         val css = binding.context.readRawResource(R.raw.custom_dark_mode)
         binding.messageBody.evaluateJavascript(
-            """ var style = document.createElement('style')
+            """
+                var style = document.createElement('style')
                 document.head.appendChild(style)
                 style.id = "$DARK_BACKGROUND_STYLE_ID"
                 style.innerHTML = `$css`
@@ -155,6 +157,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 }
                 styledBody = context.injectCssInHtml(R.raw.remove_margin, styledBody)
                 styledBody = context.injectCssInHtml(R.raw.add_padding, styledBody)
+                styledBody = addBottomPadding(styledBody)
             }
 
             val margin = if (it.type == TEXT_HTML) NO_MARGIN else plainTextMargin
@@ -162,6 +165,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
             messageBody.loadDataWithBaseURL("", styledBody, it.type, Utils.UTF_8, "")
         }
+    }
+
+    private fun addBottomPadding(styledBody: String) = with(Jsoup.parse(styledBody)) {
+        body().appendElement("div").attr("style", "height: 16px")
+        html()
     }
 
     private fun ThreadViewHolder.bindHeader(message: Message) = with(binding) {
