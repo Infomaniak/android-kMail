@@ -151,7 +151,9 @@ class ThreadFragment : Fragment() {
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
                 R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
-                R.id.quickActionForward -> notYetImplemented()
+                R.id.quickActionForward -> threadViewModel.forward(threadUid) { messageUid ->
+                    safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUid)
+                }
                 R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
                 R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
                 R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)

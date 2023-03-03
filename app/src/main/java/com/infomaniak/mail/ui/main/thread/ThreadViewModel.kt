@@ -36,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ThreadViewModel : ViewModel() {
 
@@ -91,5 +92,11 @@ class ThreadViewModel : ViewModel() {
         val thread = ThreadController.getThread(threadUid) ?: return@launch
         val message = MessageController.getMessageToReplyTo(thread)
         quickActionBarClicks.postValue(message to menuId)
+    }
+
+    fun forward(threadUid: String, navigate: (messageUid: String) -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        val thread = ThreadController.getThread(threadUid) ?: return@launch
+        val message = MessageController.getMessageToReplyTo(thread)
+        withContext(Dispatchers.Main) { navigate(message.uid) }
     }
 }
