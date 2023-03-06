@@ -240,9 +240,11 @@ class NewMessageFragment : Fragment() {
         }
 
         draft.uiQuote?.let { html ->
-            quoteWebView.loadQuote(html)
-            quoteWebView.initWebViewClient(draft.attachments)
-            quoteWebView.isVisible = true
+            quoteWebView.apply {
+                loadQuote(html)
+                initWebViewClient(draft.attachments)
+                isVisible = true
+            }
         }
     }
 
