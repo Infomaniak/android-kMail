@@ -23,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.MatomoMail.toMailActionValue
+import com.infomaniak.mail.MatomoMail.trackMailActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.databinding.BottomSheetJunkBinding
@@ -53,9 +55,13 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
 
         setSpamUi(message)
 
-        spam.setClosingOnClickListener { mainViewModel.toggleSpamOrHam(threadUid, message) }
+        spam.setClosingOnClickListener {
+            trackMailActionsEvent("spamMessage", message.isSpam.toMailActionValue())
+            mainViewModel.toggleSpamOrHam(threadUid, message)
+        }
 
         phishing.setClosingOnClickListener {
+            trackMailActionsEvent("signalPhishingMessage")
             createDescriptionDialog(
                 title = getString(R.string.reportPhishingTitle),
                 description = getString(R.string.reportPhishingDescription),
@@ -64,7 +70,10 @@ class JunkBottomSheetDialog : ActionsBottomSheetDialog() {
             ).show()
         }
 
-        blockSender.setClosingOnClickListener { mainViewModel.blockUser(message) }
+        blockSender.setClosingOnClickListener {
+            trackMailActionsEvent("blockUserMessage")
+            mainViewModel.blockUser(message)
+        }
     }
 
     private fun setSpamUi(message: Message) {

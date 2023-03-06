@@ -18,6 +18,7 @@
 package com.infomaniak.mail
 
 import android.content.Context
+import androidx.fragment.app.Fragment
 import com.infomaniak.lib.core.MatomoCore
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import org.matomo.sdk.Tracker
@@ -26,4 +27,11 @@ object MatomoMail : MatomoCore {
 
     override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
     override val siteId = 9
+
+    fun Fragment.trackMailActionsEvent(name: String, value: Float? = null) {
+        activity?.trackEvent("actionsMail", name, TrackerAction.CLICK, value)
+    }
+
+    // We need to invert this logical value to keep a coherent value for analytics
+    fun Boolean.toMailActionValue() = (!this).toFloat()
 }
