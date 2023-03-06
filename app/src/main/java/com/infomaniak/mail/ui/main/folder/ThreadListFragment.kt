@@ -206,10 +206,13 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
 
         cancel.setOnClickListener {
-            threadListViewModel.isMultiSelectOn.value = false
-            threadListViewModel.selectedThreadUids.value?.clear()
+            threadListViewModel.apply {
+                isMultiSelectOn.value = false
+                selectedThreadUids.value?.clear()
+            }
             threadListAdapter.updateSelection()
         }
+        selectAll.setOnClickListener { threadListAdapter.selectUnselectAll() }
 
         searchButton.setOnClickListener {
             safeNavigate(
@@ -418,6 +421,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             else {
                 unlockSwipeActionsIfSet()
             }
+
+            val noUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCount == 0 } == true
+            binding.unreadCountChip.isGone = isMultiSelectOn || noUnread
         }
 
         threadListViewModel.selectedThreadUids.observe(viewLifecycleOwner) {
@@ -448,7 +454,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
-            isVisible = unreadCount > 0
+            isGone = unreadCount == 0 || threadListViewModel.isMultiSelectOn.value == true
         }
     }
 

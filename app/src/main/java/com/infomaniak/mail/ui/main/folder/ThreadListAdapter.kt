@@ -68,6 +68,7 @@ class ThreadListAdapter(
     private val multiSelection: MultiSelectionListener<String>,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
+    private var threadCount = -1
     private lateinit var recyclerView: RecyclerView
 
     private val localSettings by lazy { LocalSettings.getInstance(context) }
@@ -372,6 +373,7 @@ class ThreadListAdapter(
     override fun createDiffUtil(oldList: List<Any>, newList: List<Any>): DragDropSwipeDiffCallback<Any>? = null
 
     override fun updateList(itemList: List<Thread>) {
+        threadCount = itemList.count()
         dataSet = formatList(itemList, recyclerView.context, folderRole, threadDensity)
     }
 
@@ -386,6 +388,20 @@ class ThreadListAdapter(
 
     fun updateSelection() {
         notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
+    }
+
+    fun selectUnselectAll() {
+        multiSelection.selectedItems.value?.let { selectedItems ->
+            if (selectedItems.count() == threadCount) {
+                selectedItems.clear()
+            } else {
+                dataSet.forEachIndexed { index, item ->
+                    if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add((item as Thread).uid)
+                }
+            }
+            multiSelection.selectedItems.value = selectedItems
+            updateSelection()
+        }
     }
 
     private enum class DisplayType(val layout: Int) {

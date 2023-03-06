@@ -87,7 +87,6 @@
                     app:navigationIcon="@null"
                     tools:visibility="visible">
 
-                    <!-- TODO : Center -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -106,7 +105,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:ellipsize="end"
                             android:gravity="center"
+                            android:lines="1"
                             tools:text="2 sélectionnés" />
 
                         <com.google.android.material.button.MaterialButton
@@ -117,7 +118,6 @@
                             android:text="@string/buttonSelectAll" />
 
                     </LinearLayout>
-
                 </com.google.android.material.appbar.MaterialToolbar>
             </FrameLayout>
 
