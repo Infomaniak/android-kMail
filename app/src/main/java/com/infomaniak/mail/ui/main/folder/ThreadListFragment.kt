@@ -206,7 +206,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         cancel.setOnClickListener {
             threadListViewModel.isMultiSelectOn.value = false
             threadListViewModel.selectedThreadUids.value?.clear()
-            // threadListAdapter.updateSelection() // TODO
+            threadListAdapter.updateSelection()
         }
 
         searchButton.setOnClickListener {

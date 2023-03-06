@@ -104,10 +104,15 @@ class ThreadListAdapter(
     }
 
     override fun onBindViewHolder(holder: ThreadViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.firstOrNull() is Unit && holder.itemViewType == DisplayType.THREAD.layout) {
+        val payload = payloads.firstOrNull()
+        if (payload is NotificationType && holder.itemViewType == DisplayType.THREAD.layout) {
             val binding = holder.binding as CardviewThreadItemBinding
             val thread = dataSet[position] as Thread
-            binding.displayAvatar(thread)
+
+            when (payload) {
+                NotificationType.AVATAR -> binding.displayAvatar(thread)
+                NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread.uid)
+            }
         } else {
             super.onBindViewHolder(holder, position, payloads)
         }
@@ -163,7 +168,7 @@ class ThreadListAdapter(
 
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
 
-            displaySelectedState(multiSelection.selectedItems.value?.contains(uid) == true)
+            updateSelectedState(uid)
         }
 
         root.setOnClickListener {
@@ -179,12 +184,14 @@ class ThreadListAdapter(
         isEnabled.value = true
         selectedItems.value?.let {
             if (it.contains(threadUid)) it.remove(threadUid) else it.add(threadUid)
-            displaySelectedState(it.contains(threadUid))
+            selectedItems.value = it // Trigger the observer
         }
+        updateSelectedState(threadUid)
     }
 
-    private fun CardviewThreadItemBinding.displaySelectedState(isSelected: Boolean) {
+    private fun CardviewThreadItemBinding.updateSelectedState(threadUid: String) {
         // TODO : Modify the ui accordingly
+        val isSelected = multiSelection.selectedItems.value?.contains(threadUid) == true
         root.backgroundTintList = if (isSelected) {
             ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
         } else {
@@ -370,11 +377,15 @@ class ThreadListAdapter(
 
     fun updateContacts(newContacts: Map<Recipient, MergedContact>) {
         contacts = newContacts
-        notifyItemRangeChanged(0, itemCount, Unit)
+        notifyItemRangeChanged(0, itemCount, NotificationType.AVATAR)
     }
 
     fun updateFolderRole(newRole: FolderRole?) {
         folderRole = newRole
+    }
+
+    fun updateSelection() {
+        notifyItemRangeChanged(0, itemCount, NotificationType.SELECTED_STATE)
     }
 
     private enum class DisplayType(val layout: Int) {
@@ -382,6 +393,11 @@ class ThreadListAdapter(
         DATE_SEPARATOR(R.layout.item_thread_date_separator),
         FLUSH_FOLDER_BUTTON(R.layout.item_thread_flush_folder_button),
         SEE_ALL_BUTTON(R.layout.item_thread_see_all_button),
+    }
+
+    private enum class NotificationType {
+        AVATAR,
+        SELECTED_STATE,
     }
 
     private data class SwipeActionUiData(@ColorRes val colorRes: Int, @DrawableRes val iconRes: Int?)
