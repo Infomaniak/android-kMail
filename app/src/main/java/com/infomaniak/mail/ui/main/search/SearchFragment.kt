@@ -41,6 +41,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
 import com.infomaniak.lib.core.utils.Utils
+import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
@@ -193,6 +194,8 @@ class SearchFragment : Fragment() {
         }
 
         searchBar.searchTextInput.apply {
+            showKeyboard()
+
             doOnTextChanged { text, _, _, _ ->
                 if (searchViewModel.previousSearch != null) {
                     searchViewModel.previousSearch = null
