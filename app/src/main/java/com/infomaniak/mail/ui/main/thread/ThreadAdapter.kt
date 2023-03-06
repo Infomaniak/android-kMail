@@ -92,21 +92,11 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
                 val isThemeTheSame = !isThemeTheSameMap[message.uid]!!
                 isThemeTheSameMap[message.uid] = isThemeTheSame
                 bodyWebView.toggleWebViewTheme(isThemeTheSame)
-                toggleQuoteButtonTheme(isThemeTheSame)
                 quoteWebView.toggleWebViewTheme(isThemeTheSame)
+                toggleQuoteButtonTheme(isThemeTheSame)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
-        }
-    }
-
-    private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
-        if (isThemeTheSame) {
-            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_dark))
-            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
-        } else {
-            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_light))
-            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimaryInverse))
         }
     }
 
@@ -122,6 +112,16 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (isThemeTheSame) addBackgroundJs() else removeBackgroundJs()
 
         settings.javaScriptEnabled = false
+    }
+
+    private fun ItemMessageBinding.toggleQuoteButtonTheme(isThemeTheSame: Boolean) {
+        if (isThemeTheSame) {
+            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_dark))
+            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimary))
+        } else {
+            quoteButtonFrameLayout.setBackgroundColor(context.getColor(R.color.background_color_light))
+            quoteButton.setTextColor(context.getAttributeColor(RMaterial.attr.colorPrimaryInverse))
+        }
     }
 
     private fun WebView.addBackgroundJs() {
