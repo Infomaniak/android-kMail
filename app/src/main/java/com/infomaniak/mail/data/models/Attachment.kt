@@ -100,7 +100,8 @@ class Attachment : EmbeddedRealmObject {
     }
 
     fun getUploadLocalFile(
-        context: Context, localDraftUuid: String,
+        context: Context,
+        localDraftUuid: String,
         userId: Int = AccountUtils.currentUserId,
         mailboxId: Int = AccountUtils.currentMailboxId,
     ): File {

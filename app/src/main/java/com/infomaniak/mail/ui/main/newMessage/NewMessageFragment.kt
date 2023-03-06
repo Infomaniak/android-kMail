@@ -292,9 +292,10 @@ class NewMessageFragment : Fragment() {
     }
 
     private fun handleMultipleSendIntent() {
-        requireActivity().intent.parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)?.filterIsInstance<Uri>()?.let { uris ->
-            newMessageViewModel.importAttachments(uris)
-        }
+        requireActivity().intent
+            .parcelableArrayListExtra<Parcelable>(Intent.EXTRA_STREAM)
+            ?.filterIsInstance<Uri>()
+            ?.let(newMessageViewModel::importAttachments)
     }
 
     private fun doAfterSubjectChange() {

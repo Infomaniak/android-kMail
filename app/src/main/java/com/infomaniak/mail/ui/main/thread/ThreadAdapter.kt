@@ -38,7 +38,6 @@ import com.infomaniak.mail.databinding.ItemMessageBinding
 import com.infomaniak.mail.ui.main.thread.ThreadAdapter.ThreadViewHolder
 import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.utils.Utils
-import io.realm.kotlin.ext.copyFromRealm
 import java.util.*
 
 class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBinding.OnRealmChanged<Message> {
@@ -398,11 +397,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         fun initWebViewClientIfNeeded(attachments: List<Attachment>) {
             if (doesWebViewNeedInit) {
-                val cidDictionary = mutableMapOf<String, Attachment>()
-                attachments.forEach {
-                    if (it.contentId?.isNotBlank() == true) cidDictionary[it.contentId as String] = it.copyFromRealm()
-                }
-                binding.messageBody.webViewClient = MessageWebViewClient(binding.context, cidDictionary)
+                binding.messageBody.initWebViewClient(attachments)
                 doesWebViewNeedInit = false
             }
         }

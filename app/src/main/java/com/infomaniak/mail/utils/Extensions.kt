@@ -27,6 +27,7 @@ import android.provider.OpenableColumns
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
+import android.webkit.WebView
 import androidx.annotation.IdRes
 import androidx.annotation.RawRes
 import androidx.annotation.StringRes
@@ -53,6 +54,7 @@ import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity
+import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -65,10 +67,12 @@ import com.infomaniak.mail.ui.main.folder.DateSeparatorItemDecoration
 import com.infomaniak.mail.ui.main.folder.HeaderItemDecoration
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.ui.main.newMessage.NewMessageActivityArgs
+import com.infomaniak.mail.ui.main.thread.MessageWebViewClient
 import com.infomaniak.mail.ui.main.thread.ThreadFragmentArgs
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.isManaged
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.query.Sort
@@ -197,6 +201,15 @@ fun LottieAnimationView.changePathColor(illuColors: IlluColors, isDark: Boolean)
     addValueCallback(illuColors.keyPath, LottieProperty.COLOR_FILTER) {
         SimpleColorFilter(color)
     }
+}
+
+fun WebView.initWebViewClient(attachments: List<Attachment>) {
+    val cidDictionary = mutableMapOf<String, Attachment>()
+    attachments.forEach {
+        val attachment = if (it.isManaged()) it.copyFromRealm() else it
+        if (attachment.contentId?.isNotBlank() == true) cidDictionary[attachment.contentId as String] = attachment
+    }
+    webViewClient = MessageWebViewClient(context, cidDictionary)
 }
 //endregion
 
