@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.databinding.FragmentManageMailAddressBinding
 import com.infomaniak.mail.ui.main.user.ManageMailAddressViewModel
@@ -70,6 +71,7 @@ class ManageMailAddressFragment : Fragment() {
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {
+        activity?.trackAccountEvent("logOut")
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 
