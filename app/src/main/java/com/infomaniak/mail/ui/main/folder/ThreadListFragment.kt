@@ -125,19 +125,21 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         updateSwipeActionsAccordingToSettings()
     }
 
-    private fun updateSwipeActionsAccordingToSettings() {
-        binding.threadsList.apply {
-            behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
-            behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
+    private fun updateSwipeActionsAccordingToSettings() = with(binding.threadsList) {
+        behindSwipedItemBackgroundColor = localSettings.swipeLeft.getBackgroundColor(requireContext())
+        behindSwipedItemBackgroundSecondaryColor = localSettings.swipeRight.getBackgroundColor(requireContext())
 
-            behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
-            behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
+        behindSwipedItemIconDrawableId = localSettings.swipeLeft.iconRes
+        behindSwipedItemIconSecondaryDrawableId = localSettings.swipeRight.iconRes
 
-            val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
-            if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
-            val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
-            if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
-        }
+        unlockSwipeActionsIfSet()
+    }
+
+    private fun unlockSwipeActionsIfSet() = with(binding.threadsList) {
+        val leftIsSet = localSettings.swipeLeft != SwipeAction.NONE
+        if (leftIsSet) enableSwipeDirection(DirectionFlag.LEFT) else disableSwipeDirection(DirectionFlag.LEFT)
+        val rightIsSet = localSettings.swipeRight != SwipeAction.NONE
+        if (rightIsSet) enableSwipeDirection(DirectionFlag.RIGHT) else disableSwipeDirection(DirectionFlag.RIGHT)
     }
 
     override fun onRefresh() {
@@ -404,9 +406,18 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observerMultiSelection() = with(binding) {
-        threadListViewModel.isMultiSelectOn.observe(viewLifecycleOwner) {
-            toolbar.isGone = it
-            toolbarSelection.isVisible = it
+        threadListViewModel.isMultiSelectOn.observe(viewLifecycleOwner) { isMultiSelectOn ->
+            toolbar.isGone = isMultiSelectOn
+            toolbarSelection.isVisible = isMultiSelectOn
+
+            (activity as MainActivity).setDrawerLockMode(!isMultiSelectOn)
+            if (isMultiSelectOn) threadsList.apply {
+                disableSwipeDirection(DirectionFlag.LEFT)
+                disableSwipeDirection(DirectionFlag.RIGHT)
+            }
+            else {
+                unlockSwipeActionsIfSet()
+            }
         }
 
         threadListViewModel.selectedThreadUids.observe(viewLifecycleOwner) {
