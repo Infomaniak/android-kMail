@@ -80,7 +80,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
 
                 //region Actions
                 override fun onArchive(): Unit = with(mainViewModel) {
-                    trackMailActionsEvent("archiveMessage", isCurrentFolderRole(FolderRole.ARCHIVE).toMailActionValue())
+                    trackMailActionsEvent("archiveMessage", (message.folder.role == FolderRole.ARCHIVE).toMailActionValue())
                     archiveThreadOrMessage(threadUid, message)
                 }
 

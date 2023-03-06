@@ -24,6 +24,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.infomaniak.mail.MatomoMail.toMailActionValue
+import com.infomaniak.mail.MatomoMail.trackMailActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -53,38 +55,45 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
         threadActionsViewModel.getMessageUidToReplyTo(
             threadUid,
             messageUidToReplyTo,
-        ).observe(viewLifecycleOwner) { messageUidToReply ->
+        ).observe(viewLifecycleOwner) { (thread, messageUidToReply) ->
 
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
+                    trackMailActionsEvent("replyThread")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply, currentClassName)
                 }
 
                 override fun onReplyAll() {
+                    trackMailActionsEvent("replyAllThread")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply, currentClassName)
                 }
 
                 override fun onForward() {
+                    trackMailActionsEvent("forwardThread")
                     safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUidToReply, currentClassName)
                 }
 
                 override fun onDelete() {
+                    trackMailActionsEvent("trashThread")
                     mainViewModel.deleteThreadOrMessage(threadUid)
                 }
                 //endregion
 
                 //region Actions
-                override fun onArchive() {
+                override fun onArchive(): Unit = with(mainViewModel) {
+                    trackMailActionsEvent("archiveThread", isCurrentFolderRole(FolderRole.ARCHIVE).toMailActionValue())
                     mainViewModel.archiveThreadOrMessage(threadUid)
                 }
 
                 override fun onReadUnread() {
+                    trackMailActionsEvent("markAsSeenThread", (thread.unseenMessagesCount == 0).toMailActionValue())
                     mainViewModel.toggleSeenStatus(threadUid)
                     findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
                 override fun onMove() {
+                    trackMailActionsEvent("moveThread")
                     animatedNavigation(
                         resId = R.id.moveFragment,
                         args = MoveFragmentArgs(threadUid).toBundle(),
@@ -93,20 +102,24 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onPostpone() {
+                    trackMailActionsEvent("postponeThread")
                     TODO("Not yet implemented")
                 }
 
                 override fun onFavorite() {
+                    trackMailActionsEvent("favoriteThread", thread.isFavorite.toMailActionValue())
                     mainViewModel.toggleFavoriteStatus(threadUid)
                 }
 
-                override fun onSpam() {
-                    mainViewModel.toggleSpamOrHam(threadUid)
+                override fun onSpam(): Unit = with(mainViewModel) {
+                    trackMailActionsEvent("spamThread", isCurrentFolderRole(FolderRole.SPAM).toMailActionValue())
+                    toggleSpamOrHam(threadUid)
                 }
 
                 override fun onReportJunk() = Unit
 
                 override fun onPrint() {
+                    trackMailActionsEvent("printThread")
                     notYetImplemented()
                 }
 
