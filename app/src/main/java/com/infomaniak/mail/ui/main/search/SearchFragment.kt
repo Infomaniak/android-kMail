@@ -223,7 +223,7 @@ class SearchFragment : Fragment() {
             disableDragDirection(DirectionFlag.UP)
             disableSwipeDirection(DirectionFlag.LEFT)
             disableSwipeDirection(DirectionFlag.RIGHT)
-            addStickyDateDecoration(threadListAdapter)
+            addStickyDateDecoration(threadListAdapter, localSettings.threadDensity)
             setPagination()
         }
 

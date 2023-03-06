@@ -52,6 +52,7 @@ import com.infomaniak.lib.core.utils.SnackbarUtils.showSnackbar
 import com.infomaniak.lib.login.InfomaniakLogin
 import com.infomaniak.mail.BuildConfig
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.LocalSettings.ThreadDensity
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
@@ -371,11 +372,11 @@ fun Fragment.createInputDialog(
         .setupOnShowListener()
 }
 
-fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter) {
+fun DragDropSwipeRecyclerView.addStickyDateDecoration(adapter: ThreadListAdapter, threadDensity: ThreadDensity) {
     addItemDecoration(HeaderItemDecoration(this, false) { position ->
         return@HeaderItemDecoration position >= 0 && adapter.dataSet[position] is String
     })
-    addItemDecoration(DateSeparatorItemDecoration())
+    if (threadDensity == ThreadDensity.NORMAL) addItemDecoration(DateSeparatorItemDecoration())
 }
 
 fun Context.getLocalizedNameOrAllFolders(folder: Folder?): String {
