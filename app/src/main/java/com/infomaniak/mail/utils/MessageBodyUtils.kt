@@ -100,7 +100,6 @@ object MessageBodyUtils {
                 firstQuotedContent?.remove()
                 htmlDocumentWithQuote.toString() to firstQuotedContent.toString()
             }
-
         } ?: (htmlDocumentWithQuote.toString() to null)
     }
 
