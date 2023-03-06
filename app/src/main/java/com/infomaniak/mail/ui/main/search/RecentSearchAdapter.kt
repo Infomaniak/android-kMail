@@ -25,7 +25,7 @@ import com.infomaniak.mail.databinding.ItemRecentSearchBinding
 class RecentSearchAdapter(
     private var searchQueries: MutableList<String>,
     private val onSearchQueryClicked: (searchQuery: String) -> Unit,
-    private val onSearchQueryDeleted: (isEmpty: Boolean) -> Unit,
+    private val onSearchQueryDeleted: (history: List<String>) -> Unit,
 ) : RecyclerView.Adapter<RecentSearchAdapter.RecentSearchViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecentSearchViewHolder {
@@ -40,7 +40,7 @@ class RecentSearchAdapter(
             val searchQueryPosition = searchQueries.indexOf(searchQuery)
             if (searchQueryPosition >= 0) {
                 searchQueries.removeAt(searchQueryPosition)
-                onSearchQueryDeleted(searchQueries.isNotEmpty())
+                onSearchQueryDeleted(searchQueries)
                 notifyItemRemoved(searchQueryPosition)
             }
         }

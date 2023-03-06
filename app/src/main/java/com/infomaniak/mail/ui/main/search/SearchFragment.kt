@@ -86,7 +86,9 @@ class SearchFragment : Fragment() {
                     setSelection(it.count())
                 }
             },
-            onSearchQueryDeleted = { isThereHistory ->
+            onSearchQueryDeleted = { history ->
+                val isThereHistory = history.isNotEmpty()
+                localSettings.recentSearches = history
                 updateHistoryEmptyStateVisibility(isThereHistory)
             },
         )
