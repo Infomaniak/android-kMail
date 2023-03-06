@@ -73,6 +73,8 @@ object ApiRoutes {
         return "${message(mailboxUuid, folderId, shortUid)}/attachmentsArchive"
     }
 
+    fun attachmentToForward(mailboxUuid: String) = "${draft(mailboxUuid)}/attachmentsToForward"
+
     fun search(mailboxUuid: String, folderId: String, filters: String): String {
         return "${folder(mailboxUuid, folderId)}/message?offset=0&thread=on&$filters"
     }

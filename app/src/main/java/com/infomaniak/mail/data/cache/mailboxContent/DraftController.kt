@@ -20,11 +20,14 @@ package com.infomaniak.mail.data.cache.mailboxContent
 import android.content.Context
 import com.infomaniak.lib.core.utils.contains
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.AccountUtils
 import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
@@ -115,7 +118,14 @@ object DraftController {
 
         subject = formatSubject(draftMode, previousMessage.subject ?: "")
 
-        if (draftMode == DraftMode.FORWARD) body += forwardQuote(previousMessage, context)
+        if (draftMode == DraftMode.FORWARD) {
+            val mailboxUuid = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
+            ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.let {
+                attachments += it
+            }
+
+            body += forwardQuote(previousMessage, context)
+        }
     }
 
     private fun forwardQuote(message: Message, context: Context): String {

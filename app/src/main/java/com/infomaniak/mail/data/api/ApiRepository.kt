@@ -23,6 +23,7 @@ import com.infomaniak.lib.core.api.ApiRepositoryCore
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.networking.HttpClient
 import com.infomaniak.mail.data.models.*
+import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition
 import com.infomaniak.mail.data.models.addressBook.AddressBooksResult
 import com.infomaniak.mail.data.models.correspondent.Contact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -128,6 +129,16 @@ object ApiRepository : ApiRepositoryCore() {
             callApi(ApiRoutes.draft(mailboxUuid, uuid), PUT, body, okHttpClient)
 
         return draft.remoteUuid?.let(::putDraft) ?: run(::postDraft)
+    }
+
+    fun attachmentsToForward(mailboxUuid: String, message: Message): ApiResponse<AttachmentsToForwardResult> {
+
+        val body = mapOf(
+            "to_forward_uids" to arrayOf(message.uid),
+            "mode" to AttachmentDisposition.INLINE.name.lowercase(),
+        )
+
+        return callApi(ApiRoutes.attachmentToForward(mailboxUuid), POST, body)
     }
 
     fun deleteMessages(mailboxUuid: String, messageUids: List<String>): ApiResponse<DeleteMessageResult?> {

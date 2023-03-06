@@ -31,6 +31,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.webkit.WebView
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
@@ -48,6 +49,7 @@ import com.infomaniak.lib.core.utils.isNightModeEnabled
 import com.infomaniak.lib.core.utils.parcelableArrayListExtra
 import com.infomaniak.lib.core.utils.parcelableExtra
 import com.infomaniak.mail.R
+import com.infomaniak.mail.data.models.Attachment.AttachmentDisposition.INLINE
 import com.infomaniak.mail.data.models.Mailbox
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
@@ -57,10 +59,7 @@ import com.infomaniak.mail.ui.main.newMessage.NewMessageActivity.EditorAction
 import com.infomaniak.mail.ui.main.newMessage.NewMessageFragment.FieldType.*
 import com.infomaniak.mail.ui.main.newMessage.NewMessageViewModel.ImportationResult
 import com.infomaniak.mail.ui.main.thread.AttachmentAdapter
-import com.infomaniak.mail.utils.Utils
-import com.infomaniak.mail.utils.context
-import com.infomaniak.mail.utils.injectCssInHtml
-import com.infomaniak.mail.utils.notYetImplemented
+import com.infomaniak.mail.utils.*
 import com.infomaniak.mail.workers.DraftsActionsWorker
 import com.google.android.material.R as RMaterial
 
@@ -219,7 +218,7 @@ class NewMessageFragment : Fragment() {
 
         subjectTextField.setText(draft.subject)
 
-        attachmentAdapter.addAll(draft.attachments)
+        attachmentAdapter.addAll(draft.attachments.filterNot { it.disposition == INLINE })
         attachmentsRecyclerView.isGone = attachmentAdapter.itemCount == 0
 
         bodyText.setText(draft.uiBody)
@@ -241,16 +240,16 @@ class NewMessageFragment : Fragment() {
         }
 
         draft.uiQuote?.let { html ->
-            var quote = if (context.isNightModeEnabled()) {
-                context.injectCssInHtml(R.raw.custom_dark_mode_signature, html)
-            } else {
-                html
-            }
-            quote = context.injectCssInHtml(R.raw.remove_margin, quote)
-            quoteWebView.loadDataWithBaseURL("", quote, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
-
+            quoteWebView.loadQuote(html)
+            quoteWebView.initWebViewClient(draft.attachments)
             quoteWebView.isVisible = true
         }
+    }
+
+    private fun WebView.loadQuote(html: String) {
+        var quote = if (context.isNightModeEnabled()) context.injectCssInHtml(R.raw.custom_dark_mode_signature, html) else html
+        quote = context.injectCssInHtml(R.raw.remove_margin, quote)
+        loadDataWithBaseURL("", quote, ClipDescription.MIMETYPE_TEXT_HTML, Utils.UTF_8, "")
     }
 
     private fun populateViewModelWithExternalMailData() {
