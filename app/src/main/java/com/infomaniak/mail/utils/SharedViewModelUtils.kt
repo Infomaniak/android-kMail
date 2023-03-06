@@ -61,7 +61,7 @@ object SharedViewModelUtils {
     suspend fun refreshFolders(
         mailbox: Mailbox,
         messagesFoldersIds: List<String>,
-        destinationFolderId: String? = null
+        destinationFolderId: String? = null,
     ) = withContext(Dispatchers.IO) {
 
         // We always want to refresh the `destinationFolder` last, to avoid any blink on the UI.

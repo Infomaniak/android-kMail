@@ -164,12 +164,14 @@ class Message : RealmObject {
         return if (isManaged()) copyFromRealm(depth) else this
     }
 
-    fun getRecipientForReplyTo(replyAll: Boolean = false): Pair<List<Recipient>, List<Recipient>> {
-        val cleanedTo = to.detachedFromRealm().filter { !it.isMe() }
-        val cleanedCc = cc.detachedFromRealm().filter { !it.isMe() }
+    fun getRecipientsForReplyTo(replyAll: Boolean = false): Pair<List<Recipient>, List<Recipient>> {
 
-        fun cleanedFrom() = from.detachedFromRealm().filter { !it.isMe() }
-        var to = replyTo.detachedFromRealm().filter { !it.isMe() }.ifEmpty { cleanedFrom() }
+        fun cleanedFrom() = from.detachedFromRealm().filterNot { it.isMe() }
+
+        val cleanedTo = to.detachedFromRealm().filterNot { it.isMe() }
+        val cleanedCc = cc.detachedFromRealm().filterNot { it.isMe() }
+
+        var to = replyTo.detachedFromRealm().filterNot { it.isMe() }.ifEmpty { cleanedFrom() }
         var cc = emptyList<Recipient>()
 
         if (to.isEmpty()) {
