@@ -47,6 +47,7 @@ import io.realm.kotlin.ext.copyFromRealm
 import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 class NewMessageViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -135,19 +136,20 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun splitSignatureAndQuoteFromBody() {
+
+        fun Document.split(divClassName: String, defaultValue: String): Pair<String, String?> {
+            return getElementsByClass(divClassName).lastOrNull()?.let {
+                it.remove()
+                val first = body().html()
+                val second = if (it.html().isBlank()) null else it.outerHtml()
+                first to second
+            } ?: (defaultValue to null)
+        }
+
         val doc = Jsoup.parse(draft.body)
 
-        val (bodyWithQuote, signature) = doc.getElementsByClass(Draft.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME).lastOrNull()?.let {
-            it.remove()
-            val signature = if (it.html().isBlank()) null else it.outerHtml()
-            doc.body().html() to signature
-        } ?: (draft.body to null)
-
-        val (body, quote) = doc.getElementsByClass(Draft.INFOMANIAK_QUOTE_HTML_CLASS_NAME).lastOrNull()?.let {
-            it.remove()
-            val quote = if (it.html().isBlank()) null else it.outerHtml()
-            doc.body().html() to quote
-        } ?: (bodyWithQuote to null)
+        val (bodyWithQuote, signature) = doc.split(Draft.INFOMANIAK_SIGNATURE_HTML_CLASS_NAME, draft.body)
+        val (body, quote) = doc.split(Draft.INFOMANIAK_QUOTE_HTML_CLASS_NAME, bodyWithQuote)
 
         draft.apply {
             uiBody = body.htmlToText()
