@@ -179,13 +179,9 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         if (quote == null) return@with
 
         quoteButton.setOnClickListener {
-            if (quoteFrameLayout.isVisible) {
-                quoteButton.text = context.getString(R.string.messageShowQuotedText)
-                quoteFrameLayout.isGone = true
-            } else {
-                quoteButton.text = context.getString(R.string.messageHideQuotedText)
-                quoteFrameLayout.isVisible = true
-            }
+            val textId = if (quoteFrameLayout.isVisible) R.string.messageShowQuotedText else R.string.messageHideQuotedText
+            quoteButton.text = context.getString(textId)
+            quoteFrameLayout.isVisible = !quoteFrameLayout.isVisible
         }
 
         quoteWebView.applyWebViewContent(uid, quote, type)
@@ -340,12 +336,8 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
 
         if (isExpanded) {
             displayAttachments(message.attachments)
-            quoteButtonFrameLayout.isVisible = if (message.hasQuote) {
-                quoteButton.text = context.getString(R.string.messageShowQuotedText)
-                true
-            } else {
-                false
-            }
+            if (message.hasQuote) quoteButton.text = context.getString(R.string.messageShowQuotedText)
+            quoteButtonFrameLayout.isVisible = message.hasQuote
         } else {
             hideAttachments()
             quoteButtonFrameLayout.isGone = true
