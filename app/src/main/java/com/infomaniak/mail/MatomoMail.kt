@@ -28,8 +28,11 @@ object MatomoMail : MatomoCore {
     override val Context.tracker: Tracker get() = (this as ApplicationMain).matomoTracker
     override val siteId = 9
 
+    fun Context.trackMessageEvent(name: String, value: Float? = null) {
+        trackEvent("message", name, value = value)
+    }
     fun Fragment.trackMailActionsEvent(name: String, value: Float? = null) {
-        activity?.trackEvent("actionsMail", name, TrackerAction.CLICK, value)
+        trackEvent(category = "actionsMail", name = name, value = value)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics

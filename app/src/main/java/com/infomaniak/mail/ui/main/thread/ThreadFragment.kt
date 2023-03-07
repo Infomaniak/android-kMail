@@ -43,6 +43,7 @@ import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
@@ -199,11 +200,13 @@ class ThreadFragment : Fragment() {
                 )
             }
             onDeleteDraftClicked = { message ->
+                trackMessageEvent("deleteDraft")
                 mainViewModel.currentMailbox.value?.let { mailbox ->
                     threadViewModel.deleteDraft(message, threadUid, mailbox)
                 }
             }
             onAttachmentClicked = { attachment ->
+                trackMessageEvent("openAttachment")
                 if (attachment.openWithIntent(requireContext()).hasSupportedApplications(requireContext())) {
                     attachment.display()
                 } else {
@@ -211,9 +214,11 @@ class ThreadFragment : Fragment() {
                 }
             }
             onDownloadAllClicked = { message ->
+                trackMessageEvent("downloadAll")
                 downloadAllAttachments(message)
             }
             onReplyClicked = { message ->
+                trackEvent("messageAction", "reply")
                 replyTo(message)
             }
             onMenuClicked = { message ->
@@ -320,6 +325,10 @@ class ThreadFragment : Fragment() {
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
         // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
         findNavController().popBackStack()
+    }
+
+    private fun trackMessageEvent(name: String, value: Float? = null) {
+        trackEvent("message", name, value = value)
     }
 
     enum class HeaderState {

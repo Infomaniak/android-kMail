@@ -29,6 +29,8 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.infomaniak.lib.core.utils.*
 import com.infomaniak.lib.core.views.ViewHolder
+import com.infomaniak.mail.MatomoMail.toFloat
+import com.infomaniak.mail.MatomoMail.trackMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Attachment
 import com.infomaniak.mail.data.models.Attachment.*
@@ -159,7 +161,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         bindHeader(message)
         bindAttachment(message)
 
-        binding.displayExpandedCollapsedMessage(message)
+        binding.displayExpandedCollapsedMessage(message, shouldTrack = false)
     }
 
     private fun initMapForNewMessage(message: Message, position: Int) {
@@ -228,7 +230,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             shortMessageDate.text = context.mailFormattedDate(messageDate)
         }
 
-        userAvatar.setOnClickListener { onContactClicked?.invoke(message.from.first()) }
+        userAvatar.setOnClickListener {
+            context.trackMessageEvent("selectAvatar")
+            onContactClicked?.invoke(message.from.first())
+        }
 
         initWebViewClientIfNeeded(message.attachments)
 
@@ -286,6 +291,7 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
             detailedFieldsGroup.isVisible = isExpanded
             ccGroup.isVisible = isExpanded && message.cc.isNotEmpty()
             bccGroup.isVisible = isExpanded && message.bcc.isNotEmpty()
+            context.trackMessageEvent("openDetails", isExpanded.toFloat())
         }
     }
 
@@ -328,8 +334,10 @@ class ThreadAdapter : RecyclerView.Adapter<ThreadViewHolder>(), RealmChangesBind
         return FormatterFileSize.formatShortFileSize(context, totalAttachmentsFileSizeInBytes)
     }
 
-    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message) {
+    private fun ItemMessageBinding.displayExpandedCollapsedMessage(message: Message, shouldTrack: Boolean = true) {
         val isExpanded = isExpandedMap[message.uid]!!
+
+        if (shouldTrack) context.trackMessageEvent("openMessage", isExpanded.toFloat())
 
         collapseMessageDetails(message)
         setHeaderState(message, isExpanded)
