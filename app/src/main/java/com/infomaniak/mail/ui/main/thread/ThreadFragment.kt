@@ -45,6 +45,8 @@ import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
 import com.infomaniak.mail.MatomoMail.toMailActionValue
 import com.infomaniak.mail.MatomoMail.trackEvent
+import com.infomaniak.mail.MatomoMail.trackMessageEvent
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
@@ -210,6 +212,7 @@ class ThreadFragment : Fragment() {
                 safeNavigate(ThreadFragmentDirections.actionThreadFragmentToDetailedContactBottomSheetDialog(contact))
             }
             onDraftClicked = { message ->
+                trackNewMessageEvent("openFromDraft")
                 safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToNewMessageActivity(
                         draftExists = true,
@@ -352,7 +355,7 @@ class ThreadFragment : Fragment() {
     }
 
     private fun trackMessageEvent(name: String, value: Float? = null) {
-        trackEvent("message", name, value = value)
+        activity?.trackMessageEvent(name, value)
     }
 
     enum class HeaderState {
