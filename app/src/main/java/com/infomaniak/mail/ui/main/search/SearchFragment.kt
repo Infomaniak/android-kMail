@@ -251,9 +251,13 @@ class SearchFragment : Fragment() {
             width = resources.getDimensionPixelSize(R.dimen.maxSearchChipWidth)
         }
 
-        searchViewModel.folders.observe(viewLifecycleOwner) { realmFolders ->
-            val folders = realmFolders.toMutableList<Folder?>()
+        mainViewModel.currentFoldersLive.value?.let { (defaultFolders, customFolders) ->
+            val folders = defaultFolders.toMutableList<Folder?>()
             folders.add(0, null)
+
+            // TODO : Ajotuer trait
+
+            folders.addAll(customFolders)
 
             popupMenu.setAdapter(
                 SearchFolderAdapter(folders) { folder, title ->
@@ -262,6 +266,7 @@ class SearchFragment : Fragment() {
                 }
             )
         }
+
 
         return popupMenu
     }

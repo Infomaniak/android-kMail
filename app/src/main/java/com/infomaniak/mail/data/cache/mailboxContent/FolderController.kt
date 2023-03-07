@@ -50,7 +50,7 @@ object FolderController {
      * So if this sort logic changes, it needs to be changed in both locations.
      * The other location is in `Utils.formatFoldersListWithAllChildren()`.
      */
-    private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = true): RealmQuery<Folder> {
+    private fun getFoldersQuery(realm: TypedRealm, onlyRoots: Boolean = false): RealmQuery<Folder> {
         val rootsQuery = if (onlyRoots) " AND ${Folder.parentsPropertyName}.@count == 0" else ""
         return realm
             .query<Folder>(isNotSearch + rootsQuery)
@@ -69,7 +69,7 @@ object FolderController {
     //endregion
 
     //region Get data
-    private fun getRootsFolders(
+    private fun getFolders(
         exceptionsFoldersIds: List<String> = emptyList(),
         realm: TypedRealm = defaultRealm,
     ): RealmResults<Folder> {
@@ -81,25 +81,8 @@ object FolderController {
         return realmQuery.find()
     }
 
-    fun getFolders(): List<Folder> {
-
-        fun List<Folder>.sortWithFoldersRoles(): List<Folder> {
-            return sortedWith(Comparator { firstFolder, secondFolder ->
-                val (firstRole, secondRole) = firstFolder.role to secondFolder.role
-                return@Comparator when {
-                    firstRole != null && secondRole != null -> firstRole.order.compareTo(secondRole.order)
-                    firstRole != null -> -1
-                    secondRole != null -> 1
-                    else -> 0
-                }
-            })
-        }
-
-        return getFoldersQuery(defaultRealm, false).find().sortWithFoldersRoles()
-    }
-
     fun getRootsFoldersAsync(): Flow<ResultsChange<Folder>> {
-        return getFoldersQuery(defaultRealm).asFlow()
+        return getFoldersQuery(defaultRealm, onlyRoots = true).asFlow()
     }
 
     fun getFolder(id: String, realm: TypedRealm = defaultRealm): Folder? {
@@ -151,7 +134,7 @@ object FolderController {
     }
 
     private fun MutableRealm.deleteOutdatedFolders(remoteFolders: List<Folder>) {
-        getRootsFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
+        getFolders(exceptionsFoldersIds = remoteFolders.map { it.id }, realm = this).reversed().forEach { folder ->
             deleteLocalFolder(folder)
         }
     }
