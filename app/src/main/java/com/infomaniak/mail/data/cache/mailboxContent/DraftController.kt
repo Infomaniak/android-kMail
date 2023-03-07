@@ -106,25 +106,27 @@ object DraftController {
         val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
         references = "${previousReferences}${previousMessage.messageId}"
 
-        when (draftMode) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> inReplyToUid = previousMessage.uid
-            DraftMode.FORWARD -> forwardedUid = previousMessage.uid
-            DraftMode.NEW_MAIL -> Unit
-        }
-
-        val (toList, ccList) = previousMessage.getRecipientsForReplyTo(draftMode == DraftMode.REPLY_ALL)
-        to = toList.toRealmList()
-        cc = ccList.toRealmList()
-
         subject = formatSubject(draftMode, previousMessage.subject ?: "")
 
-        if (draftMode == DraftMode.FORWARD) {
-            val mailboxUuid = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
-            ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.let {
-                attachments += it
-            }
+        when (draftMode) {
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> {
+                inReplyToUid = previousMessage.uid
 
-            body += forwardQuote(previousMessage, context)
+                val (toList, ccList) = previousMessage.getRecipientsForReplyTo(draftMode == DraftMode.REPLY_ALL)
+                to = toList.toRealmList()
+                cc = ccList.toRealmList()
+            }
+            DraftMode.FORWARD -> {
+                forwardedUid = previousMessage.uid
+
+                val mailboxUuid = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
+                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.let {
+                    attachments += it
+                }
+
+                body += forwardQuote(previousMessage, context)
+            }
+            DraftMode.NEW_MAIL -> Unit
         }
     }
 
