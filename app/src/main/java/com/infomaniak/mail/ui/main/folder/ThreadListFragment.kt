@@ -113,6 +113,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             threadListFragment = this,
             threadListAdapter = threadListAdapter,
             unlockSwipeActionsIfSet = ::unlockSwipeActionsIfSet,
+            localSettings = localSettings,
         )
 
         observeCurrentThreads()

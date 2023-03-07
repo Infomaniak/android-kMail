@@ -77,6 +77,8 @@ class ThreadListAdapter(
     private val cardCornerRadius by lazy { context.resources.getDimension(R.dimen.alternativeMargin) }
     private val threadMarginCompact by lazy { context.resources.getDimension(RCore.dimen.marginStandardVerySmall).toInt() }
     private val threadMarginOther by lazy { context.resources.getDimension(RCore.dimen.marginStandardSmall).toInt() }
+    private val checkMarkSizeLarge by lazy { context.resources.getDimension(R.dimen.userAvatarSizeLarge).toInt() }
+    private val checkMarkSizeOther by lazy { context.resources.getDimension(R.dimen.checkMarkSizeOther).toInt() }
 
     private var swipingIsAuthorized: Boolean = true
     private var displaySeeAllButton = false // TODO: Manage this for intelligent mailbox
@@ -181,6 +183,7 @@ class ThreadListAdapter(
             updateSelectedState(selectedThread)
 
             root.setOnLongClickListener {
+                if (!multiSelection.isEnabled) multiSelection.isEnabled = true
                 toggleSelection(selectedThread)
                 true
             }
@@ -188,7 +191,6 @@ class ThreadListAdapter(
     }
 
     private fun CardviewThreadItemBinding.toggleSelection(selectedThread: SelectedThread) = with(multiSelection!!) {
-        isEnabled = true
         with(selectedItems) {
             if (contains(selectedThread)) remove(selectedThread) else add(selectedThread)
             publishSelectedItems()
@@ -204,6 +206,16 @@ class ThreadListAdapter(
         } else {
             context.getColorStateList(R.color.backgroundColor)
         }
+
+        expeditorAvatar.isVisible = !isSelected && threadDensity == LARGE
+        checkMarkLayout.isVisible = multiSelection?.isEnabled == true
+
+        checkedState.isVisible = isSelected
+        uncheckedState.isVisible = multiSelection?.isEnabled == true && threadDensity != LARGE && !isSelected
+
+        // TransitionManager.endTransitions(checkMarkLayout)
+        // TransitionManager.beginDelayedTransition(textContent, TransitionSet().addTransition(ChangeBounds()))
+        // TransitionManager.beginDelayedTransition(root)
     }
 
     private fun CardviewThreadItemBinding.setupThreadDensityDependentUi() {
@@ -212,6 +224,22 @@ class ThreadListAdapter(
 
         expeditorAvatar.isVisible = threadDensity == LARGE
         mailBodyPreview.isGone = threadDensity == COMPACT
+
+        val checkMarkSize = if (threadDensity == LARGE) checkMarkSizeLarge else checkMarkSizeOther
+        checkMarkBackground.apply {
+            layoutParams.apply {
+                width = checkMarkSize
+                height = checkMarkSize
+            }
+            requestLayout()
+        }
+        uncheckedState.apply {
+            layoutParams.apply {
+                width = checkMarkSize
+                height = checkMarkSize
+            }
+            requestLayout()
+        }
     }
 
     private fun CardviewThreadItemBinding.displayAvatar(thread: Thread) {

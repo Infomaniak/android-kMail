@@ -15,12 +15,17 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
+
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/CardViewMail"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="2dp"
+    android:layout_marginStart="@dimen/marginStandardVerySmall"
+    app:cardCornerRadius="@null"
+    app:shapeAppearanceOverlay="@style/MenuDrawerItemShapeAppearance">
 
     <!-- This needs to be passed as the handle used for dragging cards around in the DragDropSwipeRecyclerview library -->
     <View
@@ -52,24 +57,82 @@
             app:shapeAppearanceOverlay="@style/CircleImageView"
             tools:visibility="visible" />
 
-        <com.infomaniak.mail.views.AvatarView
-            android:id="@+id/expeditorAvatar"
-            android:layout_width="@dimen/userAvatarSizeLarge"
-            android:layout_height="@dimen/userAvatarSizeLarge"
+        <FrameLayout
+            android:id="@+id/avatarFrameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/marginStandardVerySmall"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/newMailBullet"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars"
-            tools:visibility="visible" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.infomaniak.mail.views.AvatarView
+                android:id="@+id/expeditorAvatar"
+                android:layout_width="@dimen/userAvatarSizeLarge"
+                android:layout_height="@dimen/userAvatarSizeLarge"
+                android:visibility="gone"
+                tools:src="@tools:sample/avatars"
+                tools:visibility="visible" />
+
+            <FrameLayout
+                android:id="@+id/checkMarkLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/checkedState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/checkMarkBackground"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="?attr/colorPrimary"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
+                        tools:layout_height="@dimen/userAvatarSizeLarge"
+                        tools:layout_width="@dimen/userAvatarSizeLarge" />
+
+                    <ImageView
+                        android:id="@+id/checkMarkCheck"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_check"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="?attr/colorOnPrimary"
+                        tools:ignore="ContentDescription" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <ImageView
+                    android:id="@+id/uncheckedState"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:src="@drawable/ic_checkbox_unchecked"
+                    tools:ignore="ContentDescription"
+                    tools:layout_height="@dimen/userAvatarSizeLarge"
+                    tools:layout_width="@dimen/userAvatarSizeLarge" />
+
+            </FrameLayout>
+        </FrameLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/textContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/alternativeMargin"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/expeditorAvatar"
+            app:layout_constraintStart_toEndOf="@id/avatarFrameLayout"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_goneMarginStart="@dimen/marginStandardSmall">
 
