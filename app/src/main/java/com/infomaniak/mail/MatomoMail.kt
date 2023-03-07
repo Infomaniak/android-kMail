@@ -44,10 +44,6 @@ object MatomoMail : MatomoCore {
         trackEvent(category = "menuDrawer", name = name, value = value?.toFloat())
     }
 
-    fun Fragment.trackMailActionsEvent(name: String, value: Float? = null) {
-        trackEvent(category = "actionsMail", name = name, value = value)
-    }
-
     // We need to invert this logical value to keep a coherent value for analytics
     fun Boolean.toMailActionValue() = (!this).toFloat()
 }

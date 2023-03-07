@@ -152,7 +152,7 @@ class ThreadFragment : Fragment() {
         })
 
         iconFavorite.setOnClickListener {
-            trackThreadActionsEvent("favorite", threadViewModel.isThreadFavorite.toMailActionValue())
+            trackThreadActionsEvent("favorite", threadViewModel.isThreadFavorite)
             mainViewModel.toggleFavoriteStatus(threadUid)
         }
 
@@ -166,9 +166,9 @@ class ThreadFragment : Fragment() {
                     trackThreadActionsEvent("forward")
                     threadViewModel.clickOnQuickActionBar(threadUid, menuId)
                 }
-                R.id.quickActionArchive -> {
-                    trackThreadActionsEvent("archive", mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE).toMailActionValue())
-                    mainViewModel.archiveThreadOrMessage(threadUid)
+                R.id.quickActionArchive -> with(mainViewModel) {
+                    trackThreadActionsEvent("archive", isCurrentFolderRole(FolderRole.ARCHIVE))
+                    archiveThreadOrMessage(threadUid)
                 }
                 R.id.quickActionDelete -> {
                     trackThreadActionsEvent("trash")
@@ -223,7 +223,7 @@ class ThreadFragment : Fragment() {
                 )
             }
             onDeleteDraftClicked = { message ->
-                trackMessageEvent("deleteDraft")
+                trackMessageActionsEvent("deleteDraft")
                 mainViewModel.currentMailbox.value?.let { mailbox ->
                     threadViewModel.deleteDraft(message, threadUid, mailbox)
                 }
@@ -241,7 +241,7 @@ class ThreadFragment : Fragment() {
                 downloadAllAttachments(message)
             }
             onReplyClicked = { message ->
-                trackEvent("messageAction", "reply")
+                trackMessageActionsEvent("reply")
                 replyTo(message)
             }
             onMenuClicked = { message ->
@@ -350,12 +350,16 @@ class ThreadFragment : Fragment() {
         findNavController().popBackStack()
     }
 
-    private fun trackThreadActionsEvent(name: String, value: Float? = null) {
-        trackEvent("threadActions", name, value = value)
+    private fun trackThreadActionsEvent(name: String, value: Boolean? = null) {
+        trackEvent("threadActions", name, value = value?.toMailActionValue())
     }
 
     private fun trackMessageEvent(name: String, value: Float? = null) {
         activity?.trackMessageEvent(name, value)
+    }
+
+    private fun trackMessageActionsEvent(name: String) {
+        trackEvent("messageActions", name)
     }
 
     enum class HeaderState {

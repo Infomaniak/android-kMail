@@ -24,8 +24,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.infomaniak.mail.MatomoMail.toMailActionValue
-import com.infomaniak.mail.MatomoMail.trackMailActionsEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
@@ -60,40 +58,40 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
             initOnClickListener(object : OnActionClick {
                 //region Main actions
                 override fun onReply() {
-                    trackMailActionsEvent("replyThread")
+                    trackThreadActionsEvent("replyThread")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY, messageUidToReply, currentClassName)
                 }
 
                 override fun onReplyAll() {
-                    trackMailActionsEvent("replyAllThread")
+                    trackThreadActionsEvent("replyAllThread")
                     safeNavigateToNewMessageActivity(DraftMode.REPLY_ALL, messageUidToReply, currentClassName)
                 }
 
                 override fun onForward() {
-                    trackMailActionsEvent("forwardThread")
+                    trackThreadActionsEvent("forwardThread")
                     safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUidToReply, currentClassName)
                 }
 
                 override fun onDelete() {
-                    trackMailActionsEvent("trashThread")
+                    trackThreadActionsEvent("trashThread")
                     mainViewModel.deleteThreadOrMessage(threadUid)
                 }
                 //endregion
 
                 //region Actions
                 override fun onArchive(): Unit = with(mainViewModel) {
-                    trackMailActionsEvent("archiveThread", isCurrentFolderRole(FolderRole.ARCHIVE).toMailActionValue())
+                    trackThreadActionsEvent("archiveThread", isCurrentFolderRole(FolderRole.ARCHIVE))
                     mainViewModel.archiveThreadOrMessage(threadUid)
                 }
 
                 override fun onReadUnread() {
-                    trackMailActionsEvent("markAsSeenThread", (thread.unseenMessagesCount == 0).toMailActionValue())
+                    trackThreadActionsEvent("markAsSeenThread", thread.unseenMessagesCount == 0)
                     mainViewModel.toggleSeenStatus(threadUid)
                     findNavController().popBackStack(R.id.threadFragment, inclusive = true)
                 }
 
                 override fun onMove() {
-                    trackMailActionsEvent("moveThread")
+                    trackThreadActionsEvent("moveThread")
                     animatedNavigation(
                         resId = R.id.moveFragment,
                         args = MoveFragmentArgs(threadUid).toBundle(),
@@ -102,24 +100,24 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onPostpone() {
-                    trackMailActionsEvent("postponeThread")
+                    trackThreadActionsEvent("postponeThread")
                     TODO("Not yet implemented")
                 }
 
                 override fun onFavorite() {
-                    trackMailActionsEvent("favoriteThread", thread.isFavorite.toMailActionValue())
+                    trackThreadActionsEvent("favoriteThread", thread.isFavorite)
                     mainViewModel.toggleFavoriteStatus(threadUid)
                 }
 
                 override fun onSpam(): Unit = with(mainViewModel) {
-                    trackMailActionsEvent("spamThread", isCurrentFolderRole(FolderRole.SPAM).toMailActionValue())
+                    trackThreadActionsEvent("spamThread", isCurrentFolderRole(FolderRole.SPAM))
                     toggleSpamOrHam(threadUid)
                 }
 
                 override fun onReportJunk() = Unit
 
                 override fun onPrint() {
-                    trackMailActionsEvent("printThread")
+                    trackThreadActionsEvent("printThread")
                     notYetImplemented()
                 }
 
