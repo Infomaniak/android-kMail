@@ -21,6 +21,10 @@ package com.infomaniak.mail.data.models.message
 
 import io.realm.kotlin.types.EmbeddedRealmObject
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonTransformingSerializer
 
 @Serializable
 class Body : EmbeddedRealmObject {
@@ -31,6 +35,10 @@ class Body : EmbeddedRealmObject {
     // TODO: | - Cycles containing embedded objects are not currently supported: 'Body.subBody.body'
     // TODO: | - Cycles containing embedded objects are not currently supported: 'SubBody.body.subBody'
     // var subBody: RealmList<SubBody> = realmListOf()
+    // TODO: In the meantime, we store the `subBody` as a JSON String, and
+    // TODO: we'll have to manually deserialize it when we want to use it.
+    @Serializable(JsonAsStringSerializer::class)
+    var subBody: String? = null
 }
 
 // @Serializable
@@ -45,3 +53,8 @@ class Body : EmbeddedRealmObject {
 //     @SerialName("part_id")
 //     var partId: String? = null
 // }
+
+// Documentation: https://kotlinlang.org/api/kotlinx.serialization/kotlinx-serialization-json/kotlinx.serialization.json/-json-transforming-serializer/
+object JsonAsStringSerializer : JsonTransformingSerializer<String>(String.serializer()) {
+    override fun transformDeserialize(element: JsonElement): JsonElement = JsonPrimitive(element.toString())
+}
