@@ -47,6 +47,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListen
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.utils.setPaddingRelative
+import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
@@ -190,7 +191,10 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun setupListeners() = with(binding) {
 
-        toolbar.setNavigationOnClickListener { (activity as? MainActivity)?.binding?.drawerLayout?.open() }
+        toolbar.setNavigationOnClickListener {
+            trackMenuDrawerEvent("open")
+            (activity as? MainActivity)?.binding?.drawerLayout?.open()
+        }
 
         searchButton.setOnClickListener {
             safeNavigate(

@@ -101,15 +101,20 @@ class Folder : RealmObject {
         return role?.folderIconRes ?: if (isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder
     }
 
-    enum class FolderRole(@StringRes val folderNameRes: Int, @DrawableRes val folderIconRes: Int, val order: Int) {
-        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 0),
-        DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4),
-        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3),
-        SPAM(R.string.spamFolder, R.drawable.ic_spam, 5),
-        TRASH(R.string.trashFolder, R.drawable.ic_bin, 6),
-        ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7),
-        COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1),
-        SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2),
+    enum class FolderRole(
+        @StringRes val folderNameRes: Int,
+        @DrawableRes val folderIconRes: Int,
+        val order: Int,
+        val matomoValue: String,
+    ) {
+        INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 0, "inboxFolder"),
+        DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftsFolder"),
+        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3, "sentMessagesFolder"),
+        SPAM(R.string.spamFolder, R.drawable.ic_spam, 5, "spamFolder"),
+        TRASH(R.string.trashFolder, R.drawable.ic_bin, 6, "trashFolder"),
+        ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7, "archiveFolder"),
+        COMMERCIAL(R.string.commercialFolder, R.drawable.ic_promotions, 1, "commercialFolder"),
+        SOCIALNETWORKS(R.string.socialNetworksFolder, R.drawable.ic_social_media, 2, "socialNetworksFolder"),
     }
 
     companion object {

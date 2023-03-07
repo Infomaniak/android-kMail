@@ -42,7 +42,7 @@ abstract class MenuFoldersFragment : Fragment() {
         FolderAdapter(onClick = ::onFolderSelected, isInMenuDrawer = isInMenuDrawer)
     }
 
-    protected abstract fun onFolderSelected(folderId: String)
+    protected abstract fun onFolderSelected(folderId: String, matomoName: String? = null)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

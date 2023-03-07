@@ -40,6 +40,10 @@ object MatomoMail : MatomoCore {
         activity?.trackNewMessageEvent(name, value)
     }
 
+    fun Fragment.trackMenuDrawerEvent(name: String, value: Boolean? = null) {
+        trackEvent(category = "menuDrawer", name = name, value = value?.toFloat())
+    }
+
     fun Fragment.trackMailActionsEvent(name: String, value: Float? = null) {
         trackEvent(category = "actionsMail", name = name, value = value)
     }

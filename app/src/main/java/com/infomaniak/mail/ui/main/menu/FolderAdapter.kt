@@ -36,7 +36,7 @@ import com.infomaniak.lib.core.R as RCore
 class FolderAdapter(
     private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
-    private val onClick: (folderId: String) -> Unit,
+    private val onClick: (folderId: String, matomoName: String?) -> Unit,
     private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
@@ -67,7 +67,7 @@ class FolderAdapter(
         }
 
         folder.role?.let {
-            setFolderUi(folder.id, folderName, it.folderIconRes, badge)
+            setFolderUi(folder.id, folderName, it.folderIconRes, badge, matomoName = it.matomoValue)
         } ?: setFolderUi(
             id = folder.id,
             name = folderName,
@@ -85,6 +85,7 @@ class FolderAdapter(
         @DrawableRes iconId: Int,
         badgeText: Int,
         folderIndent: Int? = null,
+        matomoName: String? = null
     ) = with(item) {
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
@@ -95,7 +96,7 @@ class FolderAdapter(
 
         setSelectedState(currentFolderId == id)
 
-        setOnClickListener { onClick.invoke(id) }
+        setOnClickListener { onClick.invoke(id, matomoName) }
     }
 
     @SuppressLint("NotifyDataSetChanged")
