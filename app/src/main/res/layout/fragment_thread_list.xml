@@ -179,38 +179,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <FrameLayout
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="true">
+
+                    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                        android:id="@+id/threadsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:paddingBottom="@dimen/recyclerViewPaddingBottom"
+                        app:behind_swiped_item_icon_margin="@dimen/marginStandard"
+                        tools:listitem="@layout/cardview_thread_item" />
+
+                    <com.infomaniak.mail.ui.main.EmptyStateView
+                        android:id="@+id/emptyState"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        app:description="@string/noEmailDescription"
+                        app:icon="@drawable/ic_empty_state_no_mail"
+                        app:title="@string/noEmailTitle" />
+
+                </FrameLayout>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <com.infomaniak.mail.views.BottomQuickActionBarView
+                android:id="@+id/quickActionBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="true">
+                android:layout_gravity="bottom"
+                android:visibility="gone"
+                app:menu="@menu/multiselection_menu"
+                tools:visibility="visible" />
 
-                <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
-                    android:id="@+id/threadsList"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:clipToPadding="false"
-                    android:paddingBottom="@dimen/recyclerViewPaddingBottom"
-                    app:behind_swiped_item_icon_margin="@dimen/marginStandard"
-                    tools:listitem="@layout/cardview_thread_item" />
-
-                <com.infomaniak.mail.ui.main.EmptyStateView
-                    android:id="@+id/emptyState"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone"
-                    app:description="@string/noEmailDescription"
-                    app:icon="@drawable/ic_empty_state_no_mail"
-                    app:title="@string/noEmailTitle" />
-
-            </FrameLayout>
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

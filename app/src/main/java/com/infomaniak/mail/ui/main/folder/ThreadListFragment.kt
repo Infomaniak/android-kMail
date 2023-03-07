@@ -424,6 +424,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             val noUnread = mainViewModel.currentFolderLive.value?.let { it.unreadCount == 0 } == true
             binding.unreadCountChip.isGone = isMultiSelectOn || noUnread
+
+            newMessageFab.isGone = isMultiSelectOn
+            quickActionBar.isVisible = isMultiSelectOn
+            val navBarColor = context.getColor(if (isMultiSelectOn) R.color.elevatedBackground else R.color.backgroundColor)
+            requireActivity().window.navigationBarColor = navBarColor
         }
 
         threadListViewModel.selectedThreadUids.observe(viewLifecycleOwner) {
