@@ -65,7 +65,7 @@ class ThreadListAdapter(
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
     private val onSwipeFinished: () -> Unit,
-    private val multiSelection: MultiSelectionListener<Thread>,
+    private val multiSelection: MultiSelectionListener<Thread>? = null,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private var threadCount = -1
@@ -170,18 +170,20 @@ class ThreadListAdapter(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        updateSelectedState(thread)
+        multiSelection?.let {multiSelection ->
+            updateSelectedState(thread)
 
-        root.setOnClickListener {
-            if (multiSelection.isEnabled.value == true) toggleSelection(thread) else onThreadClicked?.invoke(thread)
-        }
-        root.setOnLongClickListener {
-            toggleSelection(thread)
-            true
+            root.setOnClickListener {
+                if (multiSelection.isEnabled.value == true) toggleSelection(thread) else onThreadClicked?.invoke(thread)
+            }
+            root.setOnLongClickListener {
+                toggleSelection(thread)
+                true
+            }
         }
     }
 
-    private fun CardviewThreadItemBinding.toggleSelection(thread: Thread) = with(multiSelection) {
+    private fun CardviewThreadItemBinding.toggleSelection(thread: Thread) = with(multiSelection!!) {
         isEnabled.value = true
         selectedItems.value?.let {
             if (it.contains(thread)) it.remove(thread) else it.add(thread)
@@ -192,7 +194,7 @@ class ThreadListAdapter(
 
     private fun CardviewThreadItemBinding.updateSelectedState(thread: Thread) {
         // TODO : Modify the ui accordingly
-        val isSelected = multiSelection.selectedItems.value?.contains(thread) == true
+        val isSelected = multiSelection?.selectedItems?.value?.contains(thread) == true
         root.backgroundTintList = if (isSelected) {
             ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
         } else {
@@ -391,7 +393,7 @@ class ThreadListAdapter(
     }
 
     fun selectUnselectAll() {
-        multiSelection.selectedItems.value?.let { selectedItems ->
+        multiSelection?.selectedItems?.value?.let { selectedItems ->
             if (selectedItems.count() == threadCount) {
                 selectedItems.clear()
             } else {

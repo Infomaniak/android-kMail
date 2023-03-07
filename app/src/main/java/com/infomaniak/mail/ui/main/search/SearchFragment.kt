@@ -40,18 +40,15 @@ import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView.L
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollDirection
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnListScrollListener.ScrollState
-import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.Utils
 import com.infomaniak.lib.core.utils.showKeyboard
 import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
-import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
-import com.infomaniak.mail.ui.main.folder.MultiSelectionListener
 import com.infomaniak.mail.ui.main.folder.ThreadListAdapter
 import com.infomaniak.mail.utils.addStickyDateDecoration
 import com.infomaniak.mail.utils.getLocalizedNameOrAllFolders
@@ -77,12 +74,6 @@ class SearchFragment : Fragment() {
             folderRole = null,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = {},
-            multiSelection = object : MultiSelectionListener<Thread> {
-                override val isEnabled: SingleLiveEvent<Boolean>
-                    get() = TODO("Not yet implemented")
-                override val selectedItems: SingleLiveEvent<MutableSet<Thread>>
-                    get() = TODO("Not yet implemented")
-            }
         )
     }
 
