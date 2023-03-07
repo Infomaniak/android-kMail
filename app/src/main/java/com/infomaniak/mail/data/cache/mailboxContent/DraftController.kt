@@ -143,7 +143,7 @@ object DraftController {
         val previousBody = message.body?.value ?: ""
 
         val ccList = if (message.cc.isNotEmpty()) {
-            "<div>$ccTitle ${message.cc.joinToString(", ") { it.forwardedDisplay() }}<br></div>"
+            "<div>$ccTitle ${message.cc.joinToString { it.forwardedDisplay() }}<br></div>"
         } else {
             ""
         }
@@ -154,7 +154,7 @@ object DraftController {
             <div>$fromTitle ${message.from.first().forwardedDisplay()}<br></div>
             <div>$dateTitle ${message.date.toDate()}<br></div>
             <div>$subjectTitle ${message.subject}<br></div>
-            <div>$toTitle ${message.to.joinToString(", ") { it.forwardedDisplay() }}<br></div>
+            <div>$toTitle ${message.to.joinToString { it.forwardedDisplay() }}<br></div>
             $ccList
             <div><br></div>
             <div><br></div>
