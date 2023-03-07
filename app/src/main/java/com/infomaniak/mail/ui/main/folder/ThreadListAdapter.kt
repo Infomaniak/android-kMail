@@ -171,14 +171,15 @@ class ThreadListAdapter(
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
         }
 
-        multiSelection?.let { multiSelection ->
-            val selectedThread = SelectedThread(thread)
+        val selectedThread = SelectedThread(thread)
 
+        root.setOnClickListener {
+            if (multiSelection?.isEnabled?.value == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
+        }
+
+        multiSelection?.let {
             updateSelectedState(selectedThread)
 
-            root.setOnClickListener {
-                if (multiSelection.isEnabled.value == true) toggleSelection(selectedThread) else onThreadClicked?.invoke(thread)
-            }
             root.setOnLongClickListener {
                 toggleSelection(selectedThread)
                 true
