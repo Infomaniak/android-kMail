@@ -23,8 +23,10 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.utils.SingleLiveEvent
 import com.infomaniak.lib.core.utils.guessMimeType
+import com.infomaniak.mail.MatomoMail.trackNewMessageEvent
 import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
 import com.infomaniak.mail.data.cache.mailboxContent.DraftController
@@ -226,6 +228,7 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
         autoSaveJob?.cancel()
 
         if (shouldExecuteAction(action)) {
+            trackSendingDraftEvent(action)
             saveDraftToLocal(action)
             withContext(Dispatchers.Main) { displayToast() }
         } else if (isNewMessage) {
@@ -288,6 +291,16 @@ class NewMessageViewModel(application: Application) : AndroidViewModel(applicati
                 val mimeType = file.path.guessMimeType()
                 Attachment().apply { initLocalValues(file.name, file.length(), mimeType, file.toUri().toString()) } to false
             } ?: (null to false)
+    }
+
+    private fun trackSendingDraftEvent(action: DraftAction) = with(draft) {
+        context.trackNewMessageEvent(action.matomoValue)
+        if (action == DraftAction.SEND) {
+            val trackerData = listOf("numberOfTo" to to, "numberOfCC" to cc, "numberOfBCC" to bcc)
+            trackerData.forEach { (eventName, recipients) ->
+                context.trackNewMessageEvent(eventName, recipients.size.toFloat(), TrackerAction.DATA)
+            }
+        }
     }
 
     override fun onCleared() {
