@@ -103,6 +103,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         setupListeners()
         setupUserAvatar()
         setupUnreadCountChip()
+        setupMultiSelectionActions()
 
         observeCurrentThreads()
         observeDownloadState()
@@ -163,7 +164,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             folderRole = mainViewModel.currentFolder.value?.role,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
-            multiSelection = object : MultiSelectionListener<String> {
+            multiSelection = object : MultiSelectionListener<Thread> {
                 override val isEnabled by mainViewModel::isMultiSelectOn
                 override val selectedItems by mainViewModel::selectedThreadUids
             }
@@ -336,6 +337,19 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    private fun setupMultiSelectionActions() {
+        binding.quickActionBar.setOnItemClickListener { menuId ->
+            when (menuId) {
+                R.id.quickActionUnread -> notYetImplemented()
+                R.id.quickActionArchive -> notYetImplemented()
+                R.id.quickActionFavorite -> notYetImplemented()
+                R.id.quickActionDelete -> notYetImplemented()
+                R.id.quickActionMenu -> notYetImplemented()
+            }
+            mainViewModel.isMultiSelectOn.value = false
+        }
+    }
+
     private fun observeCurrentThreads() = with(threadListViewModel) {
         mainViewModel.currentThreadsLiveToObserve.bindResultsChangeToAdapter(viewLifecycleOwner, threadListAdapter).apply {
             recyclerView = binding.threadsList
@@ -430,9 +444,33 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             requireActivity().window.navigationBarColor = navBarColor
         }
 
-        mainViewModel.selectedThreadUids.observe(viewLifecycleOwner) {
-            selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, it.count(), it.count())
+        mainViewModel.selectedThreadUids.observe(viewLifecycleOwner) { threads ->
+            selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, threads.count(), threads.count())
+
+            val (shouldRead, shouldFavorite) = computeReadFavoriteStatus(threads)
+
+            quickActionBar.apply {
+                changeIcon(0, if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
+                changeText(0, if (shouldRead) R.string.actionShortMarkAsRead else R.string.actionShortMarkAsUnread)
+
+                changeIcon(2, if (shouldFavorite) R.drawable.ic_star else R.drawable.ic_unstar)
+                // changeText(2, if (shouldFavorite) R.string.actionShortStar else R.string.actionShortStar) TODO : Use correct string
+            }
         }
+    }
+
+    private fun computeReadFavoriteStatus(threads: MutableSet<Thread>): Pair<Boolean, Boolean> {
+        var shouldUnRead = true
+        var shouldUnFavorite = true
+
+        for (thread in threads) {
+            val isSeen = thread.unseenMessagesCount == 0
+            shouldUnRead = shouldUnRead && isSeen
+            shouldUnFavorite = shouldUnFavorite && thread.isFavorite
+
+            if (!shouldUnRead && !shouldUnFavorite) break
+        }
+        return !shouldUnRead to !shouldUnFavorite
     }
 
     private fun updateUpdatedAt(newLastUpdatedDate: Date? = null) {

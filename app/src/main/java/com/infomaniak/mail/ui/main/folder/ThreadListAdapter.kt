@@ -65,7 +65,7 @@ class ThreadListAdapter(
     private var folderRole: FolderRole?,
     private var contacts: Map<Recipient, MergedContact>,
     private val onSwipeFinished: () -> Unit,
-    private val multiSelection: MultiSelectionListener<String>,
+    private val multiSelection: MultiSelectionListener<Thread>,
 ) : DragDropSwipeAdapter<Any, ThreadViewHolder>(mutableListOf()), RealmChangesBinding.OnRealmChanged<Thread> {
 
     private var threadCount = -1
@@ -112,7 +112,7 @@ class ThreadListAdapter(
 
             when (payload) {
                 NotificationType.AVATAR -> binding.displayAvatar(thread)
-                NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread.uid)
+                NotificationType.SELECTED_STATE -> binding.updateSelectedState(thread)
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
@@ -168,31 +168,31 @@ class ThreadListAdapter(
             threadCountCardview.isVisible = messagesCount > 1
 
             if (unseenMessagesCount == 0) setThreadUiRead() else setThreadUiUnread()
-
-            updateSelectedState(uid)
         }
+
+        updateSelectedState(thread)
 
         root.setOnClickListener {
-            if (multiSelection.isEnabled.value == true) toggleSelection(thread.uid) else onThreadClicked?.invoke(thread)
+            if (multiSelection.isEnabled.value == true) toggleSelection(thread) else onThreadClicked?.invoke(thread)
         }
         root.setOnLongClickListener {
-            toggleSelection(thread.uid)
+            toggleSelection(thread)
             true
         }
     }
 
-    private fun CardviewThreadItemBinding.toggleSelection(threadUid: String) = with(multiSelection) {
+    private fun CardviewThreadItemBinding.toggleSelection(thread: Thread) = with(multiSelection) {
         isEnabled.value = true
         selectedItems.value?.let {
-            if (it.contains(threadUid)) it.remove(threadUid) else it.add(threadUid)
+            if (it.contains(thread)) it.remove(thread) else it.add(thread)
             selectedItems.value = it // Trigger the observer
         }
-        updateSelectedState(threadUid)
+        updateSelectedState(thread)
     }
 
-    private fun CardviewThreadItemBinding.updateSelectedState(threadUid: String) {
+    private fun CardviewThreadItemBinding.updateSelectedState(thread: Thread) {
         // TODO : Modify the ui accordingly
-        val isSelected = multiSelection.selectedItems.value?.contains(threadUid) == true
+        val isSelected = multiSelection.selectedItems.value?.contains(thread) == true
         root.backgroundTintList = if (isSelected) {
             ColorStateList.valueOf(context.getAttributeColor(RMaterial.attr.colorPrimaryContainer))
         } else {
@@ -396,7 +396,7 @@ class ThreadListAdapter(
                 selectedItems.clear()
             } else {
                 dataSet.forEachIndexed { index, item ->
-                    if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add((item as Thread).uid)
+                    if (getItemViewType(index) == DisplayType.THREAD.layout) selectedItems.add(item as Thread)
                 }
             }
             multiSelection.selectedItems.value = selectedItems

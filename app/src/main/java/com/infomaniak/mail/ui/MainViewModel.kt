@@ -68,7 +68,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     //region Multi selection
     val isMultiSelectOn = SingleLiveEvent(false)
-    val selectedThreadUids = SingleLiveEvent(mutableSetOf<String>())
+    val selectedThreadUids = SingleLiveEvent(mutableSetOf<Thread>())
     //endregion
 
     val snackBarManager by lazy { SnackBarManager() }

@@ -47,6 +47,7 @@ import com.infomaniak.mail.MatomoMail.trackSearchEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.LocalSettings
 import com.infomaniak.mail.data.models.Folder
+import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentSearchBinding
 import com.infomaniak.mail.ui.MainViewModel
@@ -76,10 +77,10 @@ class SearchFragment : Fragment() {
             folderRole = null,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = {},
-            multiSelection = object : MultiSelectionListener<String> {
+            multiSelection = object : MultiSelectionListener<Thread> {
                 override val isEnabled: SingleLiveEvent<Boolean>
                     get() = TODO("Not yet implemented")
-                override val selectedItems: SingleLiveEvent<MutableSet<String>>
+                override val selectedItems: SingleLiveEvent<MutableSet<Thread>>
                     get() = TODO("Not yet implemented")
             }
         )
