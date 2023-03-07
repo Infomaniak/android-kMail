@@ -124,22 +124,22 @@ object DraftController {
                     attachments += it
                 }
 
-                body += forwardQuote(previousMessage, context)
+                body += context.forwardQuote(previousMessage)
             }
             DraftMode.NEW_MAIL -> Unit
         }
     }
 
-    private fun forwardQuote(message: Message, context: Context): String {
+    private fun Context.forwardQuote(message: Message): String {
 
         fun Recipient.forwardedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
 
-        val messageForwardHeader = context.getString(R.string.messageForwardHeader)
-        val fromTitle = context.getString(R.string.fromTitle)
-        val dateTitle = context.getString(R.string.dateTitle)
-        val subjectTitle = context.getString(R.string.subjectTitle)
-        val toTitle = context.getString(R.string.toTitle)
-        val ccTitle = context.getString(R.string.ccTitle)
+        val messageForwardHeader = getString(R.string.messageForwardHeader)
+        val fromTitle = getString(R.string.fromTitle)
+        val dateTitle = getString(R.string.dateTitle)
+        val subjectTitle = getString(R.string.subjectTitle)
+        val toTitle = getString(R.string.toTitle)
+        val ccTitle = getString(R.string.ccTitle)
         val previousBody = message.body?.value ?: ""
 
         val ccList = if (message.cc.isNotEmpty()) {
