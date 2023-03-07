@@ -59,6 +59,7 @@ import com.infomaniak.mail.data.LocalSettings.SwipeAction
 import com.infomaniak.mail.data.LocalSettings.ThreadDensity.COMPACT
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.FolderRole
+import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.databinding.FragmentThreadListBinding
@@ -164,9 +165,9 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             folderRole = mainViewModel.currentFolder.value?.role,
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
-            multiSelection = object : MultiSelectionListener<Thread> {
+            multiSelection = object : MultiSelectionListener<SelectedThread> {
                 override val isEnabled by mainViewModel::isMultiSelectOn
-                override val selectedItems by mainViewModel::selectedThreadUids
+                override val selectedItems by mainViewModel::selectedThreads
             }
         )
 
@@ -419,7 +420,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun observerMultiSelection() = with(binding) {
         mainViewModel.isMultiSelectOn.observe(viewLifecycleOwner) { isMultiSelectOn ->
             if (!isMultiSelectOn) {
-                mainViewModel.selectedThreadUids.value?.clear()
+                mainViewModel.selectedThreads.value?.clear()
                 threadListAdapter.updateSelection()
             }
 
@@ -444,10 +445,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             requireActivity().window.navigationBarColor = navBarColor
         }
 
-        mainViewModel.selectedThreadUids.observe(viewLifecycleOwner) { threads ->
-            selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, threads.count(), threads.count())
+        mainViewModel.selectedThreads.observe(viewLifecycleOwner) { selectedThreads ->
+            val threadCount = selectedThreads.count()
+            selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, threadCount, threadCount)
 
-            val (shouldRead, shouldFavorite) = computeReadFavoriteStatus(threads)
+            val (shouldRead, shouldFavorite) = computeReadFavoriteStatus(selectedThreads)
 
             quickActionBar.apply {
                 changeIcon(0, if (shouldRead) R.drawable.ic_envelope_open else R.drawable.ic_envelope)
@@ -459,11 +461,11 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun computeReadFavoriteStatus(threads: MutableSet<Thread>): Pair<Boolean, Boolean> {
+    private fun computeReadFavoriteStatus(selectedThreads: MutableSet<SelectedThread>): Pair<Boolean, Boolean> {
         var shouldUnRead = true
         var shouldUnFavorite = true
 
-        for (thread in threads) {
+        for (thread in selectedThreads) {
             val isSeen = thread.unseenMessagesCount == 0
             shouldUnRead = shouldUnRead && isSeen
             shouldUnFavorite = shouldUnFavorite && thread.isFavorite

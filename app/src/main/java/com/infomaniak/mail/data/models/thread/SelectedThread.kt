@@ -15,11 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.infomaniak.mail.ui.main.folder
+package com.infomaniak.mail.data.models.thread
 
-import androidx.lifecycle.MutableLiveData
+class SelectedThread(thread: Thread) {
+    val uid: String
+    val isFavorite: Boolean
+    val unseenMessagesCount: Int
 
-interface MultiSelectionListener<T> {
-    val isEnabled: MutableLiveData<Boolean>
-    val selectedItems: MutableLiveData<MutableSet<T>>
+    init {
+        uid = thread.uid
+        isFavorite = thread.isFavorite
+        unseenMessagesCount = thread.unseenMessagesCount
+    }
+
+    override fun equals(other: Any?): Boolean = other is SelectedThread && uid == other.uid
+
+    override fun hashCode(): Int {
+        var result = uid.hashCode()
+        result = 31 * result + isFavorite.hashCode()
+        result = 31 * result + unseenMessagesCount
+        return result
+    }
 }

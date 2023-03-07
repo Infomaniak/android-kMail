@@ -35,6 +35,7 @@ import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.correspondent.MergedContact
 import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.data.models.thread.SelectedThread
 import com.infomaniak.mail.data.models.thread.Thread
 import com.infomaniak.mail.data.models.thread.Thread.ThreadFilter
 import com.infomaniak.mail.ui.main.SnackBarManager
@@ -67,8 +68,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
 
     //region Multi selection
-    val isMultiSelectOn = SingleLiveEvent(false)
-    val selectedThreadUids = SingleLiveEvent(mutableSetOf<Thread>())
+    val isMultiSelectOn = MutableLiveData(false)
+    val selectedThreads = MutableLiveData(mutableSetOf<SelectedThread>())
     //endregion
 
     val snackBarManager by lazy { SnackBarManager() }
