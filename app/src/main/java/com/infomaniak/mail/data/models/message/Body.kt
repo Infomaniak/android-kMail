@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+// @file:UseSerializers(RealmListSerializer::class, RealmInstantSerializer::class)
+
 package com.infomaniak.mail.data.models.message
 
 import io.realm.kotlin.types.EmbeddedRealmObject
@@ -24,5 +26,22 @@ import kotlinx.serialization.Serializable
 class Body : EmbeddedRealmObject {
     var value: String = ""
     var type: String = ""
-    var subBody: String? = null
+    // TODO: Realm doesn't allow us to do that for now:
+    // TODO: | Caused by: io.realm.kotlin.internal.interop.RealmCoreLogicException: [18]: Schema validation failed due to the following errors:
+    // TODO: | - Cycles containing embedded objects are not currently supported: 'Body.subBody.body'
+    // TODO: | - Cycles containing embedded objects are not currently supported: 'SubBody.body.subBody'
+    // var subBody: RealmList<SubBody> = realmListOf()
 }
+
+// @Serializable
+// class SubBody : EmbeddedRealmObject {
+//     var body: Body? = null
+//     var name: String? = null
+//     var type: String? = null
+//     var date: RealmInstant = Date().toRealmInstant()
+//     var subject: String? = null
+//     var from: RealmList<Recipient> = realmListOf()
+//     var to: RealmList<Recipient> = realmListOf()
+//     @SerialName("part_id")
+//     var partId: String? = null
+// }
