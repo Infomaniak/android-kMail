@@ -113,11 +113,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun isCurrentFolderRole(role: FolderRole) = currentFolder.value?.role == role
     //endregion
 
-    init {
-        // Delete search data in case they couldn't be deleted at the end of the previous Search.
-        viewModelScope.launch(Dispatchers.IO) { SearchUtils.deleteRealmSearchData() }
-    }
-
     private fun observeFolderAndFilter() = MediatorLiveData<Pair<Folder?, ThreadFilter>>().apply {
         value = currentFolder.value to currentFilter.value!!
         addSource(currentFolder) { value = it to value!!.second }
@@ -156,7 +151,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun loadCurrentMailboxFromLocal() {
+    private suspend fun loadCurrentMailboxFromLocal() {
         Log.d(TAG, "Load current mailbox from local")
         val userId = AccountUtils.currentUserId
         val mailboxId = AccountUtils.currentMailboxId
@@ -169,6 +164,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val folder = FolderController.getFolder(DEFAULT_SELECTED_FOLDER) ?: return
                 selectFolder(folder.id)
             }
+
+            // Delete search data in case they couldn't be deleted at the end of the previous Search.
+            SearchUtils.deleteRealmSearchData()
         }
     }
 
