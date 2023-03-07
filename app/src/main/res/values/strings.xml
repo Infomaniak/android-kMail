@@ -276,7 +276,6 @@
     <string name="settingsSendTitle">Send</string>
     <string name="settingsSwipeActionNone">None</string>
     <string name="settingsSwipeActionQuickActionsMenu">Quick actions menu</string>
-    <string name="settingsSwipeActionReadAndArchive">Read and archive</string>
     <string name="settingsSwipeActionReadUnread">Read / unread</string>
     <string name="settingsSwipeActionToDefine">To define</string>
     <string name="settingsSwipeActionsTitle">Swipe actions</string>

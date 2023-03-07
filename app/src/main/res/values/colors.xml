@@ -119,7 +119,6 @@
     <color name="swipeQuickActionMenu">@color/app_blue_light</color>
     <color name="swipeInbox">@color/shark</color>
     <color name="swipeNone">@color/shark</color>
-    <color name="swipeReadAndArchive">@color/prince_light</color>
 
     <!-- Other -->
     <color name="textInputStrokeColor">@color/mouse</color>

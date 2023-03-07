@@ -273,7 +273,6 @@
     <string name="settingsSendTitle">Envoi</string>
     <string name="settingsSwipeActionNone">Aucune</string>
     <string name="settingsSwipeActionQuickActionsMenu">Menu d’actions rapides</string>
-    <string name="settingsSwipeActionReadAndArchive">Lire et archiver</string>
     <string name="settingsSwipeActionReadUnread">Lu / non lu</string>
     <string name="settingsSwipeActionToDefine">À définir</string>
     <string name="settingsSwipeActionsTitle">Actions de balayage dans la messagerie</string>

@@ -83,12 +83,6 @@
                     app:text="@string/actionSpam" />
 
                 <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
-                    android:id="@+id/readAndArchive"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:text="@string/settingsSwipeActionReadAndArchive" />
-
-                <com.infomaniak.mail.ui.main.settings.SettingRadioButtonView
                     android:id="@+id/quickActionMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

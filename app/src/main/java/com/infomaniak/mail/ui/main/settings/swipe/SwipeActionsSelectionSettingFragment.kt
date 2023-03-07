@@ -56,7 +56,6 @@ class SwipeActionsSelectionSettingFragment : Fragment() {
                 R.id.favorite to FAVORITE,
                 R.id.postpone to POSTPONE,
                 R.id.spam to SPAM,
-                R.id.readAndArchive to READ_AND_ARCHIVE,
                 R.id.quickActionMenu to QUICKACTIONS_MENU,
                 R.id.none to NONE,
             )

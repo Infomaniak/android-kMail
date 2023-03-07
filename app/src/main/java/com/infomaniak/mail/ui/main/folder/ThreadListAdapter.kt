@@ -252,7 +252,7 @@ class ThreadListAdapter(
                 colorRes = swipeAction.colorRes,
                 iconRes = if (isFavorite) R.drawable.ic_unstar else swipeAction.iconRes,
             )
-            SwipeAction.ARCHIVE, SwipeAction.READ_AND_ARCHIVE -> computeDynamicAction(FolderRole.ARCHIVE, swipeAction)
+            SwipeAction.ARCHIVE -> computeDynamicAction(FolderRole.ARCHIVE, swipeAction)
             SwipeAction.SPAM -> computeDynamicAction(FolderRole.SPAM, swipeAction)
             else -> null
         }

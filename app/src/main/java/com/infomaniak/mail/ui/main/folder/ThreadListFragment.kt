@@ -275,10 +275,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 toggleSeenStatus(threadUid)
                 true
             }
-            SwipeAction.READ_AND_ARCHIVE -> {
-                readAndArchive(threadUid)
-                isCurrentFolderRole(FolderRole.ARCHIVE)
-            }
             SwipeAction.SPAM -> {
                 toggleSpamOrHam(threadUid)
                 false
