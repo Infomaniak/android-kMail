@@ -178,7 +178,7 @@ class ThreadListAdapter(
             0 -> context.getString(R.string.unknownRecipientTitle)
             1 -> recipients.single().displayedName(context)
             else -> {
-                recipients.joinToString(", ") {
+                recipients.joinToString {
                     with(it.displayedName(context)) {
                         if (isEmail()) substringBefore("@") else it.computeFirstAndLastName().first
                     }

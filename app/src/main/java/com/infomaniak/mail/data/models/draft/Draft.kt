@@ -60,7 +60,6 @@ class Draft : RealmObject {
 
     var subject: String? = null
     var body: String = ""
-    var quote: String? = null
     var attachments: RealmList<Attachment> = realmListOf()
 
     @SerialName("mime_type")
@@ -103,6 +102,9 @@ class Draft : RealmObject {
     @Transient
     @Ignore
     var uiSignature: String? = null
+    @Transient
+    @Ignore
+    var uiQuote: String? = null
     //endregion
 
     var action
@@ -164,6 +166,7 @@ class Draft : RealmObject {
 
     companion object {
         const val INFOMANIAK_SIGNATURE_HTML_CLASS_NAME = "editorUserSignature"
+        const val INFOMANIAK_QUOTE_HTML_CLASS_NAME = "forwardContentMessage"
 
         val actionPropertyName get() = Draft::_action.name
         private val draftJson = Json(ApiController.json) { encodeDefaults = true }

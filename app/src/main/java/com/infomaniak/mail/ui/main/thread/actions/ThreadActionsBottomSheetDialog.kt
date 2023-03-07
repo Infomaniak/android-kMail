@@ -66,7 +66,7 @@ class ThreadActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onForward() {
-                    notYetImplemented()
+                    safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUidToReply, currentClassName)
                 }
 
                 override fun onDelete() {

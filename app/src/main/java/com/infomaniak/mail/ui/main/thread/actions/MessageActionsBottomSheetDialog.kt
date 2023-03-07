@@ -63,7 +63,7 @@ class MessageActionsBottomSheetDialog : MailActionsBottomSheetDialog() {
                 }
 
                 override fun onForward() {
-                    notYetImplemented()
+                    safeNavigateToNewMessageActivity(DraftMode.FORWARD, messageUid, currentClassName)
                 }
 
                 override fun onDelete() {

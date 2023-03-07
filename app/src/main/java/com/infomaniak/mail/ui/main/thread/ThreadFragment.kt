@@ -151,9 +151,9 @@ class ThreadFragment : Fragment() {
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
                 R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
-                R.id.quickActionForward -> notYetImplemented()
-                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
+                R.id.quickActionForward -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
                 R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
+                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
                 R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
             }
         }
@@ -163,6 +163,7 @@ class ThreadFragment : Fragment() {
         threadViewModel.quickActionBarClicks.observe(viewLifecycleOwner) { (lastMessageToReplyTo, menuId) ->
             when (menuId) {
                 R.id.quickActionReply -> replyTo(lastMessageToReplyTo)
+                R.id.quickActionForward -> safeNavigateToNewMessageActivity(DraftMode.FORWARD, lastMessageToReplyTo.uid)
                 R.id.quickActionMenu -> safeNavigate(
                     ThreadFragmentDirections.actionThreadFragmentToThreadActionsBottomSheetDialog(
                         threadUid = navigationArgs.threadUid,
@@ -245,7 +246,7 @@ class ThreadFragment : Fragment() {
 
     private fun replyTo(message: Message) {
         if (message.getRecipientsForReplyTo(true).second.isEmpty()) {
-            safeNavigateToNewMessageActivity(DraftMode.REPLY, message.uid, ThreadFragment::class.java.name)
+            safeNavigateToNewMessageActivity(DraftMode.REPLY, message.uid)
         } else {
             safeNavigate(ThreadFragmentDirections.actionThreadFragmentToReplyBottomSheetDialog(messageUid = message.uid))
         }
@@ -313,11 +314,11 @@ class ThreadFragment : Fragment() {
     }
 
     private fun leaveThread() {
+        valueAnimator?.cancel()
         // TODO: The day we'll have the Notifications, this `popBackStack` will probably fail to execute correctly.
         // TODO: When opening a Thread via a Notification, the action of leaving this fragment
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
         // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
-        valueAnimator?.cancel()
         findNavController().popBackStack()
     }
 

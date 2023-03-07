@@ -17,11 +17,18 @@
  */
 package com.infomaniak.mail.data.cache.mailboxContent
 
+import android.content.Context
 import com.infomaniak.lib.core.utils.contains
+import com.infomaniak.mail.R
+import com.infomaniak.mail.data.api.ApiRepository
 import com.infomaniak.mail.data.cache.RealmDatabase
+import com.infomaniak.mail.data.cache.mailboxInfo.MailboxController
+import com.infomaniak.mail.data.models.correspondent.Recipient
 import com.infomaniak.mail.data.models.draft.Draft
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
+import com.infomaniak.mail.utils.AccountUtils
+import com.infomaniak.mail.utils.toDate
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.TypedRealm
 import io.realm.kotlin.UpdatePolicy
@@ -92,24 +99,68 @@ object DraftController {
     //endregion
 
     //region Open Draft
-    fun Draft.setPreviousMessage(draftMode: DraftMode, previousMessage: Message) {
+    fun Draft.setPreviousMessage(draftMode: DraftMode, previousMessage: Message, context: Context) {
 
         inReplyTo = previousMessage.messageId
 
         val previousReferences = if (previousMessage.references == null) "" else "${previousMessage.references} "
         references = "${previousReferences}${previousMessage.messageId}"
 
+        subject = formatSubject(draftMode, previousMessage.subject ?: "")
+
         when (draftMode) {
-            DraftMode.REPLY, DraftMode.REPLY_ALL -> inReplyToUid = previousMessage.uid
-            DraftMode.FORWARD -> forwardedUid = previousMessage.uid
+            DraftMode.REPLY, DraftMode.REPLY_ALL -> {
+                inReplyToUid = previousMessage.uid
+
+                val (toList, ccList) = previousMessage.getRecipientsForReplyTo(draftMode == DraftMode.REPLY_ALL)
+                to = toList.toRealmList()
+                cc = ccList.toRealmList()
+            }
+            DraftMode.FORWARD -> {
+                forwardedUid = previousMessage.uid
+
+                val mailboxUuid = MailboxController.getMailbox(AccountUtils.currentUserId, AccountUtils.currentMailboxId)!!.uuid
+                ApiRepository.attachmentsToForward(mailboxUuid, previousMessage).data?.attachments?.let {
+                    attachments += it
+                }
+
+                body += context.forwardQuote(previousMessage)
+            }
             DraftMode.NEW_MAIL -> Unit
         }
+    }
 
-        val (toList, ccList) = previousMessage.getRecipientsForReplyTo(draftMode == DraftMode.REPLY_ALL)
-        to = toList.toRealmList()
-        cc = ccList.toRealmList()
+    private fun Context.forwardQuote(message: Message): String {
 
-        subject = formatSubject(draftMode, previousMessage.subject ?: "")
+        fun Recipient.forwardedDisplay(): String = "${("$name ").ifBlank { "" }}&lt;$email&gt;"
+
+        val messageForwardHeader = getString(R.string.messageForwardHeader)
+        val fromTitle = getString(R.string.fromTitle)
+        val dateTitle = getString(R.string.dateTitle)
+        val subjectTitle = getString(R.string.subjectTitle)
+        val toTitle = getString(R.string.toTitle)
+        val ccTitle = getString(R.string.ccTitle)
+        val previousBody = message.body?.value ?: ""
+
+        val ccList = if (message.cc.isNotEmpty()) {
+            "<div>$ccTitle ${message.cc.joinToString { it.forwardedDisplay() }}<br></div>"
+        } else {
+            ""
+        }
+
+        return """
+            <div class="${Draft.INFOMANIAK_QUOTE_HTML_CLASS_NAME}">
+            <div>---------- $messageForwardHeader ---------<br></div>
+            <div>$fromTitle ${message.from.first().forwardedDisplay()}<br></div>
+            <div>$dateTitle ${message.date.toDate()}<br></div>
+            <div>$subjectTitle ${message.subject}<br></div>
+            <div>$toTitle ${message.to.joinToString { it.forwardedDisplay() }}<br></div>
+            $ccList
+            <div><br></div>
+            <div><br></div>
+            $previousBody
+            </div>
+        """.trimIndent()
     }
 
     private fun formatSubject(draftMode: DraftMode, subject: String): String {
