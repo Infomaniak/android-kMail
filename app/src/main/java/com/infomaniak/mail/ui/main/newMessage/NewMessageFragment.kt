@@ -301,7 +301,9 @@ class NewMessageFragment : Fragment() {
         if (hasExtra(Intent.EXTRA_TEXT)) {
             getStringExtra(Intent.EXTRA_SUBJECT)?.let { newMessageViewModel.draft.subject = it }
             getStringExtra(Intent.EXTRA_TEXT)?.let { newMessageViewModel.draft.uiBody = it }
-        } else {
+        }
+
+        if (hasExtra(Intent.EXTRA_STREAM)) {
             (parcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { uri ->
                 newMessageViewModel.importAttachments(listOf(uri))
             }
