@@ -43,10 +43,12 @@ import com.infomaniak.lib.core.utils.getBackNavigationResult
 import com.infomaniak.lib.core.utils.hasSupportedApplications
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.lib.core.views.DividerItemDecorator
+import com.infomaniak.mail.MatomoMail.toMailActionValue
 import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.api.ApiRoutes
 import com.infomaniak.mail.data.models.Attachment
+import com.infomaniak.mail.data.models.Folder.FolderRole
 import com.infomaniak.mail.data.models.draft.Draft.DraftMode
 import com.infomaniak.mail.data.models.message.Message
 import com.infomaniak.mail.data.models.thread.Thread
@@ -147,15 +149,33 @@ class ThreadFragment : Fragment() {
             }
         })
 
-        iconFavorite.setOnClickListener { mainViewModel.toggleFavoriteStatus(threadUid) }
+        iconFavorite.setOnClickListener {
+            trackThreadActionsEvent("favorite", threadViewModel.isThreadFavorite.toMailActionValue())
+            mainViewModel.toggleFavoriteStatus(threadUid)
+        }
 
         quickActionBar.setOnItemClickListener { menuId ->
             when (menuId) {
-                R.id.quickActionReply -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
-                R.id.quickActionForward -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
-                R.id.quickActionDelete -> mainViewModel.deleteThreadOrMessage(threadUid)
-                R.id.quickActionArchive -> mainViewModel.archiveThreadOrMessage(threadUid)
-                R.id.quickActionMenu -> threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                R.id.quickActionReply -> {
+                    trackThreadActionsEvent("reply")
+                    threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                }
+                R.id.quickActionForward -> {
+                    trackThreadActionsEvent("forward")
+                    threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                }
+                R.id.quickActionArchive -> {
+                    trackThreadActionsEvent("archive", mainViewModel.isCurrentFolderRole(FolderRole.ARCHIVE).toMailActionValue())
+                    mainViewModel.archiveThreadOrMessage(threadUid)
+                }
+                R.id.quickActionDelete -> {
+                    trackThreadActionsEvent("trash")
+                    mainViewModel.deleteThreadOrMessage(threadUid)
+                }
+                R.id.quickActionMenu -> {
+                    trackThreadActionsEvent("openBottomSheet")
+                    threadViewModel.clickOnQuickActionBar(threadUid, menuId)
+                }
             }
         }
     }
@@ -325,6 +345,10 @@ class ThreadFragment : Fragment() {
         // TODO: (either via a classic Back button, or via this `popBackStack`) will probably
         // TODO: do nothing instead of going back to the ThreadList fragment (as it should be).
         findNavController().popBackStack()
+    }
+
+    private fun trackThreadActionsEvent(name: String, value: Float? = null) {
+        trackEvent("threadActions", name, value = value)
     }
 
     private fun trackMessageEvent(name: String, value: Float? = null) {
