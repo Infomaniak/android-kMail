@@ -21,7 +21,6 @@ import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.infomaniak.lib.core.utils.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -33,9 +32,6 @@ class ThreadListViewModel : ViewModel() {
 
     val isRecoveringFinished = MutableLiveData(true)
     val updatedAtTrigger = MutableLiveData<Unit>()
-
-    val selectedThreadUids = SingleLiveEvent(mutableSetOf<String>())
-    var isMultiSelectOn = SingleLiveEvent(false)
 
     var currentFolderCursor: String? = null
     var currentThreadsCount: Int? = null

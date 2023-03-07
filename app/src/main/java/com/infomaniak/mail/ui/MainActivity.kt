@@ -130,6 +130,10 @@ class MainActivity : ThemedActivity() {
             (menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDrawer()
         }
 
+        fun closeMultiSelect() {
+            mainViewModel.isMultiSelectOn.value = false
+        }
+
         fun popBack() {
             if (navController.currentDestination?.id == R.id.threadListFragment) {
                 finish()
@@ -139,7 +143,11 @@ class MainActivity : ThemedActivity() {
         }
 
         onBackPressedDispatcher.addCallback(this@MainActivity) {
-            if (drawerLayout.isOpen) closeDrawer() else popBack()
+            when {
+                drawerLayout.isOpen -> closeDrawer()
+                mainViewModel.isMultiSelectOn.value == true -> closeMultiSelect()
+                else -> popBack()
+            }
         }
     }
 

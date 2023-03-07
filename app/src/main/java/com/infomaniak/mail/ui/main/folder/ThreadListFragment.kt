@@ -164,8 +164,8 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             contacts = mainViewModel.mergedContacts.value ?: emptyMap(),
             onSwipeFinished = { isRecoveringFinished.value = true },
             multiSelection = object : MultiSelectionListener<String> {
-                override var isEnabled by threadListViewModel::isMultiSelectOn
-                override val selectedItems by threadListViewModel::selectedThreadUids
+                override val isEnabled by mainViewModel::isMultiSelectOn
+                override val selectedItems by mainViewModel::selectedThreadUids
             }
         )
 
@@ -205,13 +205,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             (activity as? MainActivity)?.binding?.drawerLayout?.open()
         }
 
-        cancel.setOnClickListener {
-            threadListViewModel.apply {
-                isMultiSelectOn.value = false
-                selectedThreadUids.value?.clear()
-            }
-            threadListAdapter.updateSelection()
-        }
+        cancel.setOnClickListener { mainViewModel.isMultiSelectOn.value = false }
         selectAll.setOnClickListener { threadListAdapter.selectUnselectAll() }
 
         searchButton.setOnClickListener {
@@ -409,7 +403,12 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun observerMultiSelection() = with(binding) {
-        threadListViewModel.isMultiSelectOn.observe(viewLifecycleOwner) { isMultiSelectOn ->
+        mainViewModel.isMultiSelectOn.observe(viewLifecycleOwner) { isMultiSelectOn ->
+            if (!isMultiSelectOn) {
+                mainViewModel.selectedThreadUids.value?.clear()
+                threadListAdapter.updateSelection()
+            }
+
             toolbar.isGone = isMultiSelectOn
             toolbarSelection.isVisible = isMultiSelectOn
 
@@ -431,7 +430,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             requireActivity().window.navigationBarColor = navBarColor
         }
 
-        threadListViewModel.selectedThreadUids.observe(viewLifecycleOwner) {
+        mainViewModel.selectedThreadUids.observe(viewLifecycleOwner) {
             selectedCount.text = resources.getQuantityString(R.plurals.multipleSelectionCount, it.count(), it.count())
         }
     }
@@ -459,7 +458,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         binding.unreadCountChip.apply {
             text = resources.getQuantityString(R.plurals.threadListHeaderUnreadCount, unreadCount, formatUnreadCount(unreadCount))
-            isGone = unreadCount == 0 || threadListViewModel.isMultiSelectOn.value == true
+            isGone = unreadCount == 0 || mainViewModel.isMultiSelectOn.value == true
         }
     }
 

@@ -60,10 +60,17 @@ import com.infomaniak.lib.core.R as RCore
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private inline val context: Context get() = getApplication<Application>()
+
     val isInternetAvailable = SingleLiveEvent<Boolean>()
-    var isDownloadingChanges = MutableLiveData(false)
+    val isDownloadingChanges = MutableLiveData(false)
     val isNewFolderCreated = SingleLiveEvent<Boolean>()
-    var mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+    val mergedContacts = MutableLiveData<Map<Recipient, MergedContact>?>()
+
+    //region Multi selection
+    val isMultiSelectOn = SingleLiveEvent(false)
+    val selectedThreadUids = SingleLiveEvent(mutableSetOf<String>())
+    //endregion
+
     val snackBarManager by lazy { SnackBarManager() }
 
     val toggleLightThemeForMessage = SingleLiveEvent<Message>()
