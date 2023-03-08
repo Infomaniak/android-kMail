@@ -108,8 +108,8 @@ class Folder : RealmObject {
         val matomoValue: String,
     ) {
         INBOX(R.string.inboxFolder, R.drawable.ic_drawer_inbox, 0, "inboxFolder"),
-        DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftsFolder"),
-        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3, "sentMessagesFolder"),
+        DRAFT(R.string.draftFolder, R.drawable.ic_draft, 4, "draftFolder"),
+        SENT(R.string.sentFolder, R.drawable.ic_sent_messages, 3, "sentFolder"),
         SPAM(R.string.spamFolder, R.drawable.ic_spam, 5, "spamFolder"),
         TRASH(R.string.trashFolder, R.drawable.ic_bin, 6, "trashFolder"),
         ARCHIVE(R.string.archiveFolder, R.drawable.ic_archive_folder, 7, "archiveFolder"),

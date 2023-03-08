@@ -48,8 +48,12 @@ object MatomoMail : MatomoCore {
         activity?.trackNewMessageEvent(name, value)
     }
 
-    fun Fragment.trackMenuDrawerEvent(name: String, value: Boolean? = null) {
-        trackEvent(category = "menuDrawer", name = name, value = value?.toFloat())
+    fun Fragment.trackMenuDrawerEvent(name: String, value: Float? = null) {
+        activity?.trackMenuDrawerEvent(name, value = value)
+    }
+
+    fun Context.trackMenuDrawerEvent(name: String, action: TrackerAction = TrackerAction.CLICK, value: Float? = null) {
+        trackEvent("menuDrawer", name, action, value)
     }
 
     // We need to invert this logical value to keep a coherent value for analytics

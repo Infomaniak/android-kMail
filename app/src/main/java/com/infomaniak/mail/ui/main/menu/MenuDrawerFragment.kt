@@ -36,6 +36,7 @@ import com.infomaniak.lib.bugtracker.BugTrackerActivityArgs
 import com.infomaniak.lib.core.utils.UtilsUi.openUrl
 import com.infomaniak.lib.core.utils.safeNavigate
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.toFloat
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
@@ -98,12 +99,12 @@ class MenuDrawerFragment : MenuFoldersFragment() {
                 isVisible = !isVisible
                 mailboxExpandButton.toggleChevron(!isVisible)
                 mailboxSwitcherText.setTextAppearance(if (isVisible) R.style.BodyMedium_Accent else R.style.BodyMedium)
-                trackMenuDrawerEvent("mailboxes", isVisible)
+                trackMenuDrawerEvent("mailboxes", isVisible.toFloat())
             }
         }
 
         customFolders.setOnClickListener {
-            trackMenuDrawerEvent("customFolders", !customFolders.isCollapsed)
+            trackMenuDrawerEvent("customFolders", (!customFolders.isCollapsed).toFloat())
             customFoldersLayout.isGone = customFolders.isCollapsed
         }
 
@@ -141,7 +142,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         }
 
         advancedActions.setOnClickListener {
-            trackMenuDrawerEvent("advancedActions", !advancedActions.isCollapsed)
+            trackMenuDrawerEvent("advancedActions", (!advancedActions.isCollapsed).toFloat())
             advancedActionsLayout.isGone = advancedActions.isCollapsed
         }
 
@@ -165,8 +166,7 @@ class MenuDrawerFragment : MenuFoldersFragment() {
         binding.addressesList.adapter = addressAdapter
     }
 
-    override fun onFolderSelected(folderId: String, matomoName: String?) {
-        matomoName?.let { trackMenuDrawerEvent(it) }
+    override fun onFolderSelected(folderId: String) {
         mainViewModel.openFolder(folderId)
         closeDrawer()
     }

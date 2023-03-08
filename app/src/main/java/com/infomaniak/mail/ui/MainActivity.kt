@@ -26,13 +26,14 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.annotation.FloatRange
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
-import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
+import androidx.drawerlayout.widget.DrawerLayout.*
 import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
 import com.infomaniak.mail.checkPlayServices
@@ -63,20 +64,31 @@ class MainActivity : ThemedActivity() {
     }
 
     private val drawerListener = object : DrawerLayout.DrawerListener {
+
+        var hasDragged = false
+
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             colorSystemBarsWithMenuDrawer(slideOffset)
         }
 
         override fun onDrawerOpened(drawerView: View) {
+            if (hasDragged) trackMenuDrawerEvent("openByGesture", TrackerAction.DRAG)
             colorSystemBarsWithMenuDrawer()
             (binding.menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.onDrawerOpened()
         }
 
         override fun onDrawerClosed(drawerView: View) {
+            if (hasDragged) trackMenuDrawerEvent("closeByGesture", TrackerAction.DRAG)
             (binding.menuDrawerFragment.getFragment() as? MenuDrawerFragment)?.closeDropdowns()
         }
 
-        override fun onDrawerStateChanged(newState: Int) = Unit
+        override fun onDrawerStateChanged(newState: Int) {
+            when (newState) {
+                STATE_DRAGGING -> hasDragged = true
+                STATE_IDLE -> hasDragged = false
+                else -> Unit
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

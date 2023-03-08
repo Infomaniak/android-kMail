@@ -192,7 +192,7 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun setupListeners() = with(binding) {
 
         toolbar.setNavigationOnClickListener {
-            trackMenuDrawerEvent("open")
+            trackMenuDrawerEvent("openByButton")
             (activity as? MainActivity)?.binding?.drawerLayout?.open()
         }
 

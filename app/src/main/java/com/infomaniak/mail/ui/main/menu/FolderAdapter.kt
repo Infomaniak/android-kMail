@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.R
 import com.infomaniak.mail.data.models.Folder
 import com.infomaniak.mail.data.models.Folder.*
@@ -36,7 +37,7 @@ import com.infomaniak.lib.core.R as RCore
 class FolderAdapter(
     private var folders: List<Folder> = emptyList(),
     private var currentFolderId: String? = null,
-    private val onClick: (folderId: String, matomoName: String?) -> Unit,
+    private val onClick: (folderId: String) -> Unit,
     private val isInMenuDrawer: Boolean = true,
 ) : RecyclerView.Adapter<FolderViewHolder>() {
 
@@ -67,14 +68,19 @@ class FolderAdapter(
         }
 
         folder.role?.let {
-            setFolderUi(folder.id, folderName, it.folderIconRes, badge, matomoName = it.matomoValue)
-        } ?: setFolderUi(
-            id = folder.id,
-            name = folderName,
-            iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
-            badgeText = badge,
-            folderIndent = min(folder.path.split(folder.separator).size - 1, MAX_SUB_FOLDERS_INDENT),
-        )
+            setFolderUi(folder.id, folderName, it.folderIconRes, badge, it.matomoValue)
+        } ?: run {
+            val indentLevel = folder.path.split(folder.separator).size - 1
+            setFolderUi(
+                id = folder.id,
+                name = folderName,
+                iconId = if (folder.isFavorite) R.drawable.ic_folder_star else R.drawable.ic_folder,
+                badgeText = badge,
+                trackerName = "customFolder",
+                trackerValue = indentLevel.toFloat(),
+                folderIndent = min(indentLevel, MAX_SUB_FOLDERS_INDENT),
+            )
+        }
     }
 
     override fun getItemCount() = folders.size
@@ -84,8 +90,9 @@ class FolderAdapter(
         name: String,
         @DrawableRes iconId: Int,
         badgeText: Int,
+        trackerName: String,
+        trackerValue: Float? = null,
         folderIndent: Int? = null,
-        matomoName: String? = null
     ) = with(item) {
         text = name
         icon = AppCompatResources.getDrawable(context, iconId)
@@ -96,7 +103,10 @@ class FolderAdapter(
 
         setSelectedState(currentFolderId == id)
 
-        setOnClickListener { onClick.invoke(id, matomoName) }
+        setOnClickListener {
+            if (isInMenuDrawer) context.trackMenuDrawerEvent(trackerName, value = trackerValue)
+            onClick.invoke(id)
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
