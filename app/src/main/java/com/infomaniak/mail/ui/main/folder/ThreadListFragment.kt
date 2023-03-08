@@ -347,7 +347,6 @@ class ThreadListFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 R.id.quickActionDelete -> notYetImplemented()
                 R.id.quickActionMenu -> notYetImplemented()
             }
-            mainViewModel.isMultiSelectOn.value = false
         }
     }
 
