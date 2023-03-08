@@ -145,7 +145,7 @@ class LocalSettings private constructor(context: Context) {
         ARCHIVE(R.string.actionArchive, R.color.swipeArchive, R.drawable.ic_archive_folder),
         READ_UNREAD(R.string.settingsSwipeActionReadUnread, R.color.swipeReadUnread, R.drawable.ic_envelope),
         MOVE(R.string.actionMove, R.color.swipeMove, R.drawable.ic_email_action_move),
-        FAVORITE(R.string.favoritesFolder, R.color.swipeFavorite, R.drawable.ic_star),
+        FAVORITE(R.string.actionShortStar, R.color.swipeFavorite, R.drawable.ic_star),
         POSTPONE(R.string.actionPostpone, R.color.swipePostpone, R.drawable.ic_alarm_clock),
         SPAM(R.string.actionSpam, R.color.swipeSpam, R.drawable.ic_spam),
         READ_AND_ARCHIVE(R.string.settingsSwipeActionReadAndArchive, R.color.swipeReadAndArchive, R.drawable.ic_archive_folder),
