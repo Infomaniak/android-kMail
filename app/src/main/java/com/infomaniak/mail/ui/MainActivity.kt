@@ -33,6 +33,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.networking.LiveDataNetworkStatus
 import com.infomaniak.mail.BuildConfig
+import com.infomaniak.mail.MatomoMail.trackEvent
 import com.infomaniak.mail.MatomoMail.trackMenuDrawerEvent
 import com.infomaniak.mail.MatomoMail.trackScreen
 import com.infomaniak.mail.R
@@ -167,6 +168,7 @@ class MainActivity : ThemedActivity() {
         }
 
         mainViewModel.snackBarManager.setup(this, ::getAnchor) {
+            trackEvent("snackbar", "undo")
             mainViewModel.undoAction(it)
         }
     }

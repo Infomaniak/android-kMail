@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.infomaniak.lib.core.InfomaniakCore
+import com.infomaniak.lib.core.MatomoCore.TrackerAction
 import com.infomaniak.lib.core.models.ApiError
 import com.infomaniak.lib.core.models.ApiResponse
 import com.infomaniak.lib.core.models.user.User
@@ -263,6 +264,7 @@ class LoginActivity : AppCompatActivity() {
                             }
                             else -> {
                                 apiResponse.data?.let { mailboxes ->
+                                    context.trackAccountEvent("nbMailboxes", TrackerAction.DATA, mailboxes.count().toFloat())
                                     AccountUtils.addUser(it)
                                     MailboxController.updateMailboxes(context, mailboxes)
 

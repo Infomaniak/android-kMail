@@ -20,6 +20,7 @@ package com.infomaniak.mail.ui.main.user
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.infomaniak.mail.MatomoMail.trackAccountEvent
 import com.infomaniak.mail.databinding.ItemMailboxMyAccountBinding
 
 class SimpleMailboxAdapter : RecyclerView.Adapter<SimpleMailboxAdapter.SimpleMailboxViewHolder>() {
@@ -30,7 +31,10 @@ class SimpleMailboxAdapter : RecyclerView.Adapter<SimpleMailboxAdapter.SimpleMai
     }
 
     override fun onBindViewHolder(holder: SimpleMailboxViewHolder, position: Int): Unit = with(holder.binding) {
-        email.text = mailboxes[position]
+        email.apply {
+            text = mailboxes[position]
+            setOnClickListener { context.trackAccountEvent("selectMailAddress") }
+        }
     }
 
     override fun getItemCount(): Int = mailboxes.count()

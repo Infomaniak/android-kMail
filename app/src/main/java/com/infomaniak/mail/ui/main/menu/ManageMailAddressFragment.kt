@@ -58,7 +58,10 @@ class ManageMailAddressFragment : Fragment() {
 
         changeAccountButton.setOnClickListener { animatedNavigation(ManageMailAddressFragmentDirections.actionManageMailAddressFragmentToSwitchUserFragment()) }
 
-        disconnectAccountButton.setOnClickListener { logoutAlert.show() }
+        disconnectAccountButton.setOnClickListener {
+            activity?.trackAccountEvent("logOut")
+            logoutAlert.show()
+        }
 
         mailboxesRecyclerView.apply {
             adapter = simpleMailboxAdapter
@@ -71,7 +74,7 @@ class ManageMailAddressFragment : Fragment() {
     }
 
     private fun removeCurrentUser() = lifecycleScope.launch(Dispatchers.IO) {
-        activity?.trackAccountEvent("logOut")
+        activity?.trackAccountEvent("logOutConfirm")
         AccountUtils.removeUser(requireContext(), AccountUtils.currentUser!!)
     }
 
