@@ -311,52 +311,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //region Archive
-    fun readAndArchive(threadUid: String) = viewModelScope.launch(Dispatchers.IO) {
-        val mailbox = currentMailbox.value!!
-        val archiveId = FolderController.getFolder(FolderRole.ARCHIVE)!!.id
-        val messagesFoldersIds = mutableListOf<String>()
-        val thread = ThreadController.getThread(threadUid)!!
-
-        if (thread.unseenMessagesCount > 0) markAsSeen(mailbox, thread, withRefresh = false)?.also(messagesFoldersIds::addAll)
-        archiveThreadOrMessageSync(threadUid, withRefresh = false)?.also(messagesFoldersIds::addAll)
-
-        if (messagesFoldersIds.isNotEmpty()) refreshFolders(mailbox, messagesFoldersIds, archiveId)
-    }
-
     fun archiveThreadOrMessage(threadUid: String, message: Message? = null) = viewModelScope.launch(Dispatchers.IO) {
-        archiveThreadOrMessageSync(threadUid, message)
-    }
-
-    private suspend fun archiveThreadOrMessageSync(
-        threadUid: String,
-        message: Message? = null,
-        withRefresh: Boolean = true,
-    ): List<String>? {
         val mailbox = currentMailbox.value!!
         val thread = ThreadController.getThread(threadUid)!!
 
         val isArchived = message?.let { it.folder.role == FolderRole.ARCHIVE } ?: isCurrentFolderRole(FolderRole.ARCHIVE)
 
         val destinationFolderRole = if (isArchived) FolderRole.INBOX else FolderRole.ARCHIVE
-        val destinationFolder = FolderController.getFolder(destinationFolderRole) ?: return null
+        val destinationFolder = FolderController.getFolder(destinationFolderRole)!!
 
         val messages = getMessagesToMove(thread, message)
 
         val apiResponse = ApiRepository.moveMessages(mailbox.uuid, messages.getUids(), destinationFolder.id)
 
-        var impactedFoldersIds: List<String>? = null
         if (apiResponse.isSuccess()) {
             val messagesFoldersIds = messages.getFoldersIds(exception = destinationFolder.id)
-            if (withRefresh) {
-                refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id)
-            } else {
-                impactedFoldersIds = messagesFoldersIds
-            }
+            refreshFolders(mailbox, messagesFoldersIds, destinationFolder.id)
         }
 
         showMoveSnackbar(thread.folderId, message, messages, apiResponse, destinationFolder)
-
-        return impactedFoldersIds
     }
     //endregion
 
